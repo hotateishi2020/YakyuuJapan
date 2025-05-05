@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:logger/logger.dart';
+
+final logger = Logger();
 
 void main() {
   runApp(const MyApp());
@@ -7,119 +12,159 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Flutter + Neon',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: Scaffold(
+        appBar: AppBar(title: Text("順位予想")),
+        body: PredictionPage(),
+      ),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class PredictionPage extends StatefulWidget {
+  const PredictionPage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<PredictionPage> createState() => _PredictionPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _PredictionPageState extends State<PredictionPage> {
+  List<Map<String, dynamic>> predictions = [];
+  bool isLoading = true;
+  String? error;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
+    fetchPredictions();
+  }
+
+  Future<void> fetchPredictions() async {
+    try {
+      final response = await http.get(Uri.parse('http://192.168.0.58:5050/predictions'));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as List;
+        setState(() {
+          predictions = data.map((e) => Map<String, dynamic>.from(e)).toList();
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          error = 'HTTPエラー: ${response.statusCode}';
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      logger.e('通信エラー: $e');
+      setState(() {
+        error = '通信エラー: $e';
+        isLoading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+    if (isLoading) return const Center(child: CircularProgressIndicator());
+    if (error != null) return Center(child: Text(error!));
+
+    return PredictionGrid(predictions: predictions);
+  }
+}
+
+class PredictionGrid extends StatelessWidget {
+  final List<Map<String, dynamic>> predictions;
+
+  const PredictionGrid({super.key, required this.predictions});
+
+  @override
+  Widget build(BuildContext context) {
+    // ユーザーごとにグループ化
+    final groupedByUser = <String, List<Map<String, dynamic>>>{};
+    for (var item in predictions) {
+      final user = item['name_user_last'];
+      groupedByUser.putIfAbsent(user, () => []).add(item);
+    }
+
+    return Center( // 全体を中央寄せ
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center, // ✅ 中央に配置
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: groupedByUser.entries.map((entry) {
+            final userName = entry.key;
+            final userPredictions = entry.value;
+
+            final league1 = userPredictions
+                .where((e) => e['id_league'] == 1)
+                .toList()
+              ..sort((a, b) => a['int_rank'].compareTo(b['int_rank']));
+            final league2 = userPredictions
+                .where((e) => e['id_league'] == 2)
+                .toList()
+              ..sort((a, b) => a['int_rank'].compareTo(b['int_rank']));
+
+            return SizedBox(
+              width: 300,
+              child: Card(
+                elevation: 3,
+                margin: const EdgeInsets.only(right: 16),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text('$userName さんの予想',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                      const SizedBox(height: 12),
+                      Text('セ・リーグ', style: Theme.of(context).textTheme.titleMedium),
+                      const SizedBox(height: 6),
+                      ...league1.map(_buildTeamRow),
+                      const SizedBox(height: 12),
+                      Text('パ・リーグ', style: Theme.of(context).textTheme.titleMedium),
+                      const SizedBox(height: 6),
+                      ...league2.map(_buildTeamRow),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+
+  Widget _buildTeamRow(Map<String, dynamic> team) {
+  return Container(
+    margin: const EdgeInsets.only(bottom: 8),
+    padding: const EdgeInsets.all(6),
+    decoration: BoxDecoration(
+      border: Border.all(color: Colors.grey.shade300),
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text('${team['int_rank']}'),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            team['name_team_short'],
+            style: const TextStyle(fontWeight: FontWeight.bold),
+            textAlign: TextAlign.right,
+          ),
+        ),
+      ],
+    ),
+  );
+}
 }

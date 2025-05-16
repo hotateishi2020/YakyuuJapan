@@ -1,55 +1,43 @@
 import 'dart:convert';
-// import 'dart:io';
+import 'dart:io';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:postgres/postgres.dart';
-import 'dart:io';
-
-// NeonのPostgreSQL接続情報
-final connection = PostgreSQLConnection(
-  'ep-wandering-bonus-a7vpjxw5-pooler.ap-southeast-2.aws.neon.tech',  // Neonのホスト
-  5432,                  // 標準PostgreSQLポート
-  'neondb',  // データベース名
-  username: 'neondb_owner',  // ユーザー名
-  password: 'npg_fAUXQBOVj19K',  // パスワード
-  useSSL: true,
-);
+import 'package:koko/tools/sql.dart';
+import 'package:koko/tools/FetchURL.dart';
 
 final app = Router();
 
+// ✅ 毎回新しい接続を作成する関数
+Future<PostgreSQLConnection> createConnection() async {
+  final conn = PostgreSQLConnection(
+    'ep-wandering-bonus-a7vpjxw5-pooler.ap-southeast-2.aws.neon.tech',
+    5432,
+    'neondb',
+    username: 'neondb_owner',
+    password: 'npg_fAUXQBOVj19K',
+    useSSL: true,
+  );
+  await conn.open();
+  await conn.query('SET search_path TO public');
+  return conn;
+}
+
 void main() async {
-  print('b1');
-  await connection.open();  // DB接続
-  await connection.query("SET search_path TO public");
+  print('index.dart:main');
 
-  // /users エンドポイントでデータをJSON形式で返す
-app.get('/predictions', (Request request) async {
-  try {
-    print('== START /users ==');
-    final users = <Map<String, dynamic>>[];
+  // エンドポイント
+  app.get('/predictions', (Request request) async {
+    final conn = await createConnection(); // ✅ 毎回新しい接続
 
-    var sql = '';
-    sql += 'SELECT';
-    sql += '    t_predict_team.id AS id_predict, ';
-    sql += '    m_user.id AS id_user, ';
-    sql += '    m_user.name_last, ';
-    sql += '    m_team.name_short, ';
-    sql += '    m_team.id_league, ';
-    sql += '    int_rank, ';
-    sql += '    flg_champion ';
-    sql += 'FROM t_predict_team ';
-    sql += '    LEFT OUTER JOIN m_user ON m_user.id = t_predict_team.id_user ';
-    sql += '    LEFT OUTER JOIN m_team ON m_team.id = t_predict_team.id_team ';
-    sql += 'ORDER BY m_user.id, id_league, int_rank ';
-    print(sql);
+    try {
+      print('== 順位予測のデータを取得開始 ==');
 
-    final results = await connection.query(sql);
-    print('== Query success ==');
-
-    for (final row in results) {
-      users.add({
+      final results = await conn.query(Sql.getPredictNPBTeams());
+      print(results);
+      final users = results.map((row) => {
         'id_predict': row[0],
         'id_user': row[1],
         'name_user_last': row[2],
@@ -57,30 +45,35 @@ app.get('/predictions', (Request request) async {
         'id_league': row[4],
         'int_rank': row[5],
         'flg_champion': row[6],
+      }).toList();
+
+      final npbStandings = await FetchURL.fetchNPBStandings();
+
+      final json = {
+        'users': users,
+        'npbstandings': npbStandings,
+      };
+
+      return Response.ok(jsonEncode(json), headers: {
+        'Content-Type': 'application/json',
       });
+
+    } catch (e, stacktrace) {
+      stderr.writeln('🔥 DB ERROR: $e');
+      stderr.writeln('📌 STACKTRACE: $stacktrace');
+      return Response.internalServerError(body: 'データベースエラー: $e');
+    } finally {
+      await conn.close(); // ✅ 接続を必ずクローズ
+      print('== 順位予測のデータを取得完了 ==');
     }
+  });
 
-    print('== END /users ==');
-    return Response.ok(jsonEncode(users), headers: {
-      'Content-Type': 'application/json',
-    });
+  // ミドルウェア + サーバー起動
+  final handler = Pipeline()
+      .addMiddleware(logRequests())
+      .addMiddleware(corsHeaders())
+      .addHandler(app);
 
-  } catch (e, stacktrace) {
-    stderr.writeln('🔥 DB ERROR: $e');
-    stderr.writeln('📌 STACKTRACE: $stacktrace');
-    return Response.internalServerError(body: 'データベースエラー: $e');
-  } finally {
-    print('== FINALLY executed ==');
-  }
-});
-  // // サーバー起動
-  // final server = await io.serve(app, 'localhost', 8080);
-  // print('Server running on http://${server.address.host}:${server.port}');
-
-  // ✅ ここが重要：ルーターをHandlerとして使う
-  final handler = Pipeline().addMiddleware(logRequests()).addMiddleware(corsHeaders()).addHandler(app);
-
-  // ✅ handler を serve に渡す
   final server = await io.serve(handler, InternetAddress.anyIPv4, 5050);
-  print('Server running on http://${server.address.host}:${server.port}');
+  print('✅ Server running on http://${server.address.host}:${server.port}');
 }

@@ -35,8 +35,9 @@ void main() async {
     try {
       print('== 順位予測のデータを取得開始 ==');
 
+      FetchURL.scrapeAndInsert(); // NPBの順位を取得してDBに保存
+
       final results = await conn.query(Sql.getPredictNPBTeams());
-      print(results);
       final users = results.map((row) => {
         'id_predict': row[0],
         'id_user': row[1],

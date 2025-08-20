@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:logger/logger.dart';
+import 'package:koko/tools/Env.dart';
 
 final logger = Logger();
 
@@ -49,7 +50,7 @@ class _PredictionPageState extends State<PredictionPage> {
 
   Future<void> fetchPredictions() async {
     try {
-      final response = await http.get(Uri.parse('http://127.0.0.1:5050/predictions'));
+      final response = await http.get(Uri.parse('${Env.baseUrl()}/predictions'));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -112,9 +113,9 @@ class PredictionGrid extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildUserCard(context, userEntries[0]),
+            if (userEntries.isNotEmpty) _buildUserCard(context, userEntries[0]),
             _buildStandingsCard(context),
-            _buildUserCard(context, userEntries[1]),
+            if (userEntries.length > 1) _buildUserCard(context, userEntries[1]),
           ],
         ),
       ),

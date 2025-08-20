@@ -2,9 +2,12 @@ import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart';
 import 'dart:convert';
+import 'package:koko/tools/Sql.dart';
+import 'package:koko/tools/Postgres.dart';
+import 'package:koko/tools/StringTool.dart';
+import 'package:koko/DB/m_player.dart';
 
 class FetchURL {
-
   static const targetUrl = 'https://npb.jp/bis/teams/rst_h.html';
 
   static Future<List<Map<String, dynamic>>> fetchNPBStandings() async {
@@ -21,10 +24,9 @@ class FetchURL {
     var cnt = 0;
 
     for (final card in cards) {
-
       final teams = <Map<String, String>>[];
       final rows = card.querySelectorAll('tbody tr');
-    
+
       if (cnt == 2) {
         break;
       }
@@ -49,49 +51,89 @@ class FetchURL {
   }
 
   static Future<void> scrapeAndInsert() async {
-  // 1) 取得（npb.jp は通常 UTF-8。文字化けする場合は bytes から decode を工夫）
-  final res = await http.get(Uri.parse(targetUrl));
-  if (res.statusCode != 200) {
-    throw Exception('HTTP ${res.statusCode}');
+    final conn = await Postgres.openConnection(); // ✅ 毎回新しい接続
+    final results = await conn.query(Sql.selectTeams());
+    final teams = results
+        .map((row) => {
+              'id': row[0],
+              'url': row[1],
+            })
+        .toList();
+
+    try {
+      print(1);
+      await Postgres.begin(conn);
+
+      for (final team in teams) {
+        print(2);
+        final url = team['url'] as String;
+        final res = await http.get(Uri.parse(url));
+        if (res.statusCode != 200) {
+          throw Exception('HTTP ${res.statusCode}');
+        }
+
+        final doc = parse(utf8.decode(res.bodyBytes));
+        final tables = doc.querySelectorAll('table.rosterlisttbl');
+        if (tables.isEmpty) {
+          throw Exception('テーブルが見つかりませんでした');
+        }
+        final table = tables.first;
+
+        for (final tr in table.querySelectorAll('tr')) {
+          final tds = tr.querySelectorAll('td');
+          if (tds.isEmpty) continue;
+
+          final cols = tds.map((td) => td.text.trim()).toList();
+          print(cols);
+
+          m_player player = m_player();
+
+          if (cols[1].split("　").length == 2) {
+            player.name_last = cols[1].split("　")[0];
+            player.name_first = cols[1].split("　")[1];
+          } else {
+            if (StringTool.isKatakana(cols[1])) {
+              player.name_last = cols[1];
+            } else {
+              player.name_first = cols[1];
+            }
+          }
+
+          player.date_birth = DateTime.tryParse(cols[2]); // 失敗時は null を保持
+          player.uniform_number = cols[0];
+          player.name_middle = '';
+          player.height = int.tryParse(cols[3]) ?? 0;
+          player.weight = int.tryParse(cols[4]) ?? 0;
+          player.id_team = team['id'];
+
+          if (cols.length > 5) {
+            if (cols[5] == '右') {
+              player.pitching = 0;
+            } else if (cols[5] == '左') {
+              player.pitching = 1;
+            } else {
+              player.pitching = 2;
+            }
+            if (cols[6] == '右') {
+              player.batting = 0;
+            } else if (cols[6] == '左') {
+              player.batting = 1;
+            } else {
+              player.batting = 2;
+            }
+          }
+
+          await Postgres.insert(conn, player);
+        }
+      }
+
+      await Postgres.commit(conn);
+      print("✅ トランザクション成功 → COMMIT されました");
+    } catch (e) {
+      await Postgres.rollback(conn);
+      print("❌ ロールバックされました: $e");
+    } finally {
+      await conn.close();
+    }
   }
-
-  // Encodingの自動判別が必要な場合は res.bodyBytes を使い、UTF-8前提なら以下でOK
-  final doc = parse(utf8.decode(res.bodyBytes));
-
-  // 2) テーブルを探索（サイト構造に依存。必要に応じてセレクタ調整）
-  // 例: 最初の <table> のデータ行を拾う
-  final tables = doc.querySelectorAll('table.rosterlisttbl');
-  if (tables.isEmpty) {
-    throw Exception('テーブルが見つかりませんでした');
-  }
-
-  // どのテーブルか分かっているなら、class や caption で絞り込むのがベター
-  // final table = doc.querySelector('table.someClass') ?? tables.first;
-  final table = tables.first;
-
-  // 3) 行パース（thead をスキップ、th だけの行は除外）
-  // final rows = <TeamRow>[];
-  for (final tr in table.querySelectorAll('tr')) {
-    final tds = tr.querySelectorAll('td');
-    if (tds.isEmpty) continue; // ヘッダ行などはスキップ
-
-    // 1列目を label、それ以降を配列で保持
-    final cols = tds.map((td) => td.text.trim()).toList();
-
-    print(cols);
-
-    // 例: 空行や「合計」などを除外したい場合はここでフィルタ
-    // if (label.isEmpty) continue;
-
-    // rows.add(TeamRow(label: label, cols: cols));
-  }
-
-  // if (rows.isEmpty) {
-  //   throw Exception('データ行が抽出できませんでした。セレクタを見直してください。');
-  // }
-
-  // // 4) DBへ一括INSERT
-  // await AppDatabase.insertRows(rows);
-}
-
 }

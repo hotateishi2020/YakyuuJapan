@@ -6,10 +6,9 @@ import 'package:koko/tools/Sql.dart';
 import 'package:koko/tools/Postgres.dart';
 import 'package:koko/tools/StringTool.dart';
 import 'package:koko/DB/m_player.dart';
+import 'package:koko/DB/t_stats_player.dart';
 
 class FetchURL {
-  static const targetUrl = 'https://npb.jp/bis/teams/rst_h.html';
-
   static Future<List<Map<String, dynamic>>> fetchNPBStandings() async {
     final url = Uri.parse('https://baseball.yahoo.co.jp/npb/standings/');
     final res = await http.get(url);
@@ -50,7 +49,7 @@ class FetchURL {
     return result;
   }
 
-  static Future<void> scrapeAndInsert() async {
+  static Future<void> fetchNPBPlayers() async {
     final conn = await Postgres.openConnection(); // ✅ 毎回新しい接続
     final results = await conn.query(Sql.selectTeams());
     final teams = results
@@ -61,11 +60,9 @@ class FetchURL {
         .toList();
 
     try {
-      print(1);
       await Postgres.begin(conn);
 
       for (final team in teams) {
-        print(2);
         final url = team['url'] as String;
         final res = await http.get(Uri.parse(url));
         if (res.statusCode != 200) {
@@ -125,6 +122,75 @@ class FetchURL {
 
           await Postgres.insert(conn, player);
         }
+      }
+
+      await Postgres.commit(conn);
+      print("✅ トランザクション成功 → COMMIT されました");
+    } catch (e) {
+      await Postgres.rollback(conn);
+      print("❌ ロールバックされました: $e");
+    } finally {
+      await conn.close();
+    }
+  }
+
+  static Future<void> fetchNPBStatsDetails() async {
+    final conn = await Postgres.openConnection(); // ✅ 毎回新しい接続
+    print(0);
+    final results = await conn.query(Sql.selectStatsDetails());
+    print(0);
+    final stats = results
+        .map((row) => {
+              'id_stats': row[0],
+              'id_league': row[1],
+              'url': row[2],
+              'int_idx_col': row[3],
+            })
+        .toList();
+    try {
+      await Postgres.begin(conn);
+      print(results);
+      print("✅ トランザクション開始されました");
+
+      for (final stat in stats) {
+        print(1);
+        final url = stat['url'] as String;
+        final res = await http.get(Uri.parse(url));
+        if (res.statusCode != 200) {
+          throw Exception('HTTP ${res.statusCode}');
+        }
+
+        final doc = parse(utf8.decode(res.bodyBytes));
+        final tables = doc.querySelectorAll('#js-playerTable');
+        if (tables.isEmpty) {
+          throw Exception('テーブルが見つかりませんでした');
+        }
+
+        final table = tables.first;
+        List<t_stats_player> listStats = [];
+
+        for (final tr in table.querySelectorAll('tr')) {
+          print(2);
+          final tds = tr.querySelectorAll('td');
+          if (tds.isEmpty) continue;
+
+          final cols = tds.map((td) => td.text.trim()).toList();
+
+          t_stats_player statsPlayer = t_stats_player();
+          statsPlayer.id_league = stat['id_league'];
+          statsPlayer.id_stats = stat['id_stats'];
+          statsPlayer.stats = double.tryParse(cols[stat['int_idx_col']]) ?? 0;
+          statsPlayer.playerName = cols[1].split(RegExp(r'[\s　]+'))[0];
+          statsPlayer.teamName = cols[1]
+              .split(RegExp(r'[\s　]+'))[1]
+              .replaceAll("(", "")
+              .replaceAll(")", "");
+          listStats.add(statsPlayer);
+        }
+        var (sql, map) = Sql.selectInsertPlayerStats(listStats);
+        print(4);
+        var cnt_rows = await Postgres.execute(conn, sql, map);
+        print("実行行数" + cnt_rows.toString());
       }
 
       await Postgres.commit(conn);

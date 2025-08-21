@@ -20,7 +20,8 @@ void main() async {
     try {
       print('== 順位予測のデータを取得開始 ==');
 
-      FetchURL.scrapeAndInsert(); // NPBの順位を取得してDBに保存
+      // FetchURL.fetchNPBPlayers(); // NPBの順位を取得してDBに保存
+      // FetchURL.fetchNPBStatsDetails(); //NPBの個人成績をDBに保存
 
       final results = await conn.query(Sql.selectPredictNPBTeams());
       final users = results
@@ -37,9 +38,24 @@ void main() async {
 
       final npbStandings = await FetchURL.fetchNPBStandings();
 
+      final statsRows = await conn.query(Sql.selectPredictPlayer());
+      final npbPlayerStats = statsRows
+          .map((row) => {
+                'id_user': row[0],
+                'username': row[1],
+                'league_name': row[2],
+                'title': row[3],
+                'player_name': row[4],
+                'flg_atari': row[5],
+              })
+          .toList();
+
+      print(npbPlayerStats);
+
       final json = {
         'users': users,
         'npbstandings': npbStandings,
+        'npbPlayerStats': npbPlayerStats,
       };
 
       return Response.ok(jsonEncode(json), headers: {

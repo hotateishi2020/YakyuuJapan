@@ -1,5 +1,5 @@
-import 'package:koko/DB/t_stats_player.dart';
-import 'package:koko/DB/t_stats_player.dart';
+import '../DB/t_stats_player.dart';
+import '../DB/t_stats_player.dart';
 
 class AppSql {
   //m_stats_details

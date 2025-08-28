@@ -4,9 +4,9 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 import 'package:shelf_router/shelf_router.dart';
-import 'package:koko/tools/AppSql.dart';
-import 'package:koko/tools/FetchURL.dart';
-import 'package:koko/tools/Postgres.dart';
+import 'tools/AppSql.dart';
+import 'tools/FetchURL.dart';
+import 'tools/Postgres.dart';
 import 'package:intl/intl.dart';
 
 final app = Router();

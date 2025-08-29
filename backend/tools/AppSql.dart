@@ -48,7 +48,7 @@ class AppSql {
     ''';
   }
 
-  static String selectTeamsTodayGame() {
+  static String selectTeamsWhereName() {
     return '''
       SELECT
         id
@@ -95,7 +95,7 @@ class AppSql {
         LEFT OUTER JOIN m_player AS pitcher_win ON pitcher_win.id = t_game.id_pitcher_win
         LEFT OUTER JOIN m_player AS pitcher_lose ON pitcher_lose.id = t_game.id_pitcher_lose
         LEFT OUTER JOIN m_stadium ON m_stadium.id = t_game.id_stadium
-      WHERE datetime_start::date = \$1
+      WHERE datetime_start::date = \$1;
     ''';
   }
 
@@ -144,10 +144,12 @@ class AppSql {
             tsp.id_stats,
             tsp.id_player,
             tsp.id_team,
+            tsp.crtat,
             RANK() OVER (PARTITION BY tsp.id_stats, tsp.id_league ORDER BY tsp.stats DESC) AS rnk
           FROM t_stats_player tsp
           LEFT JOIN m_stats  ON m_stats.id  = tsp.id_stats
           WHERE m_stats.flg_positive = TRUE
+          AND tsp.crtat = (SELECT MAX(crtat) FROM t_stats_player)
 
           UNION ALL
 
@@ -157,10 +159,12 @@ class AppSql {
             tsp.id_stats,
             tsp.id_player,
             tsp.id_team,
+            tsp.crtat,
             RANK() OVER (PARTITION BY tsp.id_stats, tsp.id_league ORDER BY tsp.stats ASC) AS rnk
           FROM t_stats_player tsp
           LEFT JOIN m_stats  ON m_stats.id  = tsp.id_stats
           WHERE m_stats.flg_positive = FALSE
+          AND tsp.crtat = (SELECT MAX(crtat) FROM t_stats_player)
         ) t
         WHERE t.rnk = 1
      ) u
@@ -188,6 +192,25 @@ class AppSql {
           LEFT OUTER JOIN m_user ON m_user.id = t_predict_team.id_user
           LEFT OUTER JOIN m_team ON m_team.id = t_predict_team.id_team
       ORDER BY m_user.id, id_league, int_rank
+    ''';
+  }
+
+  //t_team_stats
+  static String selectTeamStats() {
+    return '''
+      SELECT 
+        year,
+        int_rank,
+        id_team,
+        m_team.name_short AS name_team,
+        id_league,
+        m_league.name_short AS name_league
+      FROM t_team_stats
+        LEFT OUTER JOIN m_team ON m_team.id = t_team_stats.id_team
+        LEFT OUTER JOIN m_league ON m_league.id = m_team.id_league
+      WHERE year = \$1
+        AND t_team_stats.crtat = (SELECT MAX(crtat) FROM t_team_stats GROUP BY crtat)
+      ORDER BY int_rank
     ''';
   }
 

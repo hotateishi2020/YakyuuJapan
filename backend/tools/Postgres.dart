@@ -3,10 +3,12 @@ import '../DB/DBModel.dart';
 
 class Postgres {
   // ✅ 毎回新しい接続を作成する関数
-  static Future<Connection> openConnection() async {
+  //利用者側記述：　　await Postgres.openConnection((conn) async {     }); //connectionOpenClose
+  static Future openConnection(Future<void> callback(Connection conn)) async {
     final conn = await Connection.open(
       Endpoint(
-        host: 'ep-wandering-bonus-a7vpjxw5-pooler.ap-southeast-2.aws.neon.tech',
+        // host: 'ep-wandering-bonus-a7vpjxw5-pooler.ap-southeast-2.aws.neon.tech',
+        host: 'ep-wandering-bonus-a7vpjxw5.ap-southeast-2.aws.neon.tech',
         port: 5432,
         database: 'neondb',
         username: 'neondb_owner',
@@ -17,8 +19,16 @@ class Postgres {
         queryMode: QueryMode.extended,
       ),
     );
-    await conn.execute('SET search_path TO public');
-    return conn;
+
+    try {
+      await conn.execute('SET search_path TO public');
+
+      await callback(conn);
+    } catch (e, st) {
+      throw (e, st);
+    } finally {
+      await conn.close();
+    }
   }
 
 // 手動トランザクション制御
@@ -54,7 +64,8 @@ class Postgres {
     } catch (e, stacktrace) {
       await Postgres.rollback(conn);
       print("❌ ロールバックされました: $e, $stacktrace");
-    } finally {}
+      throw (e, stacktrace);
+    }
   }
 
   static Future<int> execute(Connection conn, String sql,
@@ -93,6 +104,63 @@ class Postgres {
       if (value is int) return value;
     }
     return 0;
+  }
+
+  static Future<List<int>> insertMulti(
+      Connection conn, List<DBModel> models) async {
+    if (models.isEmpty) return const <int>[];
+
+    // 1) カラム順は最初のモデルから確定（id は自動採番想定なので除外）
+    final first = Map.of(models.first.toMap())..remove('id');
+    final columns = first.keys.toList();
+    final columnList = columns.join(', ');
+
+    // 2) パラメータの平坦化と ($1,$2,...) の生成
+    final allParams = <Object?>[];
+    final valuesClause = StringBuffer();
+    var paramIndex = 1;
+
+    for (var i = 0; i < models.length; i++) {
+      final m = Map.of(models[i].toMap())..remove('id');
+
+      // 念のためカラムの整合性をチェック（足りない/余分はエラーにする）
+
+      // 既定のカラム順で値を積む
+      final rowValues = columns.map((c) => m[c]).toList();
+      allParams.addAll(rowValues);
+
+      // ($1,$2,...) のひとかたまりを作る
+      final rowPlaceholders = List.generate(
+        columns.length,
+        (_) => '\$${paramIndex++}',
+      ).join(', ');
+
+      if (i > 0) valuesClause.write(', ');
+      valuesClause.write('($rowPlaceholders)');
+    }
+
+    final sql = '''
+    INSERT INTO ${models.first.tableName}
+      ($columnList)
+    VALUES ${valuesClause.toString()}
+    RETURNING id;
+  ''';
+
+    final result = await conn.execute(sql, parameters: allParams);
+
+    // RETURNING id の配列を作って返す
+    final ids = <int>[];
+    for (final row in result) {
+      final v = row.first;
+      if (v is int) {
+        ids.add(v);
+      } else if (v is BigInt) {
+        ids.add(v.toInt());
+      } else if (v is num) {
+        ids.add(v.toInt());
+      }
+    }
+    return ids;
   }
 
   static Future<int> update(Connection conn, DBModel model) async {

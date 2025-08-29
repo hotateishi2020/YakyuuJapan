@@ -42,7 +42,7 @@ void main() async {
   app.get('/fetchPlayerStats', (Request request) async {
     await Postgres.openConnection((conn) async {
       await Postgres.transactionCommit(conn, () async {
-        await FetchURL.fetchNPBPlayers(conn);
+        await FetchURL.fetchNPBStatsDetails(conn);
       });
     });
     return Response.ok('ok');

@@ -38,7 +38,7 @@ class PredictionPage extends StatefulWidget {
 class _PredictionPageState extends State<PredictionPage> {
   // 左カラム
   List<Map<String, dynamic>> predictions = [];
-  List<Map<String, dynamic>> standings = [];
+  List<Map<String, dynamic>> standings = []; // ← フラット行（id_league/name_league入り）
   List<Map<String, dynamic>> npbPlayerStats = [];
 
   // 右カラム（すべて文字列で扱う）
@@ -76,38 +76,45 @@ class _PredictionPageState extends State<PredictionPage> {
 
   Future<void> fetchData() async {
     try {
-      final response =
-          await http.get(Uri.parse('${Env.baseUrl()}/predictions'));
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+      final uri = Env.api('/predictions');
+      final res = await http.get(uri);
 
-        final users = (data['users'] as List).cast<Map<String, dynamic>>();
-        final npb = (data['npbstandings'] as List).cast<Map<String, dynamic>>();
-        final stats =
-            (data['npbPlayerStats'] as List).cast<Map<String, dynamic>>();
-        final gms = (data['games'] as List).cast<Map<String, dynamic>>();
-
+      if (res.statusCode != 200) {
         setState(() {
-          predictions = users;
-          standings = npb;
-          npbPlayerStats = stats;
-          games = gms;
+          error = 'HTTPエラー: ${res.statusCode}';
           isLoading = false;
         });
-
-        // 初期表示での自動縮小を確実化
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted) return;
-          setState(() {});
-        });
-      } else {
-        setState(() {
-          error = 'HTTPエラー: ${response.statusCode}';
-          isLoading = false;
-        });
+        logger.w(
+            'HTTP ${res.statusCode} body: ${res.body.substring(0, res.body.length.clamp(0, 400))}');
+        return;
       }
-    } catch (e) {
-      logger.e('通信エラー: $e');
+
+      final map = jsonDecode(res.body) as Map<String, dynamic>;
+
+      // null安全に取り出すヘルパ
+      List<Map<String, dynamic>> _listMap(dynamic v) {
+        final raw = (v as List?) ?? const [];
+        // JSONの各要素がMap<String,dynamic>であることを保証
+        return raw
+            .map((e) => (e as Map).map((k, v) => MapEntry('$k', v)))
+            .cast<Map<String, dynamic>>()
+            .toList();
+      }
+
+      final users = _listMap(map['users']);
+      final npb = _listMap(map['npbstandings']);
+      final stats = _listMap(map['npbPlayerStats']);
+      final gms = _listMap(map['games']);
+
+      setState(() {
+        predictions = users;
+        standings = npb;
+        npbPlayerStats = stats;
+        games = gms;
+        isLoading = false;
+      });
+    } catch (e, st) {
+      logger.e('通信/解析エラー: $e\n$st');
       setState(() {
         error = '通信エラー: $e';
         isLoading = false;
@@ -122,14 +129,6 @@ class _PredictionPageState extends State<PredictionPage> {
     final m = d.month.toString().padLeft(2, '0');
     final dd = d.day.toString().padLeft(2, '0');
     return '$y-$m-$dd';
-  }
-
-  // games を date_game でフィルタ
-  List<Map<String, dynamic>> _filterGamesByOffset(int offset) {
-    final ymd = _ymdWithOffset(offset);
-    return games
-        .where((g) => (g['date_game']?.toString() ?? '') == ymd)
-        .toList();
   }
 
   @override
@@ -149,7 +148,7 @@ class _PredictionPageState extends State<PredictionPage> {
 
         final left = _UnifiedGrid(
           predictions: predictions,
-          standings: standings,
+          standings: standings, // ← フラットのまま渡す
           npbPlayerStats: npbPlayerStats,
           usernameForId: _usernameForId,
           userNameFromPredictions: _userNameFromPredictions,
@@ -167,7 +166,6 @@ class _PredictionPageState extends State<PredictionPage> {
             Expanded(
               child: GamesBoardYahooStyle(
                 games: games,
-                // 既存のフィルタがあればここで "YYYY-MM-DD" を渡す
                 dateFilter: _ymdWithOffset(_selectedDayOffset),
               ),
             ),
@@ -303,14 +301,6 @@ class OneLineShrinkText extends StatelessWidget {
 }
 
 /// 右ペイン：スコア状況（JSONはすべて文字列で扱う）
-/// ─────────────────────────────────────────────
-/// Yahoo!風の試合ボード（セ／パ／交流戦 でセクション分け）
-/// すべて文字列のJSONを想定
-/// games の要素キー:
-///   date_game, time_game, name_team_home, name_team_away,
-///   name_pitcher_home, name_pitcher_away, name_pitcher_win, name_pitcher_lose,
-///   name_stadium, score_home, score_away, id_league_home, id_league_away
-/// ─────────────────────────────────────────────
 class GamesBoardYahooStyle extends StatelessWidget {
   final List<Map<String, dynamic>> games;
   final String? dateFilter; // "YYYY-MM-DD"
@@ -374,7 +364,7 @@ class GamesBoardYahooStyle extends StatelessWidget {
                 crossAxisCount: cross,
                 crossAxisSpacing: 8,
                 mainAxisSpacing: 8,
-                childAspectRatio: 6.4, // ← 3.2 から上げて高さを約半分へ
+                childAspectRatio: 6.4, // 高さを抑える
               ),
               itemBuilder: (context, i) => _GameCard(bySec[sec]![i]),
             ),
@@ -421,7 +411,6 @@ class _GameCard extends StatelessWidget {
   String get _away => g['name_team_away']?.toString() ?? '';
   String get _stadium => g['name_stadium']?.toString() ?? '';
   String get _time => g['time_game']?.toString() ?? '';
-  String get _date => g['date_game']?.toString() ?? '';
   String get _win => g['name_pitcher_win']?.toString() ?? '';
   String get _lose => g['name_pitcher_lose']?.toString() ?? '';
   String get _pHome => g['name_pitcher_home']?.toString() ?? '';
@@ -434,8 +423,7 @@ class _GameCard extends StatelessWidget {
   bool get _showScore {
     final h = _parseScore(_sHome);
     final a = _parseScore(_sAway);
-    // どちらかが -1 なら非表示
-    if (h < 0 || a < 0) return false;
+    if (h < 0 || a < 0) return false; // どちらかが -1 なら非表示
     return true;
   }
 
@@ -449,21 +437,19 @@ class _GameCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // 上段: 会場（左）／ 時刻/ステータス（右）
+            // 上段: 時刻（左）／ 球場（右）
             Row(
               children: [
-                // 左：時刻（なければ試合状況）
                 Text(
                   _time.isNotEmpty ? _time : (_showScore ? '試合終了' : ''),
                   style: TextStyle(
-                    fontSize: 11, // 少し小さく
+                    fontSize: 11,
                     color: _showScore ? Colors.purple : Colors.black54,
                     fontWeight:
                         _showScore ? FontWeight.w600 : FontWeight.normal,
                   ),
                 ),
                 const SizedBox(width: 6),
-                // 右：球場（広がる）
                 Expanded(
                   child: Text(
                     _stadium,
@@ -475,7 +461,7 @@ class _GameCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
 
-            // 中段: 左(ホーム: チーム名＋先発) / 中央(スコア or vs) / 右(ビジター: チーム名＋先発)
+            // 中段: ホーム / スコアorvs / ビジター
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -564,7 +550,7 @@ class _GameCard extends StatelessWidget {
 // ────────────────────────────────────────────────────────────────
 class _UnifiedGrid extends StatelessWidget {
   final List<Map<String, dynamic>> predictions;
-  final List<Map<String, dynamic>> standings;
+  final List<Map<String, dynamic>> standings; // ← フラット
   final List<Map<String, dynamic>> npbPlayerStats;
   final String Function(String idUser) usernameForId;
   final String Function(String idUser) userNameFromPredictions;
@@ -623,29 +609,35 @@ class _UnifiedGrid extends StatelessWidget {
     return out.isEmpty ? '—' : out.join(', ');
   }
 
-  List<Widget> _buildLeagueColumn(String leagueName) {
-    // 現在順位
-    final lg = standings.firstWhere(
-      (e) => (e['league'] ?? '').toString() == leagueName,
-      orElse: () => const {},
-    );
+  // standings はフラットなので leagueId でフィルタ
+  List<Widget> _buildLeagueColumn(int leagueId) {
+    final rows = standings.where((e) {
+      final id = (e['id_league'] is int)
+          ? e['id_league'] as int
+          : int.tryParse('${e['id_league']}') ?? 0;
+      return id == leagueId;
+    }).toList();
+
+    // リーグ名
+    final leagueName = rows.isNotEmpty
+        ? (rows.first['name_league']?.toString() ?? 'リーグ不明')
+        : 'リーグ不明';
+
+    // 現在順位：rank→team名
     final curMap = <int, String>{};
-    if (lg.isNotEmpty) {
-      final teams = (lg['teams'] as List?)?.cast<Map<String, dynamic>>() ?? [];
-      for (final t in teams) {
-        final r = int.tryParse('${t['rank']}') ?? 0;
-        curMap[r] = (t['team'] ?? '').toString();
-      }
+    for (final r in rows) {
+      final rk = int.tryParse('${r['rank']}') ?? 0;
+      final tm = (r['name_team'] ?? '').toString();
+      if (rk > 0 && tm.isNotEmpty) curMap[rk] = tm;
     }
 
-    // 予想
+    // 予想（id_user → rank → [team]）
     final predMap = <String, Map<int, List<String>>>{};
     for (final p in predictions) {
-      final leagueId = p['id_league'];
-      final ln = (leagueId == 1)
-          ? 'セ・リーグ'
-          : (leagueId == 2 ? 'パ・リーグ' : '${leagueId ?? ''}');
-      if (ln != leagueName) continue;
+      final id = (p['id_league'] is int)
+          ? p['id_league'] as int
+          : int.tryParse('${p['id_league']}') ?? 0;
+      if (id != leagueId) continue;
 
       final idUser = '${p['id_user']}';
       final rank = p['int_rank'] is int
@@ -658,10 +650,14 @@ class _UnifiedGrid extends StatelessWidget {
       if (team.isNotEmpty) predMap[idUser]![rank]!.add(team);
     }
 
-    // 個人タイトル
+    // 個人タイトル（id_stats|title → rows）
     final statMap = <String, List<Map<String, dynamic>>>{};
     for (final r in npbPlayerStats) {
-      if ((r['league_name'] ?? '').toString() != leagueName) continue;
+      // npbPlayerStats の league_name は「セ・リーグ/パ・リーグ」想定
+      final ln = (r['league_name'] ?? '').toString();
+      final target = (leagueId == 1) ? 'セ・リーグ' : 'パ・リーグ';
+      if (ln != target) continue;
+
       final idStatStr =
           (r['id_stats'] == null) ? 'unknown' : '${r['id_stats']}';
       final title = (r['title'] ?? '不明').toString();
@@ -780,11 +776,11 @@ class _UnifiedGrid extends StatelessWidget {
     for (int i = 0; i < visibleStats; i++) {
       final entry = statEntries[i];
       final title = entry.key.split('|').last;
-      final rows = entry.value;
+      final rows2 = entry.value;
 
-      final user1Rows = rows.where((e) => '${e['id_user']}' == '1');
-      final user0Rows = rows.where((e) => '${e['id_user']}' == '0');
-      final user2Rows = rows.where((e) => '${e['id_user']}' == '2');
+      final user1Rows = rows2.where((e) => '${e['id_user']}' == '1');
+      final user0Rows = rows2.where((e) => '${e['id_user']}' == '0');
+      final user2Rows = rows2.where((e) => '${e['id_user']}' == '2');
 
       final txt1 =
           _joinDedup(user1Rows.map((e) => (e['player_name'] ?? '').toString()));
@@ -828,14 +824,14 @@ class _UnifiedGrid extends StatelessWidget {
               Expanded(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: _buildLeagueColumn('セ・リーグ'),
+                  children: _buildLeagueColumn(1), // ← id_league = 1（セ）
                 ),
               ),
               const VerticalDivider(width: 8, thickness: 0.5),
               Expanded(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: _buildLeagueColumn('パ・リーグ'),
+                  children: _buildLeagueColumn(2), // ← id_league = 2（パ）
                 ),
               ),
             ],

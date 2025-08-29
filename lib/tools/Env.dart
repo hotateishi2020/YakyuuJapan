@@ -2,28 +2,28 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class Env {
+  static const _apiBaseFromDefine = String.fromEnvironment('API_BASE');
+
   static String baseUrl() {
-    // 本番用 API（Render / Railway / CloudRun などにデプロイしたバックエンドのURL）
-    const prodUrl = "https://your-api-service.onrender.com";
+    if (_apiBaseFromDefine.isNotEmpty) return _apiBaseFromDefine;
 
-    // デバッグ環境かどうかを判定
-    const bool isProd = bool.fromEnvironment('dart.vm.product');
+    const isProd = bool.fromEnvironment('dart.vm.product');
 
-    if (isProd) {
-      // Flutter build --release の時 → 本番 API
-      return prodUrl;
-    } else {
-      // デバッグ実行中
-      if (kIsWeb) {
-        return "http://127.0.0.1:5050";
-      }
-      try {
-        if (Platform.isAndroid) return "http://10.0.2.2:5050"; // Android エミュ
-        if (Platform.isIOS || Platform.isMacOS) return "http://127.0.0.1:5050";
-        if (Platform.isWindows || Platform.isLinux)
-          return "http://127.0.0.1:5050";
-      } catch (_) {}
-      return "http://127.0.0.1:5050"; // fallback
+    if (kIsWeb) {
+      // 本番(Web/Render)は同一オリジン、デバッグ(Web)はローカルAPI
+      return isProd ? '' : 'http://127.0.0.1:8080';
     }
+    try {
+      if (Platform.isAndroid) return 'http://10.0.2.2:8080';
+      if (Platform.isIOS || Platform.isMacOS) return 'http://127.0.0.1:8080';
+      if (Platform.isWindows || Platform.isLinux)
+        return 'http://127.0.0.1:8080';
+    } catch (_) {}
+    return 'http://127.0.0.1:8080';
+  }
+
+  static Uri api(String path) {
+    final base = baseUrl();
+    return base.isEmpty ? Uri.parse(path) : Uri.parse('$base$path');
   }
 }

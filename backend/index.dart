@@ -141,30 +141,68 @@ void main() async {
       stderr.writeln('🔥 /predictions ERROR: $e\n$st');
       return Response.internalServerError(body: 'データベースエラー: $e');
     }
-  });
+  }); //prediction
 
-  final serveStatic =
-      (Platform.environment['SERVE_STATIC'] ?? 'false') == 'true';
-  Handler handler = Pipeline()
-      .addMiddleware(logRequests())
-      .addMiddleware(corsHeaders()) // devでもCORS許可
-      .addHandler(app);
-
-  if (serveStatic) {
-    // / で Flutter のビルド成果物（backend/public）を返す
-    final staticHandler = createStaticHandler(
-      'public',
-      defaultDocument: 'index.html',
-      listDirectories: false,
-    );
-    handler = Cascade().add(staticHandler).add(handler).handler;
-  } else {
-    // 開発時は / にアクセスしたら分かりやすいメッセージ
-    app.get('/', (_) => Response.ok('Backend API (dev). Try /predictions'));
+  // 2) 静的ディレクトリの検出
+  final candidates = [Directory('public'), Directory('backend/public')];
+  Directory? publicDir;
+  for (final d in candidates) {
+    if (await d.exists() && File('${d.path}/index.html').existsSync()) {
+      publicDir = d;
+      break;
+    }
   }
 
-  final port = int.parse(Platform.environment['PORT'] ?? '8080'); // dev=8080
+  // 3) ハンドラ作成（API → 静的の順で Cascade）
+  Handler handler;
+  if (publicDir != null) {
+    final staticHandler = createStaticHandler(
+      publicDir.path,
+      defaultDocument: 'index.html',
+    );
+
+    // SPA fallback: 静的で 404 のときだけ index.html を返すラッパー
+    Future<Response> staticWithSpa(Request req) async {
+      final res = await staticHandler(req);
+      if (res.statusCode == 404 && req.method == 'GET') {
+        final index = File('${publicDir!.path}/index.html');
+        if (await index.exists()) {
+          return Response.ok(
+            index.openRead(),
+            headers: {'content-type': 'text/html; charset=utf-8'},
+          );
+        }
+      }
+      return res;
+    }
+
+    handler = Cascade()
+        .add(app.call) // ← まず API
+        .add(staticWithSpa) // ← 次に静的（+ SPA fallback）
+        .handler;
+
+    handler = Pipeline()
+        .addMiddleware(logRequests())
+        .addMiddleware(corsHeaders())
+        .addHandler(handler);
+
+    stdout.writeln('🗂 Serving static from: ${publicDir.path}');
+  } else {
+    // 静的なし（dev表示）
+    handler = Pipeline()
+        .addMiddleware(logRequests())
+        .addMiddleware(corsHeaders())
+        .addHandler((req) {
+      if (req.url.path.isEmpty) {
+        return Response.ok('Backend API (dev). Try /predictions',
+            headers: {'content-type': 'text/plain; charset=utf-8'});
+      }
+      return app.call(req);
+    });
+  }
+
+  final port = int.tryParse(Platform.environment['PORT'] ?? '') ?? 8080;
   final server = await io.serve(handler, InternetAddress.anyIPv4, port);
-  print('✅ Server running on http://${server.address.host}:${server.port} '
-      '(serveStatic=$serveStatic)');
-}
+  print('✅ Server running on http://${server.address.host}:${server.port}'
+      ' (serveStatic=${publicDir != null})');
+} // void main

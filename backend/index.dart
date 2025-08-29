@@ -131,7 +131,6 @@ void main() async {
           'npbPlayerStats': npbPlayerStats,
           'games': games,
         };
-        print(json);
       }); //connectionOpenClose
 
       return Response.ok(jsonEncode(json),

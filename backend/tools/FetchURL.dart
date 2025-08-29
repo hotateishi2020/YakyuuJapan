@@ -44,16 +44,16 @@ class FetchURL {
           var team = t_team_stats();
           team.year = DateTimeTool.getThisYear();
           team.id_team = r_team.first.toColumnMap()['id'];
-          team.int_rank = cells[0].text.trim() as int;
-          team.int_win = cells[2].text.trim() as int;
-          team.int_lose = cells[3].text.trim() as int;
-          team.int_draw = cells[4].text.trim() as int;
+          team.int_rank = int.tryParse(cells[0].text.trim()) ?? 0;
+          team.int_win = int.tryParse(cells[2].text.trim()) ?? 0;
+          team.int_lose = int.tryParse(cells[3].text.trim()) ?? 0;
+          team.int_draw = int.tryParse(cells[4].text.trim()) ?? 0;
           team.game_behind = cells[6].text.trim();
-          team.int_rbi = cells[8].text.trim() as int;
-          team.int_homerun = cells[10].text.trim() as int;
-          team.int_sh = cells[11].text.trim() as int;
-          team.num_avg_batting = cells[12].text.trim() as double;
-          team.num_era_total = cells[13].text.trim() as double;
+          team.int_rbi = int.tryParse(cells[8].text.trim()) ?? 0;
+          team.int_homerun = int.tryParse(cells[10].text.trim()) ?? 0;
+          team.int_sh = int.tryParse(cells[11].text.trim()) ?? 0;
+          team.num_avg_batting = double.tryParse(cells[12].text.trim()) ?? 0;
+          team.num_era_total = double.tryParse(cells[13].text.trim()) ?? 0;
           teams.add(team);
         }
       } //for html各チーム
@@ -105,7 +105,9 @@ class FetchURL {
           }
           var url_href =
               card.querySelectorAll('a')[0].attributes['href']?.trim() ?? '';
+
           var url_detail = url.resolve(url_href.replaceFirst('index', 'top'));
+          print(url_href);
 
           final res_detail = await http.get(url_detail);
 
@@ -113,8 +115,8 @@ class FetchURL {
             throw Exception('Failed to fetch standings');
           }
 
-          final document = parse(res_detail.body);
-          final match = document
+          final doc_detail = parse(res_detail.body);
+          final match = doc_detail
               .querySelectorAll('#gm_brd')[0]
               .querySelectorAll('div')[0];
 
@@ -150,8 +152,6 @@ class FetchURL {
               .text
               .trim();
 
-          var flg_before = false;
-
           try {
             score_home = int.tryParse(
                   match
@@ -174,15 +174,13 @@ class FetchURL {
                 -1;
           } catch (e) {
             print('試合前なのでスコアのスクレイピングは行いませんでした。');
-          } finally {
-            flg_before = true;
           }
 
           String pitcher_home = '';
           String pitcher_away = '';
 
-          if (flg_before = false) {
-            pitcher_home = document
+          try {
+            pitcher_home = doc_detail
                 .querySelectorAll('#strt_mem')[0]
                 .querySelectorAll('section')[0]
                 .querySelectorAll('div')[0]
@@ -195,7 +193,7 @@ class FetchURL {
                 .text
                 .trim();
 
-            pitcher_away = document
+            pitcher_away = doc_detail
                 .querySelectorAll('#strt_mem')[0]
                 .querySelectorAll('section')[0]
                 .querySelectorAll('div')[0]
@@ -207,8 +205,9 @@ class FetchURL {
                 .querySelectorAll('a')[0]
                 .text
                 .trim();
-          } else {
-            pitcher_home = document
+          } catch (e) {
+            print('試合終了後のためスクレイピングを修正します');
+            pitcher_home = doc_detail
                 .querySelectorAll('#strt_pit')[0]
                 .querySelectorAll('div')[0]
                 .querySelectorAll('div')[0]
@@ -223,7 +222,7 @@ class FetchURL {
                 .text
                 .trim();
 
-            pitcher_away = document
+            pitcher_away = doc_detail
                 .querySelectorAll('#strt_pit')[0]
                 .querySelectorAll('div')[0]
                 .querySelectorAll('div')[0]

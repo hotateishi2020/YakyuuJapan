@@ -1,26 +1,37 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 import 'package:shelf_router/shelf_router.dart';
+import 'package:shelf_static/shelf_static.dart'; // ← 重要
+
 import 'tools/AppSql.dart';
 import 'tools/FetchURL.dart';
 import 'tools/Postgres.dart';
 import 'package:intl/intl.dart';
 
-final app = Router();
+Future<Response> _notFoundFallback(Request req) async {
+  // 最後の砦：/public/index.html を返す（SPA 想定）
+  final file = File('public/index.html');
+  if (await file.exists()) {
+    return Response.ok(await file.readAsString(), headers: {
+      'content-type': 'text/html; charset=utf-8',
+    });
+  }
+  return Response.notFound('Not Found');
+}
 
 void main() async {
+  final app = Router();
+
+  // ====== API ======
+  app.get('/healthz', (Request _) => Response.ok('ok'));
+
   app.get('/predictions', (Request request) async {
-    final conn = await Postgres.openConnection(); // ✅ 毎回新しい接続
-
+    final conn = await Postgres.openConnection();
     try {
-      print('== 順位予測のデータを取得開始 ==');
-
-      // FetchURL.fetchNPBPlayers(); // NPBの順位を取得してDBに保存
-      // FetchURL.fetchNPBStatsDetails(); //NPBの個人成績をDBに保存
-
       final results = await conn.execute(AppSql.selectPredictNPBTeams());
       final users = results
           .map((row) => {
@@ -48,14 +59,13 @@ void main() async {
               })
           .toList();
 
-      //今日の先発情報をスクレイピングしてDB登録
+      // 今日の先発情報を更新→取得（必要に応じてコメントアウト可）
       await FetchURL.fetchTodayPitcherNPB(conn);
 
-      //今日の先発情報をDBから取得
-      final format_today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-      final result_game =
-          await conn.execute(AppSql.selectGames(), parameters: [format_today]);
-      final games = result_game
+      final formatToday = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final resultGame =
+          await conn.execute(AppSql.selectGames(), parameters: [formatToday]);
+      final games = resultGame
           .map((row) => {
                 'date_game': row[0],
                 'time_game': row[1],
@@ -73,32 +83,39 @@ void main() async {
               })
           .toList();
 
-      final json = {
+      final jsonBody = {
         'users': users,
         'npbstandings': npbStandings,
         'npbPlayerStats': npbPlayerStats,
         'games': games,
       };
 
-      return Response.ok(jsonEncode(json), headers: {
-        'Content-Type': 'application/json',
-      });
-    } catch (e, stacktrace) {
-      stderr.writeln('🔥 DB ERROR: $e');
-      stderr.writeln('📌 STACKTRACE: $stacktrace');
+      return Response.ok(jsonEncode(jsonBody),
+          headers: {'content-type': 'application/json; charset=utf-8'});
+    } catch (e, st) {
+      stderr.writeln('🔥 /predictions ERROR: $e\n$st');
       return Response.internalServerError(body: 'データベースエラー: $e');
     } finally {
-      await conn.close(); // ✅ 接続を必ずクローズ
-      print('== 順位予測のデータを取得完了 ==');
+      await conn.close();
     }
   });
 
-  // ミドルウェア + サーバー起動
+  // ====== 静的ファイル（public/） ======
+  // 例: / → public/index.html, /main.dart.js, /assets/... を配信
+  final staticHandler = createStaticHandler(
+    'public',
+    defaultDocument: 'index.html',
+    listDirectories: false,
+  );
+
+  // ====== パイプラインとカスケード ======
   final handler = Pipeline()
       .addMiddleware(logRequests())
       .addMiddleware(corsHeaders())
-      .addHandler(app);
+      // 404 は次のハンドラへ回すため、必ず Cascade を使う
+      .addHandler(Cascade().add(app).add(staticHandler).handler);
 
-  final server = await io.serve(handler, InternetAddress.anyIPv4, 5050);
+  final port = int.parse(Platform.environment['PORT'] ?? '8080');
+  final server = await io.serve(handler, InternetAddress.anyIPv4, port);
   print('✅ Server running on http://${server.address.host}:${server.port}');
 }

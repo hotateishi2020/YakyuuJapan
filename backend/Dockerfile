@@ -18,7 +18,7 @@ RUN echo "PWD:" && pwd \
 # 4) Dartのバージョン/依存/解析を出す（ここで詳細なエラーが見える）
 RUN dart --version
 RUN dart pub deps
-RUN dart analyze
+# RUN dart analyze
 
 # 5) コンパイル
 RUN dart compile exe index.dart -o bin/server

@@ -36,6 +36,7 @@ void main() async {
         await FetchURL.fetchNPBStandings(conn);
       });
     });
+    return Response.ok('ok');
   });
 
   app.get('/fetchPlayerStats', (Request request) async {
@@ -44,6 +45,7 @@ void main() async {
         await FetchURL.fetchNPBPlayers(conn);
       });
     });
+    return Response.ok('ok');
   });
 
   app.get('/fetchGames', (Request request) async {
@@ -53,6 +55,7 @@ void main() async {
         await FetchURL.fetchTodayPitcherNPB(conn);
       }); //DB-Commit
     }); //DB-Close
+    return Response.ok('ok');
   });
 
   //タイトル予想画面の表示

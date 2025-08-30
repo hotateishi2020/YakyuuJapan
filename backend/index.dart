@@ -54,17 +54,17 @@ void main() async {
     return await commonTryCatch(() async {
       Map<String, dynamic> json = {};
       await Postgres.openConnection((conn) async {
+        print(1);
         final users =
             await conn.execute(AppSql.selectPredictNPBTeams()); //予想者データをDBから取得
-
+        print(1);
         final npbPlayerStats = await conn
             .execute(AppSql.selectPredictPlayer()); //個人タイトル予想のデータをDBから取得
-
+        print(1);
         final games = await conn.execute(AppSql.selectGames(),
             parameters: [DateTimeTool.getNow('yyyy-MM-dd')]);
-
-        final npbStandings = await Postgres.select(
-            conn, AppSql.selectStatsTeam(), DateTimeTool.getThisYear());
+        print(1);
+        final npbStandings = await conn.execute(AppSql.selectStatsTeam());
 
         json = {
           'users': Postgres.toJson(users),

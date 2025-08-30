@@ -204,13 +204,24 @@ class AppSql {
         id_team,
         m_team.name_short AS name_team,
         id_league,
-        m_league.name_short AS name_league
+        m_league.name_short AS name_league,
+        int_game,
+        int_win	int_lose,
+        int_draw,
+        game_behind,
+        num_avg_batting,
+        int_homerun,
+        int_rbi,
+        int_sh,
+        num_era_total,
+        num_era_starter,
+        num_era_relief,
+        num_avg_fielding
       FROM t_stats_team
         LEFT OUTER JOIN m_team ON m_team.id = t_stats_team.id_team
         LEFT OUTER JOIN m_league ON m_league.id = m_team.id_league
-      WHERE year = \$1
-        AND t_stats_team.crtat = (SELECT MAX(crtat) FROM t_stats_team)
-      ORDER BY int_rank
+        WHERE t_stats_team.crtat = (SELECT MAX(crtat) FROM t_stats_team)
+      ORDER BY id_league, int_rank
     ''';
   }
 

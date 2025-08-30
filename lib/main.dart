@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter + Neon',
+      title: 'Yakyuu! Japan',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -609,51 +609,136 @@ class _UnifiedGrid extends StatelessWidget {
     return out.isEmpty ? '—' : out.join(', ');
   }
 
-  // standings はフラットなので leagueId でフィルタ
   List<Widget> _buildLeagueColumn(int leagueId) {
-    final rows = standings.where((e) {
-      final id = (e['id_league'] is int)
-          ? e['id_league'] as int
-          : int.tryParse('${e['id_league']}') ?? 0;
+    // standingsから対象リーグを抽出
+    final currentRows = standings.where((e) {
+      final id = int.tryParse('${e['id_league']}') ?? 0;
       return id == leagueId;
-    }).toList();
+    }).toList()
+      ..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0)
+          .compareTo(int.tryParse('${b['int_rank']}') ?? 0));
 
-    // リーグ名
-    final leagueName = rows.isNotEmpty
-        ? (rows.first['name_league']?.toString() ?? 'リーグ不明')
+    // predictionsから対象リーグを抽出
+    final pred1 = predictions
+        .where((e) =>
+            '${e['id_user']}' == '1' &&
+            (int.tryParse('${e['id_league']}') ?? 0) == leagueId)
+        .toList()
+      ..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0)
+          .compareTo(int.tryParse('${b['int_rank']}') ?? 0));
+
+    final pred2 = predictions
+        .where((e) =>
+            '${e['id_user']}' == '2' &&
+            (int.tryParse('${e['id_league']}') ?? 0) == leagueId)
+        .toList()
+      ..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0)
+          .compareTo(int.tryParse('${b['int_rank']}') ?? 0));
+
+    final leagueName = currentRows.isNotEmpty
+        ? (currentRows.first['name_league']?.toString() ?? 'リーグ不明')
         : 'リーグ不明';
 
-    // 現在順位：rank→team名
-    final curMap = <int, String>{};
-    for (final r in rows) {
-      final rk = int.tryParse('${r['rank']}') ?? 0;
-      final tm = (r['name_team'] ?? '').toString();
-      if (rk > 0 && tm.isNotEmpty) curMap[rk] = tm;
+    final widgets = <Widget>[];
+
+    // 見出し
+    widgets.add(Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Center(
+        child: Text(leagueName,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+      ),
+    ));
+
+    // ヘッダー
+    widgets.add(Row(children: [
+      const Expanded(flex: 2, child: Center(child: OneLineShrinkText('順位'))),
+      Expanded(
+          flex: 2,
+          child: Center(
+            child: OneLineShrinkText(userNameFromPredictions('1'),
+                weight: FontWeight.bold),
+          )),
+      const Expanded(
+          flex: 2,
+          child: Center(
+            child: OneLineShrinkText('現在', weight: FontWeight.bold),
+          )),
+      Expanded(
+          flex: 2,
+          child: Center(
+            child: OneLineShrinkText(userNameFromPredictions('2'),
+                weight: FontWeight.bold),
+          )),
+    ]));
+    widgets.add(const Divider(height: 8, thickness: 0.5));
+
+    bool _isHit(
+        Map<String, dynamic>? pred, List<Map<String, dynamic>> curGroup) {
+      if (pred == null || curGroup.isEmpty) return false;
+
+      // 予想側の id_team / name
+      final int prdId = int.tryParse('${pred['id_team']}') ?? -1;
+      final String prdName = (pred['name_team_short']?.toString() ??
+              pred['name_team']?.toString() ??
+              '')
+          .trim();
+
+      for (final cur in curGroup) {
+        final int curId = int.tryParse('${cur['id_team']}') ?? -1;
+        final String curName = (cur['name_team']?.toString() ?? '').trim();
+
+        if ((prdId >= 0 && curId >= 0 && prdId == curId) ||
+            (prdName.isNotEmpty && curName == prdName)) {
+          return true;
+        }
+      }
+      return false;
     }
 
-    // 予想（id_user → rank → [team]）
-    final predMap = <String, Map<int, List<String>>>{};
-    for (final p in predictions) {
-      final id = (p['id_league'] is int)
-          ? p['id_league'] as int
-          : int.tryParse('${p['id_league']}') ?? 0;
-      if (id != leagueId) continue;
+    for (var rk = 1; rk <= 6; rk++) {
+      // 現在の順位グループ（同じ int_rank のチームを全部）
+      final curGroup = currentRows
+          .where((e) => int.tryParse('${e['int_rank']}') == rk)
+          .toList();
 
-      final idUser = '${p['id_user']}';
-      final rank = p['int_rank'] is int
-          ? p['int_rank'] as int
-          : int.tryParse('${p['int_rank']}') ?? 0;
-      final team = (p['name_team_short'] ?? p['team'] ?? '').toString();
+      // 予想側
+      final p1 = pred1.firstWhere((e) => int.tryParse('${e['int_rank']}') == rk,
+          orElse: () => {});
+      final p2 = pred2.firstWhere((e) => int.tryParse('${e['int_rank']}') == rk,
+          orElse: () => {});
 
-      predMap.putIfAbsent(idUser, () => {});
-      predMap[idUser]!.putIfAbsent(rank, () => []);
-      if (team.isNotEmpty) predMap[idUser]![rank]!.add(team);
+      // 表示テキスト
+      final curTeamText = curGroup.isNotEmpty
+          ? curGroup.map((e) => e['name_team']?.toString() ?? '').join(', ')
+          : '—';
+      final txt1 =
+          p1.isNotEmpty ? (p1['name_team_short']?.toString() ?? '—') : '—';
+      final txt2 =
+          p2.isNotEmpty ? (p2['name_team_short']?.toString() ?? '—') : '—';
+
+      // ハイライト判定（予想チームが現在の順位グループに含まれているか）
+      final hi1 = _isHit(p1.isNotEmpty ? p1 : null, curGroup);
+      final hi2 = _isHit(p2.isNotEmpty ? p2 : null, curGroup);
+
+      widgets.add(Row(
+        children: [
+          Expanded(flex: 2, child: headerCell('$rk')),
+          Expanded(flex: 2, child: cell(txt1, highlight: hi1)),
+          Expanded(flex: 2, child: cell(curTeamText)),
+          Expanded(flex: 2, child: cell(txt2, highlight: hi2)),
+        ],
+      ));
     }
 
-    // 個人タイトル（id_stats|title → rows）
+    widgets.add(const SizedBox(height: 4));
+    widgets.add(const Divider(height: 8, thickness: 0.5));
+
+    // ───────────────────────────────
+    // 個人タイトル表示 (statMap)
+    // ───────────────────────────────
     final statMap = <String, List<Map<String, dynamic>>>{};
     for (final r in npbPlayerStats) {
-      // npbPlayerStats の league_name は「セ・リーグ/パ・リーグ」想定
       final ln = (r['league_name'] ?? '').toString();
       final target = (leagueId == 1) ? 'セ・リーグ' : 'パ・リーグ';
       if (ln != target) continue;
@@ -665,116 +750,34 @@ class _UnifiedGrid extends StatelessWidget {
       statMap.putIfAbsent(key, () => []).add(r);
     }
 
-    final widgets = <Widget>[];
-
-    // 見出し
-    widgets.add(
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Center(
-          child: Text(
-            leagueName,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-          ),
-        ),
-      ),
-    );
-
-    // チーム順位（4列：順位 / id=1 / 現在 / id=2）
-    widgets.add(
-      Row(
-        children: [
-          const Expanded(
-              flex: 2,
-              child: Center(child: OneLineShrinkText('順位', baseSize: 12))),
-          Expanded(
-              flex: 2,
-              child: Center(
-                  child: OneLineShrinkText(userNameFromPredictions('1'),
-                      baseSize: 12, weight: FontWeight.bold))),
-          const Expanded(
-              flex: 2,
-              child: Center(
-                  child: OneLineShrinkText('現在',
-                      baseSize: 12, weight: FontWeight.bold))),
-          Expanded(
-              flex: 2,
-              child: Center(
-                  child: OneLineShrinkText(userNameFromPredictions('2'),
-                      baseSize: 12, weight: FontWeight.bold))),
-        ],
-      ),
-    );
-    widgets.add(const Divider(height: 8, thickness: 0.5));
-
-    final maxRank =
-        curMap.keys.isEmpty ? 0 : curMap.keys.reduce((a, b) => a > b ? a : b);
-    final lastRank = compact ? (maxRank.clamp(0, 5)) : maxRank; // コンパクト時は上位5
-
-    for (int rk = 1; rk <= lastRank; rk++) {
-      final nowTeam = curMap[rk] ?? '';
-      String txtFor(String uid) => _joinDedup(predMap[uid]?[rk]);
-
-      final txt1 = txtFor('1');
-      final txt2 = txtFor('2');
-      final hi1 = (txt1 != '—' &&
-          nowTeam.isNotEmpty &&
-          txt1.split(', ').contains(nowTeam));
-      final hi2 = (txt2 != '—' &&
-          nowTeam.isNotEmpty &&
-          txt2.split(', ').contains(nowTeam));
-
-      widgets.add(
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-                flex: 2, child: headerCell('$rk', weight: FontWeight.w600)),
-            Expanded(flex: 2, child: cell(txt1, highlight: hi1)),
-            Expanded(flex: 2, child: cell(nowTeam)),
-            Expanded(flex: 2, child: cell(txt2, highlight: hi2)),
-          ],
-        ),
-      );
-    }
-
-    widgets.add(const SizedBox(height: 4));
-    widgets.add(const Divider(height: 8, thickness: 0.5));
-
-    // 個人タイトル（4列：スタッツ / id=1 / id=0 / id=2）
-    widgets.add(
-      Row(
-        children: [
-          const Expanded(
-              flex: 2,
-              child: Center(child: OneLineShrinkText('スタッツ', baseSize: 12))),
-          Expanded(
-              flex: 2,
-              child: Center(
-                  child: OneLineShrinkText(usernameForId('1'),
-                      baseSize: 12, weight: FontWeight.bold))),
-          Expanded(
-              flex: 2,
-              child: Center(
-                  child: OneLineShrinkText(usernameForId('0'),
-                      baseSize: 12, weight: FontWeight.bold))),
-          Expanded(
-              flex: 2,
-              child: Center(
-                  child: OneLineShrinkText(usernameForId('2'),
-                      baseSize: 12, weight: FontWeight.bold))),
-        ],
-      ),
-    );
+    // タイトルの見出し行
+    widgets.add(Row(children: [
+      const Expanded(flex: 2, child: Center(child: OneLineShrinkText('スタッツ'))),
+      Expanded(
+          flex: 2,
+          child: Center(
+            child:
+                OneLineShrinkText(usernameForId('1'), weight: FontWeight.bold),
+          )),
+      Expanded(
+          flex: 2,
+          child: Center(
+            child:
+                OneLineShrinkText(usernameForId('0'), weight: FontWeight.bold),
+          )),
+      Expanded(
+          flex: 2,
+          child: Center(
+            child:
+                OneLineShrinkText(usernameForId('2'), weight: FontWeight.bold),
+          )),
+    ]));
     widgets.add(const Divider(height: 8, thickness: 0.5));
 
     final statEntries = statMap.entries.toList()
       ..sort((a, b) => a.key.split('|').last.compareTo(b.key.split('|').last));
-    final visibleStats =
-        compact ? (statEntries.length.clamp(0, 6)) : statEntries.length;
 
-    for (int i = 0; i < visibleStats; i++) {
-      final entry = statEntries[i];
+    for (final entry in statEntries) {
       final title = entry.key.split('|').last;
       final rows2 = entry.value;
 
@@ -783,27 +786,24 @@ class _UnifiedGrid extends StatelessWidget {
       final user2Rows = rows2.where((e) => '${e['id_user']}' == '2');
 
       final txt1 =
-          _joinDedup(user1Rows.map((e) => (e['player_name'] ?? '').toString()));
+          _joinDedup(user1Rows.map((e) => '${e['player_name'] ?? ''}'));
       final txt0 =
-          _joinDedup(user0Rows.map((e) => (e['player_name'] ?? '').toString()));
+          _joinDedup(user0Rows.map((e) => '${e['player_name'] ?? ''}'));
       final txt2 =
-          _joinDedup(user2Rows.map((e) => (e['player_name'] ?? '').toString()));
+          _joinDedup(user2Rows.map((e) => '${e['player_name'] ?? ''}'));
 
       final hi1 = user1Rows.any((e) => e['flg_atari'] == true);
       final hi0 = user0Rows.any((e) => e['flg_atari'] == true);
       final hi2 = user2Rows.any((e) => e['flg_atari'] == true);
 
-      widgets.add(
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(flex: 2, child: headerCell(title)),
-            Expanded(flex: 2, child: cell(txt1, highlight: hi1)),
-            Expanded(flex: 2, child: cell(txt0, highlight: hi0)),
-            Expanded(flex: 2, child: cell(txt2, highlight: hi2)),
-          ],
-        ),
-      );
+      widgets.add(Row(
+        children: [
+          Expanded(flex: 2, child: headerCell(title)),
+          Expanded(flex: 2, child: cell(txt1, highlight: hi1)),
+          Expanded(flex: 2, child: cell(txt0, highlight: hi0)),
+          Expanded(flex: 2, child: cell(txt2, highlight: hi2)),
+        ],
+      ));
     }
 
     return widgets;

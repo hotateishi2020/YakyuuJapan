@@ -3,14 +3,14 @@ import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
 import 'dart:convert';
 import 'AppSql.dart';
-import 'Postgres.dart';
-import 'StringTool.dart';
-import 'DateTimeTool.dart';
-import '../DB/m_player.dart';
-import '../DB/t_stats_player.dart';
-import '../DB/t_game.dart';
-import '../DB/m_stadium.dart';
-import '../DB/t_stats_team.dart';
+import '../_tools/Postgres.dart';
+import '../_tools/StringTool.dart';
+import '../_tools/DateTimeTool.dart';
+import 'DB/m_player.dart';
+import 'DB/t_stats_player.dart';
+import 'DB/t_game.dart';
+import 'DB/m_stadium.dart';
+import 'DB/t_stats_team.dart';
 import 'package:intl/intl.dart';
 import 'package:postgres/postgres.dart';
 
@@ -48,11 +48,12 @@ class FetchURL {
           team.int_win = int.tryParse(cells[2].text.trim()) ?? 0;
           team.int_lose = int.tryParse(cells[3].text.trim()) ?? 0;
           team.int_draw = int.tryParse(cells[4].text.trim()) ?? 0;
-          team.game_behind = cells[6].text.trim();
+          team.game_behind = cells[7].text.trim();
           team.int_rbi = int.tryParse(cells[8].text.trim()) ?? 0;
           team.int_homerun = int.tryParse(cells[10].text.trim()) ?? 0;
           team.int_sh = int.tryParse(cells[11].text.trim()) ?? 0;
-          team.num_avg_batting = double.tryParse(cells[12].text.trim()) ?? 0;
+          team.num_avg_batting =
+              double.tryParse("0" + cells[12].text.trim()) ?? 0;
           team.num_era_total = double.tryParse(cells[13].text.trim()) ?? 0;
           teams.add(team);
         }
@@ -425,6 +426,7 @@ class FetchURL {
         statsPlayer.id_stats = stat['id_stats'] as int;
         statsPlayer.stats =
             double.tryParse(cols[stat['int_idx_col'] as int]) ?? 0;
+        statsPlayer.int_rank = int.tryParse(cols[0]) ?? 0;
         statsPlayer.playerName = cols[1].split(RegExp(r'[\s　]+'))[0];
         statsPlayer.teamName = cols[1]
             .split(RegExp(r'[\s　]+'))[1]

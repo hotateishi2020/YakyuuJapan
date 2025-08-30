@@ -41,14 +41,12 @@ void main() async {
 
   app.get('/fetchGames', (Request request) async {
     // 今日の先発情報を更新→取得（必要に応じてコメントアウト可）
-    return await commonTryCatch(() async {
-      await Postgres.openConnection((conn) async {
-        await Postgres.transactionCommit(conn, () async {
-          await FetchURL.fetchTodayPitcherNPB(conn);
-        }); //DB-Commit
-      }); //DB-Close
-      return Response.ok('ok');
-    }); //catch
+    await Postgres.openConnection((conn) async {
+      await Postgres.transactionCommit(conn, () async {
+        await FetchURL.fetchTodayPitcherNPB(conn);
+      }); //DB-Commit
+    }); //DB-Close
+    return Response.ok('ok');
   });
 
   //タイトル予想画面の表示
@@ -74,7 +72,8 @@ void main() async {
           'npbPlayerStats': Postgres.toJson(npbPlayerStats),
           'games': Postgres.toJson(games),
         };
-        print(json);
+        print(Postgres.toJson(npbStandings));
+        // print(json);
       }); //connectionOpenClose
 
       return Response.ok(jsonEncode(json),

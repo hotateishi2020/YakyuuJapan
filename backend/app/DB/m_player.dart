@@ -1,4 +1,4 @@
-import 'DBModel.dart';
+import '../../tools/DBModel.dart';
 
 class m_player extends DBModel {
   String name_last = '';

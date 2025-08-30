@@ -1,4 +1,4 @@
-import 'DBModel.dart';
+import '../../tools/DBModel.dart';
 
 class m_stadium extends DBModel {
   String tableName = 'm_stadium';

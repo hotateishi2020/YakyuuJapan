@@ -1,5 +1,5 @@
 import 'package:postgres/postgres.dart';
-import '../DB/DBModel.dart';
+import 'DBModel.dart';
 
 class Postgres {
   // ✅ 毎回新しい接続を作成する関数

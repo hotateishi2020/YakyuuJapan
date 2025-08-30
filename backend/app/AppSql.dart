@@ -232,6 +232,7 @@ class AppSql {
           id_stats,
           id_player,
           id_team,
+          int_rank,
           stats
         )
         ''';
@@ -245,6 +246,7 @@ class AppSql {
           ${stat.id_stats} AS id_stats,
           m_player.id AS id_player, 
           m_player.id_team,
+          ${stat.int_rank} AS int_rank,
           ${stat.stats} AS stats
         FROM m_player
         LEFT OUTER JOIN m_team ON m_team.id = m_player.id_team

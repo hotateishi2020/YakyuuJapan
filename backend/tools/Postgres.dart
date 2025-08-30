@@ -31,25 +31,6 @@ class Postgres {
     }
   }
 
-// 手動トランザクション制御
-  static Future<void> begin(Connection conn) async {
-    await conn.execute('BEGIN');
-  }
-
-  static Future<void> commit(Connection conn) async {
-    await conn.execute('COMMIT');
-  }
-
-  static Future<void> rollback(Connection conn) async {
-    await conn.execute('ROLLBACK');
-  }
-
-  static Future<Result> select(
-      Connection conn, String sql, dynamic value) async {
-    final results = await conn.execute(sql, parameters: [value]);
-    return results;
-  }
-
   //利用者側記述：　　await Postgres.transactionCommit(conn, () async {     }); //transactionCommit
   static Future<void> transactionCommit(
       Connection conn, Future<void> Function() callback) async {
@@ -68,6 +49,18 @@ class Postgres {
     }
   }
 
+  static Future<void> begin(Connection conn) async {
+    await conn.execute('BEGIN');
+  }
+
+  static Future<void> commit(Connection conn) async {
+    await conn.execute('COMMIT');
+  }
+
+  static Future<void> rollback(Connection conn) async {
+    await conn.execute('ROLLBACK');
+  }
+
   static Future<int> execute(Connection conn, String sql,
       {Map<String, dynamic>? data}) async {
     final result = await conn.execute(sql, parameters: data);
@@ -78,10 +71,17 @@ class Postgres {
     return 0;
   }
 
+  static Future<Result> select(
+      Connection conn, String sql, dynamic value) async {
+    final results = await conn.execute(sql, parameters: [value]);
+    return results;
+  }
+
 // トランザクション/既存接続で使うINSERT（安全な名前付きパラメータ）
   static Future<int> insert(Connection conn, DBModel model) async {
     final data = model.toMap();
     data.remove("id"); //insertではidを指定しない（DBの方で自動生成されるため）
+    data.remove("crtat");
     final columns = data.keys.toList();
     final values = data.values.toList();
 
@@ -111,7 +111,9 @@ class Postgres {
     if (models.isEmpty) return const <int>[];
 
     // 1) カラム順は最初のモデルから確定（id は自動採番想定なので除外）
-    final first = Map.of(models.first.toMap())..remove('id');
+    final first = Map.of(models.first.toMap())
+      ..remove('id')
+      ..remove('crtat');
     final columns = first.keys.toList();
     final columnList = columns.join(', ');
 
@@ -206,5 +208,19 @@ class Postgres {
       return res.first.first as int;
     }
     return 0; // 該当なし
+  }
+
+  static List<Map<String, dynamic>> toJson(Result result) {
+    // カラム名を schema から取得
+    final columns =
+        result.schema?.columns.map((c) => c.columnName).toList() ?? [];
+
+    return result.map((row) {
+      final map = <String, dynamic>{};
+      for (var i = 0; i < columns.length; i++) {
+        map[columns[i].toString()] = row[i];
+      }
+      return map;
+    }).toList();
   }
 }

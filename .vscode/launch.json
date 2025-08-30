@@ -11,15 +11,17 @@
         //     "url": "http://localhost:8080",
         //     "webRoot": "${workspaceFolder}"
         // },
-
         {
             "name": "Flutter Web",
             "request": "launch",
             "type": "dart",
             "deviceId": "chrome",
-            "args": ["--web-port", "3000"]
+            "args": [
+                "--web-port",
+                "3000"
+            ],
+            "program": "lib/main.dart"
         },
-
         {
             "name": "Koko",
             "request": "launch",

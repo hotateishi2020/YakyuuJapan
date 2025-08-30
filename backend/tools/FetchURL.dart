@@ -10,7 +10,7 @@ import '../DB/m_player.dart';
 import '../DB/t_stats_player.dart';
 import '../DB/t_game.dart';
 import '../DB/m_stadium.dart';
-import '../DB/t_team_stats.dart';
+import '../DB/t_stats_team.dart';
 import 'package:intl/intl.dart';
 import 'package:postgres/postgres.dart';
 
@@ -26,7 +26,7 @@ class FetchURL {
     final document = parse(res.body);
     final html_tables = document.querySelectorAll('table.bb-rankTable');
     var cnt = 0;
-    List<t_team_stats> teams = [];
+    List<t_stats_team> teams = [];
 
     for (final html_table in html_tables) {
       final html_teams = html_table.querySelectorAll('tbody tr');
@@ -41,7 +41,7 @@ class FetchURL {
           var team_name = cells[1].text.trim();
           var r_team = await Postgres.select(
               conn, AppSql.selectTeamsWhereName(), team_name);
-          var team = t_team_stats();
+          var team = t_stats_team();
           team.year = DateTimeTool.getThisYear();
           team.id_team = r_team.first.toColumnMap()['id'];
           team.int_rank = int.tryParse(cells[0].text.trim()) ?? 0;

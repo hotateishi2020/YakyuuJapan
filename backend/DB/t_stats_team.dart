@@ -1,7 +1,7 @@
 import 'DBModel.dart';
 
-class t_team_stats extends DBModel {
-  String tableName = 't_team_stats';
+class t_stats_team extends DBModel {
+  String tableName = 't_stats_team';
   int year = 0;
   int id_team = 0;
   int int_rank = 0;

@@ -4,4 +4,8 @@ class DateTimeTool {
   static int getThisYear() {
     return int.tryParse(DateFormat('yyyy').format(DateTime.now())) ?? 0;
   }
+
+  static String getNow(String format) {
+    return DateFormat('yyyy-MM-dd').format(DateTime.now());
+  }
 }

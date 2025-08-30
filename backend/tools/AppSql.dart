@@ -183,8 +183,8 @@ class AppSql {
       SELECT
         t_predict_team.id AS id_predict,
         m_user.id AS id_user,
-        m_user.name_last,
-        m_team.name_short,
+        m_user.name_last AS name_user_last,
+        m_team.name_short AS name_team_short,
         m_team.id_league,
         int_rank,
         flg_champion
@@ -195,8 +195,8 @@ class AppSql {
     ''';
   }
 
-  //t_team_stats
-  static String selectTeamStats() {
+  //t_stats_team
+  static String selectStatsTeam() {
     return '''
       SELECT 
         year,
@@ -205,16 +205,16 @@ class AppSql {
         m_team.name_short AS name_team,
         id_league,
         m_league.name_short AS name_league
-      FROM t_team_stats
-        LEFT OUTER JOIN m_team ON m_team.id = t_team_stats.id_team
+      FROM t_stats_team
+        LEFT OUTER JOIN m_team ON m_team.id = t_stats_team.id_team
         LEFT OUTER JOIN m_league ON m_league.id = m_team.id_league
       WHERE year = \$1
-        AND t_team_stats.crtat = (SELECT MAX(crtat) FROM t_team_stats GROUP BY crtat)
+        AND t_stats_team.crtat = (SELECT MAX(crtat) FROM t_stats_team)
       ORDER BY int_rank
     ''';
   }
 
-  //m_player
+  //t_stats_player
   static String selectInsertPlayerStats(List<t_stats_player> stats) {
     String sql = '''
         INSERT INTO ${stats.first.tableName} (

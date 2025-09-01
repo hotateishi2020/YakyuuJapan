@@ -40,6 +40,7 @@ class _PredictionPageState extends State<PredictionPage> {
   List<Map<String, dynamic>> predictions = [];
   List<Map<String, dynamic>> standings = []; // ← フラット行（id_league/name_league入り）
   List<Map<String, dynamic>> npbPlayerStats = [];
+  List<Map<String, dynamic>> npbPlayerStatsActual = [];
 
   // 右カラム（すべて文字列で扱う）
   List<Map<String, dynamic>> games = [];
@@ -76,7 +77,7 @@ class _PredictionPageState extends State<PredictionPage> {
 
   Future<void> fetchData() async {
     try {
-      final uri = Env.api('/predictions');
+      final uri = Uri.parse('${Env.baseUrl()}/predictions');
       final res = await http.get(uri);
 
       if (res.statusCode != 200) {
@@ -101,15 +102,18 @@ class _PredictionPageState extends State<PredictionPage> {
             .toList();
       }
 
-      final users = _listMap(map['users']);
-      final npb = _listMap(map['npbstandings']);
-      final stats = _listMap(map['npbPlayerStats']);
+      // After（stats_playerを使う）
+      final users = _listMap(map['predict_team']);
+      final npb = _listMap(map['stats_team']);
+      final statsPredict = _listMap(map['predict_player']); // 左ブロック（予想）
+      final statsActual = _listMap(map['stats_player']); // 中央ブロック（実績）
       final gms = _listMap(map['games']);
 
       setState(() {
         predictions = users;
         standings = npb;
-        npbPlayerStats = stats;
+        npbPlayerStats = statsPredict; // 左
+        npbPlayerStatsActual = statsActual; // 中央
         games = gms;
         isLoading = false;
       });
@@ -131,6 +135,266 @@ class _PredictionPageState extends State<PredictionPage> {
     return '$y-$m-$dd';
   }
 
+  // yyyy-MM-dd フォーマット
+  String _ymd(DateTime d) {
+    final y = d.year.toString().padLeft(4, '0');
+    final m = d.month.toString().padLeft(2, '0');
+    final dd = d.day.toString().padLeft(2, '0');
+    return '$y-$m-$dd';
+  }
+
+  // games に含まれる日付の中で最新日を起点にする（なければ今日）
+  String _anchorYmdFromGames() {
+    DateTime? maxD;
+    for (final g in games) {
+      final s = (g['date_game']?.toString() ?? '').trim();
+      if (s.isEmpty) continue;
+      final dt = DateTime.tryParse(s);
+      if (dt == null) continue;
+      if (maxD == null || dt.isAfter(maxD!)) maxD = dt;
+    }
+    return maxD == null ? _ymdWithOffset(0) : _ymd(maxD!);
+  }
+
+  // flg_atari の合計（予想者のみ: id_user 1/2、セ+パ合算）
+  Map<String, int> _atariCounts() {
+    final counts = <String, int>{'1': 0, '2': 0};
+
+    // 個人成績（予想・実績）の的中
+    void addFromPlayer(List<Map<String, dynamic>> src) {
+      for (final r in src) {
+        final id = '${r['id_user'] ?? ''}';
+        if (!counts.containsKey(id)) continue; // 1 or 2 のみ
+        if (r['flg_atari'] == true) counts[id] = (counts[id] ?? 0) + 1;
+      }
+    }
+
+    addFromPlayer(npbPlayerStats);
+    addFromPlayer(npbPlayerStatsActual);
+
+    // チーム順位の的中（現在と予想の一致）
+    bool _teamHit(
+        Map<String, dynamic>? pred, List<Map<String, dynamic>> curGroup) {
+      if (pred == null || pred.isEmpty || curGroup.isEmpty) return false;
+      final int prdId = int.tryParse('${pred['id_team']}') ?? -1;
+      final String prdName = (pred['name_team_short']?.toString() ??
+              pred['name_team']?.toString() ??
+              '')
+          .trim();
+      for (final cur in curGroup) {
+        final int curId = int.tryParse('${cur['id_team']}') ?? -1;
+        final String curName = (cur['name_team']?.toString() ?? '').trim();
+        if ((prdId >= 0 && curId >= 0 && prdId == curId) ||
+            (prdName.isNotEmpty && curName == prdName)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    for (final leagueId in [1, 2]) {
+      final curRows = standings
+          .where((e) => int.tryParse('${e['id_league']}') == leagueId)
+          .toList();
+      final pred1 = predictions
+          .where((e) =>
+              '${e['id_user']}' == '1' &&
+              (int.tryParse('${e['id_league']}') ?? 0) == leagueId)
+          .toList();
+      final pred2 = predictions
+          .where((e) =>
+              '${e['id_user']}' == '2' &&
+              (int.tryParse('${e['id_league']}') ?? 0) == leagueId)
+          .toList();
+      for (int rk = 1; rk <= 6; rk++) {
+        final curGroup = curRows
+            .where((e) => int.tryParse('${e['int_rank']}') == rk)
+            .toList();
+        final p1 = pred1.firstWhere(
+            (e) => int.tryParse('${e['int_rank']}') == rk,
+            orElse: () => {});
+        final p2 = pred2.firstWhere(
+            (e) => int.tryParse('${e['int_rank']}') == rk,
+            orElse: () => {});
+        if (_teamHit(p1.isNotEmpty ? p1 : null, curGroup))
+          counts['1'] = (counts['1'] ?? 0) + 1;
+        if (_teamHit(p2.isNotEmpty ? p2 : null, curGroup))
+          counts['2'] = (counts['2'] ?? 0) + 1;
+      }
+    }
+
+    return counts;
+  }
+
+  // 画面上部: 全体ヘッダー
+  Widget _globalHeader() {
+    return Container(
+      height: 28,
+      decoration: BoxDecoration(
+        color: Colors.orange.shade200,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      alignment: Alignment.centerLeft,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: const Text('Yakyuu! Japan',
+          style: TextStyle(fontWeight: FontWeight.bold)),
+    );
+  }
+
+  // 画面切替タブ（ダミー表示）
+  Widget _tabsBar() {
+    final tabs = ['侍', 'MLB', 'NPB', '2軍', '独立', '社会人', '大学/高校'];
+    return SizedBox(
+      height: 28,
+      child: Row(children: [
+        for (final t in tabs) ...[
+          Container(
+            margin: const EdgeInsets.only(right: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+                color: Colors.orange.shade300,
+                borderRadius: BorderRadius.circular(4)),
+            child: Text(t, style: const TextStyle(fontSize: 12)),
+          ),
+        ]
+      ]),
+    );
+  }
+
+  // 上部: Score + News + イベント日程
+  Widget _scoreNewsEventsRow() {
+    final counts = _atariCounts();
+    Widget _scoreBox() {
+      return Container(
+        width: 220,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: Colors.black45),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Row(children: [
+          Container(
+            width: 72,
+            height: 56,
+            color: Colors.red,
+            alignment: Alignment.center,
+            child: const Text('SCORE',
+                style: TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _scoreNumber(counts['1'] ?? 0),
+                _scoreNumber(counts['2'] ?? 0),
+              ],
+            ),
+          ),
+        ]),
+      );
+    }
+
+    Widget _newsBox() {
+      return Expanded(
+        child: Container(
+          height: 120,
+          decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.black45),
+              borderRadius: BorderRadius.circular(4)),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('News', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              const Divider(height: 1),
+              const SizedBox(height: 4),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text('・News ------------------------------',
+                          style: TextStyle(fontSize: 12)),
+                      Text('・News ------------------------------',
+                          style: TextStyle(fontSize: 12)),
+                      Text('・News ------------------------------',
+                          style: TextStyle(fontSize: 12)),
+                      Text('・News ------------------------------',
+                          style: TextStyle(fontSize: 12)),
+                      Text('・News ------------------------------',
+                          style: TextStyle(fontSize: 12)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    Widget _eventsBox() {
+      return Container(
+        width: 220,
+        height: 120,
+        decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Colors.black45),
+            borderRadius: BorderRadius.circular(4)),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('イベント日程', style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4),
+            const Divider(height: 1),
+            const SizedBox(height: 4),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text('・Event', style: TextStyle(fontSize: 12)),
+                    Text('・Event', style: TextStyle(fontSize: 12)),
+                    Text('・Event', style: TextStyle(fontSize: 12)),
+                    Text('・Event', style: TextStyle(fontSize: 12)),
+                    Text('・Event', style: TextStyle(fontSize: 12)),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Row(children: [
+      _scoreBox(),
+      const SizedBox(width: 8),
+      _newsBox(),
+      const SizedBox(width: 8),
+      _eventsBox(),
+    ]);
+  }
+
+  Widget _scoreNumber(int n) {
+    return Container(
+      width: 64,
+      height: 56,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.black45),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text('$n',
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (isLoading) return const Center(child: CircularProgressIndicator());
@@ -138,56 +402,313 @@ class _PredictionPageState extends State<PredictionPage> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        // デザイン幅基準のスケーリング
-        const designWidth = 1200.0;
-        const minScale = 0.75;
-        final width = constraints.maxWidth;
-        final rawScale = width / designWidth;
-        final scale = rawScale.clamp(minScale, 1.0);
-        final compact = rawScale < minScale;
+        // フル幅表示（スケーリングなし）
+        final designWidth = constraints.maxWidth;
+        const double scale = 1.0;
+        final compact = false;
 
-        final left = _UnifiedGrid(
-          predictions: predictions,
-          standings: standings, // ← フラットのまま渡す
-          npbPlayerStats: npbPlayerStats,
-          usernameForId: _usernameForId,
-          userNameFromPredictions: _userNameFromPredictions,
-          compact: compact,
-        );
-
-        final right = Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _DaySwitcher(
-              selectedOffset: _selectedDayOffset,
-              onChanged: (o) => setState(() => _selectedDayOffset = o),
-            ),
-            const SizedBox(height: 6),
-            Expanded(
-              child: GamesBoardYahooStyle(
-                games: games,
-                dateFilter: _ymdWithOffset(_selectedDayOffset),
-              ),
-            ),
-          ],
-        );
-
+        // レイアウトを「リーグ×2行、各行に 予想・成績・試合情報」を配置
         return Container(
           alignment: Alignment.topCenter,
           child: Transform.scale(
             scale: scale,
             alignment: Alignment.topCenter,
             child: ConstrainedBox(
-              constraints: const BoxConstraints.tightFor(width: designWidth),
+              constraints: BoxConstraints.tightFor(width: designWidth),
               child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(child: left),
-                    const VerticalDivider(width: 8, thickness: 0.5),
-                    Expanded(child: right),
-                  ],
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                child: SizedBox(
+                  height: constraints.maxHeight,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // ─────────────────────────────────────────────
+                      // ヘッダー（タブ / News / Score / イベント）
+                      // ─────────────────────────────────────────────
+                      _globalHeader(),
+                      const SizedBox(height: 8),
+                      _tabsBar(),
+                      const SizedBox(height: 8),
+                      _scoreNewsEventsRow(),
+                      const SizedBox(height: 12),
+                      const Divider(height: 1),
+                      const SizedBox(height: 12),
+                      // 2リーグを 1:1 の高さで配置
+                      Expanded(
+                        child: Column(
+                          children: [
+                            // 1行目: セ・リーグ
+                            Expanded(
+                              child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      flex: 2,
+                                      child: _UnifiedGrid(
+                                        predictions: predictions,
+                                        standings: standings,
+                                        npbPlayerStats: npbPlayerStats,
+                                        usernameForId: _usernameForId,
+                                        userNameFromPredictions:
+                                            _userNameFromPredictions,
+                                        compact: compact,
+                                        onlyLeagueId: 1,
+                                      ),
+                                    ),
+                                    const VerticalDivider(
+                                        width: 8, thickness: 0.5),
+                                    Expanded(
+                                      flex: 3,
+                                      child: SeasonTableBlock(
+                                        standings: standings,
+                                        stats: npbPlayerStatsActual,
+                                        onlyLeagueId: 1,
+                                      ),
+                                    ),
+                                    const VerticalDivider(
+                                        width: 8, thickness: 0.5),
+                                    Expanded(
+                                      flex: 3,
+                                      child: Row(children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: [
+                                              const Text('昨日',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                              const SizedBox(height: 6),
+                                              Expanded(
+                                                child: GamesBoardYahooStyle(
+                                                  games: games
+                                                      .where((g) =>
+                                                          (int.tryParse(
+                                                                      '${g['id_league_home']}') ??
+                                                                  0) ==
+                                                              1 &&
+                                                          (int.tryParse(
+                                                                      '${g['id_league_away']}') ??
+                                                                  0) ==
+                                                              1)
+                                                      .toList(),
+                                                  dateFilter:
+                                                      _ymdWithOffset(-1),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: [
+                                              const Text('今日',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                              const SizedBox(height: 6),
+                                              Expanded(
+                                                child: GamesBoardYahooStyle(
+                                                  games: games
+                                                      .where((g) =>
+                                                          (int.tryParse(
+                                                                      '${g['id_league_home']}') ??
+                                                                  0) ==
+                                                              1 &&
+                                                          (int.tryParse(
+                                                                      '${g['id_league_away']}') ??
+                                                                  0) ==
+                                                              1)
+                                                      .toList(),
+                                                  dateFilter:
+                                                      _anchorYmdFromGames(),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: [
+                                              const Text('明日',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                              const SizedBox(height: 6),
+                                              Expanded(
+                                                child: GamesBoardYahooStyle(
+                                                  games: games
+                                                      .where((g) =>
+                                                          (int.tryParse(
+                                                                      '${g['id_league_home']}') ??
+                                                                  0) ==
+                                                              1 &&
+                                                          (int.tryParse(
+                                                                      '${g['id_league_away']}') ??
+                                                                  0) ==
+                                                              1)
+                                                      .toList(),
+                                                  dateFilter: _ymd(DateTime.parse(
+                                                          _anchorYmdFromGames())
+                                                      .add(const Duration(
+                                                          days: 1))),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ]),
+                                    ),
+                                  ]),
+                            ),
+                            const SizedBox(height: 12),
+                            const Divider(height: 1),
+                            const SizedBox(height: 12),
+                            // 2行目: パ・リーグ
+                            Expanded(
+                              child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      flex: 2,
+                                      child: _UnifiedGrid(
+                                        predictions: predictions,
+                                        standings: standings,
+                                        npbPlayerStats: npbPlayerStats,
+                                        usernameForId: _usernameForId,
+                                        userNameFromPredictions:
+                                            _userNameFromPredictions,
+                                        compact: compact,
+                                        onlyLeagueId: 2,
+                                      ),
+                                    ),
+                                    const VerticalDivider(
+                                        width: 8, thickness: 0.5),
+                                    Expanded(
+                                      flex: 3,
+                                      child: SeasonTableBlock(
+                                        standings: standings,
+                                        stats: npbPlayerStatsActual,
+                                        onlyLeagueId: 2,
+                                      ),
+                                    ),
+                                    const VerticalDivider(
+                                        width: 8, thickness: 0.5),
+                                    Expanded(
+                                      flex: 3,
+                                      child: Row(children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: [
+                                              const Text('昨日',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                              const SizedBox(height: 6),
+                                              Expanded(
+                                                child: GamesBoardYahooStyle(
+                                                  games: games
+                                                      .where((g) =>
+                                                          (int.tryParse(
+                                                                      '${g['id_league_home']}') ??
+                                                                  0) ==
+                                                              2 &&
+                                                          (int.tryParse(
+                                                                      '${g['id_league_away']}') ??
+                                                                  0) ==
+                                                              2)
+                                                      .toList(),
+                                                  dateFilter: _ymd(DateTime.parse(
+                                                          _anchorYmdFromGames())
+                                                      .subtract(const Duration(
+                                                          days: 1))),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: [
+                                              const Text('今日',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                              const SizedBox(height: 6),
+                                              Expanded(
+                                                child: GamesBoardYahooStyle(
+                                                  games: games
+                                                      .where((g) =>
+                                                          (int.tryParse(
+                                                                      '${g['id_league_home']}') ??
+                                                                  0) ==
+                                                              2 &&
+                                                          (int.tryParse(
+                                                                      '${g['id_league_away']}') ??
+                                                                  0) ==
+                                                              2)
+                                                      .toList(),
+                                                  dateFilter:
+                                                      _anchorYmdFromGames(),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: [
+                                              const Text('明日',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                              const SizedBox(height: 6),
+                                              Expanded(
+                                                child: GamesBoardYahooStyle(
+                                                  games: games
+                                                      .where((g) =>
+                                                          (int.tryParse(
+                                                                      '${g['id_league_home']}') ??
+                                                                  0) ==
+                                                              2 &&
+                                                          (int.tryParse(
+                                                                      '${g['id_league_away']}') ??
+                                                                  0) ==
+                                                              2)
+                                                      .toList(),
+                                                  dateFilter: _ymd(DateTime.parse(
+                                                          _anchorYmdFromGames())
+                                                      .add(const Duration(
+                                                          days: 1))),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ]),
+                                    ),
+                                  ]),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -250,12 +771,15 @@ class _DaySwitcher extends StatelessWidget {
 }
 
 /// セル幅に合わせて1行自動縮小（省略記号なし）
+
+// After
 class OneLineShrinkText extends StatelessWidget {
   final String text;
   final double baseSize;
   final double minSize;
   final FontWeight? weight;
   final TextAlign align;
+  final Color? color;
 
   const OneLineShrinkText(
     this.text, {
@@ -264,6 +788,7 @@ class OneLineShrinkText extends StatelessWidget {
     this.minSize = 6,
     this.weight,
     this.align = TextAlign.center,
+    this.color, // ← 追加
   });
 
   @override
@@ -294,7 +819,7 @@ class OneLineShrinkText extends StatelessWidget {
         softWrap: false,
         overflow: TextOverflow.clip,
         textAlign: align,
-        style: TextStyle(fontSize: fontSize, fontWeight: weight),
+        style: TextStyle(fontSize: fontSize, fontWeight: weight, color: color),
       );
     });
   }
@@ -327,6 +852,7 @@ class GamesBoardYahooStyle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(dateFilter);
     final src = (dateFilter == null || dateFilter!.isEmpty)
         ? games
         : games
@@ -345,31 +871,30 @@ class GamesBoardYahooStyle extends StatelessWidget {
     }
 
     return LayoutBuilder(builder: (context, c) {
-      final w = c.maxWidth;
-      final cross = w >= 1000 ? 3 : (w >= 700 ? 2 : 1);
       final order =
-          ['セ・リーグ', 'パ・リーグ', '交流戦'].where(bySec.keys.toSet().contains).toList();
+          ['セ・リーグ', 'パ・リーグ'].where(bySec.keys.toSet().contains).toList();
 
-      return ListView(
-        padding: const EdgeInsets.all(8),
+      Widget threeRows(List<Map<String, dynamic>> list) {
+        final g0 = list.isNotEmpty ? list[0] : null;
+        final g1 = list.length > 1 ? list[1] : null;
+        final g2 = list.length > 2 ? list[2] : null;
+        return Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            children: [
+              Expanded(child: g0 != null ? _GameCard(g0) : const SizedBox()),
+              const SizedBox(height: 8),
+              Expanded(child: g1 != null ? _GameCard(g1) : const SizedBox()),
+              const SizedBox(height: 8),
+              Expanded(child: g2 != null ? _GameCard(g2) : const SizedBox()),
+            ],
+          ),
+        );
+      }
+
+      return Column(
         children: [
-          for (final sec in order) ...[
-            _LeagueHeader(sec),
-            const SizedBox(height: 6),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: bySec[sec]!.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: cross,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-                childAspectRatio: 6.4, // 高さを抑える
-              ),
-              itemBuilder: (context, i) => _GameCard(bySec[sec]![i]),
-            ),
-            const SizedBox(height: 12),
-          ],
+          for (final sec in order) Expanded(child: threeRows(bySec[sec]!)),
         ],
       );
     });
@@ -440,21 +965,22 @@ class _GameCard extends StatelessWidget {
             // 上段: 時刻（左）／ 球場（右）
             Row(
               children: [
-                Text(
+                OneLineShrinkText(
                   _time.isNotEmpty ? _time : (_showScore ? '試合終了' : ''),
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: _showScore ? Colors.purple : Colors.black54,
-                    fontWeight:
-                        _showScore ? FontWeight.w600 : FontWeight.normal,
-                  ),
+                  baseSize: 12,
+                  minSize: 8,
+                  weight: _showScore ? FontWeight.w600 : FontWeight.normal,
+                  color: _showScore ? Colors.purple : Colors.black54,
+                  align: TextAlign.left,
                 ),
                 const SizedBox(width: 6),
                 Expanded(
-                  child: Text(
+                  child: OneLineShrinkText(
                     _stadium,
-                    style: const TextStyle(fontSize: 11, color: Colors.black87),
-                    overflow: TextOverflow.ellipsis,
+                    baseSize: 12,
+                    minSize: 8,
+                    color: Colors.black87,
+                    align: TextAlign.left,
                   ),
                 ),
               ],
@@ -471,15 +997,19 @@ class _GameCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(_home,
-                            style: const TextStyle(
-                                fontSize: 13, fontWeight: FontWeight.w600)),
+                        OneLineShrinkText(_home,
+                            baseSize: 13,
+                            minSize: 8,
+                            weight: FontWeight.w600,
+                            align: TextAlign.left),
                         if (_pHome.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(top: 2),
-                            child: Text(_pHome,
-                                style: const TextStyle(
-                                    fontSize: 11, color: Colors.black87)),
+                            child: OneLineShrinkText(_pHome,
+                                baseSize: 11,
+                                minSize: 8,
+                                color: Colors.black87,
+                                align: TextAlign.left),
                           ),
                       ],
                     ),
@@ -488,12 +1018,11 @@ class _GameCard extends StatelessWidget {
                 SizedBox(
                   width: 72,
                   child: Center(
-                    child: Text(
+                    child: OneLineShrinkText(
                       _showScore ? '$_sHome  -  $_sAway' : 'vs',
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      baseSize: 15,
+                      minSize: 10,
+                      weight: FontWeight.bold,
                     ),
                   ),
                 ),
@@ -503,15 +1032,19 @@ class _GameCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(_away,
-                            style: const TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w600)),
+                        OneLineShrinkText(_away,
+                            baseSize: 14,
+                            minSize: 8,
+                            weight: FontWeight.w600,
+                            align: TextAlign.right),
                         if (_pAway.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(top: 2),
-                            child: Text(_pAway,
-                                style: const TextStyle(
-                                    fontSize: 12, color: Colors.black87)),
+                            child: OneLineShrinkText(_pAway,
+                                baseSize: 12,
+                                minSize: 8,
+                                color: Colors.black87,
+                                align: TextAlign.right),
                           ),
                       ],
                     ),
@@ -527,15 +1060,23 @@ class _GameCard extends StatelessWidget {
               Row(
                 children: [
                   if (_win.isNotEmpty)
-                    Text('(勝)$_win',
-                        style: const TextStyle(
-                            fontSize: 12, color: Colors.black87)),
+                    Expanded(
+                      child: OneLineShrinkText('(勝)$_win',
+                          baseSize: 12,
+                          minSize: 8,
+                          color: Colors.black87,
+                          align: TextAlign.left),
+                    ),
                   if (_win.isNotEmpty && _lose.isNotEmpty)
                     const SizedBox(width: 8),
                   if (_lose.isNotEmpty)
-                    Text('(敗)$_lose',
-                        style: const TextStyle(
-                            fontSize: 12, color: Colors.black87)),
+                    Expanded(
+                      child: OneLineShrinkText('(敗)$_lose',
+                          baseSize: 12,
+                          minSize: 8,
+                          color: Colors.black87,
+                          align: TextAlign.right),
+                    ),
                 ],
               ),
           ],
@@ -555,8 +1096,9 @@ class _UnifiedGrid extends StatelessWidget {
   final String Function(String idUser) usernameForId;
   final String Function(String idUser) userNameFromPredictions;
   final bool compact;
+  final int? onlyLeagueId; // 1: セ, 2: パ, null: 両方
 
-  const _UnifiedGrid({
+  _UnifiedGrid({
     super.key,
     required this.predictions,
     required this.standings,
@@ -564,30 +1106,36 @@ class _UnifiedGrid extends StatelessWidget {
     required this.usernameForId,
     required this.userNameFromPredictions,
     required this.compact,
+    this.onlyLeagueId,
   });
 
-  Widget headerCell(String text, {FontWeight weight = FontWeight.bold}) {
+// After
+  Widget headerCell(String text,
+      {FontWeight weight = FontWeight.bold, Color? bgColor, Color? fgColor}) {
     return Container(
-      margin: const EdgeInsets.all(1),
-      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+      margin: const EdgeInsets.fromLTRB(1, 0, 1, 0),
+      padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 4),
       decoration: BoxDecoration(
+        color: bgColor,
         border: Border.all(color: Colors.grey.shade300),
         borderRadius: BorderRadius.circular(4),
       ),
+
+// After
       child: SizedBox(
         width: double.infinity,
-        child:
-            OneLineShrinkText(text, baseSize: 12, minSize: 6, weight: weight),
+        child: OneLineShrinkText(text,
+            baseSize: 12, minSize: 6, weight: weight, color: fgColor),
       ),
     );
   }
 
-  Widget cell(String text, {bool highlight = false}) {
+  Widget cell(String text, {bool highlight = false, Color? bgColor}) {
     return Container(
-      margin: const EdgeInsets.all(1),
-      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+      margin: const EdgeInsets.fromLTRB(1, 0, 1, 0),
+      padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 4),
       decoration: BoxDecoration(
-        color: highlight ? Colors.yellow[200] : null,
+        color: bgColor ?? (highlight ? Colors.yellow[200] : null),
         border: Border.all(color: Colors.grey.shade300),
         borderRadius: BorderRadius.circular(4),
       ),
@@ -650,15 +1198,12 @@ class _UnifiedGrid extends StatelessWidget {
       ),
     ));
 
-    // ヘッダー
     widgets.add(Row(children: [
-      const Expanded(flex: 2, child: Center(child: OneLineShrinkText('順位'))),
-      Expanded(
-          flex: 2,
-          child: Center(
-            child: OneLineShrinkText(userNameFromPredictions('1'),
-                weight: FontWeight.bold),
-          )),
+// After
+      SizedBox(
+        width: 56, // 4文字ぶん
+        child: headerCell('順位', bgColor: Colors.black, fgColor: Colors.white),
+      ),
       const Expanded(
           flex: 2,
           child: Center(
@@ -667,8 +1212,14 @@ class _UnifiedGrid extends StatelessWidget {
       Expanded(
           flex: 2,
           child: Center(
+            child: OneLineShrinkText(userNameFromPredictions('1'),
+                weight: FontWeight.bold), // 立石
+          )),
+      Expanded(
+          flex: 2,
+          child: Center(
             child: OneLineShrinkText(userNameFromPredictions('2'),
-                weight: FontWeight.bold),
+                weight: FontWeight.bold), // 江島
           )),
     ]));
     widgets.add(const Divider(height: 8, thickness: 0.5));
@@ -723,10 +1274,16 @@ class _UnifiedGrid extends StatelessWidget {
 
       widgets.add(Row(
         children: [
-          Expanded(flex: 2, child: headerCell('$rk')),
-          Expanded(flex: 2, child: cell(txt1, highlight: hi1)),
-          Expanded(flex: 2, child: cell(curTeamText)),
-          Expanded(flex: 2, child: cell(txt2, highlight: hi2)),
+          SizedBox(
+              width: 56,
+              child: headerCell('$rk',
+                  bgColor: Colors.black, fgColor: Colors.white)),
+          Expanded(
+              flex: 2,
+              child: cell(curTeamText,
+                  bgColor: const Color(0xFFF0E68C))), // 現在を #f0e68c
+          Expanded(flex: 2, child: cell(txt1, highlight: hi1)), // 立石
+          Expanded(flex: 2, child: cell(txt2, highlight: hi2)), // 江島
         ],
       ));
     }
@@ -752,30 +1309,50 @@ class _UnifiedGrid extends StatelessWidget {
 
     // タイトルの見出し行
     widgets.add(Row(children: [
-      const Expanded(flex: 2, child: Center(child: OneLineShrinkText('スタッツ'))),
+      const SizedBox(
+        width: 56, // 4文字ぶんの目安
+        child: Center(child: OneLineShrinkText('スタッツ')),
+      ),
       Expanded(
           flex: 2,
           child: Center(
-            child:
-                OneLineShrinkText(usernameForId('1'), weight: FontWeight.bold),
+            child: OneLineShrinkText(usernameForId('0'),
+                weight: FontWeight.bold), // 現在
           )),
       Expanded(
           flex: 2,
           child: Center(
-            child:
-                OneLineShrinkText(usernameForId('0'), weight: FontWeight.bold),
+            child: OneLineShrinkText(usernameForId('1'),
+                weight: FontWeight.bold), // 立石
           )),
       Expanded(
           flex: 2,
           child: Center(
-            child:
-                OneLineShrinkText(usernameForId('2'), weight: FontWeight.bold),
+            child: OneLineShrinkText(usernameForId('2'),
+                weight: FontWeight.bold), // 江島
           )),
     ]));
     widgets.add(const Divider(height: 8, thickness: 0.5));
 
+    int _idxOf(Map<String, dynamic> r) {
+      final v = r['int_index'] ?? r['id_stats']; // 保険で id_stats も参照
+      return int.tryParse('$v') ?? 1 << 30;
+    }
+
+    int _minIdx(List<Map<String, dynamic>> rows) => rows.isEmpty
+        ? (1 << 30)
+        : rows.map(_idxOf).reduce((a, b) => a < b ? a : b);
+
     final statEntries = statMap.entries.toList()
-      ..sort((a, b) => a.key.split('|').last.compareTo(b.key.split('|').last));
+      ..sort((a, b) {
+        final ia = _minIdx(a.value);
+        final ib = _minIdx(b.value);
+        if (ia != ib) return ia.compareTo(ib);
+        return a.key
+            .split('|')
+            .last
+            .compareTo(b.key.split('|').last); // 同順位は名称で
+      });
 
     for (final entry in statEntries) {
       final title = entry.key.split('|').last;
@@ -796,12 +1373,24 @@ class _UnifiedGrid extends StatelessWidget {
       final hi0 = user0Rows.any((e) => e['flg_atari'] == true);
       final hi2 = user2Rows.any((e) => e['flg_atari'] == true);
 
+// After
+      final isPitcher = rows2.any((e) => e['flg_pitcher'] == true);
+      final titleBg = isPitcher
+          ? const Color(0xFF64B5F6)
+          : const Color(0xFFEF9A9A); // 少し濃い青/赤
+
       widgets.add(Row(
         children: [
-          Expanded(flex: 2, child: headerCell(title)),
-          Expanded(flex: 2, child: cell(txt1, highlight: hi1)),
-          Expanded(flex: 2, child: cell(txt0, highlight: hi0)),
-          Expanded(flex: 2, child: cell(txt2, highlight: hi2)),
+          SizedBox(
+            width: 56, // 4文字ぶんの目安
+            child: headerCell(title, bgColor: titleBg),
+          ),
+          Expanded(
+              flex: 2,
+              child: cell(txt0,
+                  bgColor: const Color(0xFFF0E68C), highlight: hi0)), // 現在
+          Expanded(flex: 2, child: cell(txt1, highlight: hi1)), // 立石
+          Expanded(flex: 2, child: cell(txt2, highlight: hi2)), // 江島
         ],
       ));
     }
@@ -818,23 +1407,476 @@ class _UnifiedGrid extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Padding(
           padding: const EdgeInsets.all(8),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: onlyLeagueId == null
+                  ? [
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: _buildLeagueColumn(1),
+                      ),
+                      const SizedBox(height: 12),
+                      const Divider(height: 1),
+                      const SizedBox(height: 12),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: _buildLeagueColumn(2),
+                      ),
+                    ]
+                  : [
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: _buildLeagueColumn(onlyLeagueId!),
+                      ),
+                    ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SeasonTableBlock extends StatelessWidget {
+  final List<Map<String, dynamic>> standings;
+  final List<Map<String, dynamic>> stats;
+  final int? onlyLeagueId; // 1: セ, 2: パ, null: 両方
+
+  const SeasonTableBlock({
+    super.key,
+    required this.standings,
+    required this.stats,
+    this.onlyLeagueId,
+  });
+
+  // 文字→数値(表示用)
+  String _num(dynamic v) => (v == null || '$v'.isEmpty) ? '—' : '$v';
+
+  // リーグ別フィルタ
+  List<Map<String, dynamic>> _standingsOf(int leagueId) => standings
+      .where((e) => int.tryParse('${e['id_league']}') == leagueId)
+      .toList()
+    ..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0)
+        .compareTo(int.tryParse('${b['int_rank']}') ?? 0));
+
+  List<Map<String, dynamic>> _statsOf(int leagueId, {required bool pitcher}) =>
+      stats
+          .where((e) =>
+              ((e['league_name'] ?? '').toString() ==
+                  (leagueId == 1 ? 'セ・リーグ' : 'パ・リーグ')) &&
+              (e['flg_pitcher'] == pitcher))
+          .toList();
+
+  // タイトル→選手名(なければ ?)
+  String _playerOf(List<Map<String, dynamic>> rows, String title) {
+    final r = rows.firstWhere(
+      (e) => (e['title'] ?? '').toString() == title,
+      orElse: () => const {},
+    );
+    final name = (r.isNotEmpty ? (r['name_player'] ?? '') : '').toString();
+    return name.isEmpty ? '?' : name;
+  }
+
+  Widget _sectionHeader(String label, Color color) {
+    return Container(
+      height: 26,
+      decoration:
+          BoxDecoration(color: color, borderRadius: BorderRadius.circular(4)),
+      alignment: Alignment.centerLeft,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Text(label,
+          style: const TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold)),
+    );
+  }
+
+  // 簡易セル
+  Widget _cell(String text, {Color? bg, FontWeight? weight, Color? fg}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+      decoration: BoxDecoration(
+        color: bg,
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      alignment: Alignment.center,
+      child: OneLineShrinkText(text,
+          baseSize: 12, minSize: 6, weight: weight, color: fg),
+    );
+  }
+
+  // 最小幅付きセル（数値列用）
+  Widget _minCell(String text, double min,
+      {Color? bg, Color? fg, FontWeight? weight}) {
+    return ConstrainedBox(
+      constraints: BoxConstraints(minWidth: min),
+      child: _cell(text, bg: bg, fg: fg, weight: weight),
+    );
+  }
+
+  // 順位テーブル（上:順位行、下:スタッツ要約）
+  Widget _leagueTable(int leagueId) {
+    final cur = _standingsOf(leagueId);
+    final leagueName = cur.isNotEmpty
+        ? (cur.first['name_league']?.toString() ?? '')
+        : (leagueId == 1 ? 'セ・リーグ' : 'パ・リーグ');
+
+    // 打撃/投手タイトル（画像に近い簡易版）: stats_player の形に合わせて抽出
+    const battingTitles = ['打率', '本塁打', '打点', '盗塁', '出塁率'];
+    const pitchingTitles = ['防御率', '最多勝', '奪三振', 'HP', 'セーブ'];
+    final leagueStats = stats
+        .where((e) => int.tryParse('${e['id_league']}') == leagueId)
+        .toList();
+    final bat = leagueStats
+        .where((e) => battingTitles.contains(((e['title'] ?? '').toString())))
+        .toList();
+    final pit = leagueStats
+        .where((e) => pitchingTitles.contains(((e['title'] ?? '').toString())))
+        .toList();
+
+    // 文字幅の目安（12pxフォントで約14px/字）
+    // 文字幅の目安（12pxフォントで約14px/字）
+    const double _kChar = 14.0;
+    const double _wRank = _kChar * 2; // 2文字ぶん
+    const double _wTeam = _kChar * 7; // 7文字ぶん（順位表で使用中）
+    const double _wNum = _kChar * 3; // 3文字ぶん（順位表で使用中）
+    const double _wStat = _kChar * 18; // 個人成績の各タイトル列幅
+
+    Widget _gridCell(String text,
+        {double h = 28, Color? bg, Color? fg, FontWeight? weight}) {
+      return Container(
+        height: h,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: bg,
+          border: Border.all(color: Colors.black26, width: 1),
+        ),
+        child: OneLineShrinkText(text,
+            baseSize: 12, minSize: 6, weight: weight, color: fg),
+      );
+    }
+
+    Widget _bar(String label, Color color,
+        {double h = 26, Color fg = Colors.white}) {
+      return Container(
+        height: h,
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(color: color),
+        child: Text(label,
+            style: TextStyle(color: fg, fontWeight: FontWeight.bold)),
+      );
+    }
+
+    Widget _personalStatsSheet(int leagueId, List<Map<String, dynamic>> bat,
+        List<Map<String, dynamic>> pit) {
+      final leagueLabel = leagueId == 1 ? 'セ・リーグ' : 'パ・リーグ';
+
+      List<TableRow> _rankRows(
+          List<String> cols, List<Map<String, dynamic>> src) {
+        String _normalizeTitle(String t) => t == 'ホールド' ? 'HP' : t;
+        String _nameBy(String title, int rank) {
+          final e = src.firstWhere(
+              (m) =>
+                  (m['title']?.toString() ?? '') == _normalizeTitle(title) &&
+                  (int.tryParse('${m['int_rank']}') ?? -1) == rank,
+              orElse: () => const {});
+          return (e.isNotEmpty ? (e['name_player'] ?? '') : '').toString();
+        }
+
+        final rows = <TableRow>[];
+        for (int r = 1; r <= 5; r++) {
+          rows.add(TableRow(children: [
+            _gridCell('$r', bg: Colors.white, fg: Colors.black),
+            for (final t in cols) _gridCell(_nameBy(t, r)),
+          ]));
+        }
+        return rows;
+      }
+
+      // 1位の選手名（無ければ空文字）
+      String _pick(List<Map<String, dynamic>> src, String title) {
+        final v = src.firstWhere((e) => (e['title'] ?? '') == title,
+            orElse: () => const {});
+        return (v.isNotEmpty ? (v['name_player'] ?? '') : '').toString();
+      }
+
+      String _normalizeTitle(String t) => t == 'ホールド' ? 'HP' : t;
+      String _nameBy(List<Map<String, dynamic>> src, String title, int rank) {
+        final e = src.firstWhere(
+            (m) =>
+                (m['title']?.toString() ?? '') == _normalizeTitle(title) &&
+                (int.tryParse('${m['int_rank']}') ?? -1) == rank,
+            orElse: () => const {});
+        return (e.isNotEmpty ? (e['name_player'] ?? '') : '').toString();
+      }
+
+      final battingCols = ['打率', '本塁打', '打点', '盗塁', '出塁率'];
+      final pitchingCols = ['防御率', '最多勝', '奪三振', 'ホールド', 'セーブ'];
+
+      // 個人成績セル: ランク/チーム/選手/数値 を1セル内に表示
+      Widget _entryCell(
+          List<Map<String, dynamic>> src, String title, int rank) {
+        final e = src.firstWhere(
+            (m) =>
+                (m['title']?.toString() ?? '') == _normalizeTitle(title) &&
+                (int.tryParse('${m['int_rank']}') ?? -1) == rank,
+            orElse: () => const {});
+        final team = (e.isNotEmpty ? (e['name_team'] ?? '') : '').toString();
+        final name = (e.isNotEmpty ? (e['name_player'] ?? '') : '').toString();
+        final stat = _num(e.isNotEmpty ? e['stats'] : null);
+
+        const double _segRank = _kChar * 2;
+        const double _segTeam = _kChar * 2;
+        const double _segStat = _kChar * 4;
+
+        return SizedBox(
+          width: _wStat,
+          child: Container(
+            height: 28,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.black26, width: 1),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 2),
+            child: Row(children: [
+              SizedBox(
+                  width: _segRank,
+                  child: OneLineShrinkText('$rank', baseSize: 12, minSize: 6)),
+              SizedBox(
+                  width: _segTeam,
+                  child: OneLineShrinkText(team, baseSize: 12, minSize: 6)),
               Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: _buildLeagueColumn(1), // ← id_league = 1（セ）
-                ),
-              ),
-              const VerticalDivider(width: 8, thickness: 0.5),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: _buildLeagueColumn(2), // ← id_league = 2（パ）
-                ),
-              ),
-            ],
+                  child: OneLineShrinkText(name, baseSize: 12, minSize: 6)),
+              SizedBox(
+                  width: _segStat,
+                  child: OneLineShrinkText(stat, baseSize: 12, minSize: 6)),
+            ]),
+          ),
+        );
+      }
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // 黒: 個人成績
+          _bar('個人成績', Colors.black),
+          // 緑: リーグ名
+          _bar(leagueLabel, const Color(0xFF7CB342)),
+          // 赤: 打撃 見出し（横スクロール）
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(children: [
+              for (final t in battingCols)
+                SizedBox(
+                    width: _wStat,
+                    child: _gridCell(t, bg: const Color(0xFFE57373), h: 30)),
+            ]),
+          ),
+          // 打撃 本文（ランク/チーム/選手/数値）
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Column(children: [
+              for (int r = 1; r <= 5; r++)
+                Row(children: [
+                  for (final t in battingCols) _entryCell(bat, t, r),
+                ]),
+            ]),
+          ),
+          const SizedBox(height: 8),
+          // 青: 投手 見出し（横スクロール）
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(children: [
+              for (final t in pitchingCols)
+                SizedBox(
+                    width: _wStat,
+                    child: _gridCell(t, bg: const Color(0xFF64B5F6), h: 30)),
+            ]),
+          ),
+          // 投手 本文（ランク/チーム/選手/数値）
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Column(children: [
+              for (int r = 1; r <= 5; r++)
+                Row(children: [
+                  for (final t in pitchingCols) _entryCell(pit, t, r),
+                ]),
+            ]),
+          ),
+        ],
+      );
+    }
+
+    // スクロール分離: チーム順位は専用の横スクロール、個人成績は別
+    final double _standingsWidth =
+        _wRank + _wTeam + _wNum * 11; // 列数: 試合/勝/負/分/勝差/勝率/打率/本塁打/打点/盗塁/防御率
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // リーグ見出し
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Center(
+            child: Text(
+              leagueName,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            ),
+          ),
+        ),
+
+        // チーム順位（独立横スクロール）
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: SizedBox(
+            width: _standingsWidth,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ヘッダー
+                Row(children: [
+                  SizedBox(
+                      width: _wRank,
+                      child: _cell('順位',
+                          bg: Colors.black,
+                          fg: Colors.white,
+                          weight: FontWeight.bold)),
+                  SizedBox(
+                      width: _wTeam,
+                      child: _cell('チーム', weight: FontWeight.bold)),
+                  SizedBox(
+                      width: _wNum,
+                      child: _cell('試合', weight: FontWeight.bold)),
+                  SizedBox(
+                      width: _wNum, child: _cell('勝', weight: FontWeight.bold)),
+                  SizedBox(
+                      width: _wNum, child: _cell('負', weight: FontWeight.bold)),
+                  SizedBox(
+                      width: _wNum, child: _cell('分', weight: FontWeight.bold)),
+                  SizedBox(
+                      width: _wNum,
+                      child: _cell('勝差', weight: FontWeight.bold)),
+                  SizedBox(
+                      width: _wNum,
+                      child: _cell('勝率', weight: FontWeight.bold)),
+                  SizedBox(
+                      width: _wNum,
+                      child: _cell('打率', weight: FontWeight.bold)),
+                  SizedBox(
+                      width: _wNum,
+                      child: _cell('本塁打', weight: FontWeight.bold)),
+                  SizedBox(
+                      width: _wNum,
+                      child: _cell('打点', weight: FontWeight.bold)),
+                  SizedBox(
+                      width: _wNum,
+                      child: _cell('盗塁', weight: FontWeight.bold)),
+                  SizedBox(
+                      width: _wNum,
+                      child: _cell('防御率', weight: FontWeight.bold)),
+                ]),
+                const SizedBox(height: 4),
+
+                // 本文 1..6
+                for (int rk = 1; rk <= 6; rk++)
+                  Row(children: [
+                    SizedBox(
+                        width: _wRank,
+                        child:
+                            _cell('$rk', bg: Colors.black, fg: Colors.white)),
+                    SizedBox(
+                        width: _wTeam,
+                        child: _cell(_num(cur.firstWhere(
+                            (e) => int.tryParse('${e['int_rank']}') == rk,
+                            orElse: () => const {})['name_team']))),
+                    SizedBox(
+                        width: _wNum,
+                        child: _cell(_num(cur.firstWhere(
+                            (e) => int.tryParse('${e['int_rank']}') == rk,
+                            orElse: () => const {})['int_game']))),
+                    SizedBox(
+                        width: _wNum,
+                        child: _cell(_num(cur.firstWhere(
+                            (e) => int.tryParse('${e['int_rank']}') == rk,
+                            orElse: () => const {})['int_win']))),
+                    SizedBox(
+                        width: _wNum,
+                        child: _cell(_num(cur.firstWhere(
+                            (e) => int.tryParse('${e['int_rank']}') == rk,
+                            orElse: () => const {})['int_lose']))),
+                    SizedBox(
+                        width: _wNum,
+                        child: _cell(_num(cur.firstWhere(
+                            (e) => int.tryParse('${e['int_rank']}') == rk,
+                            orElse: () => const {})['int_draw']))),
+                    SizedBox(
+                        width: _wNum,
+                        child: _cell(_num(cur.firstWhere(
+                            (e) => int.tryParse('${e['int_rank']}') == rk,
+                            orElse: () => const {})['game_behind']))),
+                    SizedBox(
+                        width: _wNum,
+                        child: _cell(_num(cur.firstWhere(
+                            (e) => int.tryParse('${e['int_rank']}') == rk,
+                            orElse: () => const {})['win_rate']))),
+                    SizedBox(
+                        width: _wNum,
+                        child: _cell(_num(cur.firstWhere(
+                            (e) => int.tryParse('${e['int_rank']}') == rk,
+                            orElse: () => const {})['num_avg_batting']))),
+                    SizedBox(
+                        width: _wNum,
+                        child: _cell(_num(cur.firstWhere(
+                            (e) => int.tryParse('${e['int_rank']}') == rk,
+                            orElse: () => const {})['int_homerun']))),
+                    SizedBox(
+                        width: _wNum,
+                        child: _cell(_num(cur.firstWhere(
+                            (e) => int.tryParse('${e['int_rank']}') == rk,
+                            orElse: () => const {})['int_rbi']))),
+                    SizedBox(
+                        width: _wNum,
+                        child: _cell(_num(cur.firstWhere(
+                            (e) => int.tryParse('${e['int_rank']}') == rk,
+                            orElse: () => const {})['int_sh']))),
+                    SizedBox(
+                        width: _wNum,
+                        child: _cell(_num(cur.firstWhere(
+                            (e) => int.tryParse('${e['int_rank']}') == rk,
+                            orElse: () => const {})['num_era_total']))),
+                  ]),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+
+        // 個人成績（独立: 内部で横スクロールを制御）
+        _personalStatsSheet(leagueId, bat, pit),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.all(4),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: SingleChildScrollView(
+          child: Column(
+            children: onlyLeagueId == null
+                ? [
+                    _leagueTable(1), // セ
+                    const SizedBox(height: 16),
+                    _leagueTable(2), // パ
+                  ]
+                : [
+                    _leagueTable(onlyLeagueId!),
+                  ],
           ),
         ),
       ),

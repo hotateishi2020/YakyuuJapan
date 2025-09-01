@@ -41,12 +41,20 @@ void main() async {
 
   app.get('/fetchGames', (Request request) async {
     // 今日の先発情報を更新→取得（必要に応じてコメントアウト可）
-    await Postgres.openConnection((conn) async {
-      await Postgres.transactionCommit(conn, () async {
-        await FetchURL.fetchTodayPitcherNPB(conn);
-      }); //DB-Commit
-    }); //DB-Close
-    return Response.ok('ok');
+    print('/fetchGames');
+    return await commonTryCatch(() async {
+      await Postgres.openConnection((conn) async {
+        await Postgres.transactionCommit(conn, () async {
+          print(1);
+          await FetchURL.fetchGames(conn, DateTime.now()); //今日の試合
+          print(2);
+          await FetchURL.fetchGames(
+              conn, DateTime.now().add(const Duration(days: 1))); //明日の試合
+          print(3);
+        }); //DB-Commit
+      }); //DB-Close
+      return Response.ok('ok');
+    });
   });
 
   //タイトル予想画面の表示
@@ -54,25 +62,27 @@ void main() async {
     return await commonTryCatch(() async {
       Map<String, dynamic> json = {};
       await Postgres.openConnection((conn) async {
-        print(1);
-        final users =
+        final predict_team =
             await conn.execute(AppSql.selectPredictNPBTeams()); //予想者データをDBから取得
-        print(1);
-        final npbPlayerStats = await conn
+
+        final predict_player = await conn
             .execute(AppSql.selectPredictPlayer()); //個人タイトル予想のデータをDBから取得
-        print(1);
-        final games = await conn.execute(AppSql.selectGames(),
-            parameters: [DateTimeTool.getNow('yyyy-MM-dd')]);
-        print(1);
-        final npbStandings = await conn.execute(AppSql.selectStatsTeam());
+
+        final stats_team = await conn.execute(AppSql.selectStatsTeam());
+
+        final stats_player = await conn.execute(AppSql.selectStatsPlayer(),
+            parameters: [DateTimeTool.getThisYear()]);
+
+        final games = await conn.execute(AppSql.selectGames());
 
         json = {
-          'users': Postgres.toJson(users),
-          'npbstandings': Postgres.toJson(npbStandings),
-          'npbPlayerStats': Postgres.toJson(npbPlayerStats),
+          'predict_team': Postgres.toJson(predict_team),
+          'predict_player': Postgres.toJson(predict_player),
+          'stats_team': Postgres.toJson(stats_team),
+          'stats_player': Postgres.toJson(stats_player),
           'games': Postgres.toJson(games),
         };
-        print(Postgres.toJson(npbStandings));
+        print(Postgres.toJson(games));
         // print(json);
       }); //connectionOpenClose
 

@@ -94,7 +94,7 @@ class AppSql {
         LEFT OUTER JOIN m_player AS pitcher_win ON pitcher_win.id = t_game.id_pitcher_win
         LEFT OUTER JOIN m_player AS pitcher_lose ON pitcher_lose.id = t_game.id_pitcher_lose
         LEFT OUTER JOIN m_stadium ON m_stadium.id = t_game.id_stadium
-      WHERE datetime_start::date = \$1;
+      WHERE t_game.datetime_start BETWEEN (CURRENT_DATE - INTERVAL '1 day') AND (CURRENT_DATE + INTERVAL '2 day');
     ''';
   }
 
@@ -118,7 +118,9 @@ class AppSql {
             THEN TRUE
             ELSE FALSE
           END 
-      END AS flg_atari
+      END AS flg_atari,
+      int_index,
+      flg_pitcher
       FROM (
         SELECT
           id_user,
@@ -172,7 +174,7 @@ class AppSql {
      LEFT JOIN m_stats ON m_stats.id = u.id_stats
      LEFT JOIN m_player ON m_player.id = u.id_player
      LEFT JOIN m_team ON m_team.id = u.id_team
-     ORDER BY id_user, u.id_league, id_stats;
+     ORDER BY id_user, u.id_league, int_index;
     ''';
   }
 
@@ -205,9 +207,11 @@ class AppSql {
         id_league,
         m_league.name_short AS name_league,
         int_game,
-        int_win	int_lose,
+        int_win,
+        int_lose,
         int_draw,
         game_behind,
+        int_win / (int_win + int_lose) AS pct_win,
         num_avg_batting,
         int_homerun,
         int_rbi,
@@ -225,8 +229,45 @@ class AppSql {
   }
 
   //t_stats_player
-  static String selectInsertPlayerStats(List<t_stats_player> stats) {
+  static String selectStatsPlayer() {
+    return '''
+      SELECT
+        m_stats.title,
+        t_stats_player.int_rank,
+        m_team.name_shortest AS name_team,
+        m_player.name_full   AS name_player,
+        t_stats_player.stats,
+        COALESCE('/' || string_agg(DISTINCT t_predict_player.id_user::text, '/' 
+                                ORDER BY t_predict_player.id_user::text) || '/', '') AS id_users,
+        t_stats_player.id_league,
+        m_stats.int_index,
+        t_stats_player.id_stats
+      FROM t_stats_player
+        LEFT JOIN m_stats   ON m_stats.id   = t_stats_player.id_stats
+        LEFT JOIN m_team    ON m_team.id    = t_stats_player.id_team
+        LEFT JOIN m_player  ON m_player.id  = t_stats_player.id_player
+        LEFT JOIN m_league  ON m_league.id  = m_team.id_league
+        LEFT JOIN t_predict_player
+          ON t_predict_player.id_player = t_stats_player.id_player
+          AND t_predict_player.id_stats  = t_stats_player.id_stats
+          AND t_predict_player.year      = \$1
+      WHERE t_stats_player.crtat = (SELECT MAX(crtat) FROM t_stats_player WHERE EXTRACT(YEAR FROM crtat) = \$1)
+      GROUP BY
+        m_stats.title,
+        t_stats_player.int_rank,
+        m_team.name_shortest,
+        m_player.name_full,
+        t_stats_player.stats,
+        t_stats_player.id_league,
+        m_stats.int_index,
+        t_stats_player.id_stats
+      ORDER BY t_stats_player.id_league, m_stats.int_index, t_stats_player.int_rank;
+    ''';
+  }
+
+  static String selectInsertStatsPlayer(List<t_stats_player> stats) {
     String sql = '''
+        DELETE FROM ${stats.first.tableName};
         INSERT INTO ${stats.first.tableName} (
           id_league,
           id_stats,

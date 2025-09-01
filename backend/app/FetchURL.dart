@@ -63,12 +63,11 @@ class FetchURL {
     await Postgres.insertMulti(conn, teams);
   }
 
-  static Future<List<Map<String, dynamic>>> fetchTodayPitcherNPB(
-      Connection conn) async {
+  static Future<List<Map<String, dynamic>>> fetchGames(
+      Connection conn, DateTime date) async {
     var urlString = 'https://baseball.yahoo.co.jp/npb/schedule/?date=';
-    final now = DateTime.now();
     final formatter = DateFormat('yyyy-MM-dd');
-    final formatted = formatter.format(now);
+    final formatted = formatter.format(date);
     final url = Uri.parse(urlString + formatted);
     final res = await http.get(url);
 
@@ -76,241 +75,248 @@ class FetchURL {
       throw Exception('Failed to fetch standings');
     }
 
-    final document = parse(res.body);
-    final leagues =
-        document.querySelectorAll('#gm_card')[0].querySelectorAll('section');
-
     final result = <Map<String, dynamic>>[];
-    var cnt = 0;
 
-    for (var league in leagues) {
-      print(league);
+    try {
+      final document = parse(res.body);
+      final leagues =
+          document.querySelectorAll('#gm_card')[0].querySelectorAll('section');
 
-      var id_stadium = 0;
-      var id_team_home = 0;
-      var id_team_away = 0;
-      var id_pitcher_home = 0;
-      var id_pitcher_away = 0;
-      var score_home = -1;
-      var score_away = -1;
-      DateTime datetime_gamestart = DateTime.now();
+      var cnt = 0;
 
-      var cards = league.querySelectorAll('ul')[0].querySelectorAll('li');
-      print(cards.length);
-      for (var card in cards) {
-        try {
-          print(card);
-          print(card.querySelectorAll('a').length);
-          if (card.querySelectorAll('a').isEmpty) {
-            continue;
-          }
-          var url_href =
-              card.querySelectorAll('a')[0].attributes['href']?.trim() ?? '';
+      for (var league in leagues) {
+        print(league);
 
-          var url_detail = url.resolve(url_href.replaceFirst('index', 'top'));
-          print(url_href);
+        var id_stadium = 0;
+        var id_team_home = 0;
+        var id_team_away = 0;
+        var id_pitcher_home = 0;
+        var id_pitcher_away = 0;
+        var score_home = -1;
+        var score_away = -1;
+        DateTime datetime_gamestart = DateTime.now();
 
-          final res_detail = await http.get(url_detail);
-
-          if (res_detail.statusCode != 200) {
-            throw Exception('Failed to fetch standings');
-          }
-
-          final doc_detail = parse(res_detail.body);
-          final match = doc_detail
-              .querySelectorAll('#gm_brd')[0]
-              .querySelectorAll('div')[0];
-
-          final name_stadium = match
-              .querySelectorAll('div')[0]
-              .querySelectorAll('p')[0]
-              .nodes
-              .last
-              .text!
-              .replaceAll(RegExp(r'\s+'), '');
-
-          final time_gamestart = match
-              .querySelectorAll('div')[0]
-              .querySelectorAll('p')[0]
-              .querySelectorAll('time')[0]
-              .text
-              .trim();
-
-          final gamestart = formatted + " " + time_gamestart + ":00";
-          datetime_gamestart = DateTime.tryParse(gamestart)!;
-
-          final team_home = match
-              .querySelectorAll('#async-gameDetail')[0]
-              .querySelectorAll('div')[0]
-              .querySelectorAll('p a')[0]
-              .text
-              .trim();
-
-          final team_away = match
-              .querySelectorAll('#async-gameDetail')[0]
-              .querySelectorAll('div')[2]
-              .querySelectorAll('p a')[0]
-              .text
-              .trim();
-
+        var cards = league.querySelectorAll('ul')[0].querySelectorAll('li');
+        print(cards.length);
+        for (var card in cards) {
           try {
-            score_home = int.tryParse(
-                  match
+            print(card);
+            print(card.querySelectorAll('a').length);
+            if (card.querySelectorAll('a').isEmpty) {
+              continue;
+            }
+            var url_href =
+                card.querySelectorAll('a')[0].attributes['href']?.trim() ?? '';
+
+            var url_detail = url.resolve(url_href.replaceFirst('index', 'top'));
+            print(url_href);
+
+            final res_detail = await http.get(url_detail);
+
+            if (res_detail.statusCode != 200) {
+              throw Exception('Failed to fetch standings');
+            }
+
+            final doc_detail = parse(res_detail.body);
+            final match = doc_detail
+                .querySelectorAll('#gm_brd')[0]
+                .querySelectorAll('div')[0];
+
+            final name_stadium = match
+                .querySelectorAll('div')[0]
+                .querySelectorAll('p')[0]
+                .nodes
+                .last
+                .text!
+                .replaceAll(RegExp(r'\s+'), '');
+
+            final time_gamestart = match
+                .querySelectorAll('div')[0]
+                .querySelectorAll('p')[0]
+                .querySelectorAll('time')[0]
+                .text
+                .trim();
+
+            final gamestart = formatted + " " + time_gamestart + ":00";
+            datetime_gamestart = DateTime.tryParse(gamestart)!;
+
+            final team_home = match
+                .querySelectorAll('#async-gameDetail')[0]
+                .querySelectorAll('div')[0]
+                .querySelectorAll('p a')[0]
+                .text
+                .trim();
+
+            final team_away = match
+                .querySelectorAll('#async-gameDetail')[0]
+                .querySelectorAll('div')[2]
+                .querySelectorAll('p a')[0]
+                .text
+                .trim();
+
+            try {
+              score_home = int.tryParse(
+                    match
+                        .querySelectorAll('#async-gameDetail')[0]
+                        .querySelectorAll('div')[1]
+                        .querySelectorAll('p')[0]
+                        .querySelectorAll('span')[0]
+                        .text
+                        .trim(),
+                  ) ??
+                  -1;
+
+              score_away = int.tryParse(match
                       .querySelectorAll('#async-gameDetail')[0]
                       .querySelectorAll('div')[1]
                       .querySelectorAll('p')[0]
-                      .querySelectorAll('span')[0]
+                      .querySelectorAll('span')[2]
                       .text
-                      .trim(),
-                ) ??
-                -1;
+                      .trim()) ??
+                  -1;
+            } catch (e) {
+              print('試合前なのでスコアのスクレイピングは行いませんでした。');
+            }
 
-            score_away = int.tryParse(match
-                    .querySelectorAll('#async-gameDetail')[0]
-                    .querySelectorAll('div')[1]
-                    .querySelectorAll('p')[0]
-                    .querySelectorAll('span')[2]
-                    .text
-                    .trim()) ??
-                -1;
-          } catch (e) {
-            print('試合前なのでスコアのスクレイピングは行いませんでした。');
+            String pitcher_home = '';
+            String pitcher_away = '';
+
+            try {
+              pitcher_home = doc_detail
+                  .querySelectorAll('#strt_mem')[0]
+                  .querySelectorAll('section')[0]
+                  .querySelectorAll('div')[0]
+                  .querySelectorAll('section')[0]
+                  .querySelectorAll('table')[0]
+                  .querySelectorAll('tbody')[0]
+                  .querySelectorAll('tr')[0]
+                  .querySelectorAll('td')[2]
+                  .querySelectorAll('a')[0]
+                  .text
+                  .trim();
+
+              pitcher_away = doc_detail
+                  .querySelectorAll('#strt_mem')[0]
+                  .querySelectorAll('section')[0]
+                  .querySelectorAll('div')[0]
+                  .querySelectorAll('section')[1]
+                  .querySelectorAll('table')[0]
+                  .querySelectorAll('tbody')[0]
+                  .querySelectorAll('tr')[0]
+                  .querySelectorAll('td')[2]
+                  .querySelectorAll('a')[0]
+                  .text
+                  .trim();
+            } catch (e) {
+              print('試合終了後のためスクレイピングを修正します');
+              pitcher_home = doc_detail
+                  .querySelectorAll('#strt_pit')[0]
+                  .querySelectorAll('div')[0]
+                  .querySelectorAll('div')[0]
+                  .querySelectorAll('section')[0]
+                  .querySelectorAll('div')[1]
+                  .querySelectorAll('div')[0]
+                  .querySelectorAll('table')[0]
+                  .querySelectorAll('tbody')[0]
+                  .querySelectorAll('tr')[0]
+                  .querySelectorAll('td')[2]
+                  .querySelectorAll('a')[0]
+                  .text
+                  .trim();
+
+              pitcher_away = doc_detail
+                  .querySelectorAll('#strt_pit')[0]
+                  .querySelectorAll('div')[0]
+                  .querySelectorAll('div')[0]
+                  .querySelectorAll('section')[1]
+                  .querySelectorAll('div')[1]
+                  .querySelectorAll('div')[0]
+                  .querySelectorAll('table')[0]
+                  .querySelectorAll('tbody')[0]
+                  .querySelectorAll('tr')[0]
+                  .querySelectorAll('td')[2]
+                  .querySelectorAll('a')[0]
+                  .text
+                  .trim();
+            }
+
+            print(team_home);
+
+            final result_team_home = await Postgres.select(
+                conn, AppSql.selectTeamsWhereName(), team_home);
+
+            id_team_home = result_team_home.first.toColumnMap()['id'];
+
+            print(team_away);
+
+            final results_team_away = await Postgres.select(
+                conn, AppSql.selectTeamsWhereName(), team_away);
+
+            id_team_away = results_team_away.first.toColumnMap()['id'];
+
+            print(pitcher_home);
+
+            final result_pitcher_home = await conn.execute(
+                AppSql.selectTodayPitcher(),
+                parameters: [StringTool.noSpace(pitcher_home), id_team_home]);
+            id_pitcher_home = result_pitcher_home.first.toColumnMap()['id'];
+
+            print(pitcher_away);
+
+            final result_pitcher_away = await conn.execute(
+                AppSql.selectTodayPitcher(),
+                parameters: [StringTool.noSpace(pitcher_away), id_team_away]);
+            id_pitcher_away = result_pitcher_away.first.toColumnMap()['id'];
+
+            print(name_stadium);
+
+            final result_stadium = await Postgres.select(
+                conn, AppSql.selectStadium(), '%$name_stadium%');
+
+            if (result_stadium.isEmpty) {
+              //DBに存在しないスタジアムの場合は新規登録する。
+              var stadium = m_stadium();
+              stadium.name_short = name_stadium;
+              stadium.id_team = id_team_home;
+              id_stadium = await Postgres.insert(conn, stadium);
+            } else {
+              //DBに存在するスタジアムの場合
+              id_stadium = result_stadium.first.toColumnMap()['id'];
+            }
+          } catch (e, stacktrace) {
+            print(e);
+            print(stacktrace);
+            continue;
           }
+          final result_game = await conn.execute(AppSql.selectExistsGame(),
+              parameters: [id_team_home, id_team_away, datetime_gamestart]);
 
-          String pitcher_home = '';
-          String pitcher_away = '';
+          final game = t_game();
+          game.id_stadium = id_stadium;
+          game.id_team_home = id_team_home;
+          game.id_team_away = id_team_away;
+          game.id_pitcher_home = id_pitcher_home;
+          game.id_pitcher_away = id_pitcher_away;
+          game.datetime_start = datetime_gamestart;
+          game.score_home = score_home;
+          game.score_away = score_away;
 
-          try {
-            pitcher_home = doc_detail
-                .querySelectorAll('#strt_mem')[0]
-                .querySelectorAll('section')[0]
-                .querySelectorAll('div')[0]
-                .querySelectorAll('section')[0]
-                .querySelectorAll('table')[0]
-                .querySelectorAll('tbody')[0]
-                .querySelectorAll('tr')[0]
-                .querySelectorAll('td')[2]
-                .querySelectorAll('a')[0]
-                .text
-                .trim();
-
-            pitcher_away = doc_detail
-                .querySelectorAll('#strt_mem')[0]
-                .querySelectorAll('section')[0]
-                .querySelectorAll('div')[0]
-                .querySelectorAll('section')[1]
-                .querySelectorAll('table')[0]
-                .querySelectorAll('tbody')[0]
-                .querySelectorAll('tr')[0]
-                .querySelectorAll('td')[2]
-                .querySelectorAll('a')[0]
-                .text
-                .trim();
-          } catch (e) {
-            print('試合終了後のためスクレイピングを修正します');
-            pitcher_home = doc_detail
-                .querySelectorAll('#strt_pit')[0]
-                .querySelectorAll('div')[0]
-                .querySelectorAll('div')[0]
-                .querySelectorAll('section')[0]
-                .querySelectorAll('div')[1]
-                .querySelectorAll('div')[0]
-                .querySelectorAll('table')[0]
-                .querySelectorAll('tbody')[0]
-                .querySelectorAll('tr')[0]
-                .querySelectorAll('td')[2]
-                .querySelectorAll('a')[0]
-                .text
-                .trim();
-
-            pitcher_away = doc_detail
-                .querySelectorAll('#strt_pit')[0]
-                .querySelectorAll('div')[0]
-                .querySelectorAll('div')[0]
-                .querySelectorAll('section')[1]
-                .querySelectorAll('div')[1]
-                .querySelectorAll('div')[0]
-                .querySelectorAll('table')[0]
-                .querySelectorAll('tbody')[0]
-                .querySelectorAll('tr')[0]
-                .querySelectorAll('td')[2]
-                .querySelectorAll('a')[0]
-                .text
-                .trim();
-          }
-
-          print(team_home);
-
-          final result_team_home = await Postgres.select(
-              conn, AppSql.selectTeamsWhereName(), team_home);
-
-          id_team_home = result_team_home.first.toColumnMap()['id'];
-
-          print(team_away);
-
-          final results_team_away = await Postgres.select(
-              conn, AppSql.selectTeamsWhereName(), team_away);
-
-          id_team_away = results_team_away.first.toColumnMap()['id'];
-
-          print(pitcher_home);
-
-          final result_pitcher_home = await conn.execute(
-              AppSql.selectTodayPitcher(),
-              parameters: [StringTool.noSpace(pitcher_home), id_team_home]);
-          id_pitcher_home = result_pitcher_home.first.toColumnMap()['id'];
-
-          print(pitcher_away);
-
-          final result_pitcher_away = await conn.execute(
-              AppSql.selectTodayPitcher(),
-              parameters: [StringTool.noSpace(pitcher_away), id_team_away]);
-          id_pitcher_away = result_pitcher_away.first.toColumnMap()['id'];
-
-          print(name_stadium);
-
-          final result_stadium = await Postgres.select(
-              conn, AppSql.selectStadium(), '%$name_stadium%');
-
-          if (result_stadium.isEmpty) {
-            //DBに存在しないスタジアムの場合は新規登録する。
-            var stadium = m_stadium();
-            stadium.name_short = name_stadium;
-            stadium.id_team = id_team_home;
-            id_stadium = await Postgres.insert(conn, stadium);
+          if (result_game.isEmpty) {
+            //DBに同じ日付、同じ組み合わせの試合が登録されていない場合、新規登録する
+            await Postgres.insert(conn, game);
           } else {
-            //DBに存在するスタジアムの場合
-            id_stadium = result_stadium.first.toColumnMap()['id'];
+            //DBに同じ日付、同じ組み合わせの試合が登録されている場合は更新する
+            await Postgres.update(conn, game);
           }
-        } catch (e, stacktrace) {
-          print(e);
-          print(stacktrace);
-          continue;
-        }
-        final result_game = await conn.execute(AppSql.selectExistsGame(),
-            parameters: [id_team_home, id_team_away, datetime_gamestart]);
+        } //for card
+      } //for league
 
-        final game = t_game();
-        game.id_stadium = id_stadium;
-        game.id_team_home = id_team_home;
-        game.id_team_away = id_team_away;
-        game.id_pitcher_home = id_pitcher_home;
-        game.id_pitcher_away = id_pitcher_away;
-        game.datetime_start = datetime_gamestart;
-        game.score_home = score_home;
-        game.score_away = score_away;
-
-        if (result_game.isEmpty) {
-          //DBに同じ日付、同じ組み合わせの試合が登録されていない場合、新規登録する
-          await Postgres.insert(conn, game);
-        } else {
-          //DBに同じ日付、同じ組み合わせの試合が登録されている場合は更新する
-          await Postgres.update(conn, game);
-        }
-      } //for card
-    } //for league
-
-    print('== 予告先発投手スクレイピング完了 ==');
+      print('== 試合情報スクレイピング完了 ==');
+    } catch (e, stacktrace) {
+      print(e);
+      print(stacktrace);
+      print('スクレイピングに失敗しました。当日は試合がない場合があります。');
+    }
     return result;
   }
 
@@ -434,7 +440,7 @@ class FetchURL {
             .replaceAll(")", "");
         listStats.add(statsPlayer);
       }
-      var sql = AppSql.selectInsertPlayerStats(listStats);
+      var sql = AppSql.selectInsertStatsPlayer(listStats);
       var cnt_rows = await Postgres.execute(conn, sql);
       print("実行行数" + cnt_rows.toString());
     }

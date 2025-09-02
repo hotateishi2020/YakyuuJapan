@@ -8,6 +8,7 @@ class t_stats_player extends DBModel {
   int id_team = 0;
   int int_rank = 0;
   double stats = 0;
+  String code_category = '';
 
   String playerName = '';
   String teamName = '';

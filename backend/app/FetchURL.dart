@@ -401,6 +401,10 @@ class FetchURL {
   }
 
   static Future<void> fetchNPBStatsDetails(Connection conn) async {
+    // 前回のデータを削除
+    await conn.execute(AppSql.deleteStatsPlayer(),
+        parameters: [DateTimeTool.getThisYear()]);
+
     final results = await conn.execute(AppSql.selectStatsDetails());
     final stats = results
         .map((row) => {
@@ -449,6 +453,7 @@ class FetchURL {
         listStats.add(statsPlayer);
       }
       var sql = AppSql.selectInsertStatsPlayer(listStats);
+      print(sql);
       var cnt_rows = await Postgres.execute(conn, sql);
       print("実行行数" + cnt_rows.toString());
     }

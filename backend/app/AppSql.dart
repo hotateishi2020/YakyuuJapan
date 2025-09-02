@@ -1,4 +1,5 @@
 import 'DB/t_stats_player.dart';
+import 'Value.dart';
 
 class AppSql {
   //m_stats_details
@@ -265,16 +266,24 @@ class AppSql {
     ''';
   }
 
+  static String deleteStatsPlayer() {
+    return '''
+      DELETE FROM ${t_stats_player().tableName} 
+      WHERE EXTRACT(YEAR FROM crtat) = \$1
+        AND code_category = '${Value.code_category_game_npb}';
+    ''';
+  }
+
   static String selectInsertStatsPlayer(List<t_stats_player> stats) {
     String sql = '''
-        DELETE FROM ${stats.first.tableName};
         INSERT INTO ${stats.first.tableName} (
           id_league,
           id_stats,
           id_player,
           id_team,
           int_rank,
-          stats
+          stats,
+          code_category
         )
         ''';
     int cnt = 1;
@@ -288,7 +297,8 @@ class AppSql {
           m_player.id AS id_player, 
           m_player.id_team,
           ${stat.int_rank} AS int_rank,
-          ${stat.stats} AS stats
+          ${stat.stats} AS stats,
+          '${stat.code_category}' AS code_category
         FROM m_player
         LEFT OUTER JOIN m_team ON m_team.id = m_player.id_team
         WHERE m_team.name_shortest = '${stat.teamName}'

@@ -180,6 +180,7 @@ class FetchURL {
 
             String pitcher_home = '';
             String pitcher_away = '';
+            var flg_no_pitcher = false;
 
             try {
               pitcher_home = doc_detail
@@ -209,35 +210,40 @@ class FetchURL {
                   .trim();
             } catch (e) {
               print('試合終了後のためスクレイピングを修正します');
-              pitcher_home = doc_detail
-                  .querySelectorAll('#strt_pit')[0]
-                  .querySelectorAll('div')[0]
-                  .querySelectorAll('div')[0]
-                  .querySelectorAll('section')[0]
-                  .querySelectorAll('div')[1]
-                  .querySelectorAll('div')[0]
-                  .querySelectorAll('table')[0]
-                  .querySelectorAll('tbody')[0]
-                  .querySelectorAll('tr')[0]
-                  .querySelectorAll('td')[2]
-                  .querySelectorAll('a')[0]
-                  .text
-                  .trim();
+              try {
+                pitcher_home = doc_detail
+                    .querySelectorAll('#strt_pit')[0]
+                    .querySelectorAll('div')[0]
+                    .querySelectorAll('div')[0]
+                    .querySelectorAll('section')[0]
+                    .querySelectorAll('div')[1]
+                    .querySelectorAll('div')[0]
+                    .querySelectorAll('table')[0]
+                    .querySelectorAll('tbody')[0]
+                    .querySelectorAll('tr')[0]
+                    .querySelectorAll('td')[2]
+                    .querySelectorAll('a')[0]
+                    .text
+                    .trim();
 
-              pitcher_away = doc_detail
-                  .querySelectorAll('#strt_pit')[0]
-                  .querySelectorAll('div')[0]
-                  .querySelectorAll('div')[0]
-                  .querySelectorAll('section')[1]
-                  .querySelectorAll('div')[1]
-                  .querySelectorAll('div')[0]
-                  .querySelectorAll('table')[0]
-                  .querySelectorAll('tbody')[0]
-                  .querySelectorAll('tr')[0]
-                  .querySelectorAll('td')[2]
-                  .querySelectorAll('a')[0]
-                  .text
-                  .trim();
+                pitcher_away = doc_detail
+                    .querySelectorAll('#strt_pit')[0]
+                    .querySelectorAll('div')[0]
+                    .querySelectorAll('div')[0]
+                    .querySelectorAll('section')[1]
+                    .querySelectorAll('div')[1]
+                    .querySelectorAll('div')[0]
+                    .querySelectorAll('table')[0]
+                    .querySelectorAll('tbody')[0]
+                    .querySelectorAll('tr')[0]
+                    .querySelectorAll('td')[2]
+                    .querySelectorAll('a')[0]
+                    .text
+                    .trim();
+              } catch (e) {
+                print('予告先発投手が発表されていないので詳細のスクレイピングは行いませんでした。');
+                flg_no_pitcher = true;
+              }
             }
 
             print(team_home);
@@ -254,19 +260,21 @@ class FetchURL {
 
             id_team_away = results_team_away.first.toColumnMap()['id'];
 
-            print(pitcher_home);
+            if (flg_no_pitcher = false) {
+              //先発投手が発表されている場合
+              print(pitcher_home);
+              final result_pitcher_home = await conn.execute(
+                  AppSql.selectTodayPitcher(),
+                  parameters: [StringTool.noSpace(pitcher_home), id_team_home]);
+              id_pitcher_home = result_pitcher_home.first.toColumnMap()['id'];
 
-            final result_pitcher_home = await conn.execute(
-                AppSql.selectTodayPitcher(),
-                parameters: [StringTool.noSpace(pitcher_home), id_team_home]);
-            id_pitcher_home = result_pitcher_home.first.toColumnMap()['id'];
+              print(pitcher_away);
 
-            print(pitcher_away);
-
-            final result_pitcher_away = await conn.execute(
-                AppSql.selectTodayPitcher(),
-                parameters: [StringTool.noSpace(pitcher_away), id_team_away]);
-            id_pitcher_away = result_pitcher_away.first.toColumnMap()['id'];
+              final result_pitcher_away = await conn.execute(
+                  AppSql.selectTodayPitcher(),
+                  parameters: [StringTool.noSpace(pitcher_away), id_team_away]);
+              id_pitcher_away = result_pitcher_away.first.toColumnMap()['id'];
+            }
 
             print(name_stadium);
 

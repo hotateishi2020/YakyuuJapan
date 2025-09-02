@@ -524,8 +524,7 @@ class _PredictionPageState extends State<PredictionPage> {
                                                                   0) ==
                                                               1)
                                                       .toList(),
-                                                  dateFilter:
-                                                      _anchorYmdFromGames(),
+                                                  dateFilter: _ymdWithOffset(0),
                                                 ),
                                               ),
                                             ],
@@ -555,10 +554,7 @@ class _PredictionPageState extends State<PredictionPage> {
                                                                   0) ==
                                                               1)
                                                       .toList(),
-                                                  dateFilter: _ymd(DateTime.parse(
-                                                          _anchorYmdFromGames())
-                                                      .add(const Duration(
-                                                          days: 1))),
+                                                  dateFilter: _ymdWithOffset(1),
                                                 ),
                                               ),
                                             ],
@@ -627,10 +623,8 @@ class _PredictionPageState extends State<PredictionPage> {
                                                                   0) ==
                                                               2)
                                                       .toList(),
-                                                  dateFilter: _ymd(DateTime.parse(
-                                                          _anchorYmdFromGames())
-                                                      .subtract(const Duration(
-                                                          days: 1))),
+                                                  dateFilter:
+                                                      _ymdWithOffset(-1),
                                                 ),
                                               ),
                                             ],
@@ -660,8 +654,7 @@ class _PredictionPageState extends State<PredictionPage> {
                                                                   0) ==
                                                               2)
                                                       .toList(),
-                                                  dateFilter:
-                                                      _anchorYmdFromGames(),
+                                                  dateFilter: _ymdWithOffset(0),
                                                 ),
                                               ),
                                             ],
@@ -691,10 +684,7 @@ class _PredictionPageState extends State<PredictionPage> {
                                                                   0) ==
                                                               2)
                                                       .toList(),
-                                                  dateFilter: _ymd(DateTime.parse(
-                                                          _anchorYmdFromGames())
-                                                      .add(const Duration(
-                                                          days: 1))),
+                                                  dateFilter: _ymdWithOffset(1),
                                                 ),
                                               ),
                                             ],

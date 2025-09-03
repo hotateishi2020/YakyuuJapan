@@ -44,6 +44,7 @@ class _PredictionPageState extends State<PredictionPage> {
 
   // 右カラム（すべて文字列で扱う）
   List<Map<String, dynamic>> games = [];
+  List<Map<String, dynamic>> events = [];
 
   bool isLoading = true;
   String? error;
@@ -108,6 +109,7 @@ class _PredictionPageState extends State<PredictionPage> {
       final statsPredict = _listMap(map['predict_player']); // 左ブロック（予想）
       final statsActual = _listMap(map['stats_player']); // 中央ブロック（実績）
       final gms = _listMap(map['games']);
+      final evts = _listMap(map['events']);
 
       setState(() {
         predictions = users;
@@ -115,6 +117,7 @@ class _PredictionPageState extends State<PredictionPage> {
         npbPlayerStats = statsPredict; // 左
         npbPlayerStatsActual = statsActual; // 中央
         games = gms;
+        events = evts;
         isLoading = false;
       });
     } catch (e, st) {
@@ -264,34 +267,129 @@ class _PredictionPageState extends State<PredictionPage> {
   // 上部: Score + News + イベント日程
   Widget _scoreNewsEventsRow() {
     final counts = _atariCounts();
-    Widget _scoreBox() {
-      return Container(
-        width: 220,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: Colors.black45),
+    Widget _scoreBox(double width) {
+      final name1 = _userNameFromPredictions('1');
+      final name2 = _userNameFromPredictions('2');
+
+      // 予想ブロックの列幅に合わせる: 左(順位56 + 現在 1/3) / 立石 1/3 / 江島 1/3
+      const double rankW = 56; // 予想ブロックの順位列幅
+      const double vBorder = 1.0; // 縦ボーダー幅（立石/江島 列の左境界）
+      final double gutters = vBorder * 2;
+      final double rem = (width - rankW - gutters).clamp(0, double.infinity);
+      final double eachW = (rem / 3).floorToDouble();
+      final double leftHeaderW =
+          (width - gutters - (eachW * 2)).clamp(0, double.infinity);
+
+      return SizedBox(
+        width: width,
+        height: 120,
+        child: ClipRRect(
           borderRadius: BorderRadius.circular(4),
-        ),
-        child: Row(children: [
-          Container(
-            width: 72,
-            height: 56,
-            color: Colors.red,
-            alignment: Alignment.center,
-            child: const Text('SCORE',
-                style: TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold)),
-          ),
-          Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.black45),
+              borderRadius: BorderRadius.circular(4),
+            ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _scoreNumber(counts['1'] ?? 0),
-                _scoreNumber(counts['2'] ?? 0),
+                // 左: SCORE（順位+現在の幅に合わせる）
+                Container(
+                  width: leftHeaderW,
+                  color: Colors.red,
+                  alignment: Alignment.center,
+                  child: const OneLineShrinkText(
+                    'SCORE',
+                    baseSize: 35,
+                    minSize: 12,
+                    weight: FontWeight.bold,
+                    align: TextAlign.center,
+                    color: Colors.white,
+                  ),
+                ),
+
+                // 立石 列（ヘッダー+スコア）
+                Container(
+                  width: eachW,
+                  decoration: const BoxDecoration(
+                    border: Border(
+                        left:
+                            BorderSide(color: Colors.black45, width: vBorder)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Container(
+                        height: 36,
+                        color: Colors.red,
+                        alignment: Alignment.center,
+                        child: OneLineShrinkText(
+                          name1,
+                          baseSize: 18,
+                          minSize: 10,
+                          weight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Expanded(
+                        child: Container(
+                          color: Colors.white,
+                          alignment: Alignment.center,
+                          child: OneLineShrinkText(
+                            '${counts['1'] ?? 0}',
+                            baseSize: 45,
+                            minSize: 14,
+                            weight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // 江島 列（ヘッダー+スコア）
+                Container(
+                  width: eachW,
+                  decoration: const BoxDecoration(
+                    border: Border(
+                        left:
+                            BorderSide(color: Colors.black45, width: vBorder)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Container(
+                        height: 36,
+                        color: Colors.red,
+                        alignment: Alignment.center,
+                        child: OneLineShrinkText(
+                          name2,
+                          baseSize: 18,
+                          minSize: 10,
+                          weight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Expanded(
+                        child: Container(
+                          color: Colors.white,
+                          alignment: Alignment.center,
+                          child: OneLineShrinkText(
+                            '${counts['2'] ?? 0}',
+                            baseSize: 45,
+                            minSize: 14,
+                            weight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
-        ]),
+        ),
       );
     }
 
@@ -336,14 +434,44 @@ class _PredictionPageState extends State<PredictionPage> {
       );
     }
 
-    Widget _eventsBox() {
-      return Container(
-        width: 220,
-        height: 120,
+    Widget _eventsBox({double? width}) {
+      final evs = [...events];
+      evs.sort((a, b) => (a['date_from_temp'] ?? '')
+          .toString()
+          .compareTo((b['date_from_temp'] ?? '').toString()));
+
+      Color parse(String? name, Color fallback) {
+        final n = (name ?? '').toLowerCase().trim();
+        const m = {
+          'red': 0xFFF44336,
+          'green': 0xFF4CAF50,
+          'blue': 0xFF2196F3,
+          'navy': 0xFF001F3F,
+          'royalblue': 0xFF4169E1,
+          'orange': 0xFFFF9800,
+          'yellow': 0xFFFFEB3B,
+          'gold': 0xFFFFD700,
+          'lime': 0xFFCDDC39,
+          'black': 0xFF000000,
+          'gray': 0xFF9E9E9E,
+          'grey': 0xFF9E9E9E,
+          'crimson': 0xFFDC143C,
+          'lightgreen': 0xFF8BC34A,
+          'white': 0xFFFFFFFF,
+        };
+        if (m.containsKey(n)) return Color(m[n]!);
+        return fallback;
+      }
+
+      const catW = 64.0; // 主・サブの列幅（同一）
+
+      final content = Container(
+        height: 120, // 必要なら調整
         decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.black45),
-            borderRadius: BorderRadius.circular(4)),
+          color: Colors.white,
+          border: Border.all(color: Colors.black45),
+          borderRadius: BorderRadius.circular(4),
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -353,31 +481,151 @@ class _PredictionPageState extends State<PredictionPage> {
             const Divider(height: 1),
             const SizedBox(height: 4),
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text('・Event', style: TextStyle(fontSize: 12)),
-                    Text('・Event', style: TextStyle(fontSize: 12)),
-                    Text('・Event', style: TextStyle(fontSize: 12)),
-                    Text('・Event', style: TextStyle(fontSize: 12)),
-                    Text('・Event', style: TextStyle(fontSize: 12)),
-                  ],
-                ),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  double measureTextWidth(String text) {
+                    final painter = TextPainter(
+                      text: TextSpan(
+                          text: text,
+                          style: const TextStyle(
+                            fontSize: 12,
+                          )),
+                      maxLines: 1,
+                      textDirection: TextDirection.ltr,
+                    )..layout();
+                    return painter.width;
+                  }
+
+                  double rawMaxTitleW = 0;
+                  for (final e in evs) {
+                    final t = (e['title_event'] ?? '').toString();
+                    final w = measureTextWidth(t);
+                    if (w > rawMaxTitleW) rawMaxTitleW = w;
+                  }
+
+                  // 固定列幅計算
+                  const double spacing = 6 + 6 + 4; // cat間+title-date間
+                  const double minDate = 48;
+                  final double fixedCats = catW * 2;
+                  double titleColW = rawMaxTitleW;
+                  final maxAllowed =
+                      constraints.maxWidth - fixedCats - spacing - minDate;
+                  if (titleColW > maxAllowed) titleColW = maxAllowed;
+                  if (titleColW < 60) titleColW = 60;
+
+                  double dateMaxW =
+                      constraints.maxWidth - fixedCats - spacing - titleColW;
+                  if (dateMaxW < minDate) dateMaxW = minDate;
+
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        for (final e in evs)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 2),
+                            child: Row(children: [
+                              // 主カテゴリ
+                              Container(
+                                width: catW,
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 2, horizontal: 4),
+                                decoration: BoxDecoration(
+                                  color: parse(e['event_category_color_back'],
+                                      Colors.grey.shade300),
+                                  borderRadius: BorderRadius.circular(3),
+                                ),
+                                child: OneLineShrinkText(
+                                  (e['event_category'] ?? '').toString(),
+                                  baseSize: 12,
+                                  minSize: 8,
+                                  color: parse(e['event_category_color_font'],
+                                      Colors.white),
+                                  align: TextAlign.center,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              // サブカテゴリ
+                              Container(
+                                width: catW,
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 2, horizontal: 4),
+                                decoration: BoxDecoration(
+                                  color: parse(
+                                      e['event_category_sub_color_back'],
+                                      Colors.grey.shade300),
+                                  borderRadius: BorderRadius.circular(3),
+                                ),
+                                child: OneLineShrinkText(
+                                  (e['event_category_sub'] ?? '').toString(),
+                                  baseSize: 12,
+                                  minSize: 8,
+                                  color: parse(
+                                      e['event_category_sub_color_font'],
+                                      Colors.white),
+                                  align: TextAlign.center,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              // タイトル（最長幅に固定）
+                              SizedBox(
+                                width: titleColW,
+                                child: OneLineShrinkText(
+                                  (e['title_event'] ?? '').toString(),
+                                  baseSize: 12,
+                                  minSize: 8,
+                                  align: TextAlign.left,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              // 日付（左詰め・最小/最大幅内で縮小）
+                              ConstrainedBox(
+                                constraints: BoxConstraints(
+                                    minWidth: minDate, maxWidth: dateMaxW),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: OneLineShrinkText(
+                                    (e['txt_timing'] ?? '').toString(),
+                                    baseSize: 12,
+                                    minSize: 8,
+                                    align: TextAlign.left,
+                                  ),
+                                ),
+                              ),
+                            ]),
+                          ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
           ],
         ),
       );
+
+      return width != null
+          ? SizedBox(width: width, child: content)
+          : Expanded(child: content);
     }
 
-    return Row(children: [
-      _scoreBox(),
-      const SizedBox(width: 8),
-      _newsBox(),
-      const SizedBox(width: 8),
-      _eventsBox(),
-    ]);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double totalW = constraints.maxWidth;
+        const double gamesFraction = 3 / 8;
+        const double predFraction = 2 / 8;
+        final double eventsW = totalW * gamesFraction;
+        final double scoreW = totalW * predFraction;
+        return Row(children: [
+          _scoreBox(scoreW),
+          const SizedBox(width: 8),
+          _newsBox(),
+          const SizedBox(width: 8),
+          _eventsBox(width: eventsW),
+        ]);
+      },
+    );
   }
 
   Widget _scoreNumber(int n) {
@@ -391,7 +639,7 @@ class _PredictionPageState extends State<PredictionPage> {
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text('$n',
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
     );
   }
 

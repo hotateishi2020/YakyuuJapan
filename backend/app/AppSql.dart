@@ -58,6 +58,61 @@ class AppSql {
     ''';
   }
 
+  //t_events_details
+  static String selectEventsDetails() {
+    return '''
+      SELECT 
+        * 
+      FROM (
+        SELECT
+          event_category.name1 AS event_category,  
+          event_category_sub.name1 AS event_category_sub,
+          events.title_event,
+          CASE WHEN events.date_from IS NOT NULL THEN events.date_from
+               ELSE 
+                 (CASE WHEN m_event.code_date_from = 'EARLY' THEN to_char(make_date(EXTRACT(YEAR FROM m_event.date_from)::int,EXTRACT(MONTH FROM m_event.date_from)::int,1),'YYYY-MM-DD')::timestamp
+                       WHEN m_event.code_date_from = 'MID' THEN to_char(make_date(EXTRACT(YEAR FROM m_event.date_from)::int,EXTRACT(MONTH FROM m_event.date_from)::int,10),'YYYY-MM-DD')::timestamp
+                       WHEN m_event.code_date_from = 'LATE' THEN to_char(make_date(EXTRACT(YEAR FROM m_event.date_from)::int,EXTRACT(MONTH FROM m_event.date_from)::int,20),'YYYY-MM-DD')::timestamp
+                       WHEN m_event.code_date_from = 'MONTH' THEN to_char(make_date(EXTRACT(YEAR FROM m_event.date_from)::int,EXTRACT(MONTH FROM m_event.date_from)::int,1),'YYYY-MM-DD')::timestamp
+                       WHEN m_event.code_date_from = 'DATE' THEN m_event.date_from
+                       WHEN m_event.code_date_from = '7_DAYS_LATOR_JS' THEN m_event.date_from
+                  END)
+          END AS date_from_temp,
+          CASE WHEN events.date_from IS NOT NULL THEN 
+           (CASE WHEN m_event.flg_span = TRUE AND events.date_to IS NOT NULL THEN to_char(events.date_from, 'YYYY"年"MM"月"DD"日"') || '〜' || to_char(events.date_to, 'YYYY"年"MM"月"DD"日"')
+                 ELSE (CASE WHEN EXTRACT(HOUR FROM events.date_from) = 0 THEN to_char(events.date_from, 'YYYY"年"MM"月"DD"日"')
+                            ELSE to_char(events.date_from, 'YYYY"年"MM"月"DD"日" HH24":"MI')
+                            END)
+                 END)
+               ELSE 
+                 (CASE WHEN m_event.code_date_from = 'EARLY' THEN EXTRACT(MONTH FROM m_event.date_from) || '月上旬'
+                       WHEN m_event.code_date_from = 'MID' THEN EXTRACT(MONTH FROM m_event.date_from) || '月中旬'
+                       WHEN m_event.code_date_from = 'LATE' THEN EXTRACT(MONTH FROM m_event.date_from) || '月下旬'
+                       WHEN m_event.code_date_from = 'MONTH' THEN EXTRACT(MONTH FROM m_event.date_from) || '月中'
+                       WHEN m_event.code_date_from = 'DATE' THEN to_char(m_event.date_from, 'YYYY"年"MM"月"DD"日"')
+                       WHEN m_event.code_date_from = '7_DAYS_LATOR_JS' THEN '日本シリーズ終了の翌日から土日祝日を除く7日後'
+                  END)
+          END AS txt_timing,
+          event_category.code_color1 AS event_category_color_back,
+          event_category.code_color2 AS event_category_color_font,
+          event_category_sub.code_color1 AS event_category_sub_color_back,
+          event_category_sub.code_color2 AS event_category_sub_color_font
+        FROM (
+          SELECT id_event, title_event, date_from, date_to FROM t_event
+          UNION ALL
+          SELECT t_event.id_event, t_event_details.title_event, t_event_details.datetime_start AS date_from, NULL FROM t_event_details
+            LEFT OUTER JOIN t_event ON t_event.id = t_event_details.id_t_event
+        ) AS events
+          LEFT OUTER JOIN m_event ON m_event.id = events.id_event
+          LEFT OUTER JOIN m_system_code AS event_category ON event_category.key = m_event.code_category AND event_category.code = 'EVENT'
+          LEFT OUTER JOIN m_system_code AS event_category_sub ON event_category_sub.key = m_event.code_category_sub AND event_category_sub.code = 'EVENT_SUB'
+          ORDER BY events.date_from
+        ) AS t
+      WHERE date_from_temp >= CURRENT_DATE
+      ORDER BY date_from_temp, txt_timing;
+    ''';
+  }
+
   //t_game
   static String selectExistsGame() {
     return '''
@@ -95,7 +150,7 @@ class AppSql {
         LEFT OUTER JOIN m_player AS pitcher_win ON pitcher_win.id = t_game.id_pitcher_win
         LEFT OUTER JOIN m_player AS pitcher_lose ON pitcher_lose.id = t_game.id_pitcher_lose
         LEFT OUTER JOIN m_stadium ON m_stadium.id = t_game.id_stadium
-      WHERE t_game.datetime_start BETWEEN (CURRENT_DATE - INTERVAL '1 day') AND (CURRENT_DATE + INTERVAL '2 day');
+      WHERE t_game.datetime_start BETWEEN (CURRENT_DATE - INTERVAL '1 day') AND (CURRENT_DATE + INTERVAL '3 day');
     ''';
   }
 

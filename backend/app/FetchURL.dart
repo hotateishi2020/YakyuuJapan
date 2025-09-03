@@ -85,8 +85,6 @@ class FetchURL {
       var cnt = 0;
 
       for (var league in leagues) {
-        print(league);
-
         var id_stadium = 0;
         var id_team_home = 0;
         var id_team_away = 0;
@@ -97,11 +95,9 @@ class FetchURL {
         DateTime datetime_gamestart = DateTime.now();
 
         var cards = league.querySelectorAll('ul')[0].querySelectorAll('li');
-        print(cards.length);
+
         for (var card in cards) {
           try {
-            print(card);
-            print(card.querySelectorAll('a').length);
             if (card.querySelectorAll('a').isEmpty) {
               continue;
             }
@@ -109,7 +105,6 @@ class FetchURL {
                 card.querySelectorAll('a')[0].attributes['href']?.trim() ?? '';
 
             var url_detail = url.resolve(url_href.replaceFirst('index', 'top'));
-            print(url_href);
 
             final res_detail = await http.get(url_detail);
 
@@ -246,37 +241,28 @@ class FetchURL {
               }
             }
 
-            print(team_home);
-
             final result_team_home = await Postgres.select(
                 conn, AppSql.selectTeamsWhereName(), team_home);
 
             id_team_home = result_team_home.first.toColumnMap()['id'];
-
-            print(team_away);
 
             final results_team_away = await Postgres.select(
                 conn, AppSql.selectTeamsWhereName(), team_away);
 
             id_team_away = results_team_away.first.toColumnMap()['id'];
 
-            if (flg_no_pitcher = false) {
+            if (flg_no_pitcher == false) {
               //先発投手が発表されている場合
-              print(pitcher_home);
               final result_pitcher_home = await conn.execute(
                   AppSql.selectTodayPitcher(),
                   parameters: [StringTool.noSpace(pitcher_home), id_team_home]);
               id_pitcher_home = result_pitcher_home.first.toColumnMap()['id'];
-
-              print(pitcher_away);
 
               final result_pitcher_away = await conn.execute(
                   AppSql.selectTodayPitcher(),
                   parameters: [StringTool.noSpace(pitcher_away), id_team_away]);
               id_pitcher_away = result_pitcher_away.first.toColumnMap()['id'];
             }
-
-            print(name_stadium);
 
             final result_stadium = await Postgres.select(
                 conn, AppSql.selectStadium(), '%$name_stadium%');
@@ -309,11 +295,15 @@ class FetchURL {
           game.score_home = score_home;
           game.score_away = score_away;
 
+          print(game.toMap());
+          print('');
+
           if (result_game.isEmpty) {
             //DBに同じ日付、同じ組み合わせの試合が登録されていない場合、新規登録する
             await Postgres.insert(conn, game);
           } else {
             //DBに同じ日付、同じ組み合わせの試合が登録されている場合は更新する
+            game.id = result_game.first.toColumnMap()['id'];
             await Postgres.update(conn, game);
           }
         } //for card

@@ -5,6 +5,7 @@ on:
     - cron: "*/60 7-15 * * *" # 毎日16時から24時の時間帯に60分間隔
     - cron: "*/30 7-15 * * *" # 毎日16時から24時の時間帯に30分間隔
     - cron: "*/10 4-15 * * *" # 毎日13時から24時の時間帯に10分間隔
+    - cron: "*/60 15-21 * * *" # 毎日0時から6時の時間帯に60分間隔
   workflow_dispatch:
 
 jobs:
@@ -21,4 +22,8 @@ jobs:
 
       - name: Call /fetchGames (C)
         if: ${{ github.event.schedule == '*/10 4-15 * * *' }}
+        run: curl -fsS "https://yakyuujapan.onrender.com/fetchGames"
+
+      - name: Call /fetchGames (D)
+        if: ${{ github.event.schedule == '*/60 15-21 * * *' }}
         run: curl -fsS "https://yakyuujapan.onrender.com/fetchGames"

@@ -218,7 +218,12 @@ class Postgres {
     return result.map((row) {
       final map = <String, dynamic>{};
       for (var i = 0; i < columns.length; i++) {
-        map[columns[i].toString()] = row[i];
+        var value = row[i];
+        if (value is DateTime) {
+          value =
+              value.toIso8601String(); //DateTimeはそのままjsonデータにはできないので、文字列に変換する。
+        }
+        map[columns[i].toString()] = value;
       }
       return map;
     }).toList();

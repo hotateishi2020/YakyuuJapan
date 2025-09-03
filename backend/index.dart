@@ -47,12 +47,10 @@ void main() async {
       return await commonTryCatch(() async {
         await Postgres.openConnection((conn) async {
           await Postgres.transactionCommit(conn, () async {
-            print(1);
             await FetchURL.fetchGames(conn, DateTime.now()); //今日の試合
-            print(2);
+
             await FetchURL.fetchGames(
                 conn, DateTime.now().add(const Duration(days: 1))); //明日の試合
-            print(3);
           }); //DB-Commit
         }); //DB-Close
         return Response.ok('ok');
@@ -78,14 +76,17 @@ void main() async {
 
           final games = await conn.execute(AppSql.selectGames());
 
+          final events = await conn.execute(AppSql.selectEventsDetails());
+
           json = {
             'predict_team': Postgres.toJson(predict_team),
             'predict_player': Postgres.toJson(predict_player),
             'stats_team': Postgres.toJson(stats_team),
             'stats_player': Postgres.toJson(stats_player),
             'games': Postgres.toJson(games),
+            'events': Postgres.toJson(events),
           };
-          print(Postgres.toJson(games));
+          print(Postgres.toJson(events));
           // print(json);
         }); //connectionOpenClose
 

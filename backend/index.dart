@@ -86,8 +86,8 @@ void main() async {
             'games': Postgres.toJson(games),
             'events': Postgres.toJson(events),
           };
-          print(Postgres.toJson(events));
-          // print(json);
+          // print(Postgres.toJson(events));
+          print(json);
         }); //connectionOpenClose
 
         return Response.ok(jsonEncode(json),

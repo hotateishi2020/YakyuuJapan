@@ -2,6 +2,8 @@ import 'package:http/http.dart' as http;
 
 import 'package:html/parser.dart' show parse;
 import 'dart:convert';
+import 'dart:math';
+import 'dart:typed_data';
 import 'AppSql.dart';
 import '../tools/Postgres.dart';
 import '../tools/StringTool.dart';
@@ -15,6 +17,34 @@ import 'package:intl/intl.dart';
 import 'package:postgres/postgres.dart';
 
 class FetchURL {
+  // Detect encoding (header/meta) and decode bytes accordingly (UTF-8 preferred)
+  static String _decodeHtml(http.Response res) {
+    final bytes = res.bodyBytes;
+    String? charset;
+    final ct = res.headers['content-type'] ?? res.headers['Content-Type'];
+    if (ct != null) {
+      final m = RegExp(r'charset=([A-Za-z0-9_\-]+)', caseSensitive: false)
+          .firstMatch(ct);
+      if (m != null) charset = m.group(1)?.toLowerCase();
+    }
+    charset ??= _detectCharsetFromMeta(bytes);
+
+    // Prefer UTF-8; otherwise fall back to latin1 to avoid exceptions
+    if (charset == null || charset.contains('utf')) {
+      return utf8.decode(bytes, allowMalformed: true);
+    }
+    // latin1 fallback (header/meta missing or unexpected values)
+    return latin1.decode(bytes, allowInvalid: true);
+  }
+
+  static String? _detectCharsetFromMeta(Uint8List bytes) {
+    final headLen = min(bytes.length, 4096);
+    final head = latin1.decode(bytes.sublist(0, headLen), allowInvalid: true);
+    final m = RegExp(r'charset\s*=\s*([A-Za-z0-9_\-]+)', caseSensitive: false)
+        .firstMatch(head);
+    return m?.group(1)?.toLowerCase();
+  }
+
   static Future fetchNPBStandings(Connection conn) async {
     final url = Uri.parse('https://baseball.yahoo.co.jp/npb/standings/');
     final res = await http.get(url);
@@ -23,7 +53,8 @@ class FetchURL {
       throw Exception('Failed to fetch standings');
     }
 
-    final document = parse(res.body);
+    final html = _decodeHtml(res);
+    final document = parse(html);
     final html_tables = document.querySelectorAll('table.bb-rankTable');
     var cnt = 0;
     List<t_stats_team> teams = [];
@@ -41,6 +72,7 @@ class FetchURL {
           var team_name = cells[1].text.trim();
           var r_team = await Postgres.select(
               conn, AppSql.selectTeamsWhereName(), team_name);
+          if (r_team.isEmpty) continue;
           var team = t_stats_team();
           team.year = DateTimeTool.getThisYear();
           team.id_team = r_team.first.toColumnMap()['id'];
@@ -60,6 +92,114 @@ class FetchURL {
       } //for html各チーム
       cnt++;
     } //for htmlリーグ
+
+    //先発防御率と中継ぎ防御率
+    var urls_pitching = [];
+    urls_pitching.add('https://baseballdata.jp/c/#');
+    urls_pitching.add('https://baseballdata.jp/p/');
+    var urls_defence = [];
+    urls_defence.add('https://npb.jp/bis/2025/stats/tmf_c.html');
+    urls_defence.add('https://npb.jp/bis/2025/stats/tmf_p.html');
+
+    for (int i = 0; i < 2; i++) {
+      //先発防御率・中継ぎ防御率をスクレイピング
+      final url_pitching = Uri.parse(urls_pitching[i]);
+      final res_pitching = await http.get(url_pitching);
+
+      if (res_pitching.statusCode != 200) {
+        throw Exception('Failed to fetch standings');
+      }
+
+      final htmlPitching = _decodeHtml(res_pitching);
+      final document = parse(htmlPitching);
+      final divs = document
+          .querySelectorAll('body div.container div.main div.table-responsive');
+      final rows = divs[2].querySelectorAll('table tbody tr');
+
+      for (final tr in rows) {
+        final ths = tr.querySelectorAll('th');
+        final tds = tr.querySelectorAll('td');
+        if (ths.isEmpty || tds.length < 3) {
+          continue;
+        }
+        var team_name = ths[0].text.trim();
+        if (team_name == '阪') {
+          team_name = '神';
+        } else if (team_name == 'D') {
+          team_name = 'デ';
+        }
+        var pitching_rate_starter = tds[1].text.trim();
+        var pitching_rate_reliever = tds[2].text.trim();
+        var r_team = await Postgres.select(
+            conn, AppSql.selectTeamsWhereNameShortest(), team_name);
+        if (r_team.isEmpty) {
+          // チーム名が一致しないケースはスキップ
+          print('データが見つかりませんでした。');
+          continue;
+        }
+        var idx = Postgres.findIndex(
+            teams, 'id_team', r_team.first.toColumnMap()['id']);
+        if (idx < 0 || idx >= teams.length) {
+          print('インデックスが見つかりませんでした。');
+          continue;
+        }
+        teams[idx].num_era_starter =
+            double.tryParse(pitching_rate_starter) ?? 0;
+        teams[idx].num_era_relief =
+            double.tryParse(pitching_rate_reliever) ?? 0;
+      }
+
+      //チーム守備率をスクレイピング
+      final url_defence = Uri.parse(urls_defence[i]);
+      final res_defence = await http.get(url_defence);
+
+      if (res_defence.statusCode != 200) {
+        throw Exception('Failed to fetch standings');
+      }
+
+      final htmlDefence = _decodeHtml(res_defence);
+      final document_defence = parse(htmlDefence);
+      final rows_defence = document_defence.querySelectorAll('table tbody tr');
+      var cnt = 0;
+
+      for (final tr_defence in rows_defence) {
+        // 先頭行（ヘッダーなど）はスキップ
+        if (cnt < 2) {
+          cnt++;
+          continue;
+        }
+
+        final tds = tr_defence.querySelectorAll('td');
+        if (tds.length < 2) {
+          continue;
+        }
+
+        var team_name_defence = tds[0].text.trim();
+        var defence_rate = tds[1].text.trim();
+        var r_team_defence = await Postgres.select(
+            conn,
+            AppSql.selectTeamsWhereName(),
+            StringTool.noSpace(team_name_defence));
+
+        print(team_name_defence);
+        print(defence_rate);
+
+        if (r_team_defence.isEmpty) {
+          print('データが見つかりませんでした。');
+          continue;
+        }
+
+        var idx_defence = Postgres.findIndex(
+            teams, 'id_team', r_team_defence.first.toColumnMap()['id']);
+        if (idx_defence < 0 || idx_defence >= teams.length) {
+          print('インデックスが見つかりませんでした。');
+          continue;
+        }
+        teams[idx_defence].num_avg_fielding =
+            double.tryParse(defence_rate) ?? 0;
+      }
+    }
+
     await Postgres.insertMulti(conn, teams);
   }
 
@@ -78,7 +218,7 @@ class FetchURL {
     final result = <Map<String, dynamic>>[];
 
     try {
-      final document = parse(res.body);
+      final document = parse(_decodeHtml(res));
       final leagues =
           document.querySelectorAll('#gm_card')[0].querySelectorAll('section');
 
@@ -112,7 +252,7 @@ class FetchURL {
               throw Exception('Failed to fetch standings');
             }
 
-            final doc_detail = parse(res_detail.body);
+            final doc_detail = parse(_decodeHtml(res_detail));
             final match = doc_detail
                 .querySelectorAll('#gm_brd')[0]
                 .querySelectorAll('div')[0];
@@ -334,7 +474,7 @@ class FetchURL {
         throw Exception('HTTP ${res.statusCode}');
       }
 
-      final doc = parse(utf8.decode(res.bodyBytes));
+      final doc = parse(_decodeHtml(res));
       final tables = doc.querySelectorAll('table.rosterlisttbl');
       if (tables.isEmpty) {
         throw Exception('テーブルが見つかりませんでした');
@@ -413,7 +553,7 @@ class FetchURL {
         throw Exception('HTTP ${res.statusCode}');
       }
 
-      final doc = parse(utf8.decode(res.bodyBytes));
+      final doc = parse(_decodeHtml(res));
       final tables = doc.querySelectorAll('#js-playerTable');
       if (tables.isEmpty) {
         throw Exception('テーブルが見つかりませんでした');

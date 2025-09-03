@@ -15,6 +15,7 @@ class t_stats_team extends DBModel {
   int int_rbi = 0;
   int int_sh = 0;
   double num_era_total = 0;
+  double num_era_starter = 0;
   double num_era_relief = 0;
   double num_avg_fielding = 0;
 
@@ -34,6 +35,7 @@ class t_stats_team extends DBModel {
         "int_rbi": int_rbi,
         "int_sh": int_sh,
         "num_era_total": num_era_total,
+        "num_era_starter": num_era_starter,
         "num_era_relief": num_era_relief,
         "num_avg_fielding": num_avg_fielding,
       });

@@ -58,6 +58,16 @@ class AppSql {
     ''';
   }
 
+  static String selectTeamsWhereNameShortest() {
+    return '''
+      SELECT
+        id
+      FROM m_team
+      WHERE name_shortest = \$1 
+      LIMIT 1
+    ''';
+  }
+
   //t_events_details
   static String selectEventsDetails() {
     return '''

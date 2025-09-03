@@ -228,4 +228,22 @@ class Postgres {
       return map;
     }).toList();
   }
+
+  static DBModel? find(List<DBModel> models, String key, dynamic value) {
+    for (var model in models) {
+      if (model.toMap()[key] == value) {
+        return model;
+      }
+    }
+    return null;
+  }
+
+  static int findIndex(List<DBModel> models, String key, dynamic value) {
+    for (var i = 0; i < models.length; i++) {
+      if (models[i].toMap()[key] == value) {
+        return i;
+      }
+    }
+    return -1;
+  }
 }

@@ -10,6 +10,7 @@ import 'app/FetchURL.dart';
 import 'tools/Postgres.dart';
 import 'tools/DateTimeTool.dart';
 import 'package:intl/intl.dart';
+import 'package:postgres/postgres.dart';
 
 void main() async {
   try {
@@ -19,64 +20,59 @@ void main() async {
     app.get('/healthz', (Request _) => Response.ok('ok'));
 
     app.get('/fetchTeamsNPB', (Request request) async {
-      print('/fetchTeamsNPB');
-      return await commonTryCatch(() async {
-        await Postgres.openConnection((conn) async {
-          await Postgres.transactionCommit(conn, () async {
-            await FetchURL.fetchNPBStandings(conn);
-          });
-        });
-        return Response.ok('ok');
-      }); //catch
+      return await commonAPI(request, (conn) async {
+        await FetchURL.fetchNPBStandings(conn);
+      });
     });
 
     app.get('/fetchPlayerStats', (Request request) async {
-      return await commonTryCatch(() async {
-        await Postgres.openConnection((conn) async {
-          await Postgres.transactionCommit(conn, () async {
-            await FetchURL.fetchNPBStatsDetails(conn);
-          }); //commit
-        }); //close
-        return Response.ok('ok');
-      }); //catch
+      return await commonAPI(request, (conn) async {
+        await FetchURL.fetchNPBStatsDetails(conn);
+      });
     });
 
     app.get('/fetchGames', (Request request) async {
       // 今日の先発情報を更新→取得（必要に応じてコメントアウト可）
-      print('/fetchGames');
-      return await commonTryCatch(() async {
-        await Postgres.openConnection((conn) async {
-          await Postgres.transactionCommit(conn, () async {
-            await FetchURL.fetchGames(conn, DateTime.now()); //今日の試合
+      return await commonAPI(request, (conn) async {
+        await FetchURL.fetchGames(conn, DateTime.now()); //今日の試合
 
-            await FetchURL.fetchGames(
-                conn, DateTime.now().add(const Duration(days: 1))); //明日の試合
-          }); //DB-Commit
-        }); //DB-Close
-        return Response.ok('ok');
+        await FetchURL.fetchGames(
+            conn, DateTime.now().add(const Duration(days: 1))); //明日の試合
       });
     });
 
     //タイトル予想画面の表示
     app.get('/predictions', (Request request) async {
-      print('/predictions');
-      return await commonTryCatch(() async {
+      return await commonTryCatch(request, () async {
         Map<String, dynamic> json = {};
         await Postgres.openConnection((conn) async {
-          final predict_team = await conn
-              .execute(AppSql.selectPredictNPBTeams()); //予想者データをDBから取得
+          final current_year = DateTimeTool.getThisYear();
 
-          final predict_player = await conn
-              .execute(AppSql.selectPredictPlayer()); //個人タイトル予想のデータをDBから取得
+          final predict_team = await Postgres.execute(
+              conn, AppSql.selectPredictNPBTeams(),
+              data: [current_year]); //予想者データをDBから取得
 
-          final stats_team = await conn.execute(AppSql.selectStatsTeam());
+          final predict_player = await Postgres.execute(
+              conn, AppSql.selectPredictPlayer(),
+              data: [current_year]); //個人タイトル予想のデータをDBから取得
 
-          final stats_player = await conn.execute(AppSql.selectStatsPlayer(),
-              parameters: [DateTimeTool.getThisYear()]);
+          final stats_team =
+              await Postgres.execute(conn, AppSql.selectStatsTeam());
 
-          final games = await conn.execute(AppSql.selectGames());
+          final stats_player = await Postgres.execute(
+              conn, AppSql.selectStatsPlayer(),
+              data: [current_year]);
 
-          final events = await conn.execute(AppSql.selectEventsDetails());
+          final games = await Postgres.execute(conn, AppSql.selectGames(),
+              data: [current_year]);
+
+          final events =
+              await Postgres.execute(conn, AppSql.selectEventsDetails());
+
+          final notification =
+              await Postgres.execute(conn, AppSql.selectNotification());
+
+          print(notification);
 
           json = {
             'predict_team': Postgres.toJson(predict_team),
@@ -85,9 +81,10 @@ void main() async {
             'stats_player': Postgres.toJson(stats_player),
             'games': Postgres.toJson(games),
             'events': Postgres.toJson(events),
+            'notification': Postgres.toJson(notification),
           };
-          // print(Postgres.toJson(events));
-          print(json);
+          print(Postgres.toJson(notification));
+          // print(json);
         }); //connectionOpenClose
 
         return Response.ok(jsonEncode(json),
@@ -163,12 +160,42 @@ void main() async {
   }
 } // void main
 
-Future<Response> commonTryCatch(Function() callback) async {
+Future<Response> commonTryCatch(Request request, Function() callback) async {
   try {
+    print(
+        '🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
+    print("🌐Routing...【" + request.requestedUri.toString() + "】");
+    print("");
     return await callback();
   } catch (e, st) {
+    print(
+        "⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️");
+    print(
+        "👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇");
     print('🔥 /predictions ERROR: $e\n$st');
     stderr.writeln('🔥 /predictions ERROR: $e\n$st');
+    print(
+        "👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆");
+    print(
+        "⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️");
     return Response.internalServerError(body: 'データベースエラー: $e');
+  } finally {
+    print("");
+    print(
+        "🌐Responsed Successfully‼️【" + request.requestedUri.toString() + "】");
+    print(
+        '🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
   }
+}
+
+Future<Response> commonAPI(
+    Request request, Future<void> callback(Connection conn)) async {
+  return await commonTryCatch(request, () async {
+    await Postgres.openConnection((conn) async {
+      await Postgres.transactionCommit(conn, () async {
+        await callback(conn);
+      });
+    });
+    return Response.ok('ok');
+  }); //catch
 }

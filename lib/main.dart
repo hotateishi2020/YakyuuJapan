@@ -45,6 +45,7 @@ class _PredictionPageState extends State<PredictionPage> {
   // 右カラム（すべて文字列で扱う）
   List<Map<String, dynamic>> games = [];
   List<Map<String, dynamic>> events = [];
+  List<Map<String, dynamic>> notifications = [];
 
   bool isLoading = true;
   String? error;
@@ -110,6 +111,7 @@ class _PredictionPageState extends State<PredictionPage> {
       final statsActual = _listMap(map['stats_player']); // 中央ブロック（実績）
       final gms = _listMap(map['games']);
       final evts = _listMap(map['events']);
+      final notifs = _listMap(map['notification']);
 
       setState(() {
         predictions = users;
@@ -118,6 +120,7 @@ class _PredictionPageState extends State<PredictionPage> {
         npbPlayerStatsActual = statsActual; // 中央
         games = gms;
         events = evts;
+        notifications = notifs;
         isLoading = false;
       });
     } catch (e, st) {
@@ -232,7 +235,7 @@ class _PredictionPageState extends State<PredictionPage> {
   // 画面上部: 全体ヘッダー
   Widget _globalHeader() {
     return Container(
-      height: 28,
+      height: 26,
       decoration: BoxDecoration(
         color: Colors.orange.shade200,
         borderRadius: BorderRadius.circular(4),
@@ -248,7 +251,7 @@ class _PredictionPageState extends State<PredictionPage> {
   Widget _tabsBar() {
     final tabs = ['侍', 'MLB', 'NPB', '2軍', '独立', '社会人', '大学/高校'];
     return SizedBox(
-      height: 28,
+      height: 26,
       child: Row(children: [
         for (final t in tabs) ...[
           Container(
@@ -321,7 +324,7 @@ class _PredictionPageState extends State<PredictionPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Container(
-                        height: 36,
+                        height: 34,
                         color: Colors.red,
                         alignment: Alignment.center,
                         child: OneLineShrinkText(
@@ -360,7 +363,7 @@ class _PredictionPageState extends State<PredictionPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Container(
-                        height: 36,
+                        height: 34,
                         color: Colors.red,
                         alignment: Alignment.center,
                         child: OneLineShrinkText(
@@ -394,29 +397,70 @@ class _PredictionPageState extends State<PredictionPage> {
     }
 
     Widget _newsBox() {
+      Color parse(String? name, Color fallback) {
+        final n = (name ?? '').toLowerCase().trim();
+        const m = {
+          'red': 0xFFF44336,
+          'green': 0xFF4CAF50,
+          'blue': 0xFF2196F3,
+          'navy': 0xFF001F3F,
+          'royalblue': 0xFF4169E1,
+          'orange': 0xFFFF9800,
+          'yellow': 0xFFFFEB3B,
+          'gold': 0xFFFFD700,
+          'lime': 0xFFCDDC39,
+          'black': 0xFF000000,
+          'gray': 0xFF9E9E9E,
+          'grey': 0xFF9E9E9E,
+          'crimson': 0xFFDC143C,
+          'lightgreen': 0xFF8BC34A,
+          'white': 0xFFFFFFFF,
+        };
+        if (m.containsKey(n)) return Color(m[n]!);
+        return fallback;
+      }
+
+      const double tagW = 64.0;
+      const double tagH = 20.0;
+
       return Expanded(
         child: Container(
           height: 120,
           decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.black45),
-              borderRadius: BorderRadius.circular(4)),
+            color: Colors.white,
+            border: Border.all(color: Colors.black45),
+            borderRadius: BorderRadius.circular(4),
+          ),
           padding: EdgeInsets.zero,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(
-                width: double.infinity,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                  child: const Text('News',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white)),
+              // Header with embedded 'すべて既読にする'
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(3),
+                ),
+                child: Row(
+                  children: [
+                    const Expanded(
+                      child: Text('News',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Text('未読メッセージを一覧表示',
+                          style: TextStyle(color: Colors.white, fontSize: 11)),
+                    ),
+                  ],
                 ),
               ),
               Expanded(
@@ -424,20 +468,89 @@ class _PredictionPageState extends State<PredictionPage> {
                   padding: const EdgeInsets.fromLTRB(10, 4, 10, 6),
                   child: SingleChildScrollView(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: const [
-                        Divider(height: 1),
-                        SizedBox(height: 4),
-                        Text('・News ------------------------------',
-                            style: TextStyle(fontSize: 12)),
-                        Text('・News ------------------------------',
-                            style: TextStyle(fontSize: 12)),
-                        Text('・News ------------------------------',
-                            style: TextStyle(fontSize: 12)),
-                        Text('・News ------------------------------',
-                            style: TextStyle(fontSize: 12)),
-                        Text('・News ------------------------------',
-                            style: TextStyle(fontSize: 12)),
+                      children: [
+                        const Divider(height: 1),
+                        const SizedBox(height: 4),
+                        for (final n in notifications)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 2),
+                            child: Row(
+                              children: [
+                                // メインタグ
+                                Container(
+                                  width: tagW,
+                                  alignment: Alignment.center,
+                                  constraints:
+                                      const BoxConstraints(minHeight: tagH),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 2, horizontal: 4),
+                                  decoration: BoxDecoration(
+                                    color: parse(n['tag_main_color_back'],
+                                        Colors.grey.shade300),
+                                    borderRadius: BorderRadius.circular(3),
+                                  ),
+                                  child: OneLineShrinkText(
+                                    (n['tag_main_title'] ?? '').toString(),
+                                    baseSize: 12,
+                                    minSize: 8,
+                                    color: parse(
+                                        n['tag_main_color_font'], Colors.white),
+                                    align: TextAlign.center,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                // サブタグ
+                                Container(
+                                  width: tagW,
+                                  alignment: Alignment.center,
+                                  constraints:
+                                      const BoxConstraints(minHeight: tagH),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 2, horizontal: 4),
+                                  decoration: BoxDecoration(
+                                    color: parse(n['tag_sub_color_back'],
+                                        Colors.grey.shade300),
+                                    borderRadius: BorderRadius.circular(3),
+                                  ),
+                                  child: OneLineShrinkText(
+                                    (n['tag_sub_title'] ?? '').toString(),
+                                    baseSize: 12,
+                                    minSize: 8,
+                                    color: parse(
+                                        n['tag_sub_color_font'], Colors.white),
+                                    align: TextAlign.center,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                // タイトル
+                                Expanded(
+                                  child: OneLineShrinkText(
+                                    (n['title'] ?? '').toString(),
+                                    baseSize: 12,
+                                    minSize: 8,
+                                    align: TextAlign.left,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                // 既読/未読ボタン
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: (n['flg_read'] == true)
+                                        ? Colors.grey
+                                        : Colors.orange,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    (n['flg_read'] == true) ? '既読' : '未読',
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 12),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -643,11 +756,16 @@ class _PredictionPageState extends State<PredictionPage> {
       builder: (context, constraints) {
         final double totalW = constraints.maxWidth;
         const double gamesFraction = 3 / 8;
-        const double predFraction = 2 / 8;
+        // 下段の構成に合わせて算出:
+        // リーグ名左端(4) → リーグ名幅(36) → ギャップ(2) → 予想(Expanded 2/8, ただし内部の縦Divider 8+8 を控除)
+        // 上段は左右に 8px のパディングがあるため、左側 8px を引く
+        // 下段の実寸と一致させるため、全体幅 W と上段の有効幅 w_top の差(左右8px)を反映
+        // 下段距離: 0.25 * W + 24.5, ここで W = w_top + 16
+        // よって scoreW = 0.25 * (w_top + 16) + 24.5 = 0.25 * w_top + 28.5
+        final double scoreW = (totalW * 0.25) + 28.5;
         final double eventsW = totalW * gamesFraction;
-        final double scoreW = totalW * predFraction;
         return Row(children: [
-          _scoreBox(scoreW),
+          _scoreBox(scoreW.clamp(0, totalW)),
           const SizedBox(width: 8),
           _newsBox(),
           const SizedBox(width: 8),
@@ -703,23 +821,23 @@ class _PredictionPageState extends State<PredictionPage> {
                       // ヘッダー（タブ / News / Score / イベント）
                       // ─────────────────────────────────────────────
                       _globalHeader(),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 2),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: _tabsBar(),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 2),
                       Expanded(
-                        flex: 6,
+                        flex: 3,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                           child: _scoreNewsEventsRow(),
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 2),
                       // 1行目: セ・リーグ（比率 2）
                       Expanded(
-                        flex: 17,
+                        flex: 11,
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
@@ -728,31 +846,43 @@ class _PredictionPageState extends State<PredictionPage> {
                               width: 36,
                               margin: const EdgeInsets.only(left: 4, right: 0),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF7CB342),
+                                color: const Color(0xFF0B8F3A),
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              child: const Center(
+                              child: Center(
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text('セ',
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 4, bottom: 4),
+                                      child: Image.asset(
+                                        'assets/images/logo_league_central.webp',
+                                        width: 20,
+                                        height: 20,
+                                        fit: BoxFit.contain,
+                                        errorBuilder: (_, __, ___) =>
+                                            const SizedBox(height: 20),
+                                      ),
+                                    ),
+                                    const Text('セ',
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold)),
-                                    Text('・',
+                                    const Text('・',
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold)),
-                                    Text('リ',
+                                    const Text('リ',
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold)),
-                                    Text('|',
+                                    const Text('|',
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold)),
-                                    Text('グ',
+                                    const Text('グ',
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold)),
@@ -900,7 +1030,7 @@ class _PredictionPageState extends State<PredictionPage> {
                       const SizedBox(height: 8),
                       // 2行目: パ・リーグ（比率 2）
                       Expanded(
-                        flex: 17,
+                        flex: 11,
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
@@ -909,31 +1039,43 @@ class _PredictionPageState extends State<PredictionPage> {
                               width: 36,
                               margin: const EdgeInsets.only(left: 4, right: 0),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF2CB1BC),
+                                color: const Color(0xFF4DB5E8),
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              child: const Center(
+                              child: Center(
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text('パ',
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 4, bottom: 4),
+                                      child: Image.asset(
+                                        'assets/images/logo_league_pacific.png',
+                                        width: 22,
+                                        height: 22,
+                                        fit: BoxFit.contain,
+                                        errorBuilder: (_, __, ___) =>
+                                            const SizedBox(height: 22),
+                                      ),
+                                    ),
+                                    const Text('パ',
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold)),
-                                    Text('・',
+                                    const Text('・',
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold)),
-                                    Text('リ',
+                                    const Text('リ',
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold)),
-                                    Text('|',
+                                    const Text('|',
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold)),
-                                    Text('グ',
+                                    const Text('グ',
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold)),
@@ -1158,7 +1300,7 @@ class OneLineShrinkText extends StatelessWidget {
     this.text, {
     super.key,
     this.baseSize = 12,
-    this.minSize = 6,
+    this.minSize = 1,
     this.weight,
     this.align = TextAlign.center,
     this.color,
@@ -1277,7 +1419,6 @@ class GamesBoardYahooStyle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(dateFilter);
     final src = (dateFilter == null || dateFilter!.isEmpty)
         ? games
         : games
@@ -1366,6 +1507,8 @@ class _GameCard extends StatelessWidget {
   String get _lose => g['name_pitcher_lose']?.toString() ?? '';
   String get _pHome => g['name_pitcher_home']?.toString() ?? '';
   String get _pAway => g['name_pitcher_away']?.toString() ?? '';
+  String get _cPitchHome => g['colors_pitcher_home']?.toString() ?? '';
+  String get _cPitchAway => g['colors_pitcher_away']?.toString() ?? '';
   String get _sHome => g['score_home']?.toString() ?? '';
   String get _sAway => g['score_away']?.toString() ?? '';
 
@@ -1388,137 +1531,468 @@ class _GameCard extends StatelessWidget {
       final baseMid = (h * 0.12).clamp(10.0, 15.0);
       final baseBig = (h * 0.14).clamp(11.0, 16.0);
 
+      // チーム名セル用の色（試合JSONから）
+      Color? _parseColor(String? name) {
+        final n = (name ?? '').trim().toLowerCase();
+        if (n.isEmpty) return null;
+        const m = {
+          'red': 0xFFF44336,
+          'orange': 0xFFFF9800,
+          'yellow': 0xFFFFEB3B,
+          'green': 0xFF4CAF50,
+          'lightgreen': 0xFF8BC34A,
+          'blue': 0xFF2196F3,
+          'royalblue': 0xFF4169E1,
+          'mediumblue': 0xFF0000CD,
+          'midnightblue': 0xFF191970,
+          'darkblue': 0xFF00008B,
+          'dodgerblue': 0xFF1E90FF,
+          'navy': 0xFF001F3F,
+          'crimson': 0xFFDC143C,
+          'gold': 0xFFFFD700,
+          'lime': 0xFFCDDC39,
+          'gray': 0xFF9E9E9E,
+          'grey': 0xFF9E9E9E,
+          'black': 0xFF000000,
+          'white': 0xFFFFFFFF,
+        };
+        final v = m[n];
+        return v == null ? null : Color(v);
+      }
+
+      final Color? homeNameBg = _parseColor(g['color_back_home']?.toString());
+      final Color? awayNameBg = _parseColor(g['color_back_away']?.toString());
+      final Color? homeNameFg = _parseColor(g['color_font_home']?.toString());
+      final Color? awayNameFg = _parseColor(g['color_font_away']?.toString());
+
+      // チーム名チップの最小高さ（文字数が多くても高さを維持）
+      final double nameChipH = (baseMid + 6).clamp(18.0, 24.0);
+
+      // チーム名セルの横幅（カード幅の約1/3）
+      final double teamNameW = (c.maxWidth.isFinite ? c.maxWidth : 300.0) / 3.0;
+
+      // カード背景: ホーム/アウェイ色で二分割グラデーション
+      Color? _teamColor(String? name) {
+        final n = (name ?? '').trim().toLowerCase();
+        if (n.isEmpty) return null;
+        const m = {
+          'red': 0xFFF44336,
+          'orange': 0xFFFF9800,
+          'yellow': 0xFFFFEB3B,
+          'green': 0xFF4CAF50,
+          'lightgreen': 0xFF8BC34A,
+          'blue': 0xFF2196F3,
+          'royalblue': 0xFF4169E1,
+          'mediumblue': 0xFF0000CD,
+          'midnightblue': 0xFF191970,
+          'darkblue': 0xFF00008B,
+          'dodgerblue': 0xFF1E90FF,
+          'navy': 0xFF001F3F,
+          'crimson': 0xFFDC143C,
+          'gold': 0xFFFFD700,
+          'lime': 0xFFCDDC39,
+          'gray': 0xFF9E9E9E,
+          'grey': 0xFF9E9E9E,
+          'black': 0xFF000000,
+          'white': 0xFFFFFFFF,
+        };
+        final v = m[n];
+        return v == null ? null : Color(v);
+      }
+
+      final Color? homeBg = _teamColor(g['color_back_home']?.toString());
+      final Color? awayBg = _teamColor(g['color_back_away']?.toString());
+      // チーム名エリアまでは各色でべた塗り、その先からグラデーション
+      final double cardW = c.maxWidth.isFinite ? c.maxWidth : 300.0;
+      final double teamNameFracW = cardW / 3.0; // 既存チップ幅相当
+      final double frac = (teamNameFracW / cardW).clamp(0.05, 0.45);
+      const double eps = 0.04; // 適度なブレンド幅
+      final double fracSolid = (frac - 0.02).clamp(0.03, 0.45); // ベタ領域を少しだけ短く
+
+      final BoxDecoration? cardDecoration = (homeBg != null && awayBg != null)
+          ? (() {
+              // 10段階の緩やかなグラデーション（左右対称）
+              const int steps = 10; // 左右それぞれの段数
+              const double epsSolid = 0.01; // べた領域の終端を明示
+              final List<Color> gColors = [];
+              final List<double> gStops = [];
+
+              // 左: 0.0 〜 frac はホーム色をべた塗り
+              gColors.add(homeBg.withOpacity(1));
+              gStops.add(0.0);
+              gColors.add(homeBg.withOpacity(1));
+              gStops.add((fracSolid - epsSolid).clamp(0.0, 0.49));
+
+              // 左: frac → 0.5 まで徐々に透明へ
+              for (int i = 1; i <= steps; i++) {
+                final double t = i / steps; // 0→1
+                final double pos =
+                    fracSolid + (0.5 - fracSolid) * t; // 左ベタ終端→中央
+                final double opacity = (1.0 - t); // 1→0 線形
+                gColors.add(homeBg.withOpacity(opacity));
+                gStops.add(pos.clamp(0.0, 0.5));
+              }
+
+              // 中央透明
+              gColors.add(Colors.transparent);
+              gStops.add(0.5);
+              gColors.add(Colors.transparent);
+              gStops.add(0.5);
+
+              // 右: 0.5 → (1-frac) で徐々に色を濃く
+              for (int i = 1; i <= steps; i++) {
+                final double t = i / steps; // 0→1
+                final double pos =
+                    0.5 + (0.5 - fracSolid) * t; // 0.5→(1-fracSolid)
+                final double opacity = t; // 中央から外側へ行くほど濃く
+                gColors.add(awayBg.withOpacity(opacity));
+                gStops.add(pos.clamp(0.5, 1.0));
+              }
+
+              // 右: (1-frac) 〜 1.0 はアウェイ色をべた塗り
+              gColors.add(awayBg.withOpacity(1));
+              gStops.add((1.0 - fracSolid + epsSolid).clamp(0.51, 1.0));
+              gColors.add(awayBg.withOpacity(1));
+              gStops.add(1.0);
+
+              return BoxDecoration(
+                gradient: LinearGradient(
+                  colors: gColors,
+                  stops: gStops,
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+                borderRadius: BorderRadius.circular(6),
+              );
+            })()
+          : (homeBg != null || awayBg != null)
+              ? (() {
+                  final base = (homeBg ?? awayBg)!;
+                  const int steps = 10;
+                  const double epsSolid = 0.01;
+                  final List<Color> gColors = [];
+                  final List<double> gStops = [];
+
+                  // 左べた
+                  gColors.add(base.withOpacity(1));
+                  gStops.add(0.0);
+                  gColors.add(base.withOpacity(1));
+                  gStops.add((fracSolid - epsSolid).clamp(0.0, 0.49));
+
+                  // 左→中央
+                  for (int i = 1; i <= steps; i++) {
+                    final double t = i / steps;
+                    final double pos = fracSolid + (0.5 - fracSolid) * t;
+                    final double opacity = (1.0 - t);
+                    gColors.add(base.withOpacity(opacity));
+                    gStops.add(pos.clamp(0.0, 0.5));
+                  }
+
+                  // 中央透明
+                  gColors.add(Colors.transparent);
+                  gStops.add(0.5);
+                  gColors.add(Colors.transparent);
+                  gStops.add(1.0);
+
+                  return BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: gColors,
+                      stops: gStops,
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                    borderRadius: BorderRadius.circular(6),
+                  );
+                })()
+              : null;
+
       return Card(
         elevation: 0.5,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(8, vPad, 8, vPad),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // 上段: 時刻（左）／ 球場（右）
-              Row(
-                children: [
-                  OneLineShrinkText(
-                    _time.isNotEmpty ? _time : (_showScore ? '試合終了' : ''),
-                    baseSize: baseSmall,
-                    minSize: 7,
-                    weight: _showScore ? FontWeight.w600 : FontWeight.normal,
-                    color: _showScore ? Colors.purple : Colors.black54,
-                    align: TextAlign.left,
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: OneLineShrinkText(
-                      _stadium,
-                      baseSize: baseSmall,
-                      minSize: 7,
-                      color: Colors.black87,
-                      align: TextAlign.left,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: gap),
-
-              // 中段: ホーム / スコアorvs / ビジター
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          OneLineShrinkText(_home,
-                              baseSize: baseMid,
-                              minSize: 8,
-                              weight: FontWeight.w600,
-                              align: TextAlign.left),
-                          if (_pHome.isNotEmpty)
-                            Padding(
-                              padding: EdgeInsets.only(top: gap * 0.3),
-                              child: OneLineShrinkText(_pHome,
-                                  baseSize: baseSmall,
-                                  minSize: 7,
-                                  color: Colors.black87,
-                                  align: TextAlign.left),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 72,
-                    child: Center(
-                      child: OneLineShrinkText(
-                        _showScore ? '$_sHome  -  $_sAway' : 'vs',
-                        baseSize: baseBig,
-                        minSize: 9,
-                        weight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          OneLineShrinkText(_away,
-                              baseSize: baseMid,
-                              minSize: 8,
-                              weight: FontWeight.w600,
-                              align: TextAlign.right),
-                          if (_pAway.isNotEmpty)
-                            Padding(
-                              padding: EdgeInsets.only(top: gap * 0.3),
-                              child: OneLineShrinkText(_pAway,
-                                  baseSize: baseSmall,
-                                  minSize: 7,
-                                  color: Colors.black87,
-                                  align: TextAlign.right),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: gap),
-
-              // 下段: 勝敗投手（あれば）
-              if (_win.isNotEmpty || _lose.isNotEmpty)
+        child: Container(
+          decoration: cardDecoration,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(8, vPad, 8, vPad),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // 上段: 時刻（左）／ 球場（右）
                 Row(
                   children: [
-                    if (_win.isNotEmpty)
-                      Expanded(
-                        child: OneLineShrinkText('(勝)$_win',
-                            baseSize: baseSmall,
-                            minSize: 7,
-                            color: Colors.black87,
-                            align: TextAlign.left),
+                    OneLineShrinkText(
+                      _time.isNotEmpty ? _time : (_showScore ? '試合終了' : ''),
+                      baseSize: baseSmall,
+                      minSize: 7,
+                      weight: _showScore ? FontWeight.w600 : FontWeight.normal,
+                      color: _showScore ? Colors.purple : Colors.black54,
+                      align: TextAlign.left,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: OneLineShrinkText(
+                        _stadium,
+                        baseSize: baseSmall,
+                        minSize: 7,
+                        color: Colors.black87,
+                        align: TextAlign.left,
                       ),
-                    if (_win.isNotEmpty && _lose.isNotEmpty)
-                      const SizedBox(width: 8),
-                    if (_lose.isNotEmpty)
-                      Expanded(
-                        child: OneLineShrinkText('(敗)$_lose',
-                            baseSize: baseSmall,
-                            minSize: 7,
-                            color: Colors.black87,
-                            align: TextAlign.right),
-                      ),
+                    ),
                   ],
                 ),
-            ],
+                SizedBox(height: gap),
+
+                // 中段: ホーム / スコアorvs / ビジター
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                                width: teamNameW,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: null,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  constraints:
+                                      BoxConstraints(minHeight: nameChipH),
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 4),
+                                  alignment: Alignment.center,
+                                  width: double.infinity,
+                                  child: OneLineShrinkText(_home,
+                                      baseSize: baseMid,
+                                      minSize: 8,
+                                      weight: FontWeight.w600,
+                                      color: homeNameFg ?? Colors.black87,
+                                      align: TextAlign.center),
+                                )),
+                            if (_pHome.isNotEmpty)
+                              Padding(
+                                padding: EdgeInsets.only(top: gap * 0.3),
+                                child: _pitcherNameBox(
+                                  name: _pHome,
+                                  colorsRaw: _cPitchHome,
+                                  baseSize: baseSmall,
+                                  alignLeft: true,
+                                  overrideTextColor: _cPitchHome.trim().isEmpty
+                                      ? (homeNameFg ?? Colors.black87)
+                                      : null,
+                                  overrideWeight: _cPitchHome.trim().isEmpty
+                                      ? FontWeight.w600
+                                      : null,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 72,
+                      child: Center(
+                        child: OneLineShrinkText(
+                          _showScore ? '$_sHome  -  $_sAway' : 'vs',
+                          baseSize: baseBig,
+                          minSize: 9,
+                          weight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            SizedBox(
+                                width: teamNameW,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: null,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  constraints:
+                                      BoxConstraints(minHeight: nameChipH),
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 4),
+                                  alignment: Alignment.center,
+                                  width: double.infinity,
+                                  child: OneLineShrinkText(_away,
+                                      baseSize: baseMid,
+                                      minSize: 8,
+                                      weight: FontWeight.w600,
+                                      color: awayNameFg ?? Colors.black87,
+                                      align: TextAlign.center),
+                                )),
+                            if (_pAway.isNotEmpty)
+                              Padding(
+                                padding: EdgeInsets.only(top: gap * 0.3),
+                                child: _pitcherNameBox(
+                                  name: _pAway,
+                                  colorsRaw: _cPitchAway,
+                                  baseSize: baseSmall,
+                                  alignLeft: false,
+                                  overrideTextColor: _cPitchAway.trim().isEmpty
+                                      ? (awayNameFg ?? Colors.black87)
+                                      : null,
+                                  overrideWeight: _cPitchAway.trim().isEmpty
+                                      ? FontWeight.w600
+                                      : null,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: gap),
+
+                // 下段: 勝敗投手（あれば）
+                if (_win.isNotEmpty || _lose.isNotEmpty)
+                  Row(
+                    children: [
+                      if (_win.isNotEmpty)
+                        Expanded(
+                          child: OneLineShrinkText('(勝)$_win',
+                              baseSize: baseSmall,
+                              minSize: 7,
+                              color: Colors.black87,
+                              align: TextAlign.left),
+                        ),
+                      if (_win.isNotEmpty && _lose.isNotEmpty)
+                        const SizedBox(width: 8),
+                      if (_lose.isNotEmpty)
+                        Expanded(
+                          child: OneLineShrinkText('(敗)$_lose',
+                              baseSize: baseSmall,
+                              minSize: 7,
+                              color: Colors.black87,
+                              align: TextAlign.right),
+                        ),
+                    ],
+                  ),
+              ],
+            ),
           ),
         ),
       );
     });
   }
+}
+
+// 先発投手名の背景色を colors_user 形式で適用（/red/blue/ → グラデ）
+Widget _pitcherNameBox({
+  required String name,
+  required String colorsRaw,
+  required double baseSize,
+  required bool alignLeft,
+  Color? overrideTextColor,
+  FontWeight? overrideWeight,
+}) {
+  Color? _colorFrom(String? name) {
+    final n = (name ?? '').trim().toLowerCase();
+    if (n.isEmpty) return null;
+    const m = {
+      'red': 0xFFF44336,
+      'orange': 0xFFFF9800,
+      'yellow': 0xFFFFEB3B,
+      'green': 0xFF4CAF50,
+      'lightgreen': 0xFF8BC34A,
+      'blue': 0xFF2196F3,
+      'royalblue': 0xFF4169E1,
+      'mediumblue': 0xFF0000CD,
+      'midnightblue': 0xFF191970,
+      'darkblue': 0xFF00008B,
+      'dodgerblue': 0xFF1E90FF,
+      'navy': 0xFF001F3F,
+      'crimson': 0xFFDC143C,
+      'gold': 0xFFFFD700,
+      'lime': 0xFFCDDC39,
+      'gray': 0xFF9E9E9E,
+      'grey': 0xFF9E9E9E,
+      'black': 0xFF000000,
+      'white': 0xFFFFFFFF,
+    };
+    final v = m[n];
+    return v == null ? null : Color(v);
+  }
+
+  BoxDecoration? deco;
+  final parts = colorsRaw
+      .split('/')
+      .map((s) => s.trim().toLowerCase())
+      .where((s) => s.isNotEmpty)
+      .toList();
+  if (parts.isNotEmpty) {
+    final cols = <Color>[];
+    for (final p in parts) {
+      final c = _colorFrom(p);
+      if (c != null) cols.add(c);
+    }
+    if (cols.isNotEmpty) {
+      if (cols.length == 1) {
+        deco = BoxDecoration(
+            color: cols.first, borderRadius: BorderRadius.circular(4));
+      } else {
+        // 混ざり合いを狭める: 境界を急峻にするため color/stop を重ねる
+        final List<Color> gColors = [];
+        final List<double> gStops = [];
+        if (cols.length == 2) {
+          gColors.addAll([cols[0], cols[0], cols[1], cols[1]]);
+          gStops.addAll([0.0, 0.46, 0.54, 1.0]);
+        } else {
+          const double eps = 0.04;
+          gColors.add(cols.first);
+          gStops.add(0.0);
+          for (int i = 0; i < cols.length - 1; i++) {
+            final double pos = (i + 1) / (cols.length - 1);
+            final double left = (pos - eps).clamp(0.0, 1.0);
+            final double right = (pos + eps).clamp(0.0, 1.0);
+            gColors.add(cols[i]);
+            gStops.add(left);
+            gColors.add(cols[i + 1]);
+            gStops.add(right);
+          }
+          gColors.add(cols.last);
+          gStops.add(1.0);
+        }
+        deco = BoxDecoration(
+          gradient: LinearGradient(
+            colors: gColors,
+            stops: gStops,
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          borderRadius: BorderRadius.circular(4),
+        );
+      }
+    }
+  }
+
+  final bool hasColor = deco != null;
+  return SizedBox(
+    width: double.infinity,
+    child: Container(
+      decoration: deco,
+      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+      alignment: Alignment.center,
+      child: OneLineShrinkText(
+        name,
+        baseSize: baseSize,
+        minSize: 7,
+        color: hasColor ? Colors.white : (overrideTextColor ?? Colors.black87),
+        weight:
+            overrideWeight ?? (hasColor ? FontWeight.bold : FontWeight.normal),
+        align: TextAlign.center,
+      ),
+    ),
+  );
 }
 
 // ────────────────────────────────────────────────────────────────
@@ -1548,21 +2022,22 @@ class _UnifiedGrid extends StatelessWidget {
   Widget headerCell(String text,
       {FontWeight weight = FontWeight.bold, Color? bgColor, Color? fgColor}) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(1, 0, 1, 0),
-      padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 4),
+      margin: const EdgeInsets.symmetric(horizontal: 0),
+      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+      constraints: const BoxConstraints(minHeight: 21.5),
       decoration: BoxDecoration(
         color: bgColor,
         border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(3),
       ),
       child: SizedBox(
         width: double.infinity,
         child: OneLineShrinkText(text,
             baseSize: 12,
-            minSize: 6,
+            minSize: 1,
             weight: weight,
             color: fgColor,
-            verticalPadding: 2,
+            verticalPadding: 0,
             fast: true),
       ),
     );
@@ -1570,17 +2045,18 @@ class _UnifiedGrid extends StatelessWidget {
 
   Widget cell(String text, {bool highlight = false, Color? bgColor}) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(1, 0, 1, 0),
-      padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 4),
+      margin: const EdgeInsets.symmetric(horizontal: 0),
+      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+      constraints: const BoxConstraints(minHeight: 21.5),
       decoration: BoxDecoration(
         color: bgColor ?? (highlight ? Colors.yellow[200] : null),
         border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(3),
       ),
       child: SizedBox(
         width: double.infinity,
         child: OneLineShrinkText(text,
-            baseSize: 12, minSize: 6, verticalPadding: 2, fast: true),
+            baseSize: 12, minSize: 1, verticalPadding: 0, fast: true),
       ),
     );
   }
@@ -1599,7 +2075,7 @@ class _UnifiedGrid extends StatelessWidget {
   List<Widget> _buildLeagueColumn(int leagueId) {
     // リーグ色（予想ブロック内サイドヘッダー用）
     final Color leagueColor =
-        leagueId == 1 ? const Color(0xFF7CB342) : const Color(0xFF2CB1BC);
+        leagueId == 1 ? const Color(0xFF0B8F3A) : const Color(0xFF4DB5E8);
     // standingsから対象リーグを抽出
     final currentRows = standings.where((e) {
       final id = int.tryParse('${e['id_league']}') ?? 0;
@@ -1749,7 +2225,6 @@ class _UnifiedGrid extends StatelessWidget {
                   Text('ム',
                       style: TextStyle(
                           color: Colors.white, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 6),
                   Text('順',
                       style: TextStyle(
                           color: Colors.white, fontWeight: FontWeight.bold)),
@@ -1875,7 +2350,6 @@ class _UnifiedGrid extends StatelessWidget {
                   Text('人',
                       style: TextStyle(
                           color: Colors.white, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 6),
                   Text('タ',
                       style: TextStyle(
                           color: Colors.white, fontWeight: FontWeight.bold)),
@@ -1958,6 +2432,48 @@ class SeasonTableBlock extends StatelessWidget {
     this.onlyLeagueId,
   });
 
+  // JSONの色名をColorに変換（不明ならnull）
+  Color? _parseColorName(String? name) {
+    final n = (name ?? '').trim().toLowerCase();
+    if (n.isEmpty) return null;
+    const m = {
+      'red': 0xFFF44336,
+      'orange': 0xFFFF9800,
+      'yellow': 0xFFFFEB3B,
+      'green': 0xFF4CAF50,
+      'lightgreen': 0xFF8BC34A,
+      'blue': 0xFF2196F3,
+      'royalblue': 0xFF4169E1,
+      'mediumblue': 0xFF0000CD,
+      'midnightblue': 0xFF191970,
+      'darkblue': 0xFF00008B,
+      'dodgerblue': 0xFF1E90FF,
+      'navy': 0xFF001F3F,
+      'crimson': 0xFFDC143C,
+      'gold': 0xFFFFD700,
+      'lime': 0xFFCDDC39,
+      'gray': 0xFF9E9E9E,
+      'grey': 0xFF9E9E9E,
+      'black': 0xFF000000,
+      'white': 0xFFFFFFFF,
+    };
+    final v = m[n];
+    if (v == null) return null;
+    return Color(v);
+  }
+
+  // 元の色を白とブレンドして淡くする
+  Color _paleOf(Color base, [double t = 0.88]) {
+    t = t.clamp(0.0, 1.0);
+    final r = (base.value >> 16) & 0xFF;
+    final g = (base.value >> 8) & 0xFF;
+    final b = base.value & 0xFF;
+    final rr = (r + (255 - r) * t).round();
+    final gg = (g + (255 - g) * t).round();
+    final bb = (b + (255 - b) * t).round();
+    return Color(0xFF000000 | (rr << 16) | (gg << 8) | bb);
+  }
+
   // 文字→数値(表示用)
   String _num(dynamic v) => (v == null || '$v'.isEmpty) ? '—' : '$v';
 
@@ -2012,7 +2528,7 @@ class SeasonTableBlock extends StatelessWidget {
       ),
       alignment: Alignment.center,
       child: OneLineShrinkText(text,
-          baseSize: 12, minSize: 6, weight: weight, color: fg),
+          baseSize: 10, minSize: 1, weight: weight, color: fg),
     );
   }
 
@@ -2046,13 +2562,14 @@ class SeasonTableBlock extends StatelessWidget {
     // 文字幅の目安（12pxフォントで約14px/字）
     // 文字幅の目安（12pxフォントで約14px/字）
     const double _kChar = 14.0;
-    const double _wRank = _kChar * 2; // 2文字ぶん
-    const double _wTeam = _kChar * 7; // 7文字ぶん（順位表で使用中）
-    const double _wNum = _kChar * 3; // 3文字ぶん（順位表で使用中）
-    const double _wStat = _kChar * 18; // 個人成績の各タイトル列幅
+    const double _wChar2 = _kChar * 2; // 2文字ぶん
+    const double _wChar1 = _kChar * 1.5; // 1文字ぶん
+    const double _wChar6 = _kChar * 6; // 6文字ぶん（順位表で使用中）
+    const double _wChar3 = _kChar * 3; // 3文字ぶん（順位表で使用中）
+    const double _wStat = _kChar * 8; // 個人成績の各タイトル列幅
 
     Widget _gridCell(String text,
-        {double h = 28, Color? bg, Color? fg, FontWeight? weight}) {
+        {double h = 15, Color? bg, Color? fg, FontWeight? weight}) {
       return Container(
         height: h,
         alignment: Alignment.center,
@@ -2065,8 +2582,25 @@ class SeasonTableBlock extends StatelessWidget {
       );
     }
 
+    // タイトル列ごとに、クリック/ホバーで全ランキングを展開できるカラム
+    Widget _statsColumn({
+      required String title,
+      required double width,
+      required Color headerBg,
+      required List<Map<String, dynamic>> rows,
+      required Widget Function(Map<String, dynamic>) buildRow,
+    }) {
+      return _StatsColumn(
+        title: title,
+        width: width,
+        headerBg: headerBg,
+        rows: rows,
+        buildRow: buildRow,
+      );
+    }
+
     Widget _bar(String label, Color color,
-        {double h = 26, Color fg = Colors.white}) {
+        {double h = 24, Color fg = Colors.white}) {
       return Container(
         height: h,
         alignment: Alignment.centerLeft,
@@ -2124,41 +2658,216 @@ class SeasonTableBlock extends StatelessWidget {
       final pitchingCols = ['防御率', '最多勝', '奪三振', 'ホールド', 'セーブ'];
 
       // 個人成績セル: ランク/チーム/選手/数値 を1セル内に表示
+      // rank は「表示行のインデックス(1..5)」。同順位がある場合も
+      // タイトルごとに int_rank 昇順で並べた上位5件から rank 番目を表示する。
       Widget _entryCell(
           List<Map<String, dynamic>> src, String title, int rank) {
-        final e = src.firstWhere(
-            (m) =>
-                (m['title']?.toString() ?? '') == _normalizeTitle(title) &&
-                (int.tryParse('${m['int_rank']}') ?? -1) == rank,
-            orElse: () => const {});
+        final list = src
+            .where(
+                (m) => (m['title']?.toString() ?? '') == _normalizeTitle(title))
+            .toList()
+          ..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 1 << 30)
+              .compareTo(int.tryParse('${b['int_rank']}') ?? 1 << 30));
+        final idx = (rank - 1).clamp(0, list.isNotEmpty ? list.length - 1 : 0);
+        final Map<String, dynamic> e =
+            list.isNotEmpty && list.length >= rank ? list[idx] : const {};
+
+        final rankText =
+            (e.isNotEmpty ? (e['int_rank']?.toString() ?? '') : '').toString();
         final team = (e.isNotEmpty ? (e['name_team'] ?? '') : '').toString();
         final name = (e.isNotEmpty ? (e['name_player'] ?? '') : '').toString();
         final stat = _num(e.isNotEmpty ? e['stats'] : null);
 
-        const double _segRank = _kChar * 2;
-        const double _segTeam = _kChar * 2;
-        const double _segStat = _kChar * 4;
+        // colors_user: "/red/blue/" のように / 区切りで色名が入る
+        // 1色なら単色背景、2色以上なら左→右のグラデーション
+        BoxDecoration? _nameBgDecoration() {
+          final raw = (e.isNotEmpty ? (e['colors_user'] ?? '') : '').toString();
+          if (raw.isEmpty) return null;
+          final parts = raw
+              .split('/')
+              .map((s) => s.trim().toLowerCase())
+              .where((s) => s.isNotEmpty)
+              .toList();
+          if (parts.isEmpty) return null;
+          final cols = <Color>[];
+          for (final p in parts) {
+            final c = _parseColorName(p);
+            if (c != null) cols.add(c);
+          }
+          if (cols.isEmpty) return null;
+          if (cols.length == 1) {
+            return BoxDecoration(
+              color: cols.first,
+              borderRadius: BorderRadius.circular(4),
+            );
+          }
+          return BoxDecoration(
+            gradient: LinearGradient(
+              colors: cols,
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+            borderRadius: BorderRadius.circular(4),
+          );
+        }
 
         return SizedBox(
           width: _wStat,
           child: Container(
-            height: 28,
+            height: 13.5,
             decoration: BoxDecoration(
               border: Border.all(color: Colors.black26, width: 1),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 2),
             child: Row(children: [
-              SizedBox(
-                  width: _segRank,
-                  child: OneLineShrinkText('$rank', baseSize: 12, minSize: 6)),
-              SizedBox(
-                  width: _segTeam,
-                  child: OneLineShrinkText(team, baseSize: 12, minSize: 6)),
               Expanded(
-                  child: OneLineShrinkText(name, baseSize: 12, minSize: 6)),
-              SizedBox(
-                  width: _segStat,
-                  child: OneLineShrinkText(stat, baseSize: 12, minSize: 6)),
+                  flex: 2,
+                  child: Center(
+                    child: () {
+                      final isOne = rankText.trim() == '1';
+                      if (isOne) {
+                        return const FittedBox(
+                          fit: BoxFit.contain,
+                          child: Text('👑',
+                              style: TextStyle(
+                                fontSize: 20,
+                                height: 1.0,
+                              )),
+                        );
+                      }
+                      return OneLineShrinkText(
+                          rankText.isNotEmpty ? rankText : '—',
+                          baseSize: 12,
+                          minSize: 1,
+                          fast: true);
+                    }(),
+                  )),
+              Expanded(
+                  flex: 2,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: _parseColorName(e['color_back']),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                    alignment: Alignment.center,
+                    child: OneLineShrinkText(team,
+                        baseSize: 12,
+                        minSize: 1,
+                        fast: true,
+                        color: _parseColorName(e['color_font'])),
+                  )),
+              Expanded(
+                  flex: 10,
+                  child: Container(
+                    decoration: _nameBgDecoration(),
+                    alignment: Alignment.center,
+                    child: OneLineShrinkText(name,
+                        baseSize: 12, minSize: 1, fast: true),
+                  )),
+              Expanded(
+                  flex: 4,
+                  child: OneLineShrinkText(stat,
+                      baseSize: 12, minSize: 1, fast: true)),
+            ]),
+          ),
+        );
+      }
+
+      // 1行分（与えられた行データからそのまま描画）
+      Widget _entryCellFromRow(Map<String, dynamic> e) {
+        final rankText = (e['int_rank']?.toString() ?? '').toString();
+        final team = (e['name_team'] ?? '').toString();
+        final name = (e['name_player'] ?? '').toString();
+        final stat = _num(e['stats']);
+
+        BoxDecoration? _nameBgDecorationFromRow() {
+          final raw = (e['colors_user'] ?? '').toString();
+          if (raw.isEmpty) return null;
+          final parts = raw
+              .split('/')
+              .map((s) => s.trim().toLowerCase())
+              .where((s) => s.isNotEmpty)
+              .toList();
+          if (parts.isEmpty) return null;
+          final cols = <Color>[];
+          for (final p in parts) {
+            final c = _parseColorName(p);
+            if (c != null) cols.add(c);
+          }
+          if (cols.isEmpty) return null;
+          if (cols.length == 1) {
+            return BoxDecoration(
+              color: cols.first,
+              borderRadius: BorderRadius.circular(4),
+            );
+          }
+          return BoxDecoration(
+            gradient: LinearGradient(
+              colors: cols,
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+            borderRadius: BorderRadius.circular(4),
+          );
+        }
+
+        return SizedBox(
+          width: _wStat,
+          child: Container(
+            height: 13.5,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.black26, width: 1),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 2),
+            child: Row(children: [
+              Expanded(
+                  flex: 2,
+                  child: Center(
+                    child: () {
+                      final isOne = rankText.trim() == '1';
+                      if (isOne) {
+                        return const FittedBox(
+                          fit: BoxFit.contain,
+                          child: Text('👑',
+                              style: TextStyle(
+                                fontSize: 20,
+                                height: 1.0,
+                              )),
+                        );
+                      }
+                      return OneLineShrinkText(
+                          rankText.isNotEmpty ? rankText : '—',
+                          baseSize: 12,
+                          minSize: 1,
+                          fast: true);
+                    }(),
+                  )),
+              Expanded(
+                  flex: 2,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: _parseColorName(e['color_back']),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                    alignment: Alignment.center,
+                    child: OneLineShrinkText(team,
+                        baseSize: 12,
+                        minSize: 1,
+                        fast: true,
+                        color: _parseColorName(e['color_font'])),
+                  )),
+              Expanded(
+                  flex: 10,
+                  child: Container(
+                    decoration: _nameBgDecorationFromRow(),
+                    alignment: Alignment.center,
+                    child: OneLineShrinkText(name,
+                        baseSize: 12, minSize: 1, fast: true),
+                  )),
+              Expanded(
+                  flex: 4,
+                  child: OneLineShrinkText(stat,
+                      baseSize: 12, minSize: 1, fast: true)),
             ]),
           ),
         );
@@ -2169,45 +2878,72 @@ class SeasonTableBlock extends StatelessWidget {
         children: [
           // 個人成績 見出しは非表示
           // 緑: リーグ名（非表示）
-          // 赤: 打撃 見出し（横スクロール）
+          // 打撃（見出し+本文を同一スクロールで横スクロール）
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(children: [
               for (final t in battingCols)
                 SizedBox(
-                    width: _wStat,
-                    child: _gridCell(t, bg: const Color(0xFFE57373), h: 30)),
+                  width: _wStat,
+                  child: Column(children: [
+                    _gridCell(t, bg: const Color(0xFFE57373), h: 20),
+                    SizedBox(
+                      height: 13.5 * 5,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            for (final e in (bat
+                                .where(
+                                    (m) => (m['title']?.toString() ?? '') == t)
+                                .toList()
+                              ..sort((a, b) =>
+                                  (int.tryParse('${a['int_rank']}') ?? 1 << 30)
+                                      .compareTo(
+                                          int.tryParse('${b['int_rank']}') ??
+                                              1 << 30))))
+                              _entryCellFromRow(e),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ]),
+                ),
             ]),
           ),
-          // 打撃 本文（ランク/チーム/選手/数値）
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Column(children: [
-              for (int r = 1; r <= 5; r++)
-                Row(children: [
-                  for (final t in battingCols) _entryCell(bat, t, r),
-                ]),
-            ]),
-          ),
-          const SizedBox(height: 8),
-          // 青: 投手 見出し（横スクロール）
+          const SizedBox(height: 0),
+          // 投手（見出し+本文を同一スクロールで横スクロール）
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(children: [
               for (final t in pitchingCols)
                 SizedBox(
-                    width: _wStat,
-                    child: _gridCell(t, bg: const Color(0xFF64B5F6), h: 30)),
-            ]),
-          ),
-          // 投手 本文（ランク/チーム/選手/数値）
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Column(children: [
-              for (int r = 1; r <= 5; r++)
-                Row(children: [
-                  for (final t in pitchingCols) _entryCell(pit, t, r),
-                ]),
+                  width: _wStat,
+                  child: Column(children: [
+                    _gridCell(t, bg: const Color(0xFF64B5F6), h: 20),
+                    SizedBox(
+                      height: 13.5 * 5,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            for (final e in (pit
+                                .where((m) =>
+                                    (m['title']?.toString() ?? '') == t ||
+                                    (_normalizeTitle(
+                                            (m['title'] ?? '').toString()) ==
+                                        _normalizeTitle(t)))
+                                .toList()
+                              ..sort((a, b) =>
+                                  (int.tryParse('${a['int_rank']}') ?? 1 << 30)
+                                      .compareTo(
+                                          int.tryParse('${b['int_rank']}') ??
+                                              1 << 30))))
+                              _entryCellFromRow(e),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ]),
+                ),
             ]),
           ),
         ],
@@ -2215,9 +2951,10 @@ class SeasonTableBlock extends StatelessWidget {
     }
 
     // スクロール分離: チーム順位は専用の横スクロール、個人成績は別
-    final double _standingsWidth = _wRank +
-        _wTeam +
-        _wNum * 14; // 列数: 試合/勝/負/分/勝差/勝率/打率/本塁打/打点/盗塁/防御率(総合/先発/救援)/守備率
+    final double _standingsWidth = _wChar2 +
+        _wChar6 +
+        _wChar3 * 14; // 列数: 試合/勝/負/分/勝差/勝率/打率/本塁打/打点/盗塁/防御率(総合/先発/救援)/守備率
+    final hStatsTeamHeader = 33.0;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -2234,154 +2971,264 @@ class SeasonTableBlock extends StatelessWidget {
                 // ヘッダー（非防御率は縦結合、防御率のみ二段）
                 Row(children: [
                   SizedBox(
-                      width: _wRank,
-                      child: _cell('順位',
-                          h: 44,
+                      width: _wChar2,
+                      child: _gridCell('順位',
+                          h: hStatsTeamHeader,
                           bg: Colors.black,
                           fg: Colors.white,
                           weight: FontWeight.bold)),
                   SizedBox(
-                      width: _wTeam,
-                      child: _cell('チーム', weight: FontWeight.bold, h: 44)),
+                      width: _wChar6,
+                      child: _gridCell('チーム',
+                          weight: FontWeight.bold, h: hStatsTeamHeader)),
                   SizedBox(
-                      width: _wNum,
-                      child: _cell('試合', weight: FontWeight.bold, h: 44)),
+                      width: _wChar2,
+                      child: _gridCell('試合',
+                          weight: FontWeight.bold, h: hStatsTeamHeader)),
                   SizedBox(
-                      width: _wNum,
-                      child: _cell('勝', weight: FontWeight.bold, h: 44)),
+                      width: _wChar1,
+                      child: _gridCell('勝',
+                          weight: FontWeight.bold, h: hStatsTeamHeader)),
                   SizedBox(
-                      width: _wNum,
-                      child: _cell('負', weight: FontWeight.bold, h: 44)),
+                      width: _wChar1,
+                      child: _gridCell('負',
+                          weight: FontWeight.bold, h: hStatsTeamHeader)),
                   SizedBox(
-                      width: _wNum,
-                      child: _cell('分', weight: FontWeight.bold, h: 44)),
+                      width: _wChar1,
+                      child: _gridCell('分',
+                          weight: FontWeight.bold, h: hStatsTeamHeader)),
                   SizedBox(
-                      width: _wNum,
-                      child: _cell('勝差', weight: FontWeight.bold, h: 44)),
+                      width: _wChar2,
+                      child: _gridCell('勝差',
+                          weight: FontWeight.bold, h: hStatsTeamHeader)),
                   SizedBox(
-                      width: _wNum,
-                      child: _cell('勝率', weight: FontWeight.bold, h: 44)),
+                      width: _wChar3,
+                      child: _gridCell('勝率',
+                          weight: FontWeight.bold, h: hStatsTeamHeader)),
                   SizedBox(
-                      width: _wNum,
-                      child: _cell('打率', weight: FontWeight.bold, h: 44)),
+                      width: _wChar2,
+                      child: _gridCell('打率',
+                          weight: FontWeight.bold, h: hStatsTeamHeader)),
                   SizedBox(
-                      width: _wNum,
-                      child: _cell('本塁打', weight: FontWeight.bold, h: 44)),
+                      width: _wChar3,
+                      child: _gridCell('本塁打',
+                          weight: FontWeight.bold, h: hStatsTeamHeader)),
                   SizedBox(
-                      width: _wNum,
-                      child: _cell('打点', weight: FontWeight.bold, h: 44)),
+                      width: _wChar2,
+                      child: _gridCell('打点',
+                          weight: FontWeight.bold, h: hStatsTeamHeader)),
                   SizedBox(
-                      width: _wNum,
-                      child: _cell('盗塁', weight: FontWeight.bold, h: 44)),
+                      width: _wChar2,
+                      child: _gridCell('盗塁',
+                          weight: FontWeight.bold, h: hStatsTeamHeader)),
 
                   SizedBox(
-                      width: _wNum,
-                      child: _cell('守備率', weight: FontWeight.bold, h: 44)),
+                      width: _wChar3,
+                      child: _gridCell('失策率',
+                          weight: FontWeight.bold, h: hStatsTeamHeader)),
 
                   // 防御率ブロック（上: 見出し、下: 総合/先発/救援）
                   SizedBox(
-                    width: _wNum * 3,
+                    width: _wChar2 * 3,
                     child: Column(children: [
-                      _cell('防御率', weight: FontWeight.bold, h: 22),
+                      _gridCell('防御率',
+                          weight: FontWeight.bold, h: hStatsTeamHeader / 2),
                       Row(children: [
                         SizedBox(
-                            width: _wNum,
-                            child: _cell('総合', weight: FontWeight.bold, h: 22)),
+                            width: _wChar2,
+                            child: _gridCell('総合',
+                                weight: FontWeight.bold,
+                                h: hStatsTeamHeader / 2)),
                         SizedBox(
-                            width: _wNum,
-                            child: _cell('先発', weight: FontWeight.bold, h: 22)),
+                            width: _wChar2,
+                            child: _gridCell('先発',
+                                weight: FontWeight.bold,
+                                h: hStatsTeamHeader / 2)),
                         SizedBox(
-                            width: _wNum,
-                            child: _cell('救援', weight: FontWeight.bold, h: 22)),
+                            width: _wChar2,
+                            child: _gridCell('救援',
+                                weight: FontWeight.bold,
+                                h: hStatsTeamHeader / 2)),
                       ]),
                     ]),
                   ),
                 ]),
-                const SizedBox(height: 4),
+                const SizedBox(height: 0),
 
                 // 本文 1..6
                 for (int rk = 1; rk <= 6; rk++)
-                  Row(children: [
-                    SizedBox(
-                        width: _wRank,
-                        child:
-                            _cell('$rk', bg: Colors.black, fg: Colors.white)),
-                    SizedBox(
-                        width: _wTeam,
-                        child: _cell(_num(cur.firstWhere(
-                            (e) => int.tryParse('${e['int_rank']}') == rk,
-                            orElse: () => const {})['name_team']))),
-                    SizedBox(
-                        width: _wNum,
-                        child: _cell(_num(cur.firstWhere(
-                            (e) => int.tryParse('${e['int_rank']}') == rk,
-                            orElse: () => const {})['int_game']))),
-                    SizedBox(
-                        width: _wNum,
-                        child: _cell(_num(cur.firstWhere(
-                            (e) => int.tryParse('${e['int_rank']}') == rk,
-                            orElse: () => const {})['int_win']))),
-                    SizedBox(
-                        width: _wNum,
-                        child: _cell(_num(cur.firstWhere(
-                            (e) => int.tryParse('${e['int_rank']}') == rk,
-                            orElse: () => const {})['int_lose']))),
-                    SizedBox(
-                        width: _wNum,
-                        child: _cell(_num(cur.firstWhere(
-                            (e) => int.tryParse('${e['int_rank']}') == rk,
-                            orElse: () => const {})['int_draw']))),
-                    SizedBox(
-                        width: _wNum,
-                        child: _cell(_num(cur.firstWhere(
-                            (e) => int.tryParse('${e['int_rank']}') == rk,
-                            orElse: () => const {})['game_behind']))),
-                    SizedBox(
-                        width: _wNum,
-                        child: _cell(_num(cur.firstWhere(
-                            (e) => int.tryParse('${e['int_rank']}') == rk,
-                            orElse: () => const {})['win_rate']))),
-                    SizedBox(
-                        width: _wNum,
-                        child: _cell(_num(cur.firstWhere(
-                            (e) => int.tryParse('${e['int_rank']}') == rk,
-                            orElse: () => const {})['num_avg_batting']))),
-                    SizedBox(
-                        width: _wNum,
-                        child: _cell(_num(cur.firstWhere(
-                            (e) => int.tryParse('${e['int_rank']}') == rk,
-                            orElse: () => const {})['int_homerun']))),
-                    SizedBox(
-                        width: _wNum,
-                        child: _cell(_num(cur.firstWhere(
-                            (e) => int.tryParse('${e['int_rank']}') == rk,
-                            orElse: () => const {})['int_rbi']))),
-                    SizedBox(
-                        width: _wNum,
-                        child: _cell(_num(cur.firstWhere(
-                            (e) => int.tryParse('${e['int_rank']}') == rk,
-                            orElse: () => const {})['int_sh']))),
-                    SizedBox(
-                        width: _wNum,
-                        child: _cell(_num(cur.firstWhere(
-                            (e) => int.tryParse('${e['int_rank']}') == rk,
-                            orElse: () => const {})['num_avg_fielding']))),
-                    SizedBox(
-                        width: _wNum,
-                        child: _cell(_num(cur.firstWhere(
-                            (e) => int.tryParse('${e['int_rank']}') == rk,
-                            orElse: () => const {})['num_era_total']))),
-                    SizedBox(
-                        width: _wNum,
-                        child: _cell(_num(cur.firstWhere(
-                            (e) => int.tryParse('${e['int_rank']}') == rk,
-                            orElse: () => const {})['num_era_starter']))),
-                    SizedBox(
-                        width: _wNum,
-                        child: _cell(_num(cur.firstWhere(
-                            (e) => int.tryParse('${e['int_rank']}') == rk,
-                            orElse: () => const {})['num_era_relief']))),
-                  ]),
+                  () {
+                    final row = cur.firstWhere(
+                        (e) => int.tryParse('${e['int_rank']}') == rk,
+                        orElse: () => const {});
+                    final Color? teamBg = _parseColorName(row['color_back']);
+                    final Color? teamFg = _parseColorName(row['color_font']);
+                    // 右側（チーム名より右）のセル背景は縞模様（奇数: 白 / 偶数: 薄いベージュ）
+                    final Color? paleBg =
+                        (rk % 2 == 0) ? const Color(0xFFEAD9B9) : Colors.white;
+
+                    // トップ/ワースト強調色
+                    Color? _topColor(bool cond) =>
+                        cond ? const Color(0xFF32CD32) : null; // limegreen
+                    Color? _worstColor(bool cond) => cond ? Colors.red : null;
+
+                    // 指標ごとのフラグ判定
+                    final bool topBat = row['flg_top_num_avg_batting'] == true;
+                    final bool worstBat =
+                        row['flg_worst_num_avg_batting'] == true;
+                    final Color? fgBat =
+                        _topColor(topBat) ?? _worstColor(worstBat);
+                    final FontWeight? wtBat =
+                        (topBat || worstBat) ? FontWeight.bold : null;
+
+                    final bool topHr = row['flg_top_int_homerun'] == true;
+                    final bool worstHr = row['flg_worst_int_homerun'] == true;
+                    final Color? fgHr =
+                        _topColor(topHr) ?? _worstColor(worstHr);
+                    final FontWeight? wtHr =
+                        (topHr || worstHr) ? FontWeight.bold : null;
+
+                    final bool topRbi = row['flg_top_int_rbi'] == true;
+                    final bool worstRbi = row['flg_worst_int_rbi'] == true;
+                    final Color? fgRbi =
+                        _topColor(topRbi) ?? _worstColor(worstRbi);
+                    final FontWeight? wtRbi =
+                        (topRbi || worstRbi) ? FontWeight.bold : null;
+
+                    final bool topSb = row['flg_top_int_sh'] == true;
+                    final bool worstSb = row['flg_worst_int_sh'] == true;
+                    final Color? fgSb =
+                        _topColor(topSb) ?? _worstColor(worstSb);
+                    final FontWeight? wtSb =
+                        (topSb || worstSb) ? FontWeight.bold : null;
+
+                    final bool topFld = row['flg_top_num_avg_fielding'] == true;
+                    final bool worstFld =
+                        row['flg_worst_num_avg_fielding'] == true;
+                    final Color? fgFld =
+                        _topColor(topFld) ?? _worstColor(worstFld);
+                    final FontWeight? wtFld =
+                        (topFld || worstFld) ? FontWeight.bold : null;
+
+                    final bool topEraT = row['flg_top_num_era_total'] == true;
+                    final bool worstEraT =
+                        row['flg_worst_num_era_total'] == true;
+                    final Color? fgEraT =
+                        _topColor(topEraT) ?? _worstColor(worstEraT);
+                    final FontWeight? wtEraT =
+                        (topEraT || worstEraT) ? FontWeight.bold : null;
+
+                    final bool topEraS = row['flg_top_num_era_starter'] == true;
+                    final bool worstEraS =
+                        row['flg_worst_num_era_starter'] == true;
+                    final Color? fgEraS =
+                        _topColor(topEraS) ?? _worstColor(worstEraS);
+                    final FontWeight? wtEraS =
+                        (topEraS || worstEraS) ? FontWeight.bold : null;
+
+                    final bool topEraR = row['flg_top_num_era_relief'] == true;
+                    final bool worstEraR =
+                        row['flg_worst_num_era_relief'] == true;
+                    final Color? fgEraR =
+                        _topColor(topEraR) ?? _worstColor(worstEraR);
+                    final FontWeight? wtEraR =
+                        (topEraR || worstEraR) ? FontWeight.bold : null;
+
+                    const double _gridBodyH = 20.0;
+                    return Row(children: [
+                      SizedBox(
+                          width: _wChar2,
+                          child: _gridCell('$rk',
+                              h: _gridBodyH,
+                              bg: Colors.black,
+                              fg: Colors.white,
+                              weight: FontWeight.bold)),
+                      SizedBox(
+                          width: _wChar6,
+                          child: _gridCell(_num(row['name_team']),
+                              h: _gridBodyH, bg: teamBg, fg: teamFg)),
+                      SizedBox(
+                          width: _wChar2,
+                          child: _gridCell(_num(row['int_game']),
+                              h: _gridBodyH, bg: paleBg)),
+                      SizedBox(
+                          width: _wChar1,
+                          child: _gridCell(_num(row['int_win']),
+                              h: _gridBodyH, bg: paleBg)),
+                      SizedBox(
+                          width: _wChar1,
+                          child: _gridCell(_num(row['int_lose']),
+                              h: _gridBodyH, bg: paleBg)),
+                      SizedBox(
+                          width: _wChar1,
+                          child: _gridCell(_num(row['int_draw']),
+                              h: _gridBodyH, bg: paleBg)),
+                      SizedBox(
+                          width: _wChar2,
+                          child: _gridCell(_num(row['game_behind']),
+                              h: _gridBodyH, bg: paleBg)),
+                      SizedBox(
+                          width: _wChar3,
+                          child: _gridCell(_num(row['pct_win']),
+                              h: _gridBodyH, bg: paleBg)),
+                      SizedBox(
+                          width: _wChar2,
+                          child: _gridCell(_num(row['num_avg_batting']),
+                              h: _gridBodyH,
+                              bg: paleBg,
+                              fg: fgBat,
+                              weight: wtBat)),
+                      SizedBox(
+                          width: _wChar3,
+                          child: _gridCell(_num(row['int_homerun']),
+                              h: _gridBodyH,
+                              bg: paleBg,
+                              fg: fgHr,
+                              weight: wtHr)),
+                      SizedBox(
+                          width: _wChar2,
+                          child: _gridCell(_num(row['int_rbi']),
+                              h: _gridBodyH,
+                              bg: paleBg,
+                              fg: fgRbi,
+                              weight: wtRbi)),
+                      SizedBox(
+                          width: _wChar2,
+                          child: _gridCell(_num(row['int_sh']),
+                              h: _gridBodyH,
+                              bg: paleBg,
+                              fg: fgSb,
+                              weight: wtSb)),
+                      SizedBox(
+                          width: _wChar3,
+                          child: _gridCell(_num(row['num_avg_fielding']),
+                              h: _gridBodyH,
+                              bg: paleBg,
+                              fg: fgFld,
+                              weight: wtFld)),
+                      SizedBox(
+                          width: _wChar2,
+                          child: _gridCell(_num(row['num_era_total']),
+                              h: _gridBodyH,
+                              bg: paleBg,
+                              fg: fgEraT,
+                              weight: wtEraT)),
+                      SizedBox(
+                          width: _wChar2,
+                          child: _gridCell(_num(row['num_era_starter']),
+                              h: _gridBodyH,
+                              bg: paleBg,
+                              fg: fgEraS,
+                              weight: wtEraS)),
+                      SizedBox(
+                          width: _wChar2,
+                          child: _gridCell(_num(row['num_era_relief']),
+                              h: _gridBodyH,
+                              bg: paleBg,
+                              fg: fgEraR,
+                              weight: wtEraR)),
+                    ]);
+                  }(),
               ],
             ),
           ),
@@ -2415,6 +3262,65 @@ class SeasonTableBlock extends StatelessWidget {
                   ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+// 汎用: 個人成績1タイトルのカラム。ヘッダーをクリック/ホバーで全件展開。
+class _StatsColumn extends StatefulWidget {
+  final String title;
+  final double width;
+  final Color headerBg;
+  final List<Map<String, dynamic>> rows; // 既に並び替え済み推奨
+  final Widget Function(Map<String, dynamic>) buildRow;
+
+  const _StatsColumn({
+    super.key,
+    required this.title,
+    required this.width,
+    required this.headerBg,
+    required this.rows,
+    required this.buildRow,
+  });
+
+  @override
+  State<_StatsColumn> createState() => _StatsColumnState();
+}
+
+class _StatsColumnState extends State<_StatsColumn> {
+  bool _expanded = false;
+
+  void _toggle() => setState(() => _expanded = !_expanded);
+
+  @override
+  Widget build(BuildContext context) {
+    const double _rowH = 13.5;
+    const double _headerH = 20.0;
+    final double _baseH = _headerH + _rowH * 5;
+
+    final header = Container(
+      height: _headerH,
+      width: widget.width,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(color: widget.headerBg),
+      child: OneLineShrinkText(widget.title, baseSize: 12, minSize: 6),
+    );
+
+    final firstFive =
+        widget.rows.length <= 5 ? widget.rows : widget.rows.sublist(0, 5);
+    final extras = widget.rows.length <= 5
+        ? const <Map<String, dynamic>>[]
+        : widget.rows.sublist(5);
+
+    // Revert to simple scroll version behavior at column level (no overlay expansion here).
+    return SizedBox(
+      width: widget.width,
+      child: Column(
+        children: [
+          header,
+          for (final r in firstFive) widget.buildRow(r),
+        ],
       ),
     );
   }

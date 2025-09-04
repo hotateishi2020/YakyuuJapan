@@ -61,20 +61,23 @@ class Postgres {
     await conn.execute('ROLLBACK');
   }
 
-  static Future<int> execute(Connection conn, String sql,
-      {Map<String, dynamic>? data}) async {
-    final result = await conn.execute(sql, parameters: data);
-    if (result.isNotEmpty && result.first.isNotEmpty) {
-      final value = result.first.first;
-      if (value is int) return value;
+  static Future<Result> execute(Connection conn, String sql,
+      {Object? data}) async {
+    try {
+      final result = await conn.execute(sql, parameters: data);
+      return result;
+    } catch (e, stacktrace) {
+      print(
+          "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥");
+      print("SQLの実行に失敗しました。失敗したSQL文はこちらです👇");
+      print(sql);
+      print("失敗したパラメータはこちらです👇");
+      print(data);
+      print(
+          "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥");
+      // rethrow with original stack
+      Error.throwWithStackTrace(e, stacktrace);
     }
-    return 0;
-  }
-
-  static Future<Result> select(
-      Connection conn, String sql, dynamic value) async {
-    final results = await conn.execute(sql, parameters: [value]);
-    return results;
   }
 
 // トランザクション/既存接続で使うINSERT（安全な名前付きパラメータ）

@@ -16,7 +16,7 @@ class AppSql {
   }
 
   //m_player
-  static String selectTodayPitcher() {
+  static String selectPlayerWhereFullNameAndTeamID() {
     return '''
       SELECT 
         id 
@@ -72,7 +72,8 @@ class AppSql {
   static String selectEventsDetails() {
     return '''
       SELECT 
-        * 
+        *,
+        CASE WHEN date_From_temp <= CURRENT_DATE THEN TRUE ELSE FALSE END AS flg_today 
       FROM (
         SELECT
           event_category.name1 AS event_category,  
@@ -143,15 +144,29 @@ class AppSql {
         to_char(t_game.datetime_start, 'HH24:MI')    AS time_game,
         team_home.name_short AS name_team_home,
         team_away.name_short AS name_team_away,
+        team_home.color_font AS color_font_home,
+        team_home.color_back AS color_back_home,
+        team_away.color_font AS color_font_away,
+        team_away.color_back AS color_back_away,
         pitcher_home.name_full AS name_pitcher_home,
         pitcher_away.name_full AS name_pitcher_away,
         pitcher_win.name_full AS name_pitcher_win,
         pitcher_lose.name_full AS name_pitcher_lose,
+        pitcher_save.name_full AS name_pitcher_save,
         m_stadium.name_short AS name_stadium,
         t_game.score_home,
         t_game.score_away,
+        team_home.id AS id_team_home,
+        team_away.id AS id_team_away,
+        pitcher_win.id_team AS id_pitcher_win,
+        pitcher_lose.id_team AS id_pitcher_lose,
+        pitcher_save.id_team AS id_pitcher_save,
         team_home.id_league AS id_league_home,
-        team_away.id_league AS id_league_away
+        team_away.id_league AS id_league_away,
+        COALESCE('/' || string_agg(DISTINCT user_pitcher_home.code_color, '/' 
+                                ORDER BY user_pitcher_home.code_color) || '/', '') AS colors_pitcher_home,
+        COALESCE('/' || string_agg(DISTINCT user_pitcher_away.code_color, '/' 
+                                ORDER BY user_pitcher_away.code_color) || '/', '') AS colors_pitcher_away
       FROM t_game
         LEFT OUTER JOIN m_player AS pitcher_home ON pitcher_home.id = t_game.id_pitcher_home
         LEFT OUTER JOIN m_player AS pitcher_away ON pitcher_away.id = t_game.id_pitcher_away
@@ -159,8 +174,38 @@ class AppSql {
         LEFT OUTER JOIN m_team AS team_away ON team_away.id = t_game.id_team_away
         LEFT OUTER JOIN m_player AS pitcher_win ON pitcher_win.id = t_game.id_pitcher_win
         LEFT OUTER JOIN m_player AS pitcher_lose ON pitcher_lose.id = t_game.id_pitcher_lose
+        LEFT OUTER JOIN m_player AS pitcher_save ON pitcher_save.id = t_game.id_pitcher_save
         LEFT OUTER JOIN m_stadium ON m_stadium.id = t_game.id_stadium
-      WHERE t_game.datetime_start BETWEEN (CURRENT_DATE - INTERVAL '1 day') AND (CURRENT_DATE + INTERVAL '3 day');
+        LEFT OUTER JOIN (SELECT * FROM t_predict_player LEFT OUTER JOIN m_user ON m_user.id = t_predict_player.id_user WHERE year = \$1) AS user_pitcher_home ON user_pitcher_home.id_player = pitcher_home.id
+        LEFT OUTER JOIN (SELECT * FROM t_predict_player LEFT OUTER JOIN m_user ON m_user.id = t_predict_player.id_user WHERE year = \$1) AS user_pitcher_away ON user_pitcher_away.id_player = pitcher_away.id
+      WHERE t_game.datetime_start BETWEEN (CURRENT_DATE - INTERVAL '1 day') AND (CURRENT_DATE + INTERVAL '3 day')
+      GROUP BY t_game.datetime_start, team_home.name_short, team_away.name_short, pitcher_home.name_full, pitcher_away.name_full,
+               pitcher_win.name_full, pitcher_lose.name_full, m_stadium.name_short, t_game.score_home, t_game.score_away,
+               team_home.id_league, team_away.id_league, team_home.color_font, team_home.color_back, team_away.color_font,
+               team_away.color_back, team_home.id, team_away.id, pitcher_win.id_team, pitcher_lose.id_team, pitcher_save.name_full, 
+               pitcher_save.id_team;
+    ''';
+  }
+
+  //t_nortification
+  static String selectNotification() {
+    return '''
+      SELECT  
+        tag_main.name1 AS tag_main_title,
+        tag_sub.name1 AS tag_sub_title,
+        title,
+        text_main,
+        id_user,
+        flg_read,
+        url,
+        tag_main.code_color1 AS tag_main_color_back,
+        tag_main.code_color2 AS tag_main_color_font,
+        tag_sub.code_color1 AS tag_sub_color_back,
+        tag_sub.code_color2 AS tag_sub_color_font
+      FROM t_nortification
+        LEFT OUTER JOIN m_system_code AS tag_main ON tag_main.key = t_nortification.code_tag_main AND tag_main.code = 'NORTIFICATION'
+        LEFT OUTER JOIN m_system_code AS tag_sub ON tag_sub.key = t_nortification.code_tag_sub AND tag_sub.code = 'NORTIFICATION_SUB'
+      ORDER BY t_nortification.crtat DESC
     ''';
   }
 
@@ -195,6 +240,7 @@ class AppSql {
           id_player,
           id_team
         FROM t_predict_player
+        WHERE year = \$1
 
         UNION ALL
 
@@ -258,6 +304,7 @@ class AppSql {
       FROM t_predict_team
           LEFT OUTER JOIN m_user ON m_user.id = t_predict_team.id_user
           LEFT OUTER JOIN m_team ON m_team.id = t_predict_team.id_team
+      WHERE t_predict_team.int_year = \$1
       ORDER BY m_user.id, id_league, int_rank
     ''';
   }
@@ -270,6 +317,8 @@ class AppSql {
         int_rank,
         id_team,
         m_team.name_short AS name_team,
+        m_team.color_font,
+        m_team.color_back,
         id_league,
         m_league.name_short AS name_league,
         int_game,
@@ -277,19 +326,38 @@ class AppSql {
         int_lose,
         int_draw,
         game_behind,
-        int_win / (int_win + int_lose) AS pct_win,
-        num_avg_batting,
+        to_char(int_win / (int_win + int_lose) ::NUMERIC * 100, 'FM990.0') || '%' AS pct_win,
+        regexp_replace(to_char(num_avg_batting, 'FM0.000'), '^0(?=\.)', '') AS num_avg_batting,
         int_homerun,
         int_rbi,
         int_sh,
-        num_era_total,
-        num_era_starter,
-        num_era_relief,
-        num_avg_fielding
+        to_char(num_era_total, '0.00') AS num_era_total,
+        to_char(num_era_starter, '0.00') AS num_era_starter,
+        to_char(num_era_relief, '0.00') AS num_era_relief,
+        to_char((1 -num_avg_fielding) * 100, 'FM990.0') || '%' AS num_avg_fielding,
+  
+        CASE WHEN num_avg_batting = MAX(num_avg_batting) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_top_num_avg_batting,
+        CASE WHEN int_homerun = MAX(int_homerun) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_top_int_homerun,
+        CASE WHEN int_rbi = MAX(int_rbi) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_top_int_rbi,
+        CASE WHEN int_sh = MAX(int_sh) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_top_int_sh,
+        CASE WHEN num_era_total = MIN(num_era_total) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_top_num_era_total,
+        CASE WHEN num_era_starter = MIN(num_era_starter) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_top_num_era_starter,
+        CASE WHEN num_era_relief = MIN(num_era_relief) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_top_num_era_relief,
+        CASE WHEN num_avg_fielding = MAX(num_avg_fielding) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_top_num_avg_fielding,
+
+        CASE WHEN num_avg_batting = MIN(num_avg_batting) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_worst_num_avg_batting,
+        CASE WHEN int_homerun = MIN(int_homerun) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_worst_int_homerun,
+        CASE WHEN int_rbi = MIN(int_rbi) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_worst_int_rbi,
+        CASE WHEN int_sh = MIN(int_sh) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_worst_int_sh,
+        CASE WHEN num_era_total = MAX(num_era_total) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_worst_num_era_total,
+        CASE WHEN num_era_starter = MAX(num_era_starter) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_worst_num_era_starter,
+        CASE WHEN num_era_relief = MAX(num_era_relief) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_worst_num_era_relief,
+        CASE WHEN num_avg_fielding = MIN(num_avg_fielding) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_worst_num_avg_fielding
+
       FROM t_stats_team
         LEFT OUTER JOIN m_team ON m_team.id = t_stats_team.id_team
         LEFT OUTER JOIN m_league ON m_league.id = m_team.id_league
-        WHERE t_stats_team.crtat = (SELECT MAX(crtat) FROM t_stats_team)
+      WHERE t_stats_team.crtat = (SELECT MAX(crtat) FROM t_stats_team)
       ORDER BY id_league, int_rank
     ''';
   }
@@ -301,10 +369,19 @@ class AppSql {
         m_stats.title,
         t_stats_player.int_rank,
         m_team.name_shortest AS name_team,
+        m_team.color_font,
+        m_team.color_back,
         m_player.name_full   AS name_player,
-        t_stats_player.stats,
+        CASE WHEN m_stats.code_display = 'INTEGER' THEN TRUNC(stats)::int::text
+             WHEN m_stats.code_display = 'INT_DEC_2' THEN to_char(stats, '0.00')
+             WHEN m_stats.code_display = 'INT_DEC_3' THEN to_char(stats, '0.000')
+             WHEN m_stats.code_display = 'NUM_NO_ZERO_3' THEN regexp_replace(to_char(stats, 'FM0.000'), '^0(?=\.)', '')
+             ELSE to_char(stats, '')
+        END AS stats,
         COALESCE('/' || string_agg(DISTINCT t_predict_player.id_user::text, '/' 
                                 ORDER BY t_predict_player.id_user::text) || '/', '') AS id_users,
+        COALESCE('/' || string_agg(DISTINCT m_user.code_color, '/' 
+                                ORDER BY m_user.code_color) || '/', '') AS colors_user,
         t_stats_player.id_league,
         m_stats.int_index,
         t_stats_player.id_stats
@@ -317,15 +394,19 @@ class AppSql {
           ON t_predict_player.id_player = t_stats_player.id_player
           AND t_predict_player.id_stats  = t_stats_player.id_stats
           AND t_predict_player.year      = \$1
+        LEFT JOIN m_user    ON m_user.id = t_predict_player.id_user
       WHERE t_stats_player.crtat = (SELECT MAX(crtat) FROM t_stats_player WHERE EXTRACT(YEAR FROM crtat) = \$1)
       GROUP BY
         m_stats.title,
         t_stats_player.int_rank,
         m_team.name_shortest,
+        m_team.color_font,
+        m_team.color_back,
         m_player.name_full,
         t_stats_player.stats,
         t_stats_player.id_league,
         m_stats.int_index,
+        m_stats.code_display,
         t_stats_player.id_stats
       ORDER BY t_stats_player.id_league, m_stats.int_index, t_stats_player.int_rank;
     ''';

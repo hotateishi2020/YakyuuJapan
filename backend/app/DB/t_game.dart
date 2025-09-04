@@ -8,9 +8,11 @@ class t_game extends DBModel {
   int id_team_away = 0;
   int id_pitcher_win = 0;
   int id_pitcher_lose = 0;
+  int id_pitcher_save = 0;
   int id_stadium = 0;
   int score_home = 0;
   int score_away = 0;
+  String state = '';
   DateTime? datetime_start = null;
 
   Map<String, dynamic> toMap() {
@@ -22,9 +24,11 @@ class t_game extends DBModel {
         "id_team_away": id_team_away,
         "id_pitcher_win": id_pitcher_win,
         "id_pitcher_lose": id_pitcher_lose,
+        "id_pitcher_save": id_pitcher_save,
         "id_stadium": id_stadium,
         "score_home": score_home,
         "score_away": score_away,
+        "state": state,
         "datetime_start": datetime_start,
       });
   }

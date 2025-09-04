@@ -73,7 +73,7 @@ class AppSql {
     return '''
       SELECT 
         *,
-        CASE WHEN date_From_temp <= CURRENT_DATE THEN TRUE ELSE FALSE END AS flg_today 
+        CASE WHEN date_From_temp < (CURRENT_DATE + INTERVAL '2 day') THEN TRUE ELSE FALSE END AS flg_today 
       FROM (
         SELECT
           event_category.name1 AS event_category,  
@@ -158,11 +158,12 @@ class AppSql {
         t_game.score_away,
         team_home.id AS id_team_home,
         team_away.id AS id_team_away,
-        pitcher_win.id_team AS id_pitcher_win,
-        pitcher_lose.id_team AS id_pitcher_lose,
-        pitcher_save.id_team AS id_pitcher_save,
+        pitcher_win.id_team AS id_team_pitcher_win,
+        pitcher_lose.id_team AS id_team_pitcher_lose,
+        pitcher_save.id_team AS id_team_pitcher_save,
         team_home.id_league AS id_league_home,
         team_away.id_league AS id_league_away,
+        t_game.state,
         COALESCE('/' || string_agg(DISTINCT user_pitcher_home.code_color, '/' 
                                 ORDER BY user_pitcher_home.code_color) || '/', '') AS colors_pitcher_home,
         COALESCE('/' || string_agg(DISTINCT user_pitcher_away.code_color, '/' 
@@ -183,7 +184,7 @@ class AppSql {
                pitcher_win.name_full, pitcher_lose.name_full, m_stadium.name_short, t_game.score_home, t_game.score_away,
                team_home.id_league, team_away.id_league, team_home.color_font, team_home.color_back, team_away.color_font,
                team_away.color_back, team_home.id, team_away.id, pitcher_win.id_team, pitcher_lose.id_team, pitcher_save.name_full, 
-               pitcher_save.id_team;
+               pitcher_save.id_team, t_game.state;
     ''';
   }
 

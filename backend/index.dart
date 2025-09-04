@@ -72,8 +72,6 @@ void main() async {
           final notification =
               await Postgres.execute(conn, AppSql.selectNotification());
 
-          print(notification);
-
           json = {
             'predict_team': Postgres.toJson(predict_team),
             'predict_player': Postgres.toJson(predict_player),
@@ -83,7 +81,7 @@ void main() async {
             'events': Postgres.toJson(events),
             'notification': Postgres.toJson(notification),
           };
-          print(Postgres.toJson(notification));
+          print(Postgres.toJson(events));
           // print(json);
         }); //connectionOpenClose
 

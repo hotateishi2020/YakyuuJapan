@@ -60,11 +60,11 @@ class FetchURL {
     List<t_stats_team> teams = [];
 
     for (final html_table in html_tables) {
-      final html_teams = html_table.querySelectorAll('tbody tr');
-
       if (cnt == 2) {
         break;
       }
+
+      final html_teams = html_table.querySelectorAll('tbody tr');
 
       for (final html_team in html_teams) {
         final cells = html_team.querySelectorAll('td');
@@ -72,7 +72,7 @@ class FetchURL {
           var team_name = cells[1].text.trim();
           var r_team = await Postgres.execute(
               conn, AppSql.selectTeamsWhereName(),
-              data: team_name);
+              data: [team_name]);
           if (r_team.isEmpty) continue;
           var team = t_stats_team();
           team.year = DateTimeTool.getThisYear();
@@ -134,7 +134,7 @@ class FetchURL {
         var pitching_rate_reliever = tds[2].text.trim();
         var r_team = await Postgres.execute(
             conn, AppSql.selectTeamsWhereNameShortest(),
-            data: team_name);
+            data: [team_name]);
         if (r_team.isEmpty) {
           // チーム名が一致しないケースはスキップ
           print('データが見つかりませんでした。');
@@ -182,7 +182,7 @@ class FetchURL {
         var defence_rate = tds[1].text.trim();
         var r_team_defence = await Postgres.execute(
             conn, AppSql.selectTeamsWhereName(),
-            data: StringTool.noSpace(team_name_defence));
+            data: [StringTool.noSpace(team_name_defence)]);
 
         print(team_name_defence);
         print(defence_rate);
@@ -357,8 +357,9 @@ class FetchURL {
                   .querySelectorAll('a')[0]
                   .text
                   .trim();
+
+              print("試合中もしくは試合後の先発投手を取得しました。");
             } catch (e) {
-              print('試合終了後のためスクレイピングを修正します');
               try {
                 pitcher_home = doc_detail
                     .querySelectorAll('#strt_pit')[0]
@@ -390,70 +391,92 @@ class FetchURL {
                     .text
                     .trim();
 
-                var players_result = doc_detail
-                    .querySelectorAll('#async-resultPitcher table tbody tr');
-                for (var player in players_result) {
-                  var name_team = player
-                          .querySelectorAll('td')[0]
-                          .querySelectorAll('span')[0]
-                          .text
-                          ?.trim() ??
-                      '';
-                  var result =
-                      player.querySelectorAll('th')[0].text?.trim() ?? '';
-                  var href_player = player
-                          .querySelectorAll('td')[0]
-                          .querySelectorAll('a')[0]
-                          .attributes['href']
-                          ?.trim() ??
-                      '';
-                  var url_player = url.resolve(href_player);
-
-                  final res_player = await http.get(url_player);
-
-                  if (res_player.statusCode != 200) {
-                    throw Exception('Failed to fetch standings');
-                  }
-
-                  final doc_player = parse(_decodeHtml(res_player));
-                  final name_player = doc_player
-                      .querySelectorAll('#tm_menu ruby.bb-profile__ruby')[0]
-                      .text
-                      .trim();
-                  final team_result = await Postgres.execute(
-                      conn, AppSql.selectTeamsWhereName(),
-                      data: [name_team]);
-
-                  final id_team_result = team_result.first.toColumnMap()['id'];
-                  final result_player = await Postgres.execute(
-                      conn, AppSql.selectPlayerWhereFullNameAndTeamID(),
-                      data: [StringTool.noSpace(name_player), id_team_result]);
-                  final id_player_result =
-                      result_player.first.toColumnMap()['id'];
-
-                  if (result == '勝利投手') {
-                    id_pitcher_win = id_player_result;
-                  } else if (result == '敗戦投手') {
-                    id_pitcher_lose = id_player_result;
-                  } else if (result == 'セーブ') {
-                    id_pitcher_save = id_player_result;
-                  }
-                } //for players_result
+                print('試合前なので予告先発投手を取得しました。');
               } catch (e) {
                 print('予告先発投手が発表されていないので詳細のスクレイピングは行いませんでした。');
                 flg_no_pitcher = true;
               }
             }
 
+            //勝利投手、敗戦投手、セーブ投手を取得
+            try {
+              var players_result = doc_detail
+                  .querySelectorAll('#async-resultPitcher table tbody tr');
+              if (players_result.isEmpty) {
+                throw Exception('試合が終了していないので活躍投手のHTMLが存在しません。');
+              }
+              for (var player in players_result) {
+                var name_team_block =
+                    player.querySelectorAll('td')[0].querySelectorAll('span');
+
+                if (name_team_block.isEmpty) {
+                  continue;
+                }
+
+                var name_team = name_team_block[0].text?.trim() ?? '';
+
+                print(name_team);
+
+                var result =
+                    player.querySelectorAll('th')[0].text?.trim() ?? '';
+                var href_player = player
+                        .querySelectorAll('td')[0]
+                        .querySelectorAll('a')[0]
+                        .attributes['href']
+                        ?.trim() ??
+                    '';
+
+                var url_player = url.resolve(href_player);
+
+                final res_player = await http.get(url_player);
+
+                if (res_player.statusCode != 200) {
+                  throw Exception('Failed to fetch standings');
+                }
+
+                final doc_player = parse(_decodeHtml(res_player));
+                final name_player = doc_player
+                    .querySelectorAll('ruby.bb-profile__ruby')[0]
+                    .text
+                    .split('（')[0]
+                    .trim();
+                print(StringTool.noSpace(name_player));
+                final team_result = await Postgres.execute(
+                    conn, AppSql.selectTeamsWhereName(),
+                    data: [name_team]);
+
+                final id_team_result = team_result.first.toColumnMap()['id'];
+                final result_player = await Postgres.execute(
+                    conn, AppSql.selectPlayerWhereFullNameAndTeamID(),
+                    data: [StringTool.noSpace(name_player), id_team_result]);
+                final id_player_result =
+                    result_player.first.toColumnMap()['id'];
+
+                if (result == '勝利投手') {
+                  id_pitcher_win = id_player_result;
+                  print("勝利投手を取得しました。");
+                } else if (result == '敗戦投手') {
+                  id_pitcher_lose = id_player_result;
+                  print("敗戦投手を取得しました。");
+                } else if (result == 'セーブ') {
+                  id_pitcher_save = id_player_result;
+                  print("セーブ投手を取得しました。");
+                }
+                print('');
+              } //for players_result
+            } catch (e, stacktrace) {
+              print('試合が終了していないので活躍選手を取得できませんでした。');
+            }
+
             final result_team_home = await Postgres.execute(
                 conn, AppSql.selectTeamsWhereName(),
-                data: team_home);
+                data: [team_home]);
 
             id_team_home = result_team_home.first.toColumnMap()['id'];
 
             final results_team_away = await Postgres.execute(
                 conn, AppSql.selectTeamsWhereName(),
-                data: team_away);
+                data: [team_away]);
 
             id_team_away = results_team_away.first.toColumnMap()['id'];
 
@@ -472,7 +495,7 @@ class FetchURL {
 
             final result_stadium = await Postgres.execute(
                 conn, AppSql.selectStadium(),
-                data: '%$name_stadium%');
+                data: ['%$name_stadium%']);
 
             if (result_stadium.isEmpty) {
               //DBに存在しないスタジアムの場合は新規登録する。
@@ -506,7 +529,7 @@ class FetchURL {
           game.id_pitcher_lose = id_pitcher_lose;
           game.id_pitcher_save = id_pitcher_save;
 
-          print(game.toMap());
+          // print(game.toMap());
           print('');
 
           if (result_game.isEmpty) {

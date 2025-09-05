@@ -994,7 +994,7 @@ class _PredictionPageState extends State<PredictionPage> {
                                               ),
                                               const SizedBox(height: 6),
                                               SizedBox(
-                                                height: 320,
+                                                height: 340,
                                                 child: GamesBoardYahooStyle(
                                                   games: games
                                                       .where((g) =>
@@ -1049,7 +1049,7 @@ class _PredictionPageState extends State<PredictionPage> {
                                               ),
                                               const SizedBox(height: 6),
                                               SizedBox(
-                                                height: 320,
+                                                height: 340,
                                                 child: GamesBoardYahooStyle(
                                                   games: games
                                                       .where((g) =>
@@ -1103,7 +1103,7 @@ class _PredictionPageState extends State<PredictionPage> {
                                               ),
                                               const SizedBox(height: 6),
                                               SizedBox(
-                                                height: 320,
+                                                height: 340,
                                                 child: GamesBoardYahooStyle(
                                                   games: games
                                                       .where((g) =>
@@ -1246,7 +1246,7 @@ class _PredictionPageState extends State<PredictionPage> {
                                               ),
                                               const SizedBox(height: 6),
                                               SizedBox(
-                                                height: 320,
+                                                height: 340,
                                                 child: GamesBoardYahooStyle(
                                                   games: games
                                                       .where((g) =>
@@ -1301,7 +1301,7 @@ class _PredictionPageState extends State<PredictionPage> {
                                               ),
                                               const SizedBox(height: 6),
                                               SizedBox(
-                                                height: 320,
+                                                height: 340,
                                                 child: GamesBoardYahooStyle(
                                                   games: games
                                                       .where((g) =>
@@ -1348,7 +1348,7 @@ class _PredictionPageState extends State<PredictionPage> {
                                               ),
                                               const SizedBox(height: 6),
                                               SizedBox(
-                                                height: 320,
+                                                height: 340,
                                                 child: GamesBoardYahooStyle(
                                                   games: games
                                                       .where((g) =>
@@ -1909,145 +1909,125 @@ class _GameCard extends StatelessWidget {
         );
       }
 
-      return Card(
-        elevation: 0.5,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-        child: Container(
-          decoration: cardDecoration,
-          child: Padding(
-            padding: const EdgeInsets.all(2),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // 上段: 球場（左上：ホーム色）／ 時刻（右上：アウェイ色）
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: stadiumW,
+      final bool inProgress = _stateTxt.contains('回');
+      final inner = Container(
+        decoration: cardDecoration,
+        child: Padding(
+          padding: const EdgeInsets.all(2),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // 上段: 球場（左上：ホーム色）／ 時刻（右上：アウェイ色）
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: stadiumW,
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 2, top: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: homeNameBg,
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                      child: OneLineShrinkText(
+                        _stadium,
+                        baseSize: baseSmall,
+                        minSize: 7,
+                        color: homeNameFg ?? Colors.black87,
+                        align: TextAlign.left,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.topRight,
                       child: Container(
-                        margin: const EdgeInsets.only(left: 2, top: 2),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: homeNameBg,
+                          color: awayNameBg,
                           borderRadius: BorderRadius.circular(3),
                         ),
                         child: OneLineShrinkText(
-                          _stadium,
+                          _time.isNotEmpty ? _time : (_showScore ? '試合終了' : ''),
                           baseSize: baseSmall,
                           minSize: 7,
-                          color: homeNameFg ?? Colors.black87,
-                          align: TextAlign.left,
+                          weight: FontWeight.bold,
+                          color: awayNameFg ?? Colors.black87,
+                          align: TextAlign.center,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.topRight,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: awayNameBg,
-                            borderRadius: BorderRadius.circular(3),
-                          ),
-                          child: OneLineShrinkText(
-                            _time.isNotEmpty
-                                ? _time
-                                : (_showScore ? '試合終了' : ''),
-                            baseSize: baseSmall,
-                            minSize: 7,
-                            weight: FontWeight.bold,
-                            color: awayNameFg ?? Colors.black87,
-                            align: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 2),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 2),
 
-                // 中段: ホーム / スコアorvs / ビジター
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                                width: teamNameW,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: null,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  constraints:
-                                      BoxConstraints(minHeight: nameChipH2),
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 4),
-                                  alignment: Alignment.center,
-                                  width: double.infinity,
-                                  child: OneLineShrinkText(_home,
-                                      baseSize: baseMid,
-                                      minSize: 8,
-                                      weight: FontWeight.w600,
-                                      color: homeNameFg ?? Colors.black87,
-                                      align: TextAlign.center),
-                                )),
-                            if (_pHome.isNotEmpty)
-                              Padding(
-                                padding: EdgeInsets.only(top: gap * 0.3),
-                                child: _pitcherNameBox(
-                                  name: _pHome,
-                                  colorsRaw: _cPitchHome,
-                                  baseSize: baseSmall,
-                                  alignLeft: true,
-                                  overrideTextColor: _cPitchHome.trim().isEmpty
-                                      ? (homeNameFg ?? Colors.black87)
-                                      : null,
-                                  overrideWeight: _cPitchHome.trim().isEmpty
-                                      ? FontWeight.w600
-                                      : null,
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 72,
+              // 中段: ホーム / スコアorvs / ビジター
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
                       child: Column(
-                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (_stateTxt.isNotEmpty)
+                          SizedBox(
+                              width: teamNameW,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: null,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                constraints:
+                                    BoxConstraints(minHeight: nameChipH2),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 4),
+                                alignment: Alignment.center,
+                                width: double.infinity,
+                                child: OneLineShrinkText(_home,
+                                    baseSize: baseMid,
+                                    minSize: 8,
+                                    weight: FontWeight.w600,
+                                    color: homeNameFg ?? Colors.black87,
+                                    align: TextAlign.center),
+                              )),
+                          if (_pHome.isNotEmpty)
                             Padding(
-                              padding: const EdgeInsets.only(bottom: 2),
-                              child: OneLineShrinkText(
-                                _stateTxt,
+                              padding: EdgeInsets.only(top: gap * 0.3),
+                              child: _pitcherNameBox(
+                                name: _pHome,
+                                colorsRaw: _cPitchHome,
                                 baseSize: baseSmall,
-                                minSize: 7,
-                                color: Colors.black,
-                                shadows: [
-                                  Shadow(
-                                      color: Colors.white.withOpacity(0.85),
-                                      blurRadius: 2,
-                                      offset: Offset(0, 1))
-                                ],
-                                align: TextAlign.center,
+                                alignLeft: true,
+                                overrideTextColor: _cPitchHome.trim().isEmpty
+                                    ? (homeNameFg ?? Colors.black87)
+                                    : null,
+                                overrideWeight: _cPitchHome.trim().isEmpty
+                                    ? FontWeight.w600
+                                    : null,
                               ),
                             ),
-                          Center(
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 72,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_stateTxt.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 2),
                             child: OneLineShrinkText(
-                              _showScore ? '$_sHome  -  $_sAway' : 'vs',
-                              baseSize: baseBig,
-                              minSize: 9,
-                              weight: FontWeight.bold,
+                              _stateTxt,
+                              baseSize: baseSmall,
+                              minSize: 7,
                               color: Colors.black,
                               shadows: [
                                 Shadow(
@@ -2055,212 +2035,242 @@ class _GameCard extends StatelessWidget {
                                     blurRadius: 2,
                                     offset: Offset(0, 1))
                               ],
+                              align: TextAlign.center,
                             ),
                           ),
+                        Center(
+                          child: OneLineShrinkText(
+                            _showScore ? '$_sHome  -  $_sAway' : 'vs',
+                            baseSize: baseBig,
+                            minSize: 9,
+                            weight: FontWeight.bold,
+                            color: Colors.black,
+                            shadows: [
+                              Shadow(
+                                  color: Colors.white.withOpacity(0.85),
+                                  blurRadius: 2,
+                                  offset: Offset(0, 1))
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          SizedBox(
+                              width: teamNameW,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: null,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                constraints:
+                                    BoxConstraints(minHeight: nameChipH2),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 4),
+                                alignment: Alignment.center,
+                                width: double.infinity,
+                                child: OneLineShrinkText(_away,
+                                    baseSize: baseMid,
+                                    minSize: 8,
+                                    weight: FontWeight.w600,
+                                    color: awayNameFg ?? Colors.black87,
+                                    align: TextAlign.center),
+                              )),
+                          if (_pAway.isNotEmpty)
+                            Padding(
+                              padding: EdgeInsets.only(top: gap * 0.3),
+                              child: _pitcherNameBox(
+                                name: _pAway,
+                                colorsRaw: _cPitchAway,
+                                baseSize: baseSmall,
+                                alignLeft: false,
+                                overrideTextColor: _cPitchAway.trim().isEmpty
+                                    ? (awayNameFg ?? Colors.black87)
+                                    : null,
+                                overrideWeight: _cPitchAway.trim().isEmpty
+                                    ? FontWeight.w600
+                                    : null,
+                              ),
+                            ),
                         ],
                       ),
                     ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: gap),
+
+              // 下段: 勝敗S投手（各サイドの先発投手行の下に表示）
+              if (_win.isNotEmpty || _lose.isNotEmpty || _save.isNotEmpty)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 左側（ホーム）
                     Expanded(
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (_win.isNotEmpty && _idTeamPitchWin == _idTeamHome)
                             SizedBox(
-                                width: teamNameW,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: null,
-                                    borderRadius: BorderRadius.circular(4),
+                              height: _rowH,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  _badge('勝', Colors.red, badgeD),
+                                  const SizedBox(width: 6),
+                                  Flexible(
+                                    child: OneLineShrinkText(_win,
+                                        baseSize: baseSmall + 2,
+                                        minSize: 7,
+                                        color: homeNameFg ?? Colors.black87,
+                                        align: TextAlign.left),
                                   ),
-                                  constraints:
-                                      BoxConstraints(minHeight: nameChipH2),
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 4),
-                                  alignment: Alignment.center,
-                                  width: double.infinity,
-                                  child: OneLineShrinkText(_away,
-                                      baseSize: baseMid,
-                                      minSize: 8,
-                                      weight: FontWeight.w600,
-                                      color: awayNameFg ?? Colors.black87,
-                                      align: TextAlign.center),
-                                )),
-                            if (_pAway.isNotEmpty)
-                              Padding(
-                                padding: EdgeInsets.only(top: gap * 0.3),
-                                child: _pitcherNameBox(
-                                  name: _pAway,
-                                  colorsRaw: _cPitchAway,
-                                  baseSize: baseSmall,
-                                  alignLeft: false,
-                                  overrideTextColor: _cPitchAway.trim().isEmpty
-                                      ? (awayNameFg ?? Colors.black87)
-                                      : null,
-                                  overrideWeight: _cPitchAway.trim().isEmpty
-                                      ? FontWeight.w600
-                                      : null,
-                                ),
+                                ],
                               ),
-                          ],
-                        ),
+                            ),
+                          if (_lose.isNotEmpty &&
+                              _idTeamPitchLose == _idTeamHome)
+                            SizedBox(
+                              height: _rowH,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  _badge('負', Colors.blue, badgeD),
+                                  const SizedBox(width: 6),
+                                  Flexible(
+                                    child: OneLineShrinkText(_lose,
+                                        baseSize: baseSmall + 2,
+                                        minSize: 7,
+                                        color: homeNameFg ?? Colors.black87,
+                                        align: TextAlign.left),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          if (_save.isNotEmpty &&
+                              _idTeamPitchSave == _idTeamHome)
+                            SizedBox(
+                              height: _rowH,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  _badge('S', Colors.amber, badgeD),
+                                  const SizedBox(width: 6),
+                                  Flexible(
+                                    child: OneLineShrinkText(_save,
+                                        baseSize: baseSmall + 2,
+                                        minSize: 7,
+                                        color: homeNameFg ?? Colors.black87,
+                                        align: TextAlign.left),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    // 中央スペーサ（スコア列の幅ぶん）
+                    SizedBox(width: 72),
+                    // 右側（ビジター）
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          if (_win.isNotEmpty && _idTeamPitchWin == _idTeamAway)
+                            SizedBox(
+                              height: _rowH,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  _badge('勝', Colors.red, badgeD),
+                                  const SizedBox(width: 6),
+                                  Flexible(
+                                    child: OneLineShrinkText(_win,
+                                        baseSize: baseSmall + 2,
+                                        minSize: 7,
+                                        color: awayNameFg ?? Colors.black87,
+                                        align: TextAlign.right),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          if (_lose.isNotEmpty &&
+                              _idTeamPitchLose == _idTeamAway)
+                            SizedBox(
+                              height: _rowH,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  _badge('負', Colors.blue, badgeD),
+                                  const SizedBox(width: 6),
+                                  Flexible(
+                                    child: OneLineShrinkText(_lose,
+                                        baseSize: baseSmall + 2,
+                                        minSize: 7,
+                                        color: awayNameFg ?? Colors.black87,
+                                        align: TextAlign.right),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          if (_save.isNotEmpty &&
+                              _idTeamPitchSave == _idTeamAway)
+                            SizedBox(
+                              height: _rowH,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  _badge('S', Colors.amber, badgeD),
+                                  const SizedBox(width: 6),
+                                  Flexible(
+                                    child: OneLineShrinkText(_save,
+                                        baseSize: baseSmall + 2,
+                                        minSize: 7,
+                                        color: awayNameFg ?? Colors.black87,
+                                        align: TextAlign.right),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-
-                SizedBox(height: gap),
-
-                // 下段: 勝敗S投手（各サイドの先発投手行の下に表示）
-                if (_win.isNotEmpty || _lose.isNotEmpty || _save.isNotEmpty)
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // 左側（ホーム）
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (_win.isNotEmpty &&
-                                _idTeamPitchWin == _idTeamHome)
-                              SizedBox(
-                                height: _rowH,
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    _badge('勝', Colors.red, badgeD),
-                                    const SizedBox(width: 6),
-                                    Flexible(
-                                      child: OneLineShrinkText(_win,
-                                          baseSize: baseSmall + 2,
-                                          minSize: 7,
-                                          color: homeNameFg ?? Colors.black87,
-                                          align: TextAlign.left),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            if (_lose.isNotEmpty &&
-                                _idTeamPitchLose == _idTeamHome)
-                              SizedBox(
-                                height: _rowH,
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    _badge('負', Colors.blue, badgeD),
-                                    const SizedBox(width: 6),
-                                    Flexible(
-                                      child: OneLineShrinkText(_lose,
-                                          baseSize: baseSmall + 2,
-                                          minSize: 7,
-                                          color: homeNameFg ?? Colors.black87,
-                                          align: TextAlign.left),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            if (_save.isNotEmpty &&
-                                _idTeamPitchSave == _idTeamHome)
-                              SizedBox(
-                                height: _rowH,
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    _badge('S', Colors.amber, badgeD),
-                                    const SizedBox(width: 6),
-                                    Flexible(
-                                      child: OneLineShrinkText(_save,
-                                          baseSize: baseSmall + 2,
-                                          minSize: 7,
-                                          color: homeNameFg ?? Colors.black87,
-                                          align: TextAlign.left),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                      // 中央スペーサ（スコア列の幅ぶん）
-                      SizedBox(width: 72),
-                      // 右側（ビジター）
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            if (_win.isNotEmpty &&
-                                _idTeamPitchWin == _idTeamAway)
-                              SizedBox(
-                                height: _rowH,
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    _badge('勝', Colors.red, badgeD),
-                                    const SizedBox(width: 6),
-                                    Flexible(
-                                      child: OneLineShrinkText(_win,
-                                          baseSize: baseSmall + 2,
-                                          minSize: 7,
-                                          color: awayNameFg ?? Colors.black87,
-                                          align: TextAlign.right),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            if (_lose.isNotEmpty &&
-                                _idTeamPitchLose == _idTeamAway)
-                              SizedBox(
-                                height: _rowH,
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    _badge('負', Colors.blue, badgeD),
-                                    const SizedBox(width: 6),
-                                    Flexible(
-                                      child: OneLineShrinkText(_lose,
-                                          baseSize: baseSmall + 2,
-                                          minSize: 7,
-                                          color: awayNameFg ?? Colors.black87,
-                                          align: TextAlign.right),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            if (_save.isNotEmpty &&
-                                _idTeamPitchSave == _idTeamAway)
-                              SizedBox(
-                                height: _rowH,
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    _badge('S', Colors.amber, badgeD),
-                                    const SizedBox(width: 6),
-                                    Flexible(
-                                      child: OneLineShrinkText(_save,
-                                          baseSize: baseSmall + 2,
-                                          minSize: 7,
-                                          color: awayNameFg ?? Colors.black87,
-                                          align: TextAlign.right),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-              ],
-            ),
+            ],
           ),
         ),
       );
+
+      final card = Card(
+        elevation: 0.5,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+        child: inProgress
+            ? _BlinkBorder(
+                color: Colors.amber,
+                radius: 6,
+                width: 4,
+                duration: const Duration(milliseconds: 900),
+                baseBgColor: Colors.transparent,
+                fillUseColor: false,
+                child: inner,
+              )
+            : inner,
+      );
+      return card;
     });
   }
 }
@@ -2846,7 +2856,7 @@ class _UnifiedGrid extends StatelessWidget {
         children: [
           SizedBox(
             width: 56, // 4文字ぶんの目安
-            child: headerCell(title, bgColor: titleBg),
+            child: headerCell(title, bgColor: titleBg, fgColor: Colors.white),
           ),
           Expanded(
             flex: 2,
@@ -3635,7 +3645,11 @@ class SeasonTableBlock extends StatelessWidget {
                 SizedBox(
                   width: _wStat,
                   child: Column(children: [
-                    _gridCell(t, bg: const Color(0xFFE57373), h: 20),
+                    _gridCell(t,
+                        bg: const Color(0xFFE57373),
+                        fg: Colors.white,
+                        weight: FontWeight.bold,
+                        h: 20),
                     SizedBox(
                       height: 15 * 5.5,
                       child: SingleChildScrollView(
@@ -3668,7 +3682,11 @@ class SeasonTableBlock extends StatelessWidget {
                 SizedBox(
                   width: _wStat,
                   child: Column(children: [
-                    _gridCell(t, bg: const Color(0xFF64B5F6), h: 20),
+                    _gridCell(t,
+                        bg: const Color(0xFF64B5F6),
+                        fg: Colors.white,
+                        weight: FontWeight.bold,
+                        h: 20),
                     SizedBox(
                       height: 15 * 5.5,
                       child: SingleChildScrollView(

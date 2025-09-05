@@ -434,8 +434,6 @@ class AppSql {
         t_game_home.id_pitcher_home,
         t_game_away.id_pitcher_away
       ORDER BY t_stats_player.id_league, m_stats.int_index, t_stats_player.int_rank;
-
-
     ''';
   }
 

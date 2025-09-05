@@ -149,6 +149,17 @@ class _PredictionPageState extends State<PredictionPage> {
     return '$y-$m-$dd';
   }
 
+  // 日本語: YYYY年MM月DD日(曜日)
+  String _jaDateWithOffset(int offset) {
+    final d = DateTime.now().add(Duration(days: offset));
+    const youbi = ['月', '火', '水', '木', '金', '土', '日'];
+    final wd = youbi[(d.weekday - 1).clamp(0, 6)];
+    final y = d.year.toString().padLeft(4, '0');
+    final m = d.month.toString().padLeft(2, '0');
+    final dd = d.day.toString().padLeft(2, '0');
+    return '$y年$m月$dd日($wd)';
+  }
+
   // games に含まれる日付の中で最新日を起点にする（なければ今日）
   String _anchorYmdFromGames() {
     DateTime? maxD;
@@ -962,10 +973,24 @@ class _PredictionPageState extends State<PredictionPage> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.stretch,
                                             children: [
-                                              const Text('昨日',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold)),
+                                              Container(
+                                                alignment: Alignment.center,
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 6),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black,
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                ),
+                                                child: Text(
+                                                    '昨日  ${_jaDateWithOffset(-1)}',
+                                                    textAlign: TextAlign.center,
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white)),
+                                              ),
                                               const SizedBox(height: 6),
                                               SizedBox(
                                                 height: 320,
@@ -988,17 +1013,38 @@ class _PredictionPageState extends State<PredictionPage> {
                                             ],
                                           ),
                                         ),
-                                        const SizedBox(width: 6),
+                                        const SizedBox(width: 2),
+                                        SizedBox(
+                                          width: 1,
+                                          child: Container(
+                                            color: Colors.black26,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 3),
                                         Expanded(
                                           child: Column(
                                             mainAxisSize: MainAxisSize.min,
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.stretch,
                                             children: [
-                                              const Text('今日',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold)),
+                                              Container(
+                                                alignment: Alignment.center,
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 6),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black,
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                ),
+                                                child: Text(
+                                                    '今日  ${_jaDateWithOffset(0)}',
+                                                    textAlign: TextAlign.center,
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white)),
+                                              ),
                                               const SizedBox(height: 6),
                                               SizedBox(
                                                 height: 320,
@@ -1020,17 +1066,38 @@ class _PredictionPageState extends State<PredictionPage> {
                                             ],
                                           ),
                                         ),
-                                        const SizedBox(width: 6),
+                                        const SizedBox(width: 2),
+                                        SizedBox(
+                                          width: 1,
+                                          child: Container(
+                                            color: Colors.black26,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 3),
                                         Expanded(
                                           child: Column(
                                             mainAxisSize: MainAxisSize.min,
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.stretch,
                                             children: [
-                                              const Text('明日',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold)),
+                                              Container(
+                                                alignment: Alignment.center,
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 6),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black,
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                ),
+                                                child: Text(
+                                                    '明日  ${_jaDateWithOffset(1)}',
+                                                    textAlign: TextAlign.center,
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white)),
+                                              ),
                                               const SizedBox(height: 6),
                                               SizedBox(
                                                 height: 320,
@@ -1155,10 +1222,24 @@ class _PredictionPageState extends State<PredictionPage> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.stretch,
                                             children: [
-                                              const Text('昨日',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold)),
+                                              Container(
+                                                alignment: Alignment.center,
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 6),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black,
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                ),
+                                                child: Text(
+                                                    '昨日  ${_jaDateWithOffset(-1)}',
+                                                    textAlign: TextAlign.center,
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white)),
+                                              ),
                                               const SizedBox(height: 6),
                                               SizedBox(
                                                 height: 320,
@@ -1181,17 +1262,38 @@ class _PredictionPageState extends State<PredictionPage> {
                                             ],
                                           ),
                                         ),
-                                        const SizedBox(width: 6),
+                                        const SizedBox(width: 2),
+                                        SizedBox(
+                                          width: 1,
+                                          child: Container(
+                                            color: Colors.black26,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 3),
                                         Expanded(
                                           child: Column(
                                             mainAxisSize: MainAxisSize.min,
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.stretch,
                                             children: [
-                                              const Text('今日',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold)),
+                                              Container(
+                                                alignment: Alignment.center,
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 6),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black,
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                ),
+                                                child: Text(
+                                                    '今日  ${_jaDateWithOffset(0)}',
+                                                    textAlign: TextAlign.center,
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white)),
+                                              ),
                                               const SizedBox(height: 6),
                                               SizedBox(
                                                 height: 320,
@@ -1220,10 +1322,24 @@ class _PredictionPageState extends State<PredictionPage> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.stretch,
                                             children: [
-                                              const Text('明日',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold)),
+                                              Container(
+                                                alignment: Alignment.center,
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 6),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black,
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                ),
+                                                child: Text(
+                                                    '明日  ${_jaDateWithOffset(1)}',
+                                                    textAlign: TextAlign.center,
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white)),
+                                              ),
                                               const SizedBox(height: 6),
                                               SizedBox(
                                                 height: 320,

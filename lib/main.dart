@@ -2268,9 +2268,61 @@ Widget _pitcherNameBox({
   Color? overrideTextColor,
   FontWeight? overrideWeight,
 }) {
+  return _PitcherNameBox(
+    name: name,
+    colorsRaw: colorsRaw,
+    baseSize: baseSize,
+    alignLeft: alignLeft,
+    overrideTextColor: overrideTextColor,
+    overrideWeight: overrideWeight,
+  );
+}
+
+class _PitcherNameBox extends StatefulWidget {
+  final String name;
+  final String colorsRaw;
+  final double baseSize;
+  final bool alignLeft;
+  final Color? overrideTextColor;
+  final FontWeight? overrideWeight;
+
+  const _PitcherNameBox({
+    super.key,
+    required this.name,
+    required this.colorsRaw,
+    required this.baseSize,
+    required this.alignLeft,
+    this.overrideTextColor,
+    this.overrideWeight,
+  });
+
+  @override
+  State<_PitcherNameBox> createState() => _PitcherNameBoxState();
+}
+
+class _PitcherNameBoxState extends State<_PitcherNameBox>
+    with SingleTickerProviderStateMixin {
+  BoxDecoration? deco;
+  Color? firstBlinkColor;
+  late final AnimationController _ctrl;
+  late final Animation<double> _t;
+
   Color? _colorFrom(String? name) {
-    final n = (name ?? '').trim().toLowerCase();
-    if (n.isEmpty) return null;
+    final raw = (name ?? '').trim();
+    if (raw.isEmpty) return null;
+    final n = raw.toLowerCase();
+    // hex (#RRGGBB or #AARRGGBB or 0xAARRGGBB)
+    String hex = n;
+    if (hex.startsWith('#')) hex = hex.substring(1);
+    if (hex.startsWith('0x')) hex = hex.substring(2);
+    if (RegExp(r'^[0-9a-f]{6} ?$', caseSensitive: false).hasMatch(hex)) {
+      final v = int.tryParse(hex, radix: 16);
+      if (v != null) return Color(0xFF000000 | v);
+    }
+    if (RegExp(r'^[0-9a-f]{8} ?$', caseSensitive: false).hasMatch(hex)) {
+      final v = int.tryParse(hex, radix: 16);
+      if (v != null) return Color(v);
+    }
     const m = {
       'red': 0xFFF44336,
       'orange': 0xFFFF9800,
@@ -2296,76 +2348,126 @@ Widget _pitcherNameBox({
     return v == null ? null : Color(v);
   }
 
-  BoxDecoration? deco;
-  final parts = colorsRaw
-      .split('/')
-      .map((s) => s.trim().toLowerCase())
-      .where((s) => s.isNotEmpty)
-      .toList();
-  if (parts.isNotEmpty) {
-    final cols = <Color>[];
-    for (final p in parts) {
-      final c = _colorFrom(p);
-      if (c != null) cols.add(c);
-    }
-    if (cols.isNotEmpty) {
-      if (cols.length == 1) {
-        deco = BoxDecoration(
-            color: cols.first, borderRadius: BorderRadius.circular(4));
-      } else {
-        // 混ざり合いを狭める: 境界を急峻にするため color/stop を重ねる
-        final List<Color> gColors = [];
-        final List<double> gStops = [];
-        if (cols.length == 2) {
-          gColors.addAll([cols[0], cols[0], cols[1], cols[1]]);
-          gStops.addAll([0.0, 0.46, 0.54, 1.0]);
-        } else {
-          const double eps = 0.04;
-          gColors.add(cols.first);
-          gStops.add(0.0);
-          for (int i = 0; i < cols.length - 1; i++) {
-            final double pos = (i + 1) / (cols.length - 1);
-            final double left = (pos - eps).clamp(0.0, 1.0);
-            final double right = (pos + eps).clamp(0.0, 1.0);
-            gColors.add(cols[i]);
-            gStops.add(left);
-            gColors.add(cols[i + 1]);
-            gStops.add(right);
-          }
-          gColors.add(cols.last);
-          gStops.add(1.0);
+  @override
+  void initState() {
+    super.initState();
+    // 解析: 背景装飾と点滅カラー
+    final parts = widget.colorsRaw
+        .split('/')
+        .map((s) => s.trim().toLowerCase())
+        .where((s) => s.isNotEmpty)
+        .toList();
+    if (parts.isNotEmpty) {
+      final cols = <Color>[];
+      for (final p in parts) {
+        final c = _colorFrom(p);
+        if (c != null) {
+          cols.add(c);
+          firstBlinkColor ??= c;
         }
-        deco = BoxDecoration(
-          gradient: LinearGradient(
-            colors: gColors,
-            stops: gStops,
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
-          borderRadius: BorderRadius.circular(4),
-        );
+      }
+      if (cols.isNotEmpty) {
+        if (cols.length == 1) {
+          deco = BoxDecoration(
+              color: cols.first, borderRadius: BorderRadius.circular(4));
+        } else {
+          final List<Color> gColors = [];
+          final List<double> gStops = [];
+          if (cols.length == 2) {
+            gColors.addAll([cols[0], cols[0], cols[1], cols[1]]);
+            gStops.addAll([0.0, 0.46, 0.54, 1.0]);
+          } else {
+            const double eps = 0.04;
+            gColors.add(cols.first);
+            gStops.add(0.0);
+            for (int i = 0; i < cols.length - 1; i++) {
+              final double pos = (i + 1) / (cols.length - 1);
+              final double left = (pos - eps).clamp(0.0, 1.0);
+              final double right = (pos + eps).clamp(0.0, 1.0);
+              gColors.add(cols[i]);
+              gStops.add(left);
+              gColors.add(cols[i + 1]);
+              gStops.add(right);
+            }
+            gColors.add(cols.last);
+            gStops.add(1.0);
+          }
+          deco = BoxDecoration(
+            gradient: LinearGradient(
+              colors: gColors,
+              stops: gStops,
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+            borderRadius: BorderRadius.circular(4),
+          );
+        }
       }
     }
+
+    _ctrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 500))
+      ..repeat(reverse: true);
+    _t = CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut);
   }
 
-  final bool hasColor = deco != null;
-  return SizedBox(
-    width: double.infinity,
-    child: Container(
-      decoration: deco,
-      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-      alignment: Alignment.center,
-      child: OneLineShrinkText(
-        name,
-        baseSize: baseSize,
-        minSize: 7,
-        color: hasColor ? Colors.white : (overrideTextColor ?? Colors.black87),
-        weight:
-            overrideWeight ?? (hasColor ? FontWeight.bold : FontWeight.normal),
-        align: TextAlign.center,
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool hasColor = deco != null;
+    final textColor =
+        hasColor ? Colors.white : (widget.overrideTextColor ?? Colors.black87);
+    final weight = widget.overrideWeight ??
+        (hasColor ? FontWeight.bold : FontWeight.normal);
+
+    return SizedBox(
+      width: double.infinity,
+      child: Stack(
+        children: [
+          // 背景（固定: 単色 or グラデ）
+          if (deco != null)
+            Positioned.fill(
+              child: Container(decoration: deco),
+            ),
+          // 点滅オーバーレイ（背景の上、テキストの下）
+          if (firstBlinkColor != null)
+            Positioned.fill(
+              child: AnimatedBuilder(
+                animation: _t,
+                builder: (context, _) {
+                  final double bgAlpha =
+                      (0.12 + 0.23 * _t.value).clamp(0.0, 1.0).toDouble();
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: firstBlinkColor!.withOpacity(bgAlpha),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  );
+                },
+              ),
+            ),
+          // テキスト
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+            alignment: Alignment.center,
+            child: OneLineShrinkText(
+              widget.name,
+              baseSize: widget.baseSize,
+              minSize: 7,
+              color: textColor,
+              weight: weight,
+              align: TextAlign.center,
+            ),
+          ),
+        ],
       ),
-    ),
-  );
+    );
+  }
 }
 
 // ────────────────────────────────────────────────────────────────
@@ -2747,7 +2849,7 @@ class _UnifiedGrid extends StatelessWidget {
                     color: c0,
                     radius: 3,
                     width: 2,
-                    duration: const Duration(milliseconds: 1800),
+                    duration: const Duration(milliseconds: 1000),
                     baseBgColor: _baseBg0,
                     fillUseColor: true,
                     child: w0)
@@ -2760,7 +2862,7 @@ class _UnifiedGrid extends StatelessWidget {
                     color: c1,
                     radius: 3,
                     width: 2,
-                    duration: const Duration(milliseconds: 1800),
+                    duration: const Duration(milliseconds: 1000),
                     baseBgColor: Colors.transparent,
                     fillUseColor: true,
                     child: w1)
@@ -2773,7 +2875,7 @@ class _UnifiedGrid extends StatelessWidget {
                     color: c2,
                     radius: 3,
                     width: 2,
-                    duration: const Duration(milliseconds: 1800),
+                    duration: const Duration(milliseconds: 1000),
                     baseBgColor: Colors.transparent,
                     fillUseColor: true,
                     child: w2)
@@ -2892,7 +2994,7 @@ class _BlinkBorder extends StatefulWidget {
     required this.color,
     this.radius = 3,
     this.width = 2,
-    this.duration = const Duration(milliseconds: 1800),
+    this.duration = const Duration(milliseconds: 1000),
     this.baseBgColor,
     this.fillUseColor = true,
   });
@@ -2927,14 +3029,20 @@ class _BlinkBorderState extends State<_BlinkBorder>
       builder: (context, child) {
         final alpha = (0.35 + 0.45 * _t.value).clamp(0.0, 1.0);
         Color? bg;
+        Color? overlay;
         if (widget.fillUseColor) {
+          // 前面に半透明オーバーレイを重ねる（子の背景の上に載る）
           final double bgAlpha = (0.12 + 0.23 * _t.value).clamp(0.0, 1.0);
-          bg = widget.color.withOpacity(bgAlpha);
+          overlay = widget.color.withOpacity(bgAlpha);
+          bg = null;
         } else if (widget.baseBgColor != null) {
+          // 背景色そのものをブレンド（子の背景として使う）
           final double mix = (0.35 * _t.value).clamp(0.0, 1.0);
           bg = Color.lerp(widget.baseBgColor!, widget.color, mix);
+          overlay = null;
         } else {
           bg = null;
+          overlay = null;
         }
         return Container(
           decoration: BoxDecoration(
@@ -2943,6 +3051,12 @@ class _BlinkBorderState extends State<_BlinkBorder>
                 color: widget.color.withOpacity(alpha), width: widget.width),
             borderRadius: BorderRadius.circular(widget.radius),
           ),
+          foregroundDecoration: overlay != null
+              ? BoxDecoration(
+                  color: overlay,
+                  borderRadius: BorderRadius.circular(widget.radius),
+                )
+              : null,
           child: child,
         );
       },

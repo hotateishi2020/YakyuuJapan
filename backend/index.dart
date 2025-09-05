@@ -88,7 +88,7 @@ void main() async {
           'events': Postgres.toJson(events),
           'notification': Postgres.toJson(notification),
         };
-        print(Postgres.toJson(predict_player));
+        print(Postgres.toJson(games));
         // print(json);
         return Response.ok(jsonEncode(json),
             headers: {'content-type': 'application/json; charset=utf-8'});

@@ -25,16 +25,14 @@ void main() async {
     // ====== API ======
 
     app.get('/fetchStatsTeamNPB', (Request request) async {
-      return await commonAPI(
-          request, log.Fetch.NAME, log.Fetch.Codes.STATS_TEAM, (conn) async {
+      return await commonAPI(request, log.Fetch.NAME, log.Fetch.Codes.STATS_TEAM, (conn) async {
         await FetchURL.fetchStatsTeamNPB(conn);
         return Response.ok('ok');
       });
     });
 
     app.get('/fetchStatsPlayerNPB', (Request request) async {
-      return await commonAPI(
-          request, log.Fetch.NAME, log.Fetch.Codes.STATS_PLAYER, (conn) async {
+      return await commonAPI(request, log.Fetch.NAME, log.Fetch.Codes.STATS_PLAYER, (conn) async {
         await FetchURL.fetchStatsPlayerNPB(conn);
         return Response.ok('ok');
       });
@@ -42,42 +40,28 @@ void main() async {
 
     app.get('/fetchGamesNPB', (Request request) async {
       // 今日の先発情報を更新→取得（必要に応じてコメントアウト可）
-      return await commonAPI(request, log.Fetch.NAME, log.Fetch.Codes.GAMES,
-          (conn) async {
+      return await commonAPI(request, log.Fetch.NAME, log.Fetch.Codes.GAMES, (conn) async {
         await FetchURL.fetchGamesNPB(conn, DateTime.now()); //今日の試合
 
-        await FetchURL.fetchGamesNPB(
-            conn, DateTime.now().add(const Duration(days: 1))); //明日の試合
+        await FetchURL.fetchGamesNPB(conn, DateTime.now().add(const Duration(days: 1))); //明日の試合
         return Response.ok('ok');
       });
     });
 
     //タイトル予想画面の表示
     app.get('/predictions', (Request request) async {
-      return await commonTryCatch(
-          request, log.Prediction.NAME, log.Prediction.Codes.ENTER_NPB,
-          (conn) async {
+      return await commonTryCatch(request, log.Prediction.NAME, log.Prediction.Codes.ENTER_NPB, (conn) async {
         //予想データの取得
         Map<String, dynamic> json = {};
         final current_year = DateTimeTool.getThisYear();
 
-        final predict_team = await Postgres.execute(
-            conn, AppSql.selectPredictNPBTeams(),
-            data: [current_year]); //予想者データをDBから取得
-        final predict_player = await Postgres.execute(
-            conn, AppSql.selectPredictPlayer(),
-            data: [current_year]); //個人タイトル予想のデータをDBから取得
-        final stats_team =
-            await Postgres.execute(conn, AppSql.selectStatsTeam());
-        final stats_player = await Postgres.execute(
-            conn, AppSql.selectStatsPlayer(),
-            data: [current_year]);
-        final games = await Postgres.execute(conn, AppSql.selectGames(),
-            data: [current_year]);
-        final events =
-            await Postgres.execute(conn, AppSql.selectEventsDetails());
-        final notification =
-            await Postgres.execute(conn, AppSql.selectNotification());
+        final predict_team = await Postgres.execute(conn, AppSql.selectPredictNPBTeams(), data: [current_year]); //予想者データをDBから取得
+        final predict_player = await Postgres.execute(conn, AppSql.selectPredictPlayer(), data: [current_year]); //個人タイトル予想のデータをDBから取得
+        final stats_team = await Postgres.execute(conn, AppSql.selectStatsTeam());
+        final stats_player = await Postgres.execute(conn, AppSql.selectStatsPlayer(), data: [current_year]);
+        final games = await Postgres.execute(conn, AppSql.selectGames(), data: [current_year]);
+        final events = await Postgres.execute(conn, AppSql.selectEventsDetails());
+        final notification = await Postgres.execute(conn, AppSql.selectNotification());
 
         json = {
           'predict_team': Postgres.toJson(predict_team),
@@ -88,10 +72,9 @@ void main() async {
           'events': Postgres.toJson(events),
           'notification': Postgres.toJson(notification),
         };
-        print(Postgres.toJson(games));
+        print(Postgres.toJson(stats_player));
         // print(json);
-        return Response.ok(jsonEncode(json),
-            headers: {'content-type': 'application/json; charset=utf-8'});
+        return Response.ok(jsonEncode(json), headers: {'content-type': 'application/json; charset=utf-8'});
       });
     });
 
@@ -133,21 +116,14 @@ void main() async {
           .add(staticWithSpa) // ← 次に静的（+ SPA fallback）
           .handler;
 
-      handler = Pipeline()
-          .addMiddleware(logRequests())
-          .addMiddleware(corsHeaders())
-          .addHandler(handler);
+      handler = Pipeline().addMiddleware(logRequests()).addMiddleware(corsHeaders()).addHandler(handler);
 
       stdout.writeln('🗂 Serving static from: ${publicDir.path}');
     } else {
       // 静的なし（dev表示）
-      handler = Pipeline()
-          .addMiddleware(logRequests())
-          .addMiddleware(corsHeaders())
-          .addHandler((req) {
+      handler = Pipeline().addMiddleware(logRequests()).addMiddleware(corsHeaders()).addHandler((req) {
         if (req.url.path.isEmpty) {
-          return Response.ok('Backend API (dev). Try /predictions',
-              headers: {'content-type': 'text/plain; charset=utf-8'});
+          return Response.ok('Backend API (dev). Try /predictions', headers: {'content-type': 'text/plain; charset=utf-8'});
         }
         return app.call(req);
       });
@@ -163,16 +139,14 @@ void main() async {
   }
 } // void main
 
-Future<Response> commonTryCatch(Request request, String category_system,
-    String code_system, Future<Response> callback(Connection conn)) async {
+Future<Response> commonTryCatch(Request request, String category_system, String code_system, Future<Response> callback(Connection conn)) async {
   var id_error = 0;
   final user = m_user();
   var response = Response.ok('ok');
   await Postgres.openConnection((conn) async {
     try {
       //ログインユーザー情報
-      print(
-          '🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
+      print('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
       print("🌐Routing...【" + request.requestedUri.toString() + "】");
       print("");
 
@@ -184,16 +158,12 @@ Future<Response> commonTryCatch(Request request, String category_system,
       response = await callback(conn);
     } catch (e, st) {
       var flg_db_error = false;
-      print(
-          "⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️");
-      print(
-          "👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇");
+      print("⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️");
+      print("👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇");
       print('🔥 /predictions ERROR: $e\n$st');
       stderr.writeln('🔥 /predictions ERROR: $e\n$st');
-      print(
-          "👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆");
-      print(
-          "⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️");
+      print("👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆");
+      print("⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️");
       try {
         id_error = await insertLogError(conn, e, st.toString(), user);
       } catch (e, st) {
@@ -247,23 +217,18 @@ Future<Response> commonTryCatch(Request request, String category_system,
         log.updpgm = user.code_system;
 
         await Postgres.insert(conn, log);
+      }); //transactionCommit
 
-        print("");
-        print("🌐Responsed Successfully‼️【" +
-            request.requestedUri.toString() +
-            "】");
-        print(
-            '🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
-      });
+      print("");
+      print("🌐Responsed Successfully‼️【" + request.requestedUri.toString() + "】");
+      print('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
     }
   }); // connectionOpenClose
   return response;
 } //commonTryCatch
 
-Future<Response> commonAPI(Request request, String category_system,
-    String code_system, Future<Response> callback(Connection conn)) async {
-  return await commonTryCatch(request, code_system, category_system,
-      (conn) async {
+Future<Response> commonAPI(Request request, String category_system, String code_system, Future<Response> callback(Connection conn)) async {
+  return await commonTryCatch(request, code_system, category_system, (conn) async {
     await Postgres.transactionCommit(conn, () async {
       await callback(conn);
     });
@@ -271,8 +236,7 @@ Future<Response> commonAPI(Request request, String category_system,
   }); //catch
 }
 
-void sendMail(
-    String mailaddress, String password, String title, String text) async {
+void sendMail(String mailaddress, String password, String title, String text) async {
   // Yahoo SMTP
   final smtpServer = SmtpServer(
     'smtp.mail.yahoo.co.jp',
@@ -292,8 +256,7 @@ void sendMail(
   print('送信成功: ${sendReport.toString()}');
 }
 
-Future<int> insertLogError(
-    Connection conn, Object e, String stacktrace, m_user user) async {
+Future<int> insertLogError(Connection conn, Object e, String stacktrace, m_user user) async {
   final log_error = t_system_log_error();
   log_error.message_error = e.toString();
   log_error.stacktrace = stacktrace;

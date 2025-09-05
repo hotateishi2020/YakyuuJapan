@@ -400,6 +400,9 @@ class AppSql {
                                 ORDER BY t_predict_player.id_user::text) || '/', '') AS id_users,
         COALESCE('/' || string_agg(DISTINCT m_user.code_color, '/' 
                                 ORDER BY m_user.code_color) || '/', '') AS colors_user,
+        CASE WHEN t_game_home.id_pitcher_home > 0 THEN TRUE
+             WHEN t_game_away.id_pitcher_away > 0 THEN TRUE
+             ELSE FALSE END AS flg_today,
         t_stats_player.id_league,
         m_stats.int_index,
         t_stats_player.id_stats
@@ -413,6 +416,8 @@ class AppSql {
           AND t_predict_player.id_stats  = t_stats_player.id_stats
           AND t_predict_player.year      = \$1
         LEFT JOIN m_user    ON m_user.id = t_predict_player.id_user
+        LEFT JOIN (SELECT id_pitcher_home FROM t_game WHERE datetime_start::date = CURRENT_DATE) AS t_game_home ON t_game_home.id_pitcher_home = t_predict_player.id_player
+        LEFT JOIN (SELECT id_pitcher_away FROM t_game WHERE datetime_start::date = CURRENT_DATE) AS t_game_away ON t_game_away.id_pitcher_away = t_predict_player.id_player
       WHERE t_stats_player.crtat = (SELECT MAX(crtat) FROM t_stats_player WHERE EXTRACT(YEAR FROM crtat) = \$1)
       GROUP BY
         m_stats.title,
@@ -425,8 +430,12 @@ class AppSql {
         t_stats_player.id_league,
         m_stats.int_index,
         m_stats.code_display,
-        t_stats_player.id_stats
+        t_stats_player.id_stats,
+        t_game_home.id_pitcher_home,
+        t_game_away.id_pitcher_away
       ORDER BY t_stats_player.id_league, m_stats.int_index, t_stats_player.int_rank;
+
+
     ''';
   }
 

@@ -979,7 +979,8 @@ class _PredictionPageState extends State<PredictionPage> {
                                                     const EdgeInsets.symmetric(
                                                         horizontal: 6),
                                                 decoration: BoxDecoration(
-                                                  color: Colors.black,
+                                                  color:
+                                                      const Color(0xFF0B8F3A),
                                                   borderRadius:
                                                       BorderRadius.circular(6),
                                                 ),
@@ -1033,7 +1034,8 @@ class _PredictionPageState extends State<PredictionPage> {
                                                     const EdgeInsets.symmetric(
                                                         horizontal: 6),
                                                 decoration: BoxDecoration(
-                                                  color: Colors.black,
+                                                  color:
+                                                      const Color(0xFF0B8F3A),
                                                   borderRadius:
                                                       BorderRadius.circular(6),
                                                 ),
@@ -1086,7 +1088,8 @@ class _PredictionPageState extends State<PredictionPage> {
                                                     const EdgeInsets.symmetric(
                                                         horizontal: 6),
                                                 decoration: BoxDecoration(
-                                                  color: Colors.black,
+                                                  color:
+                                                      const Color(0xFF0B8F3A),
                                                   borderRadius:
                                                       BorderRadius.circular(6),
                                                 ),
@@ -1228,7 +1231,8 @@ class _PredictionPageState extends State<PredictionPage> {
                                                     const EdgeInsets.symmetric(
                                                         horizontal: 6),
                                                 decoration: BoxDecoration(
-                                                  color: Colors.black,
+                                                  color:
+                                                      const Color(0xFF4DB5E8),
                                                   borderRadius:
                                                       BorderRadius.circular(6),
                                                 ),
@@ -1282,7 +1286,8 @@ class _PredictionPageState extends State<PredictionPage> {
                                                     const EdgeInsets.symmetric(
                                                         horizontal: 6),
                                                 decoration: BoxDecoration(
-                                                  color: Colors.black,
+                                                  color:
+                                                      const Color(0xFF4DB5E8),
                                                   borderRadius:
                                                       BorderRadius.circular(6),
                                                 ),
@@ -1328,7 +1333,8 @@ class _PredictionPageState extends State<PredictionPage> {
                                                     const EdgeInsets.symmetric(
                                                         horizontal: 6),
                                                 decoration: BoxDecoration(
-                                                  color: Colors.black,
+                                                  color:
+                                                      const Color(0xFF4DB5E8),
                                                   borderRadius:
                                                       BorderRadius.circular(6),
                                                 ),
@@ -3065,6 +3071,71 @@ class _BlinkBorderState extends State<_BlinkBorder>
   }
 }
 
+// 背景のみをやさしく点滅させる（テキストは前面で固定）
+class _BlinkBg extends StatefulWidget {
+  final Widget child;
+  final BoxDecoration base;
+  final Color color; // 点滅色（上に重ねる色）
+  final double radius;
+  final Duration duration;
+
+  const _BlinkBg({
+    super.key,
+    required this.child,
+    required this.base,
+    required this.color,
+    this.radius = 4,
+    this.duration = const Duration(milliseconds: 1000),
+  });
+
+  @override
+  State<_BlinkBg> createState() => _BlinkBgState();
+}
+
+class _BlinkBgState extends State<_BlinkBg>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _t;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(vsync: this, duration: widget.duration)
+      ..repeat(reverse: true);
+    _t = CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _t,
+      builder: (context, child) {
+        final double a = (0.12 + 0.23 * _t.value).clamp(0.0, 1.0);
+        return Stack(children: [
+          // ベース背景（単色/グラデ）
+          Positioned.fill(child: Container(decoration: widget.base)),
+          // 点滅オーバーレイ
+          Positioned.fill(
+              child: Container(
+                  decoration: BoxDecoration(
+            color: widget.color.withOpacity(a),
+            borderRadius: BorderRadius.circular(widget.radius),
+          ))),
+          // 子（テキストなど）
+          child!,
+        ]);
+      },
+      child: widget.child,
+    );
+  }
+}
+
 class SeasonTableBlock extends StatelessWidget {
   final List<Map<String, dynamic>> standings;
   final List<Map<String, dynamic>> stats;
@@ -3515,22 +3586,33 @@ class SeasonTableBlock extends StatelessWidget {
                   )),
               Expanded(
                   flex: 10,
-                  child: Container(
-                    decoration: (() {
-                      final d = _nameBgDecorationFromRow();
-                      return d;
-                    })(),
-                    alignment: Alignment.center,
-                    child: (() {
-                      final hasBg = _nameBgDecorationFromRow() != null;
-                      return OneLineShrinkText(name,
-                          baseSize: 12,
-                          minSize: 1,
-                          fast: true,
-                          color: hasBg ? Colors.white : null,
-                          weight: hasBg ? FontWeight.bold : null);
-                    })(),
-                  )),
+                  child: (() {
+                    final BoxDecoration? d = _nameBgDecorationFromRow();
+                    final bool hasBg = d != null;
+                    final bool isToday = e['flg_today'] == true;
+                    final Widget txt = OneLineShrinkText(name,
+                        baseSize: 12,
+                        minSize: 1,
+                        fast: true,
+                        color: hasBg ? Colors.white : null,
+                        weight: hasBg ? FontWeight.bold : null);
+                    if (isToday) {
+                      return _BlinkBg(
+                        base: d ??
+                            BoxDecoration(
+                                borderRadius: BorderRadius.circular(4)),
+                        color: const Color(0xFFFFF176),
+                        radius: 4,
+                        duration: const Duration(milliseconds: 1000),
+                        child: Align(alignment: Alignment.center, child: txt),
+                      );
+                    }
+                    return Container(
+                      decoration: d,
+                      alignment: Alignment.center,
+                      child: txt,
+                    );
+                  }())),
               Expanded(
                   flex: 4,
                   child: OneLineShrinkText(stat,

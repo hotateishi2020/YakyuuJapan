@@ -24,8 +24,7 @@ class m_user extends DBModel {
     if (id == 0) {
       return user;
     }
-    final result =
-        await Postgres.execute(conn, AppSql.selectUserWhereId(), data: [id]);
+    final result = await Postgres.execute(conn, AppSql.selectUserWhereId(), data: [id]);
     user.name_last = result.first.toColumnMap()['name_last'];
     user.name_first = result.first.toColumnMap()['name_first'];
     user.nickname = result.first.toColumnMap()['nickname'];

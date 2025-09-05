@@ -14,16 +14,16 @@ jobs:
     steps:
       - name: Call /fetchTeamsNPB (A)
         if: ${{ github.event.schedule == '0 7-15 * * *' }}
-        run: curl -fsS "https://yakyuujapan.onrender.com/fetchTeamsNPB"
+        run: curl -fsS "https://yakyuujapan.onrender.com/fetchStatsTeamNPB"
 
       - name: Call /fetchPlayerStats (B)
         if: ${{ github.event.schedule == '*/30 7-15 * * *' }}
-        run: curl -fsS "https://yakyuujapan.onrender.com/fetchPlayerStats"
+        run: curl -fsS "https://yakyuujapan.onrender.com/fetchStatsPlayerNPB"
 
       - name: Call /fetchGames (C)
         if: ${{ github.event.schedule == '*/10 4-15 * * *' }}
-        run: curl -fsS "https://yakyuujapan.onrender.com/fetchGames"
+        run: curl -fsS "https://yakyuujapan.onrender.com/fetchGamesNPB"
 
       - name: Call /fetchGames (D)
         if: ${{ github.event.schedule == '0 15-21 * * *' }}
-        run: curl -fsS "https://yakyuujapan.onrender.com/fetchGames"
+        run: curl -fsS "https://yakyuujapan.onrender.com/fetchGamesNPB"

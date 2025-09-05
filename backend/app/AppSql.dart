@@ -225,7 +225,7 @@ class AppSql {
   // t_predict_player
   static String selectPredictPlayer() {
     return '''
-      SELECT
+    SELECT
       id_user,
       CASE 
         WHEN id_user = 0 THEN '現在'
@@ -243,6 +243,9 @@ class AppSql {
             ELSE FALSE
           END 
       END AS flg_atari,
+      CASE WHEN t_game_home.id_pitcher_home > 0 THEN m_user.code_color
+           WHEN t_game_away.id_pitcher_away > 0 THEN m_user.code_color
+           ELSE '' END AS color_today,
       int_index,
       flg_pitcher
       FROM (
@@ -299,6 +302,8 @@ class AppSql {
      LEFT JOIN m_stats ON m_stats.id = u.id_stats
      LEFT JOIN m_player ON m_player.id = u.id_player
      LEFT JOIN m_team ON m_team.id = u.id_team
+     LEFT JOIN (SELECT id_pitcher_home FROM t_game WHERE datetime_start::date = CURRENT_DATE) AS t_game_home ON t_game_home.id_pitcher_home = u.id_player
+     LEFT JOIN (SELECT id_pitcher_away FROM t_game WHERE datetime_start::date = CURRENT_DATE) AS t_game_away ON t_game_away.id_pitcher_away = u.id_player
      ORDER BY id_user, u.id_league, int_index;
     ''';
   }

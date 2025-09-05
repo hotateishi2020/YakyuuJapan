@@ -23,8 +23,7 @@ class FetchURL {
     String? charset;
     final ct = res.headers['content-type'] ?? res.headers['Content-Type'];
     if (ct != null) {
-      final m = RegExp(r'charset=([A-Za-z0-9_\-]+)', caseSensitive: false)
-          .firstMatch(ct);
+      final m = RegExp(r'charset=([A-Za-z0-9_\-]+)', caseSensitive: false).firstMatch(ct);
       if (m != null) charset = m.group(1)?.toLowerCase();
     }
     charset ??= _detectCharsetFromMeta(bytes);
@@ -40,8 +39,7 @@ class FetchURL {
   static String? _detectCharsetFromMeta(Uint8List bytes) {
     final headLen = min(bytes.length, 4096);
     final head = latin1.decode(bytes.sublist(0, headLen), allowInvalid: true);
-    final m = RegExp(r'charset\s*=\s*([A-Za-z0-9_\-]+)', caseSensitive: false)
-        .firstMatch(head);
+    final m = RegExp(r'charset\s*=\s*([A-Za-z0-9_\-]+)', caseSensitive: false).firstMatch(head);
     return m?.group(1)?.toLowerCase();
   }
 
@@ -70,9 +68,7 @@ class FetchURL {
         final cells = html_team.querySelectorAll('td');
         if (cells.length >= 3) {
           var team_name = cells[1].text.trim();
-          var r_team = await Postgres.execute(
-              conn, AppSql.selectTeamsWhereName(),
-              data: [team_name]);
+          var r_team = await Postgres.execute(conn, AppSql.selectTeamsWhereName(), data: [team_name]);
           if (r_team.isEmpty) continue;
           var team = t_stats_team();
           team.year = DateTimeTool.getThisYear();
@@ -86,8 +82,7 @@ class FetchURL {
           team.int_rbi = int.tryParse(cells[9].text.trim()) ?? 0;
           team.int_homerun = int.tryParse(cells[11].text.trim()) ?? 0;
           team.int_sh = int.tryParse(cells[12].text.trim()) ?? 0;
-          team.num_avg_batting =
-              double.tryParse("0" + cells[13].text.trim()) ?? 0;
+          team.num_avg_batting = double.tryParse("0" + cells[13].text.trim()) ?? 0;
           team.num_era_total = double.tryParse(cells[14].text.trim()) ?? 0;
           teams.add(team);
         }
@@ -114,8 +109,7 @@ class FetchURL {
 
       final htmlPitching = _decodeHtml(res_pitching);
       final document = parse(htmlPitching);
-      final divs = document
-          .querySelectorAll('body div.container div.main div.table-responsive');
+      final divs = document.querySelectorAll('body div.container div.main div.table-responsive');
       final rows = divs[2].querySelectorAll('table tbody tr');
 
       for (final tr in rows) {
@@ -132,24 +126,19 @@ class FetchURL {
         }
         var pitching_rate_starter = tds[1].text.trim();
         var pitching_rate_reliever = tds[2].text.trim();
-        var r_team = await Postgres.execute(
-            conn, AppSql.selectTeamsWhereNameShortest(),
-            data: [team_name]);
+        var r_team = await Postgres.execute(conn, AppSql.selectTeamsWhereNameShortest(), data: [team_name]);
         if (r_team.isEmpty) {
           // チーム名が一致しないケースはスキップ
           print('データが見つかりませんでした。');
           continue;
         }
-        var idx = Postgres.findIndex(
-            teams, 'id_team', r_team.first.toColumnMap()['id']);
+        var idx = Postgres.findIndex(teams, 'id_team', r_team.first.toColumnMap()['id']);
         if (idx < 0 || idx >= teams.length) {
           print('インデックスが見つかりませんでした。');
           continue;
         }
-        teams[idx].num_era_starter =
-            double.tryParse(pitching_rate_starter) ?? 0;
-        teams[idx].num_era_relief =
-            double.tryParse(pitching_rate_reliever) ?? 0;
+        teams[idx].num_era_starter = double.tryParse(pitching_rate_starter) ?? 0;
+        teams[idx].num_era_relief = double.tryParse(pitching_rate_reliever) ?? 0;
       }
 
       //チーム守備率をスクレイピング
@@ -180,9 +169,7 @@ class FetchURL {
         var team_name_defence = tds[0].text.trim();
         print("守備率チーム名：" + team_name_defence);
         var defence_rate = tds[1].text.trim();
-        var r_team_defence = await Postgres.execute(
-            conn, AppSql.selectTeamsWhereName(),
-            data: [StringTool.noSpace(team_name_defence)]);
+        var r_team_defence = await Postgres.execute(conn, AppSql.selectTeamsWhereName(), data: [StringTool.noSpace(team_name_defence)]);
 
         print(team_name_defence);
         print(defence_rate);
@@ -192,22 +179,19 @@ class FetchURL {
           continue;
         }
 
-        var idx_defence = Postgres.findIndex(
-            teams, 'id_team', r_team_defence.first.toColumnMap()['id']);
+        var idx_defence = Postgres.findIndex(teams, 'id_team', r_team_defence.first.toColumnMap()['id']);
         if (idx_defence < 0 || idx_defence >= teams.length) {
           print('インデックスが見つかりませんでした。');
           continue;
         }
-        teams[idx_defence].num_avg_fielding =
-            double.tryParse(defence_rate) ?? 0;
+        teams[idx_defence].num_avg_fielding = double.tryParse(defence_rate) ?? 0;
       }
     }
 
     await Postgres.insertMulti(conn, teams);
   }
 
-  static Future<List<Map<String, dynamic>>> fetchGames(
-      Connection conn, DateTime date) async {
+  static Future<List<Map<String, dynamic>>> fetchGamesNPB(Connection conn, DateTime date) async {
     var urlString = 'https://baseball.yahoo.co.jp/npb/schedule/?date=';
     final formatter = DateFormat('yyyy-MM-dd');
     final formatted = formatter.format(date);
@@ -222,8 +206,7 @@ class FetchURL {
 
     try {
       final document = parse(_decodeHtml(res));
-      final leagues =
-          document.querySelectorAll('#gm_card')[0].querySelectorAll('section');
+      final leagues = document.querySelectorAll('#gm_card')[0].querySelectorAll('section');
 
       var cnt = 0;
 
@@ -248,8 +231,7 @@ class FetchURL {
             if (card.querySelectorAll('a').isEmpty) {
               continue;
             }
-            var url_href =
-                card.querySelectorAll('a')[0].attributes['href']?.trim() ?? '';
+            var url_href = card.querySelectorAll('a')[0].attributes['href']?.trim() ?? '';
 
             var url_detail = url.resolve(url_href.replaceFirst('index', 'top'));
 
@@ -260,69 +242,29 @@ class FetchURL {
             }
 
             final doc_detail = parse(_decodeHtml(res_detail));
-            final match = doc_detail
-                .querySelectorAll('#gm_brd')[0]
-                .querySelectorAll('div')[0];
+            final match = doc_detail.querySelectorAll('#gm_brd')[0].querySelectorAll('div')[0];
 
-            final name_stadium = match
-                .querySelectorAll('div')[0]
-                .querySelectorAll('p')[0]
-                .nodes
-                .last
-                .text!
-                .replaceAll(RegExp(r'\s+'), '');
+            final name_stadium = match.querySelectorAll('div')[0].querySelectorAll('p')[0].nodes.last.text!.replaceAll(RegExp(r'\s+'), '');
 
-            final time_gamestart = match
-                .querySelectorAll('div')[0]
-                .querySelectorAll('p')[0]
-                .querySelectorAll('time')[0]
-                .text
-                .trim();
+            final time_gamestart = match.querySelectorAll('div')[0].querySelectorAll('p')[0].querySelectorAll('time')[0].text.trim();
 
             final gamestart = formatted + " " + time_gamestart + ":00";
             datetime_gamestart = DateTime.tryParse(gamestart)!;
 
-            final team_home = match
-                .querySelectorAll('#async-gameDetail')[0]
-                .querySelectorAll('div')[0]
-                .querySelectorAll('p a')[0]
-                .text
-                .trim();
+            final team_home = match.querySelectorAll('#async-gameDetail')[0].querySelectorAll('div')[0].querySelectorAll('p a')[0].text.trim();
 
-            final team_away = match
-                .querySelectorAll('#async-gameDetail')[0]
-                .querySelectorAll('div')[2]
-                .querySelectorAll('p a')[0]
-                .text
-                .trim();
+            final team_away = match.querySelectorAll('#async-gameDetail')[0].querySelectorAll('div')[2].querySelectorAll('p a')[0].text.trim();
 
             try {
               score_home = int.tryParse(
-                    match
-                        .querySelectorAll('#async-gameDetail')[0]
-                        .querySelectorAll('div')[1]
-                        .querySelectorAll('p')[0]
-                        .querySelectorAll('span')[0]
-                        .text
-                        .trim(),
+                    match.querySelectorAll('#async-gameDetail')[0].querySelectorAll('div')[1].querySelectorAll('p')[0].querySelectorAll('span')[0].text.trim(),
                   ) ??
                   -1;
 
-              score_away = int.tryParse(match
-                      .querySelectorAll('#async-gameDetail')[0]
-                      .querySelectorAll('div')[1]
-                      .querySelectorAll('p')[0]
-                      .querySelectorAll('span')[2]
-                      .text
-                      .trim()) ??
-                  -1;
+              score_away =
+                  int.tryParse(match.querySelectorAll('#async-gameDetail')[0].querySelectorAll('div')[1].querySelectorAll('p')[0].querySelectorAll('span')[2].text.trim()) ?? -1;
 
-              match_state = match
-                  .querySelectorAll('#async-gameDetail')[0]
-                  .querySelectorAll('div')[1]
-                  .querySelectorAll('p')[1]
-                  .text
-                  .trim();
+              match_state = match.querySelectorAll('#async-gameDetail')[0].querySelectorAll('div')[1].querySelectorAll('p')[1].text.trim();
             } catch (e) {
               print('試合前なのでスコアのスクレイピングは行いませんでした。');
             }
@@ -400,14 +342,12 @@ class FetchURL {
 
             //勝利投手、敗戦投手、セーブ投手を取得
             try {
-              var players_result = doc_detail
-                  .querySelectorAll('#async-resultPitcher table tbody tr');
+              var players_result = doc_detail.querySelectorAll('#async-resultPitcher table tbody tr');
               if (players_result.isEmpty) {
                 throw Exception('試合が終了していないので活躍投手のHTMLが存在しません。');
               }
               for (var player in players_result) {
-                var name_team_block =
-                    player.querySelectorAll('td')[0].querySelectorAll('span');
+                var name_team_block = player.querySelectorAll('td')[0].querySelectorAll('span');
 
                 if (name_team_block.isEmpty) {
                   continue;
@@ -417,14 +357,8 @@ class FetchURL {
 
                 print(name_team);
 
-                var result =
-                    player.querySelectorAll('th')[0].text?.trim() ?? '';
-                var href_player = player
-                        .querySelectorAll('td')[0]
-                        .querySelectorAll('a')[0]
-                        .attributes['href']
-                        ?.trim() ??
-                    '';
+                var result = player.querySelectorAll('th')[0].text?.trim() ?? '';
+                var href_player = player.querySelectorAll('td')[0].querySelectorAll('a')[0].attributes['href']?.trim() ?? '';
 
                 var url_player = url.resolve(href_player);
 
@@ -435,22 +369,13 @@ class FetchURL {
                 }
 
                 final doc_player = parse(_decodeHtml(res_player));
-                final name_player = doc_player
-                    .querySelectorAll('ruby.bb-profile__ruby')[0]
-                    .text
-                    .split('（')[0]
-                    .trim();
+                final name_player = doc_player.querySelectorAll('ruby.bb-profile__ruby')[0].text.split('（')[0].trim();
                 print(StringTool.noSpace(name_player));
-                final team_result = await Postgres.execute(
-                    conn, AppSql.selectTeamsWhereName(),
-                    data: [name_team]);
+                final team_result = await Postgres.execute(conn, AppSql.selectTeamsWhereName(), data: [name_team]);
 
                 final id_team_result = team_result.first.toColumnMap()['id'];
-                final result_player = await Postgres.execute(
-                    conn, AppSql.selectPlayerWhereFullNameAndTeamID(),
-                    data: [StringTool.noSpace(name_player), id_team_result]);
-                final id_player_result =
-                    result_player.first.toColumnMap()['id'];
+                final result_player = await Postgres.execute(conn, AppSql.selectPlayerWhereFullNameAndTeamID(), data: [StringTool.noSpace(name_player), id_team_result]);
+                final id_player_result = result_player.first.toColumnMap()['id'];
 
                 if (result == '勝利投手') {
                   id_pitcher_win = id_player_result;
@@ -468,34 +393,24 @@ class FetchURL {
               print('試合が終了していないので活躍選手を取得できませんでした。');
             }
 
-            final result_team_home = await Postgres.execute(
-                conn, AppSql.selectTeamsWhereName(),
-                data: [team_home]);
+            final result_team_home = await Postgres.execute(conn, AppSql.selectTeamsWhereName(), data: [team_home]);
 
             id_team_home = result_team_home.first.toColumnMap()['id'];
 
-            final results_team_away = await Postgres.execute(
-                conn, AppSql.selectTeamsWhereName(),
-                data: [team_away]);
+            final results_team_away = await Postgres.execute(conn, AppSql.selectTeamsWhereName(), data: [team_away]);
 
             id_team_away = results_team_away.first.toColumnMap()['id'];
 
             if (flg_no_pitcher == false) {
               //先発投手が発表されている場合
-              final result_pitcher_home = await conn.execute(
-                  AppSql.selectPlayerWhereFullNameAndTeamID(),
-                  parameters: [StringTool.noSpace(pitcher_home), id_team_home]);
+              final result_pitcher_home = await conn.execute(AppSql.selectPlayerWhereFullNameAndTeamID(), parameters: [StringTool.noSpace(pitcher_home), id_team_home]);
               id_pitcher_home = result_pitcher_home.first.toColumnMap()['id'];
 
-              final result_pitcher_away = await conn.execute(
-                  AppSql.selectPlayerWhereFullNameAndTeamID(),
-                  parameters: [StringTool.noSpace(pitcher_away), id_team_away]);
+              final result_pitcher_away = await conn.execute(AppSql.selectPlayerWhereFullNameAndTeamID(), parameters: [StringTool.noSpace(pitcher_away), id_team_away]);
               id_pitcher_away = result_pitcher_away.first.toColumnMap()['id'];
             }
 
-            final result_stadium = await Postgres.execute(
-                conn, AppSql.selectStadium(),
-                data: ['%$name_stadium%']);
+            final result_stadium = await Postgres.execute(conn, AppSql.selectStadium(), data: ['%$name_stadium%']);
 
             if (result_stadium.isEmpty) {
               //DBに存在しないスタジアムの場合は新規登録する。
@@ -512,8 +427,7 @@ class FetchURL {
             print(stacktrace);
             continue;
           }
-          final result_game = await conn.execute(AppSql.selectExistsGame(),
-              parameters: [id_team_home, id_team_away, datetime_gamestart]);
+          final result_game = await conn.execute(AppSql.selectExistsGame(), parameters: [id_team_home, id_team_away, datetime_gamestart]);
 
           final game = t_game();
           game.id_stadium = id_stadium;
@@ -624,8 +538,7 @@ class FetchURL {
 
   static Future<void> fetchStatsPlayerNPB(Connection conn) async {
     // 前回のデータを削除
-    await conn.execute(AppSql.deleteStatsPlayer(),
-        parameters: [DateTimeTool.getThisYear()]);
+    await conn.execute(AppSql.deleteStatsPlayer(), parameters: [DateTimeTool.getThisYear()]);
 
     final results = await conn.execute(AppSql.selectStatsDetails());
     final stats = results
@@ -664,14 +577,10 @@ class FetchURL {
         t_stats_player statsPlayer = t_stats_player();
         statsPlayer.id_league = stat['id_league'] as int;
         statsPlayer.id_stats = stat['id_stats'] as int;
-        statsPlayer.stats =
-            double.tryParse(cols[stat['int_idx_col'] as int]) ?? 0;
+        statsPlayer.stats = double.tryParse(cols[stat['int_idx_col'] as int]) ?? 0;
         statsPlayer.int_rank = int.tryParse(cols[0]) ?? 0;
         statsPlayer.playerName = cols[1].split(RegExp(r'[\s　]+'))[0];
-        statsPlayer.teamName = cols[1]
-            .split(RegExp(r'[\s　]+'))[1]
-            .replaceAll("(", "")
-            .replaceAll(")", "");
+        statsPlayer.teamName = cols[1].split(RegExp(r'[\s　]+'))[1].replaceAll("(", "").replaceAll(")", "");
         listStats.add(statsPlayer);
       }
       var sql = AppSql.selectInsertStatsPlayer(listStats);

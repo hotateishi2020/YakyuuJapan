@@ -23,9 +23,8 @@ void main() async {
     final log = Value.SystemCode.Log;
 
     // ====== API ======
-    app.get('/healthz', (Request _) => Response.ok('ok'));
 
-    app.get('/fetchTeamsNPB', (Request request) async {
+    app.get('/fetchStatsTeamNPB', (Request request) async {
       return await commonAPI(
           request, log.Fetch.NAME, log.Fetch.Codes.STATS_TEAM, (conn) async {
         await FetchURL.fetchStatsTeamNPB(conn);
@@ -33,7 +32,7 @@ void main() async {
       });
     });
 
-    app.get('/fetchPlayerStats', (Request request) async {
+    app.get('/fetchStatsPlayerNPB', (Request request) async {
       return await commonAPI(
           request, log.Fetch.NAME, log.Fetch.Codes.STATS_PLAYER, (conn) async {
         await FetchURL.fetchStatsPlayerNPB(conn);
@@ -41,13 +40,13 @@ void main() async {
       });
     });
 
-    app.get('/fetchGames', (Request request) async {
+    app.get('/fetchGamesNPB', (Request request) async {
       // 今日の先発情報を更新→取得（必要に応じてコメントアウト可）
       return await commonAPI(request, log.Fetch.NAME, log.Fetch.Codes.GAMES,
           (conn) async {
-        await FetchURL.fetchGames(conn, DateTime.now()); //今日の試合
+        await FetchURL.fetchGamesNPB(conn, DateTime.now()); //今日の試合
 
-        await FetchURL.fetchGames(
+        await FetchURL.fetchGamesNPB(
             conn, DateTime.now().add(const Duration(days: 1))); //明日の試合
         return Response.ok('ok');
       });
@@ -58,30 +57,25 @@ void main() async {
       return await commonTryCatch(
           request, log.Prediction.NAME, log.Prediction.Codes.ENTER_NPB,
           (conn) async {
+        //予想データの取得
         Map<String, dynamic> json = {};
         final current_year = DateTimeTool.getThisYear();
 
         final predict_team = await Postgres.execute(
             conn, AppSql.selectPredictNPBTeams(),
             data: [current_year]); //予想者データをDBから取得
-
         final predict_player = await Postgres.execute(
             conn, AppSql.selectPredictPlayer(),
             data: [current_year]); //個人タイトル予想のデータをDBから取得
-
         final stats_team =
             await Postgres.execute(conn, AppSql.selectStatsTeam());
-
         final stats_player = await Postgres.execute(
             conn, AppSql.selectStatsPlayer(),
             data: [current_year]);
-
         final games = await Postgres.execute(conn, AppSql.selectGames(),
             data: [current_year]);
-
         final events =
             await Postgres.execute(conn, AppSql.selectEventsDetails());
-
         final notification =
             await Postgres.execute(conn, AppSql.selectNotification());
 
@@ -94,7 +88,7 @@ void main() async {
           'events': Postgres.toJson(events),
           'notification': Postgres.toJson(notification),
         };
-        print(Postgres.toJson(events));
+        print(Postgres.toJson(predict_player));
         // print(json);
         return Response.ok(jsonEncode(json),
             headers: {'content-type': 'application/json; charset=utf-8'});

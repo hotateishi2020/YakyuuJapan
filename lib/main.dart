@@ -2416,14 +2416,15 @@ class _UnifiedGrid extends StatelessWidget {
     );
   }
 
-  Widget cell(String text, {bool highlight = false, Color? bgColor}) {
+  Widget cell(String text,
+      {bool highlight = false, Color? bgColor, Color? borderColor}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 0),
       padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
       constraints: const BoxConstraints(minHeight: 21.5),
       decoration: BoxDecoration(
         color: bgColor ?? (highlight ? Colors.yellow[200] : null),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: borderColor ?? Colors.grey.shade300),
         borderRadius: BorderRadius.circular(3),
       ),
       child: SizedBox(
@@ -2446,6 +2447,34 @@ class _UnifiedGrid extends StatelessWidget {
   }
 
   List<Widget> _buildLeagueColumn(int leagueId) {
+    Color? _parseColorNameLocal(String? name) {
+      final n = (name ?? '').trim().toLowerCase();
+      if (n.isEmpty) return null;
+      const m = {
+        'red': 0xFFF44336,
+        'orange': 0xFFFF9800,
+        'yellow': 0xFFFFEB3B,
+        'green': 0xFF4CAF50,
+        'lightgreen': 0xFF8BC34A,
+        'blue': 0xFF2196F3,
+        'royalblue': 0xFF4169E1,
+        'mediumblue': 0xFF0000CD,
+        'midnightblue': 0xFF191970,
+        'darkblue': 0xFF00008B,
+        'dodgerblue': 0xFF1E90FF,
+        'navy': 0xFF001F3F,
+        'crimson': 0xFFDC143C,
+        'gold': 0xFFFFD700,
+        'lime': 0xFFCDDC39,
+        'gray': 0xFF9E9E9E,
+        'grey': 0xFF9E9E9E,
+        'black': 0xFF000000,
+        'white': 0xFFFFFFFF,
+      };
+      final v = m[n];
+      return v == null ? null : Color(v);
+    }
+
     // リーグ色（予想ブロック内サイドヘッダー用）
     final Color leagueColor =
         leagueId == 1 ? const Color(0xFF0B8F3A) : const Color(0xFF4DB5E8);
@@ -2684,6 +2713,27 @@ class _UnifiedGrid extends StatelessWidget {
           ? const Color(0xFF64B5F6)
           : const Color(0xFFEF9A9A); // 少し濃い青/赤
 
+      // 点滅枠色（color_today）
+      Color? c0 = _parseColorNameLocal(user0Rows
+          .map((e) => '${e['color_today'] ?? ''}')
+          .firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
+      Color? c1 = _parseColorNameLocal(user1Rows
+          .map((e) => '${e['color_today'] ?? ''}')
+          .firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
+      Color? c2 = _parseColorNameLocal(user2Rows
+          .map((e) => '${e['color_today'] ?? ''}')
+          .firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
+
+      final Color _baseBg0 = const Color(0xFFF0E68C);
+      final w0 = cell(txt0,
+          bgColor: _baseBg0,
+          highlight: hi0,
+          borderColor: c0 != null ? Colors.transparent : null);
+      final w1 = cell(txt1,
+          highlight: hi1, borderColor: c1 != null ? Colors.transparent : null);
+      final w2 = cell(txt2,
+          highlight: hi2, borderColor: c2 != null ? Colors.transparent : null);
+
       statsSection.add(Row(
         children: [
           SizedBox(
@@ -2691,11 +2741,44 @@ class _UnifiedGrid extends StatelessWidget {
             child: headerCell(title, bgColor: titleBg),
           ),
           Expanded(
-              flex: 2,
-              child: cell(txt0,
-                  bgColor: const Color(0xFFF0E68C), highlight: hi0)), // 現在
-          Expanded(flex: 2, child: cell(txt1, highlight: hi1)), // 立石
-          Expanded(flex: 2, child: cell(txt2, highlight: hi2)), // 江島
+            flex: 2,
+            child: c0 != null
+                ? _BlinkBorder(
+                    color: c0,
+                    radius: 3,
+                    width: 2,
+                    duration: const Duration(milliseconds: 1800),
+                    baseBgColor: _baseBg0,
+                    fillUseColor: true,
+                    child: w0)
+                : w0,
+          ), // 現在
+          Expanded(
+            flex: 2,
+            child: c1 != null
+                ? _BlinkBorder(
+                    color: c1,
+                    radius: 3,
+                    width: 2,
+                    duration: const Duration(milliseconds: 1800),
+                    baseBgColor: Colors.transparent,
+                    fillUseColor: true,
+                    child: w1)
+                : w1,
+          ), // 立石
+          Expanded(
+            flex: 2,
+            child: c2 != null
+                ? _BlinkBorder(
+                    color: c2,
+                    radius: 3,
+                    width: 2,
+                    duration: const Duration(milliseconds: 1800),
+                    baseBgColor: Colors.transparent,
+                    fillUseColor: true,
+                    child: w2)
+                : w2,
+          ), // 江島
         ],
       ));
     }
@@ -2789,6 +2872,81 @@ class _UnifiedGrid extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+// 枠色がゆっくり点滅するラッパー
+class _BlinkBorder extends StatefulWidget {
+  final Widget child;
+  final Color color;
+  final double radius;
+  final double width;
+  final Duration duration;
+  final Color? baseBgColor;
+  final bool fillUseColor; // true: 背景も color で点滅、false: baseBg とブレンド
+
+  const _BlinkBorder({
+    super.key,
+    required this.child,
+    required this.color,
+    this.radius = 3,
+    this.width = 2,
+    this.duration = const Duration(milliseconds: 1800),
+    this.baseBgColor,
+    this.fillUseColor = true,
+  });
+
+  @override
+  State<_BlinkBorder> createState() => _BlinkBorderState();
+}
+
+class _BlinkBorderState extends State<_BlinkBorder>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _t;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(vsync: this, duration: widget.duration)
+      ..repeat(reverse: true);
+    _t = CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _t,
+      builder: (context, child) {
+        final alpha = (0.35 + 0.45 * _t.value).clamp(0.0, 1.0);
+        Color? bg;
+        if (widget.fillUseColor) {
+          final double bgAlpha = (0.12 + 0.23 * _t.value).clamp(0.0, 1.0);
+          bg = widget.color.withOpacity(bgAlpha);
+        } else if (widget.baseBgColor != null) {
+          final double mix = (0.35 * _t.value).clamp(0.0, 1.0);
+          bg = Color.lerp(widget.baseBgColor!, widget.color, mix);
+        } else {
+          bg = null;
+        }
+        return Container(
+          decoration: BoxDecoration(
+            color: bg,
+            border: Border.all(
+                color: widget.color.withOpacity(alpha), width: widget.width),
+            borderRadius: BorderRadius.circular(widget.radius),
+          ),
+          child: child,
+        );
+      },
+      child: widget.child,
     );
   }
 }

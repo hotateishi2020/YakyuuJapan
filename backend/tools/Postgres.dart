@@ -32,8 +32,7 @@ class Postgres {
   }
 
   //利用者側記述：　　await Postgres.transactionCommit(conn, () async {     }); //transactionCommit
-  static Future<void> transactionCommit(
-      Connection conn, Future<void> Function() callback) async {
+  static Future<void> transactionCommit(Connection conn, Future<void> Function() callback) async {
     try {
       await Postgres.begin(conn);
       print("✅ トランザクション開始");
@@ -61,20 +60,17 @@ class Postgres {
     await conn.execute('ROLLBACK');
   }
 
-  static Future<Result> execute(Connection conn, String sql,
-      {Object? data}) async {
+  static Future<Result> execute(Connection conn, String sql, {Object? data}) async {
     try {
       final result = await conn.execute(sql, parameters: data);
       return result;
     } catch (e, stacktrace) {
-      print(
-          "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥");
+      print("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥");
       print("SQLの実行に失敗しました。失敗したSQL文はこちらです👇");
       print(sql);
       print("失敗したパラメータはこちらです👇");
       print(data);
-      print(
-          "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥");
+      print("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥");
       // rethrow with original stack
       Error.throwWithStackTrace(e, stacktrace);
     }
@@ -90,8 +86,7 @@ class Postgres {
 
     final columnList = columns.join(', ');
     // $1, $2, $3 ... の形に変換
-    final placeholders =
-        List.generate(columns.length, (i) => '\$${i + 1}').join(', ');
+    final placeholders = List.generate(columns.length, (i) => '\$${i + 1}').join(', ');
 
     final sql = '''
     INSERT INTO ${model.tableName}
@@ -109,8 +104,7 @@ class Postgres {
     return 0;
   }
 
-  static Future<List<int>> insertMulti(
-      Connection conn, List<DBModel> models) async {
+  static Future<List<int>> insertMulti(Connection conn, List<DBModel> models) async {
     if (models.isEmpty) return const <int>[];
 
     // 1) カラム順は最初のモデルから確定（id は自動採番想定なので除外）
@@ -185,9 +179,7 @@ class Postgres {
     }
 
     // 2) SET 句: col1=$1, col2=$2, ...
-    final setClause =
-        List.generate(columns.length, (i) => '${columns[i]} = \$${i + 1}')
-            .join(', ');
+    final setClause = List.generate(columns.length, (i) => '${columns[i]} = \$${i + 1}').join(', ');
 
     // 3) パラメータ配列（最後に id を足して WHERE で使う）
     final params = [...values, model.id];
@@ -215,16 +207,14 @@ class Postgres {
 
   static List<Map<String, dynamic>> toJson(Result result) {
     // カラム名を schema から取得
-    final columns =
-        result.schema?.columns.map((c) => c.columnName).toList() ?? [];
+    final columns = result.schema?.columns.map((c) => c.columnName).toList() ?? [];
 
     return result.map((row) {
       final map = <String, dynamic>{};
       for (var i = 0; i < columns.length; i++) {
         var value = row[i];
         if (value is DateTime) {
-          value =
-              value.toIso8601String(); //DateTimeはそのままjsonデータにはできないので、文字列に変換する。
+          value = value.toIso8601String(); //DateTimeはそのままjsonデータにはできないので、文字列に変換する。
         }
         map[columns[i].toString()] = value;
       }

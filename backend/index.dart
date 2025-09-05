@@ -8,87 +8,98 @@ import 'package:shelf_static/shelf_static.dart'; // ← 重要
 import 'app/AppSql.dart';
 import 'app/FetchURL.dart';
 import 'tools/Postgres.dart';
+import 'app/Value.dart';
 import 'tools/DateTimeTool.dart';
-import 'package:intl/intl.dart';
 import 'package:postgres/postgres.dart';
+import 'app/DB/t_system_log.dart';
+import 'app/DB/t_system_log_error.dart';
+import 'app/DB/m_user.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 
 void main() async {
   try {
     final app = Router();
+    final log = Value.SystemCode.Log;
 
     // ====== API ======
     app.get('/healthz', (Request _) => Response.ok('ok'));
 
     app.get('/fetchTeamsNPB', (Request request) async {
-      return await commonAPI(request, (conn) async {
-        await FetchURL.fetchNPBStandings(conn);
+      return await commonAPI(
+          request, log.Fetch.NAME, log.Fetch.Codes.STATS_TEAM, (conn) async {
+        await FetchURL.fetchStatsTeamNPB(conn);
+        return Response.ok('ok');
       });
     });
 
     app.get('/fetchPlayerStats', (Request request) async {
-      return await commonAPI(request, (conn) async {
-        await FetchURL.fetchNPBStatsDetails(conn);
+      return await commonAPI(
+          request, log.Fetch.NAME, log.Fetch.Codes.STATS_PLAYER, (conn) async {
+        await FetchURL.fetchStatsPlayerNPB(conn);
+        return Response.ok('ok');
       });
     });
 
     app.get('/fetchGames', (Request request) async {
       // 今日の先発情報を更新→取得（必要に応じてコメントアウト可）
-      return await commonAPI(request, (conn) async {
+      return await commonAPI(request, log.Fetch.NAME, log.Fetch.Codes.GAMES,
+          (conn) async {
         await FetchURL.fetchGames(conn, DateTime.now()); //今日の試合
 
         await FetchURL.fetchGames(
             conn, DateTime.now().add(const Duration(days: 1))); //明日の試合
+        return Response.ok('ok');
       });
     });
 
     //タイトル予想画面の表示
     app.get('/predictions', (Request request) async {
-      return await commonTryCatch(request, () async {
+      return await commonTryCatch(
+          request, log.Prediction.NAME, log.Prediction.Codes.ENTER_NPB,
+          (conn) async {
         Map<String, dynamic> json = {};
-        await Postgres.openConnection((conn) async {
-          final current_year = DateTimeTool.getThisYear();
+        final current_year = DateTimeTool.getThisYear();
 
-          final predict_team = await Postgres.execute(
-              conn, AppSql.selectPredictNPBTeams(),
-              data: [current_year]); //予想者データをDBから取得
+        final predict_team = await Postgres.execute(
+            conn, AppSql.selectPredictNPBTeams(),
+            data: [current_year]); //予想者データをDBから取得
 
-          final predict_player = await Postgres.execute(
-              conn, AppSql.selectPredictPlayer(),
-              data: [current_year]); //個人タイトル予想のデータをDBから取得
+        final predict_player = await Postgres.execute(
+            conn, AppSql.selectPredictPlayer(),
+            data: [current_year]); //個人タイトル予想のデータをDBから取得
 
-          final stats_team =
-              await Postgres.execute(conn, AppSql.selectStatsTeam());
+        final stats_team =
+            await Postgres.execute(conn, AppSql.selectStatsTeam());
 
-          final stats_player = await Postgres.execute(
-              conn, AppSql.selectStatsPlayer(),
-              data: [current_year]);
+        final stats_player = await Postgres.execute(
+            conn, AppSql.selectStatsPlayer(),
+            data: [current_year]);
 
-          final games = await Postgres.execute(conn, AppSql.selectGames(),
-              data: [current_year]);
+        final games = await Postgres.execute(conn, AppSql.selectGames(),
+            data: [current_year]);
 
-          final events =
-              await Postgres.execute(conn, AppSql.selectEventsDetails());
+        final events =
+            await Postgres.execute(conn, AppSql.selectEventsDetails());
 
-          final notification =
-              await Postgres.execute(conn, AppSql.selectNotification());
+        final notification =
+            await Postgres.execute(conn, AppSql.selectNotification());
 
-          json = {
-            'predict_team': Postgres.toJson(predict_team),
-            'predict_player': Postgres.toJson(predict_player),
-            'stats_team': Postgres.toJson(stats_team),
-            'stats_player': Postgres.toJson(stats_player),
-            'games': Postgres.toJson(games),
-            'events': Postgres.toJson(events),
-            'notification': Postgres.toJson(notification),
-          };
-          print(Postgres.toJson(events));
-          // print(json);
-        }); //connectionOpenClose
-
+        json = {
+          'predict_team': Postgres.toJson(predict_team),
+          'predict_player': Postgres.toJson(predict_player),
+          'stats_team': Postgres.toJson(stats_team),
+          'stats_player': Postgres.toJson(stats_player),
+          'games': Postgres.toJson(games),
+          'events': Postgres.toJson(events),
+          'notification': Postgres.toJson(notification),
+        };
+        print(Postgres.toJson(events));
+        // print(json);
         return Response.ok(jsonEncode(json),
             headers: {'content-type': 'application/json; charset=utf-8'});
-      }); //catch
-    }); //prediction
+      });
+    });
 
     // 2) 静的ディレクトリの検出
     final candidates = [Directory('public'), Directory('backend/public')];
@@ -158,42 +169,145 @@ void main() async {
   }
 } // void main
 
-Future<Response> commonTryCatch(Request request, Function() callback) async {
-  try {
-    print(
-        '🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
-    print("🌐Routing...【" + request.requestedUri.toString() + "】");
-    print("");
-    return await callback();
-  } catch (e, st) {
-    print(
-        "⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️");
-    print(
-        "👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇");
-    print('🔥 /predictions ERROR: $e\n$st');
-    stderr.writeln('🔥 /predictions ERROR: $e\n$st');
-    print(
-        "👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆");
-    print(
-        "⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️");
-    return Response.internalServerError(body: 'データベースエラー: $e');
-  } finally {
-    print("");
-    print(
-        "🌐Responsed Successfully‼️【" + request.requestedUri.toString() + "】");
-    print(
-        '🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
-  }
-}
+Future<Response> commonTryCatch(Request request, String category_system,
+    String code_system, Future<Response> callback(Connection conn)) async {
+  var id_error = 0;
+  final user = m_user();
+  var response = Response.ok('ok');
+  await Postgres.openConnection((conn) async {
+    try {
+      //ログインユーザー情報
+      print(
+          '🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
+      print("🌐Routing...【" + request.requestedUri.toString() + "】");
+      print("");
 
-Future<Response> commonAPI(
-    Request request, Future<void> callback(Connection conn)) async {
-  return await commonTryCatch(request, () async {
-    await Postgres.openConnection((conn) async {
+      await user.loadProperty(conn, 0);
+      user.category_system = category_system;
+      user.code_system = code_system;
+      user.flg_user = false;
+
+      response = await callback(conn);
+    } catch (e, st) {
+      var flg_db_error = false;
+      print(
+          "⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️");
+      print(
+          "👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇");
+      print('🔥 /predictions ERROR: $e\n$st');
+      stderr.writeln('🔥 /predictions ERROR: $e\n$st');
+      print(
+          "👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆");
+      print(
+          "⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️");
+      try {
+        id_error = await insertLogError(conn, e, st.toString(), user);
+      } catch (e, st) {
+        //エラーログの登録に失敗
+        flg_db_error = true;
+        print('🔥 /predictions ERROR: $e\n$st');
+        stderr.writeln('🔥 /predictions ERROR: $e\n$st');
+      } finally {
+        try {
+          //callback()内ので発生したエラーをメールで通知
+          final username = 'hotateishi2012@yahoo.co.jp';
+          final password = '199424';
+          sendMail(username, password, 'プログラム上でエラーが発生しました', e.toString());
+
+          if (flg_db_error) {
+            //エラーログがDBに残せなかったことをメールで通知
+            user.category_system = Value.SystemCode.Log.Error.NAME;
+            user.code_system = Value.SystemCode.Log.Error.Codes.MAIL;
+            sendMail(username, password, 'エラーログの登録に失敗しました。', e.toString());
+          }
+        } catch (e, st) {
+          //メール送信失敗
+          print('🔥 /predictions ERROR: $e\n$st');
+          stderr.writeln('🔥 /predictions ERROR: $e\n$st');
+          if (flg_db_error) {
+            //メール送信失敗のエラーログを残す
+            user.category_system = Value.SystemCode.Log.Error.NAME;
+            user.code_system = Value.SystemCode.Log.Error.Codes.MAIL;
+            id_error = await insertLogError(conn, e, st.toString(), user);
+          }
+        }
+      }
+
+      response = Response.internalServerError(body: 'データベースエラー: $e');
+    } finally {
+      //操作ログを残す
       await Postgres.transactionCommit(conn, () async {
-        await callback(conn);
+        final log = t_system_log();
+        log.method = request.method;
+        log.category = user.category_system;
+        log.code = user.code_system;
+        log.memo = '';
+        log.flg_user = user.flg_user;
+        log.url = request.requestedUri.toString();
+        log.url_pre = "";
+        log.id_log_error = id_error;
+        log.flg_check = false;
+        log.crtby = user.id;
+        log.crtpgm = user.code_system;
+        log.updby = user.id;
+        log.updpgm = user.code_system;
+
+        await Postgres.insert(conn, log);
+
+        print("");
+        print("🌐Responsed Successfully‼️【" +
+            request.requestedUri.toString() +
+            "】");
+        print(
+            '🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
       });
+    }
+  }); // connectionOpenClose
+  return response;
+} //commonTryCatch
+
+Future<Response> commonAPI(Request request, String category_system,
+    String code_system, Future<Response> callback(Connection conn)) async {
+  return await commonTryCatch(request, code_system, category_system,
+      (conn) async {
+    await Postgres.transactionCommit(conn, () async {
+      await callback(conn);
     });
     return Response.ok('ok');
   }); //catch
+}
+
+void sendMail(
+    String mailaddress, String password, String title, String text) async {
+  // Yahoo SMTP
+  final smtpServer = SmtpServer(
+    'smtp.mail.yahoo.co.jp',
+    port: 465,
+    ssl: true,
+    username: mailaddress,
+    password: password,
+  );
+
+  final message = Message()
+    ..from = Address(mailaddress, 'YakyuuJapan')
+    ..recipients.add('hotateishi2018@gmail.com')
+    ..subject = title
+    ..text = text;
+
+  final sendReport = await send(message, smtpServer);
+  print('送信成功: ${sendReport.toString()}');
+}
+
+Future<int> insertLogError(
+    Connection conn, Object e, String stacktrace, m_user user) async {
+  final log_error = t_system_log_error();
+  log_error.message_error = e.toString();
+  log_error.stacktrace = stacktrace;
+  log_error.flg_check = false;
+  log_error.code_log_system = user.code_system;
+  log_error.crtby = user.id;
+  log_error.crtpgm = user.code_system;
+  log_error.updby = user.id;
+  log_error.updpgm = user.code_system;
+  return await Postgres.insert(conn, log_error);
 }

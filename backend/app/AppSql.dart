@@ -68,12 +68,23 @@ class AppSql {
     ''';
   }
 
+  //m_user
+  static String selectUserWhereId() {
+    return '''
+      SELECT 
+        * 
+      FROM m_user 
+      WHERE id = \$1 
+      LIMIT 1
+    ''';
+  }
+
   //t_events_details
   static String selectEventsDetails() {
     return '''
       SELECT 
         *,
-        CASE WHEN date_From_temp < (CURRENT_DATE + INTERVAL '2 day') THEN TRUE ELSE FALSE END AS flg_today 
+        CASE WHEN date_From_temp < (CURRENT_DATE + INTERVAL '1 day') THEN TRUE ELSE FALSE END AS flg_today 
       FROM (
         SELECT
           event_category.name1 AS event_category,  
@@ -184,7 +195,8 @@ class AppSql {
                pitcher_win.name_full, pitcher_lose.name_full, m_stadium.name_short, t_game.score_home, t_game.score_away,
                team_home.id_league, team_away.id_league, team_home.color_font, team_home.color_back, team_away.color_font,
                team_away.color_back, team_home.id, team_away.id, pitcher_win.id_team, pitcher_lose.id_team, pitcher_save.name_full, 
-               pitcher_save.id_team, t_game.state;
+               pitcher_save.id_team, t_game.state
+      ORDER BY to_char(t_game.datetime_start, 'YYYY-MM-DD'), team_home.id;
     ''';
   }
 
@@ -417,7 +429,7 @@ class AppSql {
     return '''
       DELETE FROM ${t_stats_player().tableName} 
       WHERE EXTRACT(YEAR FROM crtat) = \$1
-        AND code_category = '${Value.code_category_game_npb}';
+        AND code_category = '${Value.SystemCode.Key.NPB}';
     ''';
   }
 

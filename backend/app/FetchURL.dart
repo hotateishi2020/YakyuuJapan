@@ -45,7 +45,7 @@ class FetchURL {
     return m?.group(1)?.toLowerCase();
   }
 
-  static Future fetchNPBStandings(Connection conn) async {
+  static Future fetchStatsTeamNPB(Connection conn) async {
     final url = Uri.parse('https://baseball.yahoo.co.jp/npb/standings/');
     final res = await http.get(url);
 
@@ -542,8 +542,6 @@ class FetchURL {
           }
         } //for card
       } //for league
-
-      print('== 試合情報スクレイピング完了 ==');
     } catch (e, stacktrace) {
       print(e);
       print(stacktrace);
@@ -624,7 +622,7 @@ class FetchURL {
     }
   }
 
-  static Future<void> fetchNPBStatsDetails(Connection conn) async {
+  static Future<void> fetchStatsPlayerNPB(Connection conn) async {
     // 前回のデータを削除
     await conn.execute(AppSql.deleteStatsPlayer(),
         parameters: [DateTimeTool.getThisYear()]);

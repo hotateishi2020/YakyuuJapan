@@ -3,8 +3,48 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:logger/logger.dart';
 import 'tools/Env.dart';
+import 'View/Headers.dart';
+import 'View/Tabs.dart';
+import 'View/Text.dart';
+import 'View/Grid.dart';
+import 'View/Border.dart';
 
 final logger = Logger();
+
+//デザイン設定
+//全体
+final ALL_MARGIN_LEFT = 8.0; //左端のマージン
+final ALL_RATIO_BLOCK_H = [3, 11]; //上部ブロック : リーグの高さの比率
+final ALL_RATIO_BLOCK_W = [5, 50, 75, 75]; //リーグのサイドヘッダー : 予想ブロック : 成績ブロック : 試合ブロックの比率 = [1, 50, 50]; //リーグのサイドヘッダー : 予想ブロック : 成績ブロックの比率
+final ALL_COLOR_APP = Colors.orange.shade200; //アプリの色
+final ALL_SPACE_BLOCK = 5.0;
+final ALL_CELL_RADIUS_MARGIN = 2.0;
+double ALL_WIDTH = 0;
+
+//最上部ヘッダー
+final HEADER_GLOBAL_H = 26.0; //最上部ヘッダーの高さ
+final HEADER_PAD_VERTICAL = 5.0; //最上部ヘッダーのパディング
+final HEADER_TITLE = "Yakyuu! Japan"; //最上部ヘッダーのタイトル
+
+//タブバー
+final TAB_BAR_H = 26.0; //タブバーの高さ
+final TAB_PAD_HORIZONTAL = 15.0; //タブの水平マージン
+final TAB_PAD_VERTICAL = 2.0; //タブの垂直マージン
+final TAB_RADIUS = 16.0; //タブの角の丸み
+final TAB_TITLES = ['侍', 'MLB', 'NPB', '2軍', '独立', '社会人', '大学', '高校']; //タブのタイトル
+final TAB_COLOR_FONT = Colors.white; //タブの文字色
+
+//リーグサイドヘッダー
+final LEAGUE_SIDEHEADER_W = 23;
+
+//予想ブロック
+final PREDICTION_HEADER_PREDICTOR_W_PCT = 0.06;
+final PREDICTION_HEADER_STANDINGS_W = 56;
+final PREDICTION_HEADER_PREDICTOR_W = ALL_WIDTH * PREDICTION_HEADER_PREDICTOR_W_PCT;
+final PREDICTION_BLOCK_W = LEAGUE_SIDEHEADER_W + PREDICTION_HEADER_STANDINGS_W + ((ALL_WIDTH * PREDICTION_HEADER_PREDICTOR_W_PCT) * 3);
+
+//個人成績
+final STATS_PLAYER_RATIO_CELL_BLOCK_W = [1, 1, 5, 2];
 
 void main() {
   runApp(const MyApp());
@@ -15,6 +55,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ALL_WIDTH = MediaQuery.of(context).size.width;
     return MaterialApp(
       title: 'Yakyuu! Japan',
       theme: ThemeData(
@@ -87,8 +128,7 @@ class _PredictionPageState extends State<PredictionPage> {
           error = 'HTTPエラー: ${res.statusCode}';
           isLoading = false;
         });
-        logger.w(
-            'HTTP ${res.statusCode} body: ${res.body.substring(0, res.body.length.clamp(0, 400))}');
+        logger.w('HTTP ${res.statusCode} body: ${res.body.substring(0, res.body.length.clamp(0, 400))}');
         return;
       }
 
@@ -98,10 +138,7 @@ class _PredictionPageState extends State<PredictionPage> {
       List<Map<String, dynamic>> _listMap(dynamic v) {
         final raw = (v as List?) ?? const [];
         // JSONの各要素がMap<String,dynamic>であることを保証
-        return raw
-            .map((e) => (e as Map).map((k, v) => MapEntry('$k', v)))
-            .cast<Map<String, dynamic>>()
-            .toList();
+        return raw.map((e) => (e as Map).map((k, v) => MapEntry('$k', v))).cast<Map<String, dynamic>>().toList();
       }
 
       // After（stats_playerを使う）
@@ -190,19 +227,14 @@ class _PredictionPageState extends State<PredictionPage> {
     addFromPlayer(npbPlayerStatsActual);
 
     // チーム順位の的中（現在と予想の一致）
-    bool _teamHit(
-        Map<String, dynamic>? pred, List<Map<String, dynamic>> curGroup) {
+    bool _teamHit(Map<String, dynamic>? pred, List<Map<String, dynamic>> curGroup) {
       if (pred == null || pred.isEmpty || curGroup.isEmpty) return false;
       final int prdId = int.tryParse('${pred['id_team']}') ?? -1;
-      final String prdName = (pred['name_team_short']?.toString() ??
-              pred['name_team']?.toString() ??
-              '')
-          .trim();
+      final String prdName = (pred['name_team_short']?.toString() ?? pred['name_team']?.toString() ?? '').trim();
       for (final cur in curGroup) {
         final int curId = int.tryParse('${cur['id_team']}') ?? -1;
         final String curName = (cur['name_team']?.toString() ?? '').trim();
-        if ((prdId >= 0 && curId >= 0 && prdId == curId) ||
-            (prdName.isNotEmpty && curName == prdName)) {
+        if ((prdId >= 0 && curId >= 0 && prdId == curId) || (prdName.isNotEmpty && curName == prdName)) {
           return true;
         }
       }
@@ -210,107 +242,49 @@ class _PredictionPageState extends State<PredictionPage> {
     }
 
     for (final leagueId in [1, 2]) {
-      final curRows = standings
-          .where((e) => int.tryParse('${e['id_league']}') == leagueId)
-          .toList();
-      final pred1 = predictions
-          .where((e) =>
-              '${e['id_user']}' == '1' &&
-              (int.tryParse('${e['id_league']}') ?? 0) == leagueId)
-          .toList();
-      final pred2 = predictions
-          .where((e) =>
-              '${e['id_user']}' == '2' &&
-              (int.tryParse('${e['id_league']}') ?? 0) == leagueId)
-          .toList();
+      final curRows = standings.where((e) => int.tryParse('${e['id_league']}') == leagueId).toList();
+      final pred1 = predictions.where((e) => '${e['id_user']}' == '1' && (int.tryParse('${e['id_league']}') ?? 0) == leagueId).toList();
+      final pred2 = predictions.where((e) => '${e['id_user']}' == '2' && (int.tryParse('${e['id_league']}') ?? 0) == leagueId).toList();
       for (int rk = 1; rk <= 6; rk++) {
-        final curGroup = curRows
-            .where((e) => int.tryParse('${e['int_rank']}') == rk)
-            .toList();
-        final p1 = pred1.firstWhere(
-            (e) => int.tryParse('${e['int_rank']}') == rk,
-            orElse: () => {});
-        final p2 = pred2.firstWhere(
-            (e) => int.tryParse('${e['int_rank']}') == rk,
-            orElse: () => {});
-        if (_teamHit(p1.isNotEmpty ? p1 : null, curGroup))
-          counts['1'] = (counts['1'] ?? 0) + 1;
-        if (_teamHit(p2.isNotEmpty ? p2 : null, curGroup))
-          counts['2'] = (counts['2'] ?? 0) + 1;
+        final curGroup = curRows.where((e) => int.tryParse('${e['int_rank']}') == rk).toList();
+        final p1 = pred1.firstWhere((e) => int.tryParse('${e['int_rank']}') == rk, orElse: () => {});
+        final p2 = pred2.firstWhere((e) => int.tryParse('${e['int_rank']}') == rk, orElse: () => {});
+        if (_teamHit(p1.isNotEmpty ? p1 : null, curGroup)) counts['1'] = (counts['1'] ?? 0) + 1;
+        if (_teamHit(p2.isNotEmpty ? p2 : null, curGroup)) counts['2'] = (counts['2'] ?? 0) + 1;
       }
     }
 
     return counts;
   }
 
-  // 画面上部: 全体ヘッダー
-  Widget _globalHeader() {
-    return Container(
-      height: 26,
-      decoration: BoxDecoration(
-        color: Colors.orange.shade200,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      alignment: Alignment.centerLeft,
-      padding: const EdgeInsets.only(left: 8),
-      child: const Text('Yakyuu! Japan',
-          style: TextStyle(fontWeight: FontWeight.bold)),
-    );
-  }
-
-  // 画面切替タブ（ダミー表示）
-  Widget _tabsBar() {
-    final tabs = ['侍', 'MLB', 'NPB', '2軍', '独立', '社会人', '大学/高校'];
-    return SizedBox(
-      height: 26,
-      child: Row(children: [
-        for (final t in tabs) ...[
-          Container(
-            margin: const EdgeInsets.only(right: 6),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-                color: Colors.orange.shade300,
-                borderRadius: BorderRadius.circular(4)),
-            child: Text(t, style: const TextStyle(fontSize: 12)),
-          ),
-        ]
-      ]),
-    );
-  }
-
   // 上部: Score + News + イベント日程
   Widget _scoreNewsEventsRow() {
     final counts = _atariCounts();
-    Widget _scoreBox(double width) {
+    Widget _scoreBox() {
       final name1 = _userNameFromPredictions('1');
       final name2 = _userNameFromPredictions('2');
 
       // 予想ブロックの列幅に合わせる: 左(順位56 + 現在 1/3) / 立石 1/3 / 江島 1/3
-      const double rankW = 56; // 予想ブロックの順位列幅
+      // const double rankW = 56; // 予想ブロックの順位列幅
       const double vBorder = 1.0; // 縦ボーダー幅（立石/江島 列の左境界）
       final double gutters = vBorder * 2;
-      final double rem = (width - rankW - gutters).clamp(0, double.infinity);
-      final double eachW = (rem / 3).floorToDouble();
-      final double leftHeaderW =
-          (width - gutters - (eachW * 2)).clamp(0, double.infinity);
+      // final double rem = (width - rankW - gutters).clamp(0, double.infinity);
+      // final double eachW = (rem / 3).floorToDouble();
+      // final double leftHeaderW = (width - gutters - (eachW * 2)).clamp(0, double.infinity);
 
-      return SizedBox(
-        width: width,
-        height: 120,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.black45),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // 左: SCORE（順位+現在の幅に合わせる）
-                Container(
-                  width: leftHeaderW,
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Colors.black45),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: Container(
                   color: Colors.red,
                   alignment: Alignment.center,
                   child: const OneLineShrinkText(
@@ -322,86 +296,82 @@ class _PredictionPageState extends State<PredictionPage> {
                     color: Colors.white,
                   ),
                 ),
+              ),
 
-                // 立石 列（ヘッダー+スコア）
-                Container(
-                  width: eachW,
-                  decoration: const BoxDecoration(
-                    border: Border(
-                        left:
-                            BorderSide(color: Colors.black45, width: vBorder)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Container(
-                        height: 34,
-                        color: Colors.red,
+              // 立石 列（ヘッダー+スコア）
+              Container(
+                width: PREDICTION_HEADER_PREDICTOR_W,
+                decoration: const BoxDecoration(
+                  border: Border(left: BorderSide(color: Colors.black45, width: vBorder)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      height: 34,
+                      color: Colors.red,
+                      alignment: Alignment.center,
+                      child: OneLineShrinkText(
+                        name1,
+                        baseSize: 18,
+                        minSize: 10,
+                        weight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        color: Colors.white,
                         alignment: Alignment.center,
                         child: OneLineShrinkText(
-                          name1,
-                          baseSize: 18,
-                          minSize: 10,
-                          weight: FontWeight.bold,
-                          color: Colors.white,
+                          '${counts['1'] ?? 0}',
+                          baseSize: 45,
+                          minSize: 14,
+                          weight: FontWeight.w800,
                         ),
                       ),
-                      Expanded(
-                        child: Container(
-                          color: Colors.white,
-                          alignment: Alignment.center,
-                          child: OneLineShrinkText(
-                            '${counts['1'] ?? 0}',
-                            baseSize: 45,
-                            minSize: 14,
-                            weight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
+              ),
 
-                // 江島 列（ヘッダー+スコア）
-                Container(
-                  width: eachW,
-                  decoration: const BoxDecoration(
-                    border: Border(
-                        left:
-                            BorderSide(color: Colors.black45, width: vBorder)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Container(
-                        height: 34,
-                        color: Colors.red,
+              // 江島 列（ヘッダー+スコア）
+              Container(
+                width: PREDICTION_HEADER_PREDICTOR_W,
+                decoration: const BoxDecoration(
+                  border: Border(left: BorderSide(color: Colors.black45, width: vBorder)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      height: 34,
+                      color: Colors.red,
+                      alignment: Alignment.center,
+                      child: OneLineShrinkText(
+                        name2,
+                        baseSize: 18,
+                        minSize: 10,
+                        weight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        color: Colors.white,
                         alignment: Alignment.center,
                         child: OneLineShrinkText(
-                          name2,
-                          baseSize: 18,
-                          minSize: 10,
-                          weight: FontWeight.bold,
-                          color: Colors.white,
+                          '${counts['2'] ?? 0}',
+                          baseSize: 45,
+                          minSize: 14,
+                          weight: FontWeight.w800,
                         ),
                       ),
-                      Expanded(
-                        child: Container(
-                          color: Colors.white,
-                          alignment: Alignment.center,
-                          child: OneLineShrinkText(
-                            '${counts['2'] ?? 0}',
-                            baseSize: 45,
-                            minSize: 14,
-                            weight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       );
@@ -434,150 +404,129 @@ class _PredictionPageState extends State<PredictionPage> {
       const double tagW = 64.0;
       const double tagH = 20.0;
 
-      return Expanded(
-        child: Container(
-          height: 120,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.black45),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          padding: EdgeInsets.zero,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Header with embedded 'すべて既読にする'
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(3),
-                ),
-                child: Row(
-                  children: [
-                    const Expanded(
-                      child: Text('News',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 1),
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: const Text('未読メッセージを一覧表示',
-                          style: TextStyle(color: Colors.white, fontSize: 11)),
-                    ),
-                  ],
-                ),
+      return Container(
+        height: 120,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: Colors.black45),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        padding: EdgeInsets.zero,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Header with embedded 'すべて既読にする'
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(3),
               ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 4, 10, 6),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        const Divider(height: 1),
-                        const SizedBox(height: 4),
-                        for (final n in notifications)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 2),
-                            child: Row(
-                              children: [
-                                // メインタグ
-                                Container(
-                                  width: tagW,
-                                  alignment: Alignment.center,
-                                  constraints:
-                                      const BoxConstraints(minHeight: tagH),
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 2, horizontal: 4),
-                                  decoration: BoxDecoration(
-                                    color: parse(n['tag_main_color_back'],
-                                        Colors.grey.shade300),
-                                    borderRadius: BorderRadius.circular(3),
-                                  ),
-                                  child: OneLineShrinkText(
-                                    (n['tag_main_title'] ?? '').toString(),
-                                    baseSize: 12,
-                                    minSize: 8,
-                                    color: parse(
-                                        n['tag_main_color_font'], Colors.white),
-                                    align: TextAlign.center,
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                // サブタグ
-                                Container(
-                                  width: tagW,
-                                  alignment: Alignment.center,
-                                  constraints:
-                                      const BoxConstraints(minHeight: tagH),
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 2, horizontal: 4),
-                                  decoration: BoxDecoration(
-                                    color: parse(n['tag_sub_color_back'],
-                                        Colors.grey.shade300),
-                                    borderRadius: BorderRadius.circular(3),
-                                  ),
-                                  child: OneLineShrinkText(
-                                    (n['tag_sub_title'] ?? '').toString(),
-                                    baseSize: 12,
-                                    minSize: 8,
-                                    color: parse(
-                                        n['tag_sub_color_font'], Colors.white),
-                                    align: TextAlign.center,
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                // タイトル
-                                Expanded(
-                                  child: OneLineShrinkText(
-                                    (n['title'] ?? '').toString(),
-                                    baseSize: 12,
-                                    minSize: 8,
-                                    align: TextAlign.left,
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                // 既読/未読ボタン
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: (n['flg_read'] == true)
-                                        ? Colors.grey
-                                        : Colors.orange,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: Text(
-                                    (n['flg_read'] == true) ? '既読' : '未読',
-                                    style: const TextStyle(
-                                        color: Colors.white, fontSize: 12),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                      ],
+              child: Row(
+                children: [
+                  const Expanded(
+                    child: Text('News', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.circular(4),
                     ),
+                    child: const Text('未読メッセージを一覧表示', style: TextStyle(color: Colors.white, fontSize: 11)),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 4, 10, 6),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const Divider(height: 1),
+                      const SizedBox(height: 4),
+                      for (final n in notifications)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: Row(
+                            children: [
+                              // メインタグ
+                              Container(
+                                width: tagW,
+                                alignment: Alignment.center,
+                                constraints: const BoxConstraints(minHeight: tagH),
+                                padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+                                decoration: BoxDecoration(
+                                  color: parse(n['tag_main_color_back'], Colors.grey.shade300),
+                                  borderRadius: BorderRadius.circular(3),
+                                ),
+                                child: OneLineShrinkText(
+                                  (n['tag_main_title'] ?? '').toString(),
+                                  baseSize: 12,
+                                  minSize: 8,
+                                  color: parse(n['tag_main_color_font'], Colors.white),
+                                  align: TextAlign.center,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              // サブタグ
+                              Container(
+                                width: tagW,
+                                alignment: Alignment.center,
+                                constraints: const BoxConstraints(minHeight: tagH),
+                                padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+                                decoration: BoxDecoration(
+                                  color: parse(n['tag_sub_color_back'], Colors.grey.shade300),
+                                  borderRadius: BorderRadius.circular(3),
+                                ),
+                                child: OneLineShrinkText(
+                                  (n['tag_sub_title'] ?? '').toString(),
+                                  baseSize: 12,
+                                  minSize: 8,
+                                  color: parse(n['tag_sub_color_font'], Colors.white),
+                                  align: TextAlign.center,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              // タイトル
+                              Expanded(
+                                child: OneLineShrinkText(
+                                  (n['title'] ?? '').toString(),
+                                  baseSize: 12,
+                                  minSize: 8,
+                                  align: TextAlign.left,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              // 既読/未読ボタン
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: (n['flg_read'] == true) ? Colors.grey : Colors.orange,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  (n['flg_read'] == true) ? '既読' : '未読',
+                                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       );
     }
 
-    Widget _eventsBox({double? width}) {
+    Widget _eventsBox() {
       final evs = [...events];
-      evs.sort((a, b) => (a['date_from_temp'] ?? '')
-          .toString()
-          .compareTo((b['date_from_temp'] ?? '').toString()));
+      evs.sort((a, b) => (a['date_from_temp'] ?? '').toString().compareTo((b['date_from_temp'] ?? '').toString()));
 
       Color parse(String? name, Color fallback) {
         final n = (name ?? '').toLowerCase().trim();
@@ -623,9 +572,7 @@ class _PredictionPageState extends State<PredictionPage> {
                   color: Colors.black,
                   borderRadius: BorderRadius.circular(3),
                 ),
-                child: const Text('イベント日程',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white)),
+                child: const Text('イベント日程', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
               ),
             ),
             Expanded(
@@ -658,13 +605,11 @@ class _PredictionPageState extends State<PredictionPage> {
                     const double minDate = 48;
                     final double fixedCats = catW * 2;
                     double titleColW = rawMaxTitleW;
-                    final maxAllowed =
-                        constraints.maxWidth - fixedCats - spacing - minDate;
+                    final maxAllowed = constraints.maxWidth - fixedCats - spacing - minDate;
                     if (titleColW > maxAllowed) titleColW = maxAllowed;
                     if (titleColW < 60) titleColW = 60;
 
-                    double dateMaxW =
-                        constraints.maxWidth - fixedCats - spacing - titleColW;
+                    double dateMaxW = constraints.maxWidth - fixedCats - spacing - titleColW;
                     if (dateMaxW < minDate) dateMaxW = minDate;
 
                     return SingleChildScrollView(
@@ -680,19 +625,16 @@ class _PredictionPageState extends State<PredictionPage> {
                                 Container(
                                   width: catW,
                                   alignment: Alignment.center,
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 2, horizontal: 4),
+                                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
                                   decoration: BoxDecoration(
-                                    color: parse(e['event_category_color_back'],
-                                        Colors.grey.shade300),
+                                    color: parse(e['event_category_color_back'], Colors.grey.shade300),
                                     borderRadius: BorderRadius.circular(3),
                                   ),
                                   child: OneLineShrinkText(
                                     (e['event_category'] ?? '').toString(),
                                     baseSize: 12,
                                     minSize: 8,
-                                    color: parse(e['event_category_color_font'],
-                                        Colors.white),
+                                    color: parse(e['event_category_color_font'], Colors.white),
                                     align: TextAlign.center,
                                   ),
                                 ),
@@ -701,21 +643,16 @@ class _PredictionPageState extends State<PredictionPage> {
                                 Container(
                                   width: catW,
                                   alignment: Alignment.center,
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 2, horizontal: 4),
+                                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
                                   decoration: BoxDecoration(
-                                    color: parse(
-                                        e['event_category_sub_color_back'],
-                                        Colors.grey.shade300),
+                                    color: parse(e['event_category_sub_color_back'], Colors.grey.shade300),
                                     borderRadius: BorderRadius.circular(3),
                                   ),
                                   child: OneLineShrinkText(
                                     (e['event_category_sub'] ?? '').toString(),
                                     baseSize: 12,
                                     minSize: 8,
-                                    color: parse(
-                                        e['event_category_sub_color_font'],
-                                        Colors.white),
+                                    color: parse(e['event_category_sub_color_font'], Colors.white),
                                     align: TextAlign.center,
                                   ),
                                 ),
@@ -724,35 +661,28 @@ class _PredictionPageState extends State<PredictionPage> {
                                 SizedBox(
                                   width: titleColW,
                                   child: Builder(builder: (context) {
-                                    final String title =
-                                        (e['title_event'] ?? '').toString();
+                                    final String title = (e['title_event'] ?? '').toString();
                                     final bool isToday = e['flg_today'] == true;
                                     final double tw = measureTextWidth(title);
-                                    final double frac =
-                                        (tw / titleColW).clamp(0.0, 1.0);
+                                    final double frac = (tw / titleColW).clamp(0.0, 1.0);
                                     final BoxDecoration? deco = isToday
                                         ? BoxDecoration(
                                             gradient: LinearGradient(
                                               colors: [
-                                                Colors.yellowAccent
-                                                    .withOpacity(1.0),
-                                                Colors.yellowAccent
-                                                    .withOpacity(1.0),
-                                                Colors.yellowAccent
-                                                    .withOpacity(0.0),
+                                                Colors.yellowAccent.withOpacity(1.0),
+                                                Colors.yellowAccent.withOpacity(1.0),
+                                                Colors.yellowAccent.withOpacity(0.0),
                                               ],
                                               stops: [0.0, frac, 1.0],
                                               begin: Alignment.centerLeft,
                                               end: Alignment.centerRight,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(3),
+                                            borderRadius: BorderRadius.circular(3),
                                           )
                                         : null;
                                     return Container(
                                       decoration: deco,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 0, vertical: 0),
+                                      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                                       child: OneLineShrinkText(
                                         title,
                                         baseSize: 12,
@@ -762,11 +692,10 @@ class _PredictionPageState extends State<PredictionPage> {
                                     );
                                   }),
                                 ),
-                                const SizedBox(width: 4),
+                                const SizedBox(width: 2),
                                 // 日付（左詰め・最小/最大幅内で縮小）
-                                ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                      minWidth: minDate, maxWidth: dateMaxW),
+                                Expanded(
+                                  // constraints: BoxConstraints(minWidth: minDate, maxWidth: dateMaxW),
                                   child: Align(
                                     alignment: Alignment.centerLeft,
                                     child: OneLineShrinkText(
@@ -782,7 +711,7 @@ class _PredictionPageState extends State<PredictionPage> {
                         ],
                       ),
                     );
-                  },
+                  }, //builder
                 ),
               ),
             ),
@@ -790,29 +719,26 @@ class _PredictionPageState extends State<PredictionPage> {
         ),
       );
 
-      return width != null
-          ? SizedBox(width: width, child: content)
-          : Expanded(child: content);
+      return content;
     }
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final double totalW = constraints.maxWidth;
-        const double gamesFraction = 3 / 8;
-        // 下段の構成に合わせて算出:
-        // リーグ名左端(4) → リーグ名幅(36) → ギャップ(2) → 予想(Expanded 2/8, ただし内部の縦Divider 8+8 を控除)
-        // 上段は左右に 8px のパディングがあるため、左側 8px を引く
-        // 下段の実寸と一致させるため、全体幅 W と上段の有効幅 w_top の差(左右8px)を反映
-        // 下段距離: 0.25 * W + 24.5, ここで W = w_top + 16
-        // よって scoreW = 0.25 * (w_top + 16) + 24.5 = 0.25 * w_top + 28.5
-        final double scoreW = (totalW * 0.25) + 28.5;
-        final double eventsW = totalW * gamesFraction;
         return Row(children: [
-          _scoreBox(scoreW.clamp(0, totalW)),
-          const SizedBox(width: 8),
-          _newsBox(),
-          const SizedBox(width: 8),
-          _eventsBox(width: eventsW),
+          Expanded(
+            flex: ALL_RATIO_BLOCK_W[0] + ALL_RATIO_BLOCK_W[1],
+            child: _scoreBox(),
+          ),
+          const SizedBox(width: 5),
+          Expanded(
+            flex: ALL_RATIO_BLOCK_W[2],
+            child: _newsBox(),
+          ),
+          const SizedBox(width: 5),
+          Expanded(
+            flex: ALL_RATIO_BLOCK_W[3],
+            child: _eventsBox(),
+          ),
         ]);
       },
     );
@@ -828,8 +754,7 @@ class _PredictionPageState extends State<PredictionPage> {
         border: Border.all(color: Colors.black45),
         borderRadius: BorderRadius.circular(4),
       ),
-      child: Text('$n',
-          style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
+      child: Text('$n', style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
     );
   }
 
@@ -854,7 +779,7 @@ class _PredictionPageState extends State<PredictionPage> {
             child: ConstrainedBox(
               constraints: BoxConstraints.tightFor(width: designWidth),
               child: Padding(
-                padding: const EdgeInsets.only(bottom: 8),
+                padding: EdgeInsets.only(bottom: ALL_SPACE_BLOCK, left: ALL_MARGIN_LEFT, right: ALL_MARGIN_LEFT),
                 child: SizedBox(
                   height: constraints.maxHeight,
                   child: Column(
@@ -863,283 +788,191 @@ class _PredictionPageState extends State<PredictionPage> {
                       // ─────────────────────────────────────────────
                       // ヘッダー（タブ / News / Score / イベント）
                       // ─────────────────────────────────────────────
-                      _globalHeader(),
-                      const SizedBox(height: 2),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: _tabsBar(),
-                      ),
-                      const SizedBox(height: 2),
+                      Headers.globalHeader(HEADER_GLOBAL_H, ALL_COLOR_APP, HEADER_TITLE, HEADER_PAD_VERTICAL, ALL_MARGIN_LEFT),
+                      SizedBox(height: ALL_SPACE_BLOCK),
+                      Tabs.tabsBar(TAB_TITLES, TAB_BAR_H, ALL_COLOR_APP, TAB_COLOR_FONT, TAB_RADIUS, ALL_MARGIN_LEFT, TAB_PAD_HORIZONTAL, TAB_PAD_VERTICAL),
+                      SizedBox(height: ALL_SPACE_BLOCK),
                       Expanded(
-                        flex: 3,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: _scoreNewsEventsRow(),
-                        ),
+                        flex: ALL_RATIO_BLOCK_H[0],
+                        child: _scoreNewsEventsRow(),
                       ),
-                      const SizedBox(height: 2),
-                      // 1行目: セ・リーグ（比率 2）
+                      SizedBox(height: ALL_SPACE_BLOCK),
                       Expanded(
-                        flex: 11,
+                        flex: ALL_RATIO_BLOCK_H[1],
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             // サイドヘッダー（リーグ名）
-                            Container(
-                              width: 36,
-                              margin: const EdgeInsets.only(left: 4, right: 0),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF0B8F3A),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Center(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 4, bottom: 4),
-                                      child: Image.asset(
-                                        'assets/images/logo_league_central.webp',
-                                        width: 20,
-                                        height: 20,
-                                        fit: BoxFit.contain,
-                                        errorBuilder: (_, __, ___) =>
-                                            const SizedBox(height: 20),
-                                      ),
-                                    ),
-                                    const Text('セ',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold)),
-                                    const Text('・',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold)),
-                                    const Text('リ',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold)),
-                                    const Text('|',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold)),
-                                    const Text('グ',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold)),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 2),
                             Expanded(
-                              child: Row(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
+                              child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                                Expanded(
+                                    flex: ALL_RATIO_BLOCK_W[0],
+                                    child: Container(
+                                      // width: 36,
+                                      margin: const EdgeInsets.only(right: 2),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF0B8F3A),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Center(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 4, bottom: 4),
+                                              child: Image.asset(
+                                                'assets/images/logo_league_central.webp',
+                                                width: 20,
+                                                height: 20,
+                                                fit: BoxFit.contain,
+                                                errorBuilder: (_, __, ___) => const SizedBox(height: 20),
+                                              ),
+                                            ),
+                                            const Text('セ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                            const Text('・', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                            const Text('リ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                            const Text('|', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                            const Text('グ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                          ],
+                                        ),
+                                      ),
+                                    )),
+                                Expanded(
+                                  flex: ALL_RATIO_BLOCK_W[1],
+                                  child: UnifiedGrid(
+                                    predictions: predictions,
+                                    standings: standings,
+                                    npbPlayerStats: npbPlayerStats,
+                                    usernameForId: _usernameForId,
+                                    userNameFromPredictions: _userNameFromPredictions,
+                                    compact: compact,
+                                    onlyLeagueId: 1,
+                                  ),
+                                ),
+                                // const VerticalDivider(width: 8, thickness: 0.0),
+                                SizedBox(width: ALL_SPACE_BLOCK),
+                                Expanded(
+                                  flex: ALL_RATIO_BLOCK_W[2],
+                                  child: SeasonTableBlock(
+                                    standings: standings,
+                                    stats: npbPlayerStatsActual,
+                                    onlyLeagueId: 1,
+                                  ),
+                                ),
+                                SizedBox(width: ALL_SPACE_BLOCK),
+                                Expanded(
+                                  flex: ALL_RATIO_BLOCK_W[3],
+                                  child: Row(children: [
                                     Expanded(
-                                      flex: 2,
-                                      child: _UnifiedGrid(
-                                        predictions: predictions,
-                                        standings: standings,
-                                        npbPlayerStats: npbPlayerStats,
-                                        usernameForId: _usernameForId,
-                                        userNameFromPredictions:
-                                            _userNameFromPredictions,
-                                        compact: compact,
-                                        onlyLeagueId: 1,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                        children: [
+                                          Container(
+                                            alignment: Alignment.center,
+                                            margin: const EdgeInsets.symmetric(horizontal: 6),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF0B8F3A),
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: Text('昨日  ${_jaDateWithOffset(-1)}', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                                          ),
+                                          const SizedBox(height: 6),
+                                          SizedBox(
+                                            height: 340,
+                                            child: GamesBoardYahooStyle(
+                                              games: games.where((g) => (int.tryParse('${g['id_league_home']}') ?? 0) == 1 && (int.tryParse('${g['id_league_away']}') ?? 0) == 1).toList(),
+                                              dateFilter: _ymdWithOffset(-1),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    const VerticalDivider(
-                                        width: 8, thickness: 0.5),
-                                    Expanded(
-                                      flex: 3,
-                                      child: SeasonTableBlock(
-                                        standings: standings,
-                                        stats: npbPlayerStatsActual,
-                                        onlyLeagueId: 1,
+                                    const SizedBox(width: 2),
+                                    SizedBox(
+                                      width: 1,
+                                      child: Container(
+                                        color: Colors.black26,
                                       ),
                                     ),
-                                    const VerticalDivider(
-                                        width: 8, thickness: 0.5),
+                                    const SizedBox(width: 3),
                                     Expanded(
-                                      flex: 3,
-                                      child: Row(children: [
-                                        Expanded(
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
-                                            children: [
-                                              Container(
-                                                alignment: Alignment.center,
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 6),
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      const Color(0xFF0B8F3A),
-                                                  borderRadius:
-                                                      BorderRadius.circular(6),
-                                                ),
-                                                child: Text(
-                                                    '昨日  ${_jaDateWithOffset(-1)}',
-                                                    textAlign: TextAlign.center,
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white)),
-                                              ),
-                                              const SizedBox(height: 6),
-                                              SizedBox(
-                                                height: 340,
-                                                child: GamesBoardYahooStyle(
-                                                  games: games
-                                                      .where((g) =>
-                                                          (int.tryParse(
-                                                                      '${g['id_league_home']}') ??
-                                                                  0) ==
-                                                              1 &&
-                                                          (int.tryParse(
-                                                                      '${g['id_league_away']}') ??
-                                                                  0) ==
-                                                              1)
-                                                      .toList(),
-                                                  dateFilter:
-                                                      _ymdWithOffset(-1),
-                                                ),
-                                              ),
-                                            ],
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                        children: [
+                                          Container(
+                                            alignment: Alignment.center,
+                                            margin: const EdgeInsets.symmetric(horizontal: 6),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF0B8F3A),
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: Text('今日  ${_jaDateWithOffset(0)}', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                                           ),
-                                        ),
-                                        const SizedBox(width: 2),
-                                        SizedBox(
-                                          width: 1,
-                                          child: Container(
-                                            color: Colors.black26,
+                                          const SizedBox(height: 6),
+                                          SizedBox(
+                                            height: 340,
+                                            child: GamesBoardYahooStyle(
+                                              games: games.where((g) => (int.tryParse('${g['id_league_home']}') ?? 0) == 1 && (int.tryParse('${g['id_league_away']}') ?? 0) == 1).toList(),
+                                              dateFilter: _ymdWithOffset(0),
+                                            ),
                                           ),
-                                        ),
-                                        const SizedBox(width: 3),
-                                        Expanded(
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
-                                            children: [
-                                              Container(
-                                                alignment: Alignment.center,
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 6),
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      const Color(0xFF0B8F3A),
-                                                  borderRadius:
-                                                      BorderRadius.circular(6),
-                                                ),
-                                                child: Text(
-                                                    '今日  ${_jaDateWithOffset(0)}',
-                                                    textAlign: TextAlign.center,
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white)),
-                                              ),
-                                              const SizedBox(height: 6),
-                                              SizedBox(
-                                                height: 340,
-                                                child: GamesBoardYahooStyle(
-                                                  games: games
-                                                      .where((g) =>
-                                                          (int.tryParse(
-                                                                      '${g['id_league_home']}') ??
-                                                                  0) ==
-                                                              1 &&
-                                                          (int.tryParse(
-                                                                      '${g['id_league_away']}') ??
-                                                                  0) ==
-                                                              1)
-                                                      .toList(),
-                                                  dateFilter: _ymdWithOffset(0),
-                                                ),
-                                              ),
-                                            ],
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 2),
+                                    SizedBox(
+                                      width: 1,
+                                      child: Container(
+                                        color: Colors.black26,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 3),
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                        children: [
+                                          Container(
+                                            alignment: Alignment.center,
+                                            margin: const EdgeInsets.symmetric(horizontal: 6),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF0B8F3A),
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: Text('明日  ${_jaDateWithOffset(1)}', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                                           ),
-                                        ),
-                                        const SizedBox(width: 2),
-                                        SizedBox(
-                                          width: 1,
-                                          child: Container(
-                                            color: Colors.black26,
+                                          const SizedBox(height: 6),
+                                          SizedBox(
+                                            height: 340,
+                                            child: GamesBoardYahooStyle(
+                                              games: games.where((g) => (int.tryParse('${g['id_league_home']}') ?? 0) == 1 && (int.tryParse('${g['id_league_away']}') ?? 0) == 1).toList(),
+                                              dateFilter: _ymdWithOffset(1),
+                                            ),
                                           ),
-                                        ),
-                                        const SizedBox(width: 3),
-                                        Expanded(
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
-                                            children: [
-                                              Container(
-                                                alignment: Alignment.center,
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 6),
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      const Color(0xFF0B8F3A),
-                                                  borderRadius:
-                                                      BorderRadius.circular(6),
-                                                ),
-                                                child: Text(
-                                                    '明日  ${_jaDateWithOffset(1)}',
-                                                    textAlign: TextAlign.center,
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white)),
-                                              ),
-                                              const SizedBox(height: 6),
-                                              SizedBox(
-                                                height: 340,
-                                                child: GamesBoardYahooStyle(
-                                                  games: games
-                                                      .where((g) =>
-                                                          (int.tryParse(
-                                                                      '${g['id_league_home']}') ??
-                                                                  0) ==
-                                                              1 &&
-                                                          (int.tryParse(
-                                                                      '${g['id_league_away']}') ??
-                                                                  0) ==
-                                                              1)
-                                                      .toList(),
-                                                  dateFilter: _ymdWithOffset(1),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ]),
+                                        ],
+                                      ),
                                     ),
                                   ]),
+                                ),
+                              ]),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: ALL_SPACE_BLOCK),
                       // 2行目: パ・リーグ（比率 2）
                       Expanded(
-                        flex: 11,
+                        flex: ALL_RATIO_BLOCK_H[1],
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             // サイドヘッダー（リーグ名）
                             Container(
                               width: 36,
-                              margin: const EdgeInsets.only(left: 4, right: 0),
+                              margin: const EdgeInsets.only(left: 0, right: 0),
                               decoration: BoxDecoration(
                                 color: const Color(0xFF4DB5E8),
                                 borderRadius: BorderRadius.circular(4),
@@ -1150,226 +983,139 @@ class _PredictionPageState extends State<PredictionPage> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 4, bottom: 4),
+                                      padding: const EdgeInsets.only(top: 4, bottom: 4),
                                       child: Image.asset(
                                         'assets/images/logo_league_pacific.png',
                                         width: 22,
                                         height: 22,
                                         fit: BoxFit.contain,
-                                        errorBuilder: (_, __, ___) =>
-                                            const SizedBox(height: 22),
+                                        errorBuilder: (_, __, ___) => const SizedBox(height: 22),
                                       ),
                                     ),
-                                    const Text('パ',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold)),
-                                    const Text('・',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold)),
-                                    const Text('リ',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold)),
-                                    const Text('|',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold)),
-                                    const Text('グ',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold)),
+                                    const Text('パ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                    const Text('・', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                    const Text('リ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                    const Text('|', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                    const Text('グ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                                   ],
                                 ),
                               ),
                             ),
                             const SizedBox(width: 2),
                             Expanded(
-                              child: Row(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
+                              child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: UnifiedGrid(
+                                    predictions: predictions,
+                                    standings: standings,
+                                    npbPlayerStats: npbPlayerStats,
+                                    usernameForId: _usernameForId,
+                                    userNameFromPredictions: _userNameFromPredictions,
+                                    compact: compact,
+                                    onlyLeagueId: 2,
+                                  ),
+                                ),
+                                const VerticalDivider(width: 8, thickness: 0.5),
+                                Expanded(
+                                  flex: 3,
+                                  child: SeasonTableBlock(
+                                    standings: standings,
+                                    stats: npbPlayerStatsActual,
+                                    onlyLeagueId: 2,
+                                  ),
+                                ),
+                                const VerticalDivider(width: 8, thickness: 0.5),
+                                Expanded(
+                                  flex: 3,
+                                  child: Row(children: [
                                     Expanded(
-                                      flex: 2,
-                                      child: _UnifiedGrid(
-                                        predictions: predictions,
-                                        standings: standings,
-                                        npbPlayerStats: npbPlayerStats,
-                                        usernameForId: _usernameForId,
-                                        userNameFromPredictions:
-                                            _userNameFromPredictions,
-                                        compact: compact,
-                                        onlyLeagueId: 2,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                        children: [
+                                          Container(
+                                            alignment: Alignment.center,
+                                            margin: const EdgeInsets.symmetric(horizontal: 6),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF4DB5E8),
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: Text('昨日  ${_jaDateWithOffset(-1)}', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                                          ),
+                                          const SizedBox(height: 6),
+                                          SizedBox(
+                                            height: 340,
+                                            child: GamesBoardYahooStyle(
+                                              games: games.where((g) => (int.tryParse('${g['id_league_home']}') ?? 0) == 2 && (int.tryParse('${g['id_league_away']}') ?? 0) == 2).toList(),
+                                              dateFilter: _ymdWithOffset(-1),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    const VerticalDivider(
-                                        width: 8, thickness: 0.5),
-                                    Expanded(
-                                      flex: 3,
-                                      child: SeasonTableBlock(
-                                        standings: standings,
-                                        stats: npbPlayerStatsActual,
-                                        onlyLeagueId: 2,
+                                    const SizedBox(width: 2),
+                                    SizedBox(
+                                      width: 1,
+                                      child: Container(
+                                        color: Colors.black26,
                                       ),
                                     ),
-                                    const VerticalDivider(
-                                        width: 8, thickness: 0.5),
+                                    const SizedBox(width: 3),
                                     Expanded(
-                                      flex: 3,
-                                      child: Row(children: [
-                                        Expanded(
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
-                                            children: [
-                                              Container(
-                                                alignment: Alignment.center,
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 6),
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      const Color(0xFF4DB5E8),
-                                                  borderRadius:
-                                                      BorderRadius.circular(6),
-                                                ),
-                                                child: Text(
-                                                    '昨日  ${_jaDateWithOffset(-1)}',
-                                                    textAlign: TextAlign.center,
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white)),
-                                              ),
-                                              const SizedBox(height: 6),
-                                              SizedBox(
-                                                height: 340,
-                                                child: GamesBoardYahooStyle(
-                                                  games: games
-                                                      .where((g) =>
-                                                          (int.tryParse(
-                                                                      '${g['id_league_home']}') ??
-                                                                  0) ==
-                                                              2 &&
-                                                          (int.tryParse(
-                                                                      '${g['id_league_away']}') ??
-                                                                  0) ==
-                                                              2)
-                                                      .toList(),
-                                                  dateFilter:
-                                                      _ymdWithOffset(-1),
-                                                ),
-                                              ),
-                                            ],
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                        children: [
+                                          Container(
+                                            alignment: Alignment.center,
+                                            margin: const EdgeInsets.symmetric(horizontal: 6),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF4DB5E8),
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: Text('今日  ${_jaDateWithOffset(0)}', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                                           ),
-                                        ),
-                                        const SizedBox(width: 2),
-                                        SizedBox(
-                                          width: 1,
-                                          child: Container(
-                                            color: Colors.black26,
+                                          const SizedBox(height: 6),
+                                          SizedBox(
+                                            height: 340,
+                                            child: GamesBoardYahooStyle(
+                                              games: games.where((g) => (int.tryParse('${g['id_league_home']}') ?? 0) == 2 && (int.tryParse('${g['id_league_away']}') ?? 0) == 2).toList(),
+                                              dateFilter: _ymdWithOffset(0),
+                                            ),
                                           ),
-                                        ),
-                                        const SizedBox(width: 3),
-                                        Expanded(
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
-                                            children: [
-                                              Container(
-                                                alignment: Alignment.center,
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 6),
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      const Color(0xFF4DB5E8),
-                                                  borderRadius:
-                                                      BorderRadius.circular(6),
-                                                ),
-                                                child: Text(
-                                                    '今日  ${_jaDateWithOffset(0)}',
-                                                    textAlign: TextAlign.center,
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white)),
-                                              ),
-                                              const SizedBox(height: 6),
-                                              SizedBox(
-                                                height: 340,
-                                                child: GamesBoardYahooStyle(
-                                                  games: games
-                                                      .where((g) =>
-                                                          (int.tryParse(
-                                                                      '${g['id_league_home']}') ??
-                                                                  0) ==
-                                                              2 &&
-                                                          (int.tryParse(
-                                                                      '${g['id_league_away']}') ??
-                                                                  0) ==
-                                                              2)
-                                                      .toList(),
-                                                  dateFilter: _ymdWithOffset(0),
-                                                ),
-                                              ),
-                                            ],
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                        children: [
+                                          Container(
+                                            alignment: Alignment.center,
+                                            margin: const EdgeInsets.symmetric(horizontal: 6),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF4DB5E8),
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: Text('明日  ${_jaDateWithOffset(1)}', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                                           ),
-                                        ),
-                                        const SizedBox(width: 6),
-                                        Expanded(
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
-                                            children: [
-                                              Container(
-                                                alignment: Alignment.center,
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 6),
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      const Color(0xFF4DB5E8),
-                                                  borderRadius:
-                                                      BorderRadius.circular(6),
-                                                ),
-                                                child: Text(
-                                                    '明日  ${_jaDateWithOffset(1)}',
-                                                    textAlign: TextAlign.center,
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white)),
-                                              ),
-                                              const SizedBox(height: 6),
-                                              SizedBox(
-                                                height: 340,
-                                                child: GamesBoardYahooStyle(
-                                                  games: games
-                                                      .where((g) =>
-                                                          (int.tryParse(
-                                                                      '${g['id_league_home']}') ??
-                                                                  0) ==
-                                                              2 &&
-                                                          (int.tryParse(
-                                                                      '${g['id_league_away']}') ??
-                                                                  0) ==
-                                                              2)
-                                                      .toList(),
-                                                  dateFilter: _ymdWithOffset(1),
-                                                ),
-                                              ),
-                                            ],
+                                          const SizedBox(height: 6),
+                                          SizedBox(
+                                            height: 340,
+                                            child: GamesBoardYahooStyle(
+                                              games: games.where((g) => (int.tryParse('${g['id_league_home']}') ?? 0) == 2 && (int.tryParse('${g['id_league_away']}') ?? 0) == 2).toList(),
+                                              dateFilter: _ymdWithOffset(1),
+                                            ),
                                           ),
-                                        ),
-                                      ]),
+                                        ],
+                                      ),
                                     ),
                                   ]),
+                                ),
+                              ]),
                             ),
                           ],
                         ),
@@ -1409,8 +1155,7 @@ class _DaySwitcher extends StatelessWidget {
               color: selected ? Colors.deepPurple : Colors.grey.shade300,
               width: selected ? 1.5 : 1,
             ),
-            backgroundColor:
-                selected ? Colors.deepPurple.withOpacity(0.06) : null,
+            backgroundColor: selected ? Colors.deepPurple.withOpacity(0.06) : null,
           ),
           onPressed: () => onChanged(value),
           child: Text(
@@ -1439,122 +1184,6 @@ class _DaySwitcher extends StatelessWidget {
 
 /// セル幅に合わせて1行自動縮小（省略記号なし）
 
-// After
-class OneLineShrinkText extends StatelessWidget {
-  final String text;
-  final double baseSize;
-  final double minSize;
-  final FontWeight? weight;
-  final TextAlign align;
-  final Color? color;
-  final double verticalPadding;
-  final bool fast; // if true, use FittedBox(BoxFit.scaleDown)
-  final List<Shadow>? shadows;
-
-  const OneLineShrinkText(
-    this.text, {
-    super.key,
-    this.baseSize = 12,
-    this.minSize = 1,
-    this.weight,
-    this.align = TextAlign.center,
-    this.color,
-    this.verticalPadding = 0,
-    this.fast = true,
-    this.shadows,
-  });
-
-  Alignment _toAlignment(TextAlign a) {
-    switch (a) {
-      case TextAlign.left:
-      case TextAlign.start:
-        return Alignment.centerLeft;
-      case TextAlign.right:
-      case TextAlign.end:
-        return Alignment.centerRight;
-      case TextAlign.center:
-      default:
-        return Alignment.center;
-    }
-  }
-
-  bool _fits(String t, double size, double maxW, double maxH) {
-    final tp = TextPainter(
-      text: TextSpan(
-          text: t, style: TextStyle(fontSize: size, fontWeight: weight)),
-      maxLines: 1,
-      textDirection: TextDirection.ltr,
-    )..layout(maxWidth: maxW.isFinite && maxW > 0 ? maxW : double.infinity);
-    final w = tp.size.width;
-    final h = tp.size.height;
-    final okW = !(maxW.isFinite && maxW > 0) || w <= maxW + 0.5;
-    final okH = !(maxH.isFinite && maxH > 0) || h <= maxH + 0.5;
-    return okW && okH;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (fast) {
-      return Padding(
-        padding: EdgeInsets.symmetric(vertical: verticalPadding * 0.5),
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          alignment: _toAlignment(align),
-          child: Text(
-            text.isNotEmpty ? text : '—',
-            maxLines: 1,
-            softWrap: false,
-            overflow: TextOverflow.visible,
-            textAlign: align,
-            style: TextStyle(
-                fontSize: baseSize,
-                fontWeight: weight,
-                color: color,
-                shadows: shadows),
-          ),
-        ),
-      );
-    }
-
-    return LayoutBuilder(builder: (context, constraints) {
-      final maxW = constraints.maxWidth;
-      final maxH = constraints.maxHeight.isFinite
-          ? (constraints.maxHeight - verticalPadding)
-              .clamp(0.0, constraints.maxHeight)
-          : constraints.maxHeight;
-
-      double lo = minSize;
-      double hi = baseSize;
-      double chosen = baseSize;
-
-      if ((maxW.isFinite && maxW > 0) || (maxH.isFinite && maxH > 0)) {
-        for (int i = 0; i < 12; i++) {
-          final mid = (lo + hi) / 2;
-          if (_fits(text, mid, maxW, maxH)) {
-            chosen = mid;
-            lo = mid;
-          } else {
-            hi = mid;
-          }
-        }
-      }
-
-      return Text(
-        text.isNotEmpty ? text : '—',
-        maxLines: 1,
-        softWrap: false,
-        overflow: TextOverflow.clip,
-        textAlign: align,
-        style: TextStyle(
-            fontSize: chosen,
-            fontWeight: weight,
-            color: color,
-            shadows: shadows),
-      );
-    });
-  }
-}
-
 /// 右ペイン：スコア状況（JSONはすべて文字列で扱う）
 class GamesBoardYahooStyle extends StatelessWidget {
   final List<Map<String, dynamic>> games;
@@ -1582,11 +1211,7 @@ class GamesBoardYahooStyle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final src = (dateFilter == null || dateFilter!.isEmpty)
-        ? games
-        : games
-            .where((g) => (g['date_game']?.toString() ?? '') == dateFilter)
-            .toList();
+    final src = (dateFilter == null || dateFilter!.isEmpty) ? games : games.where((g) => (g['date_game']?.toString() ?? '') == dateFilter).toList();
 
     final bySec = <String, List<Map<String, dynamic>>>{};
     for (final g in src) {
@@ -1595,14 +1220,12 @@ class GamesBoardYahooStyle extends StatelessWidget {
     }
 
     if (bySec.isEmpty) {
-      return const Center(
-          child: Text('試合はありません', style: TextStyle(fontSize: 12)));
+      return const Center(child: Text('試合はありません', style: TextStyle(fontSize: 12)));
     }
 
     return LayoutBuilder(builder: (context, c) {
       final bySecKeys = bySec.keys.toSet();
-      final order =
-          ['セ・リーグ', 'パ・リーグ'].where((k) => bySecKeys.contains(k)).toList();
+      final order = ['セ・リーグ', 'パ・リーグ'].where((k) => bySecKeys.contains(k)).toList();
 
       Widget threeRows(List<Map<String, dynamic>> list) {
         final g0 = list.isNotEmpty ? list[0] : null;
@@ -1651,9 +1274,7 @@ class _LeagueHeader extends StatelessWidget {
       ),
       alignment: Alignment.centerLeft,
       padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Text(label,
-          style: const TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold)),
+      child: Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
     );
   }
 }
@@ -1679,15 +1300,9 @@ class _GameCard extends StatelessWidget {
 
   int get _idTeamHome => int.tryParse('${g['id_team_home']}') ?? -1;
   int get _idTeamAway => int.tryParse('${g['id_team_away']}') ?? -1;
-  int? get _idTeamPitchWin => g['id_team_pitcher_win'] == null
-      ? null
-      : int.tryParse('${g['id_team_pitcher_win']}');
-  int? get _idTeamPitchLose => g['id_team_pitcher_lose'] == null
-      ? null
-      : int.tryParse('${g['id_team_pitcher_lose']}');
-  int? get _idTeamPitchSave => g['id_team_pitcher_save'] == null
-      ? null
-      : int.tryParse('${g['id_team_pitcher_save']}');
+  int? get _idTeamPitchWin => g['id_team_pitcher_win'] == null ? null : int.tryParse('${g['id_team_pitcher_win']}');
+  int? get _idTeamPitchLose => g['id_team_pitcher_lose'] == null ? null : int.tryParse('${g['id_team_pitcher_lose']}');
+  int? get _idTeamPitchSave => g['id_team_pitcher_save'] == null ? null : int.tryParse('${g['id_team_pitcher_save']}');
 
   int _parseScore(String s) => int.tryParse(s.trim()) ?? -1;
 
@@ -1746,8 +1361,7 @@ class _GameCard extends StatelessWidget {
       final double nameChipH = (baseMid + 6).clamp(18.0, 24.0);
 
       // チーム名セルの横幅（カード幅の約2/5）
-      final double teamNameW =
-          (c.maxWidth.isFinite ? c.maxWidth : 300.0) * 2.0 / 5.0;
+      final double teamNameW = (c.maxWidth.isFinite ? c.maxWidth : 300.0) * 2.0 / 5.0;
 
       // カード背景: ホーム/アウェイ色で二分割グラデーション
       Color? _teamColor(String? name) {
@@ -1804,8 +1418,7 @@ class _GameCard extends StatelessWidget {
               // 左: frac → 0.5 まで徐々に透明へ
               for (int i = 1; i <= steps; i++) {
                 final double t = i / steps; // 0→1
-                final double pos =
-                    fracSolid + (0.5 - fracSolid) * t; // 左ベタ終端→中央
+                final double pos = fracSolid + (0.5 - fracSolid) * t; // 左ベタ終端→中央
                 final double opacity = (1.0 - t); // 1→0 線形
                 gColors.add(homeBg.withOpacity(opacity));
                 gStops.add(pos.clamp(0.0, 0.5));
@@ -1820,8 +1433,7 @@ class _GameCard extends StatelessWidget {
               // 右: 0.5 → (1-frac) で徐々に色を濃く
               for (int i = 1; i <= steps; i++) {
                 final double t = i / steps; // 0→1
-                final double pos =
-                    0.5 + (0.5 - fracSolid) * t; // 0.5→(1-fracSolid)
+                final double pos = 0.5 + (0.5 - fracSolid) * t; // 0.5→(1-fracSolid)
                 final double opacity = t; // 中央から外側へ行くほど濃く
                 gColors.add(awayBg.withOpacity(opacity));
                 gStops.add(pos.clamp(0.5, 1.0));
@@ -1901,11 +1513,7 @@ class _GameCard extends StatelessWidget {
           height: d,
           decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
           alignment: Alignment.center,
-          child: Text(label,
-              style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: rowFont)),
+          child: Text(label, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: rowFont)),
         );
       }
 
@@ -1925,8 +1533,7 @@ class _GameCard extends StatelessWidget {
                     width: stadiumW,
                     child: Container(
                       margin: const EdgeInsets.only(left: 2, top: 2),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: homeNameBg,
                         borderRadius: BorderRadius.circular(3),
@@ -1945,8 +1552,7 @@ class _GameCard extends StatelessWidget {
                     child: Align(
                       alignment: Alignment.topRight,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           color: awayNameBg,
                           borderRadius: BorderRadius.circular(3),
@@ -1983,18 +1589,11 @@ class _GameCard extends StatelessWidget {
                                   color: null,
                                   borderRadius: BorderRadius.circular(4),
                                 ),
-                                constraints:
-                                    BoxConstraints(minHeight: nameChipH2),
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4),
+                                constraints: BoxConstraints(minHeight: nameChipH2),
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
                                 alignment: Alignment.center,
                                 width: double.infinity,
-                                child: OneLineShrinkText(_home,
-                                    baseSize: baseMid,
-                                    minSize: 8,
-                                    weight: FontWeight.w600,
-                                    color: homeNameFg ?? Colors.black87,
-                                    align: TextAlign.center),
+                                child: OneLineShrinkText(_home, baseSize: baseMid, minSize: 8, weight: FontWeight.w600, color: homeNameFg ?? Colors.black87, align: TextAlign.center),
                               )),
                           if (_pHome.isNotEmpty)
                             Padding(
@@ -2004,12 +1603,8 @@ class _GameCard extends StatelessWidget {
                                 colorsRaw: _cPitchHome,
                                 baseSize: baseSmall,
                                 alignLeft: true,
-                                overrideTextColor: _cPitchHome.trim().isEmpty
-                                    ? (homeNameFg ?? Colors.black87)
-                                    : null,
-                                overrideWeight: _cPitchHome.trim().isEmpty
-                                    ? FontWeight.w600
-                                    : null,
+                                overrideTextColor: _cPitchHome.trim().isEmpty ? (homeNameFg ?? Colors.black87) : null,
+                                overrideWeight: _cPitchHome.trim().isEmpty ? FontWeight.w600 : null,
                               ),
                             ),
                         ],
@@ -2029,12 +1624,7 @@ class _GameCard extends StatelessWidget {
                               baseSize: baseSmall,
                               minSize: 7,
                               color: Colors.black,
-                              shadows: [
-                                Shadow(
-                                    color: Colors.white.withOpacity(0.85),
-                                    blurRadius: 2,
-                                    offset: Offset(0, 1))
-                              ],
+                              shadows: [Shadow(color: Colors.white.withOpacity(0.85), blurRadius: 2, offset: Offset(0, 1))],
                               align: TextAlign.center,
                             ),
                           ),
@@ -2045,12 +1635,7 @@ class _GameCard extends StatelessWidget {
                             minSize: 9,
                             weight: FontWeight.bold,
                             color: Colors.black,
-                            shadows: [
-                              Shadow(
-                                  color: Colors.white.withOpacity(0.85),
-                                  blurRadius: 2,
-                                  offset: Offset(0, 1))
-                            ],
+                            shadows: [Shadow(color: Colors.white.withOpacity(0.85), blurRadius: 2, offset: Offset(0, 1))],
                           ),
                         ),
                       ],
@@ -2069,18 +1654,11 @@ class _GameCard extends StatelessWidget {
                                   color: null,
                                   borderRadius: BorderRadius.circular(4),
                                 ),
-                                constraints:
-                                    BoxConstraints(minHeight: nameChipH2),
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4),
+                                constraints: BoxConstraints(minHeight: nameChipH2),
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
                                 alignment: Alignment.center,
                                 width: double.infinity,
-                                child: OneLineShrinkText(_away,
-                                    baseSize: baseMid,
-                                    minSize: 8,
-                                    weight: FontWeight.w600,
-                                    color: awayNameFg ?? Colors.black87,
-                                    align: TextAlign.center),
+                                child: OneLineShrinkText(_away, baseSize: baseMid, minSize: 8, weight: FontWeight.w600, color: awayNameFg ?? Colors.black87, align: TextAlign.center),
                               )),
                           if (_pAway.isNotEmpty)
                             Padding(
@@ -2090,12 +1668,8 @@ class _GameCard extends StatelessWidget {
                                 colorsRaw: _cPitchAway,
                                 baseSize: baseSmall,
                                 alignLeft: false,
-                                overrideTextColor: _cPitchAway.trim().isEmpty
-                                    ? (awayNameFg ?? Colors.black87)
-                                    : null,
-                                overrideWeight: _cPitchAway.trim().isEmpty
-                                    ? FontWeight.w600
-                                    : null,
+                                overrideTextColor: _cPitchAway.trim().isEmpty ? (awayNameFg ?? Colors.black87) : null,
+                                overrideWeight: _cPitchAway.trim().isEmpty ? FontWeight.w600 : null,
                               ),
                             ),
                         ],
@@ -2127,17 +1701,12 @@ class _GameCard extends StatelessWidget {
                                   _badge('勝', Colors.red, badgeD),
                                   const SizedBox(width: 6),
                                   Flexible(
-                                    child: OneLineShrinkText(_win,
-                                        baseSize: baseSmall + 2,
-                                        minSize: 7,
-                                        color: homeNameFg ?? Colors.black87,
-                                        align: TextAlign.left),
+                                    child: OneLineShrinkText(_win, baseSize: baseSmall + 2, minSize: 7, color: homeNameFg ?? Colors.black87, align: TextAlign.left),
                                   ),
                                 ],
                               ),
                             ),
-                          if (_lose.isNotEmpty &&
-                              _idTeamPitchLose == _idTeamHome)
+                          if (_lose.isNotEmpty && _idTeamPitchLose == _idTeamHome)
                             SizedBox(
                               height: _rowH,
                               child: Row(
@@ -2147,17 +1716,12 @@ class _GameCard extends StatelessWidget {
                                   _badge('負', Colors.blue, badgeD),
                                   const SizedBox(width: 6),
                                   Flexible(
-                                    child: OneLineShrinkText(_lose,
-                                        baseSize: baseSmall + 2,
-                                        minSize: 7,
-                                        color: homeNameFg ?? Colors.black87,
-                                        align: TextAlign.left),
+                                    child: OneLineShrinkText(_lose, baseSize: baseSmall + 2, minSize: 7, color: homeNameFg ?? Colors.black87, align: TextAlign.left),
                                   ),
                                 ],
                               ),
                             ),
-                          if (_save.isNotEmpty &&
-                              _idTeamPitchSave == _idTeamHome)
+                          if (_save.isNotEmpty && _idTeamPitchSave == _idTeamHome)
                             SizedBox(
                               height: _rowH,
                               child: Row(
@@ -2167,11 +1731,7 @@ class _GameCard extends StatelessWidget {
                                   _badge('S', Colors.amber, badgeD),
                                   const SizedBox(width: 6),
                                   Flexible(
-                                    child: OneLineShrinkText(_save,
-                                        baseSize: baseSmall + 2,
-                                        minSize: 7,
-                                        color: homeNameFg ?? Colors.black87,
-                                        align: TextAlign.left),
+                                    child: OneLineShrinkText(_save, baseSize: baseSmall + 2, minSize: 7, color: homeNameFg ?? Colors.black87, align: TextAlign.left),
                                   ),
                                 ],
                               ),
@@ -2196,17 +1756,12 @@ class _GameCard extends StatelessWidget {
                                   _badge('勝', Colors.red, badgeD),
                                   const SizedBox(width: 6),
                                   Flexible(
-                                    child: OneLineShrinkText(_win,
-                                        baseSize: baseSmall + 2,
-                                        minSize: 7,
-                                        color: awayNameFg ?? Colors.black87,
-                                        align: TextAlign.right),
+                                    child: OneLineShrinkText(_win, baseSize: baseSmall + 2, minSize: 7, color: awayNameFg ?? Colors.black87, align: TextAlign.right),
                                   ),
                                 ],
                               ),
                             ),
-                          if (_lose.isNotEmpty &&
-                              _idTeamPitchLose == _idTeamAway)
+                          if (_lose.isNotEmpty && _idTeamPitchLose == _idTeamAway)
                             SizedBox(
                               height: _rowH,
                               child: Row(
@@ -2216,17 +1771,12 @@ class _GameCard extends StatelessWidget {
                                   _badge('負', Colors.blue, badgeD),
                                   const SizedBox(width: 6),
                                   Flexible(
-                                    child: OneLineShrinkText(_lose,
-                                        baseSize: baseSmall + 2,
-                                        minSize: 7,
-                                        color: awayNameFg ?? Colors.black87,
-                                        align: TextAlign.right),
+                                    child: OneLineShrinkText(_lose, baseSize: baseSmall + 2, minSize: 7, color: awayNameFg ?? Colors.black87, align: TextAlign.right),
                                   ),
                                 ],
                               ),
                             ),
-                          if (_save.isNotEmpty &&
-                              _idTeamPitchSave == _idTeamAway)
+                          if (_save.isNotEmpty && _idTeamPitchSave == _idTeamAway)
                             SizedBox(
                               height: _rowH,
                               child: Row(
@@ -2236,11 +1786,7 @@ class _GameCard extends StatelessWidget {
                                   _badge('S', Colors.amber, badgeD),
                                   const SizedBox(width: 6),
                                   Flexible(
-                                    child: OneLineShrinkText(_save,
-                                        baseSize: baseSmall + 2,
-                                        minSize: 7,
-                                        color: awayNameFg ?? Colors.black87,
-                                        align: TextAlign.right),
+                                    child: OneLineShrinkText(_save, baseSize: baseSmall + 2, minSize: 7, color: awayNameFg ?? Colors.black87, align: TextAlign.right),
                                   ),
                                 ],
                               ),
@@ -2259,7 +1805,7 @@ class _GameCard extends StatelessWidget {
         elevation: 0.5,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
         child: inProgress
-            ? _BlinkBorder(
+            ? BlinkBorder(
                 color: Colors.amber,
                 radius: 6,
                 width: 4,
@@ -2316,8 +1862,7 @@ class _PitcherNameBox extends StatefulWidget {
   State<_PitcherNameBox> createState() => _PitcherNameBoxState();
 }
 
-class _PitcherNameBoxState extends State<_PitcherNameBox>
-    with SingleTickerProviderStateMixin {
+class _PitcherNameBoxState extends State<_PitcherNameBox> with SingleTickerProviderStateMixin {
   BoxDecoration? deco;
   Color? firstBlinkColor;
   late final AnimationController _ctrl;
@@ -2368,11 +1913,7 @@ class _PitcherNameBoxState extends State<_PitcherNameBox>
   void initState() {
     super.initState();
     // 解析: 背景装飾と点滅カラー
-    final parts = widget.colorsRaw
-        .split('/')
-        .map((s) => s.trim().toLowerCase())
-        .where((s) => s.isNotEmpty)
-        .toList();
+    final parts = widget.colorsRaw.split('/').map((s) => s.trim().toLowerCase()).where((s) => s.isNotEmpty).toList();
     if (parts.isNotEmpty) {
       final cols = <Color>[];
       for (final p in parts) {
@@ -2384,8 +1925,7 @@ class _PitcherNameBoxState extends State<_PitcherNameBox>
       }
       if (cols.isNotEmpty) {
         if (cols.length == 1) {
-          deco = BoxDecoration(
-              color: cols.first, borderRadius: BorderRadius.circular(4));
+          deco = BoxDecoration(color: cols.first, borderRadius: BorderRadius.circular(4));
         } else {
           final List<Color> gColors = [];
           final List<double> gStops = [];
@@ -2421,9 +1961,7 @@ class _PitcherNameBoxState extends State<_PitcherNameBox>
       }
     }
 
-    _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500))
-      ..repeat(reverse: true);
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 500))..repeat(reverse: true);
     _t = CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut);
   }
 
@@ -2436,10 +1974,8 @@ class _PitcherNameBoxState extends State<_PitcherNameBox>
   @override
   Widget build(BuildContext context) {
     final bool hasColor = deco != null;
-    final textColor =
-        hasColor ? Colors.white : (widget.overrideTextColor ?? Colors.black87);
-    final weight = widget.overrideWeight ??
-        (hasColor ? FontWeight.bold : FontWeight.normal);
+    final textColor = hasColor ? Colors.white : (widget.overrideTextColor ?? Colors.black87);
+    final weight = widget.overrideWeight ?? (hasColor ? FontWeight.bold : FontWeight.normal);
 
     return SizedBox(
       width: double.infinity,
@@ -2456,8 +1992,7 @@ class _PitcherNameBoxState extends State<_PitcherNameBox>
               child: AnimatedBuilder(
                 animation: _t,
                 builder: (context, _) {
-                  final double bgAlpha =
-                      (0.12 + 0.23 * _t.value).clamp(0.0, 1.0).toDouble();
+                  final double bgAlpha = (0.12 + 0.23 * _t.value).clamp(0.0, 1.0).toDouble();
                   return Container(
                     decoration: BoxDecoration(
                       color: firstBlinkColor!.withOpacity(bgAlpha),
@@ -2486,601 +2021,6 @@ class _PitcherNameBoxState extends State<_PitcherNameBox>
   }
 }
 
-// ────────────────────────────────────────────────────────────────
-// 左ペイン：統合グリッド（セ左・パ右）
-// ────────────────────────────────────────────────────────────────
-class _UnifiedGrid extends StatelessWidget {
-  final List<Map<String, dynamic>> predictions;
-  final List<Map<String, dynamic>> standings; // ← フラット
-  final List<Map<String, dynamic>> npbPlayerStats;
-  final String Function(String idUser) usernameForId;
-  final String Function(String idUser) userNameFromPredictions;
-  final bool compact;
-  final int? onlyLeagueId; // 1: セ, 2: パ, null: 両方
-
-  _UnifiedGrid({
-    super.key,
-    required this.predictions,
-    required this.standings,
-    required this.npbPlayerStats,
-    required this.usernameForId,
-    required this.userNameFromPredictions,
-    required this.compact,
-    this.onlyLeagueId,
-  });
-
-// After
-  Widget headerCell(String text,
-      {FontWeight weight = FontWeight.bold, Color? bgColor, Color? fgColor}) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 0),
-      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
-      constraints: const BoxConstraints(minHeight: 21.5),
-      decoration: BoxDecoration(
-        color: bgColor,
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(3),
-      ),
-      child: SizedBox(
-        width: double.infinity,
-        child: OneLineShrinkText(text,
-            baseSize: 12,
-            minSize: 1,
-            weight: weight,
-            color: fgColor,
-            verticalPadding: 0,
-            fast: true),
-      ),
-    );
-  }
-
-  Widget cell(String text,
-      {bool highlight = false, Color? bgColor, Color? borderColor}) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 0),
-      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
-      constraints: const BoxConstraints(minHeight: 21.5),
-      decoration: BoxDecoration(
-        color: bgColor ?? (highlight ? Colors.yellow[200] : null),
-        border: Border.all(color: borderColor ?? Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(3),
-      ),
-      child: SizedBox(
-        width: double.infinity,
-        child: OneLineShrinkText(text,
-            baseSize: 12, minSize: 1, verticalPadding: 0, fast: true),
-      ),
-    );
-  }
-
-  String _joinDedup(Iterable<String>? xs) {
-    if (xs == null) return '—';
-    final seen = <String>{};
-    final out = <String>[];
-    for (final s in xs) {
-      if (s.isEmpty) continue;
-      if (seen.add(s)) out.add(s);
-    }
-    return out.isEmpty ? '—' : out.join(', ');
-  }
-
-  List<Widget> _buildLeagueColumn(int leagueId) {
-    Color? _parseColorNameLocal(String? name) {
-      final n = (name ?? '').trim().toLowerCase();
-      if (n.isEmpty) return null;
-      const m = {
-        'red': 0xFFF44336,
-        'orange': 0xFFFF9800,
-        'yellow': 0xFFFFEB3B,
-        'green': 0xFF4CAF50,
-        'lightgreen': 0xFF8BC34A,
-        'blue': 0xFF0000FF,
-        'royalblue': 0xFF4169E1,
-        'mediumblue': 0xFF0000CD,
-        'midnightblue': 0xFF191970,
-        'darkblue': 0xFF00008B,
-        'dodgerblue': 0xFF1E90FF,
-        'navy': 0xFF001F3F,
-        'crimson': 0xFFDC143C,
-        'gold': 0xFFFFD700,
-        'lime': 0xFFCDDC39,
-        'gray': 0xFF9E9E9E,
-        'grey': 0xFF9E9E9E,
-        'black': 0xFF000000,
-        'white': 0xFFFFFFFF,
-      };
-      final v = m[n];
-      return v == null ? null : Color(v);
-    }
-
-    // リーグ色（予想ブロック内サイドヘッダー用）
-    final Color leagueColor =
-        leagueId == 1 ? const Color(0xFF0B8F3A) : const Color(0xFF4DB5E8);
-    // standingsから対象リーグを抽出
-    final currentRows = standings.where((e) {
-      final id = int.tryParse('${e['id_league']}') ?? 0;
-      return id == leagueId;
-    }).toList()
-      ..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0)
-          .compareTo(int.tryParse('${b['int_rank']}') ?? 0));
-
-    // predictionsから対象リーグを抽出
-    final pred1 = predictions
-        .where((e) =>
-            '${e['id_user']}' == '1' &&
-            (int.tryParse('${e['id_league']}') ?? 0) == leagueId)
-        .toList()
-      ..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0)
-          .compareTo(int.tryParse('${b['int_rank']}') ?? 0));
-
-    final pred2 = predictions
-        .where((e) =>
-            '${e['id_user']}' == '2' &&
-            (int.tryParse('${e['id_league']}') ?? 0) == leagueId)
-        .toList()
-      ..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0)
-          .compareTo(int.tryParse('${b['int_rank']}') ?? 0));
-
-    final widgets = <Widget>[];
-    final rankHeader = <Widget>[];
-    final rankRows = <Widget>[];
-
-    // サイドヘッダー(26) + ギャップ(6) + 順位セル(56) と見かけ幅を揃える
-    const double _sideHeaderW = 26;
-    const double _sideGap = 0; // サイドヘッダーと右列の余白なし
-    const double _rankCellW = 56;
-    final double _rankHeaderW = _sideHeaderW + _sideGap + _rankCellW;
-
-    rankHeader.add(Row(children: [
-      const SizedBox(width: 4),
-      SizedBox(
-        width: _rankHeaderW,
-        child:
-            headerCell('シーズン予想', bgColor: leagueColor, fgColor: Colors.white),
-      ),
-      Expanded(
-          flex: 2,
-          child: headerCell('現在', bgColor: leagueColor, fgColor: Colors.white)),
-      Expanded(
-          flex: 2,
-          child: headerCell(userNameFromPredictions('1'),
-              bgColor: leagueColor, fgColor: Colors.white)), // 立石
-      Expanded(
-          flex: 2,
-          child: headerCell(userNameFromPredictions('2'),
-              bgColor: leagueColor, fgColor: Colors.white)), // 江島
-    ]));
-    // 余白や区切り線を入れず、直後のチーム順位ブロックに密着させる
-
-    bool _isHit(
-        Map<String, dynamic>? pred, List<Map<String, dynamic>> curGroup) {
-      if (pred == null || curGroup.isEmpty) return false;
-
-      // 予想側の id_team / name
-      final int prdId = int.tryParse('${pred['id_team']}') ?? -1;
-      final String prdName = (pred['name_team_short']?.toString() ??
-              pred['name_team']?.toString() ??
-              '')
-          .trim();
-
-      for (final cur in curGroup) {
-        final int curId = int.tryParse('${cur['id_team']}') ?? -1;
-        final String curName = (cur['name_team']?.toString() ?? '').trim();
-
-        if ((prdId >= 0 && curId >= 0 && prdId == curId) ||
-            (prdName.isNotEmpty && curName == prdName)) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    for (var rk = 1; rk <= 6; rk++) {
-      // 現在の順位グループ（同じ int_rank のチームを全部）
-      final curGroup = currentRows
-          .where((e) => int.tryParse('${e['int_rank']}') == rk)
-          .toList();
-
-      // 予想側
-      final p1 = pred1.firstWhere((e) => int.tryParse('${e['int_rank']}') == rk,
-          orElse: () => {});
-      final p2 = pred2.firstWhere((e) => int.tryParse('${e['int_rank']}') == rk,
-          orElse: () => {});
-
-      // 表示テキスト
-      final curTeamText = curGroup.isNotEmpty
-          ? curGroup.map((e) => e['name_team']?.toString() ?? '').join(', ')
-          : '—';
-      final txt1 =
-          p1.isNotEmpty ? (p1['name_team_short']?.toString() ?? '—') : '—';
-      final txt2 =
-          p2.isNotEmpty ? (p2['name_team_short']?.toString() ?? '—') : '—';
-
-      // ハイライト判定（予想チームが現在の順位グループに含まれているか）
-      final hi1 = _isHit(p1.isNotEmpty ? p1 : null, curGroup);
-      final hi2 = _isHit(p2.isNotEmpty ? p2 : null, curGroup);
-
-      rankRows.add(Row(
-        children: [
-          const SizedBox(width: 0),
-          SizedBox(
-              width: _rankCellW,
-              child: headerCell('$rk',
-                  bgColor: leagueColor, fgColor: Colors.white)),
-          Expanded(
-              flex: 2,
-              child: cell(curTeamText,
-                  bgColor: const Color(0xFFF0E68C))), // 現在を #f0e68c
-          Expanded(flex: 2, child: cell(txt1, highlight: hi1)), // 立石
-          Expanded(flex: 2, child: cell(txt2, highlight: hi2)), // 江島
-        ],
-      ));
-    }
-    // まずヘッダー（順位・現在・立石・江島）を追加
-    widgets.addAll(rankHeader);
-    // サイドヘッダー付き（チーム順位）: 1位〜6位の高さに合わせる
-    widgets.add(IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 26,
-            height: double.infinity,
-            margin: const EdgeInsets.only(left: 4, right: 0),
-            decoration: BoxDecoration(
-              color: leagueColor,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Text('チ',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
-                  Text('|',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
-                  Text('ム',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
-                  Text('順',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
-                  Text('位',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ),
-          ),
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: rankRows,
-            ),
-          ),
-        ],
-      ),
-    ));
-    // チーム順位と個人タイトルの間に 2px の余白
-    widgets.add(const SizedBox(height: 2));
-
-    // ───────────────────────────────
-    // 個人タイトル表示 (statMap)
-    // ───────────────────────────────
-    final statMap = <String, List<Map<String, dynamic>>>{};
-    for (final r in npbPlayerStats) {
-      final ln = (r['league_name'] ?? '').toString();
-      final target = (leagueId == 1) ? 'セ・リーグ' : 'パ・リーグ';
-      if (ln != target) continue;
-
-      final idStatStr =
-          (r['id_stats'] == null) ? 'unknown' : '${r['id_stats']}';
-      final title = (r['title'] ?? '不明').toString();
-      final key = '$idStatStr|$title';
-      statMap.putIfAbsent(key, () => []).add(r);
-    }
-
-    // スタッツのヘッダー行（「スタッツ 現在 立石 江島」）は非表示のまま
-    final statsSection = <Widget>[];
-
-    int _idxOf(Map<String, dynamic> r) {
-      final v = r['int_index'] ?? r['id_stats']; // 保険で id_stats も参照
-      return int.tryParse('$v') ?? 1 << 30;
-    }
-
-    int _minIdx(List<Map<String, dynamic>> rows) => rows.isEmpty
-        ? (1 << 30)
-        : rows.map(_idxOf).reduce((a, b) => a < b ? a : b);
-
-    final statEntries = statMap.entries.toList()
-      ..sort((a, b) {
-        final ia = _minIdx(a.value);
-        final ib = _minIdx(b.value);
-        if (ia != ib) return ia.compareTo(ib);
-        return a.key
-            .split('|')
-            .last
-            .compareTo(b.key.split('|').last); // 同順位は名称で
-      });
-
-    for (final entry in statEntries) {
-      final title = entry.key.split('|').last;
-      final rows2 = entry.value;
-
-      final user1Rows = rows2.where((e) => '${e['id_user']}' == '1');
-      final user0Rows = rows2.where((e) => '${e['id_user']}' == '0');
-      final user2Rows = rows2.where((e) => '${e['id_user']}' == '2');
-
-      final txt1 =
-          _joinDedup(user1Rows.map((e) => '${e['player_name'] ?? ''}'));
-      final txt0 =
-          _joinDedup(user0Rows.map((e) => '${e['player_name'] ?? ''}'));
-      final txt2 =
-          _joinDedup(user2Rows.map((e) => '${e['player_name'] ?? ''}'));
-
-      final hi1 = user1Rows.any((e) => e['flg_atari'] == true);
-      final hi0 = user0Rows.any((e) => e['flg_atari'] == true);
-      final hi2 = user2Rows.any((e) => e['flg_atari'] == true);
-
-// After
-      final isPitcher = rows2.any((e) => e['flg_pitcher'] == true);
-      final titleBg = isPitcher
-          ? const Color(0xFF64B5F6)
-          : const Color(0xFFEF9A9A); // 少し濃い青/赤
-
-      // 点滅枠色（color_today）
-      Color? c0 = _parseColorNameLocal(user0Rows
-          .map((e) => '${e['color_today'] ?? ''}')
-          .firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
-      Color? c1 = _parseColorNameLocal(user1Rows
-          .map((e) => '${e['color_today'] ?? ''}')
-          .firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
-      Color? c2 = _parseColorNameLocal(user2Rows
-          .map((e) => '${e['color_today'] ?? ''}')
-          .firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
-
-      final Color _baseBg0 = const Color(0xFFF0E68C);
-      final w0 = cell(txt0,
-          bgColor: _baseBg0,
-          highlight: hi0,
-          borderColor: c0 != null ? Colors.transparent : null);
-      final w1 = cell(txt1,
-          highlight: hi1, borderColor: c1 != null ? Colors.transparent : null);
-      final w2 = cell(txt2,
-          highlight: hi2, borderColor: c2 != null ? Colors.transparent : null);
-
-      statsSection.add(Row(
-        children: [
-          SizedBox(
-            width: 56, // 4文字ぶんの目安
-            child: headerCell(title, bgColor: titleBg, fgColor: Colors.white),
-          ),
-          Expanded(
-            flex: 2,
-            child: c0 != null
-                ? _BlinkBorder(
-                    color: c0,
-                    radius: 3,
-                    width: 2,
-                    duration: const Duration(milliseconds: 1000),
-                    baseBgColor: _baseBg0,
-                    fillUseColor: true,
-                    child: w0)
-                : w0,
-          ), // 現在
-          Expanded(
-            flex: 2,
-            child: c1 != null
-                ? _BlinkBorder(
-                    color: c1,
-                    radius: 3,
-                    width: 2,
-                    duration: const Duration(milliseconds: 1000),
-                    baseBgColor: Colors.transparent,
-                    fillUseColor: true,
-                    child: w1)
-                : w1,
-          ), // 立石
-          Expanded(
-            flex: 2,
-            child: c2 != null
-                ? _BlinkBorder(
-                    color: c2,
-                    radius: 3,
-                    width: 2,
-                    duration: const Duration(milliseconds: 1000),
-                    baseBgColor: Colors.transparent,
-                    fillUseColor: true,
-                    child: w2)
-                : w2,
-          ), // 江島
-        ],
-      ));
-    }
-    // サイドヘッダー付き（個人タイトル）: 打率〜セーブまでの高さに合わせる（右余白なし）
-    widgets.add(IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 26,
-            height: double.infinity,
-            margin: const EdgeInsets.only(left: 4, right: 0),
-            decoration: BoxDecoration(
-              color: leagueColor,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Text('個',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
-                  Text('人',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
-                  Text('タ',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
-                  Text('イ',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
-                  Text('ト',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
-                  Text('ル',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ),
-          ),
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: statsSection,
-            ),
-          ),
-        ],
-      ),
-    ));
-
-    return widgets;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox.expand(
-      child: Card(
-        elevation: 2,
-        margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: EdgeInsets.zero,
-          child: SingleChildScrollView(
-            padding: EdgeInsets.zero,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: onlyLeagueId == null
-                  ? [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: _buildLeagueColumn(1),
-                      ),
-                      const SizedBox(height: 12),
-                      const Divider(height: 1),
-                      const SizedBox(height: 12),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: _buildLeagueColumn(2),
-                      ),
-                    ]
-                  : [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: _buildLeagueColumn(onlyLeagueId!),
-                      ),
-                    ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// 枠色がゆっくり点滅するラッパー
-class _BlinkBorder extends StatefulWidget {
-  final Widget child;
-  final Color color;
-  final double radius;
-  final double width;
-  final Duration duration;
-  final Color? baseBgColor;
-  final bool fillUseColor; // true: 背景も color で点滅、false: baseBg とブレンド
-
-  const _BlinkBorder({
-    super.key,
-    required this.child,
-    required this.color,
-    this.radius = 3,
-    this.width = 2,
-    this.duration = const Duration(milliseconds: 1000),
-    this.baseBgColor,
-    this.fillUseColor = true,
-  });
-
-  @override
-  State<_BlinkBorder> createState() => _BlinkBorderState();
-}
-
-class _BlinkBorderState extends State<_BlinkBorder>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _ctrl;
-  late final Animation<double> _t;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(vsync: this, duration: widget.duration)
-      ..repeat(reverse: true);
-    _t = CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut);
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _t,
-      builder: (context, child) {
-        final alpha = (0.35 + 0.45 * _t.value).clamp(0.0, 1.0);
-        Color? bg;
-        Color? overlay;
-        if (widget.fillUseColor) {
-          // 前面に半透明オーバーレイを重ねる（子の背景の上に載る）
-          final double bgAlpha = (0.12 + 0.23 * _t.value).clamp(0.0, 1.0);
-          overlay = widget.color.withOpacity(bgAlpha);
-          bg = null;
-        } else if (widget.baseBgColor != null) {
-          // 背景色そのものをブレンド（子の背景として使う）
-          final double mix = (0.35 * _t.value).clamp(0.0, 1.0);
-          bg = Color.lerp(widget.baseBgColor!, widget.color, mix);
-          overlay = null;
-        } else {
-          bg = null;
-          overlay = null;
-        }
-        return Container(
-          decoration: BoxDecoration(
-            color: bg,
-            border: Border.all(
-                color: widget.color.withOpacity(alpha), width: widget.width),
-            borderRadius: BorderRadius.circular(widget.radius),
-          ),
-          foregroundDecoration: overlay != null
-              ? BoxDecoration(
-                  color: overlay,
-                  borderRadius: BorderRadius.circular(widget.radius),
-                )
-              : null,
-          child: child,
-        );
-      },
-      child: widget.child,
-    );
-  }
-}
-
 // 背景のみをやさしく点滅させる（テキストは前面で固定）
 class _BlinkBg extends StatefulWidget {
   final Widget child;
@@ -3102,16 +2042,14 @@ class _BlinkBg extends StatefulWidget {
   State<_BlinkBg> createState() => _BlinkBgState();
 }
 
-class _BlinkBgState extends State<_BlinkBg>
-    with SingleTickerProviderStateMixin {
+class _BlinkBgState extends State<_BlinkBg> with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
   late final Animation<double> _t;
 
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(vsync: this, duration: widget.duration)
-      ..repeat(reverse: true);
+    _ctrl = AnimationController(vsync: this, duration: widget.duration)..repeat(reverse: true);
     _t = CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut);
   }
 
@@ -3204,19 +2142,9 @@ class SeasonTableBlock extends StatelessWidget {
   String _num(dynamic v) => (v == null || '$v'.isEmpty) ? '—' : '$v';
 
   // リーグ別フィルタ
-  List<Map<String, dynamic>> _standingsOf(int leagueId) => standings
-      .where((e) => int.tryParse('${e['id_league']}') == leagueId)
-      .toList()
-    ..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0)
-        .compareTo(int.tryParse('${b['int_rank']}') ?? 0));
+  List<Map<String, dynamic>> _standingsOf(int leagueId) => standings.where((e) => int.tryParse('${e['id_league']}') == leagueId).toList()..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0).compareTo(int.tryParse('${b['int_rank']}') ?? 0));
 
-  List<Map<String, dynamic>> _statsOf(int leagueId, {required bool pitcher}) =>
-      stats
-          .where((e) =>
-              ((e['league_name'] ?? '').toString() ==
-                  (leagueId == 1 ? 'セ・リーグ' : 'パ・リーグ')) &&
-              (e['flg_pitcher'] == pitcher))
-          .toList();
+  List<Map<String, dynamic>> _statsOf(int leagueId, {required bool pitcher}) => stats.where((e) => ((e['league_name'] ?? '').toString() == (leagueId == 1 ? 'セ・リーグ' : 'パ・リーグ')) && (e['flg_pitcher'] == pitcher)).toList();
 
   // タイトル→選手名(なければ ?)
   String _playerOf(List<Map<String, dynamic>> rows, String title) {
@@ -3231,19 +2159,15 @@ class SeasonTableBlock extends StatelessWidget {
   Widget _sectionHeader(String label, Color color) {
     return Container(
       height: 26,
-      decoration:
-          BoxDecoration(color: color, borderRadius: BorderRadius.circular(4)),
+      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(4)),
       alignment: Alignment.centerLeft,
       padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Text(label,
-          style: const TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold)),
+      child: Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
     );
   }
 
   // 簡易セル
-  Widget _cell(String text,
-      {Color? bg, FontWeight? weight, Color? fg, double? h}) {
+  Widget _cell(String text, {Color? bg, FontWeight? weight, Color? fg, double? h}) {
     return Container(
       height: h,
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
@@ -3253,14 +2177,12 @@ class SeasonTableBlock extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
       ),
       alignment: Alignment.center,
-      child: OneLineShrinkText(text,
-          baseSize: 10, minSize: 1, weight: weight, color: fg),
+      child: OneLineShrinkText(text, baseSize: 10, minSize: 1, weight: weight, color: fg),
     );
   }
 
   // 最小幅付きセル（数値列用）
-  Widget _minCell(String text, double min,
-      {Color? bg, Color? fg, FontWeight? weight}) {
+  Widget _minCell(String text, double min, {Color? bg, Color? fg, FontWeight? weight}) {
     return ConstrainedBox(
       constraints: BoxConstraints(minWidth: min),
       child: _cell(text, bg: bg, fg: fg, weight: weight),
@@ -3270,22 +2192,15 @@ class SeasonTableBlock extends StatelessWidget {
   // 順位テーブル（上:順位行、下:スタッツ要約）
   Widget _leagueTable(int leagueId) {
     final cur = _standingsOf(leagueId);
-    final Color leagueColor =
-        leagueId == 1 ? const Color(0xFF0B8F3A) : const Color(0xFF4DB5E8);
+    final Color leagueColor = leagueId == 1 ? const Color(0xFF0B8F3A) : const Color(0xFF4DB5E8);
     // リーグ見出しは非表示
 
     // 打撃/投手タイトル（画像に近い簡易版）: stats_player の形に合わせて抽出
     const battingTitles = ['打率', '本塁打', '打点', '盗塁', '出塁率'];
     const pitchingTitles = ['防御率', '最多勝', '奪三振', 'HP', 'セーブ'];
-    final leagueStats = stats
-        .where((e) => int.tryParse('${e['id_league']}') == leagueId)
-        .toList();
-    final bat = leagueStats
-        .where((e) => battingTitles.contains(((e['title'] ?? '').toString())))
-        .toList();
-    final pit = leagueStats
-        .where((e) => pitchingTitles.contains(((e['title'] ?? '').toString())))
-        .toList();
+    final leagueStats = stats.where((e) => int.tryParse('${e['id_league']}') == leagueId).toList();
+    final bat = leagueStats.where((e) => battingTitles.contains(((e['title'] ?? '').toString()))).toList();
+    final pit = leagueStats.where((e) => pitchingTitles.contains(((e['title'] ?? '').toString()))).toList();
 
     // 文字幅の目安（12pxフォントで約14px/字）
     // 文字幅の目安（12pxフォントで約14px/字）
@@ -3294,10 +2209,8 @@ class SeasonTableBlock extends StatelessWidget {
     const double _wChar1 = _kChar * 1.5; // 1文字ぶん
     const double _wChar6 = _kChar * 6; // 6文字ぶん（順位表で使用中）
     const double _wChar3 = _kChar * 3; // 3文字ぶん（順位表で使用中）
-    const double _wStat = _kChar * 8; // 個人成績の各タイトル列幅
 
-    Widget _gridCell(String text,
-        {double h = 15, Color? bg, Color? fg, FontWeight? weight}) {
+    Widget _gridCell(String text, {double h = 15, Color? bg, Color? fg, FontWeight? weight, TextAlign align = TextAlign.center}) {
       return Container(
         height: h,
         alignment: Alignment.center,
@@ -3305,8 +2218,7 @@ class SeasonTableBlock extends StatelessWidget {
           color: bg,
           border: Border.all(color: Colors.black26, width: 1),
         ),
-        child: OneLineShrinkText(text,
-            baseSize: 12, minSize: 6, weight: weight, color: fg),
+        child: OneLineShrinkText(text, baseSize: 12, minSize: 6, weight: weight, color: fg, align: align),
       );
     }
 
@@ -3327,31 +2239,23 @@ class SeasonTableBlock extends StatelessWidget {
       );
     }
 
-    Widget _bar(String label, Color color,
-        {double h = 24, Color fg = Colors.white}) {
+    Widget _bar(String label, Color color, {double h = 24, Color fg = Colors.white}) {
       return Container(
         height: h,
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(color: color),
-        child: Text(label,
-            style: TextStyle(color: fg, fontWeight: FontWeight.bold)),
+        child: Text(label, style: TextStyle(color: fg, fontWeight: FontWeight.bold)),
       );
     }
 
-    Widget _personalStatsSheet(int leagueId, List<Map<String, dynamic>> bat,
-        List<Map<String, dynamic>> pit) {
+    Widget _personalStatsSheet(int leagueId, List<Map<String, dynamic>> bat, List<Map<String, dynamic>> pit, double parentWidth) {
       final leagueLabel = leagueId == 1 ? 'セ・リーグ' : 'パ・リーグ';
 
-      List<TableRow> _rankRows(
-          List<String> cols, List<Map<String, dynamic>> src) {
+      List<TableRow> _rankRows(List<String> cols, List<Map<String, dynamic>> src) {
         String _normalizeTitle(String t) => t == 'ホールド' ? 'HP' : t;
         String _nameBy(String title, int rank) {
-          final e = src.firstWhere(
-              (m) =>
-                  (m['title']?.toString() ?? '') == _normalizeTitle(title) &&
-                  (int.tryParse('${m['int_rank']}') ?? -1) == rank,
-              orElse: () => const {});
+          final e = src.firstWhere((m) => (m['title']?.toString() ?? '') == _normalizeTitle(title) && (int.tryParse('${m['int_rank']}') ?? -1) == rank, orElse: () => const {});
           return (e.isNotEmpty ? (e['name_player'] ?? '') : '').toString();
         }
 
@@ -3367,18 +2271,13 @@ class SeasonTableBlock extends StatelessWidget {
 
       // 1位の選手名（無ければ空文字）
       String _pick(List<Map<String, dynamic>> src, String title) {
-        final v = src.firstWhere((e) => (e['title'] ?? '') == title,
-            orElse: () => const {});
+        final v = src.firstWhere((e) => (e['title'] ?? '') == title, orElse: () => const {});
         return (v.isNotEmpty ? (v['name_player'] ?? '') : '').toString();
       }
 
       String _normalizeTitle(String t) => t == 'ホールド' ? 'HP' : t;
       String _nameBy(List<Map<String, dynamic>> src, String title, int rank) {
-        final e = src.firstWhere(
-            (m) =>
-                (m['title']?.toString() ?? '') == _normalizeTitle(title) &&
-                (int.tryParse('${m['int_rank']}') ?? -1) == rank,
-            orElse: () => const {});
+        final e = src.firstWhere((m) => (m['title']?.toString() ?? '') == _normalizeTitle(title) && (int.tryParse('${m['int_rank']}') ?? -1) == rank, orElse: () => const {});
         return (e.isNotEmpty ? (e['name_player'] ?? '') : '').toString();
       }
 
@@ -3388,20 +2287,12 @@ class SeasonTableBlock extends StatelessWidget {
       // 個人成績セル: ランク/チーム/選手/数値 を1セル内に表示
       // rank は「表示行のインデックス(1..5)」。同順位がある場合も
       // タイトルごとに int_rank 昇順で並べた上位5件から rank 番目を表示する。
-      Widget _entryCell(
-          List<Map<String, dynamic>> src, String title, int rank) {
-        final list = src
-            .where(
-                (m) => (m['title']?.toString() ?? '') == _normalizeTitle(title))
-            .toList()
-          ..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 1 << 30)
-              .compareTo(int.tryParse('${b['int_rank']}') ?? 1 << 30));
+      Widget _entryCell(List<Map<String, dynamic>> src, String title, int rank) {
+        final list = src.where((m) => (m['title']?.toString() ?? '') == _normalizeTitle(title)).toList()..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 1 << 30).compareTo(int.tryParse('${b['int_rank']}') ?? 1 << 30));
         final idx = (rank - 1).clamp(0, list.isNotEmpty ? list.length - 1 : 0);
-        final Map<String, dynamic> e =
-            list.isNotEmpty && list.length >= rank ? list[idx] : const {};
+        final Map<String, dynamic> e = list.isNotEmpty && list.length >= rank ? list[idx] : const {};
 
-        final rankText =
-            (e.isNotEmpty ? (e['int_rank']?.toString() ?? '') : '').toString();
+        final rankText = (e.isNotEmpty ? (e['int_rank']?.toString() ?? '') : '').toString();
         final team = (e.isNotEmpty ? (e['name_team'] ?? '') : '').toString();
         final name = (e.isNotEmpty ? (e['name_player'] ?? '') : '').toString();
         final stat = _num(e.isNotEmpty ? e['stats'] : null);
@@ -3411,11 +2302,7 @@ class SeasonTableBlock extends StatelessWidget {
         BoxDecoration? _nameBgDecoration() {
           final raw = (e.isNotEmpty ? (e['colors_user'] ?? '') : '').toString();
           if (raw.isEmpty) return null;
-          final parts = raw
-              .split('/')
-              .map((s) => s.trim().toLowerCase())
-              .where((s) => s.isNotEmpty)
-              .toList();
+          final parts = raw.split('/').map((s) => s.trim().toLowerCase()).where((s) => s.isNotEmpty).toList();
           if (parts.isEmpty) return null;
           final cols = <Color>[];
           for (final p in parts) {
@@ -3440,16 +2327,16 @@ class SeasonTableBlock extends StatelessWidget {
         }
 
         return SizedBox(
-          width: _wStat,
+          width: parentWidth * 0.2,
           child: Container(
-            height: 13.5,
+            height: 20,
             decoration: BoxDecoration(
               border: Border.all(color: Colors.black26, width: 1),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 2),
+            // padding: const EdgeInsets.symmetric(horizontal: 2),
             child: Row(children: [
               Expanded(
-                  flex: 2,
+                  flex: STATS_PLAYER_RATIO_CELL_BLOCK_W[0],
                   child: Center(
                     child: () {
                       final isOne = rankText.trim() == '1';
@@ -3458,34 +2345,26 @@ class SeasonTableBlock extends StatelessWidget {
                           fit: BoxFit.contain,
                           child: Text('👑',
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 25,
                                 height: 1.0,
                               )),
                         );
                       }
-                      return OneLineShrinkText(
-                          rankText.isNotEmpty ? rankText : '—',
-                          baseSize: 12,
-                          minSize: 1,
-                          fast: true);
+                      return OneLineShrinkText(rankText.isNotEmpty ? rankText : '—', baseSize: 15, minSize: 1, fast: true);
                     }(),
                   )),
               Expanded(
-                  flex: 2,
+                  flex: STATS_PLAYER_RATIO_CELL_BLOCK_W[1],
                   child: Container(
                     decoration: BoxDecoration(
                       color: _parseColorName(e['color_back']),
                       borderRadius: BorderRadius.circular(3),
                     ),
                     alignment: Alignment.center,
-                    child: OneLineShrinkText(team,
-                        baseSize: 12,
-                        minSize: 1,
-                        fast: true,
-                        color: _parseColorName(e['color_font'])),
+                    child: OneLineShrinkText(team, baseSize: 12, minSize: 1, fast: true, color: _parseColorName(e['color_font'])),
                   )),
               Expanded(
-                  flex: 10,
+                  flex: STATS_PLAYER_RATIO_CELL_BLOCK_W[2],
                   child: Container(
                     decoration: (() {
                       final d = _nameBgDecoration();
@@ -3494,18 +2373,10 @@ class SeasonTableBlock extends StatelessWidget {
                     alignment: Alignment.center,
                     child: (() {
                       final hasBg = _nameBgDecoration() != null;
-                      return OneLineShrinkText(name,
-                          baseSize: 12,
-                          minSize: 1,
-                          fast: true,
-                          color: hasBg ? Colors.white : null,
-                          weight: hasBg ? FontWeight.bold : null);
+                      return OneLineShrinkText(name, baseSize: 12, minSize: 1, fast: true, color: hasBg ? Colors.white : null, weight: hasBg ? FontWeight.bold : null);
                     })(),
                   )),
-              Expanded(
-                  flex: 4,
-                  child: OneLineShrinkText(stat,
-                      baseSize: 12, minSize: 1, fast: true)),
+              Expanded(flex: STATS_PLAYER_RATIO_CELL_BLOCK_W[3], child: OneLineShrinkText(stat, baseSize: 12, minSize: 1, fast: true)),
             ]),
           ),
         );
@@ -3521,11 +2392,7 @@ class SeasonTableBlock extends StatelessWidget {
         BoxDecoration? _nameBgDecorationFromRow() {
           final raw = (e['colors_user'] ?? '').toString();
           if (raw.isEmpty) return null;
-          final parts = raw
-              .split('/')
-              .map((s) => s.trim().toLowerCase())
-              .where((s) => s.isNotEmpty)
-              .toList();
+          final parts = raw.split('/').map((s) => s.trim().toLowerCase()).where((s) => s.isNotEmpty).toList();
           if (parts.isEmpty) return null;
           final cols = <Color>[];
           for (final p in parts) {
@@ -3550,13 +2417,13 @@ class SeasonTableBlock extends StatelessWidget {
         }
 
         return SizedBox(
-          width: _wStat,
+          width: parentWidth * 0.2,
           child: Container(
-            height: 15,
+            height: 17.5,
             decoration: BoxDecoration(
               border: Border.all(color: Colors.black26, width: 1),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 2),
+            // padding: const EdgeInsets.symmetric(horizontal: 2),
             child: Row(children: [
               Expanded(
                   flex: 2,
@@ -3573,11 +2440,7 @@ class SeasonTableBlock extends StatelessWidget {
                               )),
                         );
                       }
-                      return OneLineShrinkText(
-                          rankText.isNotEmpty ? rankText : '—',
-                          baseSize: 12,
-                          minSize: 1,
-                          fast: true);
+                      return OneLineShrinkText(rankText.isNotEmpty ? rankText : '—', baseSize: 12, minSize: 1, fast: true);
                     }(),
                   )),
               Expanded(
@@ -3588,11 +2451,7 @@ class SeasonTableBlock extends StatelessWidget {
                       borderRadius: BorderRadius.circular(3),
                     ),
                     alignment: Alignment.center,
-                    child: OneLineShrinkText(team,
-                        baseSize: 12,
-                        minSize: 1,
-                        fast: true,
-                        color: _parseColorName(e['color_font'])),
+                    child: OneLineShrinkText(team, baseSize: 12, minSize: 1, fast: true, color: _parseColorName(e['color_font'])),
                   )),
               Expanded(
                   flex: 10,
@@ -3600,17 +2459,10 @@ class SeasonTableBlock extends StatelessWidget {
                     final BoxDecoration? d = _nameBgDecorationFromRow();
                     final bool hasBg = d != null;
                     final bool isToday = e['flg_today'] == true;
-                    final Widget txt = OneLineShrinkText(name,
-                        baseSize: 12,
-                        minSize: 1,
-                        fast: true,
-                        color: hasBg ? Colors.white : null,
-                        weight: hasBg ? FontWeight.bold : null);
+                    final Widget txt = OneLineShrinkText(name, baseSize: 12, minSize: 1, fast: true, color: hasBg ? Colors.white : null, weight: hasBg ? FontWeight.bold : null);
                     if (isToday) {
                       return _BlinkBg(
-                        base: d ??
-                            BoxDecoration(
-                                borderRadius: BorderRadius.circular(4)),
+                        base: d ?? BoxDecoration(borderRadius: BorderRadius.circular(4)),
                         color: const Color(0xFFFFF176),
                         radius: 4,
                         duration: const Duration(milliseconds: 1000),
@@ -3623,10 +2475,7 @@ class SeasonTableBlock extends StatelessWidget {
                       child: txt,
                     );
                   }())),
-              Expanded(
-                  flex: 4,
-                  child: OneLineShrinkText(stat,
-                      baseSize: 12, minSize: 1, fast: true)),
+              Expanded(flex: 4, child: OneLineShrinkText(stat, baseSize: 12, minSize: 1, fast: true)),
             ]),
           ),
         );
@@ -3643,28 +2492,15 @@ class SeasonTableBlock extends StatelessWidget {
             child: Row(children: [
               for (final t in battingCols)
                 SizedBox(
-                  width: _wStat,
+                  width: parentWidth * 0.2,
                   child: Column(children: [
-                    _gridCell(t,
-                        bg: const Color(0xFFE57373),
-                        fg: Colors.white,
-                        weight: FontWeight.bold,
-                        h: 20),
+                    _gridCell(t, bg: const Color(0xFFE57373), fg: Colors.white, weight: FontWeight.bold, h: 20),
                     SizedBox(
-                      height: 15 * 5.5,
+                      height: 17.5 * 5,
                       child: SingleChildScrollView(
                         child: Column(
                           children: [
-                            for (final e in (bat
-                                .where(
-                                    (m) => (m['title']?.toString() ?? '') == t)
-                                .toList()
-                              ..sort((a, b) =>
-                                  (int.tryParse('${a['int_rank']}') ?? 1 << 30)
-                                      .compareTo(
-                                          int.tryParse('${b['int_rank']}') ??
-                                              1 << 30))))
-                              _entryCellFromRow(e),
+                            for (final e in (bat.where((m) => (m['title']?.toString() ?? '') == t).toList()..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 1 << 30).compareTo(int.tryParse('${b['int_rank']}') ?? 1 << 30)))) _entryCellFromRow(e),
                           ],
                         ),
                       ),
@@ -3673,38 +2509,21 @@ class SeasonTableBlock extends StatelessWidget {
                 ),
             ]),
           ),
-          const SizedBox(height: 0),
           // 投手（見出し+本文を同一スクロールで横スクロール）
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(children: [
               for (final t in pitchingCols)
                 SizedBox(
-                  width: _wStat,
+                  width: parentWidth * 0.2,
                   child: Column(children: [
-                    _gridCell(t,
-                        bg: const Color(0xFF64B5F6),
-                        fg: Colors.white,
-                        weight: FontWeight.bold,
-                        h: 20),
+                    _gridCell(t, bg: const Color(0xFF64B5F6), fg: Colors.white, weight: FontWeight.bold, h: 20),
                     SizedBox(
-                      height: 15 * 5.5,
+                      height: 17.5 * 5,
                       child: SingleChildScrollView(
                         child: Column(
                           children: [
-                            for (final e in (pit
-                                .where((m) =>
-                                    (m['title']?.toString() ?? '') == t ||
-                                    (_normalizeTitle(
-                                            (m['title'] ?? '').toString()) ==
-                                        _normalizeTitle(t)))
-                                .toList()
-                              ..sort((a, b) =>
-                                  (int.tryParse('${a['int_rank']}') ?? 1 << 30)
-                                      .compareTo(
-                                          int.tryParse('${b['int_rank']}') ??
-                                              1 << 30))))
-                              _entryCellFromRow(e),
+                            for (final e in (pit.where((m) => (m['title']?.toString() ?? '') == t || (_normalizeTitle((m['title'] ?? '').toString()) == _normalizeTitle(t))).toList()..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 1 << 30).compareTo(int.tryParse('${b['int_rank']}') ?? 1 << 30)))) _entryCellFromRow(e),
                           ],
                         ),
                       ),
@@ -3718,9 +2537,7 @@ class SeasonTableBlock extends StatelessWidget {
     }
 
     // スクロール分離: チーム順位は専用の横スクロール、個人成績は別
-    final double _standingsWidth = _wChar2 +
-        _wChar6 +
-        _wChar3 * 14; // 列数: 試合/勝/負/分/勝差/勝率/打率/本塁打/打点/盗塁/防御率(総合/先発/救援)/守備率
+    final double _standingsWidth = _wChar2 + _wChar6 + _wChar3 * 14; // 列数: 試合/勝/負/分/勝差/勝率/打率/本塁打/打点/盗塁/防御率(総合/先発/救援)/守備率
     final hStatsTeamHeader = 33.0;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -3743,10 +2560,8 @@ class SeasonTableBlock extends StatelessWidget {
               _wChar2 + // 盗塁
               _wChar3 + // 失策率
               _wChar2 * 3; // 防御率(総合/先発/救援)
-          final double parentW =
-              lb.maxWidth.isFinite ? lb.maxWidth : _standingsWidth;
-          final double tableW =
-              (fixed + minNameW) > parentW ? (fixed + minNameW) : parentW;
+          final double parentW = lb.maxWidth.isFinite ? lb.maxWidth : _standingsWidth;
+          final double tableW = (fixed + minNameW) > parentW ? (fixed + minNameW) : parentW;
           final double wName = tableW - fixed;
 
           return SingleChildScrollView(
@@ -3758,130 +2573,30 @@ class SeasonTableBlock extends StatelessWidget {
                 children: [
                   // ヘッダー（非防御率は縦結合、防御率のみ二段）
                   Row(children: [
-                    SizedBox(
-                        width: _wChar2,
-                        child: _gridCell('順位',
-                            h: hStatsTeamHeader,
-                            bg: leagueColor,
-                            fg: Colors.white,
-                            weight: FontWeight.bold)),
-                    SizedBox(
-                        width: wName,
-                        child: _gridCell('チーム',
-                            weight: FontWeight.bold,
-                            h: hStatsTeamHeader,
-                            bg: leagueColor,
-                            fg: Colors.white)),
-                    SizedBox(
-                        width: _wChar2,
-                        child: _gridCell('試合',
-                            weight: FontWeight.bold,
-                            h: hStatsTeamHeader,
-                            bg: leagueColor,
-                            fg: Colors.white)),
-                    SizedBox(
-                        width: _wChar1,
-                        child: _gridCell('勝',
-                            weight: FontWeight.bold,
-                            h: hStatsTeamHeader,
-                            bg: leagueColor,
-                            fg: Colors.white)),
-                    SizedBox(
-                        width: _wChar1,
-                        child: _gridCell('負',
-                            weight: FontWeight.bold,
-                            h: hStatsTeamHeader,
-                            bg: leagueColor,
-                            fg: Colors.white)),
-                    SizedBox(
-                        width: _wChar1,
-                        child: _gridCell('分',
-                            weight: FontWeight.bold,
-                            h: hStatsTeamHeader,
-                            bg: leagueColor,
-                            fg: Colors.white)),
-                    SizedBox(
-                        width: _wChar2,
-                        child: _gridCell('勝差',
-                            weight: FontWeight.bold,
-                            h: hStatsTeamHeader,
-                            bg: leagueColor,
-                            fg: Colors.white)),
-                    SizedBox(
-                        width: _wChar3,
-                        child: _gridCell('勝率',
-                            weight: FontWeight.bold,
-                            h: hStatsTeamHeader,
-                            bg: leagueColor,
-                            fg: Colors.white)),
-                    SizedBox(
-                        width: _wChar2,
-                        child: _gridCell('打率',
-                            weight: FontWeight.bold,
-                            h: hStatsTeamHeader,
-                            bg: leagueColor,
-                            fg: Colors.white)),
-                    SizedBox(
-                        width: _wChar3,
-                        child: _gridCell('本塁打',
-                            weight: FontWeight.bold,
-                            h: hStatsTeamHeader,
-                            bg: leagueColor,
-                            fg: Colors.white)),
-                    SizedBox(
-                        width: _wChar2,
-                        child: _gridCell('打点',
-                            weight: FontWeight.bold,
-                            h: hStatsTeamHeader,
-                            bg: leagueColor,
-                            fg: Colors.white)),
-                    SizedBox(
-                        width: _wChar2,
-                        child: _gridCell('盗塁',
-                            weight: FontWeight.bold,
-                            h: hStatsTeamHeader,
-                            bg: leagueColor,
-                            fg: Colors.white)),
+                    SizedBox(width: _wChar2, child: _gridCell('順位', h: hStatsTeamHeader, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
+                    SizedBox(width: wName, child: _gridCell('チーム', weight: FontWeight.bold, h: hStatsTeamHeader, bg: leagueColor, fg: Colors.white)),
+                    SizedBox(width: _wChar2, child: _gridCell('試合', weight: FontWeight.bold, h: hStatsTeamHeader, bg: leagueColor, fg: Colors.white)),
+                    SizedBox(width: _wChar1, child: _gridCell('勝', weight: FontWeight.bold, h: hStatsTeamHeader, bg: leagueColor, fg: Colors.white)),
+                    SizedBox(width: _wChar1, child: _gridCell('負', weight: FontWeight.bold, h: hStatsTeamHeader, bg: leagueColor, fg: Colors.white)),
+                    SizedBox(width: _wChar1, child: _gridCell('分', weight: FontWeight.bold, h: hStatsTeamHeader, bg: leagueColor, fg: Colors.white)),
+                    SizedBox(width: _wChar2, child: _gridCell('勝差', weight: FontWeight.bold, h: hStatsTeamHeader, bg: leagueColor, fg: Colors.white)),
+                    SizedBox(width: _wChar3, child: _gridCell('勝率', weight: FontWeight.bold, h: hStatsTeamHeader, bg: leagueColor, fg: Colors.white)),
+                    SizedBox(width: _wChar2, child: _gridCell('打率', weight: FontWeight.bold, h: hStatsTeamHeader, bg: leagueColor, fg: Colors.white)),
+                    SizedBox(width: _wChar3, child: _gridCell('本塁打', weight: FontWeight.bold, h: hStatsTeamHeader, bg: leagueColor, fg: Colors.white)),
+                    SizedBox(width: _wChar2, child: _gridCell('打点', weight: FontWeight.bold, h: hStatsTeamHeader, bg: leagueColor, fg: Colors.white)),
+                    SizedBox(width: _wChar2, child: _gridCell('盗塁', weight: FontWeight.bold, h: hStatsTeamHeader, bg: leagueColor, fg: Colors.white)),
 
-                    SizedBox(
-                        width: _wChar3,
-                        child: _gridCell('失策率',
-                            weight: FontWeight.bold,
-                            h: hStatsTeamHeader,
-                            bg: leagueColor,
-                            fg: Colors.white)),
+                    SizedBox(width: _wChar3, child: _gridCell('失策率', weight: FontWeight.bold, h: hStatsTeamHeader, bg: leagueColor, fg: Colors.white)),
 
                     // 防御率ブロック（上: 見出し、下: 総合/先発/救援）
                     SizedBox(
                       width: _wChar2 * 3,
                       child: Column(children: [
-                        _gridCell('防御率',
-                            weight: FontWeight.bold,
-                            h: hStatsTeamHeader / 2,
-                            bg: leagueColor,
-                            fg: Colors.white),
+                        _gridCell('防御率', weight: FontWeight.bold, h: hStatsTeamHeader / 2, bg: leagueColor, fg: Colors.white),
                         Row(children: [
-                          SizedBox(
-                              width: _wChar2,
-                              child: _gridCell('総合',
-                                  weight: FontWeight.bold,
-                                  h: hStatsTeamHeader / 2,
-                                  bg: leagueColor,
-                                  fg: Colors.white)),
-                          SizedBox(
-                              width: _wChar2,
-                              child: _gridCell('先発',
-                                  weight: FontWeight.bold,
-                                  h: hStatsTeamHeader / 2,
-                                  bg: leagueColor,
-                                  fg: Colors.white)),
-                          SizedBox(
-                              width: _wChar2,
-                              child: _gridCell('救援',
-                                  weight: FontWeight.bold,
-                                  h: hStatsTeamHeader / 2,
-                                  bg: leagueColor,
-                                  fg: Colors.white)),
+                          SizedBox(width: _wChar2, child: _gridCell('総合', weight: FontWeight.bold, h: hStatsTeamHeader / 2, bg: leagueColor, fg: Colors.white, align: TextAlign.center)),
+                          SizedBox(width: _wChar2, child: _gridCell('先発', weight: FontWeight.bold, h: hStatsTeamHeader / 2, bg: leagueColor, fg: Colors.white, align: TextAlign.center)),
+                          SizedBox(width: _wChar2, child: _gridCell('救援', weight: FontWeight.bold, h: hStatsTeamHeader / 2, bg: leagueColor, fg: Colors.white, align: TextAlign.center)),
                         ]),
                       ]),
                     ),
@@ -3891,180 +2606,75 @@ class SeasonTableBlock extends StatelessWidget {
                   // 本文 1..6
                   for (int rk = 1; rk <= 6; rk++)
                     () {
-                      final row = cur.firstWhere(
-                          (e) => int.tryParse('${e['int_rank']}') == rk,
-                          orElse: () => const {});
+                      final row = cur.firstWhere((e) => int.tryParse('${e['int_rank']}') == rk, orElse: () => const {});
                       final Color? teamBg = _parseColorName(row['color_back']);
                       final Color? teamFg = _parseColorName(row['color_font']);
                       // 右側（チーム名より右）のセル背景は縞模様（奇数: 白 / 偶数: 薄いベージュ）
-                      final Color? paleBg = (rk % 2 == 0)
-                          ? const Color(0xFFEAD9B9)
-                          : Colors.white;
+                      final Color? paleBg = (rk % 2 == 0) ? const Color(0xFFEAD9B9) : Colors.white;
 
                       // トップ/ワースト強調色
-                      Color? _topColor(bool cond) =>
-                          cond ? const Color(0xFF32CD32) : null; // limegreen
+                      Color? _topColor(bool cond) => cond ? const Color(0xFF32CD32) : null; // limegreen
                       Color? _worstColor(bool cond) => cond ? Colors.red : null;
 
                       // 指標ごとのフラグ判定
-                      final bool topBat =
-                          row['flg_top_num_avg_batting'] == true;
-                      final bool worstBat =
-                          row['flg_worst_num_avg_batting'] == true;
-                      final Color? fgBat =
-                          _topColor(topBat) ?? _worstColor(worstBat);
-                      final FontWeight? wtBat =
-                          (topBat || worstBat) ? FontWeight.bold : null;
+                      final bool topBat = row['flg_top_num_avg_batting'] == true;
+                      final bool worstBat = row['flg_worst_num_avg_batting'] == true;
+                      final Color? fgBat = _topColor(topBat) ?? _worstColor(worstBat);
+                      final FontWeight? wtBat = (topBat || worstBat) ? FontWeight.bold : null;
 
                       final bool topHr = row['flg_top_int_homerun'] == true;
                       final bool worstHr = row['flg_worst_int_homerun'] == true;
-                      final Color? fgHr =
-                          _topColor(topHr) ?? _worstColor(worstHr);
-                      final FontWeight? wtHr =
-                          (topHr || worstHr) ? FontWeight.bold : null;
+                      final Color? fgHr = _topColor(topHr) ?? _worstColor(worstHr);
+                      final FontWeight? wtHr = (topHr || worstHr) ? FontWeight.bold : null;
 
                       final bool topRbi = row['flg_top_int_rbi'] == true;
                       final bool worstRbi = row['flg_worst_int_rbi'] == true;
-                      final Color? fgRbi =
-                          _topColor(topRbi) ?? _worstColor(worstRbi);
-                      final FontWeight? wtRbi =
-                          (topRbi || worstRbi) ? FontWeight.bold : null;
+                      final Color? fgRbi = _topColor(topRbi) ?? _worstColor(worstRbi);
+                      final FontWeight? wtRbi = (topRbi || worstRbi) ? FontWeight.bold : null;
 
                       final bool topSb = row['flg_top_int_sh'] == true;
                       final bool worstSb = row['flg_worst_int_sh'] == true;
-                      final Color? fgSb =
-                          _topColor(topSb) ?? _worstColor(worstSb);
-                      final FontWeight? wtSb =
-                          (topSb || worstSb) ? FontWeight.bold : null;
+                      final Color? fgSb = _topColor(topSb) ?? _worstColor(worstSb);
+                      final FontWeight? wtSb = (topSb || worstSb) ? FontWeight.bold : null;
 
-                      final bool topFld =
-                          row['flg_top_num_avg_fielding'] == true;
-                      final bool worstFld =
-                          row['flg_worst_num_avg_fielding'] == true;
-                      final Color? fgFld =
-                          _topColor(topFld) ?? _worstColor(worstFld);
-                      final FontWeight? wtFld =
-                          (topFld || worstFld) ? FontWeight.bold : null;
+                      final bool topFld = row['flg_top_num_avg_fielding'] == true;
+                      final bool worstFld = row['flg_worst_num_avg_fielding'] == true;
+                      final Color? fgFld = _topColor(topFld) ?? _worstColor(worstFld);
+                      final FontWeight? wtFld = (topFld || worstFld) ? FontWeight.bold : null;
 
                       final bool topEraT = row['flg_top_num_era_total'] == true;
-                      final bool worstEraT =
-                          row['flg_worst_num_era_total'] == true;
-                      final Color? fgEraT =
-                          _topColor(topEraT) ?? _worstColor(worstEraT);
-                      final FontWeight? wtEraT =
-                          (topEraT || worstEraT) ? FontWeight.bold : null;
+                      final bool worstEraT = row['flg_worst_num_era_total'] == true;
+                      final Color? fgEraT = _topColor(topEraT) ?? _worstColor(worstEraT);
+                      final FontWeight? wtEraT = (topEraT || worstEraT) ? FontWeight.bold : null;
 
-                      final bool topEraS =
-                          row['flg_top_num_era_starter'] == true;
-                      final bool worstEraS =
-                          row['flg_worst_num_era_starter'] == true;
-                      final Color? fgEraS =
-                          _topColor(topEraS) ?? _worstColor(worstEraS);
-                      final FontWeight? wtEraS =
-                          (topEraS || worstEraS) ? FontWeight.bold : null;
+                      final bool topEraS = row['flg_top_num_era_starter'] == true;
+                      final bool worstEraS = row['flg_worst_num_era_starter'] == true;
+                      final Color? fgEraS = _topColor(topEraS) ?? _worstColor(worstEraS);
+                      final FontWeight? wtEraS = (topEraS || worstEraS) ? FontWeight.bold : null;
 
-                      final bool topEraR =
-                          row['flg_top_num_era_relief'] == true;
-                      final bool worstEraR =
-                          row['flg_worst_num_era_relief'] == true;
-                      final Color? fgEraR =
-                          _topColor(topEraR) ?? _worstColor(worstEraR);
-                      final FontWeight? wtEraR =
-                          (topEraR || worstEraR) ? FontWeight.bold : null;
+                      final bool topEraR = row['flg_top_num_era_relief'] == true;
+                      final bool worstEraR = row['flg_worst_num_era_relief'] == true;
+                      final Color? fgEraR = _topColor(topEraR) ?? _worstColor(worstEraR);
+                      final FontWeight? wtEraR = (topEraR || worstEraR) ? FontWeight.bold : null;
 
                       const double _gridBodyH = 20.0;
                       return Row(children: [
-                        SizedBox(
-                            width: _wChar2,
-                            child: _gridCell('$rk',
-                                h: _gridBodyH,
-                                bg: leagueColor,
-                                fg: Colors.white,
-                                weight: FontWeight.bold)),
-                        SizedBox(
-                            width: wName,
-                            child: _gridCell(_num(row['name_team']),
-                                h: _gridBodyH, bg: teamBg, fg: teamFg)),
-                        SizedBox(
-                            width: _wChar2,
-                            child: _gridCell(_num(row['int_game']),
-                                h: _gridBodyH, bg: paleBg)),
-                        SizedBox(
-                            width: _wChar1,
-                            child: _gridCell(_num(row['int_win']),
-                                h: _gridBodyH, bg: paleBg)),
-                        SizedBox(
-                            width: _wChar1,
-                            child: _gridCell(_num(row['int_lose']),
-                                h: _gridBodyH, bg: paleBg)),
-                        SizedBox(
-                            width: _wChar1,
-                            child: _gridCell(_num(row['int_draw']),
-                                h: _gridBodyH, bg: paleBg)),
-                        SizedBox(
-                            width: _wChar2,
-                            child: _gridCell(_num(row['game_behind']),
-                                h: _gridBodyH, bg: paleBg)),
-                        SizedBox(
-                            width: _wChar3,
-                            child: _gridCell(_num(row['pct_win']),
-                                h: _gridBodyH, bg: paleBg)),
-                        SizedBox(
-                            width: _wChar2,
-                            child: _gridCell(_num(row['num_avg_batting']),
-                                h: _gridBodyH,
-                                bg: paleBg,
-                                fg: fgBat,
-                                weight: wtBat)),
-                        SizedBox(
-                            width: _wChar3,
-                            child: _gridCell(_num(row['int_homerun']),
-                                h: _gridBodyH,
-                                bg: paleBg,
-                                fg: fgHr,
-                                weight: wtHr)),
-                        SizedBox(
-                            width: _wChar2,
-                            child: _gridCell(_num(row['int_rbi']),
-                                h: _gridBodyH,
-                                bg: paleBg,
-                                fg: fgRbi,
-                                weight: wtRbi)),
-                        SizedBox(
-                            width: _wChar2,
-                            child: _gridCell(_num(row['int_sh']),
-                                h: _gridBodyH,
-                                bg: paleBg,
-                                fg: fgSb,
-                                weight: wtSb)),
-                        SizedBox(
-                            width: _wChar3,
-                            child: _gridCell(_num(row['num_avg_fielding']),
-                                h: _gridBodyH,
-                                bg: paleBg,
-                                fg: fgFld,
-                                weight: wtFld)),
-                        SizedBox(
-                            width: _wChar2,
-                            child: _gridCell(_num(row['num_era_total']),
-                                h: _gridBodyH,
-                                bg: paleBg,
-                                fg: fgEraT,
-                                weight: wtEraT)),
-                        SizedBox(
-                            width: _wChar2,
-                            child: _gridCell(_num(row['num_era_starter']),
-                                h: _gridBodyH,
-                                bg: paleBg,
-                                fg: fgEraS,
-                                weight: wtEraS)),
-                        SizedBox(
-                            width: _wChar2,
-                            child: _gridCell(_num(row['num_era_relief']),
-                                h: _gridBodyH,
-                                bg: paleBg,
-                                fg: fgEraR,
-                                weight: wtEraR)),
+                        SizedBox(width: _wChar2, child: _gridCell('$rk', h: _gridBodyH, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
+                        SizedBox(width: wName, child: _gridCell(_num(row['name_team']), h: _gridBodyH, bg: teamBg, fg: teamFg)),
+                        SizedBox(width: _wChar2, child: _gridCell(_num(row['int_game']), h: _gridBodyH, bg: paleBg)),
+                        SizedBox(width: _wChar1, child: _gridCell(_num(row['int_win']), h: _gridBodyH, bg: paleBg)),
+                        SizedBox(width: _wChar1, child: _gridCell(_num(row['int_lose']), h: _gridBodyH, bg: paleBg)),
+                        SizedBox(width: _wChar1, child: _gridCell(_num(row['int_draw']), h: _gridBodyH, bg: paleBg)),
+                        SizedBox(width: _wChar2, child: _gridCell(_num(row['game_behind']), h: _gridBodyH, bg: paleBg)),
+                        SizedBox(width: _wChar3, child: _gridCell(_num(row['pct_win']), h: _gridBodyH, bg: paleBg)),
+                        SizedBox(width: _wChar2, child: _gridCell(_num(row['num_avg_batting']), h: _gridBodyH, bg: paleBg, fg: fgBat, weight: wtBat)),
+                        SizedBox(width: _wChar3, child: _gridCell(_num(row['int_homerun']), h: _gridBodyH, bg: paleBg, fg: fgHr, weight: wtHr)),
+                        SizedBox(width: _wChar2, child: _gridCell(_num(row['int_rbi']), h: _gridBodyH, bg: paleBg, fg: fgRbi, weight: wtRbi)),
+                        SizedBox(width: _wChar2, child: _gridCell(_num(row['int_sh']), h: _gridBodyH, bg: paleBg, fg: fgSb, weight: wtSb)),
+                        SizedBox(width: _wChar3, child: _gridCell(_num(row['num_avg_fielding']), h: _gridBodyH, bg: paleBg, fg: fgFld, weight: wtFld)),
+                        SizedBox(width: _wChar2, child: _gridCell(_num(row['num_era_total']), h: _gridBodyH, bg: paleBg, fg: fgEraT, weight: wtEraT)),
+                        SizedBox(width: _wChar2, child: _gridCell(_num(row['num_era_starter']), h: _gridBodyH, bg: paleBg, fg: fgEraS, weight: wtEraS)),
+                        SizedBox(width: _wChar2, child: _gridCell(_num(row['num_era_relief']), h: _gridBodyH, bg: paleBg, fg: fgEraR, weight: wtEraR)),
                       ]);
                     }(),
                 ],
@@ -4075,10 +2685,10 @@ class SeasonTableBlock extends StatelessWidget {
         const SizedBox(height: 2),
 
         // 個人成績（独立: 内部で横スクロールを制御）
-        Container(
-          margin: const EdgeInsets.all(1),
-          child: _personalStatsSheet(leagueId, bat, pit),
-        ),
+        LayoutBuilder(builder: (context, lb) {
+          final double centralW = lb.maxWidth.isFinite ? lb.maxWidth : 0;
+          return _personalStatsSheet(leagueId, bat, pit, centralW);
+        }),
       ],
     );
   }
@@ -4088,8 +2698,8 @@ class SeasonTableBlock extends StatelessWidget {
     return SizedBox.expand(
       child: Card(
         elevation: 2,
-        margin: const EdgeInsets.symmetric(vertical: 2),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.symmetric(vertical: 0),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
         child: Padding(
           padding: const EdgeInsets.all(2),
           child: SingleChildScrollView(
@@ -4098,8 +2708,7 @@ class SeasonTableBlock extends StatelessWidget {
               children: onlyLeagueId == null
                   ? [
                       _leagueTable(1), // セ
-                      const SizedBox(height: 16),
-                      _leagueTable(2), // パ
+                      // _leagueTable(2), // パ
                     ]
                   : [
                       _leagueTable(onlyLeagueId!),
@@ -4152,11 +2761,8 @@ class _StatsColumnState extends State<_StatsColumn> {
       child: OneLineShrinkText(widget.title, baseSize: 12, minSize: 6),
     );
 
-    final firstFive =
-        widget.rows.length <= 5 ? widget.rows : widget.rows.sublist(0, 5);
-    final extras = widget.rows.length <= 5
-        ? const <Map<String, dynamic>>[]
-        : widget.rows.sublist(5);
+    final firstFive = widget.rows.length <= 5 ? widget.rows : widget.rows.sublist(0, 5);
+    final extras = widget.rows.length <= 5 ? const <Map<String, dynamic>>[] : widget.rows.sublist(5);
 
     // Revert to simple scroll version behavior at column level (no overlay expansion here).
     return SizedBox(

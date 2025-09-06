@@ -4,18 +4,18 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 import 'package:shelf_router/shelf_router.dart';
-import 'package:shelf_static/shelf_static.dart'; // ← 重要
-import 'app/AppSql.dart';
-import 'app/FetchURL.dart';
-import 'tools/Postgres.dart';
-import 'app/Value.dart';
-import 'tools/DateTimeTool.dart';
+import 'package:shelf_static/shelf_static.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 import 'package:postgres/postgres.dart';
+import 'tools/DateTimeTool.dart';
+import 'tools/Postgres.dart';
 import 'app/DB/t_system_log.dart';
 import 'app/DB/t_system_log_error.dart';
 import 'app/DB/m_user.dart';
-import 'package:mailer/mailer.dart';
-import 'package:mailer/smtp_server.dart';
+import 'app/AppSql.dart';
+import 'app/FetchURL.dart';
+import 'app/Value.dart';
 
 void main() async {
   try {
@@ -25,54 +25,40 @@ void main() async {
     // ====== API ======
 
     app.get('/fetchStatsTeamNPB', (Request request) async {
-      return await commonAPI(request, log.Fetch.NAME, log.Fetch.Codes.STATS_TEAM, (conn) async {
-        await FetchURL.fetchStatsTeamNPB(conn);
-        return Response.ok('ok');
+      return await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.STATS_TEAM, (conn) async {
+        return await FetchURL.fetchStatsTeamNPB(conn);
       });
     });
 
     app.get('/fetchStatsPlayerNPB', (Request request) async {
-      return await commonAPI(request, log.Fetch.NAME, log.Fetch.Codes.STATS_PLAYER, (conn) async {
-        await FetchURL.fetchStatsPlayerNPB(conn);
-        return Response.ok('ok');
+      return await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.STATS_PLAYER, (conn) async {
+        return await FetchURL.fetchStatsPlayerNPB(conn);
       });
     });
 
     app.get('/fetchGamesNPB', (Request request) async {
-      // 今日の先発情報を更新→取得（必要に応じてコメントアウト可）
-      return await commonAPI(request, log.Fetch.NAME, log.Fetch.Codes.GAMES, (conn) async {
-        await FetchURL.fetchGamesNPB(conn, DateTime.now()); //今日の試合
-
-        await FetchURL.fetchGamesNPB(conn, DateTime.now().add(const Duration(days: 1))); //明日の試合
-        return Response.ok('ok');
+      return await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.GAMES, (conn) async {
+        return await FetchURL.fetchGamesNPB(conn);
       });
     });
 
     //タイトル予想画面の表示
     app.get('/predictions', (Request request) async {
-      return await commonTryCatch(request, log.Prediction.NAME, log.Prediction.Codes.ENTER_NPB, (conn) async {
+      return await tryCatchAPI(request, log.Prediction.NAME, log.Prediction.Codes.ENTER_NPB, (conn) async {
         //予想データの取得
-        Map<String, dynamic> json = {};
+
         final current_year = DateTimeTool.getThisYear();
 
-        final predict_team = await Postgres.execute(conn, AppSql.selectPredictNPBTeams(), data: [current_year]); //予想者データをDBから取得
-        final predict_player = await Postgres.execute(conn, AppSql.selectPredictPlayer(), data: [current_year]); //個人タイトル予想のデータをDBから取得
-        final stats_team = await Postgres.execute(conn, AppSql.selectStatsTeam());
-        final stats_player = await Postgres.execute(conn, AppSql.selectStatsPlayer(), data: [current_year]);
-        final games = await Postgres.execute(conn, AppSql.selectGames(), data: [current_year]);
-        final events = await Postgres.execute(conn, AppSql.selectEventsDetails());
-        final notification = await Postgres.execute(conn, AppSql.selectNotification());
-
-        json = {
-          'predict_team': Postgres.toJson(predict_team),
-          'predict_player': Postgres.toJson(predict_player),
-          'stats_team': Postgres.toJson(stats_team),
-          'stats_player': Postgres.toJson(stats_player),
-          'games': Postgres.toJson(games),
-          'events': Postgres.toJson(events),
-          'notification': Postgres.toJson(notification),
+        Map<String, dynamic> json = {
+          'predict_team': Postgres.toJson(await Postgres.execute(conn, AppSql.selectPredictNPBTeams(), data: [current_year])),
+          'predict_player': Postgres.toJson(await Postgres.execute(conn, AppSql.selectPredictPlayer(), data: [current_year])),
+          'stats_team': Postgres.toJson(await Postgres.execute(conn, AppSql.selectStatsTeam())),
+          'stats_player': Postgres.toJson(await Postgres.execute(conn, AppSql.selectStatsPlayer(), data: [current_year])),
+          'games': Postgres.toJson(await Postgres.execute(conn, AppSql.selectGames(), data: [current_year])),
+          'events': Postgres.toJson(await Postgres.execute(conn, AppSql.selectEventsDetails())),
+          'notification': Postgres.toJson(await Postgres.execute(conn, AppSql.selectNotification())),
         };
-        print(Postgres.toJson(stats_player));
+        print(json['games']);
         // print(json);
         return Response.ok(jsonEncode(json), headers: {'content-type': 'application/json; charset=utf-8'});
       });
@@ -139,68 +125,79 @@ void main() async {
   }
 } // void main
 
-Future<Response> commonTryCatch(Request request, String category_system, String code_system, Future<Response> callback(Connection conn)) async {
+Future<Response> tryCatchAPI(Request request, String category_system, String code_system, Future<Response> callback(Connection conn)) async {
   var id_error = 0;
   final user = m_user();
   var response = Response.ok('ok');
   await Postgres.openConnection((conn) async {
-    try {
-      //ログインユーザー情報
-      print('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
-      print("🌐Routing...【" + request.requestedUri.toString() + "】");
-      print("");
-
-      await user.loadProperty(conn, 0);
-      user.category_system = category_system;
-      user.code_system = code_system;
-      user.flg_user = false;
-
-      response = await callback(conn);
-    } catch (e, st) {
-      var flg_db_error = false;
-      print("⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️");
-      print("👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇");
-      print('🔥 /predictions ERROR: $e\n$st');
-      stderr.writeln('🔥 /predictions ERROR: $e\n$st');
-      print("👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆");
-      print("⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️");
+    await Postgres.transactionCommit(conn, () async {
       try {
-        id_error = await insertLogError(conn, e, st.toString(), user);
+        //ログインユーザー情報
+        print('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
+        print("🌐Routing...【" + request.requestedUri.toString() + "】");
+        print("");
+
+        await user.loadProperty(conn, 0);
+        user.category_system = category_system;
+        user.code_system = code_system;
+        user.flg_user = false;
+
+        response = await callback(conn);
       } catch (e, st) {
-        //エラーログの登録に失敗
-        flg_db_error = true;
+        var flg_db_error = false;
+        print("⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️");
+        print("👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇");
         print('🔥 /predictions ERROR: $e\n$st');
         stderr.writeln('🔥 /predictions ERROR: $e\n$st');
-      } finally {
+        print("👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆");
+        print("⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️");
         try {
-          //callback()内ので発生したエラーをメールで通知
-          final username = 'hotateishi2012@yahoo.co.jp';
-          final password = '199424';
-          sendMail(username, password, 'プログラム上でエラーが発生しました', e.toString());
-
-          if (flg_db_error) {
-            //エラーログがDBに残せなかったことをメールで通知
-            user.category_system = Value.SystemCode.Log.Error.NAME;
-            user.code_system = Value.SystemCode.Log.Error.Codes.MAIL;
-            sendMail(username, password, 'エラーログの登録に失敗しました。', e.toString());
-          }
+          id_error = await insertLogError(conn, e, st.toString(), user);
+          print("エラーログのDBに登録しました。");
         } catch (e, st) {
-          //メール送信失敗
+          //エラーログの登録に失敗
+          flg_db_error = true;
+          print("エラーログのDB登録に失敗しました。");
           print('🔥 /predictions ERROR: $e\n$st');
           stderr.writeln('🔥 /predictions ERROR: $e\n$st');
-          if (flg_db_error) {
-            //メール送信失敗のエラーログを残す
-            user.category_system = Value.SystemCode.Log.Error.NAME;
-            user.code_system = Value.SystemCode.Log.Error.Codes.MAIL;
-            id_error = await insertLogError(conn, e, st.toString(), user);
+        } finally {
+          try {
+            //callback()内ので発生したエラーをメールで通知
+            final username = 'hotateishi2012@yahoo.co.jp';
+            final password = '199424';
+            sendMail(username, password, 'プログラム上でエラーが発生しました', e.toString());
+            print("プログラム上でのエラーを通知するメール送信に成功しました。");
+
+            if (flg_db_error) {
+              //エラーログがDBに残せなかったことをメールで通知
+              user.category_system = Value.SystemCode.Log.Error.NAME;
+              user.code_system = Value.SystemCode.Log.Error.Codes.MAIL;
+              sendMail(username, password, 'エラーログの登録に失敗しました。', e.toString());
+              print("エラーログの登録に失敗したことを通知するメール送信に成功しました。");
+            }
+          } catch (e, st) {
+            //メール送信失敗
+            print('🔥 /predictions ERROR: $e\n$st');
+            stderr.writeln('🔥 /predictions ERROR: $e\n$st');
+            if (flg_db_error) {
+              //メール送信失敗のエラーログを残す
+              print("プログラム上でのエラーを通知するメール送信に失敗しました。");
+              user.category_system = Value.SystemCode.Log.Error.NAME;
+              user.code_system = Value.SystemCode.Log.Error.Codes.MAIL;
+              id_error = await insertLogError(conn, e, st.toString(), user);
+            } else {
+              print("DB接続もメール送信もできない状態です。webサーバーのネットワーク接続に問題がある可能性があります。");
+              //webサーバーのローカルディレクトリにエラーログを書き込む。
+              final log_error = DateTimeTool.getNow("").toString() + "\n" + e.toString() + "\n" + st.toString() + "\n";
+              final file = File('error_log.txt');
+              file.writeAsStringSync(log_error);
+              print("エラーログをローカルディレクトリに書き込みました。");
+            }
           }
         }
-      }
-
-      response = Response.internalServerError(body: 'データベースエラー: $e');
-    } finally {
-      //操作ログを残す
-      await Postgres.transactionCommit(conn, () async {
+        response = Response.internalServerError(body: 'データベースエラー: $e');
+      } finally {
+        //操作ログを残す
         final log = t_system_log();
         log.method = request.method;
         log.category = user.category_system;
@@ -217,24 +214,17 @@ Future<Response> commonTryCatch(Request request, String category_system, String 
         log.updpgm = user.code_system;
 
         await Postgres.insert(conn, log);
-      }); //transactionCommit
 
-      print("");
-      print("🌐Responsed Successfully‼️【" + request.requestedUri.toString() + "】");
-      print('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
-    }
+        print("操作ログを登録しました。【${user.code_system}】");
+
+        print("");
+        print("🌐Responsed Successfully‼️【" + request.requestedUri.toString() + "】");
+        print('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
+      }
+    }); //transactionCommit
   }); // connectionOpenClose
   return response;
 } //commonTryCatch
-
-Future<Response> commonAPI(Request request, String category_system, String code_system, Future<Response> callback(Connection conn)) async {
-  return await commonTryCatch(request, code_system, category_system, (conn) async {
-    await Postgres.transactionCommit(conn, () async {
-      await callback(conn);
-    });
-    return Response.ok('ok');
-  }); //catch
-}
 
 void sendMail(String mailaddress, String password, String title, String text) async {
   // Yahoo SMTP

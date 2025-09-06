@@ -82,7 +82,7 @@ class AppSql {
   //t_events_details
   static String selectEventsDetails() {
     return '''
-      SELECT 
+            SELECT 
         *,
         CASE WHEN date_From_temp < (CURRENT_DATE + INTERVAL '1 day') THEN TRUE ELSE FALSE END AS flg_today 
       FROM (
@@ -100,6 +100,7 @@ class AppSql {
                        WHEN m_event.code_date_from = '7_DAYS_LATOR_JS' THEN m_event.date_from
                   END)
           END AS date_from_temp,
+          events.date_to,
           CASE WHEN events.date_from IS NOT NULL THEN 
            (CASE WHEN m_event.flg_span = TRUE AND events.date_to IS NOT NULL THEN to_char(events.date_from, 'YYYY"年"MM"月"DD"日"') || '〜' || to_char(events.date_to, 'YYYY"年"MM"月"DD"日"')
                  ELSE (CASE WHEN EXTRACT(HOUR FROM events.date_from) = 0 THEN to_char(events.date_from, 'YYYY"年"MM"月"DD"日"')
@@ -130,7 +131,8 @@ class AppSql {
           LEFT OUTER JOIN m_system_code AS event_category_sub ON event_category_sub.key = m_event.code_category_sub AND event_category_sub.code = 'EVENT_SUB'
           ORDER BY events.date_from
         ) AS t
-      WHERE date_from_temp >= CURRENT_DATE
+      WHERE date_from_temp > CURRENT_DATE 
+        OR (date_to IS NOT NULL AND date_to > CURRENT_DATE AND date_from_temp > (CURRENT_DATE - INTERVAL '10 day'))
       ORDER BY date_from_temp, txt_timing;
     ''';
   }
@@ -152,7 +154,9 @@ class AppSql {
     return '''
       SELECT 
         to_char(t_game.datetime_start, 'YYYY-MM-DD') AS date_game,
-        to_char(t_game.datetime_start, 'HH24:MI')    AS time_game,
+        CASE WHEN to_char(t_game.datetime_start, 'HH24:MI') BETWEEN '06:00' AND '16:59' THEN '☀️ ' || to_char(t_game.datetime_start, 'HH24:MI')
+             WHEN to_char(t_game.datetime_start, 'HH24:MI') BETWEEN '17:00' AND '24:00' THEN '🌙 ' || to_char(t_game.datetime_start, 'HH24:MI')
+             ELSE '' END AS time_game,
         team_home.name_short AS name_team_home,
         team_away.name_short AS name_team_away,
         team_home.color_font AS color_font_home,

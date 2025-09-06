@@ -22,6 +22,7 @@ class Postgres {
 
     try {
       await conn.execute('SET search_path TO public');
+      await conn.execute('SET TIME ZONE \'Asia/Tokyo\'');
 
       await callback(conn);
     } catch (e, st) {

@@ -58,8 +58,7 @@ void main() async {
           'events': Postgres.toJson(await Postgres.execute(conn, AppSql.selectEventsDetails())),
           'notification': Postgres.toJson(await Postgres.execute(conn, AppSql.selectNotification())),
         };
-        // print(json['predict_team']);
-        print(json);
+        print(json['predict_team']);
         return Response.ok(jsonEncode(json), headers: {'content-type': 'application/json; charset=utf-8'});
       });
     });

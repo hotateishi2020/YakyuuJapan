@@ -42,7 +42,7 @@ class UnifiedGrid extends StatelessWidget {
     );
   }
 
-  Widget cell(String text, {bool highlight = false, Color? bgColor, Color? borderColor}) {
+  Widget cell(String text, {bool highlight = false, Color? bgColor, Color? borderColor, Color? fgColor, FontWeight? weight}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 0),
       padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
@@ -54,7 +54,7 @@ class UnifiedGrid extends StatelessWidget {
       ),
       child: SizedBox(
         width: double.infinity,
-        child: OneLineShrinkText(text, baseSize: 12, minSize: 5, verticalPadding: 0, fast: true, weight: highlight ? FontWeight.bold : null),
+        child: OneLineShrinkText(text, baseSize: 12, minSize: 5, verticalPadding: 0, fast: true, color: fgColor, weight: weight ?? (highlight ? FontWeight.bold : null)),
       ),
     );
   }
@@ -109,6 +109,7 @@ class UnifiedGrid extends StatelessWidget {
       ..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0).compareTo(int.tryParse('${b['int_rank']}') ?? 0));
 
     // predictionsから対象リーグを抽出
+    final pred0 = predictions.where((e) => '${e['id_user']}' == '0' && (int.tryParse('${e['id_league']}') ?? 0) == leagueId).toList()..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0).compareTo(int.tryParse('${b['int_rank']}') ?? 0));
     final pred1 = predictions.where((e) => '${e['id_user']}' == '1' && (int.tryParse('${e['id_league']}') ?? 0) == leagueId).toList()..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0).compareTo(int.tryParse('${b['int_rank']}') ?? 0));
 
     final pred2 = predictions.where((e) => '${e['id_user']}' == '2' && (int.tryParse('${e['id_league']}') ?? 0) == leagueId).toList()..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0).compareTo(int.tryParse('${b['int_rank']}') ?? 0));
@@ -168,6 +169,7 @@ class UnifiedGrid extends StatelessWidget {
       final curGroup = currentRows.where((e) => int.tryParse('${e['int_rank']}') == rk).toList();
 
       // 予想側
+      final p0 = pred0.firstWhere((e) => int.tryParse('${e['int_rank']}') == rk, orElse: () => {});
       final p1 = pred1.firstWhere((e) => int.tryParse('${e['int_rank']}') == rk, orElse: () => {});
       final p2 = pred2.firstWhere((e) => int.tryParse('${e['int_rank']}') == rk, orElse: () => {});
 
@@ -185,7 +187,50 @@ class UnifiedGrid extends StatelessWidget {
           SizedBox(width: _rankCellW, child: headerCell('$rk', bgColor: leagueColor, fgColor: Colors.white)),
           SizedBox(
             width: w_col_predictor!,
-            child: cell(curTeamText, bgColor: const Color(0xFFF0E68C)),
+            child: (() {
+              // 現在列: standings 側の色（同順位複数ならグラデーション）
+              final List<Color> curColors = curGroup.map((e) => _parseColorNameLocal('${e['color_back']}')).whereType<Color>().toList();
+              final Color? curFont = curGroup.isNotEmpty ? _parseColorNameLocal('${curGroup.first['color_font']}') : null;
+              final BoxDecoration deco = curColors.isEmpty
+                  ? BoxDecoration(
+                      color: const Color(0xFFF0E68C),
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(3),
+                    )
+                  : (curColors.length == 1
+                      ? BoxDecoration(
+                          color: curColors.first,
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(3),
+                        )
+                      : BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: curColors,
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(3),
+                        ));
+              return Container(
+                margin: const EdgeInsets.symmetric(horizontal: 0),
+                padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+                constraints: const BoxConstraints(minHeight: 21.5),
+                decoration: deco,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OneLineShrinkText(
+                    curTeamText,
+                    baseSize: 12,
+                    minSize: 5,
+                    verticalPadding: 0,
+                    fast: true,
+                    color: curFont ?? Colors.black,
+                    weight: FontWeight.bold,
+                  ),
+                ),
+              );
+            })(),
           ),
           SizedBox(
             width: w_col_predictor!,
@@ -282,7 +327,9 @@ class UnifiedGrid extends StatelessWidget {
       final user2Rows = rows2.where((e) => '${e['id_user']}' == '2');
 
       final txt1 = _joinDedup(user1Rows.map((e) => '${e['player_name'] ?? ''}'));
-      final txt0 = _joinDedup(user0Rows.map((e) => '${e['player_name'] ?? ''}'));
+      // 現在列（id_user==0）は複数選手を同一セルに入れる可能性がある
+      final names0 = user0Rows.map((e) => '${e['player_name'] ?? ''}').where((s) => s.trim().isNotEmpty).toList();
+      final txt0 = _joinDedup(names0);
       final txt2 = _joinDedup(user2Rows.map((e) => '${e['player_name'] ?? ''}'));
 
       final hi1 = user1Rows.any((e) => e['flg_atari'] == true);
@@ -299,7 +346,87 @@ class UnifiedGrid extends StatelessWidget {
       Color? c2 = _parseColorNameLocal(user2Rows.map((e) => '${e['color_today'] ?? ''}').firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
 
       final Color _baseBg0 = const Color(0xFFF0E68C);
-      final w0 = cell(txt0, bgColor: _baseBg0, highlight: hi0, borderColor: c0 != null ? Colors.transparent : null);
+      // 現在列の背景を、同セル内の選手色でグラデーション（なければ既定色）
+      final colors0 = user0Rows.map((e) => _parseColorNameLocal('${e['color_back']}')).whereType<Color>().toList();
+      BoxDecoration deco0;
+      if (colors0.isEmpty) {
+        deco0 = BoxDecoration(
+          color: _baseBg0,
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(3),
+        );
+      } else if (colors0.length == 1) {
+        deco0 = BoxDecoration(
+          color: colors0.first,
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(3),
+        );
+      } else {
+        // 境界だけを極小幅でブレンドし、それ以外は各色をベタ塗り
+        final List<Color> gColors = [];
+        final List<double> gStops = [];
+        final int n = colors0.length;
+        const double eps = 0.04; // 境界ブレンド幅（とても狭い）
+
+        double clamp01(double v) => v.clamp(0.0, 1.0);
+
+        // 最初の色の開始
+        gColors.add(colors0[0]);
+        gStops.add(0.0);
+
+        for (int i = 0; i < n - 1; i++) {
+          final double boundary = (i + 1) / n; // i と i+1 の境界
+
+          // 境界直前までは左色をベタ
+          gColors.add(colors0[i]);
+          gStops.add(clamp01(boundary - eps));
+
+          // 境界直後からは右色
+          gColors.add(colors0[i + 1]);
+          gStops.add(clamp01(boundary + eps));
+        }
+
+        // 最後の色の終端
+        gColors.add(colors0.last);
+        gStops.add(1.0);
+
+        deco0 = BoxDecoration(
+          gradient: LinearGradient(
+            colors: gColors,
+            stops: gStops,
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(3),
+        );
+      }
+      // 選手ごとの文字色を適用するため、RichTextで構築
+      final parts0 = <InlineSpan>[];
+      for (final r in user0Rows) {
+        final name = (r['player_name'] ?? '').toString().trim();
+        if (name.isEmpty) continue;
+        if (parts0.isNotEmpty) parts0.add(const TextSpan(text: ', '));
+        final col = _parseColorNameLocal('${r['color_font']}');
+        parts0.add(TextSpan(text: name, style: TextStyle(color: col, fontWeight: FontWeight.bold)));
+      }
+
+      final w0 = Container(
+        margin: const EdgeInsets.symmetric(horizontal: 0),
+        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+        constraints: const BoxConstraints(minHeight: 21.5),
+        decoration: deco0,
+        child: SizedBox(
+          width: double.infinity,
+          child: parts0.isEmpty
+              ? OneLineShrinkText('—', baseSize: 12, minSize: 5, verticalPadding: 0, fast: true, weight: FontWeight.bold)
+              : FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.center,
+                  child: RichText(textAlign: TextAlign.center, text: TextSpan(style: const TextStyle(fontSize: 12), children: parts0)),
+                ),
+        ),
+      );
       final w1 = cell(txt1, highlight: hi1, borderColor: c1 != null ? Colors.transparent : null);
       final w2 = cell(txt2, highlight: hi2, borderColor: c2 != null ? Colors.transparent : null);
 

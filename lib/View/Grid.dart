@@ -48,13 +48,13 @@ class UnifiedGrid extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
       constraints: const BoxConstraints(minHeight: 21.5),
       decoration: BoxDecoration(
-        color: bgColor ?? (highlight ? Colors.yellow[200] : null),
+        color: bgColor ?? (highlight ? Colors.yellow : null),
         border: Border.all(color: borderColor ?? Colors.grey.shade300),
         borderRadius: BorderRadius.circular(3),
       ),
       child: SizedBox(
         width: double.infinity,
-        child: OneLineShrinkText(text, baseSize: 12, minSize: 5, verticalPadding: 0, fast: true),
+        child: OneLineShrinkText(text, baseSize: 12, minSize: 5, verticalPadding: 0, fast: true, weight: highlight ? FontWeight.bold : null),
       ),
     );
   }

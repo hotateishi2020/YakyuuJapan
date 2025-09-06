@@ -264,7 +264,8 @@ class FetchURL {
                       match.querySelectorAll('#async-gameDetail')[0].querySelectorAll('div')[1].querySelectorAll('p')[0].querySelectorAll('span')[0].text.trim(),
                     ) ??
                     -1;
-                score_away = int.tryParse(match.querySelectorAll('#async-gameDetail')[0].querySelectorAll('div')[1].querySelectorAll('p')[0].querySelectorAll('span')[2].text.trim()) ?? -1;
+                score_away =
+                    int.tryParse(match.querySelectorAll('#async-gameDetail')[0].querySelectorAll('div')[1].querySelectorAll('p')[0].querySelectorAll('span')[2].text.trim()) ?? -1;
                 match_state = match.querySelectorAll('#async-gameDetail')[0].querySelectorAll('div')[1].querySelectorAll('p')[1].text.trim();
               } catch (e) {
                 print('試合前なのでスコアのスクレイピングは行いませんでした。');
@@ -275,16 +276,64 @@ class FetchURL {
               var flg_no_pitcher = false;
 
               try {
-                pitcher_home = doc_detail.querySelectorAll('#strt_mem')[0].querySelectorAll('section')[0].querySelectorAll('div')[0].querySelectorAll('section')[0].querySelectorAll('table')[0].querySelectorAll('tbody')[0].querySelectorAll('tr')[0].querySelectorAll('td')[2].querySelectorAll('a')[0].text.trim();
+                pitcher_home = doc_detail
+                    .querySelectorAll('#strt_mem')[0]
+                    .querySelectorAll('section')[0]
+                    .querySelectorAll('div')[0]
+                    .querySelectorAll('section')[0]
+                    .querySelectorAll('table')[0]
+                    .querySelectorAll('tbody')[0]
+                    .querySelectorAll('tr')[0]
+                    .querySelectorAll('td')[2]
+                    .querySelectorAll('a')[0]
+                    .text
+                    .trim();
 
-                pitcher_away = doc_detail.querySelectorAll('#strt_mem')[0].querySelectorAll('section')[0].querySelectorAll('div')[0].querySelectorAll('section')[1].querySelectorAll('table')[0].querySelectorAll('tbody')[0].querySelectorAll('tr')[0].querySelectorAll('td')[2].querySelectorAll('a')[0].text.trim();
+                pitcher_away = doc_detail
+                    .querySelectorAll('#strt_mem')[0]
+                    .querySelectorAll('section')[0]
+                    .querySelectorAll('div')[0]
+                    .querySelectorAll('section')[1]
+                    .querySelectorAll('table')[0]
+                    .querySelectorAll('tbody')[0]
+                    .querySelectorAll('tr')[0]
+                    .querySelectorAll('td')[2]
+                    .querySelectorAll('a')[0]
+                    .text
+                    .trim();
 
                 print("試合中もしくは試合後の先発投手を取得しました。");
               } catch (e) {
                 try {
-                  pitcher_home = doc_detail.querySelectorAll('#strt_pit')[0].querySelectorAll('div')[0].querySelectorAll('div')[0].querySelectorAll('section')[0].querySelectorAll('div')[1].querySelectorAll('div')[0].querySelectorAll('table')[0].querySelectorAll('tbody')[0].querySelectorAll('tr')[0].querySelectorAll('td')[2].querySelectorAll('a')[0].text.trim();
+                  pitcher_home = doc_detail
+                      .querySelectorAll('#strt_pit')[0]
+                      .querySelectorAll('div')[0]
+                      .querySelectorAll('div')[0]
+                      .querySelectorAll('section')[0]
+                      .querySelectorAll('div')[1]
+                      .querySelectorAll('div')[0]
+                      .querySelectorAll('table')[0]
+                      .querySelectorAll('tbody')[0]
+                      .querySelectorAll('tr')[0]
+                      .querySelectorAll('td')[2]
+                      .querySelectorAll('a')[0]
+                      .text
+                      .trim();
 
-                  pitcher_away = doc_detail.querySelectorAll('#strt_pit')[0].querySelectorAll('div')[0].querySelectorAll('div')[0].querySelectorAll('section')[1].querySelectorAll('div')[1].querySelectorAll('div')[0].querySelectorAll('table')[0].querySelectorAll('tbody')[0].querySelectorAll('tr')[0].querySelectorAll('td')[2].querySelectorAll('a')[0].text.trim();
+                  pitcher_away = doc_detail
+                      .querySelectorAll('#strt_pit')[0]
+                      .querySelectorAll('div')[0]
+                      .querySelectorAll('div')[0]
+                      .querySelectorAll('section')[1]
+                      .querySelectorAll('div')[1]
+                      .querySelectorAll('div')[0]
+                      .querySelectorAll('table')[0]
+                      .querySelectorAll('tbody')[0]
+                      .querySelectorAll('tr')[0]
+                      .querySelectorAll('td')[2]
+                      .querySelectorAll('a')[0]
+                      .text
+                      .trim();
 
                   print('試合前なので予告先発投手を取得しました。');
                 } catch (e) {

@@ -251,7 +251,9 @@ class AppSql {
            WHEN t_game_away.id_pitcher_away > 0 THEN m_user.code_color
            ELSE '' END AS color_today,
       int_index,
-      flg_pitcher
+      flg_pitcher,
+      m_team.color_back,
+      m_team.color_font
       FROM (
         SELECT
           id_user,
@@ -321,6 +323,8 @@ class AppSql {
         m_user.name_last AS name_user_last,
         m_team.name_short AS name_team_short,
         m_team.id_league,
+        m_team.color_back,
+        m_team.color_font,
         int_rank,
         flg_champion
       FROM t_predict_team

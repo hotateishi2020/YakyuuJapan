@@ -24,6 +24,8 @@ void main() async {
 
     // ====== API ======
 
+    app.get('/healthz', (Request _) => Response.ok('ok'));
+
     app.get('/fetchStatsTeamNPB', (Request request) async {
       return await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.STATS_TEAM, (conn) async {
         return await FetchURL.fetchStatsTeamNPB(conn);

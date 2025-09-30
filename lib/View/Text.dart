@@ -55,7 +55,7 @@ class OneLineShrinkText extends StatelessWidget {
   Widget build(BuildContext context) {
     if (fast) {
       return Padding(
-        padding: EdgeInsets.symmetric(vertical: verticalPadding * 0.5),
+        padding: EdgeInsets.all(verticalPadding),
         child: FittedBox(
           fit: BoxFit.scaleDown,
           alignment: _toAlignment(align),

@@ -11,6 +11,7 @@ class UnifiedGrid extends StatelessWidget {
   final bool compact;
   final int? onlyLeagueId; // 1: セ, 2: パ, null: 両方
   double? w_col_predictor;
+  double? h_header;
 
   UnifiedGrid({
     super.key,
@@ -22,11 +23,13 @@ class UnifiedGrid extends StatelessWidget {
     required this.compact,
     this.onlyLeagueId,
     this.w_col_predictor,
+    this.h_header,
   });
 
 // After
-  Widget headerCell(String text, {FontWeight weight = FontWeight.bold, Color? bgColor, Color? fgColor}) {
+  Widget headerCell(double h, String text, {FontWeight weight = FontWeight.bold, Color? bgColor, Color? fgColor}) {
     return Container(
+      height: h,
       margin: const EdgeInsets.symmetric(horizontal: 0),
       padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
       constraints: const BoxConstraints(minHeight: 21.5),
@@ -59,6 +62,38 @@ class UnifiedGrid extends StatelessWidget {
     );
   }
 
+  // ランク番号用セル（高さは行内の他セルに追随）
+  Widget rankCell(String text, {required Color bgColor, Color? fgColor}) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 0),
+      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+      constraints: const BoxConstraints(minHeight: 21.5),
+      decoration: BoxDecoration(
+        color: bgColor,
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(3),
+      ),
+      alignment: Alignment.center,
+      child: OneLineShrinkText(text, baseSize: 12, minSize: 5, verticalPadding: 0, fast: true, color: fgColor, weight: FontWeight.bold, align: TextAlign.center),
+    );
+  }
+
+  // 個人タイトル名セル（高さは隣の選手セルに追随）
+  Widget statTitleCell(String text, {required Color bgColor, Color? fgColor}) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 0),
+      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+      constraints: const BoxConstraints(minHeight: 21.5),
+      decoration: BoxDecoration(
+        color: bgColor,
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(3),
+      ),
+      alignment: Alignment.center,
+      child: OneLineShrinkText(text, baseSize: 12, minSize: 5, verticalPadding: 0, fast: true, color: fgColor, weight: FontWeight.bold, align: TextAlign.center),
+    );
+  }
+
   String _joinDedup(Iterable<String>? xs) {
     if (xs == null) return '—';
     final seen = <String>{};
@@ -70,7 +105,7 @@ class UnifiedGrid extends StatelessWidget {
     return out.isEmpty ? '—' : out.join(', ');
   }
 
-  List<Widget> _buildLeagueColumn(int leagueId) {
+  List<Widget> _buildLeagueColumn(int leagueId, {required double rowHeight}) {
     Color? _parseColorNameLocal(String? name) {
       final n = (name ?? '').trim().toLowerCase();
       if (n.isEmpty) return null;
@@ -126,19 +161,19 @@ class UnifiedGrid extends StatelessWidget {
 
     rankHeader.add(Row(children: [
       Expanded(
-        child: headerCell('シーズン予想', bgColor: leagueColor, fgColor: Colors.white),
+        child: headerCell(h_header!, 'シーズン予想', bgColor: leagueColor, fgColor: Colors.white),
       ),
       SizedBox(
         width: w_col_predictor,
-        child: headerCell('現在', bgColor: leagueColor, fgColor: Colors.white),
+        child: headerCell(h_header!, '現在', bgColor: leagueColor, fgColor: Colors.white),
       ),
       SizedBox(
         width: w_col_predictor,
-        child: headerCell('立石', bgColor: leagueColor, fgColor: Colors.white),
+        child: headerCell(h_header!, '立石', bgColor: leagueColor, fgColor: Colors.white),
       ),
       SizedBox(
         width: w_col_predictor,
-        child: headerCell('江島', bgColor: leagueColor, fgColor: Colors.white),
+        child: headerCell(h_header!, '江島', bgColor: leagueColor, fgColor: Colors.white),
       ),
       // Expanded(flex: 1, child: headerCell('現在', bgColor: leagueColor, fgColor: Colors.white)),
       // Expanded(flex: 1, child: headerCell(userNameFromPredictions('1'), bgColor: leagueColor, fgColor: Colors.white)), // 立石
@@ -182,66 +217,70 @@ class UnifiedGrid extends StatelessWidget {
       final hi1 = _isHit(p1.isNotEmpty ? p1 : null, curGroup);
       final hi2 = _isHit(p2.isNotEmpty ? p2 : null, curGroup);
 
-      rankRows.add(Row(
-        children: [
-          SizedBox(width: _rankCellW, child: headerCell('$rk', bgColor: leagueColor, fgColor: Colors.white)),
-          SizedBox(
-            width: w_col_predictor!,
-            child: (() {
-              // 現在列: standings 側の色（同順位複数ならグラデーション）
-              final List<Color> curColors = curGroup.map((e) => _parseColorNameLocal('${e['color_back']}')).whereType<Color>().toList();
-              final Color? curFont = curGroup.isNotEmpty ? _parseColorNameLocal('${curGroup.first['color_font']}') : null;
-              final BoxDecoration deco = curColors.isEmpty
-                  ? BoxDecoration(
-                      color: const Color(0xFFF0E68C),
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(3),
-                    )
-                  : (curColors.length == 1
+      rankRows.add(SizedBox(
+          height: rowHeight,
+          child: IntrinsicHeight(
+              child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(width: _rankCellW, child: rankCell('$rk', bgColor: leagueColor, fgColor: Colors.white)),
+              SizedBox(
+                width: w_col_predictor!,
+                child: (() {
+                  // 現在列: standings 側の色（同順位複数ならグラデーション）
+                  final List<Color> curColors = curGroup.map((e) => _parseColorNameLocal('${e['color_back']}')).whereType<Color>().toList();
+                  final Color? curFont = curGroup.isNotEmpty ? _parseColorNameLocal('${curGroup.first['color_font']}') : null;
+                  final BoxDecoration deco = curColors.isEmpty
                       ? BoxDecoration(
-                          color: curColors.first,
+                          color: const Color(0xFFF0E68C),
                           border: Border.all(color: Colors.grey.shade300),
                           borderRadius: BorderRadius.circular(3),
                         )
-                      : BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: curColors,
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                          ),
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(3),
-                        ));
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 0),
-                padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
-                constraints: const BoxConstraints(minHeight: 21.5),
-                decoration: deco,
-                child: SizedBox(
-                  width: double.infinity,
-                  child: OneLineShrinkText(
-                    curTeamText,
-                    baseSize: 12,
-                    minSize: 5,
-                    verticalPadding: 0,
-                    fast: true,
-                    color: curFont ?? Colors.black,
-                    weight: FontWeight.bold,
-                  ),
-                ),
-              );
-            })(),
-          ),
-          SizedBox(
-            width: w_col_predictor!,
-            child: cell(txt1, highlight: hi1),
-          ),
-          SizedBox(
-            width: w_col_predictor!,
-            child: cell(txt2, highlight: hi2),
-          ),
-        ],
-      ));
+                      : (curColors.length == 1
+                          ? BoxDecoration(
+                              color: curColors.first,
+                              border: Border.all(color: Colors.grey.shade300),
+                              borderRadius: BorderRadius.circular(3),
+                            )
+                          : BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: curColors,
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
+                              border: Border.all(color: Colors.grey.shade300),
+                              borderRadius: BorderRadius.circular(3),
+                            ));
+                  return Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 0),
+                    padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+                    constraints: const BoxConstraints(minHeight: 21.5),
+                    decoration: deco,
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: OneLineShrinkText(
+                        curTeamText,
+                        baseSize: 12,
+                        minSize: 5,
+                        verticalPadding: 0,
+                        fast: true,
+                        color: curFont ?? Colors.black,
+                        weight: FontWeight.bold,
+                      ),
+                    ),
+                  );
+                })(),
+              ),
+              SizedBox(
+                width: w_col_predictor!,
+                child: cell(txt1, highlight: hi1),
+              ),
+              SizedBox(
+                width: w_col_predictor!,
+                child: cell(txt2, highlight: hi2),
+              ),
+            ],
+          ))));
     }
     // まずヘッダー（順位・現在・立石・江島）を追加
     widgets.addAll(rankHeader);
@@ -430,26 +469,30 @@ class UnifiedGrid extends StatelessWidget {
       final w1 = cell(txt1, highlight: hi1, borderColor: c1 != null ? Colors.transparent : null);
       final w2 = cell(txt2, highlight: hi2, borderColor: c2 != null ? Colors.transparent : null);
 
-      statsSection.add(Row(
-        children: [
-          SizedBox(
-            width: 56, // 4文字ぶんの目安
-            child: headerCell(title, bgColor: titleBg, fgColor: Colors.white),
-          ),
-          SizedBox(
-            width: w_col_predictor!,
-            child: c0 != null ? BlinkBorder(color: c0, radius: 3, width: 2, duration: const Duration(milliseconds: 1000), baseBgColor: _baseBg0, fillUseColor: true, child: w0) : w0,
-          ),
-          SizedBox(
-            width: w_col_predictor!,
-            child: c1 != null ? BlinkBorder(color: c1, radius: 3, width: 2, duration: const Duration(milliseconds: 1000), baseBgColor: Colors.transparent, fillUseColor: true, child: w1) : w1,
-          ),
-          SizedBox(
-            width: w_col_predictor!,
-            child: c2 != null ? BlinkBorder(color: c2, radius: 3, width: 2, duration: const Duration(milliseconds: 1000), baseBgColor: Colors.transparent, fillUseColor: true, child: w2) : w2,
-          ),
-        ],
-      ));
+      statsSection.add(SizedBox(
+          height: rowHeight,
+          child: IntrinsicHeight(
+              child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(
+                width: 56, // 4文字ぶんの目安
+                child: statTitleCell(title, bgColor: titleBg, fgColor: Colors.white),
+              ),
+              SizedBox(
+                width: w_col_predictor!,
+                child: c0 != null ? BlinkBorder(color: c0, radius: 3, width: 2, duration: const Duration(milliseconds: 1000), baseBgColor: _baseBg0, fillUseColor: true, child: w0) : w0,
+              ),
+              SizedBox(
+                width: w_col_predictor!,
+                child: c1 != null ? BlinkBorder(color: c1, radius: 3, width: 2, duration: const Duration(milliseconds: 1000), baseBgColor: Colors.transparent, fillUseColor: true, child: w1) : w1,
+              ),
+              SizedBox(
+                width: w_col_predictor!,
+                child: c2 != null ? BlinkBorder(color: c2, radius: 3, width: 2, duration: const Duration(milliseconds: 1000), baseBgColor: Colors.transparent, fillUseColor: true, child: w2) : w2,
+              ),
+            ],
+          ))));
     }
     // サイドヘッダー付き（個人タイトル）: 打率〜セーブまでの高さに合わせる（右余白なし）
     widgets.add(IntrinsicHeight(
@@ -497,41 +540,47 @@ class UnifiedGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     w_col_predictor = MediaQuery.of(context).size.width * 0.06;
-    return SizedBox.expand(
-      child: Card(
-        elevation: 2,
-        margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
-        child: Padding(
-          padding: EdgeInsets.zero,
-          child: SingleChildScrollView(
+    return LayoutBuilder(builder: (context, c) {
+      final double totalH = c.maxHeight.isFinite ? c.maxHeight : 360.0;
+      final double headerH = h_header ?? 28.0;
+      final double contentH = (totalH - headerH).clamp(80.0, totalH);
+      final double rowH = contentH / 16.0;
+      return SizedBox.expand(
+        child: Card(
+          elevation: 2,
+          margin: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+          child: Padding(
             padding: EdgeInsets.zero,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: onlyLeagueId == null
-                  ? [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: _buildLeagueColumn(1),
-                      ),
-                      const SizedBox(height: 12),
-                      const Divider(height: 0.5),
-                      const SizedBox(height: 12),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: _buildLeagueColumn(2),
-                      ),
-                    ]
-                  : [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: _buildLeagueColumn(onlyLeagueId!),
-                      ),
-                    ],
+            child: SingleChildScrollView(
+              padding: EdgeInsets.zero,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: onlyLeagueId == null
+                    ? [
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: _buildLeagueColumn(1, rowHeight: rowH),
+                        ),
+                        const SizedBox(height: 12),
+                        const Divider(height: 0.5),
+                        const SizedBox(height: 12),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: _buildLeagueColumn(2, rowHeight: rowH),
+                        ),
+                      ]
+                    : [
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: _buildLeagueColumn(onlyLeagueId!, rowHeight: rowH),
+                        ),
+                      ],
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

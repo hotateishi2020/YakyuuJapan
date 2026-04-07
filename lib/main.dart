@@ -979,43 +979,45 @@ class _PredictionPageState extends State<PredictionPage> {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // サイドヘッダー（リーグ名）
-                            Container(
-                              width: 36,
-                              margin: const EdgeInsets.only(left: 0, right: 0),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF4DB5E8),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Center(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 4, bottom: 4),
-                                      child: Image.asset(
-                                        'assets/images/logo_league_pacific.png',
-                                        width: 22,
-                                        height: 22,
-                                        fit: BoxFit.contain,
-                                        errorBuilder: (_, __, ___) => const SizedBox(height: 22),
-                                      ),
-                                    ),
-                                    const Text('パ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                                    const Text('・', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                                    const Text('リ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                                    const Text('|', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                                    const Text('グ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 2),
+                            // サイドヘッダー（リーグ名）＋ 各ブロック（上段と同一レイアウト）
                             Expanded(
                               child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                                // サイドヘッダー（上段と同じ比率/装飾）
                                 Expanded(
-                                  flex: 2,
+                                    flex: ALL_RATIO_BLOCK_W[0],
+                                    child: Container(
+                                      margin: const EdgeInsets.only(right: 2),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF4DB5E8),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Center(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 4, bottom: 4),
+                                              child: Image.asset(
+                                                'assets/images/logo_league_pacific.png',
+                                                width: 20,
+                                                height: 20,
+                                                fit: BoxFit.contain,
+                                                errorBuilder: (_, __, ___) => const SizedBox(height: 20),
+                                              ),
+                                            ),
+                                            const Text('パ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                            const Text('・', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                            const Text('リ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                            const Text('|', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                            const Text('グ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                          ],
+                                        ),
+                                      ),
+                                    )),
+                                // 予想グリッド（上段と同じ比率/引数）
+                                Expanded(
+                                  flex: ALL_RATIO_BLOCK_W[1],
                                   child: UnifiedGrid(
                                     predictions: predictions,
                                     standings: standings,
@@ -1024,20 +1026,23 @@ class _PredictionPageState extends State<PredictionPage> {
                                     userNameFromPredictions: _userNameFromPredictions,
                                     compact: compact,
                                     onlyLeagueId: 2,
+                                    h_header: ALL_HEADER_H,
                                   ),
                                 ),
-                                const VerticalDivider(width: 8, thickness: 0.5),
+                                SizedBox(width: ALL_SPACE_BLOCK),
+                                // 成績テーブル
                                 Expanded(
-                                  flex: 3,
+                                  flex: ALL_RATIO_BLOCK_W[2],
                                   child: SeasonTableBlock(
                                     standings: standings,
                                     stats: npbPlayerStatsActual,
                                     onlyLeagueId: 2,
                                   ),
                                 ),
-                                const VerticalDivider(width: 8, thickness: 0.5),
+                                SizedBox(width: ALL_SPACE_BLOCK),
+                                // 試合情報（昨日/今日/明日）
                                 Expanded(
-                                  flex: 3,
+                                  flex: ALL_RATIO_BLOCK_W[3],
                                   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                     Expanded(
                                       child: Column(
@@ -1045,22 +1050,25 @@ class _PredictionPageState extends State<PredictionPage> {
                                         crossAxisAlignment: CrossAxisAlignment.stretch,
                                         children: [
                                           Container(
+                                            height: ALL_HEADER_H,
                                             alignment: Alignment.center,
-                                            margin: const EdgeInsets.symmetric(horizontal: 6),
+                                            margin: const EdgeInsets.symmetric(horizontal: 2),
                                             decoration: BoxDecoration(
                                               color: const Color(0xFF4DB5E8),
-                                              borderRadius: BorderRadius.circular(6),
+                                              borderRadius: BorderRadius.circular(4),
                                             ),
-                                            child: Text('昨日  ${_jaDateWithOffset(-1)}', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                                            child: OneLineShrinkText('昨日  ${_jaDateWithOffset(-1)}', baseSize: 15.0, minSize: 5.0, weight: FontWeight.bold, align: TextAlign.center, color: Colors.white, verticalPadding: 6, fast: true, shadows: null),
                                           ),
-                                          const SizedBox(height: 6),
-                                          SizedBox(
-                                            height: 340,
-                                            child: GamesBoardYahooStyle(
-                                              games: games.where((g) => (int.tryParse('${g['id_league_home']}') ?? 0) == 2 && (int.tryParse('${g['id_league_away']}') ?? 0) == 2).toList(),
-                                              dateFilter: _ymdWithOffset(-1),
+                                          const SizedBox(height: 2),
+                                          Expanded(
+                                            child: SizedBox(
+                                              height: 340,
+                                              child: GamesBoardYahooStyle(
+                                                games: games.where((g) => (int.tryParse('${g['id_league_home']}') ?? 0) == 2 && (int.tryParse('${g['id_league_away']}') ?? 0) == 2).toList(),
+                                                dateFilter: _ymdWithOffset(-1),
+                                              ),
                                             ),
-                                          ),
+                                          )
                                         ],
                                       ),
                                     ),
@@ -1078,48 +1086,61 @@ class _PredictionPageState extends State<PredictionPage> {
                                         crossAxisAlignment: CrossAxisAlignment.stretch,
                                         children: [
                                           Container(
+                                            height: ALL_HEADER_H,
                                             alignment: Alignment.center,
-                                            margin: const EdgeInsets.symmetric(horizontal: 6),
+                                            margin: const EdgeInsets.symmetric(horizontal: 2),
                                             decoration: BoxDecoration(
                                               color: const Color(0xFF4DB5E8),
-                                              borderRadius: BorderRadius.circular(6),
+                                              borderRadius: BorderRadius.circular(4),
                                             ),
-                                            child: Text('今日  ${_jaDateWithOffset(0)}', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                                            child: OneLineShrinkText('今日  ${_jaDateWithOffset(0)}', baseSize: 15.0, minSize: 5.0, weight: FontWeight.bold, align: TextAlign.center, color: Colors.white, verticalPadding: 6, fast: true, shadows: null),
                                           ),
-                                          const SizedBox(height: 6),
-                                          SizedBox(
-                                            height: 340,
-                                            child: GamesBoardYahooStyle(
-                                              games: games.where((g) => (int.tryParse('${g['id_league_home']}') ?? 0) == 2 && (int.tryParse('${g['id_league_away']}') ?? 0) == 2).toList(),
-                                              dateFilter: _ymdWithOffset(0),
+                                          const SizedBox(height: 2),
+                                          Expanded(
+                                            child: SizedBox(
+                                              height: 340,
+                                              child: GamesBoardYahooStyle(
+                                                games: games.where((g) => (int.tryParse('${g['id_league_home']}') ?? 0) == 2 && (int.tryParse('${g['id_league_away']}') ?? 0) == 2).toList(),
+                                                dateFilter: _ymdWithOffset(0),
+                                              ),
                                             ),
-                                          ),
+                                          )
                                         ],
                                       ),
                                     ),
-                                    const SizedBox(width: 6),
+                                    const SizedBox(width: 2),
+                                    SizedBox(
+                                      width: 1,
+                                      child: Container(
+                                        color: Colors.black26,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 3),
                                     Expanded(
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         crossAxisAlignment: CrossAxisAlignment.stretch,
                                         children: [
                                           Container(
+                                            height: ALL_HEADER_H,
                                             alignment: Alignment.center,
-                                            margin: const EdgeInsets.symmetric(horizontal: 6),
+                                            margin: const EdgeInsets.symmetric(horizontal: 2),
                                             decoration: BoxDecoration(
                                               color: const Color(0xFF4DB5E8),
-                                              borderRadius: BorderRadius.circular(6),
+                                              borderRadius: BorderRadius.circular(4),
                                             ),
-                                            child: Text('明日  ${_jaDateWithOffset(1)}', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                                            child: OneLineShrinkText('明日  ${_jaDateWithOffset(1)}', baseSize: 15.0, minSize: 5.0, weight: FontWeight.bold, align: TextAlign.center, color: Colors.white, verticalPadding: 6, fast: true, shadows: null),
                                           ),
-                                          const SizedBox(height: 6),
-                                          SizedBox(
-                                            height: 340,
-                                            child: GamesBoardYahooStyle(
-                                              games: games.where((g) => (int.tryParse('${g['id_league_home']}') ?? 0) == 2 && (int.tryParse('${g['id_league_away']}') ?? 0) == 2).toList(),
-                                              dateFilter: _ymdWithOffset(1),
+                                          const SizedBox(height: 2),
+                                          Expanded(
+                                            child: SizedBox(
+                                              height: 340,
+                                              child: GamesBoardYahooStyle(
+                                                games: games.where((g) => (int.tryParse('${g['id_league_home']}') ?? 0) == 2 && (int.tryParse('${g['id_league_away']}') ?? 0) == 2).toList(),
+                                                dateFilter: _ymdWithOffset(1),
+                                              ),
                                             ),
-                                          ),
+                                          )
                                         ],
                                       ),
                                     ),
@@ -2638,14 +2659,15 @@ class SeasonTableBlock extends StatelessWidget {
                     ]),
                     const SizedBox(height: 0),
 
-                    // 本文 1..6
-                    for (int rk = 1; rk <= 6; rk++)
+                    // 本文（順位の重複がある場合も、そのまま縦に並べる）
+                    for (int i = 0; i < cur.length; i++)
                       () {
-                        final row = cur.firstWhere((e) => int.tryParse('${e['int_rank']}') == rk, orElse: () => const {});
+                        final row = cur[i];
+                        final int rk = int.tryParse('${row['int_rank']}') ?? (i + 1);
                         final Color? teamBg = _parseColorName(row['color_back']);
                         final Color? teamFg = _parseColorName(row['color_font']);
                         // 右側（チーム名より右）のセル背景は縞模様（奇数: 白 / 偶数: 薄いベージュ）
-                        final Color? paleBg = (rk % 2 == 0) ? const Color(0xFFEAD9B9) : Colors.white;
+                        final Color? paleBg = ((i + 1) % 2 == 0) ? const Color(0xFFEAD9B9) : Colors.white;
 
                         // トップ/ワースト強調色
                         Color? _topColor(bool cond) => cond ? const Color(0xFF32CD32) : null; // limegreen

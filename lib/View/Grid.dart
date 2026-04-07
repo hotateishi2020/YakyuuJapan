@@ -199,23 +199,24 @@ class UnifiedGrid extends StatelessWidget {
       return false;
     }
 
-    for (var rk = 1; rk <= 6; rk++) {
-      // 現在の順位グループ（同じ int_rank のチームを全部）
-      final curGroup = currentRows.where((e) => int.tryParse('${e['int_rank']}') == rk).toList();
+    // 行数は常に6。現在列は各チーム1行ずつ（同順位でも別行）。
+    for (int i = 0; i < 6; i++) {
+      final Map<String, dynamic> row = i < currentRows.length ? currentRows[i] : const {};
+      final int rk = int.tryParse('${row['int_rank']}') ?? (i + 1);
 
-      // 予想側
-      final p0 = pred0.firstWhere((e) => int.tryParse('${e['int_rank']}') == rk, orElse: () => {});
-      final p1 = pred1.firstWhere((e) => int.tryParse('${e['int_rank']}') == rk, orElse: () => {});
-      final p2 = pred2.firstWhere((e) => int.tryParse('${e['int_rank']}') == rk, orElse: () => {});
-
-      // 表示テキスト
-      final curTeamText = curGroup.isNotEmpty ? curGroup.map((e) => e['name_team']?.toString() ?? '').join(', ') : '—';
+      // 予想側は「表示行インデックス（1..6）」に対応させる
+      final int displayPos = i + 1;
+      final p1 = pred1.firstWhere((e) => int.tryParse('${e['int_rank']}') == displayPos, orElse: () => {});
+      final p2 = pred2.firstWhere((e) => int.tryParse('${e['int_rank']}') == displayPos, orElse: () => {});
       final txt1 = p1.isNotEmpty ? (p1['name_team_short']?.toString() ?? '—') : '—';
       final txt2 = p2.isNotEmpty ? (p2['name_team_short']?.toString() ?? '—') : '—';
 
-      // ハイライト判定（予想チームが現在の順位グループに含まれているか）
-      final hi1 = _isHit(p1.isNotEmpty ? p1 : null, curGroup);
-      final hi2 = _isHit(p2.isNotEmpty ? p2 : null, curGroup);
+      final String name = (row['name_team']?.toString() ?? '').trim();
+      final Color? curBg = _parseColorNameLocal('${row['color_back']}');
+      final Color? curFont = _parseColorNameLocal('${row['color_font']}');
+
+      final bool hi1 = _isHit(p1.isNotEmpty ? p1 : null, row.isNotEmpty ? [row] : const []);
+      final bool hi2 = _isHit(p2.isNotEmpty ? p2 : null, row.isNotEmpty ? [row] : const []);
 
       rankRows.add(SizedBox(
           height: rowHeight,
@@ -226,50 +227,26 @@ class UnifiedGrid extends StatelessWidget {
               SizedBox(width: _rankCellW, child: rankCell('$rk', bgColor: leagueColor, fgColor: Colors.white)),
               SizedBox(
                 width: w_col_predictor!,
-                child: (() {
-                  // 現在列: standings 側の色（同順位複数ならグラデーション）
-                  final List<Color> curColors = curGroup.map((e) => _parseColorNameLocal('${e['color_back']}')).whereType<Color>().toList();
-                  final Color? curFont = curGroup.isNotEmpty ? _parseColorNameLocal('${curGroup.first['color_font']}') : null;
-                  final BoxDecoration deco = curColors.isEmpty
-                      ? BoxDecoration(
-                          color: const Color(0xFFF0E68C),
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(3),
-                        )
-                      : (curColors.length == 1
-                          ? BoxDecoration(
-                              color: curColors.first,
-                              border: Border.all(color: Colors.grey.shade300),
-                              borderRadius: BorderRadius.circular(3),
-                            )
-                          : BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: curColors,
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                              ),
-                              border: Border.all(color: Colors.grey.shade300),
-                              borderRadius: BorderRadius.circular(3),
-                            ));
-                  return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 0),
-                    padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
-                    constraints: const BoxConstraints(minHeight: 21.5),
-                    decoration: deco,
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: OneLineShrinkText(
-                        curTeamText,
-                        baseSize: 12,
-                        minSize: 5,
-                        verticalPadding: 0,
-                        fast: true,
-                        color: curFont ?? Colors.black,
-                        weight: FontWeight.bold,
-                      ),
-                    ),
-                  );
-                })(),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 0),
+                  padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+                  constraints: const BoxConstraints(minHeight: 21.5),
+                  decoration: BoxDecoration(
+                    color: row.isEmpty ? const Color(0xFFF0E68C) : (curBg ?? const Color(0xFFF0E68C)),
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                  alignment: Alignment.center,
+                  child: OneLineShrinkText(
+                    row.isEmpty ? '—' : (name.isNotEmpty ? name : '—'),
+                    baseSize: 12,
+                    minSize: 5,
+                    verticalPadding: 0,
+                    fast: true,
+                    color: curFont ?? Colors.black,
+                    weight: FontWeight.bold,
+                  ),
+                ),
               ),
               SizedBox(
                 width: w_col_predictor!,

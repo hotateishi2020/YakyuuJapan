@@ -164,10 +164,10 @@ class FetchURL {
 
       for (final tr_defence in rows_defence) {
         // 先頭行（ヘッダーなど）はスキップ
-        if (cnt < 2) {
-          cnt++;
-          continue;
-        }
+        // if (cnt < 2) {
+        //   cnt++;
+        //   continue;
+        // }
 
         final tds = tr_defence.querySelectorAll('td');
         if (tds.length < 2) {

@@ -212,6 +212,7 @@ class FetchURL {
       final formatted = formatter.format(date);
       final url = Uri.parse(urlString + formatted);
       final res = await http.get(url);
+      print(urlString + formatted);
 
       if (res.statusCode != 200) {
         throw Exception('Failed to fetch standings');
@@ -258,13 +259,19 @@ class FetchURL {
               }
 
               final doc_detail = parse(_decodeHtml(res_detail));
-              final match = doc_detail.querySelectorAll('#gm_brd')[0].querySelectorAll('div')[0];
+              final match = doc_detail.querySelectorAll('#gm_brd')[0];
               final name_stadium = match.querySelectorAll('div')[0].querySelectorAll('p')[0].nodes.last.text!.replaceAll(RegExp(r'\s+'), '');
               final time_gamestart = match.querySelectorAll('div')[0].querySelectorAll('p')[0].querySelectorAll('time')[0].text.trim();
               final gamestart = formatted + " " + time_gamestart + ":00";
               datetime_gamestart = DateTime.tryParse(gamestart)!;
-              final team_home = match.querySelectorAll('#async-gameDetail')[0].querySelectorAll('div')[0].querySelectorAll('p a')[0].text.trim();
-              final team_away = match.querySelectorAll('#async-gameDetail')[0].querySelectorAll('div')[2].querySelectorAll('p a')[0].text.trim();
+
+              final a = match.querySelectorAll('#async-gameDetail')[0];
+              final b = a..querySelectorAll('div')[0];
+              final c = b.querySelectorAll('a')[0];
+              final d = c.querySelectorAll('span')[1];
+              print(d.text.trim());
+              final team_home = match.querySelectorAll('#async-gameDetail')[0].querySelectorAll('div')[0].querySelectorAll('a')[0].querySelectorAll('span')[1].text.trim();
+              final team_away = match.querySelectorAll('#async-gameDetail')[0].querySelectorAll('div')[2].querySelectorAll('a')[0].querySelectorAll('span')[1].text.trim();
 
               try {
                 score_home = int.tryParse(
@@ -363,11 +370,44 @@ class FetchURL {
 
               if (flg_no_pitcher == false) {
                 //先発投手が発表されている場合
-                final result_pitcher_home = await conn.execute(AppSql.selectPlayerWhereFullNameAndTeamID(), parameters: [StringTool.noSpace(pitcher_home), id_team_home]);
-                id_pitcher_home = result_pitcher_home.first.toColumnMap()['id'];
+                try {
+                  final result_pitcher_home = await conn.execute(AppSql.selectPlayerWhereFullNameAndTeamID(), parameters: [StringTool.noSpace(pitcher_home), id_team_home]);
+                  id_pitcher_home = result_pitcher_home.first.toColumnMap()['id'];
+                } catch (e) {
+                  final player = m_player();
+                  if (pitcher_home.split(' ').length == 2) {
+                    player.name_last = pitcher_home.split(' ')[0];
+                    player.name_first = pitcher_home.split(' ')[1];
+                    player.name_full = player.name_last + player.name_first;
+                  } else {
+                    player.name_last = pitcher_home;
+                    player.name_full = pitcher_home;
+                  }
+                  print(player.toMap());
+                  player.id_team = id_team_home;
+                  id_pitcher_home = await Postgres.insert(conn, player);
 
-                final result_pitcher_away = await conn.execute(AppSql.selectPlayerWhereFullNameAndTeamID(), parameters: [StringTool.noSpace(pitcher_away), id_team_away]);
-                id_pitcher_away = result_pitcher_away.first.toColumnMap()['id'];
+                  print('未登録の選手が先発予定投手になっていたので選手情報を登録しました。');
+                }
+                try {
+                  final result_pitcher_away = await conn.execute(AppSql.selectPlayerWhereFullNameAndTeamID(), parameters: [StringTool.noSpace(pitcher_away), id_team_away]);
+                  id_pitcher_away = result_pitcher_away.first.toColumnMap()['id'];
+                } catch (e) {
+                  final player = m_player();
+                  if (pitcher_away.split(' ').length == 2) {
+                    player.name_last = pitcher_away.split(' ')[0];
+                    player.name_first = pitcher_away.split(' ')[1];
+                    player.name_full = player.name_last + player.name_first;
+                  } else {
+                    player.name_last = pitcher_away;
+                    player.name_full = pitcher_away;
+                  }
+                  print(player.toMap());
+                  player.id_team = id_team_away;
+
+                  id_pitcher_away = await Postgres.insert(conn, player);
+                  print('未登録の選手が先発予定投手になっていたので選手情報を登録しました。');
+                }
               }
 
               final result_stadium = await Postgres.execute(conn, AppSql.selectStadium(), data: ['%$name_stadium%']);
@@ -385,6 +425,7 @@ class FetchURL {
             } catch (e, stacktrace) {
               print(e);
               print(stacktrace);
+              print('予想外のバグが発生しました。');
               continue;
             }
             final result_game = await conn.execute(AppSql.selectExistsGame(), parameters: [id_team_home, id_team_away, datetime_gamestart]);

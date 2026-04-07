@@ -3,6 +3,7 @@ import '../../tools/DBModel.dart';
 class m_player extends DBModel {
   String name_last = '';
   String name_first = '';
+  String name_full = '';
   String name_middle = '';
   DateTime? date_birth = null;
   int id_team = 0;

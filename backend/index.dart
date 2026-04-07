@@ -39,6 +39,7 @@ void main() async {
     });
 
     app.get('/fetchGamesNPB', (Request request) async {
+      print('fetchGamesNPB');
       return await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.GAMES, (conn) async {
         return await FetchURL.fetchGamesNPB(conn);
       });

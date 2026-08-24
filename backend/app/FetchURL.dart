@@ -117,8 +117,9 @@ class FetchURL {
 
       final htmlPitching = _decodeHtml(res_pitching);
       final document = parse(htmlPitching);
-      final divs = document.querySelectorAll('body div.container div.main div.table-responsive');
-      final rows = divs[2].querySelectorAll('table tbody tr');
+      final divs = document.querySelectorAll('body div.ranking-card');
+      print(divs.length);
+      final rows = divs[0].querySelectorAll('table.rank-table tbody tr');
 
       for (final tr in rows) {
         final ths = tr.querySelectorAll('th');

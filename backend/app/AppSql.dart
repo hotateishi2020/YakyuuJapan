@@ -1,4 +1,5 @@
 import 'DB/t_stats_player.dart';
+import 'DB/m_player.dart';
 import 'Value.dart';
 
 class AppSql {
@@ -25,6 +26,74 @@ class AppSql {
       AND id_team = \$2 
       LIMIT 1
     ''';
+  }
+
+  static String selectPlayerWhereFullNameAndTeamIDLike() {
+    return '''
+      SELECT 
+        m_player.name_full 
+      FROM m_player 
+      LEFT JOIN m_team ON m_team.id = m_player.id_team
+      WHERE m_player.name_full LIKE '%' || \$1 || '%' 
+      AND m_team.name_shortest = \$2
+    ''';
+  }
+
+  static String selectInsertNewPlayersNPB(List<m_player> players) {
+    String sql = '''
+      INSERT INTO m_player (
+        name_last, 
+        name_first, 
+        name_middle,
+        name_full, 
+        id_team,
+        height,
+        weight,
+        pitching,
+        batting,
+        uniform_number,
+        date_birth
+      )
+      ''';
+    int cnt = 1;
+    for (final player in players) {
+      // 文字列補間を使用して値を直接埋め込み
+      // null のときはクォートなしの NULL（'NULL'::date だと日付文字列として解釈され失敗する）
+      String date_birth = player.date_birth == null
+          ? 'NULL'
+          : "'${player.date_birth!.year.toString().padLeft(4, '0')}-"
+              "${player.date_birth!.month.toString().padLeft(2, '0')}-"
+              "${player.date_birth!.day.toString().padLeft(2, '0')}'::date";
+      sql += '''SELECT 
+          '${player.name_last}', 
+          '${player.name_first}', 
+          '',
+          '${player.name_last}${player.name_first}', 
+          ${player.id_team},
+          ${player.height},
+          ${player.weight},
+          ${player.pitching},
+          ${player.batting},
+          '${player.uniform_number}',
+          ${date_birth} ::timestamp
+        FROM m_player
+        WHERE NOT EXISTS (
+          SELECT 1
+          FROM m_player
+          WHERE name_last = '${player.name_last}'
+          AND name_first = '${player.name_first}'
+          AND id_team = ${player.id_team}
+        )''';
+
+      if (cnt < players.length) {
+        sql += '''
+                UNION
+               ''';
+      }
+
+      cnt++;
+    }
+    return sql;
   }
 
   //m_stadium

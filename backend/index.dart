@@ -45,6 +45,13 @@ void main() async {
       });
     });
 
+    app.get('/insertNewPlayersNPB', (Request request) async {
+      print('insertNewPlayersNPB');
+      return await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.GAMES, (conn) async {
+        return await FetchURL.fetchNPBPlayers(conn);
+      });
+    });
+
     //タイトル予想画面の表示
     app.get('/predictions', (Request request) async {
       return await tryCatchAPI(request, log.Prediction.NAME, log.Prediction.Codes.ENTER_NPB, (conn) async {

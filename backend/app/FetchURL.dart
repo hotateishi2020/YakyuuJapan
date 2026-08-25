@@ -470,7 +470,7 @@ class FetchURL {
     return Response.ok('ok');
   }
 
-  static Future<void> fetchNPBPlayers(Connection conn) async {
+  static Future<Response> fetchNPBPlayers(Connection conn) async {
     final results = await conn.execute(AppSql.selectTeams());
     final teams = results
         .map((row) => {
@@ -478,6 +478,8 @@ class FetchURL {
               'url': row[1],
             })
         .toList();
+
+    List<m_player> players = [];
 
     for (final team in teams) {
       final url = team['url'] as String;
@@ -516,6 +518,7 @@ class FetchURL {
         player.date_birth = DateTime.tryParse(cols[2]); // 失敗時は null を保持
         player.uniform_number = cols[0];
         player.name_middle = '';
+        player.name_full = player.name_last + player.name_first;
         player.height = int.tryParse(cols[3]) ?? 0;
         player.weight = int.tryParse(cols[4]) ?? 0;
         player.id_team = team['id'] as int;
@@ -536,10 +539,14 @@ class FetchURL {
             player.batting = 2;
           }
         }
-
-        await Postgres.insert(conn, player);
+        players.add(player);
       }
     }
+
+    var cnt_rows = await Postgres.execute(conn, AppSql.selectInsertNewPlayersNPB(players));
+
+    print("登録した新選手の数：${cnt_rows.affectedRows.toString()}");
+    return Response.ok('ok');
   }
 
   static Future<Response> fetchStatsPlayerNPB(Connection conn) async {
@@ -580,19 +587,35 @@ class FetchURL {
 
         final cols = tds.map((td) => td.text.trim()).toList();
 
+        //同じ球団内に同じ名字の選手が複数在籍していないかチェックする
+        final name_team_home = cols[1].split(RegExp(r'[\s　]+'))[1].replaceAll("(", "").replaceAll(")", "");
+        var name_player = cols[1].split(RegExp(r'[\s　]+'))[0];
+        final result_player = await Postgres.execute(conn, AppSql.selectPlayerWhereFullNameAndTeamIDLike(), data: [StringTool.noSpace(name_player), name_team_home]);
+
+        if (result_player.length > 1) {
+          //一つの球団に同じ名字の選手が複数人在籍している場合、さらに選手ページをクリックしてフルネームを取得する
+          final url_player = 'https://baseball.yahoo.co.jp/' + (tds[1].querySelectorAll('a')[0].attributes['href']?.trim() ?? '');
+          final res_player = await http.get(Uri.parse(url_player));
+          if (res_player.statusCode != 200) {
+            throw Exception('HTTP ${res_player.statusCode}');
+          }
+          final doc_player = parse(_decodeHtml(res_player));
+          name_player = doc_player.querySelectorAll('ruby.bb-profile__ruby')[0].text.split('（')[0].trim();
+        }
+
         t_stats_player statsPlayer = t_stats_player();
         statsPlayer.id_league = stat['id_league'] as int;
         statsPlayer.id_stats = stat['id_stats'] as int;
         statsPlayer.stats = double.tryParse(cols[stat['int_idx_col'] as int]) ?? 0;
         statsPlayer.int_rank = int.tryParse(cols[0]) ?? 0;
-        statsPlayer.playerName = cols[1].split(RegExp(r'[\s　]+'))[0];
+        statsPlayer.playerName = StringTool.noSpace(name_player);
         statsPlayer.teamName = cols[1].split(RegExp(r'[\s　]+'))[1].replaceAll("(", "").replaceAll(")", "");
         listStats.add(statsPlayer);
       }
       var sql = AppSql.selectInsertStatsPlayer(listStats);
       print(sql);
       var cnt_rows = await Postgres.execute(conn, sql);
-      print("実行行数" + cnt_rows.toString());
+      print("実行行数" + cnt_rows.affectedRows.toString());
     } //for stat
     return Response.ok('ok');
   }

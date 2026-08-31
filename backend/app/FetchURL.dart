@@ -92,7 +92,7 @@ class FetchURL {
           team.num_avg_batting = double.tryParse("0" + cells[13].text.trim()) ?? 0;
           team.num_era_total = double.tryParse(cells[14].text.trim()) ?? 0;
           teams.add(team);
-          print(team.toMap());
+          print(team_name + 'の基本情報を登録します。');
         }
       } //for html各チーム
       cnt++;
@@ -108,6 +108,7 @@ class FetchURL {
 
     for (int i = 0; i < 2; i++) {
       //先発防御率・中継ぎ防御率をスクレイピング
+      print("🔷先発防御率・中継ぎ防御率をスクレイピングします。");
       final url_pitching = Uri.parse(urls_pitching[i]);
       final res_pitching = await http.get(url_pitching);
 
@@ -117,14 +118,15 @@ class FetchURL {
 
       final htmlPitching = _decodeHtml(res_pitching);
       final document = parse(htmlPitching);
-      final divs = document.querySelectorAll('body div.ranking-card');
-      print(divs.length);
-      final rows = divs[0].querySelectorAll('table.rank-table tbody tr');
+      final divs = document.querySelectorAll('body section.content-panel');
+      final rows = divs[2].querySelectorAll('table.pitching-table tbody tr');
 
       for (final tr in rows) {
+        print("🟢先発防御率・中継ぎ防御率をスクレイピングします。");
         final ths = tr.querySelectorAll('th');
         final tds = tr.querySelectorAll('td');
         if (ths.isEmpty || tds.length < 3) {
+          print("continue");
           continue;
         }
         var team_name = ths[0].text.trim();
@@ -135,10 +137,12 @@ class FetchURL {
         }
         var pitching_rate_starter = tds[1].text.trim();
         var pitching_rate_reliever = tds[2].text.trim();
-        var r_team = await Postgres.execute(conn, AppSql.selectTeamsWhereNameShortest(), data: [team_name]);
+        print("先発防御率：" + pitching_rate_starter);
+        print("中継ぎ防御率：" + pitching_rate_reliever);
+        var r_team = await Postgres.execute(conn, AppSql.selectTeamsWhereName(), data: [team_name]);
         if (r_team.isEmpty) {
           // チーム名が一致しないケースはスキップ
-          print('データが見つかりませんでした。');
+          print('防御率のチーム名' + team_name + 'に該当するデータが見つかりませんでした。');
           continue;
         }
         var idx = Postgres.findIndex(teams, 'id_team', r_team.first.toColumnMap()['id']);
@@ -184,7 +188,7 @@ class FetchURL {
         print(defence_rate);
 
         if (r_team_defence.isEmpty) {
-          print('データが見つかりませんでした。');
+          print('守備率のチーム名' + team_name_defence + 'に該当するデータが見つかりませんでした。');
           continue;
         }
 

@@ -62,13 +62,13 @@ void main() async {
         Map<String, dynamic> json = {
           'predict_team': Postgres.toJson(await Postgres.execute(conn, AppSql.selectPredictNPBTeams(), data: [current_year])),
           'predict_player': Postgres.toJson(await Postgres.execute(conn, AppSql.selectPredictPlayer(), data: [current_year])),
-          'stats_team': Postgres.toJson(await Postgres.execute(conn, AppSql.selectStatsTeam())),
+          'stats_team': Postgres.toJson(await Postgres.execute(conn, AppSql.selectStatsTeam(), data: [current_year])),
           'stats_player': Postgres.toJson(await Postgres.execute(conn, AppSql.selectStatsPlayer(), data: [current_year])),
           'games': Postgres.toJson(await Postgres.execute(conn, AppSql.selectGames(), data: [current_year])),
           'events': Postgres.toJson(await Postgres.execute(conn, AppSql.selectEventsDetails())),
           'notification': Postgres.toJson(await Postgres.execute(conn, AppSql.selectNotification())),
         };
-        print(json['predict_team']);
+        print(json['stats_team']);
         return Response.ok(jsonEncode(json), headers: {'content-type': 'application/json; charset=utf-8'});
       });
     });

@@ -407,14 +407,22 @@ class AppSql {
   //t_stats_team
   static String selectStatsTeam() {
     return '''
-      SELECT 
-        year,
-        int_rank,
-        id_team,
+      
+     
+SELECT
+        t_stats_team.int_rank,
         m_team.name_short AS name_team,
+        v_predict_team.team_name_tateishi,
+        CASE WHEN m_team.id = v_predict_team.team_id_tateishi THEN true ELSE false END AS flg_atari_tateishi,
+        v_predict_team.team_color_back_tateishi,
+        v_predict_team.team_color_font_tateishi,
+        v_predict_team.team_name_ejima,
+        CASE WHEN m_team.id = v_predict_team.team_id_ejima THEN true ELSE false END AS flg_atari_ejima,
+        v_predict_team.team_color_back_ejima,
+        v_predict_team.team_color_font_ejima,
         m_team.color_font,
         m_team.color_back,
-        id_league,
+        m_team.id_league,
         m_league.name_short AS name_league,
         int_game,
         int_win,
@@ -431,29 +439,48 @@ class AppSql {
         to_char(num_era_relief, '0.00') AS num_era_relief,
         to_char((1 -num_avg_fielding) * 100, 'FM990.0') || '%' AS num_avg_fielding,
   
-        CASE WHEN num_avg_batting = MAX(num_avg_batting) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_top_num_avg_batting,
-        CASE WHEN int_homerun = MAX(int_homerun) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_top_int_homerun,
-        CASE WHEN int_rbi = MAX(int_rbi) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_top_int_rbi,
-        CASE WHEN int_sh = MAX(int_sh) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_top_int_sh,
-        CASE WHEN num_era_total = MIN(num_era_total) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_top_num_era_total,
-        CASE WHEN num_era_starter = MIN(num_era_starter) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_top_num_era_starter,
-        CASE WHEN num_era_relief = MIN(num_era_relief) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_top_num_era_relief,
-        CASE WHEN num_avg_fielding = MAX(num_avg_fielding) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_top_num_avg_fielding,
+        CASE WHEN num_avg_batting = MAX(num_avg_batting) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_top_num_avg_batting,
+        CASE WHEN int_homerun = MAX(int_homerun) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_top_int_homerun,
+        CASE WHEN int_rbi = MAX(int_rbi) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_top_int_rbi,
+        CASE WHEN int_sh = MAX(int_sh) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_top_int_sh,
+        CASE WHEN num_era_total = MIN(num_era_total) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_top_num_era_total,
+        CASE WHEN num_era_starter = MIN(num_era_starter) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_top_num_era_starter,
+        CASE WHEN num_era_relief = MIN(num_era_relief) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_top_num_era_relief,
+        CASE WHEN num_avg_fielding = MAX(num_avg_fielding) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_top_num_avg_fielding,
 
-        CASE WHEN num_avg_batting = MIN(num_avg_batting) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_worst_num_avg_batting,
-        CASE WHEN int_homerun = MIN(int_homerun) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_worst_int_homerun,
-        CASE WHEN int_rbi = MIN(int_rbi) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_worst_int_rbi,
-        CASE WHEN int_sh = MIN(int_sh) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_worst_int_sh,
-        CASE WHEN num_era_total = MAX(num_era_total) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_worst_num_era_total,
-        CASE WHEN num_era_starter = MAX(num_era_starter) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_worst_num_era_starter,
-        CASE WHEN num_era_relief = MAX(num_era_relief) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_worst_num_era_relief,
-        CASE WHEN num_avg_fielding = MIN(num_avg_fielding) OVER (PARTITION BY id_league) THEN TRUE ELSE FALSE END AS flg_worst_num_avg_fielding
+        CASE WHEN num_avg_batting = MIN(num_avg_batting) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_worst_num_avg_batting,
+        CASE WHEN int_homerun = MIN(int_homerun) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_worst_int_homerun,
+        CASE WHEN int_rbi = MIN(int_rbi) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_worst_int_rbi,
+        CASE WHEN int_sh = MIN(int_sh) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_worst_int_sh,
+        CASE WHEN num_era_total = MAX(num_era_total) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_worst_num_era_total,
+        CASE WHEN num_era_starter = MAX(num_era_starter) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_worst_num_era_starter,
+        CASE WHEN num_era_relief = MAX(num_era_relief) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_worst_num_era_relief,
+        CASE WHEN num_avg_fielding = MIN(num_avg_fielding) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_worst_num_avg_fielding
 
       FROM t_stats_team
         LEFT OUTER JOIN m_team ON m_team.id = t_stats_team.id_team
         LEFT OUTER JOIN m_league ON m_league.id = m_team.id_league
+        LEFT OUTER JOIN (
+         SELECT
+    mt.id_league,
+    tpt.int_rank,
+    MAX(tpt.id_team) FILTER (WHERE tpt.id_user = 1) AS team_id_tateishi,
+    MAX(mt.name_shortest) FILTER (WHERE tpt.id_user = 1) AS team_name_tateishi,
+  MAX(mt.color_back) FILTER (WHERE tpt.id_user = 1) AS team_color_back_tateishi,
+  MAX(mt.color_font) FILTER (WHERE tpt.id_user = 1) AS team_color_font_tateishi,
+    MAX(tpt.id_team) FILTER (WHERE tpt.id_user = 2) AS team_id_ejima,
+    MAX(mt.name_shortest) FILTER (WHERE tpt.id_user = 2) AS team_name_ejima,
+    MAX(mt.color_back) FILTER (WHERE tpt.id_user = 2) AS team_color_back_ejima,
+  MAX(mt.color_font) FILTER (WHERE tpt.id_user = 2) AS team_color_font_ejima
+FROM t_predict_team AS tpt
+LEFT JOIN m_team AS mt ON mt.id = tpt.id_team
+WHERE tpt.int_year = \$1
+GROUP BY mt.id_league, tpt.int_rank
+ORDER BY mt.id_league, tpt.int_rank
+        ) AS v_predict_team
+          ON v_predict_team.int_rank = t_stats_team.int_rank AND v_predict_team.id_league = m_team.id_league
       WHERE t_stats_team.crtat = (SELECT MAX(crtat) FROM t_stats_team)
-      ORDER BY id_league, int_rank
+      ORDER BY m_team.id_league, int_rank
     ''';
   }
 

@@ -4,13 +4,13 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        // {
-        //     "name": "Launch Chrome",
-        //     "request": "launch",
-        //     "type": "chrome",
-        //     "url": "http://localhost:8080",
-        //     "webRoot": "${workspaceFolder}"
-        // },
+        {
+            "name": "Backend API",
+            "request": "launch",
+            "type": "dart",
+            "program": "index.dart",
+            "cwd": "${workspaceFolder}/backend"
+        },
         {
             "name": "Flutter Web",
             "request": "launch",
@@ -25,18 +25,21 @@
         {
             "name": "Koko",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "program": "lib/main.dart"
         },
         {
             "name": "Koko (profile mode)",
             "request": "launch",
             "type": "dart",
+            "program": "lib/main.dart",
             "flutterMode": "profile"
         },
         {
             "name": "Koko (release mode)",
             "request": "launch",
             "type": "dart",
+            "program": "lib/main.dart",
             "flutterMode": "release"
         }
     ]

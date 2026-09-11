@@ -8,6 +8,7 @@ import 'AppSql.dart';
 import '../tools/Postgres.dart';
 import '../tools/StringTool.dart';
 import '../tools/DateTimeTool.dart';
+import '../tools/DBModel.dart';
 import 'DB/m_player.dart';
 import 'DB/t_stats_player.dart';
 import 'DB/t_game.dart';
@@ -79,7 +80,7 @@ class FetchURL {
             team.int_rank = int.tryParse(cells[0].text.trim()) ?? 0;
             team.game_behind = cells[7].text.trim();
           }
-          ;
+
           team.year = DateTimeTool.getThisYear();
           team.id_team = r_team.first.toColumnMap()['id'];
           team.int_game = int.tryParse(cells[2].text.trim()) ?? 0;
@@ -558,17 +559,10 @@ class FetchURL {
     await conn.execute(AppSql.deleteStatsPlayer(), parameters: [DateTimeTool.getThisYear()]);
 
     final results = await conn.execute(AppSql.selectStatsDetails());
-    final stats = results
-        .map((row) => {
-              'id_stats': row[0],
-              'id_league': row[1],
-              'url': row[2],
-              'int_idx_col': row[3],
-            })
-        .toList();
+    final stats = Postgres.toMap(results);
 
     for (final stat in stats) {
-      print(1);
+      print('statsID:' + stat['id_stats'].toString());
       final url = stat['url'] as String;
       final res = await http.get(Uri.parse(url));
       if (res.statusCode != 200) {
@@ -585,7 +579,6 @@ class FetchURL {
       List<t_stats_player> listStats = [];
 
       for (final tr in table.querySelectorAll('tr')) {
-        print(2);
         final tds = tr.querySelectorAll('td');
         if (tds.isEmpty) continue;
 
@@ -615,12 +608,70 @@ class FetchURL {
         statsPlayer.playerName = StringTool.noSpace(name_player);
         statsPlayer.teamName = cols[1].split(RegExp(r'[\s　]+'))[1].replaceAll("(", "").replaceAll(")", "");
         listStats.add(statsPlayer);
-      }
+      } //for選手
+
       var sql = AppSql.selectInsertStatsPlayer(listStats);
-      print(sql);
+
       var cnt_rows = await Postgres.execute(conn, sql);
-      print("実行行数" + cnt_rows.affectedRows.toString());
+      print("個人成績の登録数" + cnt_rows.affectedRows.toString());
     } //for stat
+
+    //予想者が予想した選手がランク外だった場合は選手個人のサイトをスクレイピングして個人成績を取得する
+    List<DBModel> listStatsPlayerNoRank = [];
+    final result_stats_player = await Postgres.execute(conn, AppSql.selectStatsPlayerNoRank(), data: [DateTimeTool.getThisYear()]);
+    final stats_player_map = Postgres.toMap(result_stats_player);
+
+    if (stats_player_map.isNotEmpty) {
+      print(stats_player_map);
+
+      for (final stats_player in stats_player_map) {
+        print(stats_player);
+        var url = stats_player['url'] as String;
+
+        final res = await http.get(Uri.parse(url));
+        if (res.statusCode != 200) {
+          throw Exception('HTTP ${res.statusCode}');
+        }
+
+        final doc = parse(_decodeHtml(res));
+        final rows = doc.querySelectorAll('#js-tabDom01 table.bb-playerStatsTable tbody tr');
+        if (rows.isEmpty) {
+          throw Exception('ランク外選手の詳細が記載されたテーブルが見つかりませんでした');
+        }
+
+        var idx_col = stats_player['int_idx_col_details'] as int;
+        var idx_row = stats_player['int_idx_row_details'] as int;
+
+        t_stats_player statsPlayer = t_stats_player();
+        statsPlayer.id_player = stats_player['id_player'] as int;
+        statsPlayer.id_team = stats_player['id_team'] as int;
+        statsPlayer.id_league = stats_player['id_league'] as int;
+        statsPlayer.id_stats = stats_player['id_stats'] as int;
+        statsPlayer.stats = double.tryParse(rows[idx_row].querySelectorAll('td')[idx_col].text.trim()) ?? 0;
+        statsPlayer.int_rank = 1000;
+        statsPlayer.playerName = stats_player['name_full'] as String;
+        statsPlayer.teamName = stats_player['name_shortest'] as String;
+        if (stats_player['flg_pitcher'] as bool) {
+          //投手の場合は投球回のセルから数値をスクレイピング（例: 12.1 → 12）
+          final rawIp = rows[idx_row].querySelectorAll('td')[14].text.trim();
+          statsPlayer.cnt_play = double.tryParse(rawIp)?.truncate() ?? int.tryParse(rawIp) ?? 0;
+        } else {
+          //野手の場合は打席数のセルから数値をスクレイピング
+          final rawPa = rows[idx_row].querySelectorAll('td')[2].text.trim();
+          statsPlayer.cnt_play = double.tryParse(rawPa)?.truncate() ?? int.tryParse(rawPa) ?? 0;
+        }
+        if (statsPlayer.cnt_play == 0) {
+          print('☠️打席数または投球回をスクレイピングできませんでした。☠️');
+        }
+        print(statsPlayer.toMap());
+        listStatsPlayerNoRank.add(statsPlayer);
+      }
+    }
+
+    if (listStatsPlayerNoRank.isNotEmpty) {
+      var cnt_rows = await Postgres.insertMulti(conn, listStatsPlayerNoRank);
+    }
+
     return Response.ok('ok');
   }
 }

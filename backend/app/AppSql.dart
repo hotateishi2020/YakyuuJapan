@@ -383,6 +383,64 @@ class AppSql {
     ''';
   }
 
+  static String selectPredictPlayerByStatsID() {
+    return '''
+      SELECT
+        t_predict_player.id_user,
+        m_user.code_color,
+        m_player.name_full,
+        m_player.url,
+        m_team.name_shortest,
+        m_team.color_back,
+        m_team.color_font
+      FROM t_predict_player
+        LEFT OUTER JOIN m_user ON m_user.id = t_predict_player.id_user
+        LEFT OUTER JOIN m_player ON m_player.id = t_predict_player.id_player
+        LEFT OUTER JOIN m_team ON m_team.id = m_player.id_team
+      WHERE id_stats = \$1
+      AND t_predict_player.id_league = \$2
+      AND year = \$3
+    ''';
+  }
+
+  //予想者が予想した選手であるが、個人成績にランクインしていない選手を取得
+  static String selectStatsPlayerNoRank() {
+    return '''
+      SELECT 
+        t_predict_player.id_user,
+        t_predict_player.id_player,
+        t_predict_player.id_league,
+        t_predict_player.id_stats,
+        m_user.code_color,
+        m_player.name_full,
+        m_player.url,
+        m_team.id AS id_team,
+        m_team.name_shortest,
+        m_team.color_back,
+        m_team.color_font,
+        m_stats.flg_pitcher,
+        m_stats_details.int_idx_col_details,
+        m_stats_details.int_idx_row_details,
+        t_stats_player.stats
+      FROM t_predict_player
+        LEFT OUTER JOIN m_user ON m_user.id = t_predict_player.id_user
+        LEFT OUTER JOIN m_player ON m_player.id = t_predict_player.id_player
+        LEFT OUTER JOIN m_team ON m_team.id = m_player.id_team
+        LEFT OUTER JOIN m_stats ON m_stats.id = t_predict_player.id_stats
+        LEFT OUTER JOIN t_stats_player 
+          ON t_stats_player.id_player = t_predict_player.id_player 
+          AND t_stats_player.id_stats = t_predict_player.id_stats 
+          AND t_stats_player.id_league = t_predict_player.id_league
+          AND t_stats_player.crtat = (SELECT MAX(crtat) FROM t_stats_player)
+        LEFT OUTER JOIN m_stats_details 
+          ON m_stats_details.id_stats = t_predict_player.id_stats 
+          AND m_stats_details.id_league = t_predict_player.id_league
+      WHERE t_predict_player.year = \$1 
+      AND t_stats_player.id_player IS NULL
+      AND m_player.url IS NOT NULL
+    ''';
+  }
+
   // t_predict_team
   static String selectPredictNPBTeams() {
     return '''
@@ -493,13 +551,20 @@ ORDER BY mt.id_league, tpt.int_rank
         m_team.name_shortest AS name_team,
         m_team.color_font,
         m_team.color_back,
-        m_player.name_full   AS name_player,
+        CASE WHEN t_stats_player.int_rank < 1000 THEN m_player.name_full 
+             ELSE
+               CASE WHEN m_stats.flg_pitcher = TRUE THEN m_player.name_full || '(' || ROUND(LEAST(cnt_play::numeric / int_game * 100, 100), 1) || '%)' 
+                    ELSE m_player.name_full || '(' || ROUND(LEAST(cnt_play::numeric / (int_game * 3.1) * 100, 100), 1) || '%)'
+               END
+        END AS name_player,
         CASE WHEN m_stats.code_display = 'INTEGER' THEN TRUNC(stats)::int::text
              WHEN m_stats.code_display = 'INT_DEC_2' THEN to_char(stats, '0.00')
              WHEN m_stats.code_display = 'INT_DEC_3' THEN to_char(stats, '0.000')
              WHEN m_stats.code_display = 'NUM_NO_ZERO_3' THEN regexp_replace(to_char(stats, 'FM0.000'), '^0(?=\.)', '')
              ELSE to_char(stats, '')
         END AS stats,
+        cnt_play,
+        int_game,
         COALESCE('/' || string_agg(DISTINCT t_predict_player.id_user::text, '/' 
                                 ORDER BY t_predict_player.id_user::text) || '/', '') AS id_users,
         COALESCE('/' || string_agg(DISTINCT m_user.code_color, '/' 
@@ -508,11 +573,14 @@ ORDER BY mt.id_league, tpt.int_rank
              WHEN t_game_away.id_pitcher_away > 0 THEN TRUE
              ELSE FALSE END AS flg_today,
         t_stats_player.id_league,
+        t_stats_player.cnt_play,
         m_stats.int_index,
         t_stats_player.id_stats
       FROM t_stats_player
         LEFT JOIN m_stats   ON m_stats.id   = t_stats_player.id_stats
         LEFT JOIN m_team    ON m_team.id    = t_stats_player.id_team
+        LEFT JOIN t_stats_team ON t_stats_team.id_team = m_team.id
+          AND t_stats_team.crtat = (SELECT MAX(crtat) FROM t_stats_team WHERE EXTRACT(YEAR FROM crtat) = \$1)
         LEFT JOIN m_player  ON m_player.id  = t_stats_player.id_player
         LEFT JOIN m_league  ON m_league.id  = m_team.id_league
         LEFT JOIN t_predict_player
@@ -532,12 +600,20 @@ ORDER BY mt.id_league, tpt.int_rank
         m_player.name_full,
         t_stats_player.stats,
         t_stats_player.id_league,
+        t_stats_player.cnt_play,
+        t_stats_team.int_game,
         m_stats.int_index,
         m_stats.code_display,
+        m_stats.flg_pitcher,
+        m_stats.flg_positive,
         t_stats_player.id_stats,
         t_game_home.id_pitcher_home,
         t_game_away.id_pitcher_away
-      ORDER BY t_stats_player.id_league, m_stats.int_index, t_stats_player.int_rank;
+      ORDER BY t_stats_player.id_league ASC, 
+               m_stats.int_index ASC, 
+               CASE WHEN flg_positive = TRUE THEN t_stats_player.stats END DESC,
+               CASE WHEN flg_positive = FALSE THEN t_stats_player.stats END ASC,
+               t_stats_player.int_rank ASC;
     ''';
   }
 

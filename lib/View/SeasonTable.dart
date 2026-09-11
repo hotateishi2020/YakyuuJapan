@@ -210,16 +210,15 @@ class SeasonTableBlock extends StatelessWidget {
       final pitchingCols = ['防御率', '最多勝', '奪三振', 'ホールド', 'セーブ'];
 
       // 個人成績セル: ランク/チーム/選手/数値 を1セル内に表示
-      // rank は「表示行のインデックス(1..5)」。同順位がある場合も
-      // タイトルごとに int_rank 昇順で並べた上位5件から rank 番目を表示する。
+      // rank は「表示行のインデックス(1..5)」。SQL順を維持したリストの rank 番目を表示する。
       Widget _entryCell(List<Map<String, dynamic>> src, String title, int rank) {
-        final list = src.where((m) => (m['title']?.toString() ?? '') == _normalizeTitle(title)).toList()..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 1 << 30).compareTo(int.tryParse('${b['int_rank']}') ?? 1 << 30));
+        final list = src.where((m) => (m['title']?.toString() ?? '') == _normalizeTitle(title)).toList();
         final idx = (rank - 1).clamp(0, list.isNotEmpty ? list.length - 1 : 0);
         final Map<String, dynamic> e = list.isNotEmpty && list.length >= rank ? list[idx] : const {};
 
         final rankText = (e.isNotEmpty ? (e['int_rank']?.toString() ?? '') : '').toString();
         final team = (e.isNotEmpty ? (e['name_team'] ?? '') : '').toString();
-        final name = (e.isNotEmpty ? (e['name_player'] ?? '') : '').toString();
+        final name = (e.isNotEmpty ? (e['player_name'] ?? e['name_player'] ?? '') : '').toString();
         final stat = _num(e.isNotEmpty ? e['stats'] : null);
 
         // colors_user: "/red/blue/" のように / 区切りで色名が入る
@@ -264,11 +263,19 @@ class SeasonTableBlock extends StatelessWidget {
                   flex: STATS_PLAYER_RATIO_CELL_BLOCK_W[0],
                   child: Center(
                     child: () {
-                      final isOne = rankText.trim() == '1';
-                      if (isOne) {
+                      if (rankText.trim() == '1') {
                         return const FittedBox(
                           fit: BoxFit.contain,
                           child: Text('👑',
+                              style: TextStyle(
+                                fontSize: 25,
+                                height: 1.0,
+                              )),
+                        );
+                      } else if (rankText.trim() == '1000') {
+                        return const FittedBox(
+                          fit: BoxFit.contain,
+                          child: Text('-',
                               style: TextStyle(
                                 fontSize: 25,
                                 height: 1.0,
@@ -324,7 +331,7 @@ class SeasonTableBlock extends StatelessWidget {
       Widget _entryCellFromRow(Map<String, dynamic> e) {
         final rankText = (e['int_rank']?.toString() ?? '').toString();
         final team = (e['name_team'] ?? '').toString();
-        final name = (e['name_player'] ?? '').toString();
+        final name = (e['player_name'] ?? e['name_player'] ?? '').toString();
         final stat = _num(e['stats']);
 
         BoxDecoration? _nameBgDecorationFromRow() {
@@ -371,6 +378,15 @@ class SeasonTableBlock extends StatelessWidget {
                         return const FittedBox(
                           fit: BoxFit.contain,
                           child: Text('👑',
+                              style: TextStyle(
+                                fontSize: 12,
+                                height: 1.0,
+                              )),
+                        );
+                      } else if (rankText.trim() == '1000') {
+                        return const FittedBox(
+                          fit: BoxFit.contain,
+                          child: Text('-',
                               style: TextStyle(
                                 fontSize: 12,
                                 height: 1.0,
@@ -446,7 +462,8 @@ class SeasonTableBlock extends StatelessWidget {
                           _gridCell(t, bg: headerBg, fg: Colors.white, weight: FontWeight.bold, h: headerH),
                           Expanded(
                             child: LayoutBuilder(builder: (context, bodyConstraints) {
-                              final rows = src.where((m) => matchTitle(m, t)).toList()..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 1 << 30).compareTo(int.tryParse('${b['int_rank']}') ?? 1 << 30));
+                              // SQLの ORDER BY（成績値順など）を維持するため、ここでは再ソートしない
+                              final rows = src.where((m) => matchTitle(m, t)).toList();
                               final double bodyH = bodyConstraints.maxHeight.isFinite ? bodyConstraints.maxHeight : 0;
                               final int visibleSlots = bodyH > 0 ? (bodyH / rowH).floor().clamp(0, 1000) : 0;
 

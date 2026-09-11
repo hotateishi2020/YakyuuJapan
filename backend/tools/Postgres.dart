@@ -206,6 +206,20 @@ class Postgres {
     return 0; // 該当なし
   }
 
+  //取得したデータをMap<String, dynamic>に変換する（カラム名をキーにして値をvalueにする）
+  static List<Map<String, dynamic>> toMap(Result result) {
+    // カラム名を schema から取得
+    final columns = result.schema?.columns.map((c) => c.columnName).toList() ?? [];
+
+    return result.map((row) {
+      final map = <String, dynamic>{};
+      for (var i = 0; i < columns.length; i++) {
+        map[columns[i].toString()] = row[i];
+      }
+      return map;
+    }).toList();
+  }
+
   static List<Map<String, dynamic>> toJson(Result result) {
     // カラム名を schema から取得
     final columns = result.schema?.columns.map((c) => c.columnName).toList() ?? [];

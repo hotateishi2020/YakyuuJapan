@@ -34,6 +34,7 @@ void main() async {
 
     app.get('/fetchStatsPlayerNPB', (Request request) async {
       return await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.STATS_PLAYER, (conn) async {
+        await FetchURL.fetchStatsPlayerNPB(conn);
         return await FetchURL.fetchStatsPlayerNPB(conn);
       });
     });
@@ -68,7 +69,7 @@ void main() async {
           'events': Postgres.toJson(await Postgres.execute(conn, AppSql.selectEventsDetails())),
           'notification': Postgres.toJson(await Postgres.execute(conn, AppSql.selectNotification())),
         };
-        print(json['stats_team']);
+        print(json['stats_player']);
         return Response.ok(jsonEncode(json), headers: {'content-type': 'application/json; charset=utf-8'});
       });
     });

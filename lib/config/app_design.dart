@@ -26,6 +26,10 @@ const TAB_COLOR_FONT = Colors.white;
 // リーグサイドヘッダー
 const LEAGUE_SIDEHEADER_W = 23;
 
+// 順位表の文字幅目安（SeasonTable の _kChar と揃える）
+const double STANDINGS_CHAR_W = 14.0;
+const double STANDINGS_COL_W2 = STANDINGS_CHAR_W * 2; // 順位・立・江 各列
+
 // 予想ブロック
 const PREDICTION_HEADER_PREDICTOR_W_PCT = 0.06;
 const PREDICTION_HEADER_STANDINGS_W = 56;

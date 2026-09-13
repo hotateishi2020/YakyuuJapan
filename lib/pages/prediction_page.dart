@@ -100,14 +100,31 @@ class _PredictionPageState extends State<PredictionPage> {
     Widget _scoreBox() {
       final name1 = _userNameFromPredictions('1');
       final name2 = _userNameFromPredictions('2');
+      final score1 = '${counts['1'] ?? 0}';
+      final score2 = '${counts['2'] ?? 0}';
+      const double vBorder = 1.0;
+      const double cellPad = 6.0;
+      const Color headerRed = Colors.red;
 
-      // 予想ブロックの列幅に合わせる: 左(順位56 + 現在 1/3) / 立石 1/3 / 江島 1/3
-      // const double rankW = 56; // 予想ブロックの順位列幅
-      const double vBorder = 1.0; // 縦ボーダー幅（立石/江島 列の左境界）
-      final double gutters = vBorder * 2;
-      // final double rem = (width - rankW - gutters).clamp(0, double.infinity);
-      // final double eachW = (rem / 3).floorToDouble();
-      // final double leftHeaderW = (width - gutters - (eachW * 2)).clamp(0, double.infinity);
+      Widget _nameCell(String name, {bool leftBorder = false}) {
+        return Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              color: headerRed,
+              border: leftBorder ? const Border(left: BorderSide(color: Colors.black45, width: vBorder)) : null,
+            ),
+            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: cellPad, vertical: 4),
+            child: OneLineShrinkText(
+              name,
+              baseSize: 16,
+              minSize: 8,
+              weight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        );
+      }
 
       return ClipRRect(
         borderRadius: BorderRadius.circular(4),
@@ -117,96 +134,81 @@ class _PredictionPageState extends State<PredictionPage> {
             border: Border.all(color: Colors.black45),
             borderRadius: BorderRadius.circular(4),
           ),
-          child: Row(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // 1行目: SCORE（全幅）
+              Container(
+                height: 30,
+                decoration: const BoxDecoration(
+                  color: headerRed,
+                  border: Border(bottom: BorderSide(color: Colors.black45, width: vBorder)),
+                ),
+                alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(horizontal: cellPad, vertical: 4),
+                child: const OneLineShrinkText(
+                  'SCORE',
+                  baseSize: 20,
+                  minSize: 10,
+                  weight: FontWeight.bold,
+                  align: TextAlign.center,
+                  color: Colors.white,
+                ),
+              ),
+              // 2行目: 立石 | 江島
+              Container(
+                height: 28,
+                decoration: const BoxDecoration(
+                  border: Border(bottom: BorderSide(color: Colors.black45, width: vBorder)),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _nameCell(name1),
+                    _nameCell(name2, leftBorder: true),
+                  ],
+                ),
+              ),
+              // 3行目: 数字（両列とも同じフォントサイズ）
               Expanded(
-                child: Container(
-                  color: Colors.red,
-                  alignment: Alignment.center,
-                  child: const OneLineShrinkText(
-                    'SCORE',
-                    baseSize: 35,
-                    minSize: 12,
-                    weight: FontWeight.bold,
-                    align: TextAlign.center,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+                child: LayoutBuilder(builder: (context, c) {
+                  final double halfW = c.maxWidth / 2;
+                  final double availW = (halfW - cellPad * 2).clamp(0.0, double.infinity);
+                  final double availH = (c.maxHeight - cellPad * 2).clamp(0.0, double.infinity);
+                  final double byH = availH * 0.88;
+                  final double byW = availW * 0.88;
+                  final double scoreSize = (byH < byW ? byH : byW).clamp(16.0, 56.0);
 
-              // 立石 列（ヘッダー+スコア）
-              Container(
-                width: PREDICTION_HEADER_PREDICTOR_W,
-                decoration: const BoxDecoration(
-                  border: Border(left: BorderSide(color: Colors.black45, width: vBorder)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Container(
-                      height: 34,
-                      color: Colors.red,
-                      alignment: Alignment.center,
-                      child: OneLineShrinkText(
-                        name1,
-                        baseSize: 18,
-                        minSize: 10,
-                        weight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Expanded(
+                  Widget scoreCell(String value, {bool leftBorder = false}) {
+                    return Expanded(
                       child: Container(
-                        color: Colors.white,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: leftBorder ? const Border(left: BorderSide(color: Colors.black45, width: vBorder)) : null,
+                        ),
+                        padding: const EdgeInsets.all(cellPad),
                         alignment: Alignment.center,
-                        child: OneLineShrinkText(
-                          '${counts['1'] ?? 0}',
-                          baseSize: 45,
-                          minSize: 14,
-                          weight: FontWeight.w800,
+                        child: Text(
+                          value,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: scoreSize,
+                            fontWeight: FontWeight.w800,
+                            height: 1.0,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
+                    );
+                  }
 
-              // 江島 列（ヘッダー+スコア）
-              Container(
-                width: PREDICTION_HEADER_PREDICTOR_W,
-                decoration: const BoxDecoration(
-                  border: Border(left: BorderSide(color: Colors.black45, width: vBorder)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Container(
-                      height: 34,
-                      color: Colors.red,
-                      alignment: Alignment.center,
-                      child: OneLineShrinkText(
-                        name2,
-                        baseSize: 18,
-                        minSize: 10,
-                        weight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Expanded(
-                      child: Container(
-                        color: Colors.white,
-                        alignment: Alignment.center,
-                        child: OneLineShrinkText(
-                          '${counts['2'] ?? 0}',
-                          baseSize: 45,
-                          minSize: 14,
-                          weight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      scoreCell(score1),
+                      scoreCell(score2, leftBorder: true),
+                    ],
+                  );
+                }),
               ),
             ],
           ),
@@ -560,22 +562,32 @@ class _PredictionPageState extends State<PredictionPage> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        return Row(children: [
-          Expanded(
-            flex: ALL_RATIO_BLOCK_W[0] + ALL_RATIO_BLOCK_W[1],
-            child: _scoreBox(),
-          ),
-          const SizedBox(width: 5),
-          Expanded(
-            flex: ALL_RATIO_BLOCK_W[2],
-            child: _newsBox(),
-          ),
-          const SizedBox(width: 5),
-          Expanded(
-            flex: ALL_RATIO_BLOCK_W[3],
-            child: _eventsBox(),
-          ),
-        ]);
+        // 下段 LeagueBoardRow / SeasonTable と同じ比率・隙間で幅を決める
+        final double rowW = constraints.maxWidth;
+        final int sideFlex = ALL_RATIO_BLOCK_W[0];
+        final int bodyFlex = ALL_RATIO_BLOCK_W[2] + ALL_RATIO_BLOCK_W[3];
+        const int standingsFlex = 3;
+        const int personalFlex = 2;
+        const double seasonGap = 4.0; // SeasonTable 内の隙間と同じ
+        const double rankColsW = STANDINGS_COL_W2 * 3; // 順位・立・江
+
+        // Expanded の丸め誤差を避けるため、余白は引き算で確定させる
+        final double sideW = rowW * sideFlex / (sideFlex + bodyFlex);
+        final double bodyW = rowW - sideW;
+        final double standingsW = (bodyW - seasonGap) * standingsFlex / (standingsFlex + personalFlex);
+        final double personalW = bodyW - seasonGap - standingsW;
+        final double scoreW = sideW + rankColsW;
+        final double newsW = standingsW - rankColsW;
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(width: scoreW, child: _scoreBox()),
+            SizedBox(width: newsW, child: _newsBox()),
+            const SizedBox(width: seasonGap),
+            SizedBox(width: personalW, child: _eventsBox()),
+          ],
+        );
       },
     );
   }
@@ -600,63 +612,67 @@ class _PredictionPageState extends State<PredictionPage> {
             alignment: Alignment.topCenter,
             child: ConstrainedBox(
               constraints: BoxConstraints.tightFor(width: designWidth),
-              child: Padding(
-                padding: EdgeInsets.only(bottom: ALL_SPACE_BLOCK, left: ALL_MARGIN_LEFT, right: ALL_MARGIN_LEFT),
-                child: SizedBox(
-                  height: constraints.maxHeight,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // ─────────────────────────────────────────────
-                      // ヘッダー（タブ / News / Score / イベント）
-                      // ─────────────────────────────────────────────
-                      Headers.globalHeader(HEADER_GLOBAL_H, ALL_COLOR_APP, HEADER_TITLE, HEADER_PAD_VERTICAL, ALL_MARGIN_LEFT),
-                      SizedBox(height: ALL_SPACE_BLOCK),
-                      Tabs.tabsBar(TAB_TITLES, TAB_BAR_H, ALL_COLOR_APP, TAB_COLOR_FONT, TAB_RADIUS, ALL_MARGIN_LEFT, TAB_PAD_HORIZONTAL, TAB_PAD_VERTICAL),
-                      SizedBox(height: ALL_SPACE_BLOCK),
-                      Expanded(
-                        flex: ALL_RATIO_BLOCK_H[0],
-                        child: _scoreNewsEventsRow(),
-                      ),
-                      SizedBox(height: ALL_SPACE_BLOCK),
-                      Expanded(
-                        flex: ALL_RATIO_BLOCK_H[1],
-                        child: LeagueBoardRow(
-                          leagueId: 1,
-                          leagueColor: const Color(0xFF0B8F3A),
-                          logoAsset: 'assets/images/logo_league_central.webp',
-                          leagueLabelPrefix: 'セ',
-                          predictions: predictions,
-                          standings: standings,
-                          npbPlayerStats: npbPlayerStats,
-                          npbPlayerStatsActual: npbPlayerStatsActual,
-                          games: games,
-                          usernameForId: _usernameForId,
-                          userNameFromPredictions: _userNameFromPredictions,
-                          compact: compact,
+              child: SizedBox(
+                height: constraints.maxHeight,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // ヘッダーは左右余白なし（全幅）
+                    Headers.globalHeader(HEADER_GLOBAL_H, ALL_COLOR_APP, HEADER_TITLE, HEADER_PAD_VERTICAL, ALL_MARGIN_LEFT),
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: ALL_SPACE_BLOCK, left: ALL_MARGIN_LEFT, right: ALL_MARGIN_LEFT),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            SizedBox(height: ALL_SPACE_BLOCK),
+                            Tabs.tabsBar(TAB_TITLES, TAB_BAR_H, ALL_COLOR_APP, TAB_COLOR_FONT, TAB_RADIUS, ALL_MARGIN_LEFT, TAB_PAD_HORIZONTAL, TAB_PAD_VERTICAL),
+                            SizedBox(height: ALL_SPACE_BLOCK),
+                            Expanded(
+                              flex: ALL_RATIO_BLOCK_H[0],
+                              child: _scoreNewsEventsRow(),
+                            ),
+                            SizedBox(height: ALL_SPACE_BLOCK),
+                            Expanded(
+                              flex: ALL_RATIO_BLOCK_H[1],
+                              child: LeagueBoardRow(
+                                leagueId: 1,
+                                leagueColor: const Color(0xFF0B8F3A),
+                                logoAsset: 'assets/images/logo_league_central.webp',
+                                leagueLabelPrefix: 'セ',
+                                predictions: predictions,
+                                standings: standings,
+                                npbPlayerStats: npbPlayerStats,
+                                npbPlayerStatsActual: npbPlayerStatsActual,
+                                games: games,
+                                usernameForId: _usernameForId,
+                                userNameFromPredictions: _userNameFromPredictions,
+                                compact: compact,
+                              ),
+                            ),
+                            SizedBox(height: ALL_SPACE_BLOCK),
+                            Expanded(
+                              flex: ALL_RATIO_BLOCK_H[1],
+                              child: LeagueBoardRow(
+                                leagueId: 2,
+                                leagueColor: const Color(0xFF4DB5E8),
+                                logoAsset: 'assets/images/logo_league_pacific.png',
+                                leagueLabelPrefix: 'パ',
+                                predictions: predictions,
+                                standings: standings,
+                                npbPlayerStats: npbPlayerStats,
+                                npbPlayerStatsActual: npbPlayerStatsActual,
+                                games: games,
+                                usernameForId: _usernameForId,
+                                userNameFromPredictions: _userNameFromPredictions,
+                                compact: compact,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      SizedBox(height: ALL_SPACE_BLOCK),
-// 2行目: パ・リーグ（比率 2）
-                      Expanded(
-                        flex: ALL_RATIO_BLOCK_H[1],
-                        child: LeagueBoardRow(
-                          leagueId: 2,
-                          leagueColor: const Color(0xFF4DB5E8),
-                          logoAsset: 'assets/images/logo_league_pacific.png',
-                          leagueLabelPrefix: 'パ',
-                          predictions: predictions,
-                          standings: standings,
-                          npbPlayerStats: npbPlayerStats,
-                          npbPlayerStatsActual: npbPlayerStatsActual,
-                          games: games,
-                          usernameForId: _usernameForId,
-                          userNameFromPredictions: _userNameFromPredictions,
-                          compact: compact,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),

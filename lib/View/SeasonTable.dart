@@ -329,10 +329,19 @@ class SeasonTableBlock extends StatelessWidget {
       }
 
       Widget _entryCellFromRow(Map<String, dynamic> e) {
-        final rankText = (e['int_rank']?.toString() ?? '').toString();
+        final rankRaw = e['int_rank'];
+        final rankText = (rankRaw?.toString() ?? '').toString();
+        // JSON経由で 1000.0 になる場合もあるので数値で判定
+        final int rankNum = () {
+          if (rankRaw is int) return rankRaw;
+          if (rankRaw is num) return rankRaw.round();
+          return num.tryParse(rankText.trim())?.round() ?? -1;
+        }();
         final team = (e['name_team'] ?? '').toString();
         final name = (e['player_name'] ?? e['name_player'] ?? '').toString();
         final stat = _num(e['stats']);
+        final bool isNoRank = rankNum == 1000;
+        const Color noRankBg = Color(0xFFC8C8C8); // 規定未到達などのグレー
 
         BoxDecoration? _nameBgDecorationFromRow() {
           final raw = (e['colors_user'] ?? '').toString();
@@ -361,75 +370,101 @@ class SeasonTableBlock extends StatelessWidget {
           );
         }
 
+        Widget _cellBg({required Widget child, Color? overlay}) {
+          return ColoredBox(
+            color: isNoRank ? (overlay ?? noRankBg) : (overlay ?? Colors.transparent),
+            child: child,
+          );
+        }
+
         return SizedBox(
           width: parentWidth * 0.2,
           height: rowH,
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.black26, width: 1),
-            ),
-            child: Row(children: [
-              Expanded(
-                  flex: 2,
-                  child: Center(
-                    child: () {
-                      final isOne = rankText.trim() == '1';
-                      if (isOne) {
-                        return const FittedBox(
-                          fit: BoxFit.contain,
-                          child: Text('👑',
-                              style: TextStyle(
-                                fontSize: 12,
-                                height: 1.0,
-                              )),
-                        );
-                      } else if (rankText.trim() == '1000') {
-                        return const FittedBox(
-                          fit: BoxFit.contain,
-                          child: Text('-',
-                              style: TextStyle(
-                                fontSize: 12,
-                                height: 1.0,
-                              )),
+          child: ColoredBox(
+            color: isNoRank ? noRankBg : Colors.transparent,
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black26, width: 1),
+              ),
+              child: Row(children: [
+                Expanded(
+                    flex: 2,
+                    child: _cellBg(
+                      child: Center(
+                        child: () {
+                          final isOne = rankNum == 1;
+                          if (isOne) {
+                            return const FittedBox(
+                              fit: BoxFit.contain,
+                              child: Text('👑',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    height: 1.0,
+                                  )),
+                            );
+                          } else if (isNoRank) {
+                            return const FittedBox(
+                              fit: BoxFit.contain,
+                              child: Text('-',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    height: 1.0,
+                                  )),
+                            );
+                          }
+                          return OneLineShrinkText(rankText.isNotEmpty ? '$rankNum' : '—', baseSize: 10, minSize: 1, fast: true);
+                        }(),
+                      ),
+                    )),
+                Expanded(
+                    flex: 2,
+                    child: _cellBg(
+                      // 球団カラーは従来どおり（グレー行の上に載せる）
+                      overlay: _parseColorName(e['color_back']) ?? (isNoRank ? noRankBg : Colors.transparent),
+                      child: Container(
+                        alignment: Alignment.center,
+                        child: OneLineShrinkText(team, baseSize: 10, minSize: 1, fast: true, color: _parseColorName(e['color_font'])),
+                      ),
+                    )),
+                Expanded(
+                    flex: 10,
+                    child: (() {
+                      final BoxDecoration? d = _nameBgDecorationFromRow();
+                      final bool hasBg = d != null;
+                      final bool isToday = e['flg_today'] == true;
+                      final Widget txt = OneLineShrinkText(name, baseSize: 10, minSize: 1, fast: true, color: hasBg ? Colors.white : null, weight: hasBg ? FontWeight.bold : null);
+                      // 予想者カラーがある場合はそれを優先。ないときだけグレー
+                      if (isToday) {
+                        return BlinkBg(
+                          base: d ?? BoxDecoration(borderRadius: BorderRadius.circular(4), color: isNoRank ? noRankBg : null),
+                          color: const Color(0xFFFFF176),
+                          radius: 4,
+                          duration: const Duration(milliseconds: 1000),
+                          child: Align(alignment: Alignment.center, child: txt),
                         );
                       }
-                      return OneLineShrinkText(rankText.isNotEmpty ? rankText : '—', baseSize: 10, minSize: 1, fast: true);
-                    }(),
-                  )),
-              Expanded(
-                  flex: 2,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: _parseColorName(e['color_back']),
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                    alignment: Alignment.center,
-                    child: OneLineShrinkText(team, baseSize: 10, minSize: 1, fast: true, color: _parseColorName(e['color_font'])),
-                  )),
-              Expanded(
-                  flex: 10,
-                  child: (() {
-                    final BoxDecoration? d = _nameBgDecorationFromRow();
-                    final bool hasBg = d != null;
-                    final bool isToday = e['flg_today'] == true;
-                    final Widget txt = OneLineShrinkText(name, baseSize: 10, minSize: 1, fast: true, color: hasBg ? Colors.white : null, weight: hasBg ? FontWeight.bold : null);
-                    if (isToday) {
-                      return BlinkBg(
-                        base: d ?? BoxDecoration(borderRadius: BorderRadius.circular(4)),
-                        color: const Color(0xFFFFF176),
-                        radius: 4,
-                        duration: const Duration(milliseconds: 1000),
+                      if (hasBg) {
+                        return Container(
+                          decoration: d,
+                          alignment: Alignment.center,
+                          child: txt,
+                        );
+                      }
+                      return _cellBg(
                         child: Align(alignment: Alignment.center, child: txt),
                       );
-                    }
-                    return Container(
-                      decoration: d,
+                    })()),
+                Expanded(
+                  flex: 4,
+                  child: _cellBg(
+                    child: Align(
                       alignment: Alignment.center,
-                      child: txt,
-                    );
-                  }())),
-              Expanded(flex: 4, child: OneLineShrinkText(stat, baseSize: 10, minSize: 1, fast: true)),
-            ]),
+                      child: OneLineShrinkText(stat, baseSize: 10, minSize: 1, fast: true),
+                    ),
+                  ),
+                ),
+              ]),
+            ),
           ),
         );
       }
@@ -596,7 +631,8 @@ class SeasonTableBlock extends StatelessWidget {
                       final Color? teamFgTateishi = _parseColorName(row['team_color_font_tateishi']);
                       final Color? teamBgEjima = _parseColorName(row['team_color_back_ejima']);
                       final Color? teamFgEjima = _parseColorName(row['team_color_font_ejima']);
-                      final Color? paleBg = ((i + 1) % 2 == 0) ? const Color(0xFFEAD9B9) : Colors.white;
+                      // 試合〜防御率: チーム背景色を薄くしたもの（やや濃いめ）
+                      final Color paleBg = teamBg != null ? _paleOf(teamBg, 0.72) : Colors.white;
 
                       Color? _topColor(bool cond) => cond ? const Color(0xFF32CD32) : null;
                       Color? _worstColor(bool cond) => cond ? Colors.red : null;
@@ -641,6 +677,14 @@ class SeasonTableBlock extends StatelessWidget {
                       final Color? fgEraR = _topColor(topEraR) ?? _worstColor(worstEraR);
                       final FontWeight? wtEraR = (topEraR || worstEraR) ? FontWeight.bold : null;
 
+                      // 勝差が1以下は青＋太字。M付き（マジック）は太字
+                      final String gbText = '${row['game_behind']}'.trim();
+                      final double? gameBehindVal = double.tryParse(gbText);
+                      final bool closeBehind = gameBehindVal != null && gameBehindVal <= 1.0;
+                      final bool hasMagic = gbText.toUpperCase().contains('M');
+                      final Color? fgGb = closeBehind ? Colors.blue : null;
+                      final FontWeight? wtGb = (closeBehind || hasMagic) ? FontWeight.bold : null;
+
                       const double _gridBodyH = 20.0;
                       return Row(children: [
                         SizedBox(width: _wChar2, child: _gridCell('$rk', h: _gridBodyH, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
@@ -669,7 +713,7 @@ class SeasonTableBlock extends StatelessWidget {
                         SizedBox(width: _wChar1, child: _gridCell(_num(row['int_win']), h: _gridBodyH, bg: paleBg)),
                         SizedBox(width: _wChar1, child: _gridCell(_num(row['int_lose']), h: _gridBodyH, bg: paleBg)),
                         SizedBox(width: _wChar1, child: _gridCell(_num(row['int_draw']), h: _gridBodyH, bg: paleBg)),
-                        SizedBox(width: _wChar2, child: _gridCell(_num(row['game_behind']), h: _gridBodyH, bg: paleBg)),
+                        SizedBox(width: _wChar2, child: _gridCell(_num(row['game_behind']), h: _gridBodyH, bg: paleBg, fg: fgGb, weight: wtGb)),
                         SizedBox(width: _wChar3, child: _gridCell(_num(row['pct_win']), h: _gridBodyH, bg: paleBg)),
                         SizedBox(width: _wChar2, child: _gridCell(_num(row['num_avg_batting']), h: _gridBodyH, bg: paleBg, fg: fgBat, weight: wtBat)),
                         SizedBox(width: _wChar3, child: _gridCell(_num(row['int_homerun']), h: _gridBodyH, bg: paleBg, fg: fgHr, weight: wtHr)),

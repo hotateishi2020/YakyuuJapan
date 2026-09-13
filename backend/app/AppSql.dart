@@ -151,7 +151,7 @@ class AppSql {
   //t_events_details
   static String selectEventsDetails() {
     return '''
-            SELECT 
+      SELECT 
         *,
         CASE WHEN date_From_temp < (CURRENT_DATE + INTERVAL '1 day') THEN TRUE ELSE FALSE END AS flg_today 
       FROM (
@@ -319,6 +319,7 @@ class AppSql {
       CASE WHEN t_game_home.id_pitcher_home > 0 THEN m_user.code_color
            WHEN t_game_away.id_pitcher_away > 0 THEN m_user.code_color
            ELSE '' END AS color_today,
+      m_user.code_color,
       int_index,
       flg_pitcher,
       m_team.color_back,
@@ -448,6 +449,7 @@ class AppSql {
         t_predict_team.id AS id_predict,
         m_user.id AS id_user,
         m_user.name_last AS name_user_last,
+        m_user.code_color,
         m_team.name_short AS name_team_short,
         m_team.id_league,
         m_team.color_back,

@@ -11,6 +11,8 @@ class SeasonTableBlock extends StatelessWidget {
   final List<Map<String, dynamic>> games;
   final int? onlyLeagueId; // 1: セ, 2: パ, null: 両方
   final String? gamesDateFilter; // "YYYY-MM-DD"（nullなら今日）
+  final bool portraitLayout;
+  final bool portraitShowPersonal;
 
   const SeasonTableBlock({
     super.key,
@@ -19,6 +21,8 @@ class SeasonTableBlock extends StatelessWidget {
     this.games = const [],
     this.onlyLeagueId,
     this.gamesDateFilter,
+    this.portraitLayout = false,
+    this.portraitShowPersonal = false,
   });
 
   // JSONの色名をColorに変換（不明ならnull）
@@ -564,14 +568,12 @@ class SeasonTableBlock extends StatelessWidget {
     }
 
     // 左: チーム順位 / 右: 個人成績（打撃・投手）
-    final double _standingsWidth = _wChar2 * 3 + _wChar6 + _wChar3 * 14;
     return LayoutBuilder(builder: (context, c) {
       Widget standingsTable() {
         return LayoutBuilder(builder: (context, lb) {
           final double minNameW = _wChar6;
-          // 順位 + 立 + 江 + 試合 + 勝/負/分 + 勝差 + 勝率 + 打率 + 本塁打 + 打点 + 盗塁 + 失策率 + 防御率(総合/先発/救援)
-          final double fixed = _wChar2 * 3 + // 順位・立・江
-              _wChar2 + // 試合
+          // スクロール側（試合〜防御率）の固定幅合計
+          final double scrollColsW = _wChar2 + // 試合
               _wChar1 * 3 + // 勝・負・分
               _wChar2 + // 勝差
               _wChar3 + // 勝率
@@ -581,228 +583,289 @@ class SeasonTableBlock extends StatelessWidget {
               _wChar2 + // 盗塁
               _wChar3 + // 失策率
               _wChar2 * 3; // 防御率3列
-          final double parentW = lb.maxWidth.isFinite ? lb.maxWidth : _standingsWidth;
-          final double tableW = (fixed + minNameW) > parentW ? (fixed + minNameW) : parentW;
-          final double wName = tableW - fixed;
+          final double pinnedBaseW = _wChar2 * 3; // 順位・立・江
+          final double parentW = lb.maxWidth.isFinite ? lb.maxWidth : (pinnedBaseW + minNameW + scrollColsW);
+          final double availForName = parentW - pinnedBaseW - scrollColsW;
+          final double wName = availForName > minNameW ? availForName : minNameW;
+          final bool needsHScroll = (pinnedBaseW + wName + scrollColsW) > parentW + 0.5;
+          const double gridBodyH = 20.0;
 
-          return SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: SizedBox(
-              width: tableW,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+          Widget pinnedHeader() {
+            return Row(children: [
+              SizedBox(width: _wChar2, child: _gridCell('順位', h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
+              SizedBox(width: _wChar2, child: _gridCell('立', h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
+              SizedBox(width: _wChar2, child: _gridCell('江', h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
+              SizedBox(width: wName, child: _gridCell('チーム', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+            ]);
+          }
+
+          Widget scrollHeader() {
+            return Row(children: [
+              SizedBox(width: _wChar2, child: _gridCell('試合', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: _wChar1, child: _gridCell('勝', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: _wChar1, child: _gridCell('負', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: _wChar1, child: _gridCell('分', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: _wChar2, child: _gridCell('勝差', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: _wChar3, child: _gridCell('勝率', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: _wChar2, child: _gridCell('打率', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: _wChar3, child: _gridCell('本塁打', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: _wChar2, child: _gridCell('打点', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: _wChar2, child: _gridCell('盗塁', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: _wChar3, child: _gridCell('失策率', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(
+                width: _wChar2 * 3,
+                child: Column(children: [
+                  _gridCell('防御率', weight: FontWeight.bold, h: ALL_HEADER_H / 2, bg: leagueColor, fg: Colors.white),
                   Row(children: [
-                    SizedBox(width: _wChar2, child: _gridCell('順位', h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
-                    SizedBox(width: _wChar2, child: _gridCell('立', h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
-                    SizedBox(width: _wChar2, child: _gridCell('江', h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
-                    SizedBox(width: wName, child: _gridCell('チーム', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-                    SizedBox(width: _wChar2, child: _gridCell('試合', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-                    SizedBox(width: _wChar1, child: _gridCell('勝', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-                    SizedBox(width: _wChar1, child: _gridCell('負', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-                    SizedBox(width: _wChar1, child: _gridCell('分', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-                    SizedBox(width: _wChar2, child: _gridCell('勝差', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-                    SizedBox(width: _wChar3, child: _gridCell('勝率', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-                    SizedBox(width: _wChar2, child: _gridCell('打率', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-                    SizedBox(width: _wChar3, child: _gridCell('本塁打', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-                    SizedBox(width: _wChar2, child: _gridCell('打点', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-                    SizedBox(width: _wChar2, child: _gridCell('盗塁', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-                    SizedBox(width: _wChar3, child: _gridCell('失策率', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-                    SizedBox(
-                      width: _wChar2 * 3,
-                      child: Column(children: [
-                        _gridCell('防御率', weight: FontWeight.bold, h: ALL_HEADER_H / 2, bg: leagueColor, fg: Colors.white),
-                        Row(children: [
-                          SizedBox(width: _wChar2, child: _gridCell('総合', weight: FontWeight.bold, h: ALL_HEADER_H / 2, bg: leagueColor, fg: Colors.white, align: TextAlign.center)),
-                          SizedBox(width: _wChar2, child: _gridCell('先発', weight: FontWeight.bold, h: ALL_HEADER_H / 2, bg: leagueColor, fg: Colors.white, align: TextAlign.center)),
-                          SizedBox(width: _wChar2, child: _gridCell('救援', weight: FontWeight.bold, h: ALL_HEADER_H / 2, bg: leagueColor, fg: Colors.white, align: TextAlign.center)),
-                        ]),
-                      ]),
-                    ),
+                    SizedBox(width: _wChar2, child: _gridCell('総合', weight: FontWeight.bold, h: ALL_HEADER_H / 2, bg: leagueColor, fg: Colors.white, align: TextAlign.center)),
+                    SizedBox(width: _wChar2, child: _gridCell('先発', weight: FontWeight.bold, h: ALL_HEADER_H / 2, bg: leagueColor, fg: Colors.white, align: TextAlign.center)),
+                    SizedBox(width: _wChar2, child: _gridCell('救援', weight: FontWeight.bold, h: ALL_HEADER_H / 2, bg: leagueColor, fg: Colors.white, align: TextAlign.center)),
                   ]),
-                  for (int i = 0; i < cur.length; i++)
-                    () {
-                      final row = cur[i];
-                      final int rk = int.tryParse('${row['int_rank']}') ?? (i + 1);
-                      final Color? teamBg = _parseColorName(row['color_back']);
-                      final Color? teamFg = _parseColorName(row['color_font']);
-                      final Color? teamBgTateishi = _parseColorName(row['team_color_back_tateishi']);
-                      final Color? teamFgTateishi = _parseColorName(row['team_color_font_tateishi']);
-                      final Color? teamBgEjima = _parseColorName(row['team_color_back_ejima']);
-                      final Color? teamFgEjima = _parseColorName(row['team_color_font_ejima']);
-                      // 試合〜防御率: チーム背景色を薄くしたもの（やや濃いめ）
-                      final Color paleBg = teamBg != null ? _paleOf(teamBg, 0.72) : Colors.white;
-
-                      Color? _topColor(bool cond) => cond ? const Color(0xFF32CD32) : null;
-                      Color? _worstColor(bool cond) => cond ? Colors.red : null;
-
-                      final bool topBat = row['flg_top_num_avg_batting'] == true;
-                      final bool worstBat = row['flg_worst_num_avg_batting'] == true;
-                      final Color? fgBat = _topColor(topBat) ?? _worstColor(worstBat);
-                      final FontWeight? wtBat = (topBat || worstBat) ? FontWeight.bold : null;
-
-                      final bool topHr = row['flg_top_int_homerun'] == true;
-                      final bool worstHr = row['flg_worst_int_homerun'] == true;
-                      final Color? fgHr = _topColor(topHr) ?? _worstColor(worstHr);
-                      final FontWeight? wtHr = (topHr || worstHr) ? FontWeight.bold : null;
-
-                      final bool topRbi = row['flg_top_int_rbi'] == true;
-                      final bool worstRbi = row['flg_worst_int_rbi'] == true;
-                      final Color? fgRbi = _topColor(topRbi) ?? _worstColor(worstRbi);
-                      final FontWeight? wtRbi = (topRbi || worstRbi) ? FontWeight.bold : null;
-
-                      final bool topSb = row['flg_top_int_sh'] == true;
-                      final bool worstSb = row['flg_worst_int_sh'] == true;
-                      final Color? fgSb = _topColor(topSb) ?? _worstColor(worstSb);
-                      final FontWeight? wtSb = (topSb || worstSb) ? FontWeight.bold : null;
-
-                      final bool topFld = row['flg_top_num_avg_fielding'] == true;
-                      final bool worstFld = row['flg_worst_num_avg_fielding'] == true;
-                      final Color? fgFld = _topColor(topFld) ?? _worstColor(worstFld);
-                      final FontWeight? wtFld = (topFld || worstFld) ? FontWeight.bold : null;
-
-                      final bool topEraT = row['flg_top_num_era_total'] == true;
-                      final bool worstEraT = row['flg_worst_num_era_total'] == true;
-                      final Color? fgEraT = _topColor(topEraT) ?? _worstColor(worstEraT);
-                      final FontWeight? wtEraT = (topEraT || worstEraT) ? FontWeight.bold : null;
-
-                      final bool topEraS = row['flg_top_num_era_starter'] == true;
-                      final bool worstEraS = row['flg_worst_num_era_starter'] == true;
-                      final Color? fgEraS = _topColor(topEraS) ?? _worstColor(worstEraS);
-                      final FontWeight? wtEraS = (topEraS || worstEraS) ? FontWeight.bold : null;
-
-                      final bool topEraR = row['flg_top_num_era_relief'] == true;
-                      final bool worstEraR = row['flg_worst_num_era_relief'] == true;
-                      final Color? fgEraR = _topColor(topEraR) ?? _worstColor(worstEraR);
-                      final FontWeight? wtEraR = (topEraR || worstEraR) ? FontWeight.bold : null;
-
-                      // 勝差が1以下は青＋太字。M付き（マジック）は太字
-                      final String gbText = '${row['game_behind']}'.trim();
-                      final double? gameBehindVal = double.tryParse(gbText);
-                      final bool closeBehind = gameBehindVal != null && gameBehindVal <= 1.0;
-                      final bool hasMagic = gbText.toUpperCase().contains('M');
-                      final Color? fgGb = closeBehind ? Colors.blue : null;
-                      final FontWeight? wtGb = (closeBehind || hasMagic) ? FontWeight.bold : null;
-
-                      const double _gridBodyH = 20.0;
-                      return Row(children: [
-                        SizedBox(width: _wChar2, child: _gridCell('$rk', h: _gridBodyH, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
-                        SizedBox(
-                          width: _wChar2,
-                          child: _gridCell(
-                            _num(row['team_name_tateishi']),
-                            h: _gridBodyH,
-                            bg: row['flg_atari_tateishi'] == true ? Colors.yellowAccent : teamBgTateishi,
-                            fg: row['flg_atari_tateishi'] == true ? Colors.blueAccent : teamFgTateishi,
-                            weight: row['flg_atari_tateishi'] == true ? FontWeight.bold : null,
-                          ),
-                        ),
-                        SizedBox(
-                          width: _wChar2,
-                          child: _gridCell(
-                            _num(row['team_name_ejima']),
-                            h: _gridBodyH,
-                            bg: row['flg_atari_ejima'] == true ? Colors.yellowAccent : teamBgEjima,
-                            fg: row['flg_atari_ejima'] == true ? Colors.redAccent : teamFgEjima,
-                            weight: row['flg_atari_ejima'] == true ? FontWeight.bold : null,
-                          ),
-                        ),
-                        SizedBox(width: wName, child: _gridCell(_num(row['name_team']), h: _gridBodyH, bg: teamBg, fg: teamFg)),
-                        SizedBox(width: _wChar2, child: _gridCell(_num(row['int_game']), h: _gridBodyH, bg: paleBg)),
-                        SizedBox(width: _wChar1, child: _gridCell(_num(row['int_win']), h: _gridBodyH, bg: paleBg)),
-                        SizedBox(width: _wChar1, child: _gridCell(_num(row['int_lose']), h: _gridBodyH, bg: paleBg)),
-                        SizedBox(width: _wChar1, child: _gridCell(_num(row['int_draw']), h: _gridBodyH, bg: paleBg)),
-                        SizedBox(width: _wChar2, child: _gridCell(_num(row['game_behind']), h: _gridBodyH, bg: paleBg, fg: fgGb, weight: wtGb)),
-                        SizedBox(width: _wChar3, child: _gridCell(_num(row['pct_win']), h: _gridBodyH, bg: paleBg)),
-                        SizedBox(width: _wChar2, child: _gridCell(_num(row['num_avg_batting']), h: _gridBodyH, bg: paleBg, fg: fgBat, weight: wtBat)),
-                        SizedBox(width: _wChar3, child: _gridCell(_num(row['int_homerun']), h: _gridBodyH, bg: paleBg, fg: fgHr, weight: wtHr)),
-                        SizedBox(width: _wChar2, child: _gridCell(_num(row['int_rbi']), h: _gridBodyH, bg: paleBg, fg: fgRbi, weight: wtRbi)),
-                        SizedBox(width: _wChar2, child: _gridCell(_num(row['int_sh']), h: _gridBodyH, bg: paleBg, fg: fgSb, weight: wtSb)),
-                        SizedBox(width: _wChar3, child: _gridCell(_num(row['num_avg_fielding']), h: _gridBodyH, bg: paleBg, fg: fgFld, weight: wtFld)),
-                        SizedBox(width: _wChar2, child: _gridCell(_num(row['num_era_total']), h: _gridBodyH, bg: paleBg, fg: fgEraT, weight: wtEraT)),
-                        SizedBox(width: _wChar2, child: _gridCell(_num(row['num_era_starter']), h: _gridBodyH, bg: paleBg, fg: fgEraS, weight: wtEraS)),
-                        SizedBox(width: _wChar2, child: _gridCell(_num(row['num_era_relief']), h: _gridBodyH, bg: paleBg, fg: fgEraR, weight: wtEraR)),
-                      ]);
-                    }(),
-                ],
+                ]),
               ),
-            ),
+            ]);
+          }
+
+          Widget pinnedBodyRow(int i) {
+            final row = cur[i];
+            final int rk = int.tryParse('${row['int_rank']}') ?? (i + 1);
+            final Color? teamBg = _parseColorName(row['color_back']);
+            final Color? teamFg = _parseColorName(row['color_font']);
+            final Color? teamBgTateishi = _parseColorName(row['team_color_back_tateishi']);
+            final Color? teamFgTateishi = _parseColorName(row['team_color_font_tateishi']);
+            final Color? teamBgEjima = _parseColorName(row['team_color_back_ejima']);
+            final Color? teamFgEjima = _parseColorName(row['team_color_font_ejima']);
+            return Row(children: [
+              SizedBox(width: _wChar2, child: _gridCell('$rk', h: gridBodyH, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
+              SizedBox(
+                width: _wChar2,
+                child: _gridCell(
+                  _num(row['team_name_tateishi']),
+                  h: gridBodyH,
+                  bg: row['flg_atari_tateishi'] == true ? Colors.yellowAccent : teamBgTateishi,
+                  fg: row['flg_atari_tateishi'] == true ? Colors.blueAccent : teamFgTateishi,
+                  weight: row['flg_atari_tateishi'] == true ? FontWeight.bold : null,
+                ),
+              ),
+              SizedBox(
+                width: _wChar2,
+                child: _gridCell(
+                  _num(row['team_name_ejima']),
+                  h: gridBodyH,
+                  bg: row['flg_atari_ejima'] == true ? Colors.yellowAccent : teamBgEjima,
+                  fg: row['flg_atari_ejima'] == true ? Colors.redAccent : teamFgEjima,
+                  weight: row['flg_atari_ejima'] == true ? FontWeight.bold : null,
+                ),
+              ),
+              SizedBox(width: wName, child: _gridCell(_num(row['name_team']), h: gridBodyH, bg: teamBg, fg: teamFg)),
+            ]);
+          }
+
+          Widget scrollBodyRow(int i) {
+            final row = cur[i];
+            final Color? teamBg = _parseColorName(row['color_back']);
+            final Color paleBg = teamBg != null ? _paleOf(teamBg, 0.72) : Colors.white;
+
+            Color? topColor(bool cond) => cond ? const Color(0xFF32CD32) : null;
+            Color? worstColor(bool cond) => cond ? Colors.red : null;
+
+            final bool topBat = row['flg_top_num_avg_batting'] == true;
+            final bool worstBat = row['flg_worst_num_avg_batting'] == true;
+            final Color? fgBat = topColor(topBat) ?? worstColor(worstBat);
+            final FontWeight? wtBat = (topBat || worstBat) ? FontWeight.bold : null;
+
+            final bool topHr = row['flg_top_int_homerun'] == true;
+            final bool worstHr = row['flg_worst_int_homerun'] == true;
+            final Color? fgHr = topColor(topHr) ?? worstColor(worstHr);
+            final FontWeight? wtHr = (topHr || worstHr) ? FontWeight.bold : null;
+
+            final bool topRbi = row['flg_top_int_rbi'] == true;
+            final bool worstRbi = row['flg_worst_int_rbi'] == true;
+            final Color? fgRbi = topColor(topRbi) ?? worstColor(worstRbi);
+            final FontWeight? wtRbi = (topRbi || worstRbi) ? FontWeight.bold : null;
+
+            final bool topSb = row['flg_top_int_sh'] == true;
+            final bool worstSb = row['flg_worst_int_sh'] == true;
+            final Color? fgSb = topColor(topSb) ?? worstColor(worstSb);
+            final FontWeight? wtSb = (topSb || worstSb) ? FontWeight.bold : null;
+
+            final bool topFld = row['flg_top_num_avg_fielding'] == true;
+            final bool worstFld = row['flg_worst_num_avg_fielding'] == true;
+            final Color? fgFld = topColor(topFld) ?? worstColor(worstFld);
+            final FontWeight? wtFld = (topFld || worstFld) ? FontWeight.bold : null;
+
+            final bool topEraT = row['flg_top_num_era_total'] == true;
+            final bool worstEraT = row['flg_worst_num_era_total'] == true;
+            final Color? fgEraT = topColor(topEraT) ?? worstColor(worstEraT);
+            final FontWeight? wtEraT = (topEraT || worstEraT) ? FontWeight.bold : null;
+
+            final bool topEraS = row['flg_top_num_era_starter'] == true;
+            final bool worstEraS = row['flg_worst_num_era_starter'] == true;
+            final Color? fgEraS = topColor(topEraS) ?? worstColor(worstEraS);
+            final FontWeight? wtEraS = (topEraS || worstEraS) ? FontWeight.bold : null;
+
+            final bool topEraR = row['flg_top_num_era_relief'] == true;
+            final bool worstEraR = row['flg_worst_num_era_relief'] == true;
+            final Color? fgEraR = topColor(topEraR) ?? worstColor(worstEraR);
+            final FontWeight? wtEraR = (topEraR || worstEraR) ? FontWeight.bold : null;
+
+            final String gbText = '${row['game_behind']}'.trim();
+            final double? gameBehindVal = double.tryParse(gbText);
+            final bool closeBehind = gameBehindVal != null && gameBehindVal <= 1.0;
+            final bool hasMagic = gbText.toUpperCase().contains('M');
+            final Color? fgGb = closeBehind ? Colors.blue : null;
+            final FontWeight? wtGb = (closeBehind || hasMagic) ? FontWeight.bold : null;
+
+            return Row(children: [
+              SizedBox(width: _wChar2, child: _gridCell(_num(row['int_game']), h: gridBodyH, bg: paleBg)),
+              SizedBox(width: _wChar1, child: _gridCell(_num(row['int_win']), h: gridBodyH, bg: paleBg)),
+              SizedBox(width: _wChar1, child: _gridCell(_num(row['int_lose']), h: gridBodyH, bg: paleBg)),
+              SizedBox(width: _wChar1, child: _gridCell(_num(row['int_draw']), h: gridBodyH, bg: paleBg)),
+              SizedBox(width: _wChar2, child: _gridCell(_num(row['game_behind']), h: gridBodyH, bg: paleBg, fg: fgGb, weight: wtGb)),
+              SizedBox(width: _wChar3, child: _gridCell(_num(row['pct_win']), h: gridBodyH, bg: paleBg)),
+              SizedBox(width: _wChar2, child: _gridCell(_num(row['num_avg_batting']), h: gridBodyH, bg: paleBg, fg: fgBat, weight: wtBat)),
+              SizedBox(width: _wChar3, child: _gridCell(_num(row['int_homerun']), h: gridBodyH, bg: paleBg, fg: fgHr, weight: wtHr)),
+              SizedBox(width: _wChar2, child: _gridCell(_num(row['int_rbi']), h: gridBodyH, bg: paleBg, fg: fgRbi, weight: wtRbi)),
+              SizedBox(width: _wChar2, child: _gridCell(_num(row['int_sh']), h: gridBodyH, bg: paleBg, fg: fgSb, weight: wtSb)),
+              SizedBox(width: _wChar3, child: _gridCell(_num(row['num_avg_fielding']), h: gridBodyH, bg: paleBg, fg: fgFld, weight: wtFld)),
+              SizedBox(width: _wChar2, child: _gridCell(_num(row['num_era_total']), h: gridBodyH, bg: paleBg, fg: fgEraT, weight: wtEraT)),
+              SizedBox(width: _wChar2, child: _gridCell(_num(row['num_era_starter']), h: gridBodyH, bg: paleBg, fg: fgEraS, weight: wtEraS)),
+              SizedBox(width: _wChar2, child: _gridCell(_num(row['num_era_relief']), h: gridBodyH, bg: paleBg, fg: fgEraR, weight: wtEraR)),
+            ]);
+          }
+
+          final Widget pinnedCol = Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              pinnedHeader(),
+              for (int i = 0; i < cur.length; i++) pinnedBodyRow(i),
+            ],
+          );
+
+          final Widget scrollCol = Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              scrollHeader(),
+              for (int i = 0; i < cur.length; i++) scrollBodyRow(i),
+            ],
+          );
+
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              DecoratedBox(
+                decoration: needsHScroll
+                    ? BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.12),
+                            blurRadius: 3,
+                            offset: const Offset(2, 0),
+                          ),
+                        ],
+                      )
+                    : const BoxDecoration(),
+                child: pinnedCol,
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: scrollCol,
+                ),
+              ),
+            ],
           );
         });
+      }
+
+      final Widget gamesHeader = Container(
+        height: ALL_HEADER_H * 1.0,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: leagueColor,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: OneLineShrinkText(
+          '今日  ${DateFormatUtil.jaDateWithOffset(0)}',
+          baseSize: 13.0,
+          minSize: 5.0,
+          weight: FontWeight.bold,
+          align: TextAlign.center,
+          color: Colors.white,
+          verticalPadding: 2,
+          fast: true,
+        ),
+      );
+
+      final Widget gamesBoard = GamesBoardYahooStyle(
+        games: games,
+        dateFilter: gamesDateFilter ?? DateFormatUtil.ymdWithOffset(0),
+        horizontal: true,
+      );
+
+      // 縦型: 内容の高さだけ（余白を作らない）。横型: 残り領域いっぱいに広げる
+      const double portraitGamesBodyH = 130.0;
+      final Widget gamesBlock = portraitLayout
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                gamesHeader,
+                SizedBox(height: portraitGamesBodyH, width: double.infinity, child: gamesBoard),
+              ],
+            )
+          : Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  gamesHeader,
+                  Expanded(child: gamesBoard),
+                ],
+              ),
+            );
+
+      final Widget teamPanel = Column(
+        mainAxisSize: portraitLayout ? MainAxisSize.min : MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          standingsTable(),
+          const SizedBox(height: 6),
+          gamesBlock,
+        ],
+      );
+
+      final Widget personalPanel = Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: LayoutBuilder(builder: (context, lb) {
+              final double centralW = lb.maxWidth.isFinite ? lb.maxWidth : 0;
+              return _personalStatsSheet(leagueId, bat, const [], centralW);
+            }),
+          ),
+          const SizedBox(height: 2),
+          Expanded(
+            child: LayoutBuilder(builder: (context, lb) {
+              final double centralW = lb.maxWidth.isFinite ? lb.maxWidth : 0;
+              return _personalStatsSheet(leagueId, const [], pit, centralW);
+            }),
+          ),
+        ],
+      );
+
+      if (portraitLayout) {
+        return portraitShowPersonal ? personalPanel : teamPanel;
       }
 
       return Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 左: チーム順位 + その下に今日の試合（横並び）
-          Expanded(
-            flex: 3,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // 順位表は内容高さのみ（下に空きを作らない）
-                standingsTable(),
-                const SizedBox(height: 6),
-                // 残りを試合情報に充てる
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Container(
-                        height: ALL_HEADER_H * 1.0,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: leagueColor,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: OneLineShrinkText(
-                          '今日  ${DateFormatUtil.jaDateWithOffset(0)}',
-                          baseSize: 13.0,
-                          minSize: 5.0,
-                          weight: FontWeight.bold,
-                          align: TextAlign.center,
-                          color: Colors.white,
-                          verticalPadding: 2,
-                          fast: true,
-                        ),
-                      ),
-                      Expanded(
-                        child: GamesBoardYahooStyle(
-                          games: games,
-                          dateFilter: gamesDateFilter ?? DateFormatUtil.ymdWithOffset(0),
-                          horizontal: true,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+          Expanded(flex: 3, child: teamPanel),
           const SizedBox(width: 4),
-          // 右: 個人成績（上=打撃 / 下=投手）
-          Expanded(
-            flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: LayoutBuilder(builder: (context, lb) {
-                    final double centralW = lb.maxWidth.isFinite ? lb.maxWidth : 0;
-                    return _personalStatsSheet(leagueId, bat, const [], centralW);
-                  }),
-                ),
-                const SizedBox(height: 2),
-                Expanded(
-                  child: LayoutBuilder(builder: (context, lb) {
-                    final double centralW = lb.maxWidth.isFinite ? lb.maxWidth : 0;
-                    return _personalStatsSheet(leagueId, const [], pit, centralW);
-                  }),
-                ),
-              ],
-            ),
-          ),
+          Expanded(flex: 2, child: personalPanel),
         ],
       );
     });
@@ -810,20 +873,23 @@ class SeasonTableBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox.expand(
-      child: Card(
-        elevation: 2,
-        margin: const EdgeInsets.symmetric(vertical: 0),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
-        child: onlyLeagueId == null
-            ? Column(
-                children: [
-                  Expanded(child: _leagueTable(1)),
-                ],
-              )
-            : _leagueTable(onlyLeagueId!),
-      ),
+    final content = Card(
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(vertical: 0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+      child: onlyLeagueId == null
+          ? Column(
+              children: [
+                Expanded(child: _leagueTable(1)),
+              ],
+            )
+          : _leagueTable(onlyLeagueId!),
     );
+    // 縦型のチーム成績は内容高さ。個人成績・横型は親に合わせて広げる
+    if (portraitLayout && !portraitShowPersonal) {
+      return content;
+    }
+    return SizedBox.expand(child: content);
   }
 }
 

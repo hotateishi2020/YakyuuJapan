@@ -15,6 +15,8 @@ class LeagueBoardRow extends StatelessWidget {
   final String Function(String idUser) usernameForId;
   final String Function(String idUser) userNameFromPredictions;
   final bool compact;
+  final bool portraitLayout;
+  final bool portraitShowPersonal;
 
   final String leagueLabelPrefix;
 
@@ -32,13 +34,11 @@ class LeagueBoardRow extends StatelessWidget {
     required this.usernameForId,
     required this.userNameFromPredictions,
     required this.compact,
+    this.portraitLayout = false,
+    this.portraitShowPersonal = false,
   });
 
-  List<Map<String, dynamic>> get _leagueGames => games
-      .where((g) =>
-          (int.tryParse('${g['id_league_home']}') ?? 0) == leagueId &&
-          (int.tryParse('${g['id_league_away']}') ?? 0) == leagueId)
-      .toList();
+  List<Map<String, dynamic>> get _leagueGames => games.where((g) => (int.tryParse('${g['id_league_home']}') ?? 0) == leagueId && (int.tryParse('${g['id_league_away']}') ?? 0) == leagueId).toList();
 
   Widget _sideHeader() {
     return Container(
@@ -75,12 +75,11 @@ class LeagueBoardRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    final row = Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(flex: ALL_RATIO_BLOCK_W[0], child: _sideHeader()),
         Expanded(
-          // 旧: 成績ブロック + 右の試合ブロック分の幅をまとめて使う
           flex: ALL_RATIO_BLOCK_W[2] + ALL_RATIO_BLOCK_W[3],
           child: SeasonTableBlock(
             standings: standings,
@@ -88,9 +87,21 @@ class LeagueBoardRow extends StatelessWidget {
             games: _leagueGames,
             onlyLeagueId: leagueId,
             gamesDateFilter: DateFormatUtil.ymdWithOffset(0),
+            portraitLayout: portraitLayout,
+            portraitShowPersonal: portraitShowPersonal,
           ),
         ),
       ],
     );
+
+    // 縦型チーム成績: 順位表+試合の内容高さに合わせ、下余白を作らない
+    if (portraitLayout && !portraitShowPersonal) {
+      const double gridBodyH = 20.0;
+      const double gamesBodyH = 130.0;
+      final int teams = standings.where((e) => int.tryParse('${e['id_league']}') == leagueId).length;
+      final double h = ALL_HEADER_H + teams * gridBodyH + 6 + ALL_HEADER_H + gamesBodyH;
+      return SizedBox(height: h, width: double.infinity, child: row);
+    }
+    return row;
   }
 }

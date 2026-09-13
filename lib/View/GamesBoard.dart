@@ -35,7 +35,10 @@ class GamesBoardYahooStyle extends StatelessWidget {
 
     if (horizontal) {
       if (src.isEmpty) {
-        return const Center(child: Text('試合はありません', style: TextStyle(fontSize: 12)));
+        return const SizedBox(
+          height: 40,
+          child: Center(child: Text('試合はありません', style: TextStyle(fontSize: 12))),
+        );
       }
       return Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,

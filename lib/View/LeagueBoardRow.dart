@@ -75,24 +75,29 @@ class LeagueBoardRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final row = Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(flex: ALL_RATIO_BLOCK_W[0], child: _sideHeader()),
-        Expanded(
-          flex: ALL_RATIO_BLOCK_W[2] + ALL_RATIO_BLOCK_W[3],
-          child: SeasonTableBlock(
-            standings: standings,
-            stats: npbPlayerStatsActual,
-            games: _leagueGames,
-            onlyLeagueId: leagueId,
-            gamesDateFilter: DateFormatUtil.ymdWithOffset(0),
-            portraitLayout: portraitLayout,
-            portraitShowPersonal: portraitShowPersonal,
-          ),
-        ),
-      ],
+    final table = SeasonTableBlock(
+      standings: standings,
+      stats: npbPlayerStatsActual,
+      games: _leagueGames,
+      onlyLeagueId: leagueId,
+      gamesDateFilter: DateFormatUtil.ymdWithOffset(0),
+      portraitLayout: portraitLayout,
+      portraitShowPersonal: portraitShowPersonal,
     );
+
+    // 縦型はリーグ切替タブがあるため左ヘッダー不要
+    final Widget body = portraitLayout
+        ? table
+        : Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(flex: ALL_RATIO_BLOCK_W[0], child: _sideHeader()),
+              Expanded(
+                flex: ALL_RATIO_BLOCK_W[2] + ALL_RATIO_BLOCK_W[3],
+                child: table,
+              ),
+            ],
+          );
 
     // 縦型チーム成績: 順位表+試合の内容高さに合わせ、下余白を作らない
     if (portraitLayout && !portraitShowPersonal) {
@@ -100,8 +105,8 @@ class LeagueBoardRow extends StatelessWidget {
       const double gamesBodyH = 130.0;
       final int teams = standings.where((e) => int.tryParse('${e['id_league']}') == leagueId).length;
       final double h = ALL_HEADER_H + teams * gridBodyH + 6 + ALL_HEADER_H + gamesBodyH;
-      return SizedBox(height: h, width: double.infinity, child: row);
+      return SizedBox(height: h, width: double.infinity, child: body);
     }
-    return row;
+    return body;
   }
 }

@@ -1,6 +1,6 @@
 import 'DB/t_stats_player.dart';
+import 'DB/t_stats_player_latest.dart';
 import 'DB/m_player.dart';
-import 'Value.dart';
 
 class AppSql {
   //m_stats_details
@@ -351,10 +351,9 @@ class AppSql {
             tsp.id_team,
             tsp.crtat,
             RANK() OVER (PARTITION BY tsp.id_stats, tsp.id_league ORDER BY tsp.stats DESC) AS rnk
-          FROM t_stats_player tsp
+          FROM t_stats_player_latest tsp
           LEFT JOIN m_stats  ON m_stats.id  = tsp.id_stats
           WHERE m_stats.flg_positive = TRUE
-          AND tsp.crtat = (SELECT MAX(crtat) FROM t_stats_player)
 
           UNION ALL
 
@@ -366,10 +365,9 @@ class AppSql {
             tsp.id_team,
             tsp.crtat,
             RANK() OVER (PARTITION BY tsp.id_stats, tsp.id_league ORDER BY tsp.stats ASC) AS rnk
-          FROM t_stats_player tsp
+          FROM t_stats_player_latest tsp
           LEFT JOIN m_stats  ON m_stats.id  = tsp.id_stats
           WHERE m_stats.flg_positive = FALSE
-          AND tsp.crtat = (SELECT MAX(crtat) FROM t_stats_player)
         ) t
         WHERE t.rnk = 1
      ) u
@@ -421,23 +419,21 @@ class AppSql {
         m_team.color_font,
         m_stats.flg_pitcher,
         m_stats_details.int_idx_col_details,
-        m_stats_details.int_idx_row_details,
-        t_stats_player.stats
+        m_stats_details.int_idx_row_details
       FROM t_predict_player
         LEFT OUTER JOIN m_user ON m_user.id = t_predict_player.id_user
         LEFT OUTER JOIN m_player ON m_player.id = t_predict_player.id_player
         LEFT OUTER JOIN m_team ON m_team.id = m_player.id_team
         LEFT OUTER JOIN m_stats ON m_stats.id = t_predict_player.id_stats
-        LEFT OUTER JOIN t_stats_player 
-          ON t_stats_player.id_player = t_predict_player.id_player 
-          AND t_stats_player.id_stats = t_predict_player.id_stats 
-          AND t_stats_player.id_league = t_predict_player.id_league
-          AND t_stats_player.crtat = (SELECT MAX(crtat) FROM t_stats_player)
+        LEFT OUTER JOIN t_stats_player_latest 
+          ON t_stats_player_latest.id_player = t_predict_player.id_player 
+          AND t_stats_player_latest.id_stats = t_predict_player.id_stats 
+          AND t_stats_player_latest.id_league = t_predict_player.id_league
         LEFT OUTER JOIN m_stats_details 
           ON m_stats_details.id_stats = t_predict_player.id_stats 
           AND m_stats_details.id_league = t_predict_player.id_league
       WHERE t_predict_player.year = \$1 
-      AND t_stats_player.id_player IS NULL
+      AND t_stats_player_latest.id_player IS NULL
       AND m_player.url IS NOT NULL
     ''';
   }
@@ -544,16 +540,16 @@ ORDER BY mt.id_league, tpt.int_rank
     ''';
   }
 
-  //t_stats_player
+  //t_stats_player / t_stats_player_latest
   static String selectStatsPlayer() {
     return '''
       SELECT
         m_stats.title,
-        t_stats_player.int_rank,
+        tsp.int_rank,
         m_team.name_shortest AS name_team,
         m_team.color_font,
         m_team.color_back,
-        CASE WHEN t_stats_player.int_rank < 1000 THEN m_player.name_full 
+        CASE WHEN tsp.int_rank < 1000 THEN m_player.name_full 
              ELSE
                CASE WHEN m_stats.flg_pitcher = TRUE THEN m_player.name_full || '(' || ROUND(LEAST(cnt_play::numeric / int_game * 100, 100), 1) || '%)' 
                     ELSE m_player.name_full || '(' || ROUND(LEAST(cnt_play::numeric / (int_game * 3.1) * 100, 100), 1) || '%)'
@@ -574,48 +570,47 @@ ORDER BY mt.id_league, tpt.int_rank
         CASE WHEN t_game_home.id_pitcher_home > 0 THEN TRUE
              WHEN t_game_away.id_pitcher_away > 0 THEN TRUE
              ELSE FALSE END AS flg_today,
-        t_stats_player.id_league,
-        t_stats_player.cnt_play,
+        tsp.id_league,
+        tsp.cnt_play,
         m_stats.int_index,
-        t_stats_player.id_stats
-      FROM t_stats_player
-        LEFT JOIN m_stats   ON m_stats.id   = t_stats_player.id_stats
-        LEFT JOIN m_team    ON m_team.id    = t_stats_player.id_team
+        tsp.id_stats
+      FROM t_stats_player_latest tsp
+        LEFT JOIN m_stats   ON m_stats.id   = tsp.id_stats
+        LEFT JOIN m_team    ON m_team.id    = tsp.id_team
         LEFT JOIN t_stats_team ON t_stats_team.id_team = m_team.id
           AND t_stats_team.crtat = (SELECT MAX(crtat) FROM t_stats_team WHERE EXTRACT(YEAR FROM crtat) = \$1)
-        LEFT JOIN m_player  ON m_player.id  = t_stats_player.id_player
+        LEFT JOIN m_player  ON m_player.id  = tsp.id_player
         LEFT JOIN m_league  ON m_league.id  = m_team.id_league
         LEFT JOIN t_predict_player
-          ON t_predict_player.id_player = t_stats_player.id_player
-          AND t_predict_player.id_stats  = t_stats_player.id_stats
+          ON t_predict_player.id_player = tsp.id_player
+          AND t_predict_player.id_stats  = tsp.id_stats
           AND t_predict_player.year      = \$1
         LEFT JOIN m_user    ON m_user.id = t_predict_player.id_user
         LEFT JOIN (SELECT id_pitcher_home FROM t_game WHERE datetime_start::date = CURRENT_DATE) AS t_game_home ON t_game_home.id_pitcher_home = t_predict_player.id_player
         LEFT JOIN (SELECT id_pitcher_away FROM t_game WHERE datetime_start::date = CURRENT_DATE) AS t_game_away ON t_game_away.id_pitcher_away = t_predict_player.id_player
-      WHERE t_stats_player.crtat = (SELECT MAX(crtat) FROM t_stats_player WHERE EXTRACT(YEAR FROM crtat) = \$1)
       GROUP BY
         m_stats.title,
-        t_stats_player.int_rank,
+        tsp.int_rank,
         m_team.name_shortest,
         m_team.color_font,
         m_team.color_back,
         m_player.name_full,
-        t_stats_player.stats,
-        t_stats_player.id_league,
-        t_stats_player.cnt_play,
+        tsp.stats,
+        tsp.id_league,
+        tsp.cnt_play,
         t_stats_team.int_game,
         m_stats.int_index,
         m_stats.code_display,
         m_stats.flg_pitcher,
         m_stats.flg_positive,
-        t_stats_player.id_stats,
+        tsp.id_stats,
         t_game_home.id_pitcher_home,
         t_game_away.id_pitcher_away
-      ORDER BY t_stats_player.id_league ASC, 
+      ORDER BY tsp.id_league ASC, 
                m_stats.int_index ASC, 
-               CASE WHEN flg_positive = TRUE THEN t_stats_player.stats END DESC,
-               CASE WHEN flg_positive = FALSE THEN t_stats_player.stats END ASC,
-               t_stats_player.int_rank ASC;
+               CASE WHEN flg_positive = TRUE THEN tsp.stats END DESC,
+               CASE WHEN flg_positive = FALSE THEN tsp.stats END ASC,
+               tsp.int_rank ASC;
     ''';
   }
 
@@ -623,20 +618,36 @@ ORDER BY mt.id_league, tpt.int_rank
     return '''
       DELETE FROM ${t_stats_player().tableName} 
       WHERE EXTRACT(YEAR FROM crtat) = \$1
-        AND code_category = '${Value.SystemCode.Key.NPB}';
     ''';
   }
 
-  static String selectInsertStatsPlayer(List<t_stats_player> stats) {
+  static String deleteStatsPlayerLatestByStats() {
+    return '''
+      DELETE FROM ${t_stats_player_latest().tableName}
+      WHERE id_stats = \$1
+        AND id_league = \$2
+    ''';
+  }
+
+  static String deleteStatsPlayerLatestByPlayer() {
+    return '''
+      DELETE FROM ${t_stats_player_latest().tableName}
+      WHERE id_player = \$1
+        AND id_stats = \$2
+        AND id_league = \$3
+    ''';
+  }
+
+  static String selectInsertStatsPlayer(List<t_stats_player> stats, {String? tableName}) {
+    final into = tableName ?? stats.first.tableName;
     String sql = '''
-        INSERT INTO ${stats.first.tableName} (
+        INSERT INTO $into (
           id_league,
           id_stats,
           id_player,
           id_team,
           int_rank,
-          stats,
-          code_category
+          stats
         )
         ''';
     int cnt = 1;
@@ -650,8 +661,7 @@ ORDER BY mt.id_league, tpt.int_rank
           m_player.id AS id_player, 
           m_player.id_team,
           ${stat.int_rank} AS int_rank,
-          ${stat.stats} AS stats,
-          '${stat.code_category}' AS code_category
+          ${stat.stats} AS stats
         FROM m_player
         LEFT OUTER JOIN m_team ON m_team.id = m_player.id_team
         WHERE m_team.name_shortest = '${stat.teamName}'

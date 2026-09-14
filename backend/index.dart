@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:async';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_cors_headers/shelf_cors_headers.dart';
@@ -16,6 +17,11 @@ import 'app/DB/m_user.dart';
 import 'app/AppSql.dart';
 import 'app/FetchURL.dart';
 import 'app/Value.dart';
+
+/// /predictions 用の短TTLキャッシュ（同一プロセス内）
+String? _predictionsCacheBody;
+DateTime? _predictionsCacheAt;
+const Duration _predictionsCacheTtl = Duration(seconds: 45);
 
 void main() async {
   try {
@@ -53,24 +59,52 @@ void main() async {
       });
     });
 
-    //タイトル予想画面の表示
+    //タイトル予想画面の表示（並列取得・短TTLキャッシュ・読み取り専用で高速化）
     app.get('/predictions', (Request request) async {
-      return await tryCatchAPI(request, log.Prediction.NAME, log.Prediction.Codes.ENTER_NPB, (conn) async {
-        //予想データの取得
+      return await tryCatchAPIReadonly(request, log.Prediction.NAME, log.Prediction.Codes.ENTER_NPB, () async {
+        final now = DateTime.now();
+        if (_predictionsCacheBody != null &&
+            _predictionsCacheAt != null &&
+            now.difference(_predictionsCacheAt!) < _predictionsCacheTtl) {
+          return Response.ok(
+            _predictionsCacheBody!,
+            headers: {
+              'content-type': 'application/json; charset=utf-8',
+              'x-cache': 'HIT',
+            },
+          );
+        }
 
         final current_year = DateTimeTool.getThisYear();
+        final results = await Postgres.mapParallel([
+          (conn) => Postgres.execute(conn, AppSql.selectPredictNPBTeams(), data: [current_year]),
+          (conn) => Postgres.execute(conn, AppSql.selectPredictPlayer(), data: [current_year]),
+          (conn) => Postgres.execute(conn, AppSql.selectStatsTeam(), data: [current_year]),
+          (conn) => Postgres.execute(conn, AppSql.selectStatsPlayer(), data: [current_year]),
+          (conn) => Postgres.execute(conn, AppSql.selectGames(), data: [current_year]),
+          (conn) => Postgres.execute(conn, AppSql.selectEventsDetails()),
+          (conn) => Postgres.execute(conn, AppSql.selectNotification()),
+        ]);
 
-        Map<String, dynamic> json = {
-          'predict_team': Postgres.toJson(await Postgres.execute(conn, AppSql.selectPredictNPBTeams(), data: [current_year])),
-          'predict_player': Postgres.toJson(await Postgres.execute(conn, AppSql.selectPredictPlayer(), data: [current_year])),
-          'stats_team': Postgres.toJson(await Postgres.execute(conn, AppSql.selectStatsTeam(), data: [current_year])),
-          'stats_player': Postgres.toJson(await Postgres.execute(conn, AppSql.selectStatsPlayer(), data: [current_year])),
-          'games': Postgres.toJson(await Postgres.execute(conn, AppSql.selectGames(), data: [current_year])),
-          'events': Postgres.toJson(await Postgres.execute(conn, AppSql.selectEventsDetails())),
-          'notification': Postgres.toJson(await Postgres.execute(conn, AppSql.selectNotification())),
+        final payload = <String, dynamic>{
+          'predict_team': Postgres.toJson(results[0]),
+          'predict_player': Postgres.toJson(results[1]),
+          'stats_team': Postgres.toJson(results[2]),
+          'stats_player': Postgres.toJson(results[3]),
+          'games': Postgres.toJson(results[4]),
+          'events': Postgres.toJson(results[5]),
+          'notification': Postgres.toJson(results[6]),
         };
-        print(json['stats_player']);
-        return Response.ok(jsonEncode(json), headers: {'content-type': 'application/json; charset=utf-8'});
+        final body = jsonEncode(payload);
+        _predictionsCacheBody = body;
+        _predictionsCacheAt = DateTime.now();
+        return Response.ok(
+          body,
+          headers: {
+            'content-type': 'application/json; charset=utf-8',
+            'x-cache': 'MISS',
+          },
+        );
       });
     });
 
@@ -134,6 +168,74 @@ void main() async {
     stderr.writeln('🔥 /void main ERROR: $e\n$st');
   }
 } // void main
+
+/// 読み取り専用API: トランザクションなし。ログINSERTのみ別接続で行う。
+Future<Response> tryCatchAPIReadonly(
+  Request request,
+  String category_system,
+  String code_system,
+  Future<Response> Function() callback,
+) async {
+  print('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
+  var id_error = 0;
+  final user = m_user();
+  var response = Response.ok('ok');
+  try {
+    print("🌐Routing...【" + request.requestedUri.toString() + "】");
+    user.category_system = category_system;
+    user.code_system = code_system;
+    user.flg_user = false;
+    response = await callback();
+  } catch (e, st) {
+    print("⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️");
+    print('🔥 /predictions ERROR: $e\n$st');
+    stderr.writeln('🔥 /predictions ERROR: $e\n$st');
+    try {
+      await Postgres.withConnection((conn) async {
+        id_error = await insertLogError(conn, e, st.toString(), user);
+      });
+      print("エラーログのDBに登録しました。");
+    } catch (e2, st2) {
+      print("エラーログのDB登録に失敗しました。");
+      print('🔥 /predictions ERROR: $e2\n$st2');
+    }
+    try {
+      final username = 'hotateishi2012@yahoo.co.jp';
+      final password = '199424';
+      sendMail(username, password, 'プログラム上でエラーが発生しました', e.toString());
+    } catch (_) {}
+    response = Response.internalServerError(body: 'データベースエラー: $e');
+  } finally {
+    // 操作ログは応答をブロックしない（キャッシュHIT時の体感を特に改善）
+    unawaited(() async {
+      try {
+        await Postgres.withConnection((conn) async {
+          final log = t_system_log();
+          log.method = request.method;
+          log.category = user.category_system;
+          log.code = user.code_system;
+          log.memo = '';
+          log.flg_user = user.flg_user;
+          log.url = request.requestedUri.toString();
+          log.url_pre = "";
+          log.id_log_error = id_error;
+          log.flg_check = false;
+          log.crtby = user.id;
+          log.crtpgm = user.code_system;
+          log.updby = user.id;
+          log.updpgm = user.code_system;
+          await Postgres.insert(conn, log);
+        });
+        print("操作ログを登録しました。【${user.code_system}】");
+      } catch (e, st) {
+        print('操作ログ登録失敗: $e\n$st');
+      }
+    }());
+    print("🌐Responsed Successfully‼️【" + request.requestedUri.toString() + "】");
+  }
+  print('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
+  return response;
+}
 
 Future<Response> tryCatchAPI(Request request, String category_system, String code_system, Future<Response> callback(Connection conn)) async {
   print('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');

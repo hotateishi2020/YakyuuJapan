@@ -1,35 +1,120 @@
+import 'dart:async';
+import 'dart:collection';
 import 'package:postgres/postgres.dart';
 import 'DBModel.dart';
 
 class Postgres {
-  // ✅ 毎回新しい接続を作成する関数
-  //利用者側記述：　　await Postgres.openConnection((conn) async {     }); //connectionOpenClose
-  static Future openConnection(Future<void> callback(Connection conn)) async {
-    final conn = await Connection.open(
-      Endpoint(
-        // host: 'ep-wandering-bonus-a7vpjxw5-pooler.ap-southeast-2.aws.neon.tech',
-        host: 'ep-wandering-bonus-a7vpjxw5.ap-southeast-2.aws.neon.tech',
-        port: 5432,
-        database: 'neondb',
-        username: 'neondb_owner',
-        password: 'npg_fAUXQBOVj19K',
-      ),
-      settings: const ConnectionSettings(
+  // Neon Pooler（接続確立を短縮）。prepared statement 利用のため extended を維持
+  static const String _host = 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech';
+  static const int _port = 5432;
+  static const String _database = 'neondb';
+  static const String _username = 'neondb_owner';
+  static const String _password = 'npg_rID5KHJRZa0E';
+
+  /// 同時に保持する最大アイドル接続数（並列クエリ用に複数確保）
+  static const int _maxPoolSize = 8;
+
+  static final Queue<Connection> _idle = Queue<Connection>();
+  static int _opened = 0;
+  static final List<Completer<Connection>> _waiters = [];
+
+  static Endpoint get _endpoint => Endpoint(
+        host: _host,
+        port: _port,
+        database: _database,
+        username: _username,
+        password: _password,
+      );
+
+  static ConnectionSettings get _settings => const ConnectionSettings(
         sslMode: SslMode.require,
         queryMode: QueryMode.extended,
-      ),
-    );
+      );
 
-    try {
-      await conn.execute('SET search_path TO public');
-      await conn.execute('SET TIME ZONE \'Asia/Tokyo\'');
+  static Future<Connection> _openFresh() async {
+    final conn = await Connection.open(_endpoint, settings: _settings);
+    await conn.execute('SET search_path TO public');
+    await conn.execute("SET TIME ZONE 'Asia/Tokyo'");
+    return conn;
+  }
 
-      await callback(conn);
-    } catch (e, st) {
-      throw (e, st);
-    } finally {
-      await conn.close();
+  /// プールから接続を借りる（なければ新規オープン）
+  static Future<Connection> acquire() async {
+    if (_idle.isNotEmpty) {
+      return _idle.removeFirst();
     }
+    if (_opened < _maxPoolSize) {
+      _opened++;
+      try {
+        return await _openFresh();
+      } catch (e) {
+        _opened--;
+        rethrow;
+      }
+    }
+    final c = Completer<Connection>();
+    _waiters.add(c);
+    return c.future;
+  }
+
+  /// 接続をプールへ返却（壊れていれば破棄）
+  static Future<void> release(Connection conn, {bool broken = false}) async {
+    if (broken) {
+      _opened = (_opened - 1).clamp(0, _maxPoolSize);
+      try {
+        await conn.close();
+      } catch (_) {}
+      if (_waiters.isNotEmpty && _opened < _maxPoolSize) {
+        final waiter = _waiters.removeAt(0);
+        _opened++;
+        try {
+          waiter.complete(await _openFresh());
+        } catch (e, st) {
+          _opened--;
+          waiter.completeError(e, st);
+        }
+      }
+      return;
+    }
+
+    if (_waiters.isNotEmpty) {
+      _waiters.removeAt(0).complete(conn);
+      return;
+    }
+    if (_idle.length < _maxPoolSize) {
+      _idle.addLast(conn);
+      return;
+    }
+    _opened = (_opened - 1).clamp(0, _maxPoolSize);
+    try {
+      await conn.close();
+    } catch (_) {}
+  }
+
+  /// 1本の接続で処理し、終了後にプールへ戻す
+  static Future<T> withConnection<T>(Future<T> Function(Connection conn) callback) async {
+    final conn = await acquire();
+    var broken = false;
+    try {
+      return await callback(conn);
+    } catch (e) {
+      broken = true;
+      rethrow;
+    } finally {
+      await release(conn, broken: broken);
+    }
+  }
+
+  /// 後方互換: 従来どおり callback に接続を渡す（クローズせずプール返却）
+  static Future openConnection(Future<void> Function(Connection conn) callback) async {
+    await withConnection((conn) async {
+      await callback(conn);
+    });
+  }
+
+  /// 読み取り専用の複数クエリを並列実行（接続を複数借りる）
+  static Future<List<T>> mapParallel<T>(List<Future<T> Function(Connection conn)> jobs) async {
+    return Future.wait(jobs.map((job) => withConnection(job)));
   }
 
   //利用者側記述：　　await Postgres.transactionCommit(conn, () async {     }); //transactionCommit

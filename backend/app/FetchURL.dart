@@ -11,6 +11,7 @@ import '../tools/DateTimeTool.dart';
 import '../tools/DBModel.dart';
 import 'DB/m_player.dart';
 import 'DB/t_stats_player.dart';
+import 'DB/t_stats_player_latest.dart';
 import 'DB/t_game.dart';
 import 'DB/m_stadium.dart';
 import 'DB/t_stats_team.dart';
@@ -555,9 +556,8 @@ class FetchURL {
   }
 
   static Future<Response> fetchStatsPlayerNPB(Connection conn) async {
-    // 前回のデータを削除
-    await conn.execute(AppSql.deleteStatsPlayer(), parameters: [DateTimeTool.getThisYear()]);
-
+    // t_stats_player は履歴用に削除せず INSERT のみ。
+    // t_stats_player_latest のみ同内容で deleteInsert する。
     final results = await conn.execute(AppSql.selectStatsDetails());
     final stats = Postgres.toMap(results);
 
@@ -614,6 +614,20 @@ class FetchURL {
 
       var cnt_rows = await Postgres.execute(conn, sql);
       print("個人成績の登録数" + cnt_rows.affectedRows.toString());
+
+      // t_stats_player_latest を同内容で deleteInsert
+      await conn.execute(
+        AppSql.deleteStatsPlayerLatestByStats(),
+        parameters: [stat['id_stats'] as int, stat['id_league'] as int],
+      );
+      final cnt_latest = await Postgres.execute(
+        conn,
+        AppSql.selectInsertStatsPlayer(
+          listStats,
+          tableName: t_stats_player_latest().tableName,
+        ),
+      );
+      print("個人成績latestの登録数" + cnt_latest.affectedRows.toString());
     } //for stat
 
     //予想者が予想した選手がランク外だった場合は選手個人のサイトをスクレイピングして個人成績を取得する
@@ -669,7 +683,27 @@ class FetchURL {
     }
 
     if (listStatsPlayerNoRank.isNotEmpty) {
-      var cnt_rows = await Postgres.insertMulti(conn, listStatsPlayerNoRank);
+      await Postgres.insertMulti(conn, listStatsPlayerNoRank);
+
+      // t_stats_player_latest を同内容で deleteInsert
+      final List<DBModel> listLatest = [];
+      for (final model in listStatsPlayerNoRank) {
+        final src = model as t_stats_player;
+        await conn.execute(
+          AppSql.deleteStatsPlayerLatestByPlayer(),
+          parameters: [src.id_player, src.id_stats, src.id_league],
+        );
+        final latest = t_stats_player_latest();
+        latest.id_league = src.id_league;
+        latest.id_stats = src.id_stats;
+        latest.id_player = src.id_player;
+        latest.id_team = src.id_team;
+        latest.int_rank = src.int_rank;
+        latest.stats = src.stats;
+        latest.cnt_play = src.cnt_play;
+        listLatest.add(latest);
+      }
+      await Postgres.insertMulti(conn, listLatest);
     }
 
     return Response.ok('ok');

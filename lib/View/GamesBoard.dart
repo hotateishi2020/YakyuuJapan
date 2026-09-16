@@ -1,6 +1,152 @@
 import 'package:flutter/material.dart';
+import '../tools/color_parse.dart';
+import '../tools/date_format.dart';
 import 'Text.dart';
 import 'Border.dart';
+
+class GameDateSwitcher extends StatefulWidget {
+  final List<Map<String, dynamic>> games;
+  final Color headerColor;
+  final String? initialDate;
+  final bool horizontal;
+
+  const GameDateSwitcher({
+    super.key,
+    required this.games,
+    required this.headerColor,
+    this.initialDate,
+    this.horizontal = true,
+  });
+
+  @override
+  State<GameDateSwitcher> createState() => _GameDateSwitcherState();
+}
+
+class _GameDateSwitcherState extends State<GameDateSwitcher> {
+  static const int _todayPage = 10000;
+
+  late final PageController _controller;
+  late DateTime _baseDate;
+  int _page = _todayPage;
+
+  @override
+  void initState() {
+    super.initState();
+    _baseDate = DateTime.tryParse(widget.initialDate ?? '') ?? DateTime.now();
+    _baseDate = DateTime(_baseDate.year, _baseDate.month, _baseDate.day);
+    _controller = PageController(initialPage: _page);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  DateTime _dateForPage(int page) => _baseDate.add(Duration(days: page - _todayPage));
+
+  String _jaDate(DateTime date) {
+    const weekdays = ['月', '火', '水', '木', '金', '土', '日'];
+    return '${date.year}年${date.month.toString().padLeft(2, '0')}月'
+        '${date.day.toString().padLeft(2, '0')}日'
+        '(${weekdays[date.weekday - 1]})';
+  }
+
+  String _dayLabel(int page) {
+    final offset = page - _todayPage;
+    if (offset == -1) return '昨日';
+    if (offset == 0) return '今日';
+    if (offset == 1) return '明日';
+    if (offset < 0) return '${-offset}日前';
+    return '$offset日後';
+  }
+
+  Future<void> _showPage(int page) async {
+    if (_page == page || !_controller.hasClients) return;
+    await _controller.animateToPage(
+      page,
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  Widget _dateButton(String label, int offset) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _showPage(_page + offset),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final selectedDate = _dateForPage(_page);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          height: 33,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: widget.headerColor,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Row(
+            children: [
+              _dateButton('前の日', -1),
+              Expanded(
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => _showPage(_todayPage),
+                    child: Center(
+                      child: OneLineShrinkText(
+                        '${_dayLabel(_page)}  ${_jaDate(selectedDate)}',
+                        baseSize: 13,
+                        minSize: 7,
+                        weight: FontWeight.bold,
+                        color: Colors.white,
+                        verticalPadding: 2,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              _dateButton('次の日', 1),
+            ],
+          ),
+        ),
+        Expanded(
+          child: PageView.builder(
+            controller: _controller,
+            onPageChanged: (page) => setState(() => _page = page),
+            itemBuilder: (context, page) {
+              return GamesBoardYahooStyle(
+                games: widget.games,
+                dateFilter: DateFormatUtil.ymd(_dateForPage(page)),
+                horizontal: widget.horizontal,
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
 
 class GamesBoardYahooStyle extends StatelessWidget {
   final List<Map<String, dynamic>> games;
@@ -45,7 +191,7 @@ class GamesBoardYahooStyle extends StatelessWidget {
         children: [
           for (int i = 0; i < src.length; i++) ...[
             if (i > 0) const SizedBox(width: 2),
-            Expanded(child: _GameCard(src[i])),
+            Expanded(child: _TableGameCard(src[i])),
           ],
         ],
       );
@@ -76,11 +222,11 @@ class GamesBoardYahooStyle extends StatelessWidget {
             final double hAvail = cc.maxHeight.isFinite ? cc.maxHeight : 0.0;
             const double minCardH = 110.0; // これ以下なら内部スクロール
             if (hAvail <= 0 || hAvail >= minCardH) {
-              return _GameCard(g);
+              return _TableGameCard(g);
             }
             return SingleChildScrollView(
               padding: EdgeInsets.zero,
-              child: SizedBox(height: minCardH, child: _GameCard(g)),
+              child: SizedBox(height: minCardH, child: _TableGameCard(g)),
             );
           });
         }
@@ -128,6 +274,422 @@ class _LeagueHeader extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
     );
+  }
+}
+
+class _TableGameCard extends StatelessWidget {
+  final Map<String, dynamic> game;
+
+  const _TableGameCard(this.game);
+
+  static const _lineColor = Color(0xFF333333);
+  static const _labelColor = Color(0xFF5A5A5A);
+
+  String _text(String key) => game[key]?.toString() ?? '';
+  int _int(String key) => int.tryParse('${game[key]}') ?? -1;
+
+  Color _pale(Color? color) {
+    final base = color ?? const Color(0xFFE0E0E0);
+    const mix = 0.58;
+    final value = base.toARGB32();
+    final r = (value >> 16) & 0xFF;
+    final g = (value >> 8) & 0xFF;
+    final b = value & 0xFF;
+    return Color.fromARGB(
+      255,
+      (r + (255 - r) * mix).round(),
+      (g + (255 - g) * mix).round(),
+      (b + (255 - b) * mix).round(),
+    );
+  }
+
+  List<({String name, String colors, String mark})> _pitchers(bool home) {
+    final starter = _text(home ? 'name_pitcher_home' : 'name_pitcher_away');
+    final colors = _text(home ? 'colors_pitcher_home' : 'colors_pitcher_away');
+    final teamId = _int(home ? 'id_team_home' : 'id_team_away');
+    final result = <({String name, String colors, String mark})>[];
+
+    void add(String name, String playerColors, String mark) {
+      if (name.trim().isEmpty) return;
+      final index = result.indexWhere((pitcher) => pitcher.name == name);
+      if (index < 0) {
+        result.add((name: name, colors: playerColors, mark: mark));
+        return;
+      }
+      final current = result[index];
+      result[index] = (
+        name: current.name,
+        colors: current.colors.isNotEmpty ? current.colors : playerColors,
+        mark: current.mark.isNotEmpty ? current.mark : mark,
+      );
+    }
+
+    add(starter, colors, '');
+    if (_int('id_team_pitcher_win') == teamId) {
+      add(_text('name_pitcher_win'), '', '勝');
+    }
+    if (_int('id_team_pitcher_lose') == teamId) {
+      add(_text('name_pitcher_lose'), '', '負');
+    }
+    if (_int('id_team_pitcher_save') == teamId) {
+      add(_text('name_pitcher_save'), '', 'S');
+    }
+    return result;
+  }
+
+  Widget _cell({
+    required Widget child,
+    Color? color,
+    bool right = true,
+    bool bottom = true,
+    EdgeInsetsGeometry padding = const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+  }) {
+    return Container(
+      clipBehavior: Clip.hardEdge,
+      alignment: Alignment.center,
+      padding: padding,
+      decoration: BoxDecoration(
+        color: color,
+        border: Border(
+          right: right ? const BorderSide(color: _lineColor) : BorderSide.none,
+          bottom: bottom ? const BorderSide(color: _lineColor) : BorderSide.none,
+        ),
+      ),
+      child: child,
+    );
+  }
+
+  Widget _textCell(
+    String text, {
+    required double size,
+    Color? color,
+    Color? textColor,
+    FontWeight? weight,
+    bool right = true,
+    bool bottom = true,
+    TextAlign align = TextAlign.center,
+  }) {
+    return _cell(
+      color: color,
+      right: right,
+      bottom: bottom,
+      child: OneLineShrinkText(
+        text,
+        baseSize: size,
+        minSize: 7,
+        color: textColor ?? Colors.black87,
+        weight: weight,
+        align: align,
+      ),
+    );
+  }
+
+  Widget _pitcherCell(
+    List<({String name, String colors, String mark})> pitchers, {
+    required Color color,
+    required double size,
+    required bool right,
+  }) {
+    return _cell(
+      color: color,
+      right: right,
+      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+      child: pitchers.isEmpty
+          ? const SizedBox.expand()
+          : LayoutBuilder(builder: (context, constraints) {
+              final hasResultMark = pitchers.any((pitcher) => pitcher.mark.isNotEmpty);
+              final badgeWidth = hasResultMark ? (size + 2).clamp(9.0, 16.0) : 0.0;
+              final gap = hasResultMark ? 0.5 : 0.0;
+
+              double nameWidth(String name, bool highlighted) {
+                final painter = TextPainter(
+                  text: TextSpan(
+                    text: name,
+                    style: TextStyle(
+                      fontSize: size,
+                      fontWeight: highlighted ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+                  maxLines: 1,
+                  textDirection: TextDirection.ltr,
+                )..layout();
+                return painter.width + 4;
+              }
+
+              final availableNameWidth = (constraints.maxWidth - badgeWidth - gap).clamp(1.0, double.infinity);
+              final measuredWidths = pitchers.map((pitcher) => nameWidth(pitcher.name, pitcher.colors.isNotEmpty)).toList();
+              final widestName = measuredWidths.reduce((current, width) => current > width ? current : width);
+              final nameColumnWidth = widestName.clamp(1.0, availableNameWidth);
+              final groupWidth = badgeWidth + gap + nameColumnWidth;
+
+              return Column(
+                children: [
+                  for (int i = 0; i < pitchers.length; i++)
+                    Expanded(
+                      child: Center(
+                        child: SizedBox(
+                          width: groupWidth,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              if (hasResultMark) ...[
+                                SizedBox(
+                                  width: badgeWidth,
+                                  child: pitchers[i].mark.isEmpty ? const SizedBox() : _resultBadge(pitchers[i].mark, size),
+                                ),
+                                SizedBox(width: gap),
+                              ],
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: SizedBox(
+                                  width: measuredWidths[i].clamp(1.0, nameColumnWidth),
+                                  child: _pitcherNameBox(
+                                    name: pitchers[i].name,
+                                    colorsRaw: pitchers[i].colors,
+                                    baseSize: size,
+                                    alignLeft: true,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            }),
+    );
+  }
+
+  Widget _resultBadge(String mark, double fontSize) {
+    final color = switch (mark) {
+      '勝' => Colors.red,
+      '負' => Colors.blue,
+      _ => Colors.amber.shade700,
+    };
+    final diameter = (fontSize + 2).clamp(9.0, 16.0);
+    return Container(
+      width: diameter,
+      height: diameter,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          mark,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 9,
+            fontWeight: FontWeight.bold,
+            height: 1,
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, constraints) {
+      final height = constraints.maxHeight.isFinite ? constraints.maxHeight : 140.0;
+      final headerSize = (height * 0.10).clamp(8.0, 14.0);
+      final teamSize = (height * 0.11).clamp(9.0, 16.0);
+      final stateSize = (height * 0.09).clamp(7.0, 12.0);
+      final scoreSize = (height * 0.13).clamp(10.0, 18.0);
+      final detailSize = (height * 0.09).clamp(8.0, 13.0);
+      final labelSize = (height * 0.10).clamp(8.0, 14.0);
+
+      final homeBg = parseColorNameOrNull(_text('color_back_home'));
+      final awayBg = parseColorNameOrNull(_text('color_back_away'));
+      final homeFg = parseColorNameOrNull(_text('color_font_home')) ?? Colors.black87;
+      final awayFg = parseColorNameOrNull(_text('color_font_away')) ?? Colors.black87;
+      final homePale = _pale(homeBg);
+      final awayPale = _pale(awayBg);
+
+      final scoreHome = _int('score_home');
+      final scoreAway = _int('score_away');
+      final score = scoreHome >= 0 && scoreAway >= 0 ? '$scoreHome - $scoreAway' : 'vs';
+      final state = _text('state');
+      final header = [
+        if (_text('time_game').isNotEmpty) _text('time_game'),
+        if (_text('name_stadium').isNotEmpty) _text('name_stadium'),
+      ].join(' ');
+
+      final content = Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: _lineColor),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              flex: 2,
+              child: _textCell(
+                header.isEmpty ? '　' : header,
+                size: headerSize,
+                color: homeBg ?? const Color(0xFFF4D03F),
+                textColor: homeFg,
+                weight: FontWeight.bold,
+                right: false,
+                align: TextAlign.left,
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    flex: 5,
+                    child: _textCell(
+                      _text('name_team_home'),
+                      size: teamSize,
+                      color: homeBg,
+                      textColor: homeFg,
+                      weight: FontWeight.bold,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: _cell(
+                      color: Colors.white,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (state.isNotEmpty)
+                              Text(
+                                state,
+                                style: TextStyle(
+                                  fontSize: stateSize,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1.0,
+                                ),
+                              ),
+                            if (state.isNotEmpty) const SizedBox(height: 3),
+                            Text(
+                              score,
+                              style: TextStyle(
+                                fontSize: scoreSize,
+                                fontWeight: FontWeight.w800,
+                                height: 1.0,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 5,
+                    child: _textCell(
+                      _text('name_team_away'),
+                      size: teamSize,
+                      color: awayBg,
+                      textColor: awayFg,
+                      weight: FontWeight.bold,
+                      right: false,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    flex: 5,
+                    child: _pitcherCell(
+                      _pitchers(true),
+                      color: homePale,
+                      size: detailSize,
+                      right: true,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: _textCell(
+                      '投手',
+                      size: labelSize,
+                      color: _labelColor,
+                      textColor: Colors.white,
+                      weight: FontWeight.bold,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 5,
+                    child: _pitcherCell(
+                      _pitchers(false),
+                      color: awayPale,
+                      size: detailSize,
+                      right: false,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    flex: 5,
+                    child: _textCell(
+                      _text('name_homerun_home'),
+                      size: detailSize,
+                      color: homePale,
+                      bottom: false,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: _textCell(
+                      '打者',
+                      size: labelSize,
+                      color: _labelColor,
+                      textColor: Colors.white,
+                      weight: FontWeight.bold,
+                      bottom: false,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 5,
+                    child: _textCell(
+                      _text('name_homerun_away'),
+                      size: detailSize,
+                      color: awayPale,
+                      right: false,
+                      bottom: false,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+
+      if (state.contains('回')) {
+        return BlinkBorder(
+          color: Colors.amber,
+          radius: 4,
+          width: 3,
+          duration: const Duration(milliseconds: 900),
+          baseBgColor: Colors.transparent,
+          fillUseColor: false,
+          child: content,
+        );
+      }
+      return content;
+    });
   }
 }
 
@@ -720,46 +1282,7 @@ class _PitcherNameBoxState extends State<_PitcherNameBox> with SingleTickerProvi
   late final AnimationController _ctrl;
   late final Animation<double> _t;
 
-  Color? _colorFrom(String? name) {
-    final raw = (name ?? '').trim();
-    if (raw.isEmpty) return null;
-    final n = raw.toLowerCase();
-    // hex (#RRGGBB or #AARRGGBB or 0xAARRGGBB)
-    String hex = n;
-    if (hex.startsWith('#')) hex = hex.substring(1);
-    if (hex.startsWith('0x')) hex = hex.substring(2);
-    if (RegExp(r'^[0-9a-f]{6} ?$', caseSensitive: false).hasMatch(hex)) {
-      final v = int.tryParse(hex, radix: 16);
-      if (v != null) return Color(0xFF000000 | v);
-    }
-    if (RegExp(r'^[0-9a-f]{8} ?$', caseSensitive: false).hasMatch(hex)) {
-      final v = int.tryParse(hex, radix: 16);
-      if (v != null) return Color(v);
-    }
-    const m = {
-      'red': 0xFFF44336,
-      'orange': 0xFFFF9800,
-      'yellow': 0xFFFFEB3B,
-      'green': 0xFF4CAF50,
-      'lightgreen': 0xFF8BC34A,
-      'blue': 0xFF0000FF,
-      'royalblue': 0xFF4169E1,
-      'mediumblue': 0xFF0000CD,
-      'midnightblue': 0xFF191970,
-      'darkblue': 0xFF00008B,
-      'dodgerblue': 0xFF1E90FF,
-      'navy': 0xFF001F3F,
-      'crimson': 0xFFDC143C,
-      'gold': 0xFFFFD700,
-      'lime': 0xFFCDDC39,
-      'gray': 0xFF9E9E9E,
-      'grey': 0xFF9E9E9E,
-      'black': 0xFF000000,
-      'white': 0xFFFFFFFF,
-    };
-    final v = m[n];
-    return v == null ? null : Color(v);
-  }
+  Color? _colorFrom(String? name) => parseColorNameOrNull(name);
 
   @override
   void initState() {
@@ -829,46 +1352,55 @@ class _PitcherNameBoxState extends State<_PitcherNameBox> with SingleTickerProvi
     final textColor = hasColor ? Colors.white : (widget.overrideTextColor ?? Colors.black87);
     final weight = widget.overrideWeight ?? (hasColor ? FontWeight.bold : FontWeight.normal);
 
-    return SizedBox(
-      width: double.infinity,
-      child: Stack(
-        children: [
-          // 背景（固定: 単色 or グラデ）
-          if (deco != null)
-            Positioned.fill(
-              child: Container(decoration: deco),
-            ),
-          // 点滅オーバーレイ（背景の上、テキストの下）
-          if (firstBlinkColor != null)
-            Positioned.fill(
-              child: AnimatedBuilder(
-                animation: _t,
-                builder: (context, _) {
-                  final double bgAlpha = (0.12 + 0.23 * _t.value).clamp(0.0, 1.0).toDouble();
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: firstBlinkColor!.withOpacity(bgAlpha),
-                      borderRadius: BorderRadius.circular(4),
+    return LayoutBuilder(builder: (context, constraints) {
+      return Align(
+        alignment: Alignment.center,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: constraints.maxWidth.isFinite ? constraints.maxWidth : 120,
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+              decoration: deco,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  if (firstBlinkColor != null)
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        child: AnimatedBuilder(
+                          animation: _t,
+                          builder: (context, _) {
+                            final alpha = (0.12 + 0.23 * _t.value).clamp(0.0, 1.0);
+                            return ColoredBox(
+                              color: firstBlinkColor!.withValues(alpha: alpha),
+                            );
+                          },
+                        ),
+                      ),
                     ),
-                  );
-                },
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      widget.name.isNotEmpty ? widget.name : '—',
+                      maxLines: 1,
+                      softWrap: false,
+                      style: TextStyle(
+                        fontSize: widget.baseSize,
+                        fontWeight: weight,
+                        color: textColor,
+                        height: 1.1,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          // テキスト
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-            alignment: Alignment.center,
-            child: OneLineShrinkText(
-              widget.name,
-              baseSize: widget.baseSize,
-              minSize: 7,
-              color: textColor,
-              weight: weight,
-              align: TextAlign.center,
-            ),
           ),
-        ],
-      ),
-    );
+        ),
+      );
+    });
   }
 }

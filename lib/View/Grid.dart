@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../tools/color_parse.dart';
 import 'Text.dart';
 import 'Border.dart';
 
@@ -27,7 +28,8 @@ class UnifiedGrid extends StatelessWidget {
   });
 
 // After
-  Widget headerCell(double h, String text, {FontWeight weight = FontWeight.bold, Color? bgColor, Color? fgColor}) {
+  Widget headerCell(double h, String text,
+      {FontWeight weight = FontWeight.bold, Color? bgColor, Color? fgColor}) {
     return Container(
       height: h,
       margin: const EdgeInsets.symmetric(horizontal: 0),
@@ -40,12 +42,23 @@ class UnifiedGrid extends StatelessWidget {
       ),
       child: SizedBox(
         width: double.infinity,
-        child: OneLineShrinkText(text, baseSize: 12, minSize: 1, weight: weight, color: fgColor, verticalPadding: 0, fast: true),
+        child: OneLineShrinkText(text,
+            baseSize: 12,
+            minSize: 1,
+            weight: weight,
+            color: fgColor,
+            verticalPadding: 0,
+            fast: true),
       ),
     );
   }
 
-  Widget cell(String text, {bool highlight = false, Color? bgColor, Color? borderColor, Color? fgColor, FontWeight? weight}) {
+  Widget cell(String text,
+      {bool highlight = false,
+      Color? bgColor,
+      Color? borderColor,
+      Color? fgColor,
+      FontWeight? weight}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 0),
       padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
@@ -57,7 +70,13 @@ class UnifiedGrid extends StatelessWidget {
       ),
       child: SizedBox(
         width: double.infinity,
-        child: OneLineShrinkText(text, baseSize: 12, minSize: 5, verticalPadding: 0, fast: true, color: fgColor, weight: weight ?? (highlight ? FontWeight.bold : null)),
+        child: OneLineShrinkText(text,
+            baseSize: 12,
+            minSize: 5,
+            verticalPadding: 0,
+            fast: true,
+            color: fgColor,
+            weight: weight ?? (highlight ? FontWeight.bold : null)),
       ),
     );
   }
@@ -74,7 +93,14 @@ class UnifiedGrid extends StatelessWidget {
         borderRadius: BorderRadius.circular(3),
       ),
       alignment: Alignment.center,
-      child: OneLineShrinkText(text, baseSize: 12, minSize: 5, verticalPadding: 0, fast: true, color: fgColor, weight: FontWeight.bold, align: TextAlign.center),
+      child: OneLineShrinkText(text,
+          baseSize: 12,
+          minSize: 5,
+          verticalPadding: 0,
+          fast: true,
+          color: fgColor,
+          weight: FontWeight.bold,
+          align: TextAlign.center),
     );
   }
 
@@ -90,7 +116,14 @@ class UnifiedGrid extends StatelessWidget {
         borderRadius: BorderRadius.circular(3),
       ),
       alignment: Alignment.center,
-      child: OneLineShrinkText(text, baseSize: 12, minSize: 5, verticalPadding: 0, fast: true, color: fgColor, weight: FontWeight.bold, align: TextAlign.center),
+      child: OneLineShrinkText(text,
+          baseSize: 12,
+          minSize: 5,
+          verticalPadding: 0,
+          fast: true,
+          color: fgColor,
+          weight: FontWeight.bold,
+          align: TextAlign.center),
     );
   }
 
@@ -106,48 +139,42 @@ class UnifiedGrid extends StatelessWidget {
   }
 
   List<Widget> _buildLeagueColumn(int leagueId, {required double rowHeight}) {
-    Color? _parseColorNameLocal(String? name) {
-      final n = (name ?? '').trim().toLowerCase();
-      if (n.isEmpty) return null;
-      const m = {
-        'red': 0xFFF44336,
-        'orange': 0xFFFF9800,
-        'yellow': 0xFFFFEB3B,
-        'green': 0xFF4CAF50,
-        'lightgreen': 0xFF8BC34A,
-        'blue': 0xFF0000FF,
-        'royalblue': 0xFF4169E1,
-        'mediumblue': 0xFF0000CD,
-        'midnightblue': 0xFF191970,
-        'darkblue': 0xFF00008B,
-        'dodgerblue': 0xFF1E90FF,
-        'navy': 0xFF001F3F,
-        'crimson': 0xFFDC143C,
-        'gold': 0xFFFFD700,
-        'lime': 0xFFCDDC39,
-        'gray': 0xFF9E9E9E,
-        'grey': 0xFF9E9E9E,
-        'black': 0xFF000000,
-        'white': 0xFFFFFFFF,
-      };
-      final v = m[n];
-      return v == null ? null : Color(v);
-    }
+    Color? _parseColorNameLocal(String? name) => parseColorNameOrNull(name);
 
     // リーグ色（予想ブロック内サイドヘッダー用）
-    final Color leagueColor = leagueId == 1 ? const Color(0xFF0B8F3A) : const Color(0xFF4DB5E8);
+    final Color leagueColor =
+        leagueId == 1 ? const Color(0xFF0B8F3A) : const Color(0xFF4DB5E8);
     // standingsから対象リーグを抽出
     final currentRows = standings.where((e) {
       final id = int.tryParse('${e['id_league']}') ?? 0;
       return id == leagueId;
     }).toList()
-      ..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0).compareTo(int.tryParse('${b['int_rank']}') ?? 0));
+      ..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0)
+          .compareTo(int.tryParse('${b['int_rank']}') ?? 0));
 
     // predictionsから対象リーグを抽出
-    final pred0 = predictions.where((e) => '${e['id_user']}' == '0' && (int.tryParse('${e['id_league']}') ?? 0) == leagueId).toList()..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0).compareTo(int.tryParse('${b['int_rank']}') ?? 0));
-    final pred1 = predictions.where((e) => '${e['id_user']}' == '1' && (int.tryParse('${e['id_league']}') ?? 0) == leagueId).toList()..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0).compareTo(int.tryParse('${b['int_rank']}') ?? 0));
+    final pred0 = predictions
+        .where((e) =>
+            '${e['id_user']}' == '0' &&
+            (int.tryParse('${e['id_league']}') ?? 0) == leagueId)
+        .toList()
+      ..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0)
+          .compareTo(int.tryParse('${b['int_rank']}') ?? 0));
+    final pred1 = predictions
+        .where((e) =>
+            '${e['id_user']}' == '1' &&
+            (int.tryParse('${e['id_league']}') ?? 0) == leagueId)
+        .toList()
+      ..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0)
+          .compareTo(int.tryParse('${b['int_rank']}') ?? 0));
 
-    final pred2 = predictions.where((e) => '${e['id_user']}' == '2' && (int.tryParse('${e['id_league']}') ?? 0) == leagueId).toList()..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0).compareTo(int.tryParse('${b['int_rank']}') ?? 0));
+    final pred2 = predictions
+        .where((e) =>
+            '${e['id_user']}' == '2' &&
+            (int.tryParse('${e['id_league']}') ?? 0) == leagueId)
+        .toList()
+      ..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0)
+          .compareTo(int.tryParse('${b['int_rank']}') ?? 0));
 
     final widgets = <Widget>[];
     final rankHeader = <Widget>[];
@@ -161,19 +188,23 @@ class UnifiedGrid extends StatelessWidget {
 
     rankHeader.add(Row(children: [
       Expanded(
-        child: headerCell(h_header!, 'シーズン予想', bgColor: leagueColor, fgColor: Colors.white),
+        child: headerCell(h_header!, 'シーズン予想',
+            bgColor: leagueColor, fgColor: Colors.white),
       ),
       SizedBox(
         width: w_col_predictor,
-        child: headerCell(h_header!, '現在', bgColor: leagueColor, fgColor: Colors.white),
+        child: headerCell(h_header!, '現在',
+            bgColor: leagueColor, fgColor: Colors.white),
       ),
       SizedBox(
         width: w_col_predictor,
-        child: headerCell(h_header!, '立石', bgColor: leagueColor, fgColor: Colors.white),
+        child: headerCell(h_header!, '立石',
+            bgColor: leagueColor, fgColor: Colors.white),
       ),
       SizedBox(
         width: w_col_predictor,
-        child: headerCell(h_header!, '江島', bgColor: leagueColor, fgColor: Colors.white),
+        child: headerCell(h_header!, '江島',
+            bgColor: leagueColor, fgColor: Colors.white),
       ),
       // Expanded(flex: 1, child: headerCell('現在', bgColor: leagueColor, fgColor: Colors.white)),
       // Expanded(flex: 1, child: headerCell(userNameFromPredictions('1'), bgColor: leagueColor, fgColor: Colors.white)), // 立石
@@ -181,18 +212,23 @@ class UnifiedGrid extends StatelessWidget {
     ]));
     // 余白や区切り線を入れず、直後のチーム順位ブロックに密着させる
 
-    bool _isHit(Map<String, dynamic>? pred, List<Map<String, dynamic>> curGroup) {
+    bool _isHit(
+        Map<String, dynamic>? pred, List<Map<String, dynamic>> curGroup) {
       if (pred == null || curGroup.isEmpty) return false;
 
       // 予想側の id_team / name
       final int prdId = int.tryParse('${pred['id_team']}') ?? -1;
-      final String prdName = (pred['name_team_short']?.toString() ?? pred['name_team']?.toString() ?? '').trim();
+      final String prdName = (pred['name_team_short']?.toString() ??
+              pred['name_team']?.toString() ??
+              '')
+          .trim();
 
       for (final cur in curGroup) {
         final int curId = int.tryParse('${cur['id_team']}') ?? -1;
         final String curName = (cur['name_team']?.toString() ?? '').trim();
 
-        if ((prdId >= 0 && curId >= 0 && prdId == curId) || (prdName.isNotEmpty && curName == prdName)) {
+        if ((prdId >= 0 && curId >= 0 && prdId == curId) ||
+            (prdName.isNotEmpty && curName == prdName)) {
           return true;
         }
       }
@@ -201,22 +237,31 @@ class UnifiedGrid extends StatelessWidget {
 
     // 行数は常に6。現在列は各チーム1行ずつ（同順位でも別行）。
     for (int i = 0; i < 6; i++) {
-      final Map<String, dynamic> row = i < currentRows.length ? currentRows[i] : const {};
+      final Map<String, dynamic> row =
+          i < currentRows.length ? currentRows[i] : const {};
       final int rk = int.tryParse('${row['int_rank']}') ?? (i + 1);
 
       // 予想側は「表示行インデックス（1..6）」に対応させる
       final int displayPos = i + 1;
-      final p1 = pred1.firstWhere((e) => int.tryParse('${e['int_rank']}') == displayPos, orElse: () => {});
-      final p2 = pred2.firstWhere((e) => int.tryParse('${e['int_rank']}') == displayPos, orElse: () => {});
-      final txt1 = p1.isNotEmpty ? (p1['name_team_short']?.toString() ?? '—') : '—';
-      final txt2 = p2.isNotEmpty ? (p2['name_team_short']?.toString() ?? '—') : '—';
+      final p1 = pred1.firstWhere(
+          (e) => int.tryParse('${e['int_rank']}') == displayPos,
+          orElse: () => {});
+      final p2 = pred2.firstWhere(
+          (e) => int.tryParse('${e['int_rank']}') == displayPos,
+          orElse: () => {});
+      final txt1 =
+          p1.isNotEmpty ? (p1['name_team_short']?.toString() ?? '—') : '—';
+      final txt2 =
+          p2.isNotEmpty ? (p2['name_team_short']?.toString() ?? '—') : '—';
 
       final String name = (row['name_team']?.toString() ?? '').trim();
       final Color? curBg = _parseColorNameLocal('${row['color_back']}');
       final Color? curFont = _parseColorNameLocal('${row['color_font']}');
 
-      final bool hi1 = _isHit(p1.isNotEmpty ? p1 : null, row.isNotEmpty ? [row] : const []);
-      final bool hi2 = _isHit(p2.isNotEmpty ? p2 : null, row.isNotEmpty ? [row] : const []);
+      final bool hi1 =
+          _isHit(p1.isNotEmpty ? p1 : null, row.isNotEmpty ? [row] : const []);
+      final bool hi2 =
+          _isHit(p2.isNotEmpty ? p2 : null, row.isNotEmpty ? [row] : const []);
 
       rankRows.add(SizedBox(
           height: rowHeight,
@@ -224,15 +269,21 @@ class UnifiedGrid extends StatelessWidget {
               child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(width: _rankCellW, child: rankCell('$rk', bgColor: leagueColor, fgColor: Colors.white)),
+              SizedBox(
+                  width: _rankCellW,
+                  child: rankCell('$rk',
+                      bgColor: leagueColor, fgColor: Colors.white)),
               SizedBox(
                 width: w_col_predictor!,
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 0),
-                  padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
                   constraints: const BoxConstraints(minHeight: 21.5),
                   decoration: BoxDecoration(
-                    color: row.isEmpty ? const Color(0xFFF0E68C) : (curBg ?? const Color(0xFFF0E68C)),
+                    color: row.isEmpty
+                        ? const Color(0xFFF0E68C)
+                        : (curBg ?? const Color(0xFFF0E68C)),
                     border: Border.all(color: Colors.grey.shade300),
                     borderRadius: BorderRadius.circular(3),
                   ),
@@ -279,11 +330,21 @@ class UnifiedGrid extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
-                    Text('チ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    Text('|', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    Text('ム', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    Text('順', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    Text('位', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    Text('チ',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
+                    Text('|',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
+                    Text('ム',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
+                    Text('順',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
+                    Text('位',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -310,7 +371,8 @@ class UnifiedGrid extends StatelessWidget {
       final target = (leagueId == 1) ? 'セ・リーグ' : 'パ・リーグ';
       if (ln != target) continue;
 
-      final idStatStr = (r['id_stats'] == null) ? 'unknown' : '${r['id_stats']}';
+      final idStatStr =
+          (r['id_stats'] == null) ? 'unknown' : '${r['id_stats']}';
       final title = (r['title'] ?? '不明').toString();
       final key = '$idStatStr|$title';
       statMap.putIfAbsent(key, () => []).add(r);
@@ -324,14 +386,19 @@ class UnifiedGrid extends StatelessWidget {
       return int.tryParse('$v') ?? 1 << 30;
     }
 
-    int _minIdx(List<Map<String, dynamic>> rows) => rows.isEmpty ? (1 << 30) : rows.map(_idxOf).reduce((a, b) => a < b ? a : b);
+    int _minIdx(List<Map<String, dynamic>> rows) => rows.isEmpty
+        ? (1 << 30)
+        : rows.map(_idxOf).reduce((a, b) => a < b ? a : b);
 
     final statEntries = statMap.entries.toList()
       ..sort((a, b) {
         final ia = _minIdx(a.value);
         final ib = _minIdx(b.value);
         if (ia != ib) return ia.compareTo(ib);
-        return a.key.split('|').last.compareTo(b.key.split('|').last); // 同順位は名称で
+        return a.key
+            .split('|')
+            .last
+            .compareTo(b.key.split('|').last); // 同順位は名称で
       });
 
     for (final entry in statEntries) {
@@ -342,11 +409,16 @@ class UnifiedGrid extends StatelessWidget {
       final user0Rows = rows2.where((e) => '${e['id_user']}' == '0');
       final user2Rows = rows2.where((e) => '${e['id_user']}' == '2');
 
-      final txt1 = _joinDedup(user1Rows.map((e) => '${e['player_name'] ?? ''}'));
+      final txt1 =
+          _joinDedup(user1Rows.map((e) => '${e['player_name'] ?? ''}'));
       // 現在列（id_user==0）は複数選手を同一セルに入れる可能性がある
-      final names0 = user0Rows.map((e) => '${e['player_name'] ?? ''}').where((s) => s.trim().isNotEmpty).toList();
+      final names0 = user0Rows
+          .map((e) => '${e['player_name'] ?? ''}')
+          .where((s) => s.trim().isNotEmpty)
+          .toList();
       final txt0 = _joinDedup(names0);
-      final txt2 = _joinDedup(user2Rows.map((e) => '${e['player_name'] ?? ''}'));
+      final txt2 =
+          _joinDedup(user2Rows.map((e) => '${e['player_name'] ?? ''}'));
 
       final hi1 = user1Rows.any((e) => e['flg_atari'] == true);
       final hi0 = user0Rows.any((e) => e['flg_atari'] == true);
@@ -354,16 +426,27 @@ class UnifiedGrid extends StatelessWidget {
 
 // After
       final isPitcher = rows2.any((e) => e['flg_pitcher'] == true);
-      final titleBg = isPitcher ? const Color(0xFF64B5F6) : const Color(0xFFEF9A9A); // 少し濃い青/赤
+      final titleBg = isPitcher
+          ? const Color(0xFF64B5F6)
+          : const Color(0xFFEF9A9A); // 少し濃い青/赤
 
       // 点滅枠色（color_today）
-      Color? c0 = _parseColorNameLocal(user0Rows.map((e) => '${e['color_today'] ?? ''}').firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
-      Color? c1 = _parseColorNameLocal(user1Rows.map((e) => '${e['color_today'] ?? ''}').firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
-      Color? c2 = _parseColorNameLocal(user2Rows.map((e) => '${e['color_today'] ?? ''}').firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
+      Color? c0 = _parseColorNameLocal(user0Rows
+          .map((e) => '${e['color_today'] ?? ''}')
+          .firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
+      Color? c1 = _parseColorNameLocal(user1Rows
+          .map((e) => '${e['color_today'] ?? ''}')
+          .firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
+      Color? c2 = _parseColorNameLocal(user2Rows
+          .map((e) => '${e['color_today'] ?? ''}')
+          .firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
 
       final Color _baseBg0 = const Color(0xFFF0E68C);
       // 現在列の背景を、同セル内の選手色でグラデーション（なければ既定色）
-      final colors0 = user0Rows.map((e) => _parseColorNameLocal('${e['color_back']}')).whereType<Color>().toList();
+      final colors0 = user0Rows
+          .map((e) => _parseColorNameLocal('${e['color_back']}'))
+          .whereType<Color>()
+          .toList();
       BoxDecoration deco0;
       if (colors0.isEmpty) {
         deco0 = BoxDecoration(
@@ -424,7 +507,9 @@ class UnifiedGrid extends StatelessWidget {
         if (name.isEmpty) continue;
         if (parts0.isNotEmpty) parts0.add(const TextSpan(text: ', '));
         final col = _parseColorNameLocal('${r['color_font']}');
-        parts0.add(TextSpan(text: name, style: TextStyle(color: col, fontWeight: FontWeight.bold)));
+        parts0.add(TextSpan(
+            text: name,
+            style: TextStyle(color: col, fontWeight: FontWeight.bold)));
       }
 
       final w0 = Container(
@@ -435,16 +520,27 @@ class UnifiedGrid extends StatelessWidget {
         child: SizedBox(
           width: double.infinity,
           child: parts0.isEmpty
-              ? OneLineShrinkText('—', baseSize: 12, minSize: 5, verticalPadding: 0, fast: true, weight: FontWeight.bold)
+              ? OneLineShrinkText('—',
+                  baseSize: 12,
+                  minSize: 5,
+                  verticalPadding: 0,
+                  fast: true,
+                  weight: FontWeight.bold)
               : FittedBox(
                   fit: BoxFit.scaleDown,
                   alignment: Alignment.center,
-                  child: RichText(textAlign: TextAlign.center, text: TextSpan(style: const TextStyle(fontSize: 12), children: parts0)),
+                  child: RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                          style: const TextStyle(fontSize: 12),
+                          children: parts0)),
                 ),
         ),
       );
-      final w1 = cell(txt1, highlight: hi1, borderColor: c1 != null ? Colors.transparent : null);
-      final w2 = cell(txt2, highlight: hi2, borderColor: c2 != null ? Colors.transparent : null);
+      final w1 = cell(txt1,
+          highlight: hi1, borderColor: c1 != null ? Colors.transparent : null);
+      final w2 = cell(txt2,
+          highlight: hi2, borderColor: c2 != null ? Colors.transparent : null);
 
       statsSection.add(SizedBox(
           height: rowHeight,
@@ -454,19 +550,47 @@ class UnifiedGrid extends StatelessWidget {
             children: [
               SizedBox(
                 width: 56, // 4文字ぶんの目安
-                child: statTitleCell(title, bgColor: titleBg, fgColor: Colors.white),
+                child: statTitleCell(title,
+                    bgColor: titleBg, fgColor: Colors.white),
               ),
               SizedBox(
                 width: w_col_predictor!,
-                child: c0 != null ? BlinkBorder(color: c0, radius: 3, width: 2, duration: const Duration(milliseconds: 1000), baseBgColor: _baseBg0, fillUseColor: true, child: w0) : w0,
+                child: c0 != null
+                    ? BlinkBorder(
+                        color: c0,
+                        radius: 3,
+                        width: 2,
+                        duration: const Duration(milliseconds: 1000),
+                        baseBgColor: _baseBg0,
+                        fillUseColor: true,
+                        child: w0)
+                    : w0,
               ),
               SizedBox(
                 width: w_col_predictor!,
-                child: c1 != null ? BlinkBorder(color: c1, radius: 3, width: 2, duration: const Duration(milliseconds: 1000), baseBgColor: Colors.transparent, fillUseColor: true, child: w1) : w1,
+                child: c1 != null
+                    ? BlinkBorder(
+                        color: c1,
+                        radius: 3,
+                        width: 2,
+                        duration: const Duration(milliseconds: 1000),
+                        baseBgColor: Colors.transparent,
+                        fillUseColor: true,
+                        child: w1)
+                    : w1,
               ),
               SizedBox(
                 width: w_col_predictor!,
-                child: c2 != null ? BlinkBorder(color: c2, radius: 3, width: 2, duration: const Duration(milliseconds: 1000), baseBgColor: Colors.transparent, fillUseColor: true, child: w2) : w2,
+                child: c2 != null
+                    ? BlinkBorder(
+                        color: c2,
+                        radius: 3,
+                        width: 2,
+                        duration: const Duration(milliseconds: 1000),
+                        baseBgColor: Colors.transparent,
+                        fillUseColor: true,
+                        child: w2)
+                    : w2,
               ),
             ],
           ))));
@@ -490,12 +614,24 @@ class UnifiedGrid extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
-                    Text('個', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    Text('人', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    Text('タ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    Text('イ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    Text('ト', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    Text('ル', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    Text('個',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
+                    Text('人',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
+                    Text('タ',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
+                    Text('イ',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
+                    Text('ト',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
+                    Text('ル',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -550,7 +686,8 @@ class UnifiedGrid extends StatelessWidget {
                     : [
                         Column(
                           mainAxisSize: MainAxisSize.min,
-                          children: _buildLeagueColumn(onlyLeagueId!, rowHeight: rowH),
+                          children: _buildLeagueColumn(onlyLeagueId!,
+                              rowHeight: rowH),
                         ),
                       ],
               ),

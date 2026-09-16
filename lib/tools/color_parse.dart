@@ -1,31 +1,28 @@
 import 'package:flutter/material.dart';
 
 Color parseColorName(String? name, Color fallback) {
-  final n = (name ?? '').toLowerCase().trim();
-  const m = {
-    'red': 0xFFF44336,
-    'green': 0xFF4CAF50,
-    'blue': 0xFF0000FF,
-    'navy': 0xFF001F3F,
-    'royalblue': 0xFF4169E1,
-    'orange': 0xFFFF9800,
-    'yellow': 0xFFFFEB3B,
-    'gold': 0xFFFFD700,
-    'lime': 0xFFCDDC39,
-    'black': 0xFF000000,
-    'gray': 0xFF9E9E9E,
-    'grey': 0xFF9E9E9E,
-    'crimson': 0xFFDC143C,
-    'lightgreen': 0xFF8BC34A,
-    'white': 0xFFFFFFFF,
-  };
-  if (m.containsKey(n)) return Color(m[n]!);
-  return fallback;
+  return parseColorNameOrNull(name) ?? fallback;
 }
 
 Color? parseColorNameOrNull(String? name) {
   final n = (name ?? '').trim().toLowerCase();
-  if (n.isEmpty) return null;
+  if (n.isEmpty || n == '—') return null;
+
+  var hex = n;
+  if (hex.startsWith('#')) hex = hex.substring(1);
+  if (hex.startsWith('0x')) hex = hex.substring(2);
+  if (hex.length == 3 && RegExp(r'^[0-9a-f]{3}$').hasMatch(hex)) {
+    hex = hex.split('').map((c) => '$c$c').join();
+  }
+  if (hex.length == 6 && RegExp(r'^[0-9a-f]{6}$').hasMatch(hex)) {
+    final value = int.tryParse(hex, radix: 16);
+    if (value != null) return Color(0xFF000000 | value);
+  }
+  if (hex.length == 8 && RegExp(r'^[0-9a-f]{8}$').hasMatch(hex)) {
+    final value = int.tryParse(hex, radix: 16);
+    if (value != null) return Color(value);
+  }
+
   const m = {
     'red': 0xFFF44336,
     'orange': 0xFFFF9800,

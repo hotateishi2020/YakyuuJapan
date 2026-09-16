@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../tools/Env.dart';
 import '../tools/app_logger.dart';
+import '../tools/color_parse.dart';
 import '../config/app_design.dart';
 import '../tools/json_utils.dart';
 import '../logic/atari_counts.dart';
@@ -40,11 +41,26 @@ class _PredictionPageState extends State<PredictionPage> {
   int _portraitLeagueTab = 0;
   // 縦型: 0=チーム成績, 1=個人成績
   int _portraitContentTab = 0;
+  // 1: 右側のタブから入る、-1: 左側のタブから入る
+  int _portraitSlideDirection = 1;
 
   // 個人成績の id_user → 表示名
-  String _usernameForId(String idUser) => lookupField(npbPlayerStats, 'id_user', idUser, 'username');
+  String _usernameForId(String idUser) =>
+      lookupField(npbPlayerStats, 'id_user', idUser, 'username');
 
-  String _userNameFromPredictions(String idUserStr) => lookupField(predictions, 'id_user', idUserStr, 'name_user_last');
+  String _userNameFromPredictions(String idUserStr) =>
+      lookupField(predictions, 'id_user', idUserStr, 'name_user_last');
+
+  Color _userBackColorForId(String idUser, {required Color fallback}) {
+    final teamColor =
+        lookupField(predictions, 'id_user', idUser, 'code_color', fallback: '');
+    final playerColor = lookupField(
+        npbPlayerStats, 'id_user', idUser, 'code_color',
+        fallback: '');
+    return parseColorNameOrNull(teamColor) ??
+        parseColorNameOrNull(playerColor) ??
+        fallback;
+  }
 
   @override
   void initState() {
@@ -62,7 +78,8 @@ class _PredictionPageState extends State<PredictionPage> {
           error = 'HTTPエラー: ${res.statusCode}';
           isLoading = false;
         });
-        logger.w('HTTP ${res.statusCode} body: ${res.body.substring(0, res.body.length.clamp(0, 400))}');
+        logger.w(
+            'HTTP ${res.statusCode} body: ${res.body.substring(0, res.body.length.clamp(0, 400))}');
         return;
       }
 
@@ -114,9 +131,13 @@ class _PredictionPageState extends State<PredictionPage> {
               child: GestureDetector(
                 onTap: () => onSelected(tabs[i].$2),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: TAB_PAD_VERTICAL, horizontal: TAB_PAD_HORIZONTAL),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: TAB_PAD_VERTICAL,
+                      horizontal: TAB_PAD_HORIZONTAL),
                   decoration: BoxDecoration(
-                    color: selectedIndex == tabs[i].$2 ? active : Colors.grey.shade300,
+                    color: selectedIndex == tabs[i].$2
+                        ? active
+                        : Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(TAB_RADIUS),
                   ),
                   alignment: Alignment.center,
@@ -124,8 +145,12 @@ class _PredictionPageState extends State<PredictionPage> {
                     tabs[i].$1,
                     style: TextStyle(
                       fontSize: TAB_BAR_H / 2,
-                      fontWeight: selectedIndex == tabs[i].$2 ? FontWeight.bold : FontWeight.normal,
-                      color: selectedIndex == tabs[i].$2 ? TAB_COLOR_FONT : Colors.black87,
+                      fontWeight: selectedIndex == tabs[i].$2
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      color: selectedIndex == tabs[i].$2
+                          ? TAB_COLOR_FONT
+                          : Colors.black87,
                     ),
                   ),
                 ),
@@ -144,8 +169,16 @@ class _PredictionPageState extends State<PredictionPage> {
         ('パ・リーグ', 1),
       ],
       selectedIndex: _portraitLeagueTab,
-      onSelected: (i) => setState(() => _portraitLeagueTab = i),
-      selectedColor: _portraitLeagueTab == 0 ? const Color(0xFF0B8F3A) : const Color(0xFF4DB5E8),
+      onSelected: (i) {
+        if (i == _portraitLeagueTab) return;
+        setState(() {
+          _portraitSlideDirection = i > _portraitLeagueTab ? 1 : -1;
+          _portraitLeagueTab = i;
+        });
+      },
+      selectedColor: _portraitLeagueTab == 0
+          ? const Color(0xFF0B8F3A)
+          : const Color(0xFF4DB5E8),
     );
   }
 
@@ -156,7 +189,13 @@ class _PredictionPageState extends State<PredictionPage> {
         ('個人成績', 1),
       ],
       selectedIndex: _portraitContentTab,
-      onSelected: (i) => setState(() => _portraitContentTab = i),
+      onSelected: (i) {
+        if (i == _portraitContentTab) return;
+        setState(() {
+          _portraitSlideDirection = i > _portraitContentTab ? 1 : -1;
+          _portraitContentTab = i;
+        });
+      },
     );
   }
 
@@ -179,9 +218,11 @@ class _PredictionPageState extends State<PredictionPage> {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
               child: Row(
                 children: [
-                  Icon(expanded ? Icons.expand_less : Icons.expand_more, size: 20),
+                  Icon(expanded ? Icons.expand_less : Icons.expand_more,
+                      size: 20),
                   const SizedBox(width: 4),
-                  Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Text(title,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
@@ -209,23 +250,29 @@ class _PredictionPageState extends State<PredictionPage> {
       final name2 = _userNameFromPredictions('2');
       final score1 = '${counts['1'] ?? 0}';
       final score2 = '${counts['2'] ?? 0}';
+      final color1 = _userBackColorForId('1', fallback: Colors.blue);
+      final color2 = _userBackColorForId('2', fallback: Colors.red);
       const double vBorder = 1.0;
       const double cellPad = 6.0;
-      const Color headerRed = Colors.red;
 
-      Widget _nameCell(String name, {bool leftBorder = false}) {
+      Widget _nameCell(String name, Color background,
+          {bool leftBorder = false}) {
         return Expanded(
           child: Container(
             decoration: BoxDecoration(
-              color: headerRed,
-              border: leftBorder ? const Border(left: BorderSide(color: Colors.black45, width: vBorder)) : null,
+              color: background,
+              border: leftBorder
+                  ? const Border(
+                      left: BorderSide(color: Colors.black45, width: vBorder))
+                  : null,
             ),
             alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(horizontal: cellPad, vertical: 4),
+            padding:
+                const EdgeInsets.symmetric(horizontal: cellPad, vertical: 4),
             child: OneLineShrinkText(
               name,
-              baseSize: 16,
-              minSize: 8,
+              baseSize: 20,
+              minSize: 10,
               weight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -249,11 +296,14 @@ class _PredictionPageState extends State<PredictionPage> {
                 Container(
                   height: 30,
                   decoration: const BoxDecoration(
-                    color: headerRed,
-                    border: Border(bottom: BorderSide(color: Colors.black45, width: vBorder)),
+                    color: Colors.black,
+                    border: Border(
+                        bottom:
+                            BorderSide(color: Colors.black45, width: vBorder)),
                   ),
                   alignment: Alignment.center,
-                  padding: const EdgeInsets.symmetric(horizontal: cellPad, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: cellPad, vertical: 4),
                   child: const OneLineShrinkText(
                     'SCORE',
                     baseSize: 20,
@@ -265,15 +315,17 @@ class _PredictionPageState extends State<PredictionPage> {
                 ),
               // 2行目: 立石 | 江島
               Container(
-                height: portraitCompact ? 22 : 28,
+                height: portraitCompact ? 26 : 32,
                 decoration: const BoxDecoration(
-                  border: Border(bottom: BorderSide(color: Colors.black45, width: vBorder)),
+                  border: Border(
+                      bottom:
+                          BorderSide(color: Colors.black45, width: vBorder)),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _nameCell(name1),
-                    _nameCell(name2, leftBorder: true),
+                    _nameCell(name1, color1),
+                    _nameCell(name2, color2, leftBorder: true),
                   ],
                 ),
               ),
@@ -292,7 +344,10 @@ class _PredictionPageState extends State<PredictionPage> {
                             fit: BoxFit.scaleDown,
                             child: Text(
                               score1,
-                              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, height: 1.0),
+                              style: const TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.0),
                             ),
                           ),
                         ),
@@ -300,7 +355,9 @@ class _PredictionPageState extends State<PredictionPage> {
                       Expanded(
                         child: Container(
                           decoration: const BoxDecoration(
-                            border: Border(left: BorderSide(color: Colors.black45, width: vBorder)),
+                            border: Border(
+                                left: BorderSide(
+                                    color: Colors.black45, width: vBorder)),
                           ),
                           padding: const EdgeInsets.all(cellPad),
                           alignment: Alignment.center,
@@ -308,7 +365,10 @@ class _PredictionPageState extends State<PredictionPage> {
                             fit: BoxFit.scaleDown,
                             child: Text(
                               score2,
-                              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, height: 1.0),
+                              style: const TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.0),
                             ),
                           ),
                         ),
@@ -320,18 +380,25 @@ class _PredictionPageState extends State<PredictionPage> {
                 Expanded(
                   child: LayoutBuilder(builder: (context, c) {
                     final double halfW = c.maxWidth / 2;
-                    final double availW = (halfW - cellPad * 2).clamp(0.0, double.infinity);
-                    final double availH = (c.maxHeight - cellPad * 2).clamp(0.0, double.infinity);
+                    final double availW =
+                        (halfW - cellPad * 2).clamp(0.0, double.infinity);
+                    final double availH =
+                        (c.maxHeight - cellPad * 2).clamp(0.0, double.infinity);
                     final double byH = availH * 0.88;
                     final double byW = availW * 0.88;
-                    final double scoreSize = (byH < byW ? byH : byW).clamp(16.0, 56.0);
+                    final double scoreSize =
+                        (byH < byW ? byH : byW).clamp(16.0, 56.0);
 
                     Widget scoreCell(String value, {bool leftBorder = false}) {
                       return Expanded(
                         child: Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            border: leftBorder ? const Border(left: BorderSide(color: Colors.black45, width: vBorder)) : null,
+                            border: leftBorder
+                                ? const Border(
+                                    left: BorderSide(
+                                        color: Colors.black45, width: vBorder))
+                                : null,
                           ),
                           padding: const EdgeInsets.all(cellPad),
                           alignment: Alignment.center,
@@ -412,15 +479,20 @@ class _PredictionPageState extends State<PredictionPage> {
                 child: Row(
                   children: [
                     const Expanded(
-                      child: Text('News', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                      child: Text('News',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 1),
                       decoration: BoxDecoration(
                         color: Colors.grey,
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      child: const Text('未読メッセージを一覧表示', style: TextStyle(color: Colors.white, fontSize: 11)),
+                      child: const Text('未読メッセージを一覧表示',
+                          style: TextStyle(color: Colors.white, fontSize: 11)),
                     ),
                   ],
                 ),
@@ -442,17 +514,21 @@ class _PredictionPageState extends State<PredictionPage> {
                               Container(
                                 width: tagW,
                                 alignment: Alignment.center,
-                                constraints: const BoxConstraints(minHeight: tagH),
-                                padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+                                constraints:
+                                    const BoxConstraints(minHeight: tagH),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 2, horizontal: 4),
                                 decoration: BoxDecoration(
-                                  color: parse(n['tag_main_color_back'], Colors.grey.shade300),
+                                  color: parse(n['tag_main_color_back'],
+                                      Colors.grey.shade300),
                                   borderRadius: BorderRadius.circular(3),
                                 ),
                                 child: OneLineShrinkText(
                                   (n['tag_main_title'] ?? '').toString(),
                                   baseSize: 12,
                                   minSize: 8,
-                                  color: parse(n['tag_main_color_font'], Colors.white),
+                                  color: parse(
+                                      n['tag_main_color_font'], Colors.white),
                                   align: TextAlign.center,
                                 ),
                               ),
@@ -461,17 +537,21 @@ class _PredictionPageState extends State<PredictionPage> {
                               Container(
                                 width: tagW,
                                 alignment: Alignment.center,
-                                constraints: const BoxConstraints(minHeight: tagH),
-                                padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+                                constraints:
+                                    const BoxConstraints(minHeight: tagH),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 2, horizontal: 4),
                                 decoration: BoxDecoration(
-                                  color: parse(n['tag_sub_color_back'], Colors.grey.shade300),
+                                  color: parse(n['tag_sub_color_back'],
+                                      Colors.grey.shade300),
                                   borderRadius: BorderRadius.circular(3),
                                 ),
                                 child: OneLineShrinkText(
                                   (n['tag_sub_title'] ?? '').toString(),
                                   baseSize: 12,
                                   minSize: 8,
-                                  color: parse(n['tag_sub_color_font'], Colors.white),
+                                  color: parse(
+                                      n['tag_sub_color_font'], Colors.white),
                                   align: TextAlign.center,
                                 ),
                               ),
@@ -488,14 +568,18 @@ class _PredictionPageState extends State<PredictionPage> {
                               const SizedBox(width: 6),
                               // 既読/未読ボタン
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: (n['flg_read'] == true) ? Colors.grey : Colors.orange,
+                                  color: (n['flg_read'] == true)
+                                      ? Colors.grey
+                                      : Colors.orange,
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
                                   (n['flg_read'] == true) ? '既読' : '未読',
-                                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 12),
                                 ),
                               ),
                             ],
@@ -513,7 +597,9 @@ class _PredictionPageState extends State<PredictionPage> {
 
     Widget _eventsBox({bool hideHeader = false, double? boxHeight}) {
       final evs = [...events];
-      evs.sort((a, b) => (a['date_from_temp'] ?? '').toString().compareTo((b['date_from_temp'] ?? '').toString()));
+      evs.sort((a, b) => (a['date_from_temp'] ?? '')
+          .toString()
+          .compareTo((b['date_from_temp'] ?? '').toString()));
 
       Color parse(String? name, Color fallback) {
         final n = (name ?? '').toLowerCase().trim();
@@ -556,12 +642,15 @@ class _PredictionPageState extends State<PredictionPage> {
               SizedBox(
                 width: double.infinity,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: Colors.black,
                     borderRadius: BorderRadius.circular(3),
                   ),
-                  child: const Text('イベント日程', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                  child: const Text('イベント日程',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white)),
                 ),
               ),
             Expanded(
@@ -594,11 +683,13 @@ class _PredictionPageState extends State<PredictionPage> {
                     const double minDate = 48;
                     final double fixedCats = catW * 2;
                     double titleColW = rawMaxTitleW;
-                    final maxAllowed = constraints.maxWidth - fixedCats - spacing - minDate;
+                    final maxAllowed =
+                        constraints.maxWidth - fixedCats - spacing - minDate;
                     if (titleColW > maxAllowed) titleColW = maxAllowed;
                     if (titleColW < 60) titleColW = 60;
 
-                    double dateMaxW = constraints.maxWidth - fixedCats - spacing - titleColW;
+                    double dateMaxW =
+                        constraints.maxWidth - fixedCats - spacing - titleColW;
                     if (dateMaxW < minDate) dateMaxW = minDate;
 
                     return SingleChildScrollView(
@@ -614,16 +705,19 @@ class _PredictionPageState extends State<PredictionPage> {
                                 Container(
                                   width: catW,
                                   alignment: Alignment.center,
-                                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 2, horizontal: 4),
                                   decoration: BoxDecoration(
-                                    color: parse(e['event_category_color_back'], Colors.grey.shade300),
+                                    color: parse(e['event_category_color_back'],
+                                        Colors.grey.shade300),
                                     borderRadius: BorderRadius.circular(3),
                                   ),
                                   child: OneLineShrinkText(
                                     (e['event_category'] ?? '').toString(),
                                     baseSize: 12,
                                     minSize: 8,
-                                    color: parse(e['event_category_color_font'], Colors.white),
+                                    color: parse(e['event_category_color_font'],
+                                        Colors.white),
                                     align: TextAlign.center,
                                   ),
                                 ),
@@ -632,16 +726,21 @@ class _PredictionPageState extends State<PredictionPage> {
                                 Container(
                                   width: catW,
                                   alignment: Alignment.center,
-                                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 2, horizontal: 4),
                                   decoration: BoxDecoration(
-                                    color: parse(e['event_category_sub_color_back'], Colors.grey.shade300),
+                                    color: parse(
+                                        e['event_category_sub_color_back'],
+                                        Colors.grey.shade300),
                                     borderRadius: BorderRadius.circular(3),
                                   ),
                                   child: OneLineShrinkText(
                                     (e['event_category_sub'] ?? '').toString(),
                                     baseSize: 12,
                                     minSize: 8,
-                                    color: parse(e['event_category_sub_color_font'], Colors.white),
+                                    color: parse(
+                                        e['event_category_sub_color_font'],
+                                        Colors.white),
                                     align: TextAlign.center,
                                   ),
                                 ),
@@ -650,23 +749,29 @@ class _PredictionPageState extends State<PredictionPage> {
                                 SizedBox(
                                   width: titleColW,
                                   child: Builder(builder: (context) {
-                                    final String title = (e['title_event'] ?? '').toString();
+                                    final String title =
+                                        (e['title_event'] ?? '').toString();
                                     final bool isToday = e['flg_today'] == true;
                                     final double tw = measureTextWidth(title);
-                                    final double frac = (tw / titleColW).clamp(0.0, 1.0);
+                                    final double frac =
+                                        (tw / titleColW).clamp(0.0, 1.0);
                                     final BoxDecoration? deco = isToday
                                         ? BoxDecoration(
                                             gradient: LinearGradient(
                                               colors: [
-                                                Colors.yellowAccent.withOpacity(1.0),
-                                                Colors.yellowAccent.withOpacity(1.0),
-                                                Colors.yellowAccent.withOpacity(0.0),
+                                                Colors.yellowAccent
+                                                    .withOpacity(1.0),
+                                                Colors.yellowAccent
+                                                    .withOpacity(1.0),
+                                                Colors.yellowAccent
+                                                    .withOpacity(0.0),
                                               ],
                                               stops: [0.0, frac, 1.0],
                                               begin: Alignment.centerLeft,
                                               end: Alignment.centerRight,
                                             ),
-                                            borderRadius: BorderRadius.circular(3),
+                                            borderRadius:
+                                                BorderRadius.circular(3),
                                           )
                                         : null;
                                     return Container(
@@ -751,7 +856,9 @@ class _PredictionPageState extends State<PredictionPage> {
         // Expanded の丸め誤差を避けるため、余白は引き算で確定させる
         final double sideW = rowW * sideFlex / (sideFlex + bodyFlex);
         final double bodyW = rowW - sideW;
-        final double standingsW = (bodyW - seasonGap) * standingsFlex / (standingsFlex + personalFlex);
+        final double standingsW = (bodyW - seasonGap) *
+            standingsFlex /
+            (standingsFlex + personalFlex);
         final double personalW = bodyW - seasonGap - standingsW;
         final double scoreW = sideW + rankColsW;
         final double newsW = standingsW - rankColsW;
@@ -781,7 +888,8 @@ class _PredictionPageState extends State<PredictionPage> {
         const double scale = 1.0;
         final compact = false;
 
-        final isPortrait = constraints.maxHeight / constraints.maxWidth >= PORTRAIT_ASPECT_RATIO;
+        final isPortrait = constraints.maxHeight / constraints.maxWidth >=
+            PORTRAIT_ASPECT_RATIO;
         final bool portraitShowPersonal = _portraitContentTab == 1;
 
         Widget centralLeagueBoard({
@@ -827,7 +935,15 @@ class _PredictionPageState extends State<PredictionPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(height: ALL_SPACE_BLOCK),
-            Tabs.tabsBar(TAB_TITLES, TAB_BAR_H, ALL_COLOR_APP, TAB_COLOR_FONT, TAB_RADIUS, ALL_MARGIN_LEFT, TAB_PAD_HORIZONTAL, TAB_PAD_VERTICAL),
+            Tabs.tabsBar(
+                TAB_TITLES,
+                TAB_BAR_H,
+                ALL_COLOR_APP,
+                TAB_COLOR_FONT,
+                TAB_RADIUS,
+                ALL_MARGIN_LEFT,
+                TAB_PAD_HORIZONTAL,
+                TAB_PAD_VERTICAL),
             SizedBox(height: ALL_SPACE_BLOCK),
             _scoreNewsEventsRow(portrait: true),
             _portraitLeagueTabBar(),
@@ -837,33 +953,79 @@ class _PredictionPageState extends State<PredictionPage> {
           ],
         );
 
+        final contentKey = ValueKey(
+            '$_portraitLeagueTab-$_portraitContentTab');
+        final Widget portraitBody = portraitShowPersonal
+            ? SizedBox.expand(
+                key: contentKey,
+                child: selectedPortraitLeague,
+              )
+            : SingleChildScrollView(
+                key: contentKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    selectedPortraitLeague,
+                    SizedBox(height: ALL_SPACE_BLOCK),
+                  ],
+                ),
+              );
+
         final Widget bodyContent = isPortrait
-            ? (portraitShowPersonal
-                // 個人成績: 残り縦幅いっぱいに広げ、中で溢れた分は各カラムがスクロール
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      portraitTop,
-                      Expanded(child: selectedPortraitLeague),
-                      SizedBox(height: ALL_SPACE_BLOCK),
-                    ],
-                  )
-                // チーム成績: 内容高さに合わせ、ページ全体をスクロール
-                : SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        portraitTop,
-                        selectedPortraitLeague,
-                        SizedBox(height: ALL_SPACE_BLOCK),
-                      ],
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  portraitTop,
+                  Expanded(
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 320),
+                      switchInCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeOutCubic,
+                      layoutBuilder: (currentChild, previousChildren) {
+                        return Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            for (final child in previousChildren)
+                              Positioned.fill(child: child),
+                            if (currentChild != null)
+                              Positioned.fill(child: currentChild),
+                          ],
+                        );
+                      },
+                      transitionBuilder: (child, animation) {
+                        final isIncoming = child.key == contentKey;
+                        final direction = -_portraitSlideDirection.toDouble();
+                        final begin = Offset(
+                          isIncoming ? direction : -direction,
+                          0,
+                        );
+                        return SlideTransition(
+                          position: Tween<Offset>(
+                            begin: begin,
+                            end: Offset.zero,
+                          ).animate(animation),
+                          child: child,
+                        );
+                      },
+                      child: portraitBody,
                     ),
-                  ))
+                  ),
+                  SizedBox(height: ALL_SPACE_BLOCK),
+                ],
+              )
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   SizedBox(height: ALL_SPACE_BLOCK),
-                  Tabs.tabsBar(TAB_TITLES, TAB_BAR_H, ALL_COLOR_APP, TAB_COLOR_FONT, TAB_RADIUS, ALL_MARGIN_LEFT, TAB_PAD_HORIZONTAL, TAB_PAD_VERTICAL),
+                  Tabs.tabsBar(
+                      TAB_TITLES,
+                      TAB_BAR_H,
+                      ALL_COLOR_APP,
+                      TAB_COLOR_FONT,
+                      TAB_RADIUS,
+                      ALL_MARGIN_LEFT,
+                      TAB_PAD_HORIZONTAL,
+                      TAB_PAD_VERTICAL),
                   SizedBox(height: ALL_SPACE_BLOCK),
                   Expanded(
                     flex: ALL_RATIO_BLOCK_H[0],
@@ -905,10 +1067,14 @@ class _PredictionPageState extends State<PredictionPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Headers.globalHeader(HEADER_GLOBAL_H, ALL_COLOR_APP, HEADER_TITLE, HEADER_PAD_VERTICAL, ALL_MARGIN_LEFT),
+                    Headers.globalHeader(HEADER_GLOBAL_H, ALL_COLOR_APP,
+                        HEADER_TITLE, HEADER_PAD_VERTICAL, ALL_MARGIN_LEFT),
                     Expanded(
                       child: Padding(
-                        padding: EdgeInsets.only(bottom: ALL_SPACE_BLOCK, left: ALL_MARGIN_LEFT, right: ALL_MARGIN_LEFT),
+                        padding: EdgeInsets.only(
+                            bottom: ALL_SPACE_BLOCK,
+                            left: ALL_MARGIN_LEFT,
+                            right: ALL_MARGIN_LEFT),
                         child: bodyContent,
                       ),
                     ),

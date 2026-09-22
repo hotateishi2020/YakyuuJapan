@@ -16,7 +16,6 @@ class LeagueBoardRow extends StatelessWidget {
   final String Function(String idUser) userNameFromPredictions;
   final bool compact;
   final bool portraitLayout;
-  final bool portraitShowPersonal;
 
   final String leagueLabelPrefix;
 
@@ -35,7 +34,6 @@ class LeagueBoardRow extends StatelessWidget {
     required this.userNameFromPredictions,
     required this.compact,
     this.portraitLayout = false,
-    this.portraitShowPersonal = false,
   });
 
   List<Map<String, dynamic>> get _leagueGames => games.where((g) => (int.tryParse('${g['id_league_home']}') ?? 0) == leagueId && (int.tryParse('${g['id_league_away']}') ?? 0) == leagueId).toList();
@@ -82,7 +80,6 @@ class LeagueBoardRow extends StatelessWidget {
       onlyLeagueId: leagueId,
       gamesDateFilter: DateFormatUtil.ymdWithOffset(0),
       portraitLayout: portraitLayout,
-      portraitShowPersonal: portraitShowPersonal,
     );
 
     // 縦型はリーグ切替タブがあるため左ヘッダー不要
@@ -99,14 +96,6 @@ class LeagueBoardRow extends StatelessWidget {
             ],
           );
 
-    // 縦型チーム成績: 順位表+試合の内容高さに合わせ、下余白を作らない
-    if (portraitLayout && !portraitShowPersonal) {
-      const double gridBodyH = 20.0;
-      const double gamesBodyH = 130.0;
-      final int teams = standings.where((e) => int.tryParse('${e['id_league']}') == leagueId).length;
-      final double h = ALL_HEADER_H + teams * gridBodyH + 6 + ALL_HEADER_H + gamesBodyH;
-      return SizedBox(height: h, width: double.infinity, child: body);
-    }
     return body;
   }
 }

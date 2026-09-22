@@ -15,10 +15,20 @@ jobs:
       - name: Call /fetchStatsTeamNPB (A)
         if: ${{ github.event.schedule == '0 7-15 * * *' }}
         run: curl -fsS "https://yakyuujapan.onrender.com/fetchStatsTeamNPB"
-
+        
       - name: Call /fetchStatsPlayerNPB (B)
         if: ${{ github.event.schedule == '*/30 7-15 * * *' }}
-        run: curl -fsS "https://yakyuujapan.onrender.com/fetchStatsPlayerNPB"
+        run: |
+          curl --silent --show-error \
+            --fail-with-body \
+            --location \
+            --retry 10 \
+            --retry-delay 10 \
+            --retry-all-errors \
+            --connect-timeout 30 \
+            --max-time 1800 \
+            --write-out "\nHTTP status: %{http_code}\n" \
+            "https://yakyuujapan.onrender.com/fetchStatsPlayerNPB"
 
       - name: Call /fetchGamesNPB (C)
         if: ${{ github.event.schedule == '*/10 4-15 * * *' }}

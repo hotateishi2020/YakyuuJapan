@@ -8,7 +8,6 @@ import '../config/app_design.dart';
 import '../tools/json_utils.dart';
 import '../logic/atari_counts.dart';
 import '../View/Headers.dart';
-import '../View/Tabs.dart';
 import '../View/Text.dart';
 import '../View/LeagueBoardRow.dart';
 
@@ -39,10 +38,7 @@ class _PredictionPageState extends State<PredictionPage> {
   bool _eventsExpanded = false;
   // 縦型: 0=セ・リーグ, 1=パ・リーグ
   int _portraitLeagueTab = 0;
-  // 縦型: 0=チーム成績, 1=個人成績
-  int _portraitContentTab = 0;
-  // 1: 右側のタブから入る、-1: 左側のタブから入る
-  int _portraitSlideDirection = 1;
+  late final PageController _portraitLeagueController;
 
   // 個人成績の id_user → 表示名
   String _usernameForId(String idUser) =>
@@ -65,7 +61,14 @@ class _PredictionPageState extends State<PredictionPage> {
   @override
   void initState() {
     super.initState();
+    _portraitLeagueController = PageController();
     fetchData();
+  }
+
+  @override
+  void dispose() {
+    _portraitLeagueController.dispose();
+    super.dispose();
   }
 
   Future<void> fetchData() async {
@@ -171,31 +174,17 @@ class _PredictionPageState extends State<PredictionPage> {
       selectedIndex: _portraitLeagueTab,
       onSelected: (i) {
         if (i == _portraitLeagueTab) return;
-        setState(() {
-          _portraitSlideDirection = i > _portraitLeagueTab ? 1 : -1;
-          _portraitLeagueTab = i;
-        });
+        setState(() => _portraitLeagueTab = i);
+        if (!_portraitLeagueController.hasClients) return;
+        _portraitLeagueController.animateToPage(
+          i,
+          duration: const Duration(milliseconds: 360),
+          curve: Curves.easeOutCubic,
+        );
       },
       selectedColor: _portraitLeagueTab == 0
           ? const Color(0xFF0B8F3A)
           : const Color(0xFF4DB5E8),
-    );
-  }
-
-  Widget _portraitContentTabBar() {
-    return _portraitTabBar(
-      tabs: const [
-        ('チーム成績', 0),
-        ('個人成績', 1),
-      ],
-      selectedIndex: _portraitContentTab,
-      onSelected: (i) {
-        if (i == _portraitContentTab) return;
-        setState(() {
-          _portraitSlideDirection = i > _portraitContentTab ? 1 : -1;
-          _portraitContentTab = i;
-        });
-      },
     );
   }
 
@@ -209,21 +198,33 @@ class _PredictionPageState extends State<PredictionPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Material(
-          color: Colors.grey.shade200,
+          color: Colors.black,
           borderRadius: BorderRadius.circular(4),
           child: InkWell(
             onTap: onToggle,
             borderRadius: BorderRadius.circular(4),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              child: Row(
-                children: [
-                  Icon(expanded ? Icons.expand_less : Icons.expand_more,
-                      size: 20),
-                  const SizedBox(width: 4),
-                  Text(title,
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                ],
+            child: SizedBox(
+              height: 16,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Row(
+                  children: [
+                    Icon(
+                      expanded ? Icons.expand_less : Icons.expand_more,
+                      size: 14,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -890,7 +891,6 @@ class _PredictionPageState extends State<PredictionPage> {
 
         final isPortrait = constraints.maxHeight / constraints.maxWidth >=
             PORTRAIT_ASPECT_RATIO;
-        final bool portraitShowPersonal = _portraitContentTab == 1;
 
         Widget centralLeagueBoard({
           required int leagueId,
@@ -912,64 +912,41 @@ class _PredictionPageState extends State<PredictionPage> {
             userNameFromPredictions: _userNameFromPredictions,
             compact: compact,
             portraitLayout: isPortrait,
-            portraitShowPersonal: portraitShowPersonal,
           );
         }
-
-        final Widget selectedPortraitLeague = _portraitLeagueTab == 0
-            ? centralLeagueBoard(
-                leagueId: 1,
-                leagueColor: const Color(0xFF0B8F3A),
-                logoAsset: 'assets/images/logo_league_central.webp',
-                leagueLabelPrefix: 'セ',
-              )
-            : centralLeagueBoard(
-                leagueId: 2,
-                leagueColor: const Color(0xFF4DB5E8),
-                logoAsset: 'assets/images/logo_league_pacific.png',
-                leagueLabelPrefix: 'パ',
-              );
 
         final Widget portraitTop = Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(height: ALL_SPACE_BLOCK),
-            Tabs.tabsBar(
-                TAB_TITLES,
-                TAB_BAR_H,
-                ALL_COLOR_APP,
-                TAB_COLOR_FONT,
-                TAB_RADIUS,
-                ALL_MARGIN_LEFT,
-                TAB_PAD_HORIZONTAL,
-                TAB_PAD_VERTICAL),
-            SizedBox(height: ALL_SPACE_BLOCK),
             _scoreNewsEventsRow(portrait: true),
             _portraitLeagueTabBar(),
-            SizedBox(height: ALL_SPACE_BLOCK),
-            _portraitContentTabBar(),
             SizedBox(height: ALL_SPACE_BLOCK),
           ],
         );
 
-        final contentKey = ValueKey(
-            '$_portraitLeagueTab-$_portraitContentTab');
-        final Widget portraitBody = portraitShowPersonal
-            ? SizedBox.expand(
-                key: contentKey,
-                child: selectedPortraitLeague,
-              )
-            : SingleChildScrollView(
-                key: contentKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    selectedPortraitLeague,
-                    SizedBox(height: ALL_SPACE_BLOCK),
-                  ],
+        Widget portraitLeaguePage({
+          required int leagueId,
+          required Color leagueColor,
+          required String logoAsset,
+          required String leagueLabelPrefix,
+        }) {
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                centralLeagueBoard(
+                  leagueId: leagueId,
+                  leagueColor: leagueColor,
+                  logoAsset: logoAsset,
+                  leagueLabelPrefix: leagueLabelPrefix,
                 ),
-              );
+                SizedBox(height: ALL_SPACE_BLOCK),
+              ],
+            ),
+          );
+        }
 
         final Widget bodyContent = isPortrait
             ? Column(
@@ -977,37 +954,27 @@ class _PredictionPageState extends State<PredictionPage> {
                 children: [
                   portraitTop,
                   Expanded(
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 320),
-                      switchInCurve: Curves.easeOutCubic,
-                      switchOutCurve: Curves.easeOutCubic,
-                      layoutBuilder: (currentChild, previousChildren) {
-                        return Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            for (final child in previousChildren)
-                              Positioned.fill(child: child),
-                            if (currentChild != null)
-                              Positioned.fill(child: currentChild),
-                          ],
-                        );
+                    child: PageView(
+                      controller: _portraitLeagueController,
+                      onPageChanged: (index) {
+                        if (_portraitLeagueTab != index) {
+                          setState(() => _portraitLeagueTab = index);
+                        }
                       },
-                      transitionBuilder: (child, animation) {
-                        final isIncoming = child.key == contentKey;
-                        final direction = -_portraitSlideDirection.toDouble();
-                        final begin = Offset(
-                          isIncoming ? direction : -direction,
-                          0,
-                        );
-                        return SlideTransition(
-                          position: Tween<Offset>(
-                            begin: begin,
-                            end: Offset.zero,
-                          ).animate(animation),
-                          child: child,
-                        );
-                      },
-                      child: portraitBody,
+                      children: [
+                        portraitLeaguePage(
+                          leagueId: 1,
+                          leagueColor: const Color(0xFF0B8F3A),
+                          logoAsset: 'assets/images/logo_league_central.webp',
+                          leagueLabelPrefix: 'セ',
+                        ),
+                        portraitLeaguePage(
+                          leagueId: 2,
+                          leagueColor: const Color(0xFF4DB5E8),
+                          logoAsset: 'assets/images/logo_league_pacific.png',
+                          leagueLabelPrefix: 'パ',
+                        ),
+                      ],
                     ),
                   ),
                   SizedBox(height: ALL_SPACE_BLOCK),
@@ -1016,16 +983,6 @@ class _PredictionPageState extends State<PredictionPage> {
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  SizedBox(height: ALL_SPACE_BLOCK),
-                  Tabs.tabsBar(
-                      TAB_TITLES,
-                      TAB_BAR_H,
-                      ALL_COLOR_APP,
-                      TAB_COLOR_FONT,
-                      TAB_RADIUS,
-                      ALL_MARGIN_LEFT,
-                      TAB_PAD_HORIZONTAL,
-                      TAB_PAD_VERTICAL),
                   SizedBox(height: ALL_SPACE_BLOCK),
                   Expanded(
                     flex: ALL_RATIO_BLOCK_H[0],

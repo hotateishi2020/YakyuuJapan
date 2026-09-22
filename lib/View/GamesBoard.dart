@@ -130,6 +130,7 @@ class _GameDateSwitcherState extends State<GameDateSwitcher> {
             ],
           ),
         ),
+        const SizedBox(height: 4),
         Expanded(
           child: PageView.builder(
             controller: _controller,
@@ -401,34 +402,13 @@ class _TableGameCard extends StatelessWidget {
               final badgeWidth = hasResultMark ? (size + 2).clamp(9.0, 16.0) : 0.0;
               final gap = hasResultMark ? 0.5 : 0.0;
 
-              double nameWidth(String name, bool highlighted) {
-                final painter = TextPainter(
-                  text: TextSpan(
-                    text: name,
-                    style: TextStyle(
-                      fontSize: size,
-                      fontWeight: highlighted ? FontWeight.bold : FontWeight.normal,
-                    ),
-                  ),
-                  maxLines: 1,
-                  textDirection: TextDirection.ltr,
-                )..layout();
-                return painter.width + 4;
-              }
-
-              final availableNameWidth = (constraints.maxWidth - badgeWidth - gap).clamp(1.0, double.infinity);
-              final measuredWidths = pitchers.map((pitcher) => nameWidth(pitcher.name, pitcher.colors.isNotEmpty)).toList();
-              final widestName = measuredWidths.reduce((current, width) => current > width ? current : width);
-              final nameColumnWidth = widestName.clamp(1.0, availableNameWidth);
-              final groupWidth = badgeWidth + gap + nameColumnWidth;
-
               return Column(
                 children: [
                   for (int i = 0; i < pitchers.length; i++)
                     Expanded(
                       child: Center(
                         child: SizedBox(
-                          width: groupWidth,
+                          width: constraints.maxWidth,
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
@@ -439,10 +419,9 @@ class _TableGameCard extends StatelessWidget {
                                 ),
                                 SizedBox(width: gap),
                               ],
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: SizedBox(
-                                  width: measuredWidths[i].clamp(1.0, nameColumnWidth),
+                              Expanded(
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
                                   child: _pitcherNameBox(
                                     name: pitchers[i].name,
                                     colorsRaw: pitchers[i].colors,

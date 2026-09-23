@@ -34660,7 +34660,7 @@ a3=t.p
 a4=A.c([],a3)
 a5=b.length!==0
 if(a5)a4.push(A.er(b,a7,a7,a7,A.fj(a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,o,a7,a7,B.t,a7,1,!0,a7,a7,a7,a7,a7,a7,a7,a7),a7))
-if(a5)a4.push(B.IA)
+if(a5)a4.push(B.IB)
 a4.push(A.er(c,a7,a7,a7,A.fj(a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,n,a7,a7,B.e2,a7,1,!0,a7,a7,a7,a7,a7,a7,a7,a7),a7))
 a6=A.bv(a7,A.c4(A.c([a1,A.bc(A.ci(A.c([a2,A.bc(s.St(A.rY(B.z,A.c4(a4,B.Q,B.F,B.aV),B.bW),B.h),3),A.bc(s.ZS(s.cN("name_team_away"),j,!1,q,h,B.t),5)],a3),B.B),3),A.bc(A.ci(A.c([A.bc(s.FL(s.FM(!0),g,!0,m),5),A.bc(s.H7("\u6295\u624b",B.k4,l,B.h,B.t),3),A.bc(s.FL(s.FM(!1),f,!1,m),5)],a3),B.B),3),A.bc(A.ci(A.c([A.bc(s.ZP(s.cN("name_homerun_home"),!1,g,m),5),A.bc(s.ZR("\u6253\u8005",!1,B.k4,l,B.h,B.t),3),A.bc(s.ZQ(s.cN("name_homerun_away"),!1,f,!1,m),5)],a3),B.B),3)],a3),B.B,B.F,B.R),B.c0,a7,new A.aX(B.h,a7,p,a0,a7,a7,B.w),a7,a7,a7,a7,a7)
 if(B.c.C(b,"\u56de"))return new A.qF(a6,B.EO,4,3,B.zZ,B.V,!1,a7)
@@ -34764,7 +34764,7 @@ r=(r==null?0:r)===s}else r=!1
 return r},
 $S:10}
 A.TF.prototype={
-$3(a,b,c){return B.Iz},
+$3(a,b,c){return B.IA},
 $S:257}
 A.Ev.prototype={
 ZH(a){var s=this.c,r=A.X(s).h("a8<1>")
@@ -34951,7 +34951,7 @@ p=l.f
 o=l.r
 n=l.w
 m=A.c4(A.c([A.bc(A.eK(new A.a_9(j,p,o)),1),B.vq,A.bc(A.eK(new A.a_a(j,p,n)),1)],r),B.B,B.F,B.R)
-if(k)return A.c4(A.c([s,B.is,i.$0(),B.is,A.ax(A.eK(new A.a_b(j,p,o)),260,null),B.vq,A.ax(A.eK(new A.a_c(j,p,n)),260,null)],r),B.B,B.F,B.aV)
+if(k)return A.c4(A.c([s,B.is,i.$0(),B.is,A.ax(A.eK(new A.a_b(j,p,o)),180,null),B.vq,A.ax(A.eK(new A.a_c(j,p,n)),180,null)],r),B.B,B.F,B.aV)
 return A.ci(A.c([A.bc(q,3),B.ir,A.bc(m,2)],r),B.B)},
 $S:304}
 A.a_G.prototype={
@@ -35262,9 +35262,9 @@ B.b.J(j,r)}return A.ax(A.ci(j,B.Q),26,l)},
 Yk(){var s=this.ay,r=s===0?B.dX:B.dQ
 return this.Yl(new A.a6w(this),r,s,B.C9)},
 wE(a,b,c,d){var s=null,r=A.ct(4),q=A.ct(4),p=t.p
-q=A.c([A.Cz(B.ap,!0,r,A.abL(!1,q,!0,A.ax(new A.dc(B.A9,A.ci(A.c([A.ap5(b?B.Av:B.Aw,B.h,s,14),B.ir,A.er(d,s,s,s,B.M2,s)],p),B.Q),s),16,s),s,!0,s,s,s,s,s,s,c,s,s,s),B.p,B.l,0,s,s,s,s,s,B.bC)],p)
+q=A.c([A.Cz(B.ap,!0,r,A.abL(!1,q,!0,A.ax(new A.dc(B.A9,A.ci(A.c([A.ap5(b?B.Av:B.Aw,B.h,s,14),B.ir,A.er(d,s,s,s,B.M2,s)],p),B.Q),s),24,s),s,!0,s,s,s,s,s,s,c,s,s,s),B.p,B.l,0,s,s,s,s,s,B.bC)],p)
 if(b)B.b.J(q,A.c([B.eS,a],p))
-q.push(B.IB)
+q.push(B.Iz)
 return A.c4(q,B.B,B.F,B.R)},
 Gq(a){var s,r=this,q=new A.a6J(r,A.avH(r.f,r.r,r.d,r.e)),p=new A.a6H(r),o=new A.a6B(r)
 if(a){s=r.at
@@ -68419,11 +68419,11 @@ B.ir=new A.bY(4,null,null,null)
 B.Ix=new A.bY(5,null,null,null)
 B.dq=new A.bY(6,null,null,null)
 B.Iy=new A.bY(1/0,1/0,null,null)
-B.Iz=new A.bY(null,20,null,null)
+B.Iz=new A.bY(null,2.5,null,null)
+B.IA=new A.bY(null,20,null,null)
 B.vq=new A.bY(null,2,null,null)
-B.IA=new A.bY(null,3,null,null)
+B.IB=new A.bY(null,3,null,null)
 B.eS=new A.bY(null,4,null,null)
-B.IB=new A.bY(null,5,null,null)
 B.is=new A.bY(null,6,null,null)
 B.IC=new A.bY(null,null,null,null)
 B.vE=new A.l(!0,null,null,null,null,null,12,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)

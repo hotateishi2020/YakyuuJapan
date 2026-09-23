@@ -204,7 +204,7 @@ class _PredictionPageState extends State<PredictionPage> {
             onTap: onToggle,
             borderRadius: BorderRadius.circular(4),
             child: SizedBox(
-              height: 16,
+              height: 24,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Row(
@@ -233,7 +233,7 @@ class _PredictionPageState extends State<PredictionPage> {
           const SizedBox(height: 4),
           child,
         ],
-        const SizedBox(height: ALL_SPACE_BLOCK),
+        const SizedBox(height: ALL_SPACE_BLOCK / 2),
       ],
     );
   }

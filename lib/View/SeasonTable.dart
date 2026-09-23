@@ -799,7 +799,9 @@ class SeasonTableBlock extends StatelessWidget {
       );
 
       if (portraitLayout) {
-        const double personalSectionHeight = 260.0;
+        // 縦スクロール時は、見出しと上位10名が見える高さに抑える。
+        // 横型では従来どおり、親から与えられた高さ全体を使用する。
+        const double personalSectionHeight = 20.0 + 16.0 * 10;
         return Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,

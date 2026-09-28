@@ -1,5 +1,6 @@
 import 'package:http/http.dart' as http;
 
+import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
 import 'dart:convert';
 import 'dart:math';
@@ -10,6 +11,8 @@ import '../tools/StringTool.dart';
 import '../tools/DateTimeTool.dart';
 import '../tools/DBModel.dart';
 import 'DB/m_player.dart';
+import 'DB/t_game_details.dart';
+import 'DB/t_game_summary.dart';
 import 'DB/t_stats_player.dart';
 import 'DB/t_stats_player_latest.dart';
 import 'DB/t_game.dart';
@@ -18,6 +21,7 @@ import 'DB/t_stats_team.dart';
 import 'package:intl/intl.dart';
 import 'package:postgres/postgres.dart';
 import 'package:shelf/shelf.dart';
+import 'Value.dart';
 
 class FetchURL {
   // Detect encoding (header/meta) and decode bytes accordingly (UTF-8 preferred)
@@ -44,6 +48,76 @@ class FetchURL {
     final head = latin1.decode(bytes.sublist(0, headLen), allowInvalid: true);
     final m = RegExp(r'charset\s*=\s*([A-Za-z0-9_\-]+)', caseSensitive: false).firstMatch(head);
     return m?.group(1)?.toLowerCase();
+  }
+
+  /// 試合トップの本塁打欄から、選手名 → 今季号数のリストを取り出す。
+  static Map<String, List<int>> _parseHomerunTotalsFromTop(Document doc) {
+    final totals = <String, List<int>>{};
+    final section = doc.querySelector('#async-homerun') ?? doc.querySelector('#homerun');
+    if (section == null) return totals;
+
+    for (final td in section.querySelectorAll('td')) {
+      final players = td.querySelectorAll('a.bb-gameTable__player');
+      if (players.isEmpty) continue;
+
+      var rest = StringTool.noSpace(td.text);
+      for (var i = 0; i < players.length; i++) {
+        final name = StringTool.noSpace(players[i].text.trim());
+        if (name.isEmpty) continue;
+
+        final start = rest.indexOf(name);
+        var chunk = rest;
+        if (start >= 0) {
+          chunk = rest.substring(start + name.length);
+          if (i + 1 < players.length) {
+            final nextName = StringTool.noSpace(players[i + 1].text.trim());
+            if (nextName.isNotEmpty) {
+              final nextAt = chunk.indexOf(nextName);
+              if (nextAt >= 0) {
+                rest = chunk.substring(nextAt);
+                chunk = chunk.substring(0, nextAt);
+              }
+            }
+          }
+        }
+
+        final nums = <int>[
+          for (final m in RegExp(r'(\d+)号').allMatches(chunk))
+            if (int.tryParse(m.group(1) ?? '') != null) int.parse(m.group(1)!),
+        ];
+        if (nums.isNotEmpty) {
+          totals.putIfAbsent(name, () => []).addAll(nums);
+        }
+      }
+    }
+    return totals;
+  }
+
+  /// 出場成績の打者名に、トップページで取った号数を "11, 12" 形式で結びつける。
+  static String _homerunTotalForBatter(String batterName, int homerCount, Map<String, List<int>> totals) {
+    if (homerCount <= 0 || totals.isEmpty) return '';
+    final key = StringTool.noSpace(batterName);
+    if (key.isEmpty) return '';
+
+    final exact = totals[key];
+    if (exact != null && exact.isNotEmpty) {
+      return exact.join(', ');
+    }
+
+    String? best;
+    var bestLen = 0;
+    for (final name in totals.keys) {
+      if (name.isEmpty) continue;
+      final matched = key.startsWith(name) || name.startsWith(key);
+      if (!matched) continue;
+      if (name.length > bestLen) {
+        bestLen = name.length;
+        best = name;
+      }
+    }
+    final nums = best == null ? null : totals[best];
+    if (nums == null || nums.isEmpty) return '';
+    return nums.join(', ');
   }
 
   static Future<Response> fetchStatsTeamNPB(Connection conn) async {
@@ -209,8 +283,9 @@ class FetchURL {
 
   static Future<Response> fetchGamesNPB(Connection conn) async {
     var list_date = [];
-    list_date.add(DateTime.now()); //今日
-    list_date.add(DateTime.now().add(const Duration(days: 1))); //明日
+    var now = DateTime.now();
+    list_date.add(now); //今日
+    list_date.add(now.add(const Duration(days: 1))); //明日
 
     for (var date in list_date) {
       print(date.toString() + "の試合を取得します。");
@@ -250,13 +325,14 @@ class FetchURL {
             var id_pitcher_win = 0;
             var id_pitcher_lose = 0;
             var id_pitcher_save = 0;
+            var homerun_totals = <String, List<int>>{};
+
+            if (card.querySelectorAll('a').isEmpty) {
+              continue;
+            }
+            var url_href = card.querySelectorAll('a')[0].attributes['href']?.trim() ?? '';
 
             try {
-              if (card.querySelectorAll('a').isEmpty) {
-                continue;
-              }
-              var url_href = card.querySelectorAll('a')[0].attributes['href']?.trim() ?? '';
-
               var url_detail = url.resolve(url_href.replaceFirst('index', 'top'));
 
               final res_detail = await http.get(url_detail);
@@ -331,7 +407,7 @@ class FetchURL {
 
                   print(name_team);
 
-                  var result = player.querySelectorAll('th')[0].text?.trim() ?? '';
+                  var result = player.querySelectorAll('th')[0].text.trim();
                   var href_player = player.querySelectorAll('td')[0].querySelectorAll('a')[0].attributes['href']?.trim() ?? '';
 
                   var url_player = url.resolve(href_player);
@@ -363,8 +439,17 @@ class FetchURL {
                   }
                   print('');
                 } //for players_result
-              } catch (e, stacktrace) {
+              } catch (e) {
                 print('試合が終了していないので活躍選手を取得できませんでした。');
+              }
+
+              try {
+                homerun_totals = _parseHomerunTotalsFromTop(doc_detail);
+                if (homerun_totals.isNotEmpty) {
+                  print('本塁打号数を取得しました: $homerun_totals');
+                }
+              } catch (e) {
+                print('本塁打号数を取得できませんでした。');
               }
 
               final result_team_home = await Postgres.execute(conn, AppSql.selectTeamsWhereName(), data: [team_home]);
@@ -451,9 +536,6 @@ class FetchURL {
             game.id_pitcher_lose = id_pitcher_lose;
             game.id_pitcher_save = id_pitcher_save;
 
-            // print(game.toMap());
-            print('');
-
             if (result_game.isEmpty) {
               //DBに同じ日付、同じ組み合わせの試合が登録されていない場合、新規登録する
               await Postgres.insert(conn, game);
@@ -461,6 +543,391 @@ class FetchURL {
               //DBに同じ日付、同じ組み合わせの試合が登録されている場合は更新する
               game.id = result_game.first.toColumnMap()['id'];
               await Postgres.update(conn, game);
+
+              if (date != now) {
+                continue;
+              }
+              //打席結果を取得
+              print('打席結果を取得します。');
+              try {
+                // js-scoreBord--3 table tbody tr 14列目以降
+                var url_stats = url.resolve(url_href.replaceFirst('index', 'stats'));
+                print(url_stats);
+                final res_stats = await http.get(url_stats);
+                if (res_stats.statusCode != 200) {
+                  throw Exception('Failed to fetch standings');
+                }
+                final doc_stats = parse(_decodeHtml(res_stats));
+                var list_game_summary = <t_game_summary>[];
+
+                var game_summary_away_batting = doc_stats.querySelectorAll('#async-gameBatterStats .bb-blowResultsTable table tbody tr');
+                if (game_summary_away_batting.isEmpty) {
+                  throw Exception('試合が開始していないので試合結果のHTMLが存在しません。');
+                }
+
+                // var idx_col = 0;
+                var id_team = id_team_away;
+                for (var game_summary_away_row in game_summary_away_batting) {
+                  //もしrow直下にthがある場合はスキップ
+                  if (game_summary_away_row.querySelectorAll('th').isNotEmpty) {
+                    id_team = id_team_home;
+                    continue;
+                  }
+                  var txt_batter = game_summary_away_row.querySelectorAll('td')[1].text.trim();
+                  print("打者名：" + txt_batter);
+                  final result_player = await Postgres.execute(conn, AppSql.selectPlayerWhereFullNameAndTeamID(), data: [StringTool.noSpace(txt_batter), id_team]);
+                  if (result_player.isEmpty) {
+                    print('未登録の選手が打者になっていたのでスキップします。');
+                    continue;
+                  }
+                  final id_player_result = result_player.first.toColumnMap()['id'];
+
+                  var game_summary = t_game_summary();
+                  game_summary.id_game = game.id;
+                  game_summary.id_player = id_player_result;
+                  game_summary.int_batting = int.tryParse(game_summary_away_row.querySelectorAll('td')[3].text.trim()) ?? 0;
+                  game_summary.int_homerun = int.tryParse(game_summary_away_row.querySelectorAll('td')[13].text.trim()) ?? 0;
+                  game_summary.int_hit1 = int.tryParse(game_summary_away_row.querySelectorAll('td')[5].text.trim()) ?? 0;
+                  game_summary.int_fourball = int.tryParse(game_summary_away_row.querySelectorAll('td')[8].text.trim()) ?? 0;
+                  game_summary.int_dead_batting = int.tryParse(game_summary_away_row.querySelectorAll('td')[9].text.trim()) ?? 0;
+                  game_summary.int_sacrifice = int.tryParse(game_summary_away_row.querySelectorAll('td')[10].text.trim()) ?? 0;
+                  game_summary.int_rbi = int.tryParse(game_summary_away_row.querySelectorAll('td')[6].text.trim()) ?? 0;
+                  game_summary.int_steal_base = int.tryParse(game_summary_away_row.querySelectorAll('td')[11].text.trim()) ?? 0;
+                  game_summary.int_error = int.tryParse(game_summary_away_row.querySelectorAll('td')[12].text.trim()) ?? 0;
+                  game_summary.txt_homerun_total = _homerunTotalForBatter(txt_batter, game_summary.int_homerun, homerun_totals);
+                  list_game_summary.add(game_summary);
+                  // print(game_summary.toMap());
+                }
+
+                //async-gamePitcherStats section table tbody tr
+                print('投手成績を取得します。');
+                var sections = doc_stats.querySelectorAll('#async-gamePitcherStats section');
+
+                var id_team_pitcher = id_team_away;
+                for (var section in sections) {
+                  var game_summary_pitcher = section.querySelectorAll('table tbody tr');
+                  if (game_summary_pitcher.isEmpty) {
+                    throw Exception('試合が開始していないので試合結果のHTMLが存在しません。');
+                  }
+
+                  for (var game_summary_pitcher_row in game_summary_pitcher) {
+                    var code_result_pitcher = game_summary_pitcher_row.querySelectorAll('td')[0].text.trim();
+                    var idx_minus = 0;
+                    print("code_result_pitcher:" + code_result_pitcher.length.toString());
+                    if (code_result_pitcher.length >= 2) {
+                      idx_minus = -1;
+                    }
+                    var txt_pitcher = game_summary_pitcher_row.querySelectorAll('td')[1 + idx_minus].text.trim();
+                    print("投手名：" + txt_pitcher);
+                    final result_player = await Postgres.execute(conn, AppSql.selectPlayerWhereFullNameAndTeamID(), data: [StringTool.noSpace(txt_pitcher), id_team_pitcher]);
+                    if (result_player.isEmpty) {
+                      print('未登録の選手が投手になっていたのでスキップします。');
+                      continue;
+                    }
+                    final id_player_result = result_player.first.toColumnMap()['id'];
+
+                    var game_summary_pitcher = t_game_summary();
+                    for (var game_summary in list_game_summary) {
+                      if (game_summary.id_player == id_player_result) {
+                        game_summary_pitcher = game_summary;
+                        list_game_summary.remove(game_summary);
+                        break;
+                      }
+                    }
+
+                    if (code_result_pitcher.contains('勝')) {
+                      game_summary_pitcher.code_result_pitcher = Value.CodeGameResultPitcher.WIN;
+                    } else if (code_result_pitcher.contains('敗')) {
+                      game_summary_pitcher.code_result_pitcher = Value.CodeGameResultPitcher.LOSE;
+                    } else if (code_result_pitcher.contains('Ｓ')) {
+                      game_summary_pitcher.code_result_pitcher = Value.CodeGameResultPitcher.SAVE;
+                    } else if (code_result_pitcher.contains('H')) {
+                      game_summary_pitcher.code_result_pitcher = Value.CodeGameResultPitcher.HOLD;
+                    }
+
+                    game_summary_pitcher.id_game = game.id;
+                    game_summary_pitcher.id_player = id_player_result;
+                    game_summary_pitcher.double_inning_pitch = double.tryParse(game_summary_pitcher_row.querySelectorAll('td')[3 + idx_minus].text.trim()) ?? 0.0;
+                    game_summary_pitcher.int_pitch = int.tryParse(game_summary_pitcher_row.querySelectorAll('td')[4 + idx_minus].text.trim()) ?? 0;
+                    game_summary_pitcher.int_hit = int.tryParse(game_summary_pitcher_row.querySelectorAll('td')[6 + idx_minus].text.trim()) ?? 0;
+                    game_summary_pitcher.int_strike_out = int.tryParse(game_summary_pitcher_row.querySelectorAll('td')[8 + idx_minus].text.trim()) ?? 0;
+                    game_summary_pitcher.int_four = int.tryParse(game_summary_pitcher_row.querySelectorAll('td')[9 + idx_minus].text.trim()) ?? 0;
+                    game_summary_pitcher.int_dead_pitching = int.tryParse(game_summary_pitcher_row.querySelectorAll('td')[10 + idx_minus].text.trim()) ?? 0;
+                    game_summary_pitcher.int_balk = int.tryParse(game_summary_pitcher_row.querySelectorAll('td')[11 + idx_minus].text.trim()) ?? 0;
+                    game_summary_pitcher.int_runs = int.tryParse(game_summary_pitcher_row.querySelectorAll('td')[12 + idx_minus].text.trim()) ?? 0;
+                    game_summary_pitcher.int_runs_earned = int.tryParse(game_summary_pitcher_row.querySelectorAll('td')[13 + idx_minus].text.trim()) ?? 0;
+
+                    list_game_summary.add(game_summary_pitcher);
+                    // print(game_summary_pitcher.toMap());
+                  } //for row
+                  id_team_pitcher = id_team_home;
+                } //for sections
+
+                await Postgres.execute(conn, AppSql.deleteGameSummary(), data: [game.id]);
+                await Postgres.insertMulti(conn, list_game_summary);
+                print('打席結果を登録しました。');
+                // if (idx_col < 14) {
+                //   idx_col++;
+                //   continue;
+                // }
+                // var txt_result = game_summary_away_row.querySelectorAll('td')[idx_col].text.trim();
+                // if (txt_result.isEmpty) {
+                //   continue;
+                // }
+                // if (txt_result.contains('安')) {
+
+                // } else if (txt_result.contains('2')) {
+
+                // } else if (txt_result.contains('3')) {
+
+                // } else if (txt_result.contains('本')) {
+
+                // } else if (txt_result.contains('走塁妨害')) {
+
+                // } else if (txt_result.contains('打撃妨害')) {
+
+                // } else if (txt_result.contains('捕逸')) {
+
+                // } else if (txt_result.contains('暴投')) {
+
+                // } else if (txt_result.contains('守備変更')) {
+
+                // } else if (txt_result.contains('代打')) {
+
+                // } else if (txt_result.contains('代走')) {
+
+                // } else if (txt_result.contains('代守')) {
+
+                // } else if (txt_result.contains('守備変更')) {
+
+                // } else if (txt_result.contains('代打')) {
+
+                // }
+                // }
+                // var url_text = url.resolve(url_href.replaceFirst('index', 'text'));
+                // final res_text = await http.get(url_text);
+                // if (res_text.statusCode != 200) {
+                //   throw Exception('Failed to fetch standings');
+                // }
+                // final doc_text = parse(_decodeHtml(res_text));
+                // var results_batting = doc_text.querySelectorAll('#text_live section');
+                // if (results_batting.isEmpty) {
+                //   throw Exception('試合が開始していないので打席結果のHTMLが存在しません。');
+                // }
+                // var cnt_inning = 0;
+                // var flg_bottom = false;
+                // var list_result_batting = [];
+                // var int_score_home = 0;
+                // var int_score_away = 0;
+                // var id_pitcher_home_temp = id_pitcher_home;
+                // var id_pitcher_away_temp = id_pitcher_away;
+                // var id_team_batting = id_team_away;
+
+                // for (var ret_bat in results_batting) {
+                //   //一行目はスキップ
+                //   if (cnt_inning < 1) {
+                //     cnt_inning++;
+                //     continue;
+                //   }
+
+                //   var lines = ret_bat.querySelectorAll('li');
+                //   if (lines.isEmpty) {
+                //     continue;
+                //   }
+                //   for (var line in lines) {
+                //     var batting_order = line.querySelectorAll('span.bb-liveText__order')[0].text.trim();
+                //     var player_name = line.querySelectorAll('a.bb-liveText__player')[0].text.trim();
+                //     var base_state = line.querySelectorAll('span.bb-liveText__state')[0].text.trim();
+                //     var summaries = line.querySelectorAll('p.bb-liveText__summary');
+
+                //     var game_details = t_game_details();
+                //     game_details.id_game = game.id;
+                //     game_details.int_inning = cnt_inning;
+                //     game_details.flg_bottom = flg_bottom;
+                //     game_details.int_score_home = int_score_home;
+                //     game_details.int_score_away = int_score_away;
+                //     if (flg_bottom == true) {
+                //       game_details.id_pitcher = id_pitcher_away_temp;
+                //     } else {
+                //       game_details.id_pitcher = id_pitcher_home_temp;
+                //     }
+                //     //取得した選手名から選手IDをDBから取得
+                //     final result_player = await Postgres.execute(conn, AppSql.selectPlayerWhereFullNameAndTeamID(), data: [StringTool.noSpace(player_name), id_team_home]);
+                //     game_details.id_batter = result_player.first.toColumnMap()['id'];
+                //     game_details.int_batting_order = int.tryParse(batting_order.replaceAll('番', '')) ?? 0;
+
+                //     //base_stateからcnt_outをセット
+                //     //2文字目までと3文字目以降で文字を切り分ける
+                //     var str_out = base_state.substring(0, 2);
+                //     var str_base = base_state.substring(2);
+
+                //     //str_outの文字列が無を含んでいたら0, 一を含んでいたら1, 二を含んでいたら2, 三を含んでいたら3
+                //     if (str_out.contains('無')) {
+                //       game_details.cnt_out = 0;
+                //     } else if (str_out.contains('一')) {
+                //       game_details.cnt_out = 1;
+                //     } else if (str_out.contains('二')) {
+                //       game_details.cnt_out = 2;
+                //     } else if (str_out.contains('三')) {
+                //       game_details.cnt_out = 3;
+                //     }
+                //     //str_baseの文字列が無を含んでいたら0, 一を含んでいたら1, 二を含んでいたら2, 三を含んでいたら3
+                //     if (str_base.contains('一')) {
+                //       game_details.flg_runner_first = true;
+                //     }
+                //     if (str_base.contains('二')) {
+                //       game_details.flg_runner_second = true;
+                //     }
+                //     if (str_base.contains('三')) {
+                //       game_details.flg_runner_third = true;
+                //     }
+
+                //     var flg_player_change = false;
+                //     for (var s in summaries) {
+                //       var summary_spans = s.querySelectorAll('span');
+
+                //       if (summary_spans.isNotEmpty) {
+                //         //summaryからcode_categoryとcode_resultをセット
+                //         var summary_span = summary_spans[0].text.trim();
+                //         if (summary_span.contains('安打')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.BATTING;
+                //           game_details.code_result = Value.CodeGameResult.HIT_SINGLE;
+                //           game_details.double_contribution = 1;
+                //         } else if (summary_span.contains('二塁打')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.BATTING;
+                //           game_details.code_result = Value.CodeGameResult.HIT_DOUBLE;
+                //           game_details.double_contribution = 2;
+                //         } else if (summary_span.contains('三塁打') || summary_span.contains('スリーベース')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.BATTING;
+                //           game_details.code_result = Value.CodeGameResult.HIT_TRIPLE;
+                //           game_details.double_contribution = 3;
+                //         } else if (summary_span.contains('本塁打')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.BATTING;
+                //           game_details.code_result = Value.CodeGameResult.HOME_RUN;
+                //           game_details.double_contribution = 4;
+                //         } else if (summary_span.contains('四球') || summary_span.contains('フォアボール')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.BATTING;
+                //           game_details.code_result = Value.CodeGameResult.WALK_BALL;
+                //           game_details.double_contribution = 0.8;
+                //         } else if (summary_span.contains('死球')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.BATTING;
+                //           game_details.code_result = Value.CodeGameResult.WALK_DEAD;
+                //           game_details.double_contribution = 0.2;
+                //         } else if (summary_span.contains('ゴロ')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.BATTING;
+                //           game_details.code_result = Value.CodeGameResult.OUT_GROUND;
+                //           game_details.double_contribution = 0.1;
+                //         } else if (summary_span.contains('ダブルプレー')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.BATTING;
+                //           game_details.code_result = Value.CodeGameResult.OUT_DOUBLE_PLAY;
+                //           game_details.double_contribution = -1;
+                //         } else if (summary_span.contains('犠打')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.BATTING;
+                //           game_details.code_result = Value.CodeGameResult.SACRIFICE_BUNT;
+                //           game_details.double_contribution = 0.5;
+                //         } else if (summary_span.contains('犠飛') || summary_span.contains('犠牲フライ')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.BATTING;
+                //           game_details.code_result = Value.CodeGameResult.SACRIFICE_FLY;
+                //           game_details.double_contribution = 0.5;
+                //         } else if (summary_span.contains('フライ')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.BATTING;
+                //           game_details.code_result = Value.CodeGameResult.OUT_FLY;
+                //           game_details.double_contribution = 0.1;
+                //         } else if (summary_span.contains('三振')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.BATTING;
+                //           game_details.code_result = Value.CodeGameResult.STRIKE_OUT;
+                //           game_details.double_contribution = 0;
+                //         } else if (summary_span.contains('盗塁')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.RUNNING_BASE;
+                //           game_details.code_result = Value.CodeGameResult.STEAL_BASE_SAFE;
+                //           game_details.double_contribution = 1;
+                //         } else if (summary_span.contains('盗塁死')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.RUNNING_BASE;
+                //           game_details.code_result = Value.CodeGameResult.STEAL_BASE_OUT;
+                //           game_details.double_contribution = 0;
+                //         } else if (summary_span.contains('走塁死')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.RUNNING_BASE;
+                //           game_details.code_result = Value.CodeGameResult.RUN_DEAD;
+                //           game_details.double_contribution = 0;
+                //         } else if (summary_span.contains('捕逸')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.ERROR;
+                //           game_details.code_result = Value.CodeGameResult.PASS_BALL;
+                //           game_details.double_contribution = 0;
+                //         } else if (summary_span.contains('暴投')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.ERROR;
+                //           game_details.code_result = Value.CodeGameResult.WILD_PITCH;
+                //           game_details.double_contribution = 0;
+                //         } else if (summary_span.contains('守備妨害')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.BATTING;
+                //           game_details.code_result = Value.CodeGameResult.INTERFERENCE_FIELDING;
+                //           game_details.double_contribution = 0;
+                //         } else if (summary_span.contains('走塁妨害')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.ERROR;
+                //           game_details.code_result = Value.CodeGameResult.INTERFERENCE_RUNNING;
+                //           game_details.double_contribution = 0;
+                //         } else if (summary_span.contains('打撃妨害')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.ERROR;
+                //           game_details.code_result = Value.CodeGameResult.INTERFERENCE_BATTING;
+                //           game_details.double_contribution = 0;
+                //         } else if (summary_span.contains('失策') || summary_span.contains('エラー') || summary_span.contains('落球')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.BATTING;
+                //           game_details.code_result = Value.CodeGameResult.ERROR_FIELDING;
+                //           game_details.double_contribution = 0;
+                //         } else if (summary_span.contains('代打')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.CHANGE_PLAYER;
+                //           game_details.code_result = Value.CodeGameResult.PINCH_HITTER;
+                //           flg_player_change = true;
+                //         } else if (summary_span.contains('代走')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.CHANGE_PLAYER;
+                //           game_details.code_result = Value.CodeGameResult.PINCH_RUNNER;
+                //           flg_player_change = true;
+                //         } else if (summary_span.contains('代守')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.CHANGE_PLAYER;
+                //           game_details.code_result = Value.CodeGameResult.PINCH_FIELDER;
+                //           flg_player_change = true;
+                //         } else if (summary_span.contains('守備変更')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.CHANGE_POSITION;
+                //           game_details.code_result = Value.CodeGameResult.CHANGE_POSITION;
+                //           flg_player_change = true;
+                //         } else if (summary_span.contains('投手交代')) {
+                //           game_details.code_category = Value.CodeGameResultCategory.CHANGE_PLAYER;
+                //           game_details.code_result = Value.CodeGameResult.CHANGE_PITCHER;
+                //           flg_player_change = true;
+                //         } else if (summary_span.contains('→')) {}
+                //       } // if summary_spans.isNotEmpty
+
+                //       if (flg_player_change == true) {
+                //         var flg_arrow = false;
+                //         if (summary_spans.length > 1) {
+                //           //文言でピッチャー交代を表すパターン
+                //         } else {
+                //           //矢印でピッチャー交代を表すパターン
+                //         }
+                //         var summary_anchors = s.querySelectorAll('a');
+
+                //         if (summary_anchors.isNotEmpty) {
+                //           var flg_enter = false;
+                //           for (var summary_a in summary_anchors) {
+                //             var player_name = summary_a.text.trim();
+                //             //選手名とチームIDを使って選手IDを取得
+                //             final result_player = await Postgres.execute(conn, AppSql.selectPlayerWhereFullNameAndTeamID(), data: [StringTool.noSpace(player_name), id_team_batting]);
+                //             if (flg_enter == false) {
+                //               game_details.id_player_exit = result_player.first.toColumnMap()['id'];
+                //               flg_enter = true;
+                //             } else {
+                //               game_details.id_player_enter = result_player.first.toColumnMap()['id'];
+                //             }
+                //           }
+                //         }
+                //       }
+                //     } //for summaries
+                //     list_result_batting.add(game_details);
+                //   } //for battingline
+                // } //for inning
+              } catch (e, stacktrace) {
+                print('打席結果のスクレイピングに失敗しました。');
+                print(stacktrace);
+              }
             }
           } //for card
         } //for league

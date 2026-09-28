@@ -413,7 +413,7 @@ class SeasonTableBlock extends StatelessWidget {
                           base: d ?? BoxDecoration(borderRadius: BorderRadius.circular(4), color: isNoRank ? noRankBg : null),
                           color: const Color(0xFFFFF176),
                           radius: 4,
-                          duration: const Duration(milliseconds: 1000),
+                          duration: const Duration(milliseconds: 700),
                           child: Align(alignment: Alignment.center, child: txt),
                         );
                       }
@@ -684,15 +684,19 @@ class SeasonTableBlock extends StatelessWidget {
             final bool closeBehind = gameBehindVal != null && gameBehindVal <= 2.0;
             final bool hasMagic = gbText.toUpperCase().contains('M');
             final bool isChampion = gbText == '優勝';
-            final Color? fgGb = closeBehind ? const Color.fromARGB(255, 255, 68, 196) : null;
-            final FontWeight? wtGb = (closeBehind || hasMagic || isChampion) ? FontWeight.bold : null;
+            final Color? fgGb = isChampion
+                ? Colors.yellow
+                : (closeBehind ? const Color.fromARGB(255, 255, 68, 196) : null);
+            final Color bgGb = isChampion ? Colors.red : paleBg;
+            final FontWeight? wtGb =
+                (closeBehind || hasMagic || isChampion) ? FontWeight.bold : null;
 
             return Row(children: [
               SizedBox(width: _wChar2, child: _gridCell(_num(row['int_game']), h: gridBodyH, bg: paleBg)),
               SizedBox(width: _wChar1, child: _gridCell(_num(row['int_win']), h: gridBodyH, bg: paleBg)),
               SizedBox(width: _wChar1, child: _gridCell(_num(row['int_lose']), h: gridBodyH, bg: paleBg)),
               SizedBox(width: _wChar1, child: _gridCell(_num(row['int_draw']), h: gridBodyH, bg: paleBg)),
-              SizedBox(width: _wChar2, child: _gridCell(_num(row['game_behind']), h: gridBodyH, bg: paleBg, fg: fgGb, weight: wtGb)),
+              SizedBox(width: _wChar2, child: _gridCell(_num(row['game_behind']), h: gridBodyH, bg: bgGb, fg: fgGb, weight: wtGb)),
               SizedBox(width: _wChar3, child: _gridCell(_num(row['pct_win']), h: gridBodyH, bg: paleBg)),
               SizedBox(width: _wChar2, child: _gridCell(_num(row['num_avg_batting']), h: gridBodyH, bg: paleBg, fg: fgBat, weight: wtBat)),
               SizedBox(width: _wChar3, child: _gridCell(_num(row['int_homerun']), h: gridBodyH, bg: paleBg, fg: fgHr, weight: wtHr)),
@@ -759,14 +763,9 @@ class SeasonTableBlock extends StatelessWidget {
         horizontal: true,
       );
 
-      // 縦型: 内容の高さだけ（余白を作らない）。横型: 残り領域いっぱいに広げる
-      const double portraitGamesBodyH = 130.0;
+      // 縦型は試合カードが選手人数で伸びる
       final Widget gamesBlock = portraitLayout
-          ? SizedBox(
-              height: ALL_HEADER_H + portraitGamesBodyH,
-              width: double.infinity,
-              child: gamesSwitcher,
-            )
+          ? gamesSwitcher
           : Expanded(child: gamesSwitcher);
 
       final Widget teamPanel = Column(

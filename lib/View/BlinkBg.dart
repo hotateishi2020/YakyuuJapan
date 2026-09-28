@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-// 背景のみをやさしく点滅させる（テキストは前面で固定）
+// 背景と枠線を点滅させる（テキストは前面で固定）
 class BlinkBg extends StatefulWidget {
   final Widget child;
   final BoxDecoration base;
@@ -43,14 +43,19 @@ class _BlinkBgState extends State<BlinkBg> with SingleTickerProviderStateMixin {
     return AnimatedBuilder(
       animation: _t,
       builder: (context, child) {
-        final double a = (0.12 + 0.23 * _t.value).clamp(0.0, 1.0);
+        final double backgroundAlpha = (0.85 * _t.value).clamp(0.0, 1.0);
+        final double borderAlpha = _t.value.clamp(0.0, 1.0);
         return Stack(children: [
           Positioned.fill(child: Container(decoration: widget.base)),
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
-                color: widget.color.withOpacity(a),
+                color: widget.color.withValues(alpha: backgroundAlpha),
                 borderRadius: BorderRadius.circular(widget.radius),
+                border: Border.all(
+                  color: Colors.orange.withValues(alpha: borderAlpha),
+                  width: 1,
+                ),
               ),
             ),
           ),

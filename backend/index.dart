@@ -23,6 +23,53 @@ String? _predictionsCacheBody;
 DateTime? _predictionsCacheAt;
 const Duration _predictionsCacheTtl = Duration(seconds: 45);
 
+String _gameMatchupKey(Map<String, dynamic> game) {
+  final id = '${game['id_game'] ?? ''}'.trim();
+  if (id.isNotEmpty && id != 'null' && id != '0') return 'id:$id';
+  return [
+    '${game['date_game'] ?? ''}'.trim(),
+    '${game['name_team_home'] ?? ''}'.trim(),
+    '${game['name_team_away'] ?? ''}'.trim(),
+    '${game['id_team_home'] ?? ''}'.trim(),
+    '${game['id_team_away'] ?? ''}'.trim(),
+  ].join('|');
+}
+
+List<Map<String, dynamic>> _collapseGames(List<Map<String, dynamic>> rows) {
+  final order = <String>[];
+  final groups = <String, List<Map<String, dynamic>>>{};
+  for (final row in rows) {
+    final key = _gameMatchupKey(row);
+    if (!groups.containsKey(key)) {
+      order.add(key);
+      groups[key] = [];
+    }
+    groups[key]!.add(row);
+  }
+  return [
+    for (final key in order)
+      {
+        ...groups[key]!.first,
+        'summaries': [
+          for (final row in groups[key]!)
+            if (row['id_game_summary'] != null ||
+                '${row['name_full_summary'] ?? ''}'.trim().isNotEmpty)
+              {
+                'id_game_summary': row['id_game_summary'],
+                'id_team_summary': row['id_team_summary'],
+                'name_full_summary': row['name_full_summary'],
+                'txt_batting': row['txt_batting'],
+                'txt_pitching': row['txt_pitching'],
+                'txt_homerun_total': row['txt_homerun_total'],
+                'flg_pitcher': row['flg_pitcher'],
+                'code_result_pitcher': row['code_result_pitcher'],
+                'colors_summary': row['colors_summary'],
+              },
+        ],
+      },
+  ];
+}
+
 void main() async {
   try {
     final app = Router();
@@ -63,9 +110,7 @@ void main() async {
     app.get('/predictions', (Request request) async {
       return await tryCatchAPIReadonly(request, log.Prediction.NAME, log.Prediction.Codes.ENTER_NPB, () async {
         final now = DateTime.now();
-        if (_predictionsCacheBody != null &&
-            _predictionsCacheAt != null &&
-            now.difference(_predictionsCacheAt!) < _predictionsCacheTtl) {
+        if (_predictionsCacheBody != null && _predictionsCacheAt != null && now.difference(_predictionsCacheAt!) < _predictionsCacheTtl) {
           return Response.ok(
             _predictionsCacheBody!,
             headers: {
@@ -85,13 +130,14 @@ void main() async {
           (conn) => Postgres.execute(conn, AppSql.selectEventsDetails()),
           (conn) => Postgres.execute(conn, AppSql.selectNotification()),
         ]);
-
+        final games = _collapseGames(Postgres.toJson(results[4]));
+        print(games);
         final payload = <String, dynamic>{
           'predict_team': Postgres.toJson(results[0]),
           'predict_player': Postgres.toJson(results[1]),
           'stats_team': Postgres.toJson(results[2]),
           'stats_player': Postgres.toJson(results[3]),
-          'games': Postgres.toJson(results[4]),
+          'games': games,
           'events': Postgres.toJson(results[5]),
           'notification': Postgres.toJson(results[6]),
         };

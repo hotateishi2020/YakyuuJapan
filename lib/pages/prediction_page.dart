@@ -39,7 +39,6 @@ class _PredictionPageState extends State<PredictionPage> {
   bool _eventsExpanded = false;
   // 縦型: 0=セ・リーグ, 1=パ・リーグ
   int _portraitLeagueTab = 0;
-  late final PageController _portraitLeagueController;
 
   // 個人成績の id_user → 表示名
   String _usernameForId(String idUser) => lookupField(npbPlayerStats, 'id_user', idUser, 'username');
@@ -55,14 +54,7 @@ class _PredictionPageState extends State<PredictionPage> {
   @override
   void initState() {
     super.initState();
-    _portraitLeagueController = PageController();
     fetchData();
-  }
-
-  @override
-  void dispose() {
-    _portraitLeagueController.dispose();
-    super.dispose();
   }
 
   Future<void> fetchData() async {
@@ -215,12 +207,6 @@ class _PredictionPageState extends State<PredictionPage> {
       onSelected: (i) {
         if (i == _portraitLeagueTab) return;
         setState(() => _portraitLeagueTab = i);
-        if (!_portraitLeagueController.hasClients) return;
-        _portraitLeagueController.animateToPage(
-          i,
-          duration: const Duration(milliseconds: 360),
-          curve: Curves.easeOutCubic,
-        );
       },
       selectedColor: _portraitLeagueTab == 0 ? const Color(0xFF0B8F3A) : const Color(0xFF4DB5E8),
       leadingAssets: const {
@@ -925,13 +911,8 @@ class _PredictionPageState extends State<PredictionPage> {
                 children: [
                   portraitTop,
                   Expanded(
-                    child: PageView(
-                      controller: _portraitLeagueController,
-                      onPageChanged: (index) {
-                        if (_portraitLeagueTab != index) {
-                          setState(() => _portraitLeagueTab = index);
-                        }
-                      },
+                    child: IndexedStack(
+                      index: _portraitLeagueTab,
                       children: [
                         portraitLeaguePage(
                           leagueId: 1,

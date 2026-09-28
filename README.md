@@ -20,6 +20,6 @@ flutter build web --release
 rm -rf backend/public/*
 cp -R build/web/* backend/public/
 git add .
-git commit -m "定期実行処理を修正"
+git commit -m "試合情報の打者情報を表示する機能を追加"
 git push
 cd /Users/standapp/StudioProjects/Koko/backend

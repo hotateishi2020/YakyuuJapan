@@ -1,0 +1,12 @@
+# Render Cron Job 用。Dart サーバーは起動せず、既存 Web サービスへ curl するだけ。
+FROM debian:stable-slim
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends curl ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY scripts/cron_ping.sh /app/cron_ping.sh
+RUN chmod +x /app/cron_ping.sh
+
+ENTRYPOINT ["/app/cron_ping.sh"]

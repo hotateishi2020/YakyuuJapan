@@ -718,50 +718,43 @@ class _TableGameCard extends StatelessWidget {
               final maxNameBox = math.max(0.0, cellW - leadingW);
               final nameBoxW = reservedNameW.clamp(0.0, maxNameBox).toDouble();
               final restW = math.max(0.0, cellW - leadingW - nameBoxW);
+              final hasAnyStats = pitchers.any((p) => p.stat.isNotEmpty || p.hrTotal.isNotEmpty);
+              final gapW = hasAnyStats && restW > nameStatGap ? nameStatGap : 0.0;
+              final statsViewportW = hasAnyStats ? math.max(0.0, restW - gapW) : 0.0;
 
-              Widget statsOf(({String name, String colors, String mark, String stat, String hrTotal}) pitcher, double width) {
-                return SizedBox(
-                  width: width,
-                  child: ClipRect(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      primary: false,
-                      physics: const ClampingScrollPhysics(),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (pitcher.stat.isNotEmpty)
-                            Text(
-                              pitcher.stat,
-                              maxLines: 1,
-                              softWrap: false,
-                              overflow: TextOverflow.clip,
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                fontSize: statSize,
-                                color: Colors.black87,
-                                height: 1.1,
-                              ),
-                            ),
-                          if (pitcher.hrTotal.isNotEmpty) ...[
-                            if (pitcher.stat.isNotEmpty) const SizedBox(width: 2),
-                            Text(
-                              pitcher.hrTotal,
-                              maxLines: 1,
-                              softWrap: false,
-                              overflow: TextOverflow.clip,
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                fontSize: statSize,
-                                color: Colors.black87,
-                                height: 1.1,
-                              ),
-                            ),
-                          ],
-                        ],
+              Widget statLine(({String name, String colors, String mark, String stat, String hrTotal}) pitcher) {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (pitcher.stat.isNotEmpty)
+                      Text(
+                        pitcher.stat,
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.clip,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          fontSize: statSize,
+                          color: Colors.black87,
+                          height: 1.1,
+                        ),
                       ),
-                    ),
-                  ),
+                    if (pitcher.hrTotal.isNotEmpty) ...[
+                      if (pitcher.stat.isNotEmpty) const SizedBox(width: 2),
+                      Text(
+                        pitcher.hrTotal,
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.clip,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          fontSize: statSize,
+                          color: Colors.black87,
+                          height: 1.1,
+                        ),
+                      ),
+                    ],
+                  ],
                 );
               }
 
@@ -769,46 +762,73 @@ class _TableGameCard extends StatelessWidget {
                 width: cellW,
                 height: maxH.isFinite ? maxH : null,
                 child: ClipRect(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      for (final pitcher in pitchers)
-                        SizedBox(
-                          height: fitRowH,
-                          width: cellW,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
+                      SizedBox(
+                        width: leadingW + nameBoxW,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            for (final pitcher in pitchers)
                               SizedBox(
-                                width: badgeWidth,
-                                child: pitcher.mark.isEmpty ? const SizedBox() : _resultBadge(pitcher.mark, nameSize),
-                              ),
-                              const SizedBox(width: 0.5),
-                              ClipRect(
-                                child: SizedBox(
-                                  width: nameBoxW,
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: _pitcherNameBox(
-                                      name: pitcher.name,
-                                      colorsRaw: pitcher.colors,
-                                      baseSize: nameSize,
-                                      minSize: _minPlayerNameSize,
-                                      alignLeft: true,
+                                height: fitRowH,
+                                child: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: badgeWidth,
+                                      child: pitcher.mark.isEmpty ? const SizedBox() : _resultBadge(pitcher.mark, nameSize),
                                     ),
-                                  ),
+                                    const SizedBox(width: 0.5),
+                                    ClipRect(
+                                      child: SizedBox(
+                                        width: nameBoxW,
+                                        child: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: _pitcherNameBox(
+                                            name: pitcher.name,
+                                            colorsRaw: pitcher.colors,
+                                            baseSize: nameSize,
+                                            minSize: _minPlayerNameSize,
+                                            alignLeft: true,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              if ((pitcher.stat.isNotEmpty || pitcher.hrTotal.isNotEmpty) && restW > 0) ...[
-                                if (restW > nameStatGap) ...[
-                                  SizedBox(width: nameStatGap),
-                                  statsOf(pitcher, restW - nameStatGap),
-                                ] else
-                                  statsOf(pitcher, restW),
-                              ],
-                            ],
+                          ],
+                        ),
+                      ),
+                      if (statsViewportW > 0) ...[
+                        if (gapW > 0) SizedBox(width: gapW),
+                        SizedBox(
+                          width: statsViewportW,
+                          height: maxH.isFinite ? maxH : fitRowH * pitchers.length,
+                          child: ClipRect(
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              primary: false,
+                              physics: const ClampingScrollPhysics(),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  for (final pitcher in pitchers)
+                                    SizedBox(
+                                      height: fitRowH,
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: statLine(pitcher),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
+                      ],
                     ],
                   ),
                 ),

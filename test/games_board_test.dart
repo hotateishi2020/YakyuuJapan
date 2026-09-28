@@ -231,6 +231,22 @@ void main() {
     final awayPitcherX = tester.getTopLeft(find.text('工藤泰己').first).dx;
     final awayBatterX = tester.getTopLeft(find.text('菊池涼介').first).dx;
     expect(awayPitcherX, closeTo(awayBatterX, 1.0));
+
+    final statsScrolls = find.byWidgetPredicate(
+      (w) => w is SingleChildScrollView && w.scrollDirection == Axis.horizontal,
+    );
+    expect(statsScrolls, findsNWidgets(4));
+
+    final longBefore = tester.getTopLeft(find.text('6.1回8安打3失点(3四球3奪三振119球)').first).dx;
+    final shortBefore = tester.getTopLeft(find.text('0.2回無安打無失点').first).dx;
+    final nameBefore = tester.getTopLeft(find.text('東克樹').first).dx;
+    await tester.drag(statsScrolls.first, const Offset(-60, 0));
+    await tester.pump();
+    final longAfter = tester.getTopLeft(find.text('6.1回8安打3失点(3四球3奪三振119球)').first).dx;
+    final shortAfter = tester.getTopLeft(find.text('0.2回無安打無失点').first).dx;
+    expect(longAfter, lessThan(longBefore - 1));
+    expect(shortAfter, closeTo(longAfter + (shortBefore - longBefore), 1.0));
+    expect(tester.getTopLeft(find.text('東克樹').first).dx, closeTo(nameBefore, 0.5));
   });
 
   test('same matchup rows collapse to one game', () {

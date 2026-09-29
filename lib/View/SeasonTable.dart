@@ -51,6 +51,7 @@ class SeasonTableBlock extends StatelessWidget {
     return [
       if (_isTrue(row['flg_rookie'])) '🔰',
       if (_isTrue(row['flg_career_this_year'])) '✨',
+      if (_isTrue(row['flg_under21'])) '🌱',
       if (_isTrue(row['flg_age35'])) '🍁',
     ];
   }

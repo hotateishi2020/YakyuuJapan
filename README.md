@@ -20,6 +20,6 @@ flutter build web --release
 rm -rf backend/public/*
 cp -R build/web/* backend/public/
 git add .
-git commit -m "表示を微調整"
+git commit -m "個人成績の選手名の横にマークをつけるように修正"
 git push
 cd /Users/standapp/StudioProjects/Koko/backend

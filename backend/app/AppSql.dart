@@ -742,6 +742,10 @@ ORDER BY mt.id_league, tpt.int_rank
           m_player.date_birth IS NOT NULL
           AND m_player.date_birth::date <= (CURRENT_DATE - INTERVAL '35 years')
         ), FALSE) AS flg_age35,
+        COALESCE(BOOL_OR(
+          m_player.date_birth IS NOT NULL
+          AND m_player.date_birth::date > (CURRENT_DATE - INTERVAL '21 years')
+        ), FALSE) AS flg_under21,
         tsp.id_league,
         tsp.cnt_play,
         m_stats.int_index,

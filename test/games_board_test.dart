@@ -516,4 +516,45 @@ void main() {
       isFalse,
     );
   });
+
+  test('settled central and pacific games stop game refresh and finished games allow stats', () {
+    Map<String, dynamic> game({
+      required int homeLeague,
+      required int awayLeague,
+      required String state,
+      required String id,
+    }) =>
+        {
+          'date_game': '2026-09-29',
+          'id_game': id,
+          'id_league_home': homeLeague,
+          'id_league_away': awayLeague,
+          'state': state,
+          'name_team_home': 'home$id',
+          'name_team_away': 'away$id',
+        };
+
+    final playing = [
+      game(homeLeague: 1, awayLeague: 1, state: '8回表', id: '1'),
+      game(homeLeague: 2, awayLeague: 2, state: '試合終了', id: '2'),
+    ];
+    expect(centralPacificGamesAreSettled(playing, '2026-09-29'), isFalse);
+    expect(centralPacificGamesAllFinished(playing, '2026-09-29'), isFalse);
+
+    final cancelled = [
+      game(homeLeague: 1, awayLeague: 1, state: '試合終了', id: '1'),
+      game(homeLeague: 2, awayLeague: 2, state: '試合中止', id: '2'),
+    ];
+    expect(centralPacificGamesAreSettled(cancelled, '2026-09-29'), isTrue);
+    expect(centralPacificGamesAllFinished(cancelled, '2026-09-29'), isFalse);
+
+    final finished = [
+      game(homeLeague: 1, awayLeague: 1, state: '試合終了', id: '1'),
+      game(homeLeague: 2, awayLeague: 2, state: '試合終了', id: '2'),
+      game(homeLeague: 1, awayLeague: 1, state: '試合前', id: '3')..['date_game'] = '2026-09-30',
+    ];
+    expect(centralPacificGamesAreSettled(finished, '2026-09-29'), isTrue);
+    expect(centralPacificGamesAllFinished(finished, '2026-09-29'), isTrue);
+    expect(centralPacificGamesAreSettled(const [], '2026-09-29'), isFalse);
+  });
 }

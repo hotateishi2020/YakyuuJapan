@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:async';
 import 'dart:convert';
 import '../tools/Env.dart';
 import '../tools/app_logger.dart';
@@ -39,6 +40,9 @@ class _PredictionPageState extends State<PredictionPage> {
   bool _eventsExpanded = false;
   // 縦型: 0=セ・リーグ, 1=パ・リーグ
   int _portraitLeagueTab = 0;
+  Timer? _gamesRefreshTimer;
+  bool _gamesRefreshRunning = false;
+  bool _seasonStatsRefreshStarted = false;
 
   // 個人成績の id_user → 表示名
   String _usernameForId(String idUser) => lookupField(npbPlayerStats, 'id_user', idUser, 'username');
@@ -54,7 +58,98 @@ class _PredictionPageState extends State<PredictionPage> {
   @override
   void initState() {
     super.initState();
-    fetchData();
+    _loadThenWatchGames();
+  }
+
+  @override
+  void dispose() {
+    _gamesRefreshTimer?.cancel();
+    super.dispose();
+  }
+
+  String _todayKey() {
+    final now = DateTime.now();
+    final month = now.month.toString().padLeft(2, '0');
+    final day = now.day.toString().padLeft(2, '0');
+    return '${now.year}-$month-$day';
+  }
+
+  Future<void> _loadThenWatchGames() async {
+    await fetchData();
+    if (!mounted || error != null) return;
+    if (centralPacificGamesAllFinished(games, _todayKey())) {
+      _refreshSeasonStatsOnce();
+    }
+    _gamesRefreshTimer?.cancel();
+    _gamesRefreshTimer = Timer.periodic(const Duration(minutes: 3), (_) {
+      _refreshGames();
+    });
+  }
+
+  Future<void> _refreshGames() async {
+    if (!mounted || _gamesRefreshRunning || isLoading) return;
+    final today = _todayKey();
+    if (centralPacificGamesAreSettled(games, today)) {
+      if (centralPacificGamesAllFinished(games, today)) {
+        await _refreshSeasonStatsOnce();
+      }
+      return;
+    }
+    _gamesRefreshRunning = true;
+    var refreshStats = false;
+    try {
+      final scrape = await http.get(Env.api('/fetchGamesNPB')).timeout(const Duration(minutes: 3));
+      if (!mounted || scrape.statusCode != 200) {
+        logger.w('試合スクレイピング失敗: ${scrape.statusCode}');
+        return;
+      }
+      final res = await http.get(Env.api('/predictions')).timeout(const Duration(seconds: 30));
+      if (!mounted || res.statusCode != 200) return;
+      final map = jsonDecode(res.body) as Map<String, dynamic>;
+      final nextGames = normalizeGames(listMapFromJson(map['games']));
+      setState(() {
+        games = nextGames;
+      });
+      refreshStats = centralPacificGamesAllFinished(nextGames, today);
+    } catch (e, st) {
+      logger.w('試合情報の定期更新に失敗: $e\n$st');
+    } finally {
+      _gamesRefreshRunning = false;
+    }
+    if (refreshStats) await _refreshSeasonStatsOnce();
+  }
+
+  Future<void> _refreshSeasonStatsOnce() async {
+    if (!mounted || _seasonStatsRefreshStarted) return;
+    if (!centralPacificGamesAllFinished(games, _todayKey())) return;
+    _seasonStatsRefreshStarted = true;
+    try {
+      final team = await http.get(Env.api('/fetchStatsTeamNPB')).timeout(const Duration(minutes: 5));
+      if (!mounted || team.statusCode != 200) {
+        logger.w('チーム成績スクレイピング失敗: ${team.statusCode}');
+        _seasonStatsRefreshStarted = false;
+        return;
+      }
+      final player = await http.get(Env.api('/fetchStatsPlayerNPB')).timeout(const Duration(minutes: 20));
+      if (!mounted || player.statusCode != 200) {
+        logger.w('個人成績スクレイピング失敗: ${player.statusCode}');
+        _seasonStatsRefreshStarted = false;
+        return;
+      }
+      final res = await http.get(Env.api('/predictions')).timeout(const Duration(seconds: 30));
+      if (!mounted || res.statusCode != 200) {
+        _seasonStatsRefreshStarted = false;
+        return;
+      }
+      final map = jsonDecode(res.body) as Map<String, dynamic>;
+      setState(() {
+        standings = listMapFromJson(map['stats_team']);
+        npbPlayerStatsActual = listMapFromJson(map['stats_player']);
+      });
+    } catch (e, st) {
+      _seasonStatsRefreshStarted = false;
+      logger.w('チーム・個人成績の更新に失敗: $e\n$st');
+    }
   }
 
   Future<void> fetchData() async {
@@ -461,6 +556,24 @@ class _PredictionPageState extends State<PredictionPage> {
       const double tagW = 64.0;
       const double tagH = 20.0;
 
+      Widget newsTag(String title, Color back, Color font) {
+        return Container(
+          constraints: const BoxConstraints(minWidth: tagW, minHeight: tagH),
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
+          decoration: BoxDecoration(
+            color: back,
+            borderRadius: BorderRadius.circular(3),
+          ),
+          child: Text(
+            title,
+            maxLines: 1,
+            softWrap: false,
+            style: TextStyle(fontSize: 12, color: font, height: 1.1),
+          ),
+        );
+      }
+
       final h = boxHeight ?? 120.0;
       return Container(
         height: h,
@@ -482,16 +595,24 @@ class _PredictionPageState extends State<PredictionPage> {
                 ),
                 child: Row(
                   children: [
-                    const Expanded(
-                      child: Text('News', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.circular(4),
+                    const Text('News', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerRight,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text('未読メッセージを一覧表示', style: TextStyle(color: Colors.white, fontSize: 11)),
+                          ),
+                        ),
                       ),
-                      child: const Text('未読メッセージを一覧表示', style: TextStyle(color: Colors.white, fontSize: 11)),
                     ),
                   ],
                 ),
@@ -499,68 +620,51 @@ class _PredictionPageState extends State<PredictionPage> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(10, 4, 10, 6),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      const Divider(height: 1),
-                      const SizedBox(height: 4),
-                      for (final n in notifications)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 2),
-                          child: Row(
-                            children: [
-                              // メインタグ
-                              Container(
-                                width: tagW,
-                                alignment: Alignment.center,
-                                constraints: const BoxConstraints(minHeight: tagH),
-                                padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
-                                decoration: BoxDecoration(
-                                  color: parse(n['tag_main_color_back'], Colors.grey.shade300),
-                                  borderRadius: BorderRadius.circular(3),
-                                ),
-                                child: OneLineShrinkText(
-                                  (n['tag_main_title'] ?? '').toString(),
-                                  baseSize: 12,
-                                  minSize: 8,
-                                  color: parse(n['tag_main_color_font'], Colors.white),
-                                  align: TextAlign.center,
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              // サブタグ
-                              Container(
-                                width: tagW,
-                                alignment: Alignment.center,
-                                constraints: const BoxConstraints(minHeight: tagH),
-                                padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
-                                decoration: BoxDecoration(
-                                  color: parse(n['tag_sub_color_back'], Colors.grey.shade300),
-                                  borderRadius: BorderRadius.circular(3),
-                                ),
-                                child: OneLineShrinkText(
-                                  (n['tag_sub_title'] ?? '').toString(),
-                                  baseSize: 12,
-                                  minSize: 8,
-                                  color: parse(n['tag_sub_color_font'], Colors.white),
-                                  align: TextAlign.center,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Divider(height: 1),
+                    const SizedBox(height: 4),
+                    Expanded(
+                      child: ListView(
+                        padding: EdgeInsets.zero,
+                        primary: false,
+                        children: [
+                          for (final n in notifications)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 2),
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                primary: false,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    newsTag(
+                                      (n['tag_main_title'] ?? '').toString(),
+                                      parse(n['tag_main_color_back'], Colors.grey.shade300),
+                                      parse(n['tag_main_color_font'], Colors.white),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    newsTag(
+                                      (n['tag_sub_title'] ?? '').toString(),
+                                      parse(n['tag_sub_color_back'], Colors.grey.shade300),
+                                      parse(n['tag_sub_color_font'], Colors.white),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      (n['title'] ?? '').toString(),
+                                      maxLines: 1,
+                                      softWrap: false,
+                                      style: const TextStyle(fontSize: 12, height: 1.1, color: Colors.black87),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(width: 6),
-                              // タイトル
-                              Expanded(
-                                child: OneLineShrinkText(
-                                  (n['title'] ?? '').toString(),
-                                  baseSize: 12,
-                                  minSize: 8,
-                                  align: TextAlign.left,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -805,21 +909,16 @@ class _PredictionPageState extends State<PredictionPage> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        // 下段 LeagueBoardRow / SeasonTable と同じ比率・隙間で幅を決める
+        // 下段 SeasonTable と同じ比率・隙間で幅を決める（左のリーグ名ヘッダー分は含めない）
         final double rowW = constraints.maxWidth;
-        final int sideFlex = ALL_RATIO_BLOCK_W[0];
-        final int bodyFlex = ALL_RATIO_BLOCK_W[2] + ALL_RATIO_BLOCK_W[3];
         const int standingsFlex = 3;
         const int personalFlex = 2;
         const double seasonGap = 4.0; // SeasonTable 内の隙間と同じ
         const double rankColsW = STANDINGS_COL_W2 * 3; // 順位・立・江
 
-        // Expanded の丸め誤差を避けるため、余白は引き算で確定させる
-        final double sideW = rowW * sideFlex / (sideFlex + bodyFlex);
-        final double bodyW = rowW - sideW;
-        final double standingsW = (bodyW - seasonGap) * standingsFlex / (standingsFlex + personalFlex);
-        final double personalW = bodyW - seasonGap - standingsW;
-        final double scoreW = sideW + rankColsW;
+        final double standingsW = (rowW - seasonGap) * standingsFlex / (standingsFlex + personalFlex);
+        final double personalW = rowW - seasonGap - standingsW;
+        final double scoreW = rankColsW;
         final double newsW = standingsW - rankColsW;
 
         return Row(
@@ -941,24 +1040,23 @@ class _PredictionPageState extends State<PredictionPage> {
                     child: _scoreNewsEventsRow(portrait: false),
                   ),
                   SizedBox(height: ALL_SPACE_BLOCK),
-                  Expanded(
-                    flex: ALL_RATIO_BLOCK_H[1],
-                    child: centralLeagueBoard(
-                      leagueId: 1,
-                      leagueColor: const Color(0xFF0B8F3A),
-                      logoAsset: 'assets/images/logo_league_central.webp',
-                      leagueLabelPrefix: 'セ',
-                    ),
-                  ),
+                  _portraitLeagueTabBar(),
                   SizedBox(height: ALL_SPACE_BLOCK),
                   Expanded(
-                    flex: ALL_RATIO_BLOCK_H[1],
-                    child: centralLeagueBoard(
-                      leagueId: 2,
-                      leagueColor: const Color(0xFF4DB5E8),
-                      logoAsset: 'assets/images/logo_league_pacific.png',
-                      leagueLabelPrefix: 'パ',
-                    ),
+                    flex: ALL_RATIO_BLOCK_H[1] * 2,
+                    child: _portraitLeagueTab == 0
+                        ? centralLeagueBoard(
+                            leagueId: 1,
+                            leagueColor: const Color(0xFF0B8F3A),
+                            logoAsset: 'assets/images/logo_league_central.webp',
+                            leagueLabelPrefix: 'セ',
+                          )
+                        : centralLeagueBoard(
+                            leagueId: 2,
+                            leagueColor: const Color(0xFF4DB5E8),
+                            logoAsset: 'assets/images/logo_league_pacific.png',
+                            leagueLabelPrefix: 'パ',
+                          ),
                   ),
                 ],
               );

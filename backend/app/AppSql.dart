@@ -275,44 +275,43 @@ class AppSql {
         LEFT OUTER JOIN (SELECT * FROM t_predict_player LEFT OUTER JOIN m_user ON m_user.id = t_predict_player.id_user WHERE year =  \$1) AS user_pitcher_away ON user_pitcher_away.id_player = pitcher_away.id
         LEFT OUTER JOIN (
           SELECT 
-  t_game_summary.id AS id_game_summary,
-  id_game,
-  m_player.id_team AS id_team_summary,
-  name_full AS name_full_summary,
-  int_batting::text || '打数' || CASE WHEN int_hit1 = 0 THEN '無' ELSE int_hit1::text END || '安打' || 
-    CASE WHEN (int_homerun = 0 AND int_rbi = 0 AND int_fourball = 0 AND int_steal_base = 0 AND int_sacrifice = 0) THEN '' ELSE '(' ||
-      CASE WHEN int_homerun = 0 THEN '' ELSE int_homerun::text || 'HR' END || 
-      CASE WHEN int_rbi = 0 THEN '' ELSE int_rbi::text || '打点' END ||
-      CASE WHEN int_fourball = 0 THEN '' ELSE int_fourball::text || '四球' END || 
-      CASE WHEN int_steal_base = 0 THEN '' ELSE int_steal_base::text || '盗塁' END || 
-      CASE WHEN int_sacrifice = 0 THEN '' ELSE int_sacrifice::text || '犠打' END || ')'
-    END AS txt_batting,
-    TRIM_SCALE(double_inning_pitch)::text || '回' || 
-      CASE WHEN int_hit = 0 THEN '無' ELSE int_hit::text END || '安打' ||
-      CASE WHEN int_runs = 0 THEN '無' ELSE int_runs::text END || '失点(' || 
-      CASE WHEN int_four = 0 THEN '無' ELSE int_four::text END || '四球' ||
-      CASE WHEN int_dead_pitching = 0 THEN '' ELSE int_dead_pitching::text || '死球' END || 
-      CASE WHEN int_strike_out = 0 THEN '0' ELSE int_strike_out::text END || '奪三振' || 
-  ')' AS txt_pitching,
-  COALESCE(t_game_summary.txt_homerun_total, '') AS txt_homerun_total,
-  (int_hit1 + int_homerun * 5 + int_rbi * 2 + int_steal_base + int_fourball * 0.8 + int_dead_batting * 0.2 + int_sacrifice * 0.2) AS point_total,
-  CASE WHEN t_predict_player.id_player IS NULL THEN FALSE ELSE TRUE END AS flg_predict,
-  CASE WHEN double_inning_pitch > 0 THEN TRUE ELSE FALSE END AS flg_pitcher,
-  code_result_pitcher,
-  '/' || STRING_AGG(DISTINCT code_color, '/' ORDER BY code_color DESC) || '/' AS colors_summary
-FROM t_game_summary
-  LEFT OUTER JOIN t_predict_player on t_predict_player.id_player = t_game_summary.id_player AND t_predict_player.year =  \$1
-  LEFT OUTER JOIN m_player on m_player.id = t_game_summary.id_player
-  LEFT OUTER JOIN m_stats on m_stats.id = t_predict_player.id_stats
-  LEFT OUTER JOIN m_user on m_user.id = t_predict_player.id_user
-WHERE (int_hit1 + int_homerun * 5 + int_rbi * 2 + int_steal_base + int_fourball * 0.8 + int_dead_batting * 0.2 + int_sacrifice * 0.2) >= 3.5 
-   OR (CASE WHEN t_predict_player.id_player IS NULL THEN FALSE ELSE TRUE END = TRUE AND CASE WHEN double_inning_pitch > 0 THEN TRUE ELSE FALSE END = FALSE) 
-   OR CASE WHEN double_inning_pitch > 0 THEN TRUE ELSE FALSE END = TRUE
-GROUP BY t_predict_player.id_player, id_game, m_player.id_team, name_full, int_batting, int_hit1, int_fourball, int_homerun, 
-         int_rbi, int_steal_base, int_dead_batting, int_sacrifice, double_inning_pitch, int_runs,
-         int_pitch, int_four, int_dead_pitching, int_strike_out, code_result_pitcher, int_hit, t_game_summary.id, t_game_summary.txt_homerun_total
-ORDER BY id_game, m_player.id_team, flg_pitcher DESC, point_total DESC, t_game_summary.id
-  
+            t_game_summary.id AS id_game_summary,
+            id_game,
+            m_player.id_team AS id_team_summary,
+            name_full AS name_full_summary,
+            int_batting::text || '打数' || CASE WHEN int_hit1 = 0 THEN '無' ELSE int_hit1::text END || '安打' || 
+            CASE WHEN (int_homerun = 0 AND int_rbi = 0 AND int_fourball = 0 AND int_steal_base = 0 AND int_sacrifice = 0) THEN '' ELSE '(' ||
+              CASE WHEN int_homerun = 0 THEN '' ELSE int_homerun::text || 'HR' END || 
+              CASE WHEN int_rbi = 0 THEN '' ELSE int_rbi::text || '打点' END ||
+              CASE WHEN int_fourball = 0 THEN '' ELSE int_fourball::text || '四球' END || 
+              CASE WHEN int_steal_base = 0 THEN '' ELSE int_steal_base::text || '盗塁' END || 
+              CASE WHEN int_sacrifice = 0 THEN '' ELSE int_sacrifice::text || '犠打' END || ')'
+            END AS txt_batting,
+            TRIM_SCALE(double_inning_pitch)::text || '回' || 
+              CASE WHEN int_runs = 0 THEN '無' ELSE int_runs::text END || '失点(' || 
+              CASE WHEN int_hit = 0 THEN '無' ELSE int_hit::text END || '安打' ||
+              CASE WHEN int_four = 0 THEN '無' ELSE int_four::text END || '四球' ||
+              CASE WHEN int_dead_pitching = 0 THEN '' ELSE int_dead_pitching::text || '死球' END || 
+              CASE WHEN int_strike_out = 0 THEN '0' ELSE int_strike_out::text END || '奪三振' || 
+            ')' AS txt_pitching,
+            COALESCE(t_game_summary.txt_homerun_total, '') AS txt_homerun_total,
+            (int_hit1 + int_homerun * 5 + int_rbi * 2 + int_steal_base + int_fourball * 0.8 + int_dead_batting * 0.2 + int_sacrifice * 0.2) AS point_total,
+            CASE WHEN t_predict_player.id_player IS NULL THEN FALSE ELSE TRUE END AS flg_predict,
+            CASE WHEN double_inning_pitch > 0 THEN TRUE ELSE FALSE END AS flg_pitcher,
+            code_result_pitcher,
+            '/' || STRING_AGG(DISTINCT code_color, '/' ORDER BY code_color DESC) || '/' AS colors_summary
+          FROM t_game_summary
+            LEFT OUTER JOIN t_predict_player on t_predict_player.id_player = t_game_summary.id_player AND t_predict_player.year =  \$1
+            LEFT OUTER JOIN m_player on m_player.id = t_game_summary.id_player
+            LEFT OUTER JOIN m_stats on m_stats.id = t_predict_player.id_stats
+            LEFT OUTER JOIN m_user on m_user.id = t_predict_player.id_user
+          WHERE (int_hit1 + int_homerun * 5 + int_rbi * 2 + int_steal_base + int_fourball * 0.8 + int_dead_batting * 0.2 + int_sacrifice * 0.2) >= 3.5 
+            OR (CASE WHEN t_predict_player.id_player IS NULL THEN FALSE ELSE TRUE END = TRUE AND CASE WHEN double_inning_pitch > 0 THEN TRUE ELSE FALSE END = FALSE) 
+            OR CASE WHEN double_inning_pitch > 0 THEN TRUE ELSE FALSE END = TRUE
+          GROUP BY t_predict_player.id_player, id_game, m_player.id_team, name_full, int_batting, int_hit1, int_fourball, int_homerun, 
+            int_rbi, int_steal_base, int_dead_batting, int_sacrifice, double_inning_pitch, int_runs,
+            int_pitch, int_four, int_dead_pitching, int_strike_out, code_result_pitcher, int_hit, t_game_summary.id, t_game_summary.txt_homerun_total
+          ORDER BY id_game, m_player.id_team, flg_pitcher DESC, point_total DESC, t_game_summary.id 
         ) AS v_game_summary ON v_game_summary.id_game = t_game.id 
       WHERE t_game.datetime_start BETWEEN (CURRENT_DATE - INTERVAL '1 day') AND (CURRENT_DATE + INTERVAL '3 day')
       GROUP BY t_game.id, t_game.datetime_start, team_home.name_short, team_away.name_short, pitcher_home.name_full, pitcher_away.name_full,
@@ -353,7 +352,7 @@ ORDER BY id_game, m_player.id_team, flg_pitcher DESC, point_total DESC, t_game_s
       FROM t_nortification
         LEFT OUTER JOIN m_system_code AS tag_main ON tag_main.key = t_nortification.code_tag_main AND tag_main.code = 'NORTIFICATION'
         LEFT OUTER JOIN m_system_code AS tag_sub ON tag_sub.key = t_nortification.code_tag_sub AND tag_sub.code = 'NORTIFICATION_SUB'
-      ORDER BY t_nortification.crtat DESC
+      ORDER BY t_nortification.id DESC
     ''';
   }
 

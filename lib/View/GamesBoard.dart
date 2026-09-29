@@ -41,6 +41,36 @@ bool gameHasStarted(Map<String, dynamic> game) {
   return home >= 0 && away >= 0;
 }
 
+bool _isCentralOrPacificGame(Map<String, dynamic> game) {
+  final home = _gameInt(game['id_league_home']);
+  final away = _gameInt(game['id_league_away']);
+  return (home == 1 || home == 2) && (away == 1 || away == 2);
+}
+
+Map<String, String> _todaysCentralPacificStates(List<Map<String, dynamic>> games, String today) {
+  final states = <String, String>{};
+  for (final game in games) {
+    if (gameDateOnly(game['date_game']) != today) continue;
+    if (!_isCentralOrPacificGame(game)) continue;
+    states[gameMatchupKey(game)] = '${game['state'] ?? ''}'.trim();
+  }
+  return states;
+}
+
+/// 当日のセ・パ全試合が「試合終了」または「試合中止」。試合が1件もない日は false。
+bool centralPacificGamesAreSettled(List<Map<String, dynamic>> games, String today) {
+  final states = _todaysCentralPacificStates(games, today);
+  if (states.isEmpty) return false;
+  return states.values.every((state) => state == '試合終了' || state == '試合中止');
+}
+
+/// 当日のセ・パ全試合が「試合終了」。中止が残っている日は false。
+bool centralPacificGamesAllFinished(List<Map<String, dynamic>> games, String today) {
+  final states = _todaysCentralPacificStates(games, today);
+  if (states.isEmpty) return false;
+  return states.values.every((state) => state == '試合終了');
+}
+
 List<Map<String, dynamic>> expandGameRows(Map<String, dynamic> game) {
   final raw = game['summaries'];
   var summaries = const <Map<String, dynamic>>[];

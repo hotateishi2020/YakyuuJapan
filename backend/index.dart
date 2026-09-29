@@ -23,6 +23,11 @@ String? _predictionsCacheBody;
 DateTime? _predictionsCacheAt;
 const Duration _predictionsCacheTtl = Duration(seconds: 45);
 
+void _clearPredictionsCache() {
+  _predictionsCacheBody = null;
+  _predictionsCacheAt = null;
+}
+
 String _gameMatchupKey(Map<String, dynamic> game) {
   final id = '${game['id_game'] ?? ''}'.trim();
   if (id.isNotEmpty && id != 'null' && id != '0') return 'id:$id';
@@ -52,8 +57,7 @@ List<Map<String, dynamic>> _collapseGames(List<Map<String, dynamic>> rows) {
         ...groups[key]!.first,
         'summaries': [
           for (final row in groups[key]!)
-            if (row['id_game_summary'] != null ||
-                '${row['name_full_summary'] ?? ''}'.trim().isNotEmpty)
+            if (row['id_game_summary'] != null || '${row['name_full_summary'] ?? ''}'.trim().isNotEmpty)
               {
                 'id_game_summary': row['id_game_summary'],
                 'id_team_summary': row['id_team_summary'],
@@ -80,23 +84,29 @@ void main() async {
     app.get('/healthz', (Request _) => Response.ok('ok'));
 
     app.get('/fetchStatsTeamNPB', (Request request) async {
-      return await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.STATS_TEAM, (conn) async {
+      final response = await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.STATS_TEAM, (conn) async {
         return await FetchURL.fetchStatsTeamNPB(conn);
       });
+      if (response.statusCode == 200) _clearPredictionsCache();
+      return response;
     });
 
     app.get('/fetchStatsPlayerNPB', (Request request) async {
-      return await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.STATS_PLAYER, (conn) async {
+      final response = await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.STATS_PLAYER, (conn) async {
         await FetchURL.fetchStatsPlayerNPB(conn);
         return await FetchURL.fetchStatsPlayerNPB(conn);
       });
+      if (response.statusCode == 200) _clearPredictionsCache();
+      return response;
     });
 
     app.get('/fetchGamesNPB', (Request request) async {
       print('fetchGamesNPB');
-      return await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.GAMES, (conn) async {
+      final response = await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.GAMES, (conn) async {
         return await FetchURL.fetchGamesNPB(conn);
       });
+      if (response.statusCode == 200) _clearPredictionsCache();
+      return response;
     });
 
     app.get('/insertNewPlayersNPB', (Request request) async {
@@ -131,7 +141,7 @@ void main() async {
           (conn) => Postgres.execute(conn, AppSql.selectNotification()),
         ]);
         final games = _collapseGames(Postgres.toJson(results[4]));
-        print(games);
+        // print(games);
         final payload = <String, dynamic>{
           'predict_team': Postgres.toJson(results[0]),
           'predict_player': Postgres.toJson(results[1]),

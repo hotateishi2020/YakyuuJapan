@@ -15,6 +15,7 @@ class m_player extends DBModel {
   bool flg_injury = false;
   String path_img_face = '';
   String uniform_number = '';
+  bool flg_rookie = false;
 
   @override
   String get tableName => 'm_player';
@@ -35,6 +36,7 @@ class m_player extends DBModel {
       "flg_injury": flg_injury,
       "path_img_face": path_img_face,
       "uniform_number": uniform_number,
+      "flg_rookie": flg_rookie,
     };
   }
 }

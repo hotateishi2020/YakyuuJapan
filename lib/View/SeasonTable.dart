@@ -40,6 +40,42 @@ class SeasonTableBlock extends StatelessWidget {
   // 文字→数値(表示用)
   String _num(dynamic v) => (v == null || '$v'.isEmpty) ? '—' : '$v';
 
+  bool _isTrue(dynamic v) {
+    if (v == true) return true;
+    if (v is num) return v != 0;
+    final s = '$v'.trim().toLowerCase();
+    return s == 'true' || s == 't' || s == '1';
+  }
+
+  List<String> _playerMarks(Map<String, dynamic> row) {
+    return [
+      if (_isTrue(row['flg_rookie'])) '🔰',
+      if (_isTrue(row['flg_career_this_year'])) '✨',
+      if (_isTrue(row['flg_age35'])) '🍁',
+    ];
+  }
+
+  /// 選手名の右に、付いている印をすべて並べる。名前だけ縮めて印は残す。
+  Widget _playerNameLine(Map<String, dynamic> row, String name, {required double baseSize, Color? color, FontWeight? weight}) {
+    final paren = name.indexOf('(');
+    final label = paren >= 0 ? name.substring(0, paren) : name;
+    final suffix = paren >= 0 ? name.substring(paren) : '';
+    final marks = _playerMarks(row);
+    return Row(
+      children: [
+        Flexible(
+          child: OneLineShrinkText(label.isEmpty ? '—' : label, baseSize: baseSize, minSize: 1, fast: true, color: color, weight: weight),
+        ),
+        for (final mark in marks)
+          Text(mark, style: TextStyle(fontSize: baseSize, height: 1.0, color: color)),
+        if (suffix.isNotEmpty)
+          Flexible(
+            child: OneLineShrinkText(suffix, baseSize: baseSize, minSize: 1, fast: true, color: color, weight: weight),
+          ),
+      ],
+    );
+  }
+
   // リーグ別フィルタ
   List<Map<String, dynamic>> _standingsOf(int leagueId) => standings.where((e) => int.tryParse('${e['id_league']}') == leagueId).toList()..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0).compareTo(int.tryParse('${b['int_rank']}') ?? 0));
 
@@ -406,7 +442,7 @@ class SeasonTableBlock extends StatelessWidget {
                       final BoxDecoration? d = _nameBgDecorationFromRow();
                       final bool hasBg = d != null;
                       final bool isToday = e['flg_today'] == true;
-                      final Widget txt = OneLineShrinkText(name, baseSize: 10, minSize: 1, fast: true, color: hasBg ? Colors.white : null, weight: hasBg ? FontWeight.bold : null);
+                      final Widget txt = _playerNameLine(e, name, baseSize: 10, color: hasBg ? Colors.white : null, weight: hasBg ? FontWeight.bold : null);
                       // 予想者カラーがある場合はそれを優先。ないときだけグレー
                       if (isToday) {
                         return BlinkBg(

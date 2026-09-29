@@ -20,6 +20,6 @@ flutter build web --release
 rm -rf backend/public/*
 cp -R build/web/* backend/public/
 git add .
-git commit -m "Renderでの定期実行処理に対応"
+git commit -m "表示を微調整"
 git push
 cd /Users/standapp/StudioProjects/Koko/backend

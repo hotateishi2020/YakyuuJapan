@@ -112,8 +112,113 @@ class AppSql {
     return '''
       SELECT
         id,
-        url_npb_players
+        id_league,
+        name_short,
+        name_full,
+        COALESCE(url_npb_players, '')
       FROM m_team
+      ORDER BY id
+    ''';
+  }
+
+  static String selectPlayerIdByNameAndTeam() {
+    return '''
+      SELECT id
+      FROM m_player
+      WHERE name_last = \$1
+        AND name_first = \$2
+        AND id_team = \$3
+      ORDER BY id
+      LIMIT 1
+    ''';
+  }
+
+  static String selectPlayerCareerExists() {
+    return '''
+      SELECT 1
+      FROM m_player_career
+      WHERE id_player = \$1
+      LIMIT 1
+    ''';
+  }
+
+  static String updatePlayerBirthDate() {
+    return '''
+      UPDATE m_player
+      SET date_birth = \$4,
+          updat = NOW()
+      WHERE name_last = \$1
+        AND name_first = \$2
+        AND id_team = \$3
+        AND date_birth IS DISTINCT FROM \$4::timestamp
+    ''';
+  }
+
+  static String updatePlayerRookie() {
+    return '''
+      UPDATE m_player
+      SET flg_rookie = TRUE,
+          updat = NOW()
+      WHERE id = \$1
+    ''';
+  }
+
+  static String updatePlayerNotRookie() {
+    return '''
+      UPDATE m_player
+      SET flg_rookie = FALSE,
+          updat = NOW()
+      WHERE id = \$1
+        AND flg_rookie IS DISTINCT FROM FALSE
+    ''';
+  }
+
+  /// 数字の条件を外れた選手と、年度別成績の所属がメジャーの選手だけ flg_rookie を false にする。
+  /// true にはしない。経歴のメジャー在籍は選手詳細を見て別途判定する。
+  static String updateRookieFlagsFromCareer() {
+    return '''
+      UPDATE m_player AS p
+      SET flg_rookie = j.is_rookie,
+          updat = NOW()
+      FROM (
+        SELECT
+          id_player,
+          first_year,
+          (
+            first_year + 4 >= this_year
+            AND COALESCE(SUM(pa) FILTER (
+              WHERE int_year >= first_year
+                AND int_year <= first_year + 4
+                AND int_year < this_year
+            ), 0) <= 60
+            AND COALESCE(SUM(thirds) FILTER (
+              WHERE int_year >= first_year
+                AND int_year <= first_year + 4
+                AND int_year < this_year
+            ), 0) <= 90
+            AND NOT COALESCE(BOOL_OR(id_league IN (3, 4)), FALSE)
+          ) AS is_rookie
+        FROM (
+          SELECT
+            c0.id_player,
+            c0.int_year,
+            COALESCE(c0.int_appearance, 0) AS pa,
+            (
+              trunc(COALESCE(c0.double_inning, 0))::int * 3
+              + LEAST(2, GREATEST(0, round((COALESCE(c0.double_inning, 0) - trunc(COALESCE(c0.double_inning, 0))) * 10)::int))
+            ) AS thirds,
+            MIN(c0.int_year) OVER (PARTITION BY c0.id_player) AS first_year,
+            EXTRACT(YEAR FROM CURRENT_DATE)::int AS this_year,
+            t.id_league
+          FROM m_player_career AS c0
+          LEFT JOIN m_team AS t ON t.id = c0.id_team
+          WHERE COALESCE(c0.flg_delete, FALSE) = FALSE
+        ) c
+        GROUP BY id_player, first_year, this_year
+      ) j
+      WHERE p.id = j.id_player
+        AND j.is_rookie = FALSE
+        AND p.flg_rookie IS DISTINCT FROM FALSE
     ''';
   }
 
@@ -631,6 +736,12 @@ ORDER BY mt.id_league, tpt.int_rank
         CASE WHEN t_game_home.id_pitcher_home > 0 THEN TRUE
              WHEN t_game_away.id_pitcher_away > 0 THEN TRUE
              ELSE FALSE END AS flg_today,
+        COALESCE(BOOL_OR(m_player.flg_rookie), FALSE) AS flg_rookie,
+        COALESCE(BOOL_OR(career_first.min_year = \$1), FALSE) AS flg_career_this_year,
+        COALESCE(BOOL_OR(
+          m_player.date_birth IS NOT NULL
+          AND m_player.date_birth::date <= (CURRENT_DATE - INTERVAL '35 years')
+        ), FALSE) AS flg_age35,
         tsp.id_league,
         tsp.cnt_play,
         m_stats.int_index,
@@ -641,6 +752,12 @@ ORDER BY mt.id_league, tpt.int_rank
         LEFT JOIN t_stats_team ON t_stats_team.id_team = m_team.id
           AND t_stats_team.crtat = (SELECT MAX(crtat) FROM t_stats_team WHERE EXTRACT(YEAR FROM crtat) = \$1)
         LEFT JOIN m_player  ON m_player.id  = tsp.id_player
+        LEFT JOIN (
+          SELECT id_player, MIN(int_year) AS min_year
+          FROM m_player_career
+          WHERE COALESCE(flg_delete, FALSE) = FALSE
+          GROUP BY id_player
+        ) career_first ON career_first.id_player = tsp.id_player
         LEFT JOIN m_league  ON m_league.id  = m_team.id_league
         LEFT JOIN t_predict_player
           ON t_predict_player.id_player = tsp.id_player

@@ -11,6 +11,7 @@ import '../tools/StringTool.dart';
 import '../tools/DateTimeTool.dart';
 import '../tools/DBModel.dart';
 import 'DB/m_player.dart';
+import 'DB/m_player_career.dart';
 import 'DB/t_game_details.dart';
 import 'DB/t_game_summary.dart';
 import 'DB/t_stats_player.dart';
@@ -607,7 +608,8 @@ class FetchURL {
                 for (var section in sections) {
                   var game_summary_pitcher = section.querySelectorAll('table tbody tr');
                   if (game_summary_pitcher.isEmpty) {
-                    throw Exception('試合が開始していないので試合結果のHTMLが存在しません。');
+                    id_team_pitcher = id_team_home;
+                    continue;
                   }
 
                   for (var game_summary_pitcher_row in game_summary_pitcher) {
@@ -945,18 +947,21 @@ class FetchURL {
 
   static Future<Response> fetchNPBPlayers(Connection conn) async {
     final results = await conn.execute(AppSql.selectTeams());
-    final teams = results
-        .map((row) => {
-              'id': row[0],
-              'url': row[1],
-            })
+    final clubs = results
+        .map((row) => CareerClub(
+              id: row[0] as int,
+              league: row[1] as int,
+              shortName: '${row[2] ?? ''}',
+              fullName: '${row[3] ?? ''}',
+              url: '${row[4] ?? ''}',
+            ))
         .toList();
 
     List<m_player> players = [];
+    final details = <_RosterDetail>[];
 
-    for (final team in teams) {
-      final url = team['url'] as String;
-      final res = await http.get(Uri.parse(url));
+    for (final club in clubs.where((c) => c.url.isNotEmpty)) {
+      final res = await http.get(Uri.parse(club.url));
       if (res.statusCode != 200) {
         throw Exception('HTTP ${res.statusCode}');
       }
@@ -988,13 +993,13 @@ class FetchURL {
           }
         }
 
-        player.date_birth = DateTime.tryParse(cols[2]); // 失敗時は null を保持
+        player.date_birth = _rosterBirthDate(cols[2]);
         player.uniform_number = cols[0];
         player.name_middle = '';
         player.name_full = player.name_last + player.name_first;
         player.height = int.tryParse(cols[3]) ?? 0;
         player.weight = int.tryParse(cols[4]) ?? 0;
-        player.id_team = team['id'] as int;
+        player.id_team = club.id;
 
         if (cols.length > 5) {
           if (cols[5] == '右') {
@@ -1013,13 +1018,311 @@ class FetchURL {
           }
         }
         players.add(player);
+
+        final href = tds[1].querySelector('a')?.attributes['href']?.trim() ?? '';
+        if (href.isNotEmpty) {
+          details.add(_RosterDetail(player, _npbPlayerUrl(href)));
+        }
       }
     }
 
     var cnt_rows = await Postgres.execute(conn, AppSql.selectInsertNewPlayersNPB(players));
 
     print("登録した新選手の数：${cnt_rows.affectedRows.toString()}");
+    var birthUpdated = 0;
+    for (final player in players) {
+      if (player.date_birth == null) continue;
+      final birth = player.date_birth!;
+      final birthText = '${birth.year.toString().padLeft(4, '0')}-'
+          '${birth.month.toString().padLeft(2, '0')}-'
+          '${birth.day.toString().padLeft(2, '0')}';
+      final updated = await conn.execute(
+        AppSql.updatePlayerBirthDate(),
+        parameters: [player.name_last, player.name_first, player.id_team, birthText],
+      );
+      birthUpdated += updated.affectedRows;
+    }
+    print('生年月日を更新した選手の数：$birthUpdated');
+    await _insertPlayerCareers(conn, clubs, details);
     return Response.ok('ok');
+  }
+
+  /// 名簿の選手詳細から年度別成績を m_player_career へ入れる。
+  /// 成績行が既にある選手は取り直さない。新人フラグが true の選手は経歴を見て、
+  /// メジャー球団がいれば false にする。
+  static Future<void> _insertPlayerCareers(Connection conn, List<CareerClub> clubs, List<_RosterDetail> details) async {
+    var inserted = 0;
+    var skipped = 0;
+    var rookies = 0;
+    for (final detail in details) {
+      final player = detail.player;
+      try {
+        final found = await conn.execute(
+          AppSql.selectPlayerIdByNameAndTeam(),
+          parameters: [player.name_last, player.name_first, player.id_team],
+        );
+        if (found.isEmpty) {
+          print('選手IDが見つかりません: ${player.name_full}');
+          continue;
+        }
+        final idPlayer = found.first[0] as int;
+        final exists = await conn.execute(
+          AppSql.selectPlayerCareerExists(),
+          parameters: [idPlayer],
+        );
+        final flagged = await conn.execute(
+          '''
+          SELECT id
+          FROM m_player
+          WHERE name_last = \$1
+            AND name_first = \$2
+            AND id_team = \$3
+            AND flg_rookie IS TRUE
+          ''',
+          parameters: [player.name_last, player.name_first, player.id_team],
+        );
+        if (exists.isNotEmpty && flagged.isEmpty) {
+          skipped++;
+          continue;
+        }
+
+        final res = await http.get(Uri.parse(detail.url)).timeout(const Duration(seconds: 30));
+        if (res.statusCode != 200) {
+          print('選手詳細の取得に失敗: ${detail.url} HTTP ${res.statusCode}');
+          continue;
+        }
+        final page = parseNpbPlayerCareer(parse(_decodeHtml(res)), clubs);
+        if (page.hasMlb && flagged.isNotEmpty) {
+          for (final row in flagged) {
+            await conn.execute(AppSql.updatePlayerNotRookie(), parameters: [row[0]]);
+          }
+          print('メジャー在籍のため新人解除: ${player.name_full}');
+        }
+        if (exists.isNotEmpty) {
+          skipped++;
+          continue;
+        }
+        for (final row in page.rows) {
+          row.id_player = idPlayer;
+        }
+        if (page.rows.isNotEmpty) {
+          await Postgres.insertMulti(conn, page.rows);
+          inserted += page.rows.length;
+        }
+        if (page.isRookie) {
+          await conn.execute(AppSql.updatePlayerRookie(), parameters: [idPlayer]);
+          rookies++;
+          print('新人: ${player.name_full}');
+        }
+      } catch (e, stacktrace) {
+        print('個人成績の登録に失敗: ${player.name_full} ${detail.url}');
+        print(e);
+        print(stacktrace);
+      }
+    }
+    print('個人成績の登録行数: $inserted / 既存のためスキップ: $skipped / 新人: $rookies');
+    final refreshed = await conn.execute(AppSql.updateRookieFlagsFromCareer());
+    print('規定超過またはデビュー5年超過で新人解除: ${refreshed.affectedRows}');
+  }
+
+  /// 名簿の生年月日。`1988.11.01` と ISO の両方を読む。
+  static DateTime? _rosterBirthDate(String raw) {
+    final text = raw.trim();
+    final iso = DateTime.tryParse(text);
+    if (iso != null) return DateTime(iso.year, iso.month, iso.day);
+    final m = RegExp(r'^(\d{4})[./](\d{1,2})[./](\d{1,2})$').firstMatch(text);
+    if (m == null) return null;
+    final year = int.parse(m.group(1)!);
+    final month = int.parse(m.group(2)!);
+    final day = int.parse(m.group(3)!);
+    if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+    return DateTime(year, month, day);
+  }
+
+  static String _npbPlayerUrl(String href) {
+    if (href.startsWith('http://') || href.startsWith('https://')) return href;
+    if (href.startsWith('//')) return 'https:$href';
+    if (href.startsWith('/')) return 'https://npb.jp$href';
+    return 'https://npb.jp/$href';
+  }
+
+  /// 選手詳細ページの年度別投手・打撃成績と、経歴にメジャー球団が含まれるかを読む。
+  static NpbCareerPage parseNpbPlayerCareer(Document doc, List<CareerClub> clubs) {
+    final page = NpbCareerPage();
+    page.hasMlb = _careerHasMlb(_profileText(doc, '経歴'), clubs);
+    page.hasStatsTable = doc.querySelector('#tablefix_b') != null || doc.querySelector('#tablefix_p') != null;
+
+    final byYear = <String, m_player_career>{};
+    final battingSeen = <String>{};
+
+    var unmatchedTeams = 0;
+
+    void takeTable(String tableId, int minCells, void Function(m_player_career row, List<Element> cells) apply, bool batting) {
+      final table = doc.querySelector('#$tableId');
+      if (table == null) return;
+      for (final tr in table.querySelectorAll('tr.registerStats')) {
+        final cells = tr.children.where((e) => e.localName == 'td').toList();
+        if (cells.length < minCells) continue;
+        final year = int.tryParse(cells[0].text.replaceAll(RegExp(r'\s'), '')) ?? 0;
+        if (year <= 0) continue;
+        final teamLabel = cells[1].text.replaceAll(RegExp(r'\s'), '');
+        final teamId = _matchClubId(teamLabel, clubs);
+        if (teamId == null) {
+          unmatchedTeams++;
+          print('所属球団を特定できません: $year $teamLabel');
+          continue;
+        }
+        final key = '$year|$teamId';
+        final row = byYear.putIfAbsent(key, () {
+          final created = m_player_career();
+          created.int_year = year;
+          created.id_team = teamId;
+          return created;
+        });
+        apply(row, cells);
+        if (batting) battingSeen.add(key);
+      }
+    }
+
+    takeTable('tablefix_b', 23, (row, cells) {
+      row.int_games = _cellInt(cells[2]);
+      row.int_appearance = _cellInt(cells[3]);
+      row.int_batting = _cellInt(cells[4]);
+      row.int_runs = _cellInt(cells[5]);
+      row.int_hit1 = _cellInt(cells[6]);
+      row.int_hit2 = _cellInt(cells[7]);
+      row.int_hit3 = _cellInt(cells[8]);
+      row.int_homerun = _cellInt(cells[9]);
+      row.int_total_bases = _cellInt(cells[10]);
+      row.int_rbi = _cellInt(cells[11]);
+      row.int_steal_base = _cellInt(cells[12]);
+      row.int_steal_caught = _cellInt(cells[13]);
+      row.int_sacrifice = _cellInt(cells[14]);
+      row.int_four_batting = _cellInt(cells[16]);
+      row.int_dead_batting = _cellInt(cells[17]);
+      row.int_strike_out_batting = _cellInt(cells[18]);
+      row.int_double_play = _cellInt(cells[19]);
+      row.double_average_batting = _cellDouble(cells[20]);
+      row.double_average_slugging = _cellDouble(cells[21]);
+      row.double_average_onbase = _cellDouble(cells[22]);
+    }, true);
+
+    takeTable('tablefix_p', 24, (row, cells) {
+      if (!battingSeen.contains('${row.int_year}|${row.id_team}')) {
+        row.int_games = _cellInt(cells[2]);
+      }
+      row.int_pitching = _cellInt(cells[2]);
+      row.int_win = _cellInt(cells[3]);
+      row.int_lose = _cellInt(cells[4]);
+      row.int_save = _cellInt(cells[5]);
+      row.int_hold = _cellInt(cells[6]);
+      row.int_hold_point = _cellInt(cells[7]);
+      row.int_complete_game = _cellInt(cells[8]);
+      row.int_shutout = _cellInt(cells[9]);
+      row.int_without_walks = _cellInt(cells[10]);
+      row.double_average_win = _cellDouble(cells[11]);
+      row.int_batter = _cellInt(cells[12]);
+      row.double_inning = _cellDouble(cells[13]);
+      row.int_hit_pitcher = _cellInt(cells[14]);
+      row.int_homerun_pitcher = _cellInt(cells[15]);
+      row.int_four_pitcher = _cellInt(cells[16]);
+      row.int_dead_pitcher = _cellInt(cells[17]);
+      row.int_strike_out_pitcher = _cellInt(cells[18]);
+      row.int_wild_pitch = _cellInt(cells[19]);
+      row.int_balk = _cellInt(cells[20]);
+      row.int_runs_allowed = _cellInt(cells[21]);
+      row.int_earned_runds = _cellInt(cells[22]);
+      row.double_average_earned_runs = _cellDouble(cells[23]);
+    }, false);
+
+    page.rows = byYear.values.toList()..sort((a, b) => a.int_year.compareTo(b.int_year));
+    page.isRookie = page.hasStatsTable && unmatchedTeams == 0 && !page.hasMlb && _withinRookieWindow(page.rows);
+    return page;
+  }
+
+  static String _profileText(Document doc, String label) {
+    for (final tr in doc.querySelectorAll('tr')) {
+      final th = tr.querySelector('th');
+      if (th == null || th.text.trim() != label) continue;
+      final td = tr.querySelector('td');
+      if (td != null) return td.text.trim();
+    }
+    return '';
+  }
+
+  /// 経歴の所属遍歴に、m_team.id_league が 3 または 4 の球団が含まれるか。
+  static bool _careerHasMlb(String career, List<CareerClub> clubs) {
+    final tokens = career.split(RegExp(r'\s*[-－–—]\s*')).map((s) => s.trim()).where((s) => s.isNotEmpty);
+    final npb = clubs.where((c) => c.league == 1 || c.league == 2);
+    final mlb = clubs.where((c) => c.league == 3 || c.league == 4);
+    for (final token in tokens) {
+      final name = token.replaceAll('・', '').replaceAll(RegExp(r'\s'), '');
+      final npbHit = npb.any((c) => c.shortName.length >= 2 && name.contains(c.shortName));
+      if (npbHit) continue;
+      final mlbHit = mlb.any((c) {
+        if (c.shortName.length >= 2 && name.contains(c.shortName)) return true;
+        final full = c.fullName.replaceAll('・', '').replaceAll(RegExp(r'\s'), '');
+        return name.length >= 2 && full.contains(name);
+      });
+      if (mlbHit) return true;
+    }
+    return false;
+  }
+
+  static int? _matchClubId(String raw, List<CareerClub> clubs) {
+    final name = raw.replaceAll(RegExp(r'[\s　]'), '').replaceAll('・', '');
+    if (name.isEmpty) return null;
+    int? bestId;
+    var bestScore = 0;
+    for (final club in clubs) {
+      final short = club.shortName.replaceAll('・', '');
+      final full = club.fullName.replaceAll(RegExp(r'[\s　]'), '').replaceAll('・', '');
+      var score = 0;
+      if (short.length >= 2 && name.contains(short)) score = short.length * 10;
+      if (name.length >= 2 && full.contains(name)) score = max(score, name.length * 10 + 1);
+      if (score == 0) continue;
+      final total = score * 10 + ((club.league == 1 || club.league == 2) ? 1 : 0);
+      if (total > bestScore) {
+        bestScore = total;
+        bestId = club.id;
+      }
+    }
+    return bestId;
+  }
+
+  /// 初年度から5年のあいだだけ新人候補。期間を過ぎていれば対象外。
+  /// 期間内は、今季より前の通算打席が60以内、かつ通算投球回が30以内。
+  /// 基準に達したシーズンも新人王の有資格なので、今季の成績は通算に含めない。
+  static bool _withinRookieWindow(List<m_player_career> rows) {
+    final years = rows.map((r) => r.int_year).where((y) => y > 0);
+    if (years.isEmpty) return true;
+    final first = years.reduce(min);
+    final last = first + 4;
+    final thisYear = DateTimeTool.getThisYear();
+    if (thisYear > last) return false;
+    var pa = 0;
+    var thirds = 0;
+    for (final row in rows) {
+      if (row.int_year < first || row.int_year > last || row.int_year >= thisYear) continue;
+      pa += row.int_appearance;
+      thirds += _ipThirds(row.double_inning);
+    }
+    return pa <= 60 && thirds <= 90;
+  }
+
+  /// 186.1 のような野球の投球回を、1/3回単位の整数にする。
+  static int _ipThirds(double ip) {
+    final whole = ip.truncate();
+    final frac = ((ip - whole) * 10).round().clamp(0, 2);
+    return whole * 3 + frac;
+  }
+
+  static int _cellInt(Element cell) {
+    return int.tryParse(cell.text.replaceAll(RegExp(r'\s'), '')) ?? 0;
+  }
+
+  static double _cellDouble(Element cell) {
+    return double.tryParse(cell.text.replaceAll(RegExp(r'\s'), '')) ?? 0;
   }
 
   static Future<Response> fetchStatsPlayerNPB(Connection conn) async {
@@ -1175,4 +1478,33 @@ class FetchURL {
 
     return Response.ok('ok');
   }
+}
+
+class CareerClub {
+  final int id;
+  final int league;
+  final String shortName;
+  final String fullName;
+  final String url;
+
+  CareerClub({
+    required this.id,
+    required this.league,
+    required this.shortName,
+    required this.fullName,
+    this.url = '',
+  });
+}
+
+class NpbCareerPage {
+  List<m_player_career> rows = [];
+  bool hasMlb = false;
+  bool hasStatsTable = false;
+  bool isRookie = false;
+}
+
+class _RosterDetail {
+  final m_player player;
+  final String url;
+  _RosterDetail(this.player, this.url);
 }

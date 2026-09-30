@@ -63,15 +63,18 @@ class SeasonTableBlock extends StatelessWidget {
     final suffix = paren >= 0 ? name.substring(paren) : '';
     final marks = _playerMarks(row);
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Flexible(
-          child: OneLineShrinkText(label.isEmpty ? '—' : label, baseSize: baseSize, minSize: 1, fast: true, color: color, weight: weight),
+          fit: FlexFit.loose,
+          child: OneLineShrinkText(label.isEmpty ? '—' : label, baseSize: baseSize, minSize: 1, fast: true, color: color, weight: weight, align: TextAlign.center),
         ),
         for (final mark in marks)
           Text(mark, style: TextStyle(fontSize: baseSize, height: 1.0, color: color)),
         if (suffix.isNotEmpty)
           Flexible(
-            child: OneLineShrinkText(suffix, baseSize: baseSize, minSize: 1, fast: true, color: color, weight: weight),
+            fit: FlexFit.loose,
+            child: OneLineShrinkText(suffix, baseSize: baseSize, minSize: 1, fast: true, color: color, weight: weight, align: TextAlign.center),
           ),
       ],
     );
@@ -326,7 +329,7 @@ class SeasonTableBlock extends StatelessWidget {
       }
 
       // 1行分（与えられた行データからそのまま描画）
-      const double rowH = 16.0;
+      const double rowH = 20.8;
       Widget _emptyEntryCell({double? height}) {
         return SizedBox(
           width: parentWidth * 0.2,
@@ -837,7 +840,7 @@ class SeasonTableBlock extends StatelessWidget {
       if (portraitLayout) {
         // 縦スクロール時は、見出しと上位10名が見える高さに抑える。
         // 横型では従来どおり、親から与えられた高さ全体を使用する。
-        const double personalSectionHeight = 20.0 + 16.0 * 10;
+        const double personalSectionHeight = 20.0 + 20.8 * 10;
         return Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,

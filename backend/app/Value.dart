@@ -2,6 +2,7 @@ class Value {
   static const SystemCode = _SystemCode();
   static const CodeGameResult = _CodeGameResult();
   static const CodeGameResultCategory = _CodeGameResultCategory();
+  static const CodeStateScore = _CodeStateScore();
   static const CodePosition = _CodePosition();
   static const CodeGameResultPitcher = _CodeGameResultPitcher();
 }
@@ -37,12 +38,22 @@ class _SystemCode {
 
   final Log = const _Log();
   final Key = const _Key();
+  final Code = const _Code();
+}
+
+class _Code {
+  const _Code();
+
+  final String NPB = 'NPB';
+  final String ADMIN = 'ADMIN';
 }
 
 class _Key {
   const _Key();
 
   final String NPB = 'NPB';
+  final String DATE_FINAL_GAME = 'DATE_FINAL_GAME';
+  final String DATE_OPEN_GAME = 'DATE_OPEN_GAME';
 }
 
 class _Log {
@@ -124,6 +135,7 @@ class _CodeGameResult {
   final String OUT_LINE_DRIVE = 'OUT_LINE_DRIVE';
   final String SACRIFICE_BUNT = 'SACRIFICE_BUNT';
   final String SACRIFICE_FLY = 'SACRIFICE_FLY';
+  final String SQUEEZE = 'SQUEEZE';
   final String STRIKE_OUT = 'STRIKE_OUT';
   final String WALK_ERROR = 'ERROR';
   final String WALK_BALL = 'WALK';
@@ -142,4 +154,15 @@ class _CodeGameResult {
   final String INTERFERENCE_FIELDING = 'INTERFERENCE_FIELDING';
   final String CHANGE_POSITION = 'CHANGE_POSITION';
   final String CHANGE_PITCHER = 'CHANGE_PITCHER';
+  final String EXIT = 'EXIT';
+}
+
+class _CodeStateScore {
+  const _CodeStateScore();
+
+  final String FIRST = 'FIRST';
+  final String TIE = 'TIE';
+  final String REVERSE = 'REVERSE';
+  final String GO_AHEAD = 'GO_AHEAD';
+  final String DECISIVE = 'DECISIVE';
 }

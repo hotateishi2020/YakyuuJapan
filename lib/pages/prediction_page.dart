@@ -103,6 +103,10 @@ class _PredictionPageState extends State<PredictionPage> {
         logger.w('試合スクレイピング失敗: ${scrape.statusCode}');
         return;
       }
+      if (scrape.body.contains('offseason')) {
+        _gamesRefreshTimer?.cancel();
+        return;
+      }
       final res = await http.get(Env.api('/predictions')).timeout(const Duration(seconds: 30));
       if (!mounted || res.statusCode != 200) return;
       final map = jsonDecode(res.body) as Map<String, dynamic>;
@@ -128,6 +132,10 @@ class _PredictionPageState extends State<PredictionPage> {
       if (!mounted || team.statusCode != 200) {
         logger.w('チーム成績スクレイピング失敗: ${team.statusCode}');
         _seasonStatsRefreshStarted = false;
+        return;
+      }
+      if (team.body.contains('offseason')) {
+        _gamesRefreshTimer?.cancel();
         return;
       }
       final player = await http.get(Env.api('/fetchStatsPlayerNPB')).timeout(const Duration(minutes: 20));

@@ -107,6 +107,29 @@ class AppSql {
     ''';
   }
 
+  /// 最終試合の翌日以降、次の開幕日の前日までなら true。
+  static String selectOfficialSeasonBreak() {
+    return '''
+      SELECT
+        CURRENT_DATE > (
+          SELECT datetime1::date
+          FROM m_system_code
+          WHERE code = \$1
+            AND key = \$2
+          ORDER BY datetime1 DESC
+          LIMIT 1
+        )
+        AND CURRENT_DATE < (
+          SELECT datetime1::date
+          FROM m_system_code
+          WHERE code = \$1
+            AND key = \$3
+          ORDER BY datetime1 DESC
+          LIMIT 1
+        ) AS flg_break
+    ''';
+  }
+
   // m_team
   static String selectTeams() {
     return '''
@@ -366,7 +389,17 @@ class AppSql {
         txt_homerun_total,
         flg_pitcher,
         code_result_pitcher,
-        colors_summary
+        colors_summary,
+        titles_predict,
+        double_inning_pitch,
+        int_pitch,
+        int_hit_allowed,
+        int_strike_out,
+        int_walk_pitch,
+        int_hbp_pitch,
+        int_runs_pitch,
+        int_runs_earned,
+        int_balk
       FROM t_game
         LEFT OUTER JOIN m_player AS pitcher_home ON pitcher_home.id = t_game.id_pitcher_home
         LEFT OUTER JOIN m_player AS pitcher_away ON pitcher_away.id = t_game.id_pitcher_away
@@ -404,7 +437,23 @@ class AppSql {
             CASE WHEN t_predict_player.id_player IS NULL THEN FALSE ELSE TRUE END AS flg_predict,
             CASE WHEN double_inning_pitch > 0 THEN TRUE ELSE FALSE END AS flg_pitcher,
             code_result_pitcher,
-            '/' || STRING_AGG(DISTINCT code_color, '/' ORDER BY code_color DESC) || '/' AS colors_summary
+            '/' || STRING_AGG(DISTINCT code_color, '/' ORDER BY code_color DESC) || '/' AS colors_summary,
+            COALESCE(
+              STRING_AGG(
+                BTRIM(m_stats.title_shortest) || '|' || COALESCE(BTRIM(m_user.code_color), ''),
+                ',' ORDER BY m_stats.int_index, m_stats.id, m_user.id
+              ) FILTER (WHERE BTRIM(COALESCE(m_stats.title_shortest, '')) <> ''),
+              ''
+            ) AS titles_predict,
+            double_inning_pitch,
+            int_pitch,
+            int_hit AS int_hit_allowed,
+            int_strike_out,
+            int_four AS int_walk_pitch,
+            int_dead_pitching AS int_hbp_pitch,
+            int_runs AS int_runs_pitch,
+            int_runs_earned,
+            int_balk
           FROM t_game_summary
             LEFT OUTER JOIN t_predict_player on t_predict_player.id_player = t_game_summary.id_player AND t_predict_player.year =  \$1
             LEFT OUTER JOIN m_player on m_player.id = t_game_summary.id_player
@@ -415,16 +464,17 @@ class AppSql {
             OR CASE WHEN double_inning_pitch > 0 THEN TRUE ELSE FALSE END = TRUE
           GROUP BY t_predict_player.id_player, id_game, m_player.id_team, name_full, int_batting, int_hit1, int_fourball, int_homerun, 
             int_rbi, int_steal_base, int_dead_batting, int_sacrifice, double_inning_pitch, int_runs,
-            int_pitch, int_four, int_dead_pitching, int_strike_out, code_result_pitcher, int_hit, t_game_summary.id, t_game_summary.txt_homerun_total
+            int_pitch, int_four, int_dead_pitching, int_strike_out, code_result_pitcher, int_hit, int_runs_earned, int_balk, t_game_summary.id, t_game_summary.txt_homerun_total
           ORDER BY id_game, m_player.id_team, flg_pitcher DESC, point_total DESC, t_game_summary.id 
         ) AS v_game_summary ON v_game_summary.id_game = t_game.id 
-      WHERE t_game.datetime_start BETWEEN (CURRENT_DATE - INTERVAL '1 day') AND (CURRENT_DATE + INTERVAL '3 day')
+      WHERE t_game.datetime_start::date BETWEEN (CURRENT_DATE - 10) AND (CURRENT_DATE + 10)
       GROUP BY t_game.id, t_game.datetime_start, team_home.name_short, team_away.name_short, pitcher_home.name_full, pitcher_away.name_full,
                pitcher_win.name_full, pitcher_lose.name_full, m_stadium.name_short, t_game.score_home, t_game.score_away,
                team_home.id_league, team_away.id_league, team_home.color_font, team_home.color_back, team_away.color_font,
                team_away.color_back, team_home.id, team_away.id, pitcher_win.id_team, pitcher_lose.id_team, pitcher_save.name_full, 
                pitcher_save.id_team, t_game.state, v_game_summary.id_game_summary, id_team_summary, name_full_summary, 
-               txt_batting, txt_pitching, txt_homerun_total, code_result_pitcher, colors_summary, flg_pitcher, point_total
+               txt_batting, txt_pitching, txt_homerun_total, code_result_pitcher, colors_summary, titles_predict, flg_pitcher, point_total,
+               double_inning_pitch, int_pitch, int_hit_allowed, int_strike_out, int_walk_pitch, int_hbp_pitch, int_runs_pitch, int_runs_earned, int_balk
       ORDER BY to_char(t_game.datetime_start, 'YYYY-MM-DD'), t_game.id, id_team_summary, CASE WHEN flg_pitcher = TRUE THEN v_game_summary.id_game_summary END ASC, CASE WHEN flg_pitcher = FALSE THEN v_game_summary.point_total END DESC;
 
     ''';
@@ -436,6 +486,90 @@ class AppSql {
     return '''
       DELETE FROM t_game_summary
       WHERE id_game = \$1
+    ''';
+  }
+
+  static String selectGameDetails() {
+    return '''
+      SELECT
+        id,
+        int_inning,
+        flg_bottom,
+        int_batting_order,
+        id_batter,
+        cnt_out,
+        flg_runner_first,
+        flg_runner_second,
+        flg_runner_third,
+        int_score_home,
+        int_score_away,
+        int_runs,
+        id_pitcher,
+        code_result,
+        id_player_enter
+      FROM t_game_details
+      WHERE id_game = \$1
+        AND COALESCE(flg_delete, false) = false
+      ORDER BY id
+    ''';
+  }
+
+  static String selectGamePlayRows() {
+    return '''
+      SELECT
+        d.id,
+        d.id_game,
+        p.id_team,
+        p.name_full,
+        d.int_inning,
+        d.flg_bottom,
+        d.int_batting_order,
+        d.cnt_out,
+        d.flg_runner_first,
+        d.flg_runner_second,
+        d.flg_runner_third,
+        d.code_result,
+        d.int_runs,
+        d.cnt_homerun,
+        d.code_state_score,
+        d.flg_goodbye,
+        d.code_direction_batting,
+        runner.name_full AS name_runner,
+        runner.id_team AS id_team_runner
+      FROM t_game_details d
+        INNER JOIN m_player p ON p.id = d.id_batter
+        LEFT JOIN m_player runner ON runner.id = d.id_player_enter
+          AND d.code_result IN ('STEAL_BASE_SAFE', 'STEAL_BASE_OUT')
+        INNER JOIN t_game g ON g.id = d.id_game
+      WHERE COALESCE(d.flg_delete, false) = false
+        AND d.id_batter <> 0
+        AND g.datetime_start::date BETWEEN (CURRENT_DATE - 10) AND (CURRENT_DATE + 10)
+      ORDER BY d.id_game, d.id
+    ''';
+  }
+
+  static String deleteGameDetailsFromId() {
+    return '''
+      DELETE FROM t_game_details
+      WHERE id_game = \$1
+        AND id >= \$2
+    ''';
+  }
+
+  static String selectPlayersByTeams() {
+    return '''
+      SELECT id, id_team, name_full
+      FROM m_player
+      WHERE id_team IN (\$1, \$2)
+        AND COALESCE(flg_delete, false) = false
+    ''';
+  }
+
+  static String selectTeamNamesByIds() {
+    return '''
+      SELECT id, name_shortest, name_short
+      FROM m_team
+      WHERE id IN (\$1, \$2)
     ''';
   }
 

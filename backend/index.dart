@@ -15,7 +15,9 @@ import 'app/DB/t_system_log.dart';
 import 'app/DB/t_system_log_error.dart';
 import 'app/DB/m_user.dart';
 import 'app/AppSql.dart';
+import 'app/Achieve.dart';
 import 'app/FetchURL.dart';
+import 'app/PlayLabel.dart';
 import 'app/Value.dart';
 
 /// /predictions 用の短TTLキャッシュ（同一プロセス内）
@@ -40,7 +42,84 @@ String _gameMatchupKey(Map<String, dynamic> game) {
   ].join('|');
 }
 
-List<Map<String, dynamic>> _collapseGames(List<Map<String, dynamic>> rows) {
+bool _summaryIsPitcher(dynamic value) {
+  if (value is bool) return value;
+  final text = '$value'.trim().toLowerCase();
+  return text == 'true' || text == 't' || text == '1';
+}
+
+int _asInt(dynamic value) => int.tryParse('$value') ?? (value is int ? value : 0);
+
+double _asDouble(dynamic value) => double.tryParse('$value') ?? (value is num ? value.toDouble() : 0);
+
+bool _gameFinished(dynamic state) => '$state'.contains('試合終了');
+
+bool _isStarter(Map<String, dynamic> row) {
+  final name = '${row['name_full_summary'] ?? ''}'.trim();
+  if (name.isEmpty) return false;
+  return name == '${row['name_pitcher_home'] ?? ''}'.trim() || name == '${row['name_pitcher_away'] ?? ''}'.trim();
+}
+
+String _summaryAchieve(Map<String, dynamic> row, Map<String, String> cycles, Map<int, int> maxInning) {
+  final key = playPlayerKey(row['id_game'], row['id_team_summary'], row['name_full_summary']);
+  final marks = <String>[];
+  final cycle = cycles[key] ?? '';
+  if (cycle.isNotEmpty) marks.add(cycle);
+  if (_summaryIsPitcher(row['flg_pitcher'])) {
+    final gameId = _asInt(row['id_game']);
+    final pitching = pitcherMarks(
+      finished: _gameFinished(row['state']),
+      starter: _isStarter(row),
+      innings: _asDouble(row['double_inning_pitch']),
+      pitches: _asInt(row['int_pitch']),
+      hits: _asInt(row['int_hit_allowed']),
+      walks: _asInt(row['int_walk_pitch']),
+      hbp: _asInt(row['int_hbp_pitch']),
+      runs: _asInt(row['int_runs_pitch']),
+      earned: _asInt(row['int_runs_earned']),
+      balks: _asInt(row['int_balk']),
+      gameInnings: maxInning[gameId] ?? 0,
+    );
+    if (pitching.isNotEmpty) marks.add(pitching);
+  }
+  return marks.join(' ');
+}
+
+String _summaryPitchTone(Map<String, dynamic> row) {
+  if (!_summaryIsPitcher(row['flg_pitcher'])) return '';
+  if (_asDouble(row['double_inning_pitch']) <= 0) return '';
+  final points = pitcherPoints(
+    innings: _asDouble(row['double_inning_pitch']),
+    strikeouts: _asInt(row['int_strike_out']),
+    runs: _asInt(row['int_runs_pitch']),
+    hits: _asInt(row['int_hit_allowed']),
+    walks: _asInt(row['int_walk_pitch']),
+    hbp: _asInt(row['int_hbp_pitch']),
+    starter: _isStarter(row),
+  );
+  return pitcherTone(points);
+}
+
+String _summaryPitchChips(Map<String, dynamic> row) {
+  if (!_summaryIsPitcher(row['flg_pitcher'])) return '';
+  return pitcherStatChips(
+    innings: _asDouble(row['double_inning_pitch']),
+    runs: _asInt(row['int_runs_pitch']),
+    hits: _asInt(row['int_hit_allowed']),
+    walks: _asInt(row['int_walk_pitch']),
+    hbp: _asInt(row['int_hbp_pitch']),
+    strikeouts: _asInt(row['int_strike_out']),
+    pitches: _asInt(row['int_pitch']),
+    starter: _isStarter(row),
+  );
+}
+
+List<Map<String, dynamic>> _collapseGames(
+  List<Map<String, dynamic>> rows,
+  Map<String, String> plays,
+  Map<String, String> cycles,
+  Map<int, int> maxInning,
+) {
   final order = <String>[];
   final groups = <String, List<Map<String, dynamic>>>{};
   for (final row in rows) {
@@ -55,23 +134,56 @@ List<Map<String, dynamic>> _collapseGames(List<Map<String, dynamic>> rows) {
     for (final key in order)
       {
         ...groups[key]!.first,
-        'summaries': [
-          for (final row in groups[key]!)
-            if (row['id_game_summary'] != null || '${row['name_full_summary'] ?? ''}'.trim().isNotEmpty)
-              {
-                'id_game_summary': row['id_game_summary'],
-                'id_team_summary': row['id_team_summary'],
-                'name_full_summary': row['name_full_summary'],
-                'txt_batting': row['txt_batting'],
-                'txt_pitching': row['txt_pitching'],
-                'txt_homerun_total': row['txt_homerun_total'],
-                'flg_pitcher': row['flg_pitcher'],
-                'code_result_pitcher': row['code_result_pitcher'],
-                'colors_summary': row['colors_summary'],
-              },
-        ],
+        'summaries': _summariesOf(groups[key]!, plays, cycles, maxInning),
       },
   ];
+}
+
+List<Map<String, dynamic>> _summariesOf(
+  List<Map<String, dynamic>> rows,
+  Map<String, String> plays,
+  Map<String, String> cycles,
+  Map<int, int> maxInning,
+) {
+  final summaries = <Map<String, dynamic>>[
+    for (final row in rows)
+      if (row['id_game_summary'] != null || '${row['name_full_summary'] ?? ''}'.trim().isNotEmpty)
+        {
+          'id_game_summary': row['id_game_summary'],
+          'id_team_summary': row['id_team_summary'],
+          'name_full_summary': row['name_full_summary'],
+          'txt_batting': row['txt_batting'],
+          'txt_pitching': row['txt_pitching'],
+          'txt_homerun_total': row['txt_homerun_total'],
+          'flg_pitcher': row['flg_pitcher'],
+          'code_result_pitcher': row['code_result_pitcher'],
+          'colors_summary': row['colors_summary'],
+          'titles_predict': row['titles_predict'],
+          'txt_plays': _summaryIsPitcher(row['flg_pitcher'])
+              ? ''
+              : (plays[playPlayerKey(row['id_game'], row['id_team_summary'], row['name_full_summary'])] ?? ''),
+          'txt_achieve': _summaryAchieve(row, cycles, maxInning),
+          'txt_pitch_tone': _summaryPitchTone(row),
+          'txt_pitch_chips': _summaryPitchChips(row),
+        },
+  ];
+  final gameId = rows.isEmpty ? 0 : _asInt(rows.first['id_game']);
+  final seen = <String>{
+    for (final row in summaries) playPlayerKey(gameId, row['id_team_summary'], row['name_full_summary']),
+  };
+  for (final entry in cycles.entries) {
+    if (!entry.key.startsWith('$gameId|') || seen.contains(entry.key)) continue;
+    final parts = entry.key.split('|');
+    if (parts.length < 3) continue;
+    summaries.add({
+      'id_team_summary': parts[1],
+      'name_full_summary': parts.sublist(2).join('|'),
+      'flg_pitcher': false,
+      'txt_plays': plays[entry.key] ?? '',
+      'txt_achieve': entry.value,
+    });
+  }
+  return summaries;
 }
 
 void main() async {
@@ -85,27 +197,39 @@ void main() async {
 
     app.get('/fetchStatsTeamNPB', (Request request) async {
       final response = await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.STATS_TEAM, (conn) async {
+        if (await FetchURL.isOfficialSeasonBreak(conn)) {
+          print('シーズンオフのためチーム成績のスクレイピングを行いません');
+          return Response.ok('offseason', headers: {'x-offseason': '1'});
+        }
         return await FetchURL.fetchStatsTeamNPB(conn);
       });
-      if (response.statusCode == 200) _clearPredictionsCache();
+      if (response.statusCode == 200 && response.headers['x-offseason'] != '1') _clearPredictionsCache();
       return response;
     });
 
     app.get('/fetchStatsPlayerNPB', (Request request) async {
       final response = await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.STATS_PLAYER, (conn) async {
+        if (await FetchURL.isOfficialSeasonBreak(conn)) {
+          print('シーズンオフのため個人成績のスクレイピングを行いません');
+          return Response.ok('offseason', headers: {'x-offseason': '1'});
+        }
         await FetchURL.fetchStatsPlayerNPB(conn);
         return await FetchURL.fetchStatsPlayerNPB(conn);
       });
-      if (response.statusCode == 200) _clearPredictionsCache();
+      if (response.statusCode == 200 && response.headers['x-offseason'] != '1') _clearPredictionsCache();
       return response;
     });
 
     app.get('/fetchGamesNPB', (Request request) async {
       print('fetchGamesNPB');
       final response = await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.GAMES, (conn) async {
+        if (await FetchURL.isOfficialSeasonBreak(conn)) {
+          print('シーズンオフのため試合情報のスクレイピングを行いません');
+          return Response.ok('offseason', headers: {'x-offseason': '1'});
+        }
         return await FetchURL.fetchGamesNPB(conn);
       });
-      if (response.statusCode == 200) _clearPredictionsCache();
+      if (response.statusCode == 200 && response.headers['x-offseason'] != '1') _clearPredictionsCache();
       return response;
     });
 
@@ -137,10 +261,12 @@ void main() async {
           (conn) => Postgres.execute(conn, AppSql.selectStatsTeam(), data: [current_year]),
           (conn) => Postgres.execute(conn, AppSql.selectStatsPlayer(), data: [current_year]),
           (conn) => Postgres.execute(conn, AppSql.selectGames(), data: [current_year]),
+          (conn) => Postgres.execute(conn, AppSql.selectGamePlayRows()),
           (conn) => Postgres.execute(conn, AppSql.selectEventsDetails()),
           (conn) => Postgres.execute(conn, AppSql.selectNotification()),
         ]);
-        final games = _collapseGames(Postgres.toJson(results[4]));
+        final playRows = Postgres.toJson(results[5]);
+        final games = _collapseGames(Postgres.toJson(results[4]), playLabelsByPlayer(playRows), cycleMarksByPlayer(playRows), maxInningByGame(playRows));
         // print(games);
         final payload = <String, dynamic>{
           'predict_team': Postgres.toJson(results[0]),
@@ -148,8 +274,8 @@ void main() async {
           'stats_team': Postgres.toJson(results[2]),
           'stats_player': Postgres.toJson(results[3]),
           'games': games,
-          'events': Postgres.toJson(results[5]),
-          'notification': Postgres.toJson(results[6]),
+          'events': Postgres.toJson(results[6]),
+          'notification': Postgres.toJson(results[7]),
         };
         final body = jsonEncode(payload);
         _predictionsCacheBody = body;

@@ -437,6 +437,8 @@ class _LeagueHeader extends StatelessWidget {
   }
 }
 
+typedef _PlayerLine = ({String name, String colors, String mark, String stat, String hrTotal, String predict, String plays, String achieve, String tone, String chips});
+
 class _TableGameCard extends StatelessWidget {
   final List<Map<String, dynamic>> rows;
 
@@ -497,39 +499,83 @@ class _TableGameCard extends StatelessWidget {
   }
 
   String _statOf(Map<String, dynamic> row, {required bool pitcher}) {
-    final raw = '${row[pitcher ? 'txt_pitching' : 'txt_batting'] ?? ''}'.trim();
+    if (!pitcher) return '';
+    final raw = '${row['txt_pitching'] ?? ''}'.trim();
     if (raw.isEmpty || raw == 'null') return '';
     return raw;
   }
 
-  String _homerunTotalLabel(Map<String, dynamic> row) {
-    final raw = '${row['txt_homerun_total'] ?? ''}'.trim();
+  String _playsOf(Map<String, dynamic> row) {
+    final raw = '${row['txt_plays'] ?? ''}'.trim();
     if (raw.isEmpty || raw == 'null') return '';
-    final labels = <String>[];
-    for (final part in raw.split(RegExp(r'[,、]\s*'))) {
-      final text = part.trim();
-      if (text.isEmpty) continue;
-      final digits = RegExp(r'\d+').firstMatch(text);
-      if (digits == null) continue;
-      labels.add('${digits.group(0)}号');
-    }
-    return labels.join(',');
+    return raw;
   }
 
-  List<({String name, String colors, String mark, String stat, String hrTotal})> _players({
+  bool _isQualityStart(String part) {
+    final label = part.split('|').first.trim();
+    return label == 'QS' || label == 'HQS';
+  }
+
+  bool _isPitchCount(String part) {
+    final label = part.split('|').first.trim();
+    return RegExp(r'^\d+球$').hasMatch(label);
+  }
+
+  List<String> _visibleAchievements(String raw) {
+    final parts = raw.split(' ').where((part) => part.isNotEmpty).toList();
+    final hasHqs = parts.any((part) => part == 'HQS' || part.startsWith('HQS|'));
+    if (!hasHqs) return parts;
+    return parts.where((part) => part != 'QS' && !part.startsWith('QS|')).toList();
+  }
+
+  String _achieveOf(Map<String, dynamic> row) {
+    final raw = '${row['txt_achieve'] ?? ''}'.trim();
+    if (raw.isEmpty || raw == 'null') return '';
+    return raw;
+  }
+
+  String _toneOf(Map<String, dynamic> row) {
+    final raw = '${row['txt_pitch_tone'] ?? ''}'.trim();
+    if (raw.isEmpty || raw == 'null') return '';
+    return raw;
+  }
+
+  String _chipsOf(Map<String, dynamic> row) {
+    final raw = '${row['txt_pitch_chips'] ?? ''}'.trim();
+    if (raw.isEmpty || raw == 'null') return '';
+    return raw;
+  }
+
+  String _predictLabel(dynamic raw) {
+    final seen = <String>{};
+    final marks = <String>[];
+    for (final part in '$raw'.split(',')) {
+      final text = part.trim();
+      if (text.isEmpty || text == 'null') continue;
+      final bar = text.indexOf('|');
+      final label = (bar < 0 ? text : text.substring(0, bar)).trim();
+      final color = bar < 0 ? '' : text.substring(bar + 1).trim();
+      if (label.isEmpty || !seen.add('$label|$color')) continue;
+      marks.add(color.isEmpty ? label : '$label|$color');
+    }
+    return marks.join(',');
+  }
+
+  List<_PlayerLine> _players({
     required bool home,
     required bool pitcher,
   }) {
     final teamId = _int(home ? 'id_team_home' : 'id_team_away');
     final starterName = _text(home ? 'name_pitcher_home' : 'name_pitcher_away');
     final starterColors = _text(home ? 'colors_pitcher_home' : 'colors_pitcher_away');
-    final result = <({String name, String colors, String mark, String stat, String hrTotal})>[];
+    final result = <_PlayerLine>[];
 
-    void add(String name, String playerColors, String mark, [String stat = '', String hrTotal = '']) {
+    void add(String name, String playerColors, String mark, [String stat = '', String hrTotal = '', String predict = '', String plays = '', String achieve = '', String tone = '', String chips = '']) {
       if (name.trim().isEmpty) return;
       final index = result.indexWhere((player) => player.name == name);
+      final labels = _predictLabel(predict);
       if (index < 0) {
-        result.add((name: name, colors: playerColors, mark: mark, stat: stat, hrTotal: hrTotal));
+        result.add((name: name, colors: playerColors, mark: mark, stat: stat, hrTotal: hrTotal, predict: labels, plays: plays, achieve: achieve, tone: tone, chips: chips));
         return;
       }
       final current = result[index];
@@ -539,6 +585,11 @@ class _TableGameCard extends StatelessWidget {
         mark: current.mark.isNotEmpty ? current.mark : mark,
         stat: current.stat.isNotEmpty ? current.stat : stat,
         hrTotal: current.hrTotal.isNotEmpty ? current.hrTotal : hrTotal,
+        predict: _predictLabel('${current.predict},$labels'),
+        plays: current.plays.isNotEmpty ? current.plays : plays,
+        achieve: current.achieve.isNotEmpty ? current.achieve : achieve,
+        tone: current.tone.isNotEmpty ? current.tone : tone,
+        chips: current.chips.isNotEmpty ? current.chips : chips,
       );
     }
 
@@ -550,12 +601,18 @@ class _TableGameCard extends StatelessWidget {
       if (_isPitcher(row) != pitcher) continue;
       final colors = '${row['colors_summary'] ?? ''}'.trim();
       final mark = pitcher ? _resultMark(row['code_result_pitcher']) : _batterMark(row);
+      final chips = pitcher ? _chipsOf(row) : '';
       add(
         name,
         colors.isNotEmpty ? colors : (name == starterName ? starterColors : ''),
         mark,
-        _statOf(row, pitcher: pitcher),
-        _homerunTotalLabel(row),
+        chips.isNotEmpty ? '' : _statOf(row, pitcher: pitcher),
+        '',
+        '${row['titles_predict'] ?? ''}',
+        pitcher ? '' : _playsOf(row),
+        _achieveOf(row),
+        pitcher && chips.isEmpty ? _toneOf(row) : '',
+        chips,
       );
     }
 
@@ -659,7 +716,7 @@ class _TableGameCard extends StatelessWidget {
   }
 
   double _nameColumnWidth(
-    Iterable<({String name, String colors, String mark, String stat, String hrTotal})> players,
+    Iterable<_PlayerLine> players,
     double fontSize,
     BuildContext context,
   ) {
@@ -674,7 +731,7 @@ class _TableGameCard extends StatelessWidget {
   }
 
   Widget _pitcherCell(
-    List<({String name, String colors, String mark, String stat, String hrTotal})> pitchers, {
+    List<_PlayerLine> pitchers, {
     required Color color,
     required double size,
     required bool right,
@@ -748,41 +805,46 @@ class _TableGameCard extends StatelessWidget {
               final maxNameBox = math.max(0.0, cellW - leadingW);
               final nameBoxW = reservedNameW.clamp(0.0, maxNameBox).toDouble();
               final restW = math.max(0.0, cellW - leadingW - nameBoxW);
-              final hasAnyStats = pitchers.any((p) => p.stat.isNotEmpty || p.hrTotal.isNotEmpty);
+              final hasAnyStats = pitchers.any((p) => p.stat.isNotEmpty || p.chips.isNotEmpty || p.predict.isNotEmpty || p.achieve.isNotEmpty || _orderedPlays(p.plays).isNotEmpty);
               final gapW = hasAnyStats && restW > nameStatGap ? nameStatGap : 0.0;
               final statsViewportW = hasAnyStats ? math.max(0.0, restW - gapW) : 0.0;
 
-              Widget statLine(({String name, String colors, String mark, String stat, String hrTotal}) pitcher) {
+              Widget statLine(_PlayerLine pitcher) {
+                final achievements = _visibleAchievements(pitcher.achieve);
+                final quality = achievements.where(_isQualityStart);
+                final special = achievements.where((part) => !_isQualityStart(part));
+                final chipParts = pitcher.chips.split(' ').where((part) => part.isNotEmpty);
+                final metrics = chipParts.where((part) => !_isPitchCount(part));
+                final pitchCounts = chipParts.where(_isPitchCount);
                 return Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (pitcher.stat.isNotEmpty)
-                      Text(
-                        pitcher.stat,
-                        maxLines: 1,
-                        softWrap: false,
-                        overflow: TextOverflow.clip,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                          fontSize: statSize,
-                          color: Colors.black87,
-                          height: 1.1,
-                        ),
+                    for (final part in metrics)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 3),
+                        child: _metricChip(part, statSize),
                       ),
-                    if (pitcher.hrTotal.isNotEmpty) ...[
-                      if (pitcher.stat.isNotEmpty) const SizedBox(width: 2),
-                      Text(
-                        pitcher.hrTotal,
-                        maxLines: 1,
-                        softWrap: false,
-                        overflow: TextOverflow.clip,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                          fontSize: statSize,
-                          color: Colors.black87,
-                          height: 1.1,
-                        ),
+                    for (final part in quality) _playChip(part, statSize),
+                    for (final part in special) _playChip(part, statSize),
+                    for (final part in _orderedPlays(pitcher.plays)) _playChip(part, statSize),
+                    if (pitcher.stat.isNotEmpty) ...[
+                      if (pitcher.plays.isNotEmpty || pitcher.achieve.isNotEmpty) const SizedBox(width: 4),
+                      _pitchStat(pitcher.stat, statSize, pitcher.tone),
+                    ],
+                    for (final part in pitchCounts)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 3),
+                        child: _metricChip(part, statSize),
                       ),
+                    if (pitcher.predict.isNotEmpty) ...[
+                      if (pitcher.stat.isNotEmpty || pitcher.chips.isNotEmpty || pitcher.plays.isNotEmpty || pitcher.achieve.isNotEmpty) const SizedBox(width: 2),
+                      for (final part in pitcher.predict.split(','))
+                        if (part.isNotEmpty) ...[
+                          Padding(
+                            padding: const EdgeInsets.only(right: 2),
+                            child: _predictBadge(part, statSize),
+                          ),
+                        ],
                     ],
                   ],
                 );
@@ -867,13 +929,175 @@ class _TableGameCard extends StatelessWidget {
     );
   }
 
+  Color _playColor(String kind) {
+    return switch (kind) {
+      'hr' || 'cycle' || 'cyclemis' || 'perfect' || 'nohit' || 'maddux' || 'shutout' || 'cg' => const Color(0xFFDC143C),
+      'timely' || 'hqs' => const Color(0xFFFF5722),
+      'triple' || 'double' || 'extra' || 'qs' => const Color(0xFFFFB300),
+      'single' => const Color(0xFFFFEB3B),
+      'walk' => const Color(0xFF43A047),
+      'dead' || 'error' => const Color(0xFFB0BEC5),
+      'sac' || 'sacfly' || 'squeeze' || 'sacbunt' => const Color(0xFF8E24AA),
+      'steal' => const Color(0xFFC0CA33),
+      _ => const Color(0xFFEEEEEE),
+    };
+  }
+
+  String _playKind(String encoded) {
+    final bar = encoded.lastIndexOf('|');
+    return bar < 0 ? '' : encoded.substring(bar + 1).trim();
+  }
+
+  int _playRank(String encoded) {
+    final kind = _playKind(encoded);
+    final label = encoded.lastIndexOf('|') < 0 ? encoded : encoded.substring(0, encoded.lastIndexOf('|'));
+    return switch (kind) {
+      'hr' => 0,
+      'timely' => 1,
+      'triple' => 2,
+      'double' || 'extra' => 3,
+      'single' => 4,
+      'steal' => 5,
+      'sacfly' => 6,
+      'squeeze' => 7,
+      'walk' => 8,
+      'dead' => 9,
+      'error' => 10,
+      'sacbunt' => 11,
+      'sac' => label.contains('犠打') ? 11 : (label.contains('スクイズ') ? 7 : 6),
+      'out' => -1,
+      _ => 50,
+    };
+  }
+
+  List<String> _orderedPlays(String raw) {
+    final parts = raw.split(' ').where((part) => part.isNotEmpty && _playRank(part) >= 0).toList();
+    final indexed = parts.asMap().entries.toList();
+    indexed.sort((a, b) {
+      final byKind = _playRank(a.value).compareTo(_playRank(b.value));
+      if (byKind != 0) return byKind;
+      return a.key.compareTo(b.key);
+    });
+    return indexed.map((entry) => entry.value).toList();
+  }
+
+  Color _pitchToneColor(String tone) {
+    return switch (tone) {
+      'crimson' => const Color(0xFFDC143C),
+      'rorange' => const Color(0xFFFF5722),
+      'yorange' => const Color(0xFFFFB300),
+      'yellow' => const Color(0xFFFFEB3B),
+      'green' => const Color(0xFF43A047),
+      'blue' => const Color(0xFF1E88E5),
+      'gray' => const Color(0xFFB0BEC5),
+      _ => const Color(0xFFEEEEEE),
+    };
+  }
+
+  Widget _metricChip(String encoded, double fontSize) {
+    final bar = encoded.lastIndexOf('|');
+    final label = (bar < 0 ? encoded : encoded.substring(0, bar)).trim();
+    final tone = bar < 0 ? '' : encoded.substring(bar + 1).trim();
+    if (label.isEmpty) return const SizedBox.shrink();
+    return _pitchStat(label, fontSize, tone);
+  }
+
+  Widget _pitchStat(String text, double fontSize, String tone) {
+    final style = TextStyle(
+      fontSize: fontSize,
+      color: tone.isEmpty ? Colors.black87 : (_pitchToneColor(tone).computeLuminance() > 0.55 ? Colors.black87 : Colors.white),
+      fontWeight: tone.isEmpty ? FontWeight.normal : FontWeight.w600,
+      height: 1.0,
+    );
+    final label = Text(
+      text,
+      maxLines: 1,
+      softWrap: false,
+      overflow: TextOverflow.clip,
+      textAlign: TextAlign.left,
+      style: style,
+    );
+    if (tone.isEmpty) return label;
+    return Container(
+      height: 14,
+      padding: const EdgeInsets.symmetric(horizontal: 3),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: _pitchToneColor(tone),
+        borderRadius: BorderRadius.circular(2),
+      ),
+      child: label,
+    );
+  }
+
+  Widget _playChip(String encoded, double fontSize) {
+    final bar = encoded.lastIndexOf('|');
+    final label = (bar < 0 ? encoded : encoded.substring(0, bar)).trim();
+    final kind = bar < 0 ? '' : encoded.substring(bar + 1).trim();
+    if (label.isEmpty) return const SizedBox.shrink();
+    final bg = _playColor(kind);
+    final ink = bg.computeLuminance() > 0.55 ? Colors.black87 : Colors.white;
+    final chipSize = (fontSize - 1).clamp(8.0, 11.0);
+    return Container(
+      height: 14,
+      margin: const EdgeInsets.only(right: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 3),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(2),
+      ),
+      child: Text(
+        label,
+        maxLines: 1,
+        softWrap: false,
+        style: TextStyle(
+          color: ink,
+          fontSize: chipSize,
+          fontWeight: FontWeight.w600,
+          height: 1.0,
+        ),
+      ),
+    );
+  }
+
+  Widget _predictBadge(String encoded, double fontSize) {
+    final bar = encoded.indexOf('|');
+    final label = (bar < 0 ? encoded : encoded.substring(0, bar)).trim();
+    final colorName = bar < 0 ? '' : encoded.substring(bar + 1).trim();
+    final height = (fontSize + 3).clamp(11.0, 15.0);
+    final bg = parseColorName(colorName, const Color(0xFF37474F));
+    final ink = bg.computeLuminance() > 0.55 ? Colors.black87 : Colors.white;
+    return Container(
+      height: height,
+      constraints: BoxConstraints(minWidth: height),
+      padding: EdgeInsets.symmetric(horizontal: label.length > 1 ? 3 : 1),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(height / 2),
+      ),
+      child: Text(
+        label,
+        maxLines: 1,
+        softWrap: false,
+        style: TextStyle(
+          color: ink,
+          fontSize: (fontSize * 0.78).clamp(7.0, 10.0),
+          fontWeight: FontWeight.bold,
+          height: 1,
+        ),
+      ),
+    );
+  }
+
   Widget _resultBadge(String mark, double fontSize) {
     final isHr = mark == 'HR';
     final color = switch (mark) {
       '勝' => Colors.red,
       '負' => Colors.blue,
       'H' => Colors.green.shade700,
-      'HR' => const Color(0xFFFF5FA2),
+      'HR' => const Color(0xFF7B1FA2),
       _ => Colors.amber.shade700,
     };
     final diameter = (fontSize + 2).clamp(9.0, 16.0);

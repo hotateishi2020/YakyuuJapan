@@ -20,6 +20,6 @@ flutter build web --release
 rm -rf backend/public/*
 cp -R build/web/* backend/public/
 git add .
-git commit -m "20歳以下の選手には🌱マークをつけるように修正"
+git commit -m "出場記録の表示形式を更新しました。"
 git push
 cd /Users/standapp/StudioProjects/Koko/backend

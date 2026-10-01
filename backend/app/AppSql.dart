@@ -347,6 +347,20 @@ class AppSql {
     ''';
   }
 
+  static String selectGameOnDate() {
+    return '''
+      SELECT
+        id,
+        datetime_start
+      FROM t_game
+      WHERE id_team_home = \$1
+        AND id_team_away = \$2
+        AND datetime_start::date = \$3::date
+      ORDER BY datetime_start
+      LIMIT 1
+    ''';
+  }
+
   static String selectGames() {
     return '''
       SELECT 
@@ -399,7 +413,8 @@ class AppSql {
         int_hbp_pitch,
         int_runs_pitch,
         int_runs_earned,
-        int_balk
+        int_balk,
+        int_hit_batting
       FROM t_game
         LEFT OUTER JOIN m_player AS pitcher_home ON pitcher_home.id = t_game.id_pitcher_home
         LEFT OUTER JOIN m_player AS pitcher_away ON pitcher_away.id = t_game.id_pitcher_away
@@ -453,13 +468,16 @@ class AppSql {
             int_dead_pitching AS int_hbp_pitch,
             int_runs AS int_runs_pitch,
             int_runs_earned,
-            int_balk
+            int_balk,
+            int_hit1 AS int_hit_batting
           FROM t_game_summary
             LEFT OUTER JOIN t_predict_player on t_predict_player.id_player = t_game_summary.id_player AND t_predict_player.year =  \$1
             LEFT OUTER JOIN m_player on m_player.id = t_game_summary.id_player
             LEFT OUTER JOIN m_stats on m_stats.id = t_predict_player.id_stats
             LEFT OUTER JOIN m_user on m_user.id = t_predict_player.id_user
           WHERE (int_hit1 + int_homerun * 5 + int_rbi * 2 + int_steal_base + int_fourball * 0.8 + int_dead_batting * 0.2 + int_sacrifice * 0.2) >= 3.5 
+            OR int_hit1 >= 3
+            OR int_rbi >= 1
             OR (CASE WHEN t_predict_player.id_player IS NULL THEN FALSE ELSE TRUE END = TRUE AND CASE WHEN double_inning_pitch > 0 THEN TRUE ELSE FALSE END = FALSE) 
             OR CASE WHEN double_inning_pitch > 0 THEN TRUE ELSE FALSE END = TRUE
           GROUP BY t_predict_player.id_player, id_game, m_player.id_team, name_full, int_batting, int_hit1, int_fourball, int_homerun, 
@@ -474,7 +492,7 @@ class AppSql {
                team_away.color_back, team_home.id, team_away.id, pitcher_win.id_team, pitcher_lose.id_team, pitcher_save.name_full, 
                pitcher_save.id_team, t_game.state, v_game_summary.id_game_summary, id_team_summary, name_full_summary, 
                txt_batting, txt_pitching, txt_homerun_total, code_result_pitcher, colors_summary, titles_predict, flg_pitcher, point_total,
-               double_inning_pitch, int_pitch, int_hit_allowed, int_strike_out, int_walk_pitch, int_hbp_pitch, int_runs_pitch, int_runs_earned, int_balk
+               double_inning_pitch, int_pitch, int_hit_allowed, int_strike_out, int_walk_pitch, int_hbp_pitch, int_runs_pitch, int_runs_earned, int_balk, int_hit_batting
       ORDER BY to_char(t_game.datetime_start, 'YYYY-MM-DD'), t_game.id, id_team_summary, CASE WHEN flg_pitcher = TRUE THEN v_game_summary.id_game_summary END ASC, CASE WHEN flg_pitcher = FALSE THEN v_game_summary.point_total END DESC;
 
     ''';

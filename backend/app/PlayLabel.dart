@@ -41,7 +41,9 @@ String formatPlayLabels(Iterable<Map<String, dynamic>> rows) {
     plate.clear();
   }
 
+  final seen = <String>{};
   for (final row in ordered) {
+    if (!seen.add(_playIdentity(row))) continue;
     final key = _plateKey(row);
     final anotherResult = plateKey == key && _isBattingResult('${row['code_result'] ?? ''}') && plate.any((item) => _isBattingResult('${item['code_result'] ?? ''}'));
     if (plateKey != null && (key != plateKey || anotherResult)) flush();
@@ -55,6 +57,47 @@ String formatPlayLabels(Iterable<Map<String, dynamic>> rows) {
     return a.index.compareTo(b.index);
   });
   return labels.map((chip) => '${chip.text}|${chip.kind}').join(' ');
+}
+
+/// 速報に号数が無い本塁打へ、試合トップの号数を左から順に入れる。
+String playsWithHomerNumbers(String plays, String totals) {
+  final numbers = RegExp(r'\d+').allMatches(totals).map((match) => match.group(0)!).toList();
+  if (plays.isEmpty || numbers.isEmpty) return plays;
+  var index = 0;
+  final out = <String>[];
+  for (final part in plays.split(' ')) {
+    if (part.isEmpty) continue;
+    final bar = part.lastIndexOf('|');
+    final label = bar < 0 ? part : part.substring(0, bar);
+    final kind = bar < 0 ? '' : part.substring(bar + 1);
+    final existing = RegExp(r'(\d+)号').firstMatch(label);
+    if (kind != 'hr') {
+      out.add(part);
+      continue;
+    }
+    if (existing != null) {
+      if (index < numbers.length && numbers[index] == existing.group(1)) index++;
+      out.add(part);
+      continue;
+    }
+    if (index >= numbers.length) {
+      out.add(part);
+      continue;
+    }
+    out.add('${_insertHomerNumber(label, numbers[index])}|$kind');
+    index++;
+  }
+  return out.join(' ');
+}
+
+String _insertHomerNumber(String label, String number) {
+  for (final word in ['ソロ', '2ラン', '3ラン', '満塁']) {
+    final at = label.indexOf(word);
+    if (at >= 0) return '${label.substring(0, at)}$number号${label.substring(at)}';
+  }
+  final at = label.indexOf('ホームラン');
+  if (at >= 0) return '${label.substring(0, at)}$number号${label.substring(at)}';
+  return '$label$number号';
 }
 
 int _playRank(String kind) {
@@ -115,6 +158,12 @@ List<({String text, String kind})> _chipsForPlate(List<Map<String, dynamic>> pla
     if (chip != null) chips.add(chip);
   }
   return chips;
+}
+
+String _playIdentity(Map<String, dynamic> row) {
+  final result = '${row['code_result'] ?? ''}';
+  final runner = _isSteal(result) ? '${row['name_runner'] ?? row['id_player_enter'] ?? ''}'.trim() : '';
+  return '${_plateKey(row)}|$result|$runner';
 }
 
 bool _isSteal(String result) {

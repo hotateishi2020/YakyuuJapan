@@ -399,7 +399,7 @@ class LiveText {
   }
 
   static int _homerNumber(String text) {
-    final match = RegExp(r'第\s*(\d+)\s*号').firstMatch(text);
+    final match = RegExp(r'(\d+)\s*号').firstMatch(text);
     if (match == null) return 0;
     return int.tryParse(match.group(1)!) ?? 0;
   }

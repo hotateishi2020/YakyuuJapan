@@ -25,6 +25,15 @@ import 'package:postgres/postgres.dart';
 import 'package:shelf/shelf.dart';
 import 'Value.dart';
 
+/// 「18:00」や「18：00」を、その日の開始時刻にする。読めなければ null。
+DateTime? gameStartOn(String date, String raw) {
+  final match = RegExp(r'(\d{1,2})\s*[:：]\s*(\d{2})').firstMatch(raw);
+  if (match == null) return null;
+  final hour = match.group(1)!.padLeft(2, '0');
+  final minute = match.group(2)!;
+  return DateTime.tryParse('$date $hour:$minute:00');
+}
+
 class FetchURL {
   // Detect encoding (header/meta) and decode bytes accordingly (UTF-8 preferred)
   static String _decodeHtml(http.Response res) {
@@ -371,17 +380,12 @@ class FetchURL {
                 continue;
               }
               final match = boards[0];
-              final info = match.querySelector('div p');
-              final timeNode = info?.querySelector('time');
-              final time_gamestart = timeNode?.text.trim() ?? '';
-              final gamestart = formatted + " " + time_gamestart + ":00";
-              final parsedStart = DateTime.tryParse(gamestart);
-              if (time_gamestart.isEmpty || parsedStart == null) {
-                print('開始時刻が未定のためスキップします。');
-                continue;
-              }
-              datetime_gamestart = parsedStart;
-              final stadiumText = info?.nodes.last.text?.replaceAll(RegExp(r'\s+'), '') ?? '';
+              final info = match.querySelector('#async-gameCard');
+              final timeNode = info?.querySelector('time') ?? match.querySelector('time');
+              final timeText = timeNode?.text.trim() ?? '';
+              var parsedStart = gameStartOn(formatted, timeText);
+              final stadiumSource = info ?? timeNode?.parent;
+              final stadiumText = stadiumSource?.nodes.last.text?.replaceAll(RegExp(r'\s+'), '') ?? '';
               final name_stadium = stadiumText;
 
               final teamLinks = match.querySelector('#async-gameDetail')?.querySelectorAll('a') ?? [];
@@ -501,6 +505,22 @@ class FetchURL {
               final results_team_away = await Postgres.execute(conn, AppSql.selectTeamsWhereName(), data: [team_away]);
 
               id_team_away = results_team_away.first.toColumnMap()['id'];
+
+              if (parsedStart == null) {
+                final stored = await Postgres.execute(conn, AppSql.selectGameOnDate(), data: [id_team_home, id_team_away, formatted]);
+                if (stored.isEmpty) {
+                  print('開始時刻が未定のためスキップします。');
+                  continue;
+                }
+                final rawStart = stored.first.toColumnMap()['datetime_start'];
+                parsedStart = rawStart is DateTime ? rawStart : DateTime.tryParse('$rawStart');
+                if (parsedStart == null) {
+                  print('開始時刻が未定のためスキップします。');
+                  continue;
+                }
+                print('ページに開始時刻がないため、登録済みの開始時刻を使います。');
+              }
+              datetime_gamestart = parsedStart;
 
               if (flg_no_pitcher == false) {
                 //先発投手が発表されている場合

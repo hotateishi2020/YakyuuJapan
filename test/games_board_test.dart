@@ -702,7 +702,7 @@ void main() {
                       'id_team_summary': 2,
                       'name_full_summary': '大山悠輔',
                       'flg_pitcher': false,
-                      'txt_achieve': 'サイクルヒット|cycle',
+                      'txt_achieve': 'サイクルヒット|cycle 猛打賞|multihit',
                       'txt_plays': '19号ソロホームラン|hr',
                     },
                     {
@@ -736,10 +736,12 @@ void main() {
     expect(backgroundOf('HQS'), const Color(0xFFFF5722));
     expect(find.text('QS'), findsNothing);
     expect(backgroundOf('サイクルヒット'), const Color(0xFFDC143C));
+    expect(backgroundOf('猛打賞'), const Color(0xFFDC143C));
     expect(backgroundOf('サイクル未遂'), const Color(0xFFDC143C));
     expect(backgroundOf(pitching), const Color(0xFFDC143C));
     expect(tester.getTopLeft(find.text('サイクルヒット')).dx, greaterThan(tester.getTopRight(find.text('大山悠輔')).dx));
-    expect(tester.getTopLeft(find.text('19号ソロホームラン')).dx, greaterThan(tester.getTopRight(find.text('サイクルヒット')).dx - 0.5));
+    expect(tester.getTopLeft(find.text('猛打賞')).dx, greaterThan(tester.getTopRight(find.text('サイクルヒット')).dx - 0.5));
+    expect(tester.getTopLeft(find.text('19号ソロホームラン')).dx, greaterThan(tester.getTopRight(find.text('猛打賞')).dx - 0.5));
   });
 
   testWidgets('pitching metrics sit side by side with their own colors', (tester) async {

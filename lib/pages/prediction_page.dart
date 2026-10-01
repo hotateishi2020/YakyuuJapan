@@ -81,6 +81,7 @@ class _PredictionPageState extends State<PredictionPage> {
       _refreshSeasonStatsOnce();
     }
     _gamesRefreshTimer?.cancel();
+    _refreshGames();
     _gamesRefreshTimer = Timer.periodic(const Duration(minutes: 3), (_) {
       _refreshGames();
     });

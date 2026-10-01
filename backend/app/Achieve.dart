@@ -40,8 +40,9 @@ String pitcherStatChips({
   final ip = outs / 3.0;
   final freePasses = walks + hbp;
   final runsLabel = runs == 0 ? '無失点' : '$runs失点';
+  final runsTone = _lowerTone(runs / ip, const [0, 0.15, 0.30, 0.45, 0.6, 0.75]);
   final parts = <String>[
-    '${_inningsLabel(innings)}$runsLabel|${_lowerTone(runs / ip, const [0, 0.15, 0.30, 0.45, 0.6, 0.75])}',
+    '${_inningsLabel(innings)}$runsLabel|${runsTone == 'gray' ? 'dgray' : runsTone}',
     '${hits == 0 ? '無安打' : '$hits安打'}|${_lowerTone(hits / ip, const [0, 0.3, 0.6, 0.9, 1.2, 1.5])}',
     '${freePasses == 0 ? '無四死' : '$freePasses四死'}|${_lowerTone(freePasses / ip, const [0, 0.15, 0.30, 0.45, 0.6, 0.75])}',
     '$strikeouts奪三振|${starter ? _higherTone(strikeouts / ip, const [1, 0.85, 0.7, 0.55, 0.4, 0.25]) : _reliefStrikeoutTone(strikeouts / ip)}',
@@ -138,6 +139,32 @@ String pitcherMarks({
     marks.add('QS|qs');
   }
   return marks.join(' ');
+}
+
+/// 単打・二塁打・三塁打・本塁打が3本以上なら猛打賞。
+String multiHitMark(int hits) => hits >= 3 ? '猛打賞|multihit' : '';
+
+/// 打席結果から選手ごとの安打数を数える。同じ打席の重複は1本にする。
+Map<String, int> hitCountsByPlayer(List<Map<String, dynamic>> rows) {
+  final plates = <String, Set<String>>{};
+  for (final row in rows) {
+    final result = '${row['code_result'] ?? ''}';
+    if (result != 'HIT1' && result != 'HIT2' && result != 'HIT3' && result != 'HOMERUN') continue;
+    final name = '${row['name_full'] ?? ''}'.trim();
+    if (name.isEmpty) continue;
+    final key = playPlayerKey(row['id_game'], row['id_team'], name);
+    final plate = [
+      row['int_inning'],
+      row['flg_bottom'],
+      row['int_batting_order'],
+      row['cnt_out'],
+      row['flg_runner_first'],
+      row['flg_runner_second'],
+      row['flg_runner_third'],
+    ].join('|');
+    plates.putIfAbsent(key, () => {}).add(plate);
+  }
+  return {for (final entry in plates.entries) entry.key: entry.value.length};
 }
 
 /// 打席結果から選手ごとのサイクル表記を作る。

@@ -153,6 +153,11 @@ class _GameDateSwitcherState extends State<GameDateSwitcher> {
     super.initState();
     _baseDate = DateTime.tryParse(widget.initialDate ?? '') ?? DateTime.now();
     _baseDate = DateTime(_baseDate.year, _baseDate.month, _baseDate.day);
+    // 初回フレームはウェブフォントの幅が足りず、選手名が切れることがある。
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(() {});
+    });
   }
 
   DateTime get _selectedDate => _baseDate.add(Duration(days: _offset));
@@ -712,7 +717,16 @@ class _TableGameCard extends StatelessWidget {
       textDirection: TextDirection.ltr,
       textScaler: textScaler,
     )..layout();
-    return painter.width;
+    final measured = painter.width;
+    if (text.isEmpty) return measured;
+    var cjk = 0;
+    final glyphs = text.runes.length;
+    for (final rune in text.runes) {
+      if (rune > 0xFF) cjk++;
+    }
+    // フォント未読込の初回は全角が極端に狭く測れる。1文字ぶんは確保する。
+    final floorWidth = fontSize * (cjk + (glyphs - cjk) * 0.55);
+    return measured < floorWidth ? floorWidth : measured;
   }
 
   double _nameColumnWidth(
@@ -723,8 +737,8 @@ class _TableGameCard extends StatelessWidget {
     final scaler = MediaQuery.textScalerOf(context);
     var width = 0.0;
     for (final player in players) {
-      // _pitcherNameBox の左右 padding 2+2。成績のために名前幅を削らない。
-      final w = _textWidth(player.name, fontSize, weight: FontWeight.bold, textScaler: scaler) + 4;
+      // _pitcherNameBox の左右 padding 2+2 に、末尾が切れない余裕を足す。
+      final w = _textWidth(player.name, fontSize, weight: FontWeight.bold, textScaler: scaler) + 8;
       if (w > width) width = w;
     }
     return width.ceilToDouble();
@@ -784,12 +798,17 @@ class _TableGameCard extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 0.5),
                               ],
-                              _pitcherNameBox(
-                                name: pitcher.name,
-                                colorsRaw: pitcher.colors,
-                                baseSize: nameSize,
-                                minSize: _minPlayerNameSize,
-                                alignLeft: false,
+                              Flexible(
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: _pitcherNameBox(
+                                    name: pitcher.name,
+                                    colorsRaw: pitcher.colors,
+                                    baseSize: nameSize,
+                                    minSize: _minPlayerNameSize,
+                                    alignLeft: false,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -872,18 +891,17 @@ class _TableGameCard extends StatelessWidget {
                                       child: pitcher.mark.isEmpty ? const SizedBox() : _resultBadge(pitcher.mark, nameSize),
                                     ),
                                     const SizedBox(width: 0.5),
-                                    ClipRect(
-                                      child: SizedBox(
-                                        width: nameBoxW,
-                                        child: Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: _pitcherNameBox(
-                                            name: pitcher.name,
-                                            colorsRaw: pitcher.colors,
-                                            baseSize: nameSize,
-                                            minSize: _minPlayerNameSize,
-                                            alignLeft: true,
-                                          ),
+                                    SizedBox(
+                                      width: nameBoxW,
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        alignment: Alignment.centerLeft,
+                                        child: _pitcherNameBox(
+                                          name: pitcher.name,
+                                          colorsRaw: pitcher.colors,
+                                          baseSize: nameSize,
+                                          minSize: _minPlayerNameSize,
+                                          alignLeft: true,
                                         ),
                                       ),
                                     ),
@@ -931,14 +949,14 @@ class _TableGameCard extends StatelessWidget {
 
   Color _playColor(String kind) {
     return switch (kind) {
-      'hr' || 'cycle' || 'cyclemis' || 'perfect' || 'nohit' || 'maddux' || 'shutout' || 'cg' => const Color(0xFFDC143C),
+      'hr' || 'cycle' || 'cyclemis' || 'multihit' || 'perfect' || 'nohit' || 'maddux' || 'shutout' || 'cg' => const Color(0xFFDC143C),
       'timely' || 'hqs' => const Color(0xFFFF5722),
       'triple' || 'double' || 'extra' || 'qs' => const Color(0xFFFFB300),
       'single' => const Color(0xFFFFEB3B),
       'walk' => const Color(0xFF43A047),
-      'dead' || 'error' => const Color(0xFFB0BEC5),
+      'dead' || 'error' => const Color(0xFF78909C),
       'sac' || 'sacfly' || 'squeeze' || 'sacbunt' => const Color(0xFF8E24AA),
-      'steal' => const Color(0xFFC0CA33),
+      'steal' => const Color(0xFFC6FF00),
       _ => const Color(0xFFEEEEEE),
     };
   }
@@ -989,7 +1007,7 @@ class _TableGameCard extends StatelessWidget {
       'yellow' => const Color(0xFFFFEB3B),
       'green' => const Color(0xFF43A047),
       'blue' => const Color(0xFF1E88E5),
-      'gray' => const Color(0xFFB0BEC5),
+      'gray' || 'dgray' => const Color(0xFF78909C),
       _ => const Color(0xFFEEEEEE),
     };
   }

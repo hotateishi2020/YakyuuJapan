@@ -516,11 +516,6 @@ class _TableGameCard extends StatelessWidget {
     return raw;
   }
 
-  bool _isQualityStart(String part) {
-    final label = part.split('|').first.trim();
-    return label == 'QS' || label == 'HQS';
-  }
-
   bool _isPitchCount(String part) {
     final label = part.split('|').first.trim();
     return RegExp(r'^\d+球$').hasMatch(label);
@@ -621,10 +616,15 @@ class _TableGameCard extends StatelessWidget {
       );
     }
 
+    final starterTitles = pitcher ? _text(home ? 'titles_pitcher_home' : 'titles_pitcher_away') : '';
+    if (pitcher && starterTitles.isNotEmpty && result.any((player) => player.name == starterName)) {
+      add(starterName, starterColors, '', '', '', starterTitles);
+    }
+
     if (result.isNotEmpty) return result;
 
     if (pitcher) {
-      add(starterName, starterColors, '');
+      add(starterName, starterColors, '', '', '', starterTitles);
       if (_int('id_team_pitcher_win') == teamId) {
         add(_text('name_pitcher_win'), '', '勝');
       }
@@ -801,12 +801,26 @@ class _TableGameCard extends StatelessWidget {
                               Flexible(
                                 child: FittedBox(
                                   fit: BoxFit.scaleDown,
-                                  child: _pitcherNameBox(
-                                    name: pitcher.name,
-                                    colorsRaw: pitcher.colors,
-                                    baseSize: nameSize,
-                                    minSize: _minPlayerNameSize,
-                                    alignLeft: false,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      _pitcherNameBox(
+                                        name: pitcher.name,
+                                        colorsRaw: pitcher.colors,
+                                        baseSize: nameSize,
+                                        minSize: _minPlayerNameSize,
+                                        alignLeft: false,
+                                      ),
+                                      if (pitcher.predict.isNotEmpty) ...[
+                                        const SizedBox(width: 2),
+                                        for (final part in pitcher.predict.split(','))
+                                          if (part.isNotEmpty)
+                                            Padding(
+                                              padding: const EdgeInsets.only(right: 2),
+                                              child: _predictBadge(part, nameSize),
+                                            ),
+                                      ],
+                                    ],
                                   ),
                                 ),
                               ),
@@ -830,8 +844,6 @@ class _TableGameCard extends StatelessWidget {
 
               Widget statLine(_PlayerLine pitcher) {
                 final achievements = _visibleAchievements(pitcher.achieve);
-                final quality = achievements.where(_isQualityStart);
-                final special = achievements.where((part) => !_isQualityStart(part));
                 final chipParts = pitcher.chips.split(' ').where((part) => part.isNotEmpty);
                 final metrics = chipParts.where((part) => !_isPitchCount(part));
                 final pitchCounts = chipParts.where(_isPitchCount);
@@ -843,11 +855,9 @@ class _TableGameCard extends StatelessWidget {
                         padding: const EdgeInsets.only(right: 3),
                         child: _metricChip(part, statSize),
                       ),
-                    for (final part in quality) _playChip(part, statSize),
-                    for (final part in special) _playChip(part, statSize),
                     for (final part in _orderedPlays(pitcher.plays)) _playChip(part, statSize),
                     if (pitcher.stat.isNotEmpty) ...[
-                      if (pitcher.plays.isNotEmpty || pitcher.achieve.isNotEmpty) const SizedBox(width: 4),
+                      if (pitcher.plays.isNotEmpty || pitcher.chips.isNotEmpty) const SizedBox(width: 4),
                       _pitchStat(pitcher.stat, statSize, pitcher.tone),
                     ],
                     for (final part in pitchCounts)
@@ -855,6 +865,7 @@ class _TableGameCard extends StatelessWidget {
                         padding: const EdgeInsets.only(right: 3),
                         child: _metricChip(part, statSize),
                       ),
+                    for (final part in achievements) _playChip(part, statSize, blink: true),
                     if (pitcher.predict.isNotEmpty) ...[
                       if (pitcher.stat.isNotEmpty || pitcher.chips.isNotEmpty || pitcher.plays.isNotEmpty || pitcher.achieve.isNotEmpty) const SizedBox(width: 2),
                       for (final part in pitcher.predict.split(','))
@@ -947,9 +958,16 @@ class _TableGameCard extends StatelessWidget {
     );
   }
 
+  String _homerNumberFirst(String label) {
+    final existing = RegExp(r'(\d+)号').firstMatch(label);
+    if (existing == null || existing.start == 0) return label;
+    final token = existing.group(0)!;
+    return '$token${label.substring(0, existing.start)}${label.substring(existing.end)}';
+  }
+
   Color _playColor(String kind) {
     return switch (kind) {
-      'hr' || 'cycle' || 'cyclemis' || 'multihit' || 'perfect' || 'nohit' || 'maddux' || 'shutout' || 'cg' => const Color(0xFFDC143C),
+      'hr' || 'cycle' || 'cyclemis' || 'multihit' || 'allhit' || 'allreach' || 'perfect' || 'nohit' || 'maddux' || 'shutout' || 'cg' => const Color(0xFFDC143C),
       'timely' || 'hqs' => const Color(0xFFFF5722),
       'triple' || 'double' || 'extra' || 'qs' => const Color(0xFFFFB300),
       'single' => const Color(0xFFFFEB3B),
@@ -1048,15 +1066,16 @@ class _TableGameCard extends StatelessWidget {
     );
   }
 
-  Widget _playChip(String encoded, double fontSize) {
+  Widget _playChip(String encoded, double fontSize, {bool blink = false}) {
     final bar = encoded.lastIndexOf('|');
     final label = (bar < 0 ? encoded : encoded.substring(0, bar)).trim();
     final kind = bar < 0 ? '' : encoded.substring(bar + 1).trim();
     if (label.isEmpty) return const SizedBox.shrink();
+    final shown = kind == 'hr' ? _homerNumberFirst(label) : label;
     final bg = _playColor(kind);
     final ink = bg.computeLuminance() > 0.55 ? Colors.black87 : Colors.white;
     final chipSize = (fontSize - 1).clamp(8.0, 11.0);
-    return Container(
+    final chip = Container(
       height: 14,
       margin: const EdgeInsets.only(right: 3),
       padding: const EdgeInsets.symmetric(horizontal: 3),
@@ -1066,7 +1085,7 @@ class _TableGameCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(2),
       ),
       child: Text(
-        label,
+        shown,
         maxLines: 1,
         softWrap: false,
         style: TextStyle(
@@ -1077,6 +1096,8 @@ class _TableGameCard extends StatelessWidget {
         ),
       ),
     );
+    if (!blink) return chip;
+    return _BlinkChip(child: chip);
   }
 
   Widget _predictBadge(String encoded, double fontSize) {
@@ -2039,7 +2060,7 @@ class _PitcherNameBoxState extends State<_PitcherNameBox> with SingleTickerProvi
   Widget build(BuildContext context) {
     final bool hasColor = deco != null;
     final textColor = hasColor ? Colors.white : (widget.overrideTextColor ?? Colors.black87);
-    final weight = widget.overrideWeight ?? (hasColor ? FontWeight.bold : FontWeight.normal);
+    final weight = widget.overrideWeight ?? FontWeight.bold;
 
     final alignment = widget.alignLeft ? Alignment.centerLeft : Alignment.center;
     return Align(
@@ -2080,6 +2101,39 @@ class _PitcherNameBoxState extends State<_PitcherNameBox> with SingleTickerProvi
           ],
         ),
       ),
+    );
+  }
+}
+
+class _BlinkChip extends StatefulWidget {
+  final Widget child;
+
+  const _BlinkChip({required this.child});
+
+  @override
+  State<_BlinkChip> createState() => _BlinkChipState();
+}
+
+class _BlinkChipState extends State<_BlinkChip> with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 420))..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: Tween<double>(begin: 1, end: 0).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut)),
+      child: widget.child,
     );
   }
 }

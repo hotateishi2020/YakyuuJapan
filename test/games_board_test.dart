@@ -421,6 +421,50 @@ void main() {
     expect(awayName.dx, closeTo(awayTeam.dx, 16.0));
   });
 
+  testWidgets('unstarted starters show prediction marks beside the name', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 420,
+            height: 160,
+            child: GamesBoardYahooStyle(
+              games: [
+                {
+                  'date_game': '2026-10-02',
+                  'time_game': '🌙 18:00',
+                  'name_team_home': '阪神',
+                  'name_team_away': '巨人',
+                  'name_stadium': '甲子園',
+                  'name_pitcher_home': '村上頌樹',
+                  'name_pitcher_away': '戸郷翔征',
+                  'titles_pitcher_home': 'QS|#E53935',
+                  'titles_pitcher_away': 'HQS|#1565C0',
+                  'score_home': -1,
+                  'score_away': -1,
+                  'state': '',
+                  'id_team_home': 2,
+                  'id_team_away': 1,
+                  'color_back_home': '#FFD200',
+                  'color_back_away': '#FF6600',
+                  'color_font_home': '#000000',
+                  'color_font_away': '#000000',
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    expect(find.text('QS'), findsOneWidget);
+    expect(find.text('HQS'), findsOneWidget);
+    expect(tester.getTopLeft(find.text('QS')).dx, greaterThan(tester.getTopRight(find.text('村上頌樹')).dx - 0.5));
+    expect(tester.getTopLeft(find.text('HQS')).dx, greaterThan(tester.getTopRight(find.text('戸郷翔征')).dx - 0.5));
+  });
+
   testWidgets('started games stack and keep player text readable', (tester) async {
     Map<String, dynamic> game(String home, int teamId) => {
           'date_game': '2026-09-28',
@@ -621,7 +665,7 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.text('4打数2安打(1HR1打点)'), findsNothing);
-    expect(find.text('代打逆転サヨナラ19号ソロホームラン'), findsOneWidget);
+    expect(find.text('19号代打逆転サヨナラソロホームラン'), findsOneWidget);
     expect(find.text('先制2点タイムリーツーベース'), findsOneWidget);
     expect(find.text('右3'), findsOneWidget);
     expect(find.text('左2'), findsOneWidget);
@@ -639,7 +683,7 @@ void main() {
       return (chip.decoration as BoxDecoration).color!;
     }
 
-    expect(backgroundOf('代打逆転サヨナラ19号ソロホームラン'), const Color(0xFFDC143C));
+    expect(backgroundOf('19号代打逆転サヨナラソロホームラン'), const Color(0xFFDC143C));
     expect(backgroundOf('先制2点タイムリーツーベース'), const Color(0xFFFF5722));
     expect(backgroundOf('右3'), const Color(0xFFFFB300));
     expect(backgroundOf('左2'), const Color(0xFFFFB300));
@@ -650,7 +694,7 @@ void main() {
     expect(backgroundOf('犠打'), const Color(0xFF8E24AA));
 
     final nameRight = tester.getTopRight(find.text('大山悠輔')).dx;
-    final labels = ['代打逆転サヨナラ19号ソロホームラン', '先制2点タイムリーツーベース', '右3', '左2', '中安', '犠飛', 'スクイズ', '四球', '犠打'];
+    final labels = ['19号代打逆転サヨナラソロホームラン', '先制2点タイムリーツーベース', '右3', '左2', '中安', '犠飛', 'スクイズ', '四球', '犠打'];
     var previousRight = nameRight;
     for (final label in labels) {
       final left = tester.getTopLeft(find.text(label)).dx;
@@ -702,7 +746,7 @@ void main() {
                       'id_team_summary': 2,
                       'name_full_summary': '大山悠輔',
                       'flg_pitcher': false,
-                      'txt_achieve': 'サイクルヒット|cycle 猛打賞|multihit',
+                      'txt_achieve': 'サイクルヒット|cycle 猛打賞|multihit 全打席安打|allhit 全打席出塁|allreach',
                       'txt_plays': '19号ソロホームラン|hr',
                     },
                     {
@@ -737,11 +781,16 @@ void main() {
     expect(find.text('QS'), findsNothing);
     expect(backgroundOf('サイクルヒット'), const Color(0xFFDC143C));
     expect(backgroundOf('猛打賞'), const Color(0xFFDC143C));
+    expect(backgroundOf('全打席安打'), const Color(0xFFDC143C));
+    expect(backgroundOf('全打席出塁'), const Color(0xFFDC143C));
     expect(backgroundOf('サイクル未遂'), const Color(0xFFDC143C));
     expect(backgroundOf(pitching), const Color(0xFFDC143C));
-    expect(tester.getTopLeft(find.text('サイクルヒット')).dx, greaterThan(tester.getTopRight(find.text('大山悠輔')).dx));
+    expect(tester.getTopLeft(find.text('19号ソロホームラン')).dx, greaterThan(tester.getTopRight(find.text('大山悠輔')).dx));
+    expect(tester.getTopLeft(find.text('サイクルヒット')).dx, greaterThan(tester.getTopRight(find.text('19号ソロホームラン')).dx - 0.5));
     expect(tester.getTopLeft(find.text('猛打賞')).dx, greaterThan(tester.getTopRight(find.text('サイクルヒット')).dx - 0.5));
-    expect(tester.getTopLeft(find.text('19号ソロホームラン')).dx, greaterThan(tester.getTopRight(find.text('猛打賞')).dx - 0.5));
+    expect(tester.getTopLeft(find.text('全打席安打')).dx, greaterThan(tester.getTopRight(find.text('猛打賞')).dx - 0.5));
+    expect(tester.getTopLeft(find.text('全打席出塁')).dx, greaterThan(tester.getTopRight(find.text('全打席安打')).dx - 0.5));
+    expect(find.byType(FadeTransition), findsWidgets);
   });
 
   testWidgets('pitching metrics sit side by side with their own colors', (tester) async {
@@ -807,7 +856,7 @@ void main() {
     expect(backgroundOf('3安打'), const Color(0xFFFFB300));
     expect(backgroundOf('10奪三振'), const Color(0xFFDC143C));
     expect(find.text('QS'), findsNothing);
-    final labels = ['9回無失点', '3安打', '無四死', '10奪三振', 'HQS', '完封', '98球', '本'];
+    final labels = ['9回無失点', '3安打', '無四死', '10奪三振', '98球', '完封', 'HQS', '本'];
     var previousRight = tester.getTopRight(find.text('髙橋遥人')).dx;
     for (final label in labels) {
       expect(tester.getTopLeft(find.text(label)).dx, greaterThan(previousRight - 0.5));

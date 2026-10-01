@@ -60,7 +60,7 @@ bool _isStarter(Map<String, dynamic> row) {
   return name == '${row['name_pitcher_home'] ?? ''}'.trim() || name == '${row['name_pitcher_away'] ?? ''}'.trim();
 }
 
-String _summaryAchieve(Map<String, dynamic> row, Map<String, String> cycles, Map<String, int> hits, Map<int, int> maxInning) {
+String _summaryAchieve(Map<String, dynamic> row, Map<String, String> cycles, Map<String, int> hits, Map<String, String> plateFeats, Map<int, int> maxInning) {
   final key = playPlayerKey(row['id_game'], row['id_team_summary'], row['name_full_summary']);
   final marks = <String>[];
   final cycle = cycles[key] ?? '';
@@ -70,6 +70,8 @@ String _summaryAchieve(Map<String, dynamic> row, Map<String, String> cycles, Map
     final multi = multiHitMark(hitCount);
     if (multi.isNotEmpty) marks.add(multi);
   }
+  final plateFeat = plateFeats[key] ?? '';
+  if (plateFeat.isNotEmpty) marks.add(plateFeat);
   if (_summaryIsPitcher(row['flg_pitcher'])) {
     final gameId = _asInt(row['id_game']);
     final pitching = pitcherMarks(
@@ -124,6 +126,7 @@ List<Map<String, dynamic>> _collapseGames(
   Map<String, String> plays,
   Map<String, String> cycles,
   Map<String, int> hits,
+  Map<String, String> plateFeats,
   Map<int, int> maxInning,
 ) {
   final order = <String>[];
@@ -140,7 +143,7 @@ List<Map<String, dynamic>> _collapseGames(
     for (final key in order)
       {
         ...groups[key]!.first,
-        'summaries': _summariesOf(groups[key]!, plays, cycles, hits, maxInning),
+        'summaries': _summariesOf(groups[key]!, plays, cycles, hits, plateFeats, maxInning),
       },
   ];
 }
@@ -150,6 +153,7 @@ List<Map<String, dynamic>> _summariesOf(
   Map<String, String> plays,
   Map<String, String> cycles,
   Map<String, int> hits,
+  Map<String, String> plateFeats,
   Map<int, int> maxInning,
 ) {
   final summaries = <Map<String, dynamic>>[
@@ -172,7 +176,7 @@ List<Map<String, dynamic>> _summariesOf(
                   plays[playPlayerKey(row['id_game'], row['id_team_summary'], row['name_full_summary'])] ?? '',
                   '${row['txt_homerun_total'] ?? ''}',
                 ),
-          'txt_achieve': _summaryAchieve(row, cycles, hits, maxInning),
+          'txt_achieve': _summaryAchieve(row, cycles, hits, plateFeats, maxInning),
           'txt_pitch_tone': _summaryPitchTone(row),
           'txt_pitch_chips': _summaryPitchChips(row),
         },
@@ -183,6 +187,7 @@ List<Map<String, dynamic>> _summariesOf(
   };
   final extra = <String>{
     ...cycles.keys,
+    ...plateFeats.keys,
     for (final entry in hits.entries)
       if (entry.value >= 3) entry.key,
   };
@@ -195,6 +200,8 @@ List<Map<String, dynamic>> _summariesOf(
     if (cycle.isNotEmpty) marks.add(cycle);
     final multi = multiHitMark(hits[key] ?? 0);
     if (multi.isNotEmpty) marks.add(multi);
+    final plateFeat = plateFeats[key] ?? '';
+    if (plateFeat.isNotEmpty) marks.add(plateFeat);
     if (marks.isEmpty) continue;
     summaries.add({
       'id_team_summary': parts[1],
@@ -287,7 +294,14 @@ void main() async {
           (conn) => Postgres.execute(conn, AppSql.selectNotification()),
         ]);
         final playRows = Postgres.toJson(results[5]);
-        final games = _collapseGames(Postgres.toJson(results[4]), playLabelsByPlayer(playRows), cycleMarksByPlayer(playRows), hitCountsByPlayer(playRows), maxInningByGame(playRows));
+        final games = _collapseGames(
+          Postgres.toJson(results[4]),
+          playLabelsByPlayer(playRows),
+          cycleMarksByPlayer(playRows),
+          hitCountsByPlayer(playRows),
+          plateFeatMarksByPlayer(playRows),
+          maxInningByGame(playRows),
+        );
         // print(games);
         final payload = <String, dynamic>{
           'predict_team': Postgres.toJson(results[0]),

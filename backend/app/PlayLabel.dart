@@ -77,27 +77,29 @@ String playsWithHomerNumbers(String plays, String totals) {
     }
     if (existing != null) {
       if (index < numbers.length && numbers[index] == existing.group(1)) index++;
-      out.add(part);
+      final moved = _homerNumberFirst(label);
+      out.add(moved == label ? part : '$moved|$kind');
       continue;
     }
     if (index >= numbers.length) {
       out.add(part);
       continue;
     }
-    out.add('${_insertHomerNumber(label, numbers[index])}|$kind');
+    out.add('${_homerNumberFirst(label, numbers[index])}|$kind');
     index++;
   }
   return out.join(' ');
 }
 
-String _insertHomerNumber(String label, String number) {
-  for (final word in ['ソロ', '2ラン', '3ラン', '満塁']) {
-    final at = label.indexOf(word);
-    if (at >= 0) return '${label.substring(0, at)}$number号${label.substring(at)}';
+String _homerNumberFirst(String label, [String? number]) {
+  final existing = RegExp(r'(\d+)号').firstMatch(label);
+  if (existing != null) {
+    if (existing.start == 0) return label;
+    final token = existing.group(0)!;
+    return '$token${label.substring(0, existing.start)}${label.substring(existing.end)}';
   }
-  final at = label.indexOf('ホームラン');
-  if (at >= 0) return '${label.substring(0, at)}$number号${label.substring(at)}';
-  return '$label$number号';
+  if (number == null || number.isEmpty) return label;
+  return '$number号$label';
 }
 
 int _playRank(String kind) {
@@ -212,7 +214,7 @@ bool _isBattingResult(String result) {
       _ => 'ソロ',
     };
     final number = homerNumber > 0 ? '$homerNumber号' : '';
-    return (text: '$head$number$kindホームラン', kind: 'hr');
+    return (text: '$number$head$kindホームラン', kind: 'hr');
   }
 
   if (result == Value.CodeGameResult.HIT_SINGLE || result == Value.CodeGameResult.HIT_DOUBLE || result == Value.CodeGameResult.HIT_TRIPLE) {

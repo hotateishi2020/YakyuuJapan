@@ -395,6 +395,20 @@ class AppSql {
                                 ORDER BY user_pitcher_home.code_color) || '/', '') AS colors_pitcher_home,
         COALESCE('/' || string_agg(DISTINCT user_pitcher_away.code_color, '/' 
                                 ORDER BY user_pitcher_away.code_color) || '/', '') AS colors_pitcher_away,
+        COALESCE(
+          STRING_AGG(
+            BTRIM(user_pitcher_home.title_shortest) || '|' || COALESCE(BTRIM(user_pitcher_home.code_color), ''),
+            ',' ORDER BY user_pitcher_home.int_index, user_pitcher_home.id_stats, user_pitcher_home.id_user
+          ) FILTER (WHERE BTRIM(COALESCE(user_pitcher_home.title_shortest, '')) <> ''),
+          ''
+        ) AS titles_pitcher_home,
+        COALESCE(
+          STRING_AGG(
+            BTRIM(user_pitcher_away.title_shortest) || '|' || COALESCE(BTRIM(user_pitcher_away.code_color), ''),
+            ',' ORDER BY user_pitcher_away.int_index, user_pitcher_away.id_stats, user_pitcher_away.id_user
+          ) FILTER (WHERE BTRIM(COALESCE(user_pitcher_away.title_shortest, '')) <> ''),
+          ''
+        ) AS titles_pitcher_away,
         id_game_summary,
         id_team_summary,
         name_full_summary,
@@ -424,8 +438,32 @@ class AppSql {
         LEFT OUTER JOIN m_player AS pitcher_lose ON pitcher_lose.id = t_game.id_pitcher_lose
         LEFT OUTER JOIN m_player AS pitcher_save ON pitcher_save.id = t_game.id_pitcher_save
         LEFT OUTER JOIN m_stadium ON m_stadium.id = t_game.id_stadium
-        LEFT OUTER JOIN (SELECT * FROM t_predict_player LEFT OUTER JOIN m_user ON m_user.id = t_predict_player.id_user WHERE year =  \$1) AS user_pitcher_home ON user_pitcher_home.id_player = pitcher_home.id
-        LEFT OUTER JOIN (SELECT * FROM t_predict_player LEFT OUTER JOIN m_user ON m_user.id = t_predict_player.id_user WHERE year =  \$1) AS user_pitcher_away ON user_pitcher_away.id_player = pitcher_away.id
+        LEFT OUTER JOIN (
+          SELECT
+            t_predict_player.id_player,
+            m_user.id AS id_user,
+            m_user.code_color,
+            m_stats.id AS id_stats,
+            m_stats.title_shortest,
+            m_stats.int_index
+          FROM t_predict_player
+            LEFT OUTER JOIN m_user ON m_user.id = t_predict_player.id_user
+            LEFT OUTER JOIN m_stats ON m_stats.id = t_predict_player.id_stats
+          WHERE t_predict_player.year = \$1
+        ) AS user_pitcher_home ON user_pitcher_home.id_player = pitcher_home.id
+        LEFT OUTER JOIN (
+          SELECT
+            t_predict_player.id_player,
+            m_user.id AS id_user,
+            m_user.code_color,
+            m_stats.id AS id_stats,
+            m_stats.title_shortest,
+            m_stats.int_index
+          FROM t_predict_player
+            LEFT OUTER JOIN m_user ON m_user.id = t_predict_player.id_user
+            LEFT OUTER JOIN m_stats ON m_stats.id = t_predict_player.id_stats
+          WHERE t_predict_player.year = \$1
+        ) AS user_pitcher_away ON user_pitcher_away.id_player = pitcher_away.id
         LEFT OUTER JOIN (
           SELECT 
             t_game_summary.id AS id_game_summary,

@@ -144,6 +144,70 @@ String pitcherMarks({
 /// 単打・二塁打・三塁打・本塁打が3本以上なら猛打賞。
 String multiHitMark(int hits) => hits >= 3 ? '猛打賞|multihit' : '';
 
+/// 打席が2つ以上あり、すべて安打なら全打席安打、すべて出塁なら全打席出塁。
+String plateFeatMarks({required int plates, required int reached, required int hits}) {
+  if (plates < 2) return '';
+  final marks = <String>[];
+  if (hits == plates) marks.add('全打席安打|allhit');
+  if (reached == plates) marks.add('全打席出塁|allreach');
+  return marks.join(' ');
+}
+
+bool _isHitResult(String result) {
+  return result == 'HIT1' || result == 'HIT2' || result == 'HIT3' || result == 'HOMERUN';
+}
+
+bool _isReachedResult(String result) {
+  return _isHitResult(result) || result == 'WALK' || result == 'WALK_DEAD' || result == 'ERROR' || result == 'ERROR_FIELDING' || result == 'INTERFERENCE_BATTING';
+}
+
+bool _isPlateResult(String result) {
+  return _isReachedResult(result) ||
+      result == 'OUT_FLY' ||
+      result == 'OUT_GROUND' ||
+      result == 'OUT_POP_UP' ||
+      result == 'OUT_DOUBLE_PLAY' ||
+      result == 'OUT_LINE_DRIVE' ||
+      result == 'STRIKE_OUT' ||
+      result == 'SACRIFICE_BUNT' ||
+      result == 'SACRIFICE_FLY' ||
+      result == 'SQUEEZE' ||
+      result == 'INTERFERENCE_FIELDING';
+}
+
+/// テキスト速報の打席結果から、全打席安打・全打席出塁を選手ごとに作る。
+Map<String, String> plateFeatMarksByPlayer(List<Map<String, dynamic>> rows) {
+  final plates = <String, Map<String, String>>{};
+  for (final row in rows) {
+    final result = '${row['code_result'] ?? ''}';
+    if (!_isPlateResult(result)) continue;
+    final name = '${row['name_full'] ?? ''}'.trim();
+    if (name.isEmpty) continue;
+    final key = playPlayerKey(row['id_game'], row['id_team'], name);
+    final plate = [
+      row['int_inning'],
+      row['flg_bottom'],
+      row['int_batting_order'],
+      row['cnt_out'],
+      row['flg_runner_first'],
+      row['flg_runner_second'],
+      row['flg_runner_third'],
+    ].join('|');
+    plates.putIfAbsent(key, () => {}).putIfAbsent(plate, () => result);
+  }
+  final marks = <String, String>{};
+  for (final entry in plates.entries) {
+    final results = entry.value.values.toList();
+    final text = plateFeatMarks(
+      plates: results.length,
+      reached: results.where(_isReachedResult).length,
+      hits: results.where(_isHitResult).length,
+    );
+    if (text.isNotEmpty) marks[entry.key] = text;
+  }
+  return marks;
+}
+
 /// 打席結果から選手ごとの安打数を数える。同じ打席の重複は1本にする。
 Map<String, int> hitCountsByPlayer(List<Map<String, dynamic>> rows) {
   final plates = <String, Set<String>>{};

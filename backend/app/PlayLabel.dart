@@ -228,7 +228,9 @@ bool _isBattingResult(String result) {
     };
     if (runs > 0) {
       final points = runs >= 2 ? '$runs点' : '';
-      return (text: '$head$pointsタイムリー$hit', kind: 'timely');
+      // 速報が「タイムリーヒット」でも、ヒットよりタイムリーを優先する。二塁打・三塁打は種類を残す。
+      final body = result == Value.CodeGameResult.HIT_SINGLE ? 'タイムリー' : 'タイムリー$hit';
+      return (text: '$head$points$body', kind: 'timely');
     }
     final hitKind = switch (result) {
       'HIT3' => 'triple',

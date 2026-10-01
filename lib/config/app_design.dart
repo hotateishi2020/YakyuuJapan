@@ -8,6 +8,9 @@ final ALL_COLOR_APP = Colors.orange.shade200;
 const ALL_SPACE_BLOCK = 5.0;
 /// height/width >= this value is treated as portrait layout.
 const PORTRAIT_ASPECT_RATIO = 1.05;
+
+/// 短い辺がこれ未満なら、横向きでも縦画面のレイアウトにする。スマホのブラウザ幅に合わせる。
+const COMPACT_LAYOUT_PX = 600.0;
 const ALL_CELL_RADIUS_MARGIN = 2.0;
 const ALL_HEADER_H = 33.0;
 double ALL_WIDTH = 0;

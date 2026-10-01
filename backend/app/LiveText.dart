@@ -42,6 +42,7 @@ class ParsedLiveEvent {
   String result = '';
   double totalBases = 0;
   int linguisticRuns = 0;
+  bool timely = false;
   int homerNumber = 0;
   String stateScore = '';
   bool goodbye = false;
@@ -345,6 +346,7 @@ class LiveText {
     event.goodbye = digits.contains('サヨナラ') && !digits.contains('場面');
     event.stateScore = _stateScore(digits);
     event.homerNumber = _homerNumber(digits);
+    event.timely = digits.contains('タイムリー');
     if (event.result == Value.CodeGameResult.STEAL_BASE_SAFE || event.result == Value.CodeGameResult.STEAL_BASE_OUT) {
       event.enterName = _runnerName(summary, digits);
     }

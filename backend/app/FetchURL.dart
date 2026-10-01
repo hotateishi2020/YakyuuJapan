@@ -992,6 +992,13 @@ class FetchURL {
               detail.int_runs = event.linguisticRuns;
             }
             plateRuns = detail.int_runs;
+            final timelyHit = event.timely &&
+                (event.result == Value.CodeGameResult.HIT_SINGLE ||
+                    event.result == Value.CodeGameResult.HIT_DOUBLE ||
+                    event.result == Value.CodeGameResult.HIT_TRIPLE);
+            if (timelyHit && detail.int_runs < 1) {
+              detail.int_runs = 1;
+            }
             runsAssigned = true;
           }
 

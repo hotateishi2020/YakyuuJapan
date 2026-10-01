@@ -955,7 +955,8 @@ class _PredictionPageState extends State<PredictionPage> {
         const double scale = 1.0;
         final compact = false;
 
-        final isPortrait = constraints.maxHeight / constraints.maxWidth >= PORTRAIT_ASPECT_RATIO;
+        final shortestSide = constraints.maxWidth < constraints.maxHeight ? constraints.maxWidth : constraints.maxHeight;
+        final isPortrait = constraints.maxHeight / constraints.maxWidth >= PORTRAIT_ASPECT_RATIO || shortestSide < COMPACT_LAYOUT_PX;
 
         Widget centralLeagueBoard({
           required int leagueId,

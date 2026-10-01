@@ -36302,17 +36302,17 @@ $2(a,b){var s=b.b-4,r=s*3/5
 return A.c_(A.c([A.aq(this.a.$0(),null,84),A.aq(this.b.$0(),null,r-84),B.dp,A.aq(this.c.$0(),null,s-r)],t.p),B.D,B.p,B.v)},
 $S:65}
 A.a7v.prototype={
-$2(a,b){var s,r,q,p,o,n=null,m="assets/images/logo_league_central.webp",l="assets/images/logo_league_pacific.png",k=b.b,j=b.d,i=j/k>=1.05,h=this.a,g=new A.a7w(h,!1,i),f=t.p,e=A.bT(A.c([A.aq(n,5,n),h.GE(!0),h.G_(),A.aq(n,5,n)],f),B.D,B.p,B.ae),d=new A.a7x(g)
-if(i)s=A.bT(A.c([e,A.bq(new A.Cj(h.ay,A.c([d.$4$leagueColor$leagueId$leagueLabelPrefix$logoAsset(B.dZ,1,"\u30bb",m),d.$4$leagueColor$leagueId$leagueLabelPrefix$logoAsset(B.dS,2,"\u30d1",l)],f),n),1),A.aq(n,5,n)],f),B.D,B.p,B.v)
-else{d=A.aq(n,5,n)
-r=A.bq(h.GE(!1),3)
+$2(a,b){var s,r,q,p,o,n=null,m="assets/images/logo_league_central.webp",l="assets/images/logo_league_pacific.png",k=b.b,j=b.d,i=k<j?k:j,h=j/k>=1.05||i<600,g=this.a,f=new A.a7w(g,!1,h),e=t.p,d=A.bT(A.c([A.aq(n,5,n),g.GE(!0),g.G_(),A.aq(n,5,n)],e),B.D,B.p,B.ae),c=new A.a7x(f)
+if(h)s=A.bT(A.c([d,A.bq(new A.Cj(g.ay,A.c([c.$4$leagueColor$leagueId$leagueLabelPrefix$logoAsset(B.dZ,1,"\u30bb",m),c.$4$leagueColor$leagueId$leagueLabelPrefix$logoAsset(B.dS,2,"\u30d1",l)],e),n),1),A.aq(n,5,n)],e),B.D,B.p,B.v)
+else{c=A.aq(n,5,n)
+r=A.bq(g.GE(!1),3)
 q=A.aq(n,5,n)
-p=h.G_()
+p=g.G_()
 o=A.aq(n,5,n)
-s=A.bT(A.c([d,r,q,p,o,A.bq(h.ay===0?g.$4$leagueColor$leagueId$leagueLabelPrefix$logoAsset(B.dZ,1,"\u30bb",m):g.$4$leagueColor$leagueId$leagueLabelPrefix$logoAsset(B.dS,2,"\u30d1",l),22)],f),B.D,B.p,B.v)}h=A.la(n,k)
-g=$.akV()
-j=A.aq(A.bT(A.c([A.bv(B.aG,A.di("Yakyuu! Japan",n,n,n,A.dR(n,n,n,n,n,n,n,n,n,n,n,n,n,n,B.t,n,n,!0,n,n,n,n,n,n,n,n),n),B.q,n,new A.aX(g,n,n,n,n,n,B.y),n,26,n,new A.b4(8,0,0,0),n),A.bq(new A.cF(new A.b4(8,0,8,5),s,n),1)],f),B.D,B.p,B.v),j,n)
-return A.bv(B.fc,new A.p6(A.CW(1,1,1),B.fc,!0,n,new A.ju(h,j,n),n),B.q,n,n,n,n,n,n,n)},
+s=A.bT(A.c([c,r,q,p,o,A.bq(g.ay===0?f.$4$leagueColor$leagueId$leagueLabelPrefix$logoAsset(B.dZ,1,"\u30bb",m):f.$4$leagueColor$leagueId$leagueLabelPrefix$logoAsset(B.dS,2,"\u30d1",l),22)],e),B.D,B.p,B.v)}g=A.la(n,k)
+f=$.akV()
+e=A.aq(A.bT(A.c([A.bv(B.aG,A.di("Yakyuu! Japan",n,n,n,A.dR(n,n,n,n,n,n,n,n,n,n,n,n,n,n,B.t,n,n,!0,n,n,n,n,n,n,n,n),n),B.q,n,new A.aX(f,n,n,n,n,n,B.y),n,26,n,new A.b4(8,0,0,0),n),A.bq(new A.cF(new A.b4(8,0,8,5),s,n),1)],e),B.D,B.p,B.v),j,n)
+return A.bv(B.fc,new A.p6(A.CW(1,1,1),B.fc,!0,n,new A.ju(g,e,n),n),B.q,n,n,n,n,n,n,n)},
 $S:399}
 A.a7w.prototype={
 $4$leagueColor$leagueId$leagueLabelPrefix$logoAsset(a,b,c,d){var s=this.a

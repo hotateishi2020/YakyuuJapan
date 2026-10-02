@@ -6,8 +6,9 @@ String playPlayerKey(dynamic idGame, dynamic idTeam, dynamic name) {
 }
 
 /// t_game_details の行から、選手ごとの打席結果（選手名の右に並べる文言）を作る。
-/// 各結果は「表示|種別」。凡退は含めず、ホームラン→タイムリー→三塁打→二塁打→単打→犠飛・スクイズ・四球→犠打の順。
+/// 各結果は「表示|種別」。その選手の最初の打席から記録順。
 Map<String, String> playLabelsByPlayer(List<Map<String, dynamic>> rows) {
+  _assignTimeline(rows);
   final grouped = <String, List<Map<String, dynamic>>>{};
   for (final row in rows) {
     final steal = _isSteal('${row['code_result'] ?? ''}');
@@ -26,17 +27,27 @@ Map<String, String> playLabelsByPlayer(List<Map<String, dynamic>> rows) {
   return labels;
 }
 
-/// 1人分の打席を「ホームラン タイムリー 三塁打 二塁打 単打 犠飛 スクイズ 四球 犠打」の順で連結する。
+/// 1人分の打席を、最初の打席から記録順に連結する。
 String formatPlayLabels(Iterable<Map<String, dynamic>> rows) {
-  final ordered = rows.toList();
-  final labels = <({String text, String kind, int index})>[];
+  final ordered = rows.toList()
+    ..sort((a, b) {
+      final bySeq = _asInt(a['_seq']).compareTo(_asInt(b['_seq']));
+      if (a.containsKey('_seq') && b.containsKey('_seq') && bySeq != 0) return bySeq;
+      final byInning = _asInt(a['int_inning']).compareTo(_asInt(b['int_inning']));
+      if (byInning != 0) return byInning;
+      final byHalf = (_asBool(a['flg_bottom']) ? 1 : 0).compareTo(_asBool(b['flg_bottom']) ? 1 : 0);
+      if (byHalf != 0) return byHalf;
+      final byOrder = _asInt(a['int_batting_order']).compareTo(_asInt(b['int_batting_order']));
+      if (byOrder != 0) return byOrder;
+      return _asInt(a['id']).compareTo(_asInt(b['id']));
+    });
+  final labels = <({String text, String kind})>[];
   final plate = <Map<String, dynamic>>[];
   String? plateKey;
 
   void flush() {
     for (final chip in _chipsForPlate(plate)) {
-      if (chip.kind == 'out') continue;
-      labels.add((text: chip.text, kind: chip.kind, index: labels.length));
+      labels.add((text: chip.text, kind: chip.kind));
     }
     plate.clear();
   }
@@ -51,12 +62,41 @@ String formatPlayLabels(Iterable<Map<String, dynamic>> rows) {
     plate.add(row);
   }
   if (plate.isNotEmpty) flush();
-  labels.sort((a, b) {
-    final byKind = _playRank(a.kind).compareTo(_playRank(b.kind));
-    if (byKind != 0) return byKind;
-    return a.index.compareTo(b.index);
-  });
   return labels.map((chip) => '${chip.text}|${chip.kind}').join(' ');
+}
+
+int _chipCount(String plays, bool Function(String kind) match) {
+  var count = 0;
+  for (final part in plays.split(' ')) {
+    if (part.isEmpty) continue;
+    final bar = part.lastIndexOf('|');
+    final kind = bar < 0 ? '' : part.substring(bar + 1);
+    if (match(kind)) count++;
+  }
+  return count;
+}
+
+/// 速報に残っていない安打・本塁打を、公式成績の本数だけ補う。
+String playsFilledFromLine(
+  String plays, {
+  required int singles,
+  required int doubles,
+  required int triples,
+  required int homers,
+}) {
+  final extra = <String>[];
+  final homerChips = _chipCount(plays, (kind) => kind == 'hr');
+  for (var i = homerChips; i < homers; i++) {
+    extra.add('ホームラン|hr');
+  }
+  final hitChips = _chipCount(plays, (kind) => kind == 'single' || kind == 'double' || kind == 'triple' || kind == 'timely');
+  // 公式の安打数に本塁打が含まれていても、本塁打の表示がすでにあるので「安」は足さない。
+  final expectedHits = singles + doubles + triples - homers;
+  for (var i = hitChips; i < expectedHits; i++) {
+    extra.add('安|single');
+  }
+  if (extra.isEmpty) return plays;
+  return [plays, ...extra].where((part) => part.trim().isNotEmpty).join(' ');
 }
 
 /// 速報に号数が無い本塁打へ、試合トップの号数を左から順に入れる。
@@ -92,32 +132,112 @@ String playsWithHomerNumbers(String plays, String totals) {
 }
 
 String _homerNumberFirst(String label, [String? number]) {
-  final existing = RegExp(r'(\d+)号').firstMatch(label);
+  final head = RegExp(r'^(\d+回[表裏])').firstMatch(label);
+  final prefix = head?.group(0) ?? '';
+  final body = label.substring(prefix.length);
+  final existing = RegExp(r'(\d+)号').firstMatch(body);
   if (existing != null) {
     if (existing.start == 0) return label;
     final token = existing.group(0)!;
-    return '$token${label.substring(0, existing.start)}${label.substring(existing.end)}';
+    return '$prefix$token${body.substring(0, existing.start)}${body.substring(existing.end)}';
   }
   if (number == null || number.isEmpty) return label;
-  return '$number号$label';
+  return '$prefix$number号$body';
 }
 
-int _playRank(String kind) {
-  return switch (kind) {
-    'hr' => 0,
-    'timely' => 1,
-    'triple' => 2,
-    'double' => 3,
-    'single' => 4,
-    'steal' => 5,
-    'sacfly' => 6,
-    'squeeze' => 7,
-    'walk' => 8,
-    'dead' => 9,
-    'error' => 10,
-    'sacbunt' => 11,
-    _ => 99,
-  };
+/// イニングの中は打順の回り順で並べる。登録順は打席の順と一致しない。
+void _assignTimeline(List<Map<String, dynamic>> rows) {
+  final games = <int, List<Map<String, dynamic>>>{};
+  for (final row in rows) {
+    games.putIfAbsent(_asInt(row['id_game']), () => []).add(row);
+  }
+  for (final gameRows in games.values) {
+    final halves = <String, List<Map<String, dynamic>>>{};
+    for (final row in gameRows) {
+      final half = '${_asInt(row['int_inning'])}|${_asBool(row['flg_bottom']) ? 1 : 0}';
+      halves.putIfAbsent(half, () => []).add(row);
+    }
+    final halfKeys = halves.keys.toList()..sort((a, b) {
+      final as = a.split('|');
+      final bs = b.split('|');
+      final inning = int.parse(as[0]).compareTo(int.parse(bs[0]));
+      if (inning != 0) return inning;
+      return int.parse(as[1]).compareTo(int.parse(bs[1]));
+    });
+    final nextOrder = <int, int>{0: 1, 1: 1};
+    var seq = 0;
+    for (final half in halfKeys) {
+      final side = int.parse(half.split('|')[1]);
+      final ordered = _rowsInHalfOrder(halves[half]!, nextOrder[side]!);
+      for (final row in ordered) {
+        row['_seq'] = seq++;
+      }
+      final last = _lastBattingOrder(ordered);
+      if (last >= 1 && last <= 9) nextOrder[side] = last == 9 ? 1 : last + 1;
+    }
+  }
+}
+
+List<Map<String, dynamic>> _rowsInHalfOrder(List<Map<String, dynamic>> rows, int start) {
+  final plates = <String, List<Map<String, dynamic>>>{};
+  for (final row in rows) {
+    plates.putIfAbsent(_plateKey(row), () => []).add(row);
+  }
+  int orderOf(List<Map<String, dynamic>> plate) => _asInt(plate.first['int_batting_order']);
+  int outsOf(List<Map<String, dynamic>> plate) => _asInt(plate.first['cnt_out']);
+  int dist(int order) {
+    if (order < 1 || order > 9) return -1;
+    return (order - start + 9) % 9;
+  }
+
+  final numbered = plates.values.where((plate) => dist(orderOf(plate)) >= 0).toList()
+    ..sort((a, b) {
+      final byOut = outsOf(a).compareTo(outsOf(b));
+      if (byOut != 0) return byOut;
+      final byDist = dist(orderOf(a)).compareTo(dist(orderOf(b)));
+      if (byDist != 0) return byDist;
+      return _asInt(a.first['id']).compareTo(_asInt(b.first['id']));
+    });
+  int nextOrder(int order) => order == 9 ? 1 : order + 1;
+  int distanceFor(List<Map<String, dynamic>> plate) {
+    final known = dist(orderOf(plate));
+    if (known >= 0) return known;
+    var expected = start;
+    for (final earlier in numbered) {
+      if (outsOf(earlier) < outsOf(plate)) expected = nextOrder(orderOf(earlier));
+    }
+    return dist(expected);
+  }
+
+  final orderedPlates = plates.values.toList()
+    ..sort((a, b) {
+      final byOut = outsOf(a).compareTo(outsOf(b));
+      if (byOut != 0) return byOut;
+      final byDist = distanceFor(a).compareTo(distanceFor(b));
+      if (byDist != 0) return byDist;
+      return _asInt(a.first['id']).compareTo(_asInt(b.first['id']));
+    });
+  final ordered = <Map<String, dynamic>>[];
+  for (final plate in orderedPlates) {
+    plate.sort((a, b) => _asInt(a['id']).compareTo(_asInt(b['id'])));
+    ordered.addAll(plate);
+  }
+  return ordered;
+}
+
+int _lastBattingOrder(List<Map<String, dynamic>> rows) {
+  var order = 0;
+  for (final row in rows) {
+    final value = _asInt(row['int_batting_order']);
+    if (value >= 1 && value <= 9) order = value;
+  }
+  return order;
+}
+
+String _halfInning(Map<String, dynamic> row) {
+  final inning = _asInt(row['int_inning']);
+  if (inning <= 0) return '';
+  return '$inning回${_asBool(row['flg_bottom']) ? '裏' : '表'}';
 }
 
 String _plateKey(Map<String, dynamic> row) {
@@ -146,7 +266,10 @@ List<({String text, String kind})> _chipsForPlate(List<Map<String, dynamic>> pla
       chips.add((text: '盗塁', kind: 'steal'));
       continue;
     }
-    if (result == Value.CodeGameResult.STEAL_BASE_OUT) continue;
+    if (result == Value.CodeGameResult.STEAL_BASE_OUT) {
+      chips.add((text: '盗塁失敗', kind: 'stealout'));
+      continue;
+    }
     if (!identical(row, batting)) continue;
     final chip = _formatResult(
       result: result,
@@ -156,6 +279,7 @@ List<({String text, String kind})> _chipsForPlate(List<Map<String, dynamic>> pla
       runs: _asInt(row['int_runs']),
       homerNumber: _asInt(row['cnt_homerun']),
       direction: _direction('${row['code_direction_batting'] ?? ''}'),
+      inning: _halfInning(row),
     );
     if (chip != null) chips.add(chip);
   }
@@ -204,8 +328,10 @@ bool _isBattingResult(String result) {
   required int runs,
   required int homerNumber,
   required String direction,
+  required String inning,
 }) {
-  final head = '${pinch ? '代打' : ''}$state${goodbye ? 'サヨナラ' : ''}';
+  final head = '$state${goodbye ? 'サヨナラ' : ''}';
+  final pinchHead = '${pinch ? '代打' : ''}$head';
   if (result == Value.CodeGameResult.HOME_RUN) {
     final kind = switch (runs) {
       >= 4 => '満塁',
@@ -214,7 +340,7 @@ bool _isBattingResult(String result) {
       _ => 'ソロ',
     };
     final number = homerNumber > 0 ? '$homerNumber号' : '';
-    return (text: '$number$head$kindホームラン', kind: 'hr');
+    return (text: '$inning$number$pinchHead$kindホームラン', kind: 'hr');
   }
 
   if (result == Value.CodeGameResult.HIT_SINGLE || result == Value.CodeGameResult.HIT_DOUBLE || result == Value.CodeGameResult.HIT_TRIPLE) {
@@ -232,7 +358,7 @@ bool _isBattingResult(String result) {
       final points = runs >= 2 ? '$runs点' : '';
       // 速報が「タイムリーヒット」でも、ヒットよりタイムリーを優先する。二塁打・三塁打は種類を残す。
       final body = result == Value.CodeGameResult.HIT_SINGLE ? 'タイムリー' : 'タイムリー$hit';
-      return (text: '$head$points$body', kind: 'timely');
+      return (text: '$inning$pinchHead$points$body', kind: 'timely');
     }
     final hitKind = switch (result) {
       'HIT3' => 'triple',
@@ -246,7 +372,18 @@ bool _isBattingResult(String result) {
   }
 
   if (result == 'OUT_GROUND' || result == 'OUT_FLY' || result == 'OUT_LINE_DRIVE' || result == 'OUT_POP_UP' || result == 'OUT_DOUBLE_PLAY' || result == 'STRIKE_OUT') {
-    return null;
+    final word = switch (result) {
+      'OUT_GROUND' => 'ゴロ',
+      'OUT_FLY' => 'フライ',
+      'OUT_LINE_DRIVE' => 'ライナー',
+      'OUT_POP_UP' => 'ポップ',
+      'OUT_DOUBLE_PLAY' => '併殺',
+      'STRIKE_OUT' => '三振',
+      _ => '',
+    };
+    if (word.isEmpty) return null;
+    final directed = result == 'STRIKE_OUT' || direction.isEmpty ? word : '$direction$word';
+    return (text: '$head$directed', kind: 'out');
   }
 
   final squeeze = result == Value.CodeGameResult.SQUEEZE || (result == Value.CodeGameResult.SACRIFICE_BUNT && runs > 0);

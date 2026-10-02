@@ -20,7 +20,7 @@ flutter build web --release
 rm -rf backend/public/*
 cp -R build/web/* backend/public/
 git add .
-git commit -m "スマホの横画面は縦型のレイアウトと同じにするように変更"
+git commit -m "表示形式を選択できるように修正、打者成績の表示に活躍選手と全員を選択できるように修正、プレーオフのトーナメント表を追加しました"
 git push
 cd /Users/standapp/StudioProjects/Koko/backend
 dart run index.dart

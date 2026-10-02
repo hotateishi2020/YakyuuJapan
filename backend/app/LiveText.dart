@@ -81,6 +81,56 @@ final Set<String> livePlateFinishedResults = {
   Value.CodeGameResult.INTERFERENCE_FIELDING,
 };
 
+class StoredLivePlate {
+  final int order;
+  final int batter;
+  final int outs;
+  final bool runnerFirst;
+  final bool runnerSecond;
+  final bool runnerThird;
+
+  const StoredLivePlate({
+    required this.order,
+    required this.batter,
+    required this.outs,
+    required this.runnerFirst,
+    required this.runnerSecond,
+    required this.runnerThird,
+  });
+}
+
+/// すでに保存した打席と突き合わせ、速報側にだけある打席の位置を返す。
+List<int> unmatchedLivePlates({
+  required List<ParsedPlate> plates,
+  required List<StoredLivePlate> stored,
+  required int Function(String batterName) batterIdOf,
+}) {
+  final used = <int>{};
+  final missing = <int>[];
+  for (var i = 0; i < plates.length; i++) {
+    final plate = plates[i];
+    final batterId = batterIdOf(plate.batterName);
+    var found = -1;
+    for (var s = 0; s < stored.length; s++) {
+      if (used.contains(s)) continue;
+      final row = stored[s];
+      if (plate.battingOrder != 0 && row.order != 0 && plate.battingOrder != row.order) continue;
+      if (batterId != 0 && row.batter != 0 && batterId != row.batter) continue;
+      if (plate.battingOrder == 0 && batterId == 0) continue;
+      if (row.outs != plate.outs) continue;
+      if (row.runnerFirst != plate.runnerFirst || row.runnerSecond != plate.runnerSecond || row.runnerThird != plate.runnerThird) continue;
+      found = s;
+      break;
+    }
+    if (found >= 0) {
+      used.add(found);
+    } else {
+      missing.add(i);
+    }
+  }
+  return missing;
+}
+
 class LiveText {
   static ParsedLiveText parse(Document doc) {
     final root = doc.querySelector('#text_live');
@@ -144,7 +194,46 @@ class LiveText {
       ));
     }
 
-    return ParsedLiveText(halves: halves, finished: finished);
+    return ParsedLiveText(halves: _withoutExtraPlates(halves), finished: finished);
+  }
+
+  static bool _countsAsPlate(ParsedPlate plate) {
+    return plate.events.any((event) => livePlateFinishedResults.contains(event.result));
+  }
+
+  /// 同じ打順のあとに打つ打者は、前の打順より打席が多くならない。
+  /// 代打は打順表示がなくても、その枠の次の打席として数える。
+  /// 速報の取り直しで同じ打席がもう一度入っても、後ろの枠だけ増えないように捨てる。
+  static List<ParsedHalf> _withoutExtraPlates(List<ParsedHalf> halves) {
+    final counts = <bool, Map<int, int>>{false: {}, true: {}};
+    final nextSlot = <bool, int>{false: 1, true: 1};
+    final keptHalves = <ParsedHalf>[];
+    for (final half in halves) {
+      final count = counts[half.bottom]!;
+      final kept = <ParsedPlate>[];
+      for (final plate in half.plates) {
+        if (!_countsAsPlate(plate)) {
+          kept.add(plate);
+          continue;
+        }
+        final shown = plate.battingOrder;
+        final order = shown >= 1 && shown <= 9 ? shown : nextSlot[half.bottom]!;
+        final next = (count[order] ?? 0) + 1;
+        var ahead = true;
+        for (var earlier = 1; earlier < order; earlier++) {
+          if ((count[earlier] ?? 0) < next) {
+            ahead = false;
+            break;
+          }
+        }
+        if (!ahead) continue;
+        count[order] = next;
+        nextSlot[half.bottom] = order == 9 ? 1 : order + 1;
+        kept.add(plate);
+      }
+      keptHalves.add(ParsedHalf(inning: half.inning, bottom: half.bottom, plates: kept));
+    }
+    return keptHalves;
   }
 
   static List<ParsedLiveEvent> _eventsOf(Element summary) {
@@ -311,7 +400,7 @@ class LiveText {
     } else if (digits.contains('ゴロ')) {
       event.category = Value.CodeGameResultCategory.BATTING;
       event.result = Value.CodeGameResult.OUT_GROUND;
-    } else if (digits.contains('ファンブル') || digits.contains('失策') || digits.contains('エラー') || digits.contains('後逸') || digits.contains('落球')) {
+    } else if (digits.contains('悪送球') || digits.contains('ファンブル') || digits.contains('失策') || digits.contains('エラー') || digits.contains('後逸') || digits.contains('落球')) {
       event.category = Value.CodeGameResultCategory.ERROR;
       event.result = Value.CodeGameResult.ERROR_FIELDING;
     } else if (digits.contains('暴投')) {
@@ -329,7 +418,7 @@ class LiveText {
     } else if (digits.contains('守備妨害')) {
       event.category = Value.CodeGameResultCategory.BATTING;
       event.result = Value.CodeGameResult.INTERFERENCE_FIELDING;
-    } else if (digits.contains('盗塁死')) {
+    } else if (digits.contains('盗塁死') || (digits.contains('盗塁') && (digits.contains('アウト') || digits.contains('失敗') || digits.contains('刺さ')))) {
       event.category = Value.CodeGameResultCategory.RUNNING_BASE;
       event.result = Value.CodeGameResult.STEAL_BASE_OUT;
     } else if (digits.contains('盗塁')) {
@@ -407,6 +496,22 @@ class LiveText {
   }
 
   static String _direction(String text) {
+    final mark = RegExp(r'[（(]([遊一二三投捕左右中])[）)]').firstMatch(text);
+    if (mark != null) {
+      final code = _position(switch (mark.group(1)) {
+        '遊' => '遊撃',
+        '一' => '一塁',
+        '二' => '二塁',
+        '三' => '三塁',
+        '投' => '投手',
+        '捕' => '捕手',
+        '左' => 'レフト',
+        '右' => 'ライト',
+        '中' => 'センター',
+        _ => '',
+      });
+      if (code.isNotEmpty) return code;
+    }
     const words = ['左中間', '右中間', 'レフト線', 'ライト線', 'レフト', 'ライト', 'センター', 'ファースト', 'セカンド', 'サード', 'ショート', 'ピッチャー', 'キャッチャー', '中堅'];
     for (final word in words) {
       if (text.contains(word)) {

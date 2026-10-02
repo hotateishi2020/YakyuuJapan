@@ -107,6 +107,18 @@ class AppSql {
     ''';
   }
 
+  /// 最終試合の年の9月15日から、次の開幕日の前日までなら true。
+  static String selectPostseasonBoard() {
+    return '''
+      SELECT
+        CURRENT_DATE >= make_date(EXTRACT(YEAR FROM final_game.datetime1)::int, 9, 15)
+        AND CURRENT_DATE < open_game.datetime1::date AS flg_break
+      FROM
+        (SELECT datetime1 FROM m_system_code WHERE code = \$1 AND key = \$2 ORDER BY datetime1 DESC LIMIT 1) final_game,
+        (SELECT datetime1 FROM m_system_code WHERE code = \$1 AND key = \$3 ORDER BY datetime1 DESC LIMIT 1) open_game
+    ''';
+  }
+
   /// 最終試合の翌日以降、次の開幕日の前日までなら true。
   static String selectOfficialSeasonBreak() {
     return '''
@@ -248,7 +260,8 @@ class AppSql {
   static String selectTeamsWhereName() {
     return '''
       SELECT
-        id
+        id,
+        id_league
       FROM m_team
       WHERE name_short = \$1 
       LIMIT 1
@@ -428,7 +441,15 @@ class AppSql {
         int_runs_pitch,
         int_runs_earned,
         int_balk,
-        int_hit_batting
+        int_hit_batting,
+        txt_scores_home,
+        txt_scores_away,
+        int_runs_home,
+        int_runs_away,
+        int_error_home,
+        int_error_away,
+        int_hit_home,
+        int_hit_away
       FROM t_game
         LEFT OUTER JOIN m_player AS pitcher_home ON pitcher_home.id = t_game.id_pitcher_home
         LEFT OUTER JOIN m_player AS pitcher_away ON pitcher_away.id = t_game.id_pitcher_away
@@ -480,7 +501,7 @@ class AppSql {
             END AS txt_batting,
             TRIM_SCALE(double_inning_pitch)::text || '回' || 
               CASE WHEN int_runs = 0 THEN '無' ELSE int_runs::text END || '失点(' || 
-              CASE WHEN int_hit = 0 THEN '無' ELSE int_hit::text END || '安打' ||
+              CASE WHEN int_hit = 0 THEN '無被安打' ELSE '被安打' || int_hit::text END ||
               CASE WHEN int_four = 0 THEN '無' ELSE int_four::text END || '四球' ||
               CASE WHEN int_dead_pitching = 0 THEN '' ELSE int_dead_pitching::text || '死球' END || 
               CASE WHEN int_strike_out = 0 THEN '0' ELSE int_strike_out::text END || '奪三振' || 
@@ -507,7 +528,15 @@ class AppSql {
             int_runs AS int_runs_pitch,
             int_runs_earned,
             int_balk,
-            int_hit1 AS int_hit_batting
+            int_hit1 AS int_hit_batting,
+            MAX(COALESCE(t_game_summary.txt_scores_home, '')) AS txt_scores_home,
+            MAX(COALESCE(t_game_summary.txt_scores_away, '')) AS txt_scores_away,
+            MAX(COALESCE(t_game_summary.int_runs_home, 0)) AS int_runs_home,
+            MAX(COALESCE(t_game_summary.int_runs_away, 0)) AS int_runs_away,
+            MAX(COALESCE(t_game_summary.int_error_home, 0)) AS int_error_home,
+            MAX(COALESCE(t_game_summary.int_error_away, 0)) AS int_error_away,
+            MAX(COALESCE(t_game_summary.int_hit_home, 0)) AS int_hit_home,
+            MAX(COALESCE(t_game_summary.int_hit_away, 0)) AS int_hit_away
           FROM t_game_summary
             LEFT OUTER JOIN t_predict_player on t_predict_player.id_player = t_game_summary.id_player AND t_predict_player.year =  \$1
             LEFT OUTER JOIN m_player on m_player.id = t_game_summary.id_player
@@ -530,9 +559,92 @@ class AppSql {
                team_away.color_back, team_home.id, team_away.id, pitcher_win.id_team, pitcher_lose.id_team, pitcher_save.name_full, 
                pitcher_save.id_team, t_game.state, v_game_summary.id_game_summary, id_team_summary, name_full_summary, 
                txt_batting, txt_pitching, txt_homerun_total, code_result_pitcher, colors_summary, titles_predict, flg_pitcher, point_total,
-               double_inning_pitch, int_pitch, int_hit_allowed, int_strike_out, int_walk_pitch, int_hbp_pitch, int_runs_pitch, int_runs_earned, int_balk, int_hit_batting
+               double_inning_pitch, int_pitch, int_hit_allowed, int_strike_out, int_walk_pitch, int_hbp_pitch, int_runs_pitch, int_runs_earned, int_balk, int_hit_batting,
+               txt_scores_home, txt_scores_away, int_runs_home, int_runs_away, int_error_home, int_error_away, int_hit_home, int_hit_away
       ORDER BY to_char(t_game.datetime_start, 'YYYY-MM-DD'), t_game.id, id_team_summary, CASE WHEN flg_pitcher = TRUE THEN v_game_summary.id_game_summary END ASC, CASE WHEN flg_pitcher = FALSE THEN v_game_summary.point_total END DESC;
 
+    ''';
+  }
+
+  /// 表示中の試合について、全打席記録と欠けた打席表示を公式成績で確かめる。
+  static String selectBattingLines() {
+    return '''
+      SELECT
+        s.id_game,
+        p.id_team,
+        p.name_full,
+        s.int_batting,
+        s.int_hit1,
+        s.int_hit2,
+        s.int_hit3,
+        s.int_homerun,
+        s.int_fourball,
+        s.int_dead_batting,
+        s.int_sacrifice,
+        s.int_error,
+        COALESCE(s.txt_homerun_total, '') AS txt_homerun_total
+      FROM t_game_summary s
+      JOIN m_player p ON p.id = s.id_player
+      JOIN t_game g ON g.id = s.id_game
+      WHERE g.datetime_start::date BETWEEN (CURRENT_DATE - 10) AND (CURRENT_DATE + 10)
+    ''';
+  }
+
+  /// 当年のクライマックスシリーズと日本シリーズ。
+  static String selectPostseasonGames() {
+    return '''
+      SELECT
+        t_game.id AS id_game,
+        t_game.code_game,
+        to_char(t_game.datetime_start, 'YYYY-MM-DD') AS date_game,
+        t_game.score_home,
+        t_game.score_away,
+        t_game.state,
+        t_game.id_team_home,
+        t_game.id_team_away
+      FROM t_game
+      WHERE t_game.code_game IN ('CS1', 'CSF', 'JS')
+        AND COALESCE(t_game.flg_delete, FALSE) = FALSE
+        AND EXTRACT(YEAR FROM t_game.datetime_start) = \$1
+      ORDER BY t_game.datetime_start, t_game.id
+    ''';
+  }
+
+  static String selectSeasonEdge() {
+    return '''
+      SELECT
+        final_game.datetime1::date AS date_final,
+        open_game.datetime1::date AS date_open,
+        CURRENT_DATE::text AS today,
+        CURRENT_DATE > final_game.datetime1::date AS after_final,
+        CURRENT_DATE = final_game.datetime1::date AS on_final,
+        CURRENT_DATE < open_game.datetime1::date AS before_open
+      FROM
+        (SELECT datetime1 FROM m_system_code WHERE code = \$1 AND key = \$2 ORDER BY datetime1 DESC LIMIT 1) final_game,
+        (SELECT datetime1 FROM m_system_code WHERE code = \$1 AND key = \$3 ORDER BY datetime1 DESC LIMIT 1) open_game
+    ''';
+  }
+
+  static String selectPlainGamesOnDate() {
+    return '''
+      SELECT state
+      FROM t_game
+      WHERE datetime_start::date = \$1::date
+        AND COALESCE(code_game, '') NOT IN ('CS1', 'CSF', 'JS')
+    ''';
+  }
+
+  static String updatePostseasonGame() {
+    return '''
+      UPDATE t_game
+      SET code_game = \$1,
+          state = \$2,
+          score_home = \$3,
+          score_away = \$4,
+          datetime_start = \$5,
+          id_stadium = CASE WHEN \$6 > 0 THEN \$6 ELSE id_stadium END,
+          updat = NOW()
+      WHERE id = \$7
     ''';
   }
 
@@ -570,6 +682,40 @@ class AppSql {
     ''';
   }
 
+  // 出場成績の方向補完用。打者ごとの打席を記録順に取る
+  static String selectGameBatterPlays() {
+    return '''
+      SELECT
+        d.id,
+        p.id_team,
+        p.name_full,
+        d.int_inning,
+        d.flg_bottom,
+        d.int_batting_order,
+        d.cnt_out,
+        d.flg_runner_first,
+        d.flg_runner_second,
+        d.flg_runner_third,
+        d.code_result,
+        d.code_direction_batting
+      FROM t_game_details d
+      JOIN m_player p ON p.id = d.id_batter
+      WHERE d.id_game = \$1
+        AND COALESCE(d.flg_delete, false) = false
+        AND COALESCE(d.id_batter, 0) <> 0
+      ORDER BY d.id
+    ''';
+  }
+
+  static String updateGameDetailDirection() {
+    return '''
+      UPDATE t_game_details
+      SET code_direction_batting = \$2
+      WHERE id = \$1
+        AND COALESCE(BTRIM(code_direction_batting), '') = ''
+    ''';
+  }
+
   static String selectGamePlayRows() {
     return '''
       SELECT
@@ -591,11 +737,17 @@ class AppSql {
         d.flg_goodbye,
         d.code_direction_batting,
         runner.name_full AS name_runner,
-        runner.id_team AS id_team_runner
+        runner.id_team AS id_team_runner,
+        g.id_team_home,
+        g.id_team_away,
+        entered.name_full AS name_enter,
+        exited.name_full AS name_exit
       FROM t_game_details d
         INNER JOIN m_player p ON p.id = d.id_batter
         LEFT JOIN m_player runner ON runner.id = d.id_player_enter
           AND d.code_result IN ('STEAL_BASE_SAFE', 'STEAL_BASE_OUT')
+        LEFT JOIN m_player entered ON entered.id = d.id_player_enter
+        LEFT JOIN m_player exited ON exited.id = d.id_player_exit
         INNER JOIN t_game g ON g.id = d.id_game
       WHERE COALESCE(d.flg_delete, false) = false
         AND d.id_batter <> 0
@@ -823,7 +975,9 @@ class AppSql {
      
 SELECT
         t_stats_team.int_rank,
+        m_team.id AS id_team,
         m_team.name_short AS name_team,
+        m_team.name_full AS name_team_full,
         v_predict_team.team_name_tateishi,
         CASE WHEN m_team.id = v_predict_team.team_id_tateishi THEN true ELSE false END AS flg_atari_tateishi,
         v_predict_team.team_color_back_tateishi,
@@ -840,6 +994,29 @@ SELECT
         int_win,
         int_lose,
         int_draw,
+        GREATEST(
+          COALESCE((
+            SELECT COUNT(*)::int
+            FROM t_game g
+            WHERE (g.id_team_home = m_team.id OR g.id_team_away = m_team.id)
+              AND g.datetime_start::date >= CURRENT_DATE
+              AND g.datetime_start::date <= (
+                SELECT datetime1::date FROM m_system_code
+                WHERE code = 'ADMIN' AND key = 'DATE_FINAL_GAME'
+                ORDER BY datetime1 DESC LIMIT 1
+              )
+              AND COALESCE(g.state, '') NOT IN ('試合終了', '試合中止')
+              AND COALESCE(g.code_game, '') NOT IN ('CS1', 'CSF', 'JS', 'OP', 'E', 'AS', 'SJ')
+          ), 0),
+          CASE
+            WHEN CURRENT_DATE > (
+              SELECT datetime1::date FROM m_system_code
+              WHERE code = 'ADMIN' AND key = 'DATE_FINAL_GAME'
+              ORDER BY datetime1 DESC LIMIT 1
+            ) THEN 0
+            ELSE GREATEST(0, 143 - COALESCE(t_stats_team.int_game, 0))
+          END
+        ) AS int_game_left,
         game_behind,
         to_char(int_win / (int_win + int_lose) ::NUMERIC * 100, 'FM990.0') || '%' AS pct_win,
         regexp_replace(to_char(num_avg_batting, 'FM0.000'), '^0(?=\.)', '') AS num_avg_batting,

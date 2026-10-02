@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:Yakyuu_Japan/View/BlinkBg.dart';
 import 'package:Yakyuu_Japan/View/GamesBoard.dart';
 
 void main() {
@@ -166,7 +167,7 @@ void main() {
     await tester.pump();
 
     expect(tester.takeException(), isNull);
-    expect(find.text('DeNA'), findsOneWidget);
+    expect(find.text('DeNA'), findsNWidgets(2));
     expect(find.text('東克樹'), findsWidgets);
     expect(find.text('工藤泰己'), findsWidgets);
     expect(find.text('成瀬脩人'), findsOneWidget);
@@ -188,9 +189,9 @@ void main() {
     final hrBadge = tester.widget<Container>(
       find.ancestor(of: find.text('HR'), matching: find.byType(Container)).first,
     );
-    expect((hrBadge.decoration as BoxDecoration).color, const Color(0xFF7B1FA2));
+    expect((hrBadge.decoration as BoxDecoration).color, const Color(0xFFDC143C));
     expect(find.text('本'), findsOneWidget);
-    expect(find.text('安'), findsOneWidget);
+    expect(find.text('安'), findsNWidgets(2));
     final predictHon = tester.widget<Container>(
       find.ancestor(of: find.text('本'), matching: find.byType(Container)).first,
     );
@@ -212,8 +213,17 @@ void main() {
     expect(tester.getSize(find.text('中川虎大').first).width, greaterThanOrEqualTo(namePainter.width - 0.5));
     expect(tester.getSize(find.text('中川虎大').first).width, greaterThan(tester.getSize(find.text('東克樹').first).width));
 
-    final scoreGap = tester.getTopLeft(find.text('広島')).dx - tester.getTopRight(find.text('DeNA')).dx;
-    expect(scoreGap, lessThan(155));
+    double columnWidth(Finder text) {
+      return tester.getSize(find.ancestor(of: text, matching: find.byType(Container)).first).width;
+    }
+
+    final homeColumn = columnWidth(find.text('DeNA').first);
+    final scoreColumn = columnWidth(find.text('2 - 3'));
+    final awayColumn = columnWidth(find.text('広島').first);
+    final centerHeader = columnWidth(find.text('投手'));
+    expect(awayColumn, closeTo(homeColumn, 2));
+    expect(scoreColumn, closeTo(148, 2));
+    expect(centerHeader, lessThan(scoreColumn));
 
     final boardRect = tester.getRect(find.byType(GamesBoardYahooStyle));
     expect(tester.getRect(find.text('中川虎大').first).bottom, lessThanOrEqualTo(boardRect.bottom + 0.5));
@@ -331,8 +341,8 @@ void main() {
     await tester.pump();
 
     expect(tester.takeException(), isNull);
-    expect(find.text('DeNA'), findsOneWidget);
-    expect(find.text('広島'), findsOneWidget);
+    expect(find.text('DeNA'), findsNWidgets(2));
+    expect(find.text('広島'), findsNWidgets(2));
   });
 
   testWidgets('date buttons move relative to the displayed day', (tester) async {
@@ -408,13 +418,13 @@ void main() {
     await tester.pump();
 
     expect(tester.takeException(), isNull);
-    final giants = tester.getTopLeft(find.text('巨人'));
-    final tigers = tester.getTopLeft(find.text('阪神'));
+    final giants = tester.getTopLeft(find.text('巨人').first);
+    final tigers = tester.getTopLeft(find.text('阪神').first);
     expect(giants.dx, lessThan(tigers.dx));
     expect(giants.dy, closeTo(tigers.dy, 1.0));
 
     final homeName = tester.getCenter(find.text('先発巨人'));
-    final homeTeam = tester.getCenter(find.text('巨人'));
+    final homeTeam = tester.getCenter(find.text('巨人').first);
     expect(homeName.dx, closeTo(homeTeam.dx, 16.0));
     final awayName = tester.getCenter(find.text('先発ヤクルト').first);
     final awayTeam = tester.getCenter(find.text('ヤクルト').first);
@@ -506,8 +516,8 @@ void main() {
     await tester.pump();
 
     expect(tester.takeException(), isNull);
-    final dena = tester.getTopLeft(find.text('DeNA'));
-    final tigers = tester.getTopLeft(find.text('阪神'));
+    final dena = tester.getTopLeft(find.text('DeNA').first);
+    final tigers = tester.getTopLeft(find.text('阪神').first);
     expect(dena.dy, lessThan(tigers.dy));
     expect(find.byType(SingleChildScrollView), findsWidgets);
 
@@ -521,7 +531,7 @@ void main() {
         home: Center(
           child: SizedBox(
             width: 200,
-            height: 140,
+            height: 180,
             child: GamesBoardYahooStyle(
               games: [
                 {
@@ -565,12 +575,11 @@ void main() {
     expect(tester.getSize(find.text('小笠原慎之介').first).width, greaterThanOrEqualTo(painter.width - 0.5));
 
     final nameRight = tester.getTopRight(find.text('小笠原慎之介').first).dx;
-    final statLeft = tester.getTopLeft(find.text('6.1回8安打3失点(3四球3奪三振119球)').first).dx;
+    final statFinder = find.text('6.1回8安打3失点(3四球3奪三振119球)', skipOffstage: false);
+    final statLeft = tester.getTopLeft(statFinder).dx;
     expect(statLeft, greaterThan(nameRight));
     expect(
-      tester.getRect(find.text('小笠原慎之介').first).overlaps(
-            tester.getRect(find.text('6.1回8安打3失点(3四球3奪三振119球)').first),
-          ),
+      tester.getRect(find.text('小笠原慎之介').first).overlaps(tester.getRect(statFinder)),
       isFalse,
     );
   });
@@ -617,7 +626,7 @@ void main() {
   });
 
   testWidgets('batting results line up to the right of the player name', (tester) async {
-    const plays = '一ゴ|out 犠打|sacbunt 四球|walk スクイズ|squeeze 犠飛|sacfly 中安|single 左2|double 右3|triple 先制2点タイムリーツーベース|timely 代打逆転サヨナラ19号ソロホームラン|hr';
+    const plays = '一ゴ|out 犠打|sacbunt 四球|walk スクイズ|squeeze 犠飛|sacfly 中安|single 左2|double 右3|triple 8回裏先制2点タイムリーツーベース|timely 1回表代打逆転サヨナラ19号ソロホームラン|hr';
     await tester.pumpWidget(
       MaterialApp(
         home: Center(
@@ -665,8 +674,8 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.text('4打数2安打(1HR1打点)'), findsNothing);
-    expect(find.text('19号代打逆転サヨナラソロホームラン'), findsOneWidget);
-    expect(find.text('先制2点タイムリーツーベース'), findsOneWidget);
+    expect(find.text('1回表19号代打逆転サヨナラソロホームラン'), findsOneWidget);
+    expect(find.text('8回裏先制2点タイムリーツーベース'), findsOneWidget);
     expect(find.text('右3'), findsOneWidget);
     expect(find.text('左2'), findsOneWidget);
     expect(find.text('中安'), findsOneWidget);
@@ -683,8 +692,8 @@ void main() {
       return (chip.decoration as BoxDecoration).color!;
     }
 
-    expect(backgroundOf('19号代打逆転サヨナラソロホームラン'), const Color(0xFFDC143C));
-    expect(backgroundOf('先制2点タイムリーツーベース'), const Color(0xFFFF5722));
+    expect(backgroundOf('1回表19号代打逆転サヨナラソロホームラン'), const Color(0xFFDC143C));
+    expect(backgroundOf('8回裏先制2点タイムリーツーベース'), const Color(0xFFFF5722));
     expect(backgroundOf('右3'), const Color(0xFFFFB300));
     expect(backgroundOf('左2'), const Color(0xFFFFB300));
     expect(backgroundOf('中安'), const Color(0xFFFFEB3B));
@@ -694,7 +703,7 @@ void main() {
     expect(backgroundOf('犠打'), const Color(0xFF8E24AA));
 
     final nameRight = tester.getTopRight(find.text('大山悠輔')).dx;
-    final labels = ['19号代打逆転サヨナラソロホームラン', '先制2点タイムリーツーベース', '右3', '左2', '中安', '犠飛', 'スクイズ', '四球', '犠打'];
+    final labels = ['犠打', '四球', 'スクイズ', '犠飛', '中安', '左2', '右3', '8回裏先制2点タイムリーツーベース', '1回表19号代打逆転サヨナラソロホームラン'];
     var previousRight = nameRight;
     for (final label in labels) {
       final left = tester.getTopLeft(find.text(label)).dx;
@@ -739,7 +748,7 @@ void main() {
                       'flg_pitcher': true,
                       'txt_pitching': pitching,
                       'txt_pitch_tone': 'crimson',
-                      'txt_achieve': '完全試合|perfect マダックス|maddux HQS|hqs QS|qs',
+                      'txt_achieve': '完全試合|perfect 全打席安打|allhit 全打席出塁|allreach マダックス|maddux HQS|hqs QS|qs',
                     },
                     {
                       'id_game_summary': 2,
@@ -769,6 +778,10 @@ void main() {
     expect(tester.takeException(), isNull);
 
     Color backgroundOf(String label) {
+      final blink = find.ancestor(of: find.text(label), matching: find.byType(BlinkBg));
+      if (blink.evaluate().isNotEmpty) {
+        return tester.widget<BlinkBg>(blink.first).base.color!;
+      }
       final chip = tester.widget<Container>(
         find.ancestor(of: find.text(label), matching: find.byType(Container)).first,
       );
@@ -783,6 +796,10 @@ void main() {
     expect(backgroundOf('猛打賞'), const Color(0xFFDC143C));
     expect(backgroundOf('全打席安打'), const Color(0xFFDC143C));
     expect(backgroundOf('全打席出塁'), const Color(0xFFDC143C));
+    expect(find.text('全打席安打'), findsOneWidget);
+    expect(find.text('全打席出塁'), findsOneWidget);
+    expect((tester.getCenter(find.text('全打席安打')).dy - tester.getCenter(find.text('大山悠輔')).dy).abs(), lessThan(1));
+    expect((tester.getCenter(find.text('全打席出塁')).dy - tester.getCenter(find.text('髙橋遥人')).dy).abs(), greaterThan(8));
     expect(backgroundOf('サイクル未遂'), const Color(0xFFDC143C));
     expect(backgroundOf(pitching), const Color(0xFFDC143C));
     expect(tester.getTopLeft(find.text('19号ソロホームラン')).dx, greaterThan(tester.getTopRight(find.text('大山悠輔')).dx));
@@ -790,11 +807,11 @@ void main() {
     expect(tester.getTopLeft(find.text('猛打賞')).dx, greaterThan(tester.getTopRight(find.text('サイクルヒット')).dx - 0.5));
     expect(tester.getTopLeft(find.text('全打席安打')).dx, greaterThan(tester.getTopRight(find.text('猛打賞')).dx - 0.5));
     expect(tester.getTopLeft(find.text('全打席出塁')).dx, greaterThan(tester.getTopRight(find.text('全打席安打')).dx - 0.5));
-    expect(find.byType(FadeTransition), findsWidgets);
+    expect(find.byType(BlinkBg), findsWidgets);
   });
 
   testWidgets('pitching metrics sit side by side with their own colors', (tester) async {
-    const chips = '9回無失点|crimson 3安打|yorange 無四死|crimson 10奪三振|crimson 98球|';
+    const chips = '9回無失点|crimson 被安打3|yorange 四死球0|crimson 10奪三振|crimson 98球|';
     await tester.pumpWidget(
       MaterialApp(
         home: Center(
@@ -852,15 +869,123 @@ void main() {
     }
 
     expect(backgroundOf('9回無失点'), const Color(0xFFDC143C));
-    expect(backgroundOf('無四死'), const Color(0xFFDC143C));
-    expect(backgroundOf('3安打'), const Color(0xFFFFB300));
+    expect(backgroundOf('四死球0'), const Color(0xFFDC143C));
+    expect(backgroundOf('被安打3'), const Color(0xFFFFB300));
     expect(backgroundOf('10奪三振'), const Color(0xFFDC143C));
     expect(find.text('QS'), findsNothing);
-    final labels = ['9回無失点', '3安打', '無四死', '10奪三振', '98球', '完封', 'HQS', '本'];
+    final labels = ['9回無失点', '被安打3', '四死球0', '10奪三振', '98球', '完封', 'HQS', '本'];
     var previousRight = tester.getTopRight(find.text('髙橋遥人')).dx;
     for (final label in labels) {
       expect(tester.getTopLeft(find.text(label)).dx, greaterThan(previousRight - 0.5));
       previousRight = tester.getTopRight(find.text(label)).dx;
     }
+  });
+
+  testWidgets('inning scores sit below player lines with nine columns', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 640,
+            height: 240,
+            child: GamesBoardYahooStyle(
+              horizontal: true,
+              games: [
+                {
+                  'date_game': '2026-10-02',
+                  'time_game': '🌙 18:00',
+                  'name_team_home': 'ヤクルト',
+                  'name_team_away': '巨人',
+                  'name_stadium': '神宮',
+                  'score_home': 1,
+                  'score_away': 1,
+                  'state': '4回裏',
+                  'id_team_home': 4,
+                  'id_team_away': 1,
+                  'txt_scores_home': '0,0,1,0',
+                  'txt_scores_away': '0,1,0,0',
+                  'int_runs_home': 1,
+                  'int_runs_away': 1,
+                  'int_hit_home': 5,
+                  'int_hit_away': 1,
+                  'int_error_home': 1,
+                  'int_error_away': 0,
+                  'color_back_home': '#1D4E89',
+                  'color_back_away': '#F15A22',
+                  'color_font_home': 'white',
+                  'color_font_away': 'black',
+                  'summaries': [
+                    {
+                      'id_game_summary': 1,
+                      'id_team_summary': 4,
+                      'name_full_summary': '山野太一',
+                      'flg_pitcher': true,
+                      'txt_pitching': '3回1失点',
+                    },
+                  ],
+                },
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final board = tester.getRect(find.byType(GamesBoardYahooStyle));
+    final batterRect = tester.getRect(find.text('打者'));
+    final scoreRect = tester.getRect(find.text('計'));
+    expect(scoreRect.top, greaterThan(batterRect.bottom - 1));
+    expect(tester.getRect(find.text('失')).right, greaterThan(board.right - 48));
+    expect(find.text('8'), findsOneWidget);
+    expect(find.text('9'), findsOneWidget);
+    // 4回までしかデータがなくても、5回以降は 0。両チーム分と相手の失策。
+    expect(find.text('0'), findsNWidgets(17));
+
+    Color cellColor(Finder text) {
+      final box = tester.widget<Container>(find.ancestor(of: text, matching: find.byType(Container)).first);
+      return (box.decoration! as BoxDecoration).color!;
+    }
+
+    expect(cellColor(find.text('計')), const Color(0xFF555555));
+    expect(tester.widget<Text>(find.text('計')).style?.color, Colors.white);
+    expect(cellColor(find.text('ヤクルト').at(1)), const Color(0xFF1D4E89));
+    expect(cellColor(find.text('巨人').at(1)), const Color(0xFFF15A22));
+
+    double cellW(String label) {
+      return tester.getSize(find.ancestor(of: find.text(label), matching: find.byType(Container)).first).width;
+    }
+
+    expect(cellW('計'), closeTo(cellW('1'), 0.6));
+    expect(cellW('安'), closeTo(cellW('1'), 0.6));
+    expect(cellW('失'), closeTo(cellW('1'), 0.6));
+
+    bool logo(String asset) {
+      return find.byWidgetPredicate((widget) {
+        if (widget is! Image) return false;
+        final provider = widget.image;
+        return provider is AssetImage && provider.assetName == asset;
+      }).evaluate().isNotEmpty;
+    }
+
+    expect(logo('backend/assets/images/team_s.png'), isTrue);
+    expect(logo('backend/assets/images/team_g.png'), isTrue);
+    final homeLogo = tester.getRect(find.byWidgetPredicate((widget) {
+      if (widget is! Image) return false;
+      final provider = widget.image;
+      return provider is AssetImage && provider.assetName == 'backend/assets/images/team_s.png';
+    }));
+    final awayLogo = tester.getRect(find.byWidgetPredicate((widget) {
+      if (widget is! Image) return false;
+      final provider = widget.image;
+      return provider is AssetImage && provider.assetName == 'backend/assets/images/team_g.png';
+    }));
+    final scoreText = tester.getRect(find.text('1 - 1'));
+    final homeName = tester.getRect(find.text('ヤクルト').first);
+    final awayName = tester.getRect(find.text('巨人').first);
+    expect(homeLogo.center.dx, greaterThan(homeName.right));
+    expect(homeLogo.center.dx, lessThan(scoreText.left));
+    expect(awayLogo.center.dx, greaterThan(scoreText.right));
+    expect(awayLogo.center.dx, lessThan(awayName.left));
   });
 }

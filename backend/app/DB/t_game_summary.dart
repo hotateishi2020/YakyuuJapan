@@ -26,6 +26,14 @@ class t_game_summary extends DBModel {
   int int_runs = 0;
   int int_runs_earned = 0;
   String code_result_pitcher = '';
+  String txt_scores_home = '';
+  String txt_scores_away = '';
+  int int_runs_home = 0;
+  int int_runs_away = 0;
+  int int_error_home = 0;
+  int int_error_away = 0;
+  int int_hit_home = 0;
+  int int_hit_away = 0;
 
   Map<String, dynamic> toMap() {
     return super.toMap()
@@ -54,6 +62,14 @@ class t_game_summary extends DBModel {
         "int_runs": int_runs,
         "int_runs_earned": int_runs_earned,
         "code_result_pitcher": code_result_pitcher,
+        "txt_scores_home": txt_scores_home,
+        "txt_scores_away": txt_scores_away,
+        "int_runs_home": int_runs_home,
+        "int_runs_away": int_runs_away,
+        "int_error_home": int_error_home,
+        "int_error_away": int_error_away,
+        "int_hit_home": int_hit_home,
+        "int_hit_away": int_hit_away,
       });
   }
 }

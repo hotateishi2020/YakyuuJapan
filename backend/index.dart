@@ -17,7 +17,9 @@ import 'app/DB/m_user.dart';
 import 'app/AppSql.dart';
 import 'app/Achieve.dart';
 import 'app/FetchURL.dart';
+import 'app/Lineup.dart';
 import 'app/PlayLabel.dart';
+import 'app/Postseason.dart';
 import 'app/Value.dart';
 
 /// /predictions 用の短TTLキャッシュ（同一プロセス内）
@@ -28,6 +30,14 @@ const Duration _predictionsCacheTtl = Duration(seconds: 45);
 void _clearPredictionsCache() {
   _predictionsCacheBody = null;
   _predictionsCacheAt = null;
+}
+
+bool _showPostseasonBoard(List<Map<String, dynamic>> rows) {
+  if (rows.isEmpty) return false;
+  final value = rows.first['flg_break'];
+  if (value == true) return true;
+  final text = '$value'.trim().toLowerCase();
+  return text == 'true' || text == 't';
 }
 
 String _gameMatchupKey(Map<String, dynamic> game) {
@@ -60,6 +70,36 @@ bool _isStarter(Map<String, dynamic> row) {
   return name == '${row['name_pitcher_home'] ?? ''}'.trim() || name == '${row['name_pitcher_away'] ?? ''}'.trim();
 }
 
+Map<String, Map<String, dynamic>> _battingLinesOf(List<Map<String, dynamic>> rows) {
+  final lines = <String, Map<String, dynamic>>{};
+  for (final row in rows) {
+    final name = '${row['name_full'] ?? ''}'.trim();
+    if (name.isEmpty) continue;
+    lines[playPlayerKey(row['id_game'], row['id_team'], name)] = row;
+  }
+  return lines;
+}
+
+/// 公式成績に凡退がある選手は、速報の打席だけでは全打席安打・全打席出塁にしない。
+String _plateFeatConfirmed(String playFeat, Map<String, dynamic>? line) {
+  if (line == null) return playFeat;
+  final hits = _asInt(line['int_hit1']) + _asInt(line['int_hit2']) + _asInt(line['int_hit3']) + _asInt(line['int_homerun']);
+  final atBats = _asInt(line['int_batting']);
+  final walks = _asInt(line['int_fourball']);
+  final hbp = _asInt(line['int_dead_batting']);
+  final sacrifices = _asInt(line['int_sacrifice']);
+  final errors = _asInt(line['int_error']);
+  if (atBats + hits + walks + hbp + sacrifices + errors == 0) return playFeat;
+  return plateFeatsFromLine(
+    atBats: atBats,
+    hits: hits,
+    walks: walks,
+    hbp: hbp,
+    sacrifices: sacrifices,
+    errors: errors,
+  );
+}
+
 String _summaryAchieve(Map<String, dynamic> row, Map<String, String> cycles, Map<String, int> hits, Map<String, String> plateFeats, Map<int, int> maxInning) {
   final key = playPlayerKey(row['id_game'], row['id_team_summary'], row['name_full_summary']);
   final marks = <String>[];
@@ -69,9 +109,9 @@ String _summaryAchieve(Map<String, dynamic> row, Map<String, String> cycles, Map
     final hitCount = (hits[key] ?? 0) > _asInt(row['int_hit_batting']) ? (hits[key] ?? 0) : _asInt(row['int_hit_batting']);
     final multi = multiHitMark(hitCount);
     if (multi.isNotEmpty) marks.add(multi);
+    final plateFeat = plateFeats[key] ?? '';
+    if (plateFeat.isNotEmpty) marks.add(plateFeat);
   }
-  final plateFeat = plateFeats[key] ?? '';
-  if (plateFeat.isNotEmpty) marks.add(plateFeat);
   if (_summaryIsPitcher(row['flg_pitcher'])) {
     final gameId = _asInt(row['id_game']);
     final pitching = pitcherMarks(
@@ -119,6 +159,62 @@ String _summaryPitchChips(Map<String, dynamic> row) {
     pitches: _asInt(row['int_pitch']),
     starter: _isStarter(row),
   );
+}
+
+/// イニング得点が未保存の試合は、打席の得点から表を作る。
+void _fillMissingLineScores(List<Map<String, dynamic>> games, List<Map<String, dynamic>> playRows) {
+  final byGame = <int, List<Map<String, dynamic>>>{};
+  for (final row in playRows) {
+    byGame.putIfAbsent(_asInt(row['id_game']), () => []).add(row);
+  }
+  const hits = {'HIT1', 'HIT2', 'HIT3', 'HOMERUN'};
+  for (final game in games) {
+    final homeBlank = '${game['txt_scores_home'] ?? ''}'.trim().isEmpty;
+    final awayBlank = '${game['txt_scores_away'] ?? ''}'.trim().isEmpty;
+    if (!homeBlank && !awayBlank) continue;
+    final rows = byGame[_asInt(game['id_game'])] ?? const <Map<String, dynamic>>[];
+    if (rows.isEmpty) continue;
+    final homeRuns = <int, int>{};
+    final awayRuns = <int, int>{};
+    final seenHits = <String>{};
+    var homeHits = 0;
+    var awayHits = 0;
+    var maxInning = 0;
+    for (final row in rows) {
+      final inning = _asInt(row['int_inning']);
+      if (inning <= 0) continue;
+      if (inning > maxInning) maxInning = inning;
+      final bottom = row['flg_bottom'] == true || '${row['flg_bottom']}'.trim() == 'true' || '${row['flg_bottom']}'.trim() == 't';
+      final runs = _asInt(row['int_runs']);
+      if (runs > 0) {
+        final bucket = bottom ? homeRuns : awayRuns;
+        bucket[inning] = (bucket[inning] ?? 0) + runs;
+      }
+      final result = '${row['code_result'] ?? ''}'.trim();
+      if (!hits.contains(result)) continue;
+      final key = '$inning|$bottom|${row['int_batting_order']}|${row['cnt_out']}|${row['name_full']}|$result';
+      if (!seenHits.add(key)) continue;
+      if (bottom) {
+        homeHits++;
+      } else {
+        awayHits++;
+      }
+    }
+    if (maxInning <= 0) continue;
+    if (maxInning < 9) maxInning = 9;
+    String line(Map<int, int> bucket) => [for (var i = 1; i <= maxInning; i++) '${bucket[i] ?? 0}'].join(',');
+    int total(Map<int, int> bucket) => bucket.values.fold(0, (sum, n) => sum + n);
+    if (homeBlank) {
+      game['txt_scores_home'] = line(homeRuns);
+      if (_asInt(game['int_runs_home']) <= 0) game['int_runs_home'] = total(homeRuns);
+      if (_asInt(game['int_hit_home']) <= 0 && homeHits > 0) game['int_hit_home'] = homeHits;
+    }
+    if (awayBlank) {
+      game['txt_scores_away'] = line(awayRuns);
+      if (_asInt(game['int_runs_away']) <= 0) game['int_runs_away'] = total(awayRuns);
+      if (_asInt(game['int_hit_away']) <= 0 && awayHits > 0) game['int_hit_away'] = awayHits;
+    }
+  }
 }
 
 List<Map<String, dynamic>> _collapseGames(
@@ -252,10 +348,18 @@ void main() async {
       print('fetchGamesNPB');
       final response = await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.GAMES, (conn) async {
         if (await FetchURL.isOfficialSeasonBreak(conn)) {
+          if (await Postseason.shouldKeepUpdating(conn)) {
+            await Postseason.sync(conn);
+            return Response.ok('postseason');
+          }
           print('シーズンオフのため試合情報のスクレイピングを行いません');
           return Response.ok('offseason', headers: {'x-offseason': '1'});
         }
-        return await FetchURL.fetchGamesNPB(conn);
+        final scraped = await FetchURL.fetchGamesNPB(conn);
+        if (await Postseason.isRegistrationOpen(conn)) {
+          await Postseason.sync(conn);
+        }
+        return scraped;
       });
       if (response.statusCode == 200 && response.headers['x-offseason'] != '1') _clearPredictionsCache();
       return response;
@@ -292,16 +396,47 @@ void main() async {
           (conn) => Postgres.execute(conn, AppSql.selectGamePlayRows()),
           (conn) => Postgres.execute(conn, AppSql.selectEventsDetails()),
           (conn) => Postgres.execute(conn, AppSql.selectNotification()),
+          (conn) => Postgres.execute(conn, AppSql.selectPostseasonGames(), data: [current_year]),
+          (conn) => Postgres.execute(conn, AppSql.selectPostseasonBoard(), data: [
+            Value.SystemCode.Code.ADMIN,
+            Value.SystemCode.Key.DATE_FINAL_GAME,
+            Value.SystemCode.Key.DATE_OPEN_GAME,
+          ]),
+          (conn) => Postgres.execute(conn, AppSql.selectBattingLines()),
         ]);
         final playRows = Postgres.toJson(results[5]);
+        final gameRows = Postgres.toJson(results[4]);
+        final battingLines = _battingLinesOf(Postgres.toJson(results[10]));
+        final playLabels = playLabelsByPlayer(playRows);
+        for (final entry in battingLines.entries) {
+          final filled = playsFilledFromLine(
+            playLabels[entry.key] ?? '',
+            singles: _asInt(entry.value['int_hit1']),
+            doubles: _asInt(entry.value['int_hit2']),
+            triples: _asInt(entry.value['int_hit3']),
+            homers: _asInt(entry.value['int_homerun']),
+          );
+          final numbered = playsWithHomerNumbers(filled, '${entry.value['txt_homerun_total'] ?? ''}');
+          if (numbered.isNotEmpty) playLabels[entry.key] = numbered;
+        }
+        final plateFeats = <String, String>{};
+        for (final entry in plateFeatMarksByPlayer(playRows).entries) {
+          final text = _plateFeatConfirmed(entry.value, battingLines[entry.key]);
+          if (text.isNotEmpty) plateFeats[entry.key] = text;
+        }
         final games = _collapseGames(
-          Postgres.toJson(results[4]),
-          playLabelsByPlayer(playRows),
+          gameRows,
+          playLabels,
           cycleMarksByPlayer(playRows),
           hitCountsByPlayer(playRows),
-          plateFeatMarksByPlayer(playRows),
+          plateFeats,
           maxInningByGame(playRows),
         );
+        _fillMissingLineScores(games, playRows);
+        final lineups = battingLineupsOf(playRows, plays: playLabels, pitchers: pitcherKeysOf(gameRows));
+        for (final game in games) {
+          game['lineup'] = lineups[_asInt(game['id_game'])] ?? const <Map<String, dynamic>>[];
+        }
         // print(games);
         final payload = <String, dynamic>{
           'predict_team': Postgres.toJson(results[0]),
@@ -311,6 +446,8 @@ void main() async {
           'games': games,
           'events': Postgres.toJson(results[6]),
           'notification': Postgres.toJson(results[7]),
+          'postseason_games': Postgres.toJson(results[8]),
+          'show_postseason_board': _showPostseasonBoard(Postgres.toJson(results[9])),
         };
         final body = jsonEncode(payload);
         _predictionsCacheBody = body;

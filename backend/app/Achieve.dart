@@ -43,8 +43,8 @@ String pitcherStatChips({
   final runsTone = _lowerTone(runs / ip, const [0, 0.15, 0.30, 0.45, 0.6, 0.75]);
   final parts = <String>[
     '${_inningsLabel(innings)}$runsLabel|${runsTone == 'gray' ? 'dgray' : runsTone}',
-    '${hits == 0 ? '無安打' : '$hits安打'}|${_lowerTone(hits / ip, const [0, 0.3, 0.6, 0.9, 1.2, 1.5])}',
-    '${freePasses == 0 ? '無四死' : '$freePasses四死'}|${_lowerTone(freePasses / ip, const [0, 0.15, 0.30, 0.45, 0.6, 0.75])}',
+    '${hits == 0 ? '無被安打' : '被安打$hits'}|${_lowerTone(hits / ip, const [0, 0.3, 0.6, 0.9, 1.2, 1.5])}',
+    '四死球$freePasses|${_lowerTone(freePasses / ip, const [0, 0.15, 0.30, 0.45, 0.6, 0.75])}',
     '$strikeouts奪三振|${starter ? _higherTone(strikeouts / ip, const [1, 0.85, 0.7, 0.55, 0.4, 0.25]) : _reliefStrikeoutTone(strikeouts / ip)}',
   ];
   if (pitches > 0) parts.add('$pitches球|');
@@ -151,6 +151,23 @@ String plateFeatMarks({required int plates, required int reached, required int h
   if (hits == plates) marks.add('全打席安打|allhit');
   if (reached == plates) marks.add('全打席出塁|allreach');
   return marks.join(' ');
+}
+
+/// 公式の打席成績。ゴロ・フライなどの凡退、または犠打・犠飛があるときは記録しない。
+/// 失策で出塁した打数は凡退に数えない。
+String plateFeatsFromLine({
+  required int atBats,
+  required int hits,
+  required int walks,
+  required int hbp,
+  required int sacrifices,
+  required int errors,
+}) {
+  if (errors < 0) errors = 0;
+  final outs = atBats - hits - errors;
+  if (outs > 0 || sacrifices > 0) return '';
+  final plates = hits + errors + walks + hbp;
+  return plateFeatMarks(plates: plates, reached: plates, hits: hits);
 }
 
 bool _isHitResult(String result) {

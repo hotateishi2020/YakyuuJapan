@@ -110,7 +110,7 @@ class UnifiedGrid extends StatelessWidget {
     Color? _parseColorNameLocal(String? name) => parseColorNameOrNull(name);
 
     // リーグ色（予想ブロック内サイドヘッダー用）
-    final Color leagueColor = leagueId == 1 ? const Color(0xFF0B8F3A) : const Color(0xFF4DB5E8);
+    final Color leagueColor = leagueId == 1 ? const Color(0xFF0E8E2D) : const Color(0xFF01B1EA);
     // standingsから対象リーグを抽出
     final currentRows = standings.where((e) {
       final id = int.tryParse('${e['id_league']}') ?? 0;
@@ -329,7 +329,7 @@ class UnifiedGrid extends StatelessWidget {
 
 // After
       final isPitcher = rows2.any((e) => e['flg_pitcher'] == true);
-      final titleBg = isPitcher ? const Color(0xFF64B5F6) : const Color(0xFFEF9A9A); // 少し濃い青/赤
+      final titleBg = isPitcher ? const Color(0xFF1E88E5) : const Color(0xFFDC143C);
 
       // 点滅枠色（color_today）
       Color? c0 = _parseColorNameLocal(user0Rows.map((e) => '${e['color_today'] ?? ''}').firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));

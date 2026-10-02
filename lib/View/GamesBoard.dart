@@ -6,6 +6,7 @@ import '../tools/color_parse.dart';
 import '../tools/date_format.dart';
 import 'Text.dart';
 import 'Border.dart';
+import 'BlinkBg.dart';
 
 String gameDateOnly(dynamic value) {
   final match = RegExp(r'\d{4}-\d{2}-\d{2}').firstMatch('${value ?? ''}');
@@ -31,6 +32,45 @@ String gameMatchupKey(Map<String, dynamic> game) {
     return '$date|$homeName|$awayName';
   }
   return '$date|${_gameInt(game['id_team_home'])}|${_gameInt(game['id_team_away'])}';
+}
+
+/// 12球団の球団アイコン。試合情報のチーム名の下と、トーナメント表に出す。
+String? teamLogoAsset(String name) {
+  const logos = <String, String>{
+    'ジャイアンツ': 'backend/assets/images/team_g.png',
+    '巨人': 'backend/assets/images/team_g.png',
+    'タイガース': 'backend/assets/images/team_t.png',
+    '阪神': 'backend/assets/images/team_t.png',
+    'ドラゴンズ': 'backend/assets/images/team_d.png',
+    '中日': 'backend/assets/images/team_d.png',
+    'スワローズ': 'backend/assets/images/team_s.png',
+    'ヤクルト': 'backend/assets/images/team_s.png',
+    'ベイスターズ': 'backend/assets/images/team_db.png',
+    'DeNA': 'backend/assets/images/team_db.png',
+    '横浜': 'backend/assets/images/team_db.png',
+    'カープ': 'backend/assets/images/team_c.png',
+    '広島': 'backend/assets/images/team_c.png',
+    'ホークス': 'backend/assets/images/team_h.png',
+    'ソフトバンク': 'backend/assets/images/team_h.png',
+    'ライオンズ': 'backend/assets/images/team_l.png',
+    '西武': 'backend/assets/images/team_l.png',
+    'ファイターズ': 'backend/assets/images/team_f.png',
+    '北海道日本ハム': 'backend/assets/images/team_f.png',
+    '日本ハム': 'backend/assets/images/team_f.png',
+    'バファローズ': 'backend/assets/images/team_bs.png',
+    'オリックス': 'backend/assets/images/team_bs.png',
+    'イーグルス': 'backend/assets/images/team_e.png',
+    '楽天': 'backend/assets/images/team_e.png',
+    'マリーンズ': 'backend/assets/images/team_m.png',
+    'ロッテ': 'backend/assets/images/team_m.png',
+  };
+  final trimmed = name.trim();
+  if (trimmed.isEmpty) return null;
+  final keys = logos.keys.toList()..sort((a, b) => b.length.compareTo(a.length));
+  for (final key in keys) {
+    if (trimmed.contains(key)) return logos[key];
+  }
+  return null;
 }
 
 bool gameHasStarted(Map<String, dynamic> game) {
@@ -171,7 +211,7 @@ class _GameDateSwitcherState extends State<GameDateSwitcher> {
 
   String _dayLabel() {
     if (_offset == -1) return '昨日';
-    if (_offset == 0) return '今日';
+    if (_offset == 0) return '今日の試合';
     if (_offset == 1) return '明日';
     if (_offset < 0) return '${-_offset}日前';
     return '$_offset日後';
@@ -211,7 +251,7 @@ class _GameDateSwitcherState extends State<GameDateSwitcher> {
       widget.games.where((game) => gameDateOnly(game['date_game']) == date).toList(),
     );
     final header = Container(
-      height: 33,
+      height: 42,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: widget.headerColor,
@@ -226,13 +266,26 @@ class _GameDateSwitcherState extends State<GameDateSwitcher> {
               child: InkWell(
                 onTap: () => setState(() => _offset = 0),
                 child: Center(
-                  child: OneLineShrinkText(
-                    '${_dayLabel()}  ${_jaDate(selectedDate)}',
-                    baseSize: 13,
-                    minSize: 7,
-                    weight: FontWeight.bold,
-                    color: Colors.white,
-                    verticalPadding: 2,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _dayLabel(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          height: 1.1,
+                        ),
+                      ),
+                      OneLineShrinkText(
+                        '（${_jaDate(selectedDate)}）',
+                        baseSize: 11,
+                        minSize: 8,
+                        weight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -272,7 +325,151 @@ class _GameDateSwitcherState extends State<GameDateSwitcher> {
   }
 }
 
-class GamesBoardYahooStyle extends StatelessWidget {
+/// 項目ごとの試合情報。日付ヘッダーは一つで、セとパを縦に並べる。
+class BothLeagueGameDay extends StatefulWidget {
+  final List<Map<String, dynamic>> games;
+  final String? initialDate;
+  final List<Widget> leading;
+
+  const BothLeagueGameDay({super.key, required this.games, this.initialDate, this.leading = const []});
+
+  @override
+  State<BothLeagueGameDay> createState() => _BothLeagueGameDayState();
+}
+
+class _BothLeagueGameDayState extends State<BothLeagueGameDay> {
+  late DateTime _baseDate;
+  int _offset = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _baseDate = DateTime.tryParse(widget.initialDate ?? '') ?? DateTime.now();
+    _baseDate = DateTime(_baseDate.year, _baseDate.month, _baseDate.day);
+  }
+
+  DateTime get _selectedDate => _baseDate.add(Duration(days: _offset));
+
+  String _jaDate(DateTime date) {
+    const weekdays = ['月', '火', '水', '木', '金', '土', '日'];
+    return '${date.year}年${date.month.toString().padLeft(2, '0')}月'
+        '${date.day.toString().padLeft(2, '0')}日'
+        '(${weekdays[date.weekday - 1]})';
+  }
+
+  String _dayLabel() {
+    if (_offset == -1) return '昨日';
+    if (_offset == 0) return '今日の試合';
+    if (_offset == 1) return '明日';
+    if (_offset < 0) return '${-_offset}日前';
+    return '$_offset日後';
+  }
+
+  List<Map<String, dynamic>> _leagueGames(List<Map<String, dynamic>> dayGames, int leagueId) {
+    return dayGames.where((game) {
+      final home = int.tryParse('${game['id_league_home']}') ?? 0;
+      final away = int.tryParse('${game['id_league_away']}') ?? 0;
+      return home == leagueId && away == leagueId;
+    }).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final selectedDate = _selectedDate;
+    final date = DateFormatUtil.ymd(selectedDate);
+    final dayGames = normalizeGames(
+      widget.games.where((game) => gameDateOnly(game['date_game']) == date).toList(),
+    );
+    Widget dateButton(String label, int by) {
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => setState(() => _offset += by),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Center(
+              child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
+            ),
+          ),
+        ),
+      );
+    }
+
+    final header = Container(
+      height: 42,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: const Color(0xFF37474F),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        children: [
+          dateButton('前の日', -1),
+          Expanded(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => setState(() => _offset = 0),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(_dayLabel(), style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, height: 1.1)),
+                      OneLineShrinkText('（${_jaDate(selectedDate)}）', baseSize: 11, minSize: 8, weight: FontWeight.bold, color: Colors.white),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          dateButton('次の日', 1),
+        ],
+      ),
+    );
+
+    Widget leagueBlock(String label, Color color, int leagueId) {
+      final leagueGames = _leagueGames(dayGames, leagueId);
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            height: 28,
+            alignment: Alignment.center,
+            color: color,
+            child: Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+          ),
+          const SizedBox(height: 4),
+          GamesBoardYahooStyle(
+            key: ValueKey('both-$leagueId-$date-${leagueGames.map(gameMatchupKey).join('|')}'),
+            games: leagueGames,
+            dateFilter: date,
+            horizontal: true,
+          ),
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(
+          child: ListView(
+            children: [
+              ...widget.leading,
+              header,
+              const SizedBox(height: 4),
+              leagueBlock('セ・リーグ', const Color(0xFF0E8E2D), 1),
+              const SizedBox(height: 8),
+              leagueBlock('パ・リーグ', const Color(0xFF01B1EA), 2),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class GamesBoardYahooStyle extends StatefulWidget {
   final List<Map<String, dynamic>> games;
   final String? dateFilter; // "YYYY-MM-DD"
   /// true のとき試合カードを横並び表示（リーグ内の1日分向け）
@@ -284,6 +481,32 @@ class GamesBoardYahooStyle extends StatelessWidget {
     this.dateFilter,
     this.horizontal = false,
   });
+
+  @override
+  State<GamesBoardYahooStyle> createState() => _GamesBoardYahooStyleState();
+}
+
+class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> {
+  final Map<String, bool> _allBatters = {};
+
+  List<Map<String, dynamic>> get games => widget.games;
+  String? get dateFilter => widget.dateFilter;
+  bool get horizontal => widget.horizontal;
+
+  String _cardKey(List<Map<String, dynamic>> rows) {
+    final game = rows.first;
+    return '${game['id_game']}|${game['id_team_home']}|${game['id_team_away']}|${gameDateOnly(game['date_game'])}';
+  }
+
+  bool _allOf(List<Map<String, dynamic>> rows) => _allBatters[_cardKey(rows)] ?? false;
+
+  _TableGameCard _card(List<Map<String, dynamic>> rows) {
+    return _TableGameCard(
+      rows,
+      allBatters: _allOf(rows),
+      onAllBatters: (value) => setState(() => _allBatters[_cardKey(rows)] = value),
+    );
+  }
 
   int _toInt(dynamic v) {
     if (v == null) return 0;
@@ -317,7 +540,7 @@ class GamesBoardYahooStyle extends StatelessWidget {
       }
       return LayoutBuilder(builder: (context, constraints) {
         final started = grouped.any((rows) => gameHasStarted(rows.first));
-        final heights = [for (final rows in grouped) _TableGameCard(rows).intrinsicHeight];
+        final heights = [for (final rows in grouped) _card(rows).intrinsicHeight];
         if (started) {
           final needed = heights.fold<double>(0, (sum, h) => sum + h) + 2 * math.max(0, grouped.length - 1);
           final canFit = constraints.maxHeight.isFinite && constraints.maxHeight + 0.5 >= needed;
@@ -331,9 +554,9 @@ class GamesBoardYahooStyle extends StatelessWidget {
                   expand
                       ? Expanded(
                           flex: math.max(1, heights[i].round()),
-                          child: _TableGameCard(grouped[i]),
+                          child: _card(grouped[i]),
                         )
-                      : SizedBox(height: heights[i], child: _TableGameCard(grouped[i])),
+                      : SizedBox(height: heights[i], child: _card(grouped[i])),
                 ],
               ],
             );
@@ -350,7 +573,7 @@ class GamesBoardYahooStyle extends StatelessWidget {
           children: [
             for (int i = 0; i < grouped.length; i++) ...[
               if (i > 0) const SizedBox(width: 2),
-              Expanded(child: _TableGameCard(grouped[i])),
+              Expanded(child: _card(grouped[i])),
             ],
           ],
         );
@@ -387,11 +610,11 @@ class GamesBoardYahooStyle extends StatelessWidget {
             final double hAvail = cc.maxHeight.isFinite ? cc.maxHeight : 0.0;
             const double minCardH = 110.0; // これ以下なら内部スクロール
             if (hAvail <= 0 || hAvail >= minCardH) {
-              return _TableGameCard(g);
+              return _card(g);
             }
             return SingleChildScrollView(
               padding: EdgeInsets.zero,
-              child: SizedBox(height: minCardH, child: _TableGameCard(g)),
+              child: SizedBox(height: minCardH, child: _card(g)),
             );
           });
         }
@@ -442,12 +665,16 @@ class _LeagueHeader extends StatelessWidget {
   }
 }
 
-typedef _PlayerLine = ({String name, String colors, String mark, String stat, String hrTotal, String predict, String plays, String achieve, String tone, String chips});
+typedef _PlayerLine = ({String name, String role, String colors, String mark, String stat, String hrTotal, String predict, String plays, String achieve, String tone, String chips});
+
+typedef _LineupSlot = ({int order, List<_PlayerLine> players});
 
 class _TableGameCard extends StatelessWidget {
   final List<Map<String, dynamic>> rows;
+  final bool allBatters;
+  final ValueChanged<bool> onAllBatters;
 
-  const _TableGameCard(this.rows);
+  const _TableGameCard(this.rows, {this.allBatters = false, required this.onAllBatters});
 
   Map<String, dynamic> get game => rows.first;
 
@@ -456,8 +683,9 @@ class _TableGameCard extends StatelessWidget {
   static const _minPlayerNameSize = 8.0;
   static const _minPlayerStatSize = 8.0;
   static const _minHeaderH = 22.0;
-  static const _minTeamRowH = 28.0;
+  static const _minTeamRowH = 46.0;
   static const _playerRowH = 18.0;
+  static const _lineScoreH = 42.0;
 
   String _text(String key) => game[key]?.toString() ?? '';
   int _int(String key) => int.tryParse('${game[key]}') ?? -1;
@@ -488,9 +716,9 @@ class _TableGameCard extends StatelessWidget {
     };
   }
 
-  Color _pale(Color? color) {
+  Color _pale(Color? color, {bool lighter = false}) {
     final base = color ?? const Color(0xFFE0E0E0);
-    const mix = 0.58;
+    final mix = lighter ? 0.86 : 0.58;
     final value = base.toARGB32();
     final r = (value >> 16) & 0xFF;
     final g = (value >> 8) & 0xFF;
@@ -528,10 +756,48 @@ class _TableGameCard extends StatelessWidget {
     return parts.where((part) => part != 'QS' && !part.startsWith('QS|')).toList();
   }
 
-  String _achieveOf(Map<String, dynamic> row) {
+  bool _isPitcherFeat(String part) {
+    final bar = part.lastIndexOf('|');
+    final label = (bar < 0 ? part : part.substring(0, bar)).trim();
+    final kind = bar < 0 ? '' : part.substring(bar + 1).trim();
+    const labels = {'完全試合', 'ノーヒットノーラン', 'マダックス', '完封', '完投', 'HQS', 'QS'};
+    const kinds = {'perfect', 'nohit', 'maddux', 'shutout', 'cg', 'hqs', 'qs'};
+    return labels.contains(label) || kinds.contains(kind);
+  }
+
+  String _achieveOf(Map<String, dynamic> row, {bool pitcher = false}) {
     final raw = '${row['txt_achieve'] ?? ''}'.trim();
     if (raw.isEmpty || raw == 'null') return '';
-    return raw;
+    return raw.split(' ').where((part) {
+      final label = part.split('|').first.trim();
+      if (pitcher) return label != '全打席安打' && label != '全打席出塁';
+      return !_isPitcherFeat(part);
+    }).join(' ');
+  }
+
+  String _enterRole(String name, int teamId) {
+    final raw = game['lineup'];
+    if (raw is! List) return '';
+    for (final item in raw) {
+      if (item is! Map) continue;
+      final team = int.tryParse('${item['id_team']}') ?? -1;
+      if (team != teamId) continue;
+      final listed = item['players'];
+      if (listed is! List) continue;
+      for (final player in listed) {
+        if (player is! Map) continue;
+        if ('${player['name'] ?? ''}'.trim() != name) continue;
+        final role = '${player['role'] ?? ''}'.trim();
+        if (role.isNotEmpty && role != 'null') return role;
+      }
+    }
+    return '';
+  }
+
+  String _shownName(_PlayerLine player) {
+    final role = player.role.trim();
+    if (role.isEmpty) return player.name;
+    return '$role：${player.name}';
   }
 
   String _toneOf(Map<String, dynamic> row) {
@@ -572,15 +838,17 @@ class _TableGameCard extends StatelessWidget {
 
     void add(String name, String playerColors, String mark, [String stat = '', String hrTotal = '', String predict = '', String plays = '', String achieve = '', String tone = '', String chips = '']) {
       if (name.trim().isEmpty) return;
+      final role = pitcher ? '' : _enterRole(name, teamId);
       final index = result.indexWhere((player) => player.name == name);
       final labels = _predictLabel(predict);
       if (index < 0) {
-        result.add((name: name, colors: playerColors, mark: mark, stat: stat, hrTotal: hrTotal, predict: labels, plays: plays, achieve: achieve, tone: tone, chips: chips));
+        result.add((name: name, role: role, colors: playerColors, mark: mark, stat: stat, hrTotal: hrTotal, predict: labels, plays: plays, achieve: achieve, tone: tone, chips: chips));
         return;
       }
       final current = result[index];
       result[index] = (
         name: current.name,
+        role: current.role.isNotEmpty ? current.role : role,
         colors: current.colors.isNotEmpty ? current.colors : playerColors,
         mark: current.mark.isNotEmpty ? current.mark : mark,
         stat: current.stat.isNotEmpty ? current.stat : stat,
@@ -610,7 +878,7 @@ class _TableGameCard extends StatelessWidget {
         '',
         '${row['titles_predict'] ?? ''}',
         pitcher ? '' : _playsOf(row),
-        _achieveOf(row),
+        _achieveOf(row, pitcher: pitcher),
         pitcher && chips.isEmpty ? _toneOf(row) : '',
         chips,
       );
@@ -640,17 +908,523 @@ class _TableGameCard extends StatelessWidget {
     return result;
   }
 
+  List<_LineupSlot> _lineupSlots({required bool home}) {
+    final teamId = _int(home ? 'id_team_home' : 'id_team_away');
+    final byOrder = <int, List<_PlayerLine>>{};
+    final raw = game['lineup'];
+    if (raw is List) {
+      for (final item in raw) {
+        if (item is! Map) continue;
+        final team = int.tryParse('${item['id_team']}') ?? -1;
+        if (team != teamId) continue;
+        final order = int.tryParse('${item['order']}') ?? 0;
+        if (order < 1 || order > 9) continue;
+        final players = <_PlayerLine>[];
+        final listed = item['players'];
+        if (listed is List) {
+          for (final player in listed) {
+            if (player is! Map) continue;
+            final name = '${player['name'] ?? ''}'.trim();
+            if (name.isEmpty) continue;
+            final role = '${player['role'] ?? ''}'.trim();
+            players.add(_lineupPlayer(name, '${player['plays'] ?? ''}', teamId, role == 'null' ? '' : role));
+          }
+        }
+        byOrder[order] = players;
+      }
+    }
+    return [for (var order = 1; order <= 9; order++) (order: order, players: byOrder[order] ?? const <_PlayerLine>[])];
+  }
+
+  _PlayerLine _lineupPlayer(String name, String plays, int teamId, String role) {
+    Map<String, dynamic>? summary;
+    for (final row in rows) {
+      if ('${row['name_full_summary'] ?? ''}'.trim() != name) continue;
+      final summaryTeam = int.tryParse('${row['id_team_summary']}') ?? -1;
+      if (summaryTeam != teamId || _isPitcher(row)) continue;
+      summary = row;
+      break;
+    }
+    final rawPlays = plays.trim() == 'null' ? '' : plays.trim();
+    final shownRole = role.isNotEmpty ? role : _enterRole(name, teamId);
+    if (summary == null) {
+      return (name: name, role: shownRole, colors: '', mark: rawPlays.contains('|hr') ? 'HR' : '', stat: '', hrTotal: '', predict: '', plays: rawPlays, achieve: '', tone: '', chips: '');
+    }
+    final colors = '${summary['colors_summary'] ?? ''}'.trim();
+    final summaryPlays = _playsOf(summary);
+    return (
+      name: name,
+      role: shownRole,
+      colors: colors == 'null' ? '' : colors,
+      mark: _batterMark(summary),
+      stat: '',
+      hrTotal: '',
+      predict: _predictLabel('${summary['titles_predict'] ?? ''}'),
+      plays: summaryPlays.isNotEmpty ? summaryPlays : rawPlays,
+      achieve: _achieveOf(summary),
+      tone: '',
+      chips: '',
+    );
+  }
+
+  Widget _batterHeader(double labelSize) {
+    return _cell(
+      color: _labelColor,
+      bottom: false,
+      padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+      child: LayoutBuilder(builder: (context, constraints) {
+        final width = constraints.maxWidth.isFinite ? math.max(constraints.maxWidth, 1.0) : 48.0;
+        final pickerW = width * 0.9;
+        return FittedBox(
+          fit: BoxFit.scaleDown,
+          child: SizedBox(
+            width: width,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '打者',
+                  style: TextStyle(color: Colors.white, fontSize: labelSize, fontWeight: FontWeight.bold, height: 1),
+                ),
+                const SizedBox(height: 6),
+                SizedBox(
+                  width: pickerW,
+                  height: 32,
+                  child: FittedBox(
+                  fit: BoxFit.contain,
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                  width: math.max(pickerW, 88),
+                  child: Material(
+                  type: MaterialType.transparency,
+                  child: DropdownButtonHideUnderline(
+                  child: DropdownButton<bool>(
+                    value: allBatters,
+                    isDense: false,
+                    isExpanded: true,
+                    icon: const Icon(Icons.arrow_drop_down, color: Colors.white, size: 14),
+                    dropdownColor: Colors.white,
+                    items: const [
+                      DropdownMenuItem(value: false, child: Text('活躍選手', style: TextStyle(fontSize: 12, color: Colors.black87))),
+                      DropdownMenuItem(value: true, child: Text('全員', style: TextStyle(fontSize: 12, color: Colors.black87))),
+                    ],
+                    selectedItemBuilder: (context) => [
+                      for (final text in const ['活躍選手', '全員'])
+                        Align(
+                          alignment: Alignment.center,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(text, maxLines: 1, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, height: 1)),
+                          ),
+                        ),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) onAllBatters(value);
+                    },
+                  ),
+                  ),
+                  ),
+                  ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _batterStatLine(_PlayerLine player, double statSize, {bool includeOuts = false}) {
+    final achievements = _visibleAchievements(player.achieve);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (final part in _orderedPlays(player.plays, includeOuts: includeOuts)) _playChip(part, statSize),
+        for (final part in achievements) _playChip(part, statSize, blink: true),
+        if (player.predict.isNotEmpty) ...[
+          if (player.plays.isNotEmpty || player.achieve.isNotEmpty) const SizedBox(width: 2),
+          for (final part in player.predict.split(','))
+            if (part.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(right: 2),
+                child: _predictBadge(part, statSize),
+              ),
+        ],
+      ],
+    );
+  }
+
+  Widget _lineupCell(
+    List<_LineupSlot> slots, {
+    required Color color,
+    required double size,
+    required bool right,
+  }) {
+    final nameSize = size < _minPlayerNameSize ? _minPlayerNameSize : size;
+    final statSize = (nameSize * 0.92).clamp(_minPlayerStatSize, 12.0);
+    final badgeWidth = (nameSize + 2).clamp(9.0, 16.0);
+    const orderW = 14.0;
+    return _cell(
+      color: color,
+      right: right,
+      bottom: false,
+      alignment: Alignment.topLeft,
+      padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+      child: LayoutBuilder(builder: (context, constraints) {
+        final maxH = constraints.maxHeight;
+        final count = math.max(1, slots.length);
+        final fitRowH = maxH.isFinite ? math.min(_playerRowH, maxH / count) : _playerRowH;
+        final cellW = constraints.maxWidth.isFinite ? constraints.maxWidth : 0.0;
+        if (cellW < 1) return const SizedBox.expand();
+        final scaler = MediaQuery.textScalerOf(context);
+        var nameW = 0.0;
+        for (final slot in slots) {
+          if (slot.players.isEmpty) continue;
+          final shown = _shownName(slot.players.first);
+          final w = _textWidth(shown, nameSize, weight: FontWeight.bold, textScaler: scaler) + 8;
+          if (w > nameW) nameW = w;
+        }
+        nameW = nameW.ceilToDouble();
+        final leadingW = orderW + badgeWidth;
+        final maxNameBox = math.max(0.0, cellW - leadingW);
+        if (nameW > maxNameBox) nameW = maxNameBox;
+        const gapW = 2.0;
+        final statsViewportW = math.max(0.0, cellW - leadingW - nameW - gapW);
+
+        Widget nameRow(_LineupSlot slot) {
+          final player = slot.players.isEmpty ? null : slot.players.first;
+          return SizedBox(
+            height: fitRowH,
+            child: Row(
+              children: [
+                SizedBox(
+                  width: orderW,
+                  child: Text(
+                    '${slot.order}',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: math.min(9, fitRowH * 0.7), fontWeight: FontWeight.bold, color: Colors.black87, height: 1),
+                  ),
+                ),
+                SizedBox(
+                  width: badgeWidth,
+                  child: player == null || player.mark.isEmpty ? const SizedBox() : _resultBadge(player.mark, nameSize),
+                ),
+                SizedBox(
+                  width: nameW,
+                  child: player == null
+                      ? const SizedBox()
+                      : FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: _pitcherNameBox(
+                            name: _shownName(player),
+                            colorsRaw: player.colors,
+                            baseSize: nameSize,
+                            minSize: _minPlayerNameSize,
+                            alignLeft: true,
+                          ),
+                        ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        Widget statRow(_LineupSlot slot) {
+          return SizedBox(
+            height: fitRowH,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (slot.players.isNotEmpty) _batterStatLine(slot.players.first, statSize, includeOuts: true),
+                  for (final player in slot.players.skip(1)) ...[
+                    const SizedBox(width: 6),
+                    _pitcherNameBox(
+                      name: _shownName(player),
+                      colorsRaw: player.colors,
+                      baseSize: nameSize,
+                      minSize: _minPlayerNameSize,
+                      alignLeft: true,
+                    ),
+                    const SizedBox(width: 2),
+                    _batterStatLine(player, statSize, includeOuts: true),
+                  ],
+                ],
+              ),
+            ),
+          );
+        }
+
+        return SizedBox(
+          width: cellW,
+          height: maxH.isFinite ? maxH : null,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: leadingW + nameW,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [for (final slot in slots) nameRow(slot)],
+                ),
+              ),
+              if (statsViewportW > 0) ...[
+                const SizedBox(width: gapW),
+                SizedBox(
+                  width: statsViewportW,
+                  height: maxH.isFinite ? maxH : fitRowH * count,
+                  child: ClipRect(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      primary: false,
+                      physics: const ClampingScrollPhysics(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [for (final slot in slots) statRow(slot)],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        );
+      }),
+    );
+  }
+
+  int _batterCount(bool home) {
+    if (!allBatters) return _players(home: home, pitcher: false).length;
+    return 9;
+  }
+
   double get intrinsicHeight {
     final homePitchers = _players(home: true, pitcher: true);
     final awayPitchers = _players(home: false, pitcher: true);
-    final homeBatters = _players(home: true, pitcher: false);
-    final awayBatters = _players(home: false, pitcher: false);
     final pitcherN = math.max(1, math.max(homePitchers.length, awayPitchers.length));
-    final batterN = math.max(1, math.max(homeBatters.length, awayBatters.length));
+    final batterN = math.max(1, math.max(_batterCount(true), _batterCount(false)));
     const sectionPad = 2.0;
     const chrome = 8.0;
     final inProgress = '${game['state'] ?? ''}'.contains('回');
-    return _minHeaderH + _minTeamRowH + pitcherN * _playerRowH + batterN * _playerRowH + sectionPad * 2 + chrome + (inProgress ? 6.0 : 0.0);
+    return _minHeaderH + _minTeamRowH + (_showLineScore ? _lineScoreH : 0) + pitcherN * _playerRowH + batterN * _playerRowH + sectionPad * 2 + chrome + (inProgress ? 6.0 : 0.0);
+  }
+
+  bool get _showLineScore {
+    final state = _text('state');
+    if (state.isEmpty || state == '試合前') return false;
+    return _int('score_home') >= 0 && _int('score_away') >= 0;
+  }
+
+  List<String> _inningScores(String key) {
+    return _text(key).split(',').map((part) => part.trim()).where((part) => part.isNotEmpty).toList();
+  }
+
+  String _countText(String key) {
+    final raw = game[key];
+    if (raw == null || '$raw'.trim().isEmpty) return '0';
+    final n = int.tryParse('$raw');
+    return n == null ? '0' : '$n';
+  }
+
+  Widget _lineScoreTable({
+    required Color? homeBg,
+    required Color? awayBg,
+    required Color homeFg,
+    required Color awayFg,
+  }) {
+    final homeInnings = _inningScores('txt_scores_home');
+    final awayInnings = _inningScores('txt_scores_away');
+    final n = math.max(9, math.max(homeInnings.length, awayInnings.length));
+    String at(List<String> values, int index) => index < values.length ? values[index] : '0';
+
+    Widget row({
+      required bool header,
+      required String name,
+      required List<String> innings,
+      required String runs,
+      required String hits,
+      required String errors,
+      Color? teamBg,
+      Color teamFg = Colors.black87,
+    }) {
+      final numbers = <String>[
+        for (var i = 0; i < n; i++) header ? '${i + 1}' : at(innings, i),
+        header ? '計' : runs,
+        header ? '安' : hits,
+        header ? '失' : errors,
+      ];
+      return SizedBox(
+        height: _lineScoreH / 3,
+        child: LayoutBuilder(builder: (context, constraints) {
+          // 回・計・安・失は同じ固定幅。余った幅はチーム名だけが受け取る。
+          const preferredNumberW = 18.0;
+          const minNameW = 32.0;
+          final maxW = constraints.maxWidth.isFinite ? constraints.maxWidth : preferredNumberW * numbers.length + minNameW;
+          var numberW = preferredNumberW;
+          var nameW = maxW - numberW * numbers.length;
+          if (nameW < minNameW) {
+            nameW = math.min(minNameW, maxW * 0.34);
+            numberW = numbers.isEmpty ? 0.0 : math.max(0.0, (maxW - nameW) / numbers.length);
+          }
+
+          Widget numberCell(int index) {
+            final label = numbers[index];
+            final total = index >= numbers.length - 3;
+            return SizedBox(
+              width: numberW,
+              child: _cell(
+                color: header ? const Color(0xFF555555) : Colors.white,
+                right: index != numbers.length - 1,
+                padding: const EdgeInsets.symmetric(horizontal: 1),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    softWrap: false,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 9,
+                      height: 1,
+                      fontWeight: header || total ? FontWeight.bold : FontWeight.w600,
+                      color: header ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+
+          return Row(
+            children: [
+              SizedBox(
+                width: nameW,
+                child: _cell(
+                  color: header ? const Color(0xFF555555) : (teamBg ?? Colors.white),
+                  padding: const EdgeInsets.symmetric(horizontal: 1),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      name,
+                      maxLines: 1,
+                      softWrap: false,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 9,
+                        height: 1,
+                        fontWeight: FontWeight.bold,
+                        color: header ? Colors.white : teamFg,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              for (var i = 0; i < numbers.length; i++) numberCell(i),
+            ],
+          );
+        }),
+      );
+    }
+
+    return Container(
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: _lineColor)),
+      ),
+      child: Column(
+        children: [
+          row(header: true, name: '', innings: const [], runs: '', hits: '', errors: ''),
+          row(
+            header: false,
+            name: _text('name_team_home'),
+            innings: homeInnings,
+            runs: _countText('int_runs_home'),
+            hits: _countText('int_hit_home'),
+            errors: _countText('int_error_home'),
+            teamBg: homeBg,
+            teamFg: homeFg,
+          ),
+          row(
+            header: false,
+            name: _text('name_team_away'),
+            innings: awayInnings,
+            runs: _countText('int_runs_away'),
+            hits: _countText('int_hit_away'),
+            errors: _countText('int_error_away'),
+            teamBg: awayBg,
+            teamFg: awayFg,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _logoMark(String? asset) {
+    if (asset == null) return const SizedBox(width: 2);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 1),
+      child: SizedBox(
+        width: 22,
+        height: 22,
+        child: Image.asset(
+          asset,
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.medium,
+        ),
+      ),
+    );
+  }
+
+  Widget _matchScoreCell({
+    required String state,
+    required String score,
+    required double stateSize,
+    required double scoreSize,
+    required String homeName,
+    required String awayName,
+  }) {
+    return _cell(
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _logoMark(teamLogoAsset(homeName)),
+            const SizedBox(width: 6),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (state.isNotEmpty)
+                  Text(
+                    state,
+                    style: TextStyle(
+                      fontSize: stateSize,
+                      fontWeight: FontWeight.bold,
+                      height: 1.0,
+                    ),
+                  ),
+                if (state.isNotEmpty) const SizedBox(height: 2),
+                Text(
+                  score,
+                  style: TextStyle(
+                    fontSize: scoreSize,
+                    fontWeight: FontWeight.w800,
+                    height: 1.0,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 6),
+            _logoMark(teamLogoAsset(awayName)),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _cell({
@@ -805,7 +1579,7 @@ class _TableGameCard extends StatelessWidget {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       _pitcherNameBox(
-                                        name: pitcher.name,
+                                        name: _shownName(pitcher),
                                         colorsRaw: pitcher.colors,
                                         baseSize: nameSize,
                                         minSize: _minPlayerNameSize,
@@ -836,9 +1610,14 @@ class _TableGameCard extends StatelessWidget {
               final leadingW = badgeWidth + 0.5;
               // 名前幅は成績のために削らない。セル自体が名前より狭いときだけクリップする。
               final maxNameBox = math.max(0.0, cellW - leadingW);
-              final nameBoxW = reservedNameW.clamp(0.0, maxNameBox).toDouble();
-              final restW = math.max(0.0, cellW - leadingW - nameBoxW);
               final hasAnyStats = pitchers.any((p) => p.stat.isNotEmpty || p.chips.isNotEmpty || p.predict.isNotEmpty || p.achieve.isNotEmpty || _orderedPlays(p.plays).isNotEmpty);
+              // _nameColumnWidth の +8 のうち、字形と左右 padding を超える余裕。
+              final glyphBoxW = math.max(0.0, reservedNameW - 4);
+              var nameBoxW = math.min(reservedNameW, maxNameBox);
+              if (hasAnyStats && maxNameBox - nameBoxW <= 0 && glyphBoxW < maxNameBox) {
+                nameBoxW = glyphBoxW;
+              }
+              final restW = math.max(0.0, cellW - leadingW - nameBoxW);
               final gapW = hasAnyStats && restW > nameStatGap ? nameStatGap : 0.0;
               final statsViewportW = hasAnyStats ? math.max(0.0, restW - gapW) : 0.0;
 
@@ -959,13 +1738,19 @@ class _TableGameCard extends StatelessWidget {
   }
 
   String _homerNumberFirst(String label) {
-    final existing = RegExp(r'(\d+)号').firstMatch(label);
+    final head = RegExp(r'^(\d+回[表裏])').firstMatch(label);
+    final prefix = head?.group(0) ?? '';
+    final body = label.substring(prefix.length);
+    final existing = RegExp(r'(\d+)号').firstMatch(body);
     if (existing == null || existing.start == 0) return label;
     final token = existing.group(0)!;
-    return '$token${label.substring(0, existing.start)}${label.substring(existing.end)}';
+    return '$prefix$token${body.substring(0, existing.start)}${body.substring(existing.end)}';
   }
 
-  Color _playColor(String kind) {
+  Color _playColor(String kind, String label) {
+    if (label.contains('併殺')) return Colors.black;
+    if (label.contains('三振')) return const Color(0xFF616161);
+    if (label.contains('ゴロ') || label.contains('フライ') || label.contains('ライナー')) return const Color(0xFF1E88E5);
     return switch (kind) {
       'hr' || 'cycle' || 'cyclemis' || 'multihit' || 'allhit' || 'allreach' || 'perfect' || 'nohit' || 'maddux' || 'shutout' || 'cg' => const Color(0xFFDC143C),
       'timely' || 'hqs' => const Color(0xFFFF5722),
@@ -975,6 +1760,7 @@ class _TableGameCard extends StatelessWidget {
       'dead' || 'error' => const Color(0xFF78909C),
       'sac' || 'sacfly' || 'squeeze' || 'sacbunt' => const Color(0xFF8E24AA),
       'steal' => const Color(0xFFC6FF00),
+      'stealout' => const Color(0xFF757575),
       _ => const Color(0xFFEEEEEE),
     };
   }
@@ -993,7 +1779,7 @@ class _TableGameCard extends StatelessWidget {
       'triple' => 2,
       'double' || 'extra' => 3,
       'single' => 4,
-      'steal' => 5,
+      'steal' || 'stealout' => 5,
       'sacfly' => 6,
       'squeeze' => 7,
       'walk' => 8,
@@ -1001,20 +1787,22 @@ class _TableGameCard extends StatelessWidget {
       'error' => 10,
       'sacbunt' => 11,
       'sac' => label.contains('犠打') ? 11 : (label.contains('スクイズ') ? 7 : 6),
-      'out' => -1,
+      'out' => 12,
       _ => 50,
     };
   }
 
-  List<String> _orderedPlays(String raw) {
-    final parts = raw.split(' ').where((part) => part.isNotEmpty && _playRank(part) >= 0).toList();
-    final indexed = parts.asMap().entries.toList();
-    indexed.sort((a, b) {
-      final byKind = _playRank(a.value).compareTo(_playRank(b.value));
-      if (byKind != 0) return byKind;
-      return a.key.compareTo(b.key);
-    });
-    return indexed.map((entry) => entry.value).toList();
+  List<String> _orderedPlays(String raw, {bool includeOuts = false}) {
+    return raw.split(' ').where((part) {
+      if (part.isEmpty) return false;
+      if (_playKind(part) == 'out') return includeOuts;
+      return _playRank(part) >= 0;
+    }).toList();
+  }
+
+  String _playLabel(String label, String kind) {
+    if (kind == 'hr' || kind == 'timely') return label;
+    return label.replaceFirst('代打', '');
   }
 
   Color _pitchToneColor(String tone) {
@@ -1071,33 +1859,53 @@ class _TableGameCard extends StatelessWidget {
     final label = (bar < 0 ? encoded : encoded.substring(0, bar)).trim();
     final kind = bar < 0 ? '' : encoded.substring(bar + 1).trim();
     if (label.isEmpty) return const SizedBox.shrink();
-    final shown = kind == 'hr' ? _homerNumberFirst(label) : label;
-    final bg = _playColor(kind);
-    final ink = bg.computeLuminance() > 0.55 ? Colors.black87 : Colors.white;
+    final rawLabel = _playLabel(label, kind);
+    final shown = kind == 'hr' ? _homerNumberFirst(rawLabel) : rawLabel;
+    final bg = _playColor(kind, shown);
+    final ink = shown.contains('併殺') ? const Color(0xFFE53935) : (bg.computeLuminance() > 0.55 ? Colors.black87 : Colors.white);
     final chipSize = (fontSize - 1).clamp(8.0, 11.0);
-    final chip = Container(
-      height: 14,
-      margin: const EdgeInsets.only(right: 3),
-      padding: const EdgeInsets.symmetric(horizontal: 3),
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(2),
+    final text = Text(
+      shown,
+      maxLines: 1,
+      softWrap: false,
+      style: TextStyle(
+        color: ink,
+        fontSize: chipSize,
+        fontWeight: FontWeight.w600,
+        height: 1.0,
       ),
-      child: Text(
-        shown,
-        maxLines: 1,
-        softWrap: false,
-        style: TextStyle(
-          color: ink,
-          fontSize: chipSize,
-          fontWeight: FontWeight.w600,
-          height: 1.0,
+    );
+    if (!blink) {
+      return Container(
+        height: 14,
+        margin: const EdgeInsets.only(right: 3),
+        padding: const EdgeInsets.symmetric(horizontal: 3),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(2),
+        ),
+        child: text,
+      );
+    }
+    return Padding(
+      padding: const EdgeInsets.only(right: 3),
+      child: BlinkBg(
+        base: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(2),
+        ),
+        color: const Color(0xFFFFF176),
+        radius: 2,
+        duration: const Duration(milliseconds: 700),
+        child: Container(
+          height: 14,
+          padding: const EdgeInsets.symmetric(horizontal: 3),
+          alignment: Alignment.center,
+          child: text,
         ),
       ),
     );
-    if (!blink) return chip;
-    return _BlinkChip(child: chip);
   }
 
   Widget _predictBadge(String encoded, double fontSize) {
@@ -1136,7 +1944,7 @@ class _TableGameCard extends StatelessWidget {
       '勝' => Colors.red,
       '負' => Colors.blue,
       'H' => Colors.green.shade700,
-      'HR' => const Color(0xFF7B1FA2),
+      'HR' => const Color(0xFFDC143C),
       _ => Colors.amber.shade700,
     };
     final diameter = (fontSize + 2).clamp(9.0, 16.0);
@@ -1180,8 +1988,8 @@ class _TableGameCard extends StatelessWidget {
       final awayBg = parseColorNameOrNull(_text('color_back_away'));
       final homeFg = parseColorNameOrNull(_text('color_font_home')) ?? Colors.black87;
       final awayFg = parseColorNameOrNull(_text('color_font_away')) ?? Colors.black87;
-      final homePale = _pale(homeBg);
-      final awayPale = _pale(awayBg);
+      final homePale = _pale(homeBg, lighter: _text('name_team_home').contains('ロッテ'));
+      final awayPale = _pale(awayBg, lighter: _text('name_team_away').contains('ロッテ'));
 
       final scoreHome = _int('score_home');
       final scoreAway = _int('score_away');
@@ -1193,12 +2001,14 @@ class _TableGameCard extends StatelessWidget {
       ].join(' ');
       final homePitchers = _players(home: true, pitcher: true);
       final awayPitchers = _players(home: false, pitcher: true);
-      final homeBatters = _players(home: true, pitcher: false);
-      final awayBatters = _players(home: false, pitcher: false);
+      final homeBatters = allBatters ? const <_PlayerLine>[] : _players(home: true, pitcher: false);
+      final awayBatters = allBatters ? const <_PlayerLine>[] : _players(home: false, pitcher: false);
+      final homeLineup = allBatters ? _lineupSlots(home: true) : const <_LineupSlot>[];
+      final awayLineup = allBatters ? _lineupSlots(home: false) : const <_LineupSlot>[];
       final homeNameColW = _nameColumnWidth([...homePitchers, ...homeBatters], detailSize, context);
       final awayNameColW = _nameColumnWidth([...awayPitchers, ...awayBatters], detailSize, context);
       final pitcherN = math.max(1, math.max(homePitchers.length, awayPitchers.length));
-      final batterN = math.max(1, math.max(homeBatters.length, awayBatters.length));
+      final batterN = allBatters ? 9 : math.max(1, math.max(homeBatters.length, awayBatters.length));
       final started = gameHasStarted(game);
       final midFlex = started ? 1 : 3;
 
@@ -1227,66 +2037,50 @@ class _TableGameCard extends StatelessWidget {
             ),
             SizedBox(
               height: _minTeamRowH,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    flex: 5,
-                    child: _textCell(
-                      _text('name_team_home'),
-                      size: teamSize,
-                      minSize: 9,
-                      color: homeBg,
-                      textColor: homeFg,
-                      weight: FontWeight.bold,
-                    ),
-                  ),
-                  Expanded(
-                    flex: midFlex,
-                    child: _cell(
-                      color: Colors.white,
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (state.isNotEmpty)
-                              Text(
-                                state,
-                                style: TextStyle(
-                                  fontSize: stateSize,
-                                  fontWeight: FontWeight.bold,
-                                  height: 1.0,
-                                ),
-                              ),
-                            if (state.isNotEmpty) const SizedBox(height: 3),
-                            Text(
-                              score,
-                              style: TextStyle(
-                                fontSize: scoreSize,
-                                fontWeight: FontWeight.w800,
-                                height: 1.0,
-                              ),
-                            ),
-                          ],
-                        ),
+              child: LayoutBuilder(builder: (context, teamConstraints) {
+                final rowW = teamConstraints.maxWidth.isFinite ? teamConstraints.maxWidth : 0.0;
+                // アイコンと得点の左右に少しだけ余白が残る幅。
+                final scoreW = math.min(148.0, math.max(0.0, rowW - 96));
+                final sideW = math.max(0.0, (rowW - scoreW) / 2);
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(
+                      width: sideW,
+                      child: _textCell(
+                        _text('name_team_home'),
+                        size: teamSize,
+                        minSize: 9,
+                        color: homeBg,
+                        textColor: homeFg,
+                        weight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                  Expanded(
-                    flex: 5,
-                    child: _textCell(
-                      _text('name_team_away'),
-                      size: teamSize,
-                      minSize: 9,
-                      color: awayBg,
-                      textColor: awayFg,
-                      weight: FontWeight.bold,
-                      right: false,
+                    SizedBox(
+                      width: scoreW,
+                      child: _matchScoreCell(
+                        state: state,
+                        score: score,
+                        stateSize: stateSize,
+                        scoreSize: scoreSize,
+                        homeName: _text('name_team_home'),
+                        awayName: _text('name_team_away'),
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                    Expanded(
+                      child: _textCell(
+                        _text('name_team_away'),
+                        size: teamSize,
+                        minSize: 9,
+                        color: awayBg,
+                        textColor: awayFg,
+                        weight: FontWeight.bold,
+                        right: false,
+                      ),
+                    ),
+                  ],
+                );
+              }),
             ),
             Expanded(
               flex: pitcherN,
@@ -1336,43 +2130,46 @@ class _TableGameCard extends StatelessWidget {
                 children: [
                   Expanded(
                     flex: 5,
-                    child: _pitcherCell(
-                      homeBatters,
-                      color: homePale,
-                      size: detailSize,
-                      right: true,
-                      bottom: false,
-                      nameColW: homeNameColW,
-                      centerNames: !started,
-                    ),
+                    child: allBatters
+                        ? _lineupCell(homeLineup, color: homePale, size: detailSize, right: true)
+                        : _pitcherCell(
+                            homeBatters,
+                            color: homePale,
+                            size: detailSize,
+                            right: true,
+                            bottom: false,
+                            nameColW: homeNameColW,
+                            centerNames: !started,
+                          ),
                   ),
                   Expanded(
                     flex: midFlex,
-                    child: _textCell(
-                      '打者',
-                      size: labelSize,
-                      minSize: 9,
-                      color: _labelColor,
-                      textColor: Colors.white,
-                      weight: FontWeight.bold,
-                      bottom: false,
-                    ),
+                    child: _batterHeader(labelSize),
                   ),
                   Expanded(
                     flex: 5,
-                    child: _pitcherCell(
-                      awayBatters,
-                      color: awayPale,
-                      size: detailSize,
-                      right: false,
-                      bottom: false,
-                      nameColW: awayNameColW,
-                      centerNames: !started,
-                    ),
+                    child: allBatters
+                        ? _lineupCell(awayLineup, color: awayPale, size: detailSize, right: false)
+                        : _pitcherCell(
+                            awayBatters,
+                            color: awayPale,
+                            size: detailSize,
+                            right: false,
+                            bottom: false,
+                            nameColW: awayNameColW,
+                            centerNames: !started,
+                          ),
                   ),
                 ],
               ),
             ),
+            if (_showLineScore)
+              _lineScoreTable(
+                homeBg: homeBg,
+                awayBg: awayBg,
+                homeFg: homeFg,
+                awayFg: awayFg,
+              ),
           ],
         ),
       );
@@ -2101,39 +2898,6 @@ class _PitcherNameBoxState extends State<_PitcherNameBox> with SingleTickerProvi
           ],
         ),
       ),
-    );
-  }
-}
-
-class _BlinkChip extends StatefulWidget {
-  final Widget child;
-
-  const _BlinkChip({required this.child});
-
-  @override
-  State<_BlinkChip> createState() => _BlinkChipState();
-}
-
-class _BlinkChipState extends State<_BlinkChip> with SingleTickerProviderStateMixin {
-  late final AnimationController _ctrl;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 420))..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: Tween<double>(begin: 1, end: 0).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut)),
-      child: widget.child,
     );
   }
 }

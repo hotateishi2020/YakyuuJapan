@@ -13,6 +13,7 @@ class t_game extends DBModel {
   int score_home = 0;
   int score_away = 0;
   String state = '';
+  String code_game = '';
   DateTime? datetime_start = null;
 
   Map<String, dynamic> toMap() {
@@ -29,6 +30,7 @@ class t_game extends DBModel {
         "score_home": score_home,
         "score_away": score_away,
         "state": state,
+        "code_game": code_game,
         "datetime_start": datetime_start,
       });
   }

@@ -106,7 +106,7 @@ class PostseasonBracket extends StatelessWidget {
           child: Column(
             children: [
               ColoredBox(
-                color: Colors.black,
+                color: Color(0xFF004832),
                 child: SizedBox(
                   height: 22,
                   width: double.infinity,

@@ -697,6 +697,13 @@ class _TableGameCard extends StatelessWidget {
     return text == 'true' || text == 't' || text == '1';
   }
 
+  String _defenseMark(String raw) {
+    const positions = {'投', '捕', '一', '二', '三', '遊', '左', '中', '右', '指'};
+    final text = raw.trim();
+    if (positions.contains(text)) return text;
+    return '';
+  }
+
   String _batterMark(Map<String, dynamic> row) {
     final homers = int.tryParse('${row['int_homerun'] ?? ''}') ?? 0;
     if (homers > 0) return 'HR';
@@ -927,7 +934,7 @@ class _TableGameCard extends StatelessWidget {
             final name = '${player['name'] ?? ''}'.trim();
             if (name.isEmpty) continue;
             final role = '${player['role'] ?? ''}'.trim();
-            players.add(_lineupPlayer(name, '${player['plays'] ?? ''}', teamId, role == 'null' ? '' : role));
+            players.add(_lineupPlayer(name, '${player['plays'] ?? ''}', teamId, role == 'null' ? '' : role, '${player['pos'] ?? ''}'));
           }
         }
         byOrder[order] = players;
@@ -936,7 +943,7 @@ class _TableGameCard extends StatelessWidget {
     return [for (var order = 1; order <= 9; order++) (order: order, players: byOrder[order] ?? const <_PlayerLine>[])];
   }
 
-  _PlayerLine _lineupPlayer(String name, String plays, int teamId, String role) {
+  _PlayerLine _lineupPlayer(String name, String plays, int teamId, String role, String position) {
     Map<String, dynamic>? summary;
     for (final row in rows) {
       if ('${row['name_full_summary'] ?? ''}'.trim() != name) continue;
@@ -947,8 +954,9 @@ class _TableGameCard extends StatelessWidget {
     }
     final rawPlays = plays.trim() == 'null' ? '' : plays.trim();
     final shownRole = role.isNotEmpty ? role : _enterRole(name, teamId);
+    final pos = _defenseMark(position);
     if (summary == null) {
-      return (name: name, role: shownRole, colors: '', mark: rawPlays.contains('|hr') ? 'HR' : '', stat: '', hrTotal: '', predict: '', plays: rawPlays, achieve: '', tone: '', chips: '');
+      return (name: name, role: shownRole, colors: '', mark: pos, stat: '', hrTotal: '', predict: '', plays: rawPlays, achieve: '', tone: '', chips: '');
     }
     final colors = '${summary['colors_summary'] ?? ''}'.trim();
     final summaryPlays = _playsOf(summary);
@@ -956,7 +964,7 @@ class _TableGameCard extends StatelessWidget {
       name: name,
       role: shownRole,
       colors: colors == 'null' ? '' : colors,
-      mark: _batterMark(summary),
+      mark: pos,
       stat: '',
       hrTotal: '',
       predict: _predictLabel('${summary['titles_predict'] ?? ''}'),
@@ -1040,7 +1048,7 @@ class _TableGameCard extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        for (final part in _orderedPlays(player.plays, includeOuts: includeOuts)) _playChip(part, statSize),
+        for (final part in _orderedPlays(player.plays, includeOuts: includeOuts)) _playChip(part, statSize, compact: includeOuts),
         for (final part in achievements) _playChip(part, statSize, blink: true),
         if (player.predict.isNotEmpty) ...[
           if (player.plays.isNotEmpty || player.achieve.isNotEmpty) const SizedBox(width: 2),
@@ -1108,7 +1116,7 @@ class _TableGameCard extends StatelessWidget {
                 ),
                 SizedBox(
                   width: badgeWidth,
-                  child: player == null || player.mark.isEmpty ? const SizedBox() : _resultBadge(player.mark, nameSize),
+                  child: player == null || player.mark.isEmpty ? const SizedBox() : _lineupMark(player.mark, nameSize),
                 ),
                 SizedBox(
                   width: nameW,
@@ -1339,16 +1347,6 @@ class _TableGameCard extends StatelessWidget {
           row(header: true, name: '', innings: const [], runs: '', hits: '', errors: ''),
           row(
             header: false,
-            name: _text('name_team_home'),
-            innings: homeInnings,
-            runs: _countText('int_runs_home'),
-            hits: _countText('int_hit_home'),
-            errors: _countText('int_error_home'),
-            teamBg: homeBg,
-            teamFg: homeFg,
-          ),
-          row(
-            header: false,
             name: _text('name_team_away'),
             innings: awayInnings,
             runs: _countText('int_runs_away'),
@@ -1356,6 +1354,16 @@ class _TableGameCard extends StatelessWidget {
             errors: _countText('int_error_away'),
             teamBg: awayBg,
             teamFg: awayFg,
+          ),
+          row(
+            header: false,
+            name: _text('name_team_home'),
+            innings: homeInnings,
+            runs: _countText('int_runs_home'),
+            hits: _countText('int_hit_home'),
+            errors: _countText('int_error_home'),
+            teamBg: homeBg,
+            teamFg: homeFg,
           ),
         ],
       ),
@@ -1749,7 +1757,7 @@ class _TableGameCard extends StatelessWidget {
 
   Color _playColor(String kind, String label) {
     if (label.contains('併殺')) return Colors.black;
-    if (label.contains('三振')) return const Color(0xFF616161);
+    if (label.contains('三振') || label.contains('振逃')) return const Color(0xFF616161);
     if (label.contains('ゴロ') || label.contains('フライ') || label.contains('ライナー')) return const Color(0xFF1E88E5);
     return switch (kind) {
       'hr' || 'cycle' || 'cyclemis' || 'multihit' || 'allhit' || 'allreach' || 'perfect' || 'nohit' || 'maddux' || 'shutout' || 'cg' => const Color(0xFFDC143C),
@@ -1854,14 +1862,30 @@ class _TableGameCard extends StatelessWidget {
     );
   }
 
-  Widget _playChip(String encoded, double fontSize, {bool blink = false}) {
+  String _compactPlay(String label) {
+    return label.replaceAll('ゴロ', 'ゴ').replaceAll('フライ', '飛').replaceAll('ライナー', '直').replaceAll('ポップ', 'ポ');
+  }
+
+  Widget _lineupMark(String mark, double fontSize) {
+    const positions = {'投', '捕', '一', '二', '三', '遊', '左', '中', '右', '指'};
+    if (!positions.contains(mark)) return _resultBadge(mark, fontSize);
+    return Center(
+      child: Text(
+        mark,
+        style: TextStyle(fontSize: math.min(11, fontSize), fontWeight: FontWeight.bold, color: Colors.black87, height: 1),
+      ),
+    );
+  }
+
+  Widget _playChip(String encoded, double fontSize, {bool blink = false, bool compact = false}) {
     final bar = encoded.lastIndexOf('|');
     final label = (bar < 0 ? encoded : encoded.substring(0, bar)).trim();
     final kind = bar < 0 ? '' : encoded.substring(bar + 1).trim();
     if (label.isEmpty) return const SizedBox.shrink();
     final rawLabel = _playLabel(label, kind);
-    final shown = kind == 'hr' ? _homerNumberFirst(rawLabel) : rawLabel;
-    final bg = _playColor(kind, shown);
+    final full = kind == 'hr' ? _homerNumberFirst(rawLabel) : rawLabel;
+    final shown = compact ? _compactPlay(full) : full;
+    final bg = _playColor(kind, full);
     final ink = shown.contains('併殺') ? const Color(0xFFE53935) : (bg.computeLuminance() > 0.55 ? Colors.black87 : Colors.white);
     final chipSize = (fontSize - 1).clamp(8.0, 11.0);
     final text = Text(

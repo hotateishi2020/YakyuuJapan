@@ -76,9 +76,9 @@ Map<String, dynamic> game({
 }
 
 void main() {
-  test('勝率5割以下またはゲーム差10以上でアドバンテージが2勝になる', () {
+  test('勝率5割未満またはゲーム差10以上でアドバンテージが2勝になる', () {
     expect(finalistTakesExtraAdvantage(team(id: 3, league: 1, rank: 3, wins: 60, losses: 70, behind: 8)), isTrue);
-    expect(finalistTakesExtraAdvantage(team(id: 3, league: 1, rank: 3, wins: 70, losses: 70, behind: 4)), isTrue);
+    expect(finalistTakesExtraAdvantage(team(id: 3, league: 1, rank: 3, wins: 70, losses: 70, behind: 4)), isFalse);
     expect(finalistTakesExtraAdvantage(team(id: 3, league: 1, rank: 3, wins: 71, losses: 70, behind: 9.5)), isFalse);
     expect(finalistTakesExtraAdvantage(team(id: 2, league: 1, rank: 2, wins: 75, losses: 65, behind: 10)), isTrue);
     expect(gamesBehindOf('優勝'), 0);
@@ -111,6 +111,44 @@ void main() {
     expect(board.finalCentral.slots, 4);
     expect(board.finalCentral.winsHigh, 1);
     expect(board.finalCentral.decided, isFalse);
+  });
+
+  test('今のゲーム差のまま終わると両方とも新規定なら星は5個で1位は2つ塗りつぶす', () {
+    final board = buildPostseasonBoard(
+      standings: [
+        standing(id: 1, league: 1, rank: 1, name: '阪神', wins: 88, losses: 52),
+        standing(id: 2, league: 1, rank: 2, name: '巨人', behind: '12.0', wins: 70, losses: 68),
+        standing(id: 3, league: 1, rank: 3, name: 'DeNA', behind: '15.0', wins: 65, losses: 73),
+        standing(id: 7, league: 2, rank: 1, name: 'ソフトバンク', wins: 90, losses: 48),
+        standing(id: 8, league: 2, rank: 2, name: '西武', behind: '3.0', wins: 87, losses: 51),
+        standing(id: 9, league: 2, rank: 3, name: '日本ハム', behind: '6.0', wins: 84, losses: 54),
+      ],
+      games: const [],
+    );
+    expect(board.finalCentral.slots, 5);
+    expect(board.finalCentral.advantage, 2);
+    expect(board.finalCentral.winsHigh, 2);
+    expect(board.finalPacific.slots, 4);
+    expect(board.finalPacific.winsHigh, 1);
+  });
+
+  test('3位のゲーム差が直上との差でも1位との差が10以上なら星は5個', () {
+    final board = buildPostseasonBoard(
+      standings: [
+        standing(id: 7, league: 2, rank: 1, name: 'ソフトバンク', wins: 91, losses: 48),
+        standing(id: 8, league: 2, rank: 2, name: '西武', behind: '13', wins: 77, losses: 60),
+        standing(id: 9, league: 2, rank: 3, name: '日本ハム', behind: '0.5', wins: 78, losses: 62),
+        standing(id: 1, league: 1, rank: 1, name: '阪神', wins: 77, losses: 60),
+        standing(id: 2, league: 1, rank: 2, name: '巨人', behind: '2.5', wins: 76, losses: 64),
+        standing(id: 5, league: 1, rank: 3, name: 'DeNA', behind: '5.5', wins: 70, losses: 69),
+      ],
+      games: const [],
+    );
+    expect(board.finalPacific.slots, 5);
+    expect(board.finalPacific.advantage, 2);
+    expect(board.finalPacific.winsHigh, 2);
+    expect(board.finalCentral.slots, 4);
+    expect(board.finalCentral.winsHigh, 1);
   });
 
   test('進出チームのゲーム差が10以上ならファイナルは2勝アドバンテージの5勝先取', () {

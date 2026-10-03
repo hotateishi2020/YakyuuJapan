@@ -6,7 +6,10 @@ class ParsedLiveText {
   final List<ParsedHalf> halves;
   final bool finished;
 
-  ParsedLiveText({required this.halves, required this.finished});
+  /// 先攻は false、後攻は true。名前は空白なしの苗字、値は守備位置の1文字。
+  final Map<bool, Map<String, String>> positions;
+
+  ParsedLiveText({required this.halves, required this.finished, this.positions = const {}});
 }
 
 class ParsedHalf {
@@ -72,6 +75,7 @@ final Set<String> livePlateFinishedResults = {
   Value.CodeGameResult.SACRIFICE_FLY,
   Value.CodeGameResult.SQUEEZE,
   Value.CodeGameResult.STRIKE_OUT,
+  Value.CodeGameResult.DROPPED_THIRD,
   Value.CodeGameResult.WALK_BALL,
   Value.CodeGameResult.WALK_DEAD,
   Value.CodeGameResult.WALK_ERROR,
@@ -137,6 +141,7 @@ class LiveText {
     if (root == null) {
       return ParsedLiveText(halves: [], finished: false);
     }
+    final positions = _starterPositions(root);
 
     final halves = <ParsedHalf>[];
     var finished = false;
@@ -194,7 +199,39 @@ class LiveText {
       ));
     }
 
-    return ParsedLiveText(halves: _withoutExtraPlates(halves), finished: finished);
+    return ParsedLiveText(halves: _withoutExtraPlates(halves), finished: finished, positions: positions);
+  }
+
+  static Map<bool, Map<String, String>> _starterPositions(Element root) {
+    final away = <String, String>{};
+    final home = <String, String>{};
+    final text = root.text.replaceAll(RegExp(r'\s+'), ' ');
+    final marker = text.indexOf('先攻');
+    if (marker < 0) return {false: away, true: home};
+    final rest = text.substring(marker);
+    final homeAt = rest.indexOf('後攻');
+    void fill(String chunk, Map<String, String> into) {
+      for (final match in RegExp(r'(\d+)番:\s*(\S+?)\s*[（(]([^)）]+)[)）]').allMatches(chunk)) {
+        final name = match.group(2)!.replaceAll(' ', '');
+        final pos = _shortDefense(match.group(3)!);
+        if (name.isNotEmpty && pos.isNotEmpty) into[name] = pos;
+      }
+    }
+
+    fill(homeAt < 0 ? rest : rest.substring(0, homeAt), away);
+    if (homeAt >= 0) fill(rest.substring(homeAt), home);
+    return {false: away, true: home};
+  }
+
+  static String _shortDefense(String raw) {
+    final text = raw.trim();
+    const named = {'投手': '投', '捕手': '捕', '一塁': '一', '二塁': '二', '三塁': '三', '遊撃': '遊', '左翼': '左', '中堅': '中', '右翼': '右', '指名': '指'};
+    for (final entry in named.entries) {
+      if (text.contains(entry.key)) return entry.value;
+    }
+    const short = {'投', '捕', '一', '二', '三', '遊', '左', '中', '右', '指'};
+    if (short.contains(text)) return text;
+    return '';
   }
 
   static bool _countsAsPlate(ParsedPlate plate) {
@@ -385,6 +422,9 @@ class LiveText {
     } else if (digits.contains('犠飛') || digits.contains('犠牲フライ')) {
       event.category = Value.CodeGameResultCategory.BATTING;
       event.result = Value.CodeGameResult.SACRIFICE_FLY;
+    } else if (digits.contains('振り逃げ')) {
+      event.category = Value.CodeGameResultCategory.BATTING;
+      event.result = Value.CodeGameResult.DROPPED_THIRD;
     } else if (digits.contains('三振')) {
       event.category = Value.CodeGameResultCategory.BATTING;
       event.result = Value.CodeGameResult.STRIKE_OUT;

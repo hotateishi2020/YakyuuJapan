@@ -6,7 +6,7 @@ const npbSeasonGames = 143;
 /// 2026年の規定:
 /// - ファーストステージは3試合制・先に2勝。アドバンテージはない。
 /// - ファイナルは原則6試合制。1位に1勝のアドバンテージがあり、先に4勝。
-/// - ファーストステージ勝者の勝率が5割以下、または1位とのゲーム差が10以上なら、
+/// - ファーストステージ勝者の勝率が5割未満、または1位とのゲーム差が10以上なら、
 ///   アドバンテージは2勝、先に5勝（最大7試合）。両方を満たしても2勝まで。
 class BracketTeam {
   final int id;
@@ -134,13 +134,38 @@ double? gamesBehindOf(dynamic raw) {
   return double.tryParse(text);
 }
 
+/// 1位とのゲーム差。順位表の game_behind は直上の球団との差なので、勝敗から計算する。
+double gamesBehindFirst(BracketTeam team, BracketTeam leader) {
+  return ((leader.wins - team.wins) + (team.losses - leader.losses)) / 2;
+}
+
 /// ファーストステージ勝者が、ファイナルのアドバンテージを2勝にする条件を満たすか。
-bool finalistTakesExtraAdvantage(BracketTeam finalist) {
-  final behind = finalist.gamesBehind;
+/// 勝率は5割未満。ちょうど5割は対象にならない。
+/// [leader] があるときは、その球団とのゲーム差を勝敗から出す。
+bool finalistTakesExtraAdvantage(BracketTeam finalist, {BracketTeam? leader}) {
+  final behind = leader == null || leader.id <= 0 ? finalist.gamesBehind : gamesBehindFirst(finalist, leader);
   if (behind != null && behind >= 10) return true;
   final rate = finalist.winRate;
-  if (rate != null && rate <= 0.5) return true;
+  if (rate != null && rate < 0.5) return true;
   return false;
+}
+
+BracketTeam _listedRank(List<Map<String, dynamic>> standings, int leagueId, int rank) {
+  for (final row in standings) {
+    if (_asInt(row['id_league']) == leagueId && _asInt(row['int_rank']) == rank) {
+      return _teamFromRow(row);
+    }
+  }
+  return _blankRank(leagueId, rank);
+}
+
+/// 今のゲーム差のまま終わったとき、2位でも3位でも新規定に当たるか。
+bool projectedFinalTakesExtra(List<Map<String, dynamic>> standings, int leagueId) {
+  final first = _listedRank(standings, leagueId, 1);
+  final second = _listedRank(standings, leagueId, 2);
+  final third = _listedRank(standings, leagueId, 3);
+  if (first.id <= 0 || second.id <= 0 || third.id <= 0) return false;
+  return finalistTakesExtraAdvantage(second, leader: first) && finalistTakesExtraAdvantage(third, leader: first);
 }
 
 class _Tally {
@@ -415,7 +440,7 @@ PostseasonBoard buildPostseasonBoard({
   }
 
   StageResult finalStage(BracketTeam first, BracketTeam rival) {
-    final extra = rival.id > 0 && finalistTakesExtraAdvantage(rival);
+    final extra = (rival.id > 0 && finalistTakesExtraAdvantage(rival, leader: first)) || (rival.id == 0 && projectedFinalTakesExtra(standings, first.leagueId));
     return scoreSeries(
       high: first,
       low: rival.id > 0 ? rival : _placeholder,

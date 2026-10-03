@@ -164,16 +164,13 @@ void _assignTimeline(List<Map<String, dynamic>> rows) {
       if (inning != 0) return inning;
       return int.parse(as[1]).compareTo(int.parse(bs[1]));
     });
-    final nextOrder = <int, int>{0: 1, 1: 1};
     var seq = 0;
     for (final half in halfKeys) {
-      final side = int.parse(half.split('|')[1]);
-      final ordered = _rowsInHalfOrder(halves[half]!, nextOrder[side]!);
+      final rows = halves[half]!;
+      final ordered = _rowsInHalfOrder(rows, _leadoffOrder(rows));
       for (final row in ordered) {
         row['_seq'] = seq++;
       }
-      final last = _lastBattingOrder(ordered);
-      if (last >= 1 && last <= 9) nextOrder[side] = last == 9 ? 1 : last + 1;
     }
   }
 }
@@ -225,13 +222,25 @@ List<Map<String, dynamic>> _rowsInHalfOrder(List<Map<String, dynamic>> rows, int
   return ordered;
 }
 
-int _lastBattingOrder(List<Map<String, dynamic>> rows) {
-  var order = 0;
+int _leadoffOrder(List<Map<String, dynamic>> rows) {
+  var start = 1;
+  var bestOut = 99;
+  var bestRunners = 99;
   for (final row in rows) {
-    final value = _asInt(row['int_batting_order']);
-    if (value >= 1 && value <= 9) order = value;
+    final order = _asInt(row['int_batting_order']);
+    if (order < 1 || order > 9) continue;
+    final outs = _asInt(row['cnt_out']);
+    var runners = 0;
+    if (_asBool(row['flg_runner_first'])) runners++;
+    if (_asBool(row['flg_runner_second'])) runners++;
+    if (_asBool(row['flg_runner_third'])) runners++;
+    if (outs < bestOut || (outs == bestOut && runners < bestRunners)) {
+      bestOut = outs;
+      bestRunners = runners;
+      start = order;
+    }
   }
-  return order;
+  return start;
 }
 
 String _halfInning(Map<String, dynamic> row) {
@@ -311,6 +320,7 @@ bool _isBattingResult(String result) {
     'SACRIFICE_FLY',
     'SQUEEZE',
     'STRIKE_OUT',
+    'DROPPED_THIRD',
     'ERROR',
     'WALK',
     'WALK_DEAD',
@@ -371,7 +381,7 @@ bool _isBattingResult(String result) {
     return (text: '$head$short', kind: hitKind);
   }
 
-  if (result == 'OUT_GROUND' || result == 'OUT_FLY' || result == 'OUT_LINE_DRIVE' || result == 'OUT_POP_UP' || result == 'OUT_DOUBLE_PLAY' || result == 'STRIKE_OUT') {
+  if (result == 'OUT_GROUND' || result == 'OUT_FLY' || result == 'OUT_LINE_DRIVE' || result == 'OUT_POP_UP' || result == 'OUT_DOUBLE_PLAY' || result == 'STRIKE_OUT' || result == 'DROPPED_THIRD') {
     final word = switch (result) {
       'OUT_GROUND' => 'ゴロ',
       'OUT_FLY' => 'フライ',
@@ -379,10 +389,11 @@ bool _isBattingResult(String result) {
       'OUT_POP_UP' => 'ポップ',
       'OUT_DOUBLE_PLAY' => '併殺',
       'STRIKE_OUT' => '三振',
+      'DROPPED_THIRD' => '振逃',
       _ => '',
     };
     if (word.isEmpty) return null;
-    final directed = result == 'STRIKE_OUT' || direction.isEmpty ? word : '$direction$word';
+    final directed = result == 'STRIKE_OUT' || result == 'DROPPED_THIRD' || direction.isEmpty ? word : '$direction$word';
     return (text: '$head$directed', kind: 'out');
   }
 

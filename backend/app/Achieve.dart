@@ -43,7 +43,7 @@ String pitcherStatChips({
   final runsTone = _lowerTone(runs / ip, const [0, 0.15, 0.30, 0.45, 0.6, 0.75]);
   final parts = <String>[
     '${_inningsLabel(innings)}$runsLabel|${runsTone == 'gray' ? 'dgray' : runsTone}',
-    '${hits == 0 ? '無被安打' : '被安打$hits'}|${_lowerTone(hits / ip, const [0, 0.3, 0.6, 0.9, 1.2, 1.5])}',
+    '被安打$hits|${_lowerTone(hits / ip, const [0, 0.3, 0.6, 0.9, 1.2, 1.5])}',
     '四死球$freePasses|${_lowerTone(freePasses / ip, const [0, 0.15, 0.30, 0.45, 0.6, 0.75])}',
     '$strikeouts奪三振|${starter ? _higherTone(strikeouts / ip, const [1, 0.85, 0.7, 0.55, 0.4, 0.25]) : _reliefStrikeoutTone(strikeouts / ip)}',
   ];

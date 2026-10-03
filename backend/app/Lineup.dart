@@ -66,6 +66,7 @@ List<Map<String, dynamic>> _lineupOf(
   _fillBattingOrders(rows);
   final slots = <String, List<String>>{};
   final roles = <String, String>{};
+  final positions = <String, String>{};
   final ordered = [...rows]..sort((a, b) {
       final half = _halfKey(a).compareTo(_halfKey(b));
       if (half != 0) return half;
@@ -96,6 +97,17 @@ List<Map<String, dynamic>> _lineupOf(
     return null;
   }
 
+  bool listedPitcher(int team, String name) {
+    if (name.isEmpty) return false;
+    final prefix = '$gameId|$team|';
+    for (final key in pitchers) {
+      if (!key.startsWith(prefix)) continue;
+      final full = key.substring(prefix.length);
+      if (full == name || full.startsWith(name) || name.startsWith(full)) return true;
+    }
+    return false;
+  }
+
   int pitcherSlot(int team) {
     for (var order = 9; order >= 1; order--) {
       final slot = slots['$team|$order'];
@@ -116,7 +128,7 @@ List<Map<String, dynamic>> _lineupOf(
         place(team, order, enter);
         return;
       }
-      if (pitchers.contains('$gameId|$team|$exit')) {
+      if (listedPitcher(team, exit)) {
         place(team, pitcherSlot(team), enter);
       }
     }
@@ -141,7 +153,7 @@ List<Map<String, dynamic>> _lineupOf(
       final slotOrder = replaced ?? (order >= 1 && order <= 9 ? order : null);
       if (slotOrder != null) {
         place(battingTeam, slotOrder, who);
-      } else if (exit.isNotEmpty && pitchers.contains('$gameId|$battingTeam|$exit')) {
+      } else if (exit.isNotEmpty && listedPitcher(battingTeam, exit)) {
         place(battingTeam, pitcherSlot(battingTeam), who);
       }
       continue;
@@ -156,7 +168,10 @@ List<Map<String, dynamic>> _lineupOf(
     }
     if (_changeResults.contains(code)) continue;
     final team = _asInt(row['id_team']);
-    place(team > 0 ? team : battingTeam, order, batter);
+    final batting = team > 0 ? team : battingTeam;
+    final pos = _defenseLabel('${row['code_position_from'] ?? ''}');
+    if (pos.isNotEmpty && batter.isNotEmpty) positions.putIfAbsent('$batting|$batter', () => pos);
+    place(batting, order, batter);
   }
 
   final result = <Map<String, dynamic>>[];
@@ -177,6 +192,7 @@ List<Map<String, dynamic>> _lineupOf(
             {
               'name': name,
               'role': roles['$team|$name'] ?? '',
+              'pos': positions['$team|$name'] ?? '',
               'plays': plays[playPlayerKey(gameId, team, name)] ?? '',
             },
         ],
@@ -194,7 +210,7 @@ void _fillBattingOrders(List<Map<String, dynamic>> rows) {
     groups.putIfAbsent(_halfKey(row), () => []).add(row);
   }
   for (final group in groups.values) {
-    final ordered = [...group]..sort((a, b) => _asInt(a['id']).compareTo(_asInt(b['id'])));
+    final ordered = _halfSequence(group);
     final used = <int>{};
     final byName = <String, int>{};
     var last = 0;
@@ -230,6 +246,65 @@ void _fillBattingOrders(List<Map<String, dynamic>> rows) {
       if (known != null) row['int_batting_order'] = known;
     }
   }
+}
+
+List<Map<String, dynamic>> _halfSequence(List<Map<String, dynamic>> rows) {
+  int outsOf(Map<String, dynamic> row) => _asInt(row['cnt_out']);
+  int orderOf(Map<String, dynamic> row) => _asInt(row['int_batting_order']);
+  int runnersOf(Map<String, dynamic> row) {
+    var count = 0;
+    if (_asBool(row['flg_runner_first'])) count++;
+    if (_asBool(row['flg_runner_second'])) count++;
+    if (_asBool(row['flg_runner_third'])) count++;
+    return count;
+  }
+
+  var start = 1;
+  var bestOut = 99;
+  var bestRunners = 99;
+  for (final row in rows) {
+    final order = orderOf(row);
+    if (order < 1 || order > 9) continue;
+    final outs = outsOf(row);
+    final runners = runnersOf(row);
+    if (outs < bestOut || (outs == bestOut && runners < bestRunners)) {
+      bestOut = outs;
+      bestRunners = runners;
+      start = order;
+    }
+  }
+  int distance(int order) {
+    if (order < 1 || order > 9) return 100;
+    return (order - start + 9) % 9;
+  }
+
+  final ordered = [...rows]..sort((a, b) {
+      final byOut = outsOf(a).compareTo(outsOf(b));
+      if (byOut != 0) return byOut;
+      final byDistance = distance(orderOf(a)).compareTo(distance(orderOf(b)));
+      if (byDistance != 0) return byDistance;
+      return _asInt(a['id']).compareTo(_asInt(b['id']));
+    });
+  return ordered;
+}
+
+String _defenseLabel(String raw) {
+  final text = raw.trim();
+  const short = {'投', '捕', '一', '二', '三', '遊', '左', '中', '右', '指'};
+  if (short.contains(text)) return text;
+  return switch (text) {
+    'P' || 'PITCHER' => '投',
+    'C' || 'CATCHER' => '捕',
+    'FIRST' => '一',
+    'SECOND' => '二',
+    'THIRD' => '三',
+    'SS' => '遊',
+    'LEFT' || 'LF' => '左',
+    'CENTER' || 'CF' => '中',
+    'RIGHT' || 'RF' => '右',
+    'DH' => '指',
+    _ => '',
+  };
 }
 
 int _nextOpenOrder(int after, Set<int> used) {

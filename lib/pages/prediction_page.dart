@@ -128,7 +128,7 @@ class _PredictionPageState extends State<PredictionPage> {
             expand
                 ? Expanded(
                     child: ColoredBox(
-                      color: Colors.white,
+                      color: const Color(0xFFF5F0DC),
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
                         child: child,
@@ -136,7 +136,7 @@ class _PredictionPageState extends State<PredictionPage> {
                     ),
                   )
                 : ColoredBox(
-                    color: Colors.white,
+                    color: const Color(0xFFF5F0DC),
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
                       child: child,
@@ -833,7 +833,7 @@ class _PredictionPageState extends State<PredictionPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.black,
+                  color: const Color(0xFF757575),
                   borderRadius: BorderRadius.circular(3),
                 ),
                 child: Row(
@@ -970,7 +970,7 @@ class _PredictionPageState extends State<PredictionPage> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: const Color(0xFF757575),
                     borderRadius: BorderRadius.circular(3),
                   ),
                   child: const Text('イベント日程', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),

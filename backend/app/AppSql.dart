@@ -501,7 +501,7 @@ class AppSql {
             END AS txt_batting,
             TRIM_SCALE(double_inning_pitch)::text || '回' || 
               CASE WHEN int_runs = 0 THEN '無' ELSE int_runs::text END || '失点(' || 
-              CASE WHEN int_hit = 0 THEN '無被安打' ELSE '被安打' || int_hit::text END ||
+              '被安打' || int_hit::text ||
               CASE WHEN int_four = 0 THEN '無' ELSE int_four::text END || '四球' ||
               CASE WHEN int_dead_pitching = 0 THEN '' ELSE int_dead_pitching::text || '死球' END || 
               CASE WHEN int_strike_out = 0 THEN '0' ELSE int_strike_out::text END || '奪三振' || 
@@ -736,6 +736,7 @@ class AppSql {
         d.code_state_score,
         d.flg_goodbye,
         d.code_direction_batting,
+        d.code_position_from,
         runner.name_full AS name_runner,
         runner.id_team AS id_team_runner,
         g.id_team_home,
@@ -753,6 +754,13 @@ class AppSql {
         AND d.id_batter <> 0
         AND g.datetime_start::date BETWEEN (CURRENT_DATE - 10) AND (CURRENT_DATE + 10)
       ORDER BY d.id_game, d.id
+    ''';
+  }
+
+  static String deleteGameDetails() {
+    return '''
+      DELETE FROM t_game_details
+      WHERE id_game = \$1
     ''';
   }
 

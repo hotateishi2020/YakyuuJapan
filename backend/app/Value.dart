@@ -137,6 +137,7 @@ class _CodeGameResult {
   final String SACRIFICE_FLY = 'SACRIFICE_FLY';
   final String SQUEEZE = 'SQUEEZE';
   final String STRIKE_OUT = 'STRIKE_OUT';
+  final String DROPPED_THIRD = 'DROPPED_THIRD';
   final String WALK_ERROR = 'ERROR';
   final String WALK_BALL = 'WALK';
   final String WALK_DEAD = 'WALK_DEAD';

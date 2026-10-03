@@ -666,6 +666,7 @@ class SeasonTableBlock extends StatelessWidget {
 
       final Widget gamesSwitcher = GameDateSwitcher(
         games: games,
+        playerStats: stats,
         initialDate: gamesDateFilter,
         headerColor: leagueColor,
         horizontal: true,

@@ -350,7 +350,8 @@ bool _isBattingResult(String result) {
       _ => 'ソロ',
     };
     final number = homerNumber > 0 ? '$homerNumber号' : '';
-    return (text: '$inning$number$pinchHead$kindホームラン', kind: 'hr');
+    final mark = direction.isEmpty ? '' : '^$direction';
+    return (text: '$inning$number$pinchHead$kindホームラン$mark', kind: 'hr');
   }
 
   if (result == Value.CodeGameResult.HIT_SINGLE || result == Value.CodeGameResult.HIT_DOUBLE || result == Value.CodeGameResult.HIT_TRIPLE) {
@@ -368,7 +369,8 @@ bool _isBattingResult(String result) {
       final points = runs >= 2 ? '$runs点' : '';
       // 速報が「タイムリーヒット」でも、ヒットよりタイムリーを優先する。二塁打・三塁打は種類を残す。
       final body = result == Value.CodeGameResult.HIT_SINGLE ? 'タイムリー' : 'タイムリー$hit';
-      return (text: '$inning$pinchHead$points$body', kind: 'timely');
+      final mark = direction.isEmpty ? '' : '^$direction';
+      return (text: '$inning$pinchHead$points$body$mark', kind: 'timely');
     }
     final hitKind = switch (result) {
       'HIT3' => 'triple',
@@ -386,7 +388,7 @@ bool _isBattingResult(String result) {
       'OUT_GROUND' => 'ゴロ',
       'OUT_FLY' => 'フライ',
       'OUT_LINE_DRIVE' => 'ライナー',
-      'OUT_POP_UP' => 'ポップ',
+      'OUT_POP_UP' => '邪飛',
       'OUT_DOUBLE_PLAY' => '併殺',
       'STRIKE_OUT' => '三振',
       'DROPPED_THIRD' => '振逃',

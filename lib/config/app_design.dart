@@ -16,7 +16,7 @@ const ALL_HEADER_H = 33.0;
 double ALL_WIDTH = 0;
 
 // 最上部ヘッダー
-const HEADER_GLOBAL_H = 26.0;
+const HEADER_GLOBAL_H = 42.0;
 const HEADER_PAD_VERTICAL = 5.0;
 const HEADER_TITLE = 'Yakyuu! Japan';
 

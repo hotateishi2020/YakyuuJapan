@@ -347,6 +347,41 @@ class AppSql {
     ''';
   }
 
+  /// 予告先発の今季成績。勝敗、防御率、奪三振、規定投球回到達率。
+  static String _seasonPitcherLine(String pitcher) {
+    return '''
+      (
+        SELECT TRIM(
+          c.int_win::text || '勝' || c.int_lose::text || '敗 ' ||
+          to_char(COALESCE(c.double_average_earned_runs, 0), 'FM990.00') || ' ' ||
+          COALESCE(c.int_strike_out_pitcher, 0)::text || '奪三振' ||
+          CASE
+            WHEN tg.int_game > 0 THEN
+              ' 規定到達率' || to_char(
+                ROUND(trunc(COALESCE(c.double_inning, 0))::numeric / tg.int_game * 100, 1),
+                'FM990.0'
+              ) || '%'
+            ELSE ''
+          END
+        )
+        FROM m_player_career c
+        LEFT JOIN LATERAL (
+          SELECT st.int_game
+          FROM t_stats_team st
+          WHERE st.id_team = $pitcher.id_team
+            AND EXTRACT(YEAR FROM st.crtat) = \$1
+          ORDER BY st.crtat DESC
+          LIMIT 1
+        ) tg ON TRUE
+        WHERE c.id_player = $pitcher.id
+          AND c.int_year = \$1
+          AND COALESCE(c.flg_delete, FALSE) = FALSE
+        ORDER BY c.double_inning DESC NULLS LAST
+        LIMIT 1
+      )
+    ''';
+  }
+
   //t_game
   static String selectExistsGame() {
     return '''
@@ -422,6 +457,8 @@ class AppSql {
           ) FILTER (WHERE BTRIM(COALESCE(user_pitcher_away.title_shortest, '')) <> ''),
           ''
         ) AS titles_pitcher_away,
+        ${_seasonPitcherLine('pitcher_home')} AS txt_season_pitcher_home,
+        ${_seasonPitcherLine('pitcher_away')} AS txt_season_pitcher_away,
         id_game_summary,
         id_team_summary,
         name_full_summary,
@@ -509,7 +546,7 @@ class AppSql {
             COALESCE(t_game_summary.txt_homerun_total, '') AS txt_homerun_total,
             (int_hit1 + int_homerun * 5 + int_rbi * 2 + int_steal_base + int_fourball * 0.8 + int_dead_batting * 0.2 + int_sacrifice * 0.2) AS point_total,
             CASE WHEN t_predict_player.id_player IS NULL THEN FALSE ELSE TRUE END AS flg_predict,
-            CASE WHEN double_inning_pitch > 0 THEN TRUE ELSE FALSE END AS flg_pitcher,
+            CASE WHEN double_inning_pitch > 0 OR int_pitch > 0 OR BTRIM(COALESCE(code_result_pitcher, '')) <> '' THEN TRUE ELSE FALSE END AS flg_pitcher,
             code_result_pitcher,
             '/' || STRING_AGG(DISTINCT code_color, '/' ORDER BY code_color DESC) || '/' AS colors_summary,
             COALESCE(
@@ -545,15 +582,15 @@ class AppSql {
           WHERE (int_hit1 + int_homerun * 5 + int_rbi * 2 + int_steal_base + int_fourball * 0.8 + int_dead_batting * 0.2 + int_sacrifice * 0.2) >= 3.5 
             OR int_hit1 >= 3
             OR int_rbi >= 1
-            OR (CASE WHEN t_predict_player.id_player IS NULL THEN FALSE ELSE TRUE END = TRUE AND CASE WHEN double_inning_pitch > 0 THEN TRUE ELSE FALSE END = FALSE) 
-            OR CASE WHEN double_inning_pitch > 0 THEN TRUE ELSE FALSE END = TRUE
+            OR (CASE WHEN t_predict_player.id_player IS NULL THEN FALSE ELSE TRUE END = TRUE AND NOT (double_inning_pitch > 0 OR int_pitch > 0 OR BTRIM(COALESCE(code_result_pitcher, '')) <> '')) 
+            OR double_inning_pitch > 0 OR int_pitch > 0 OR BTRIM(COALESCE(code_result_pitcher, '')) <> ''
           GROUP BY t_predict_player.id_player, id_game, m_player.id_team, name_full, int_batting, int_hit1, int_fourball, int_homerun, 
             int_rbi, int_steal_base, int_dead_batting, int_sacrifice, double_inning_pitch, int_runs,
             int_pitch, int_four, int_dead_pitching, int_strike_out, code_result_pitcher, int_hit, int_runs_earned, int_balk, t_game_summary.id, t_game_summary.txt_homerun_total
           ORDER BY id_game, m_player.id_team, flg_pitcher DESC, point_total DESC, t_game_summary.id 
         ) AS v_game_summary ON v_game_summary.id_game = t_game.id 
       WHERE t_game.datetime_start::date BETWEEN (CURRENT_DATE - 10) AND (CURRENT_DATE + 10)
-      GROUP BY t_game.id, t_game.datetime_start, team_home.name_short, team_away.name_short, pitcher_home.name_full, pitcher_away.name_full,
+      GROUP BY t_game.id, t_game.datetime_start, team_home.name_short, team_away.name_short, pitcher_home.id, pitcher_home.name_full, pitcher_away.id, pitcher_away.name_full,
                pitcher_win.name_full, pitcher_lose.name_full, m_stadium.name_short, t_game.score_home, t_game.score_away,
                team_home.id_league, team_away.id_league, team_home.color_font, team_home.color_back, team_away.color_font,
                team_away.color_back, team_home.id, team_away.id, pitcher_win.id_team, pitcher_lose.id_team, pitcher_save.name_full, 
@@ -581,6 +618,7 @@ class AppSql {
         s.int_fourball,
         s.int_dead_batting,
         s.int_sacrifice,
+        s.int_rbi,
         s.int_error,
         COALESCE(s.txt_homerun_total, '') AS txt_homerun_total
       FROM t_game_summary s

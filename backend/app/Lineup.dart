@@ -45,6 +45,7 @@ Map<int, List<Map<String, dynamic>>> battingLineupsOf(
   List<Map<String, dynamic>> rows, {
   required Map<String, String> plays,
   required Set<String> pitchers,
+  Map<String, int> rbi = const {},
 }) {
   final byGame = <int, List<Map<String, dynamic>>>{};
   for (final row in rows) {
@@ -52,7 +53,7 @@ Map<int, List<Map<String, dynamic>>> battingLineupsOf(
   }
   final lineups = <int, List<Map<String, dynamic>>>{};
   for (final entry in byGame.entries) {
-    lineups[entry.key] = _lineupOf(entry.key, entry.value, plays: plays, pitchers: pitchers);
+    lineups[entry.key] = _lineupOf(entry.key, entry.value, plays: plays, pitchers: pitchers, rbi: rbi);
   }
   return lineups;
 }
@@ -62,6 +63,7 @@ List<Map<String, dynamic>> _lineupOf(
   List<Map<String, dynamic>> rows, {
   required Map<String, String> plays,
   required Set<String> pitchers,
+  Map<String, int> rbi = const {},
 }) {
   _fillBattingOrders(rows);
   final slots = <String, List<String>>{};
@@ -194,6 +196,7 @@ List<Map<String, dynamic>> _lineupOf(
               'role': roles['$team|$name'] ?? '',
               'pos': positions['$team|$name'] ?? '',
               'plays': plays[playPlayerKey(gameId, team, name)] ?? '',
+              'rbi': rbi[playPlayerKey(gameId, team, name)] ?? 0,
             },
         ],
       });

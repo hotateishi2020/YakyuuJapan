@@ -223,6 +223,29 @@ void main() {
         ),
       ),
     ));
+    final background = tester.widget<DecoratedBox>(find.byKey(const Key('postseason-background')));
+    final gradient = (background.decoration as BoxDecoration).gradient! as LinearGradient;
+    expect(gradient.colors.first, const Color(0xFF8CFAF7));
+    expect(gradient.colors.last, const Color(0xFF1F52EB));
+    Finder logo(String asset) {
+      return find.byWidgetPredicate((widget) {
+        if (widget is! Image) return false;
+        final provider = widget.image;
+        return provider is AssetImage && provider.assetName == asset;
+      });
+    }
+
+    final centralLogo = tester.getCenter(logo('backend/assets/images/k-central.webp'));
+    final pacificLogo = tester.getCenter(logo('backend/assets/images/k-pacific.webp'));
+    final centralTeam = tester.getCenter(find.byKey(const Key('postseason-team-1-セ1位')));
+    final pacificTeam = tester.getCenter(find.byKey(const Key('postseason-team-7-パ1位')));
+    final japan = tester.getCenter(find.text('日本シリーズ'));
+    expect(centralLogo.dx, greaterThan(centralTeam.dx));
+    expect(pacificLogo.dx, lessThan(pacificTeam.dx));
+    expect(centralLogo.dx, lessThan(japan.dx));
+    expect(pacificLogo.dx, greaterThan(japan.dx));
+    final japanBox = tester.widget<Positioned>(find.ancestor(of: find.text('日本シリーズ'), matching: find.byType(Positioned)).first);
+    expect(japanBox.top, greaterThan(12));
     expect(find.text('日本シリーズ'), findsOneWidget);
     final stage = tester.widget<DecoratedBox>(find.ancestor(of: find.text('日本シリーズ'), matching: find.byType(DecoratedBox)).first);
     final stageBorder = (stage.decoration as BoxDecoration).border! as Border;

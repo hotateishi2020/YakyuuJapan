@@ -9,7 +9,8 @@ const _centralLeague = Color(0xFF0E8E2D);
 const _pacificLeague = Color(0xFF01B1EA);
 
 class BracketGeom {
-  static const w = 844.0;
+  static const boardW = 844.0;
+  static const w = boardW;
   static const h = 500.0;
   static const xs = <double>[65, 199, 333, 503, 637, 771];
   static const cardW = 114.0;
@@ -23,7 +24,7 @@ class BracketGeom {
   static final cs1P = Rect.fromCenter(center: Offset(midP, 276), width: 112, height: 34);
   static final finC = Rect.fromCenter(center: Offset((xs[0] + midC) / 2, 176), width: 156, height: 40);
   static final finP = Rect.fromCenter(center: Offset((xs[5] + midP) / 2, 176), width: 156, height: 40);
-  static final js = Rect.fromLTRB(xs[0] - 8, 4, xs[5] + 8, 116);
+  static final js = Rect.fromLTRB(xs[0] - 8, 20, xs[5] + 8, 132);
 }
 
 class PostseasonBracket extends StatelessWidget {
@@ -40,7 +41,25 @@ class PostseasonBracket extends StatelessWidget {
       child: SizedBox(
         width: BracketGeom.w,
         height: BracketGeom.h,
-        child: _bracket(board),
+        child: DecoratedBox(
+          key: const Key('postseason-background'),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [
+                Color(0xFF8CFAF7),
+                Color(0xFF2BCFAD),
+                Color(0xFF14C4C0),
+                Color(0xFF5AD8EA),
+                Color(0xFF1E6FE0),
+                Color(0xFF1F52EB),
+              ],
+              stops: [0.0, 0.22, 0.38, 0.52, 0.75, 1.0],
+            ),
+          ),
+          child: _bracket(board),
+        ),
       ),
     );
   }
@@ -49,11 +68,13 @@ class PostseasonBracket extends StatelessWidget {
     return Stack(
       children: [
             CustomPaint(
-              size: const Size(BracketGeom.w, BracketGeom.h),
+              size: const Size(BracketGeom.boardW, BracketGeom.h),
               painter: _BracketLinePainter(board),
             ),
             _innerLogo(BracketGeom.xs[0] + 14, 'backend/assets/images/logo_cs_central.png'),
             _innerLogo(BracketGeom.xs[5] - 14 - 96, 'backend/assets/images/logo_cs_pacific.png'),
+            _leagueLogo(central: true),
+            _leagueLogo(central: false),
             _japanBox(BracketGeom.js),
             _stars(BracketGeom.js.left + 10, _starTop(BracketGeom.js, board.japan.slots, insetTop: 28), board.japan.winsHigh, board.japan.slots),
             _stars(BracketGeom.js.right - 26, _starTop(BracketGeom.js, board.japan.slots, insetTop: 28), board.japan.winsLow, board.japan.slots),
@@ -76,6 +97,25 @@ class PostseasonBracket extends StatelessWidget {
             _team(4, board, board.pacific2, 'パ2位'),
             _team(5, board, board.pacific1, 'パ1位'),
       ],
+    );
+  }
+
+  /// セ・パそれぞれの、日本シリーズの下で両リーグのあいだに空いている内側。
+  Widget _leagueLogo({required bool central}) {
+    const width = 132.0;
+    const height = 86.0;
+    const gap = 18.0;
+    final center = BracketGeom.boardW / 2;
+    final top = BracketGeom.js.bottom + 10;
+    return Positioned(
+      left: central ? center - gap - width : center + gap,
+      top: top,
+      width: width,
+      height: height,
+      child: Image.asset(
+        central ? 'backend/assets/images/k-central.webp' : 'backend/assets/images/k-pacific.webp',
+        fit: BoxFit.contain,
+      ),
     );
   }
 

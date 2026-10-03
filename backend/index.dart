@@ -128,6 +128,8 @@ String _summaryAchieve(Map<String, dynamic> row, Map<String, String> cycles, Map
       gameInnings: maxInning[gameId] ?? 0,
     );
     if (pitching.isNotEmpty) marks.add(pitching);
+    final digits = doubleDigitStrikeouts(_asInt(row['int_strike_out']));
+    if (digits.isNotEmpty) marks.add(digits);
   }
   return marks.join(' ');
 }
@@ -433,7 +435,12 @@ void main() async {
           maxInningByGame(playRows),
         );
         _fillMissingLineScores(games, playRows);
-        final lineups = battingLineupsOf(playRows, plays: playLabels, pitchers: pitcherKeysOf(gameRows));
+        final lineups = battingLineupsOf(
+          playRows,
+          plays: playLabels,
+          pitchers: pitcherKeysOf(gameRows),
+          rbi: {for (final entry in battingLines.entries) entry.key: _asInt(entry.value['int_rbi'])},
+        );
         for (final game in games) {
           game['lineup'] = lineups[_asInt(game['id_game'])] ?? const <Map<String, dynamic>>[];
         }

@@ -2,6 +2,7 @@ import 'package:html/parser.dart';
 import 'package:test/test.dart';
 
 import '../app/BoxScore.dart';
+import '../app/LiveText.dart';
 import '../app/Value.dart';
 
 void main() {
@@ -141,5 +142,44 @@ void main() {
     expect(extras, hasLength(1));
     expect(extras.single.extra.result, 'STEAL_BASE_OUT');
     expect(extras.single.outs, 1);
+  });
+
+  test('セーフティバントの次の先制タイムリーを打席として残す', () {
+    String plate(int order, String name, String summary) {
+      return '''
+        <li class="bb-liveText__item">
+          <p class="bb-liveText__batter"><span class="bb-liveText__order">$order番</span><a class="bb-liveText__player">$name</a><span class="bb-liveText__state">無死走者なし</span></p>
+          <p class="bb-liveText__summary"><span>$summary</span></p>
+        </li>
+      ''';
+    }
+
+    final doc = parse('''
+      <div id="text_live">
+        <section class="bb-liveText">
+          <div class="bb-liveText__inning">1回表</div>
+          ${plate(1, '柳田', 'レフト前ヒット')}
+          ${plate(2, '周東', 'センター前ヒット')}
+          ${plate(3, '牧原', 'ライト前ヒット')}
+          ${plate(4, '今宮', 'レフト前ヒット')}
+        </section>
+        <section class="bb-liveText">
+          <div class="bb-liveText__inning">2回表</div>
+          ${plate(5, '柳町', 'ショートへの内野安打')}
+          ${plate(6, '川瀬', 'フォアボールを選ぶ')}
+          ${plate(7, '牧原大成', 'ランナー一二塁から一塁側へセーフティバントを試み、一塁セーフ 満塁')}
+          ${plate(8, '海野隆司', '0アウト満塁の1-2からレフトへのタイムリーヒットでソフトバンク先制！ ロ 0-1 ソ 満塁')}
+        </section>
+      </div>
+    ''');
+    final live = LiveText.parse(doc);
+    final second = live.halves.where((half) => half.inning == 2 && !half.bottom).single;
+    final unno = second.plates.where((plate) => plate.batterName.contains('海野'));
+    expect(unno, hasLength(1));
+    final hit = unno.single.events.single;
+    expect(hit.result, Value.CodeGameResult.HIT_SINGLE);
+    expect(hit.timely, isTrue);
+    expect(hit.stateScore, Value.CodeStateScore.FIRST);
+    expect(hit.linguisticRuns, 1);
   });
 }

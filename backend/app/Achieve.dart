@@ -141,6 +141,9 @@ String pitcherMarks({
   return marks.join(' ');
 }
 
+/// その試合で奪三振が10以上なら点滅表示する。
+String doubleDigitStrikeouts(int strikeouts) => strikeouts >= 10 ? '２ケタ奪三振|k10' : '';
+
 /// 単打・二塁打・三塁打・本塁打が3本以上なら猛打賞。
 String multiHitMark(int hits) => hits >= 3 ? '猛打賞|multihit' : '';
 

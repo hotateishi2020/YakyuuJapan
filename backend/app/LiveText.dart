@@ -234,6 +234,12 @@ class LiveText {
     return '';
   }
 
+  static bool _safetyBuntHit(String text) {
+    if (!text.contains('セーフティ')) return false;
+    if (text.contains('アウト') || text.contains('失敗')) return false;
+    return text.contains('セーフ') || text.contains('ヒット') || text.contains('安打');
+  }
+
   static bool _countsAsPlate(ParsedPlate plate) {
     return plate.events.any((event) => livePlateFinishedResults.contains(event.result));
   }
@@ -400,7 +406,7 @@ class LiveText {
       event.category = Value.CodeGameResultCategory.BATTING;
       event.result = Value.CodeGameResult.HIT_DOUBLE;
       event.totalBases = 2;
-    } else if ((digits.contains('ヒット') && !digits.contains('ヒット性')) || digits.contains('安打')) {
+    } else if ((digits.contains('ヒット') && !digits.contains('ヒット性')) || digits.contains('安打') || _safetyBuntHit(digits)) {
       event.category = Value.CodeGameResultCategory.BATTING;
       event.result = Value.CodeGameResult.HIT_SINGLE;
       event.totalBases = 1;

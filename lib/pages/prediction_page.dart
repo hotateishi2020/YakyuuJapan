@@ -398,12 +398,28 @@ class _PredictionPageState extends State<PredictionPage> {
     );
   }
 
+  double _leaguePickerWidth(BuildContext context) {
+    const style = TextStyle(fontSize: 11, color: Colors.black87, fontWeight: FontWeight.bold);
+    final scaler = MediaQuery.textScalerOf(context);
+    final painter = TextPainter(
+      text: const TextSpan(text: 'リーグ', style: style),
+      textDirection: TextDirection.ltr,
+      textScaler: scaler,
+      maxLines: 1,
+    )..layout();
+    // フォント未読込の初回は漢字が狭く測られることがある。
+    final floor = 11.0 * scaler.scale(1) * 3;
+    final textW = painter.width > floor ? painter.width : floor;
+    // 矢印・内側余白・枠線を足して、ラベルが折り返さない幅にする。
+    return textW + 40;
+  }
+
   Widget _boardTabBar() {
     final byLeague = !_viewByItem;
     return Row(
       children: [
         SizedBox(
-          width: 64,
+          width: _leaguePickerWidth(context),
           height: TAB_BAR_H,
           child: DecoratedBox(
             decoration: BoxDecoration(
@@ -419,8 +435,8 @@ class _PredictionPageState extends State<PredictionPage> {
                 padding: const EdgeInsets.only(left: 6, right: 2),
                 style: const TextStyle(fontSize: 11, color: Colors.black87, fontWeight: FontWeight.bold),
                 items: const [
-                  DropdownMenuItem(value: false, child: Text('リーグ', style: TextStyle(fontSize: 11, color: Colors.black87))),
-                  DropdownMenuItem(value: true, child: Text('項目', style: TextStyle(fontSize: 11, color: Colors.black87))),
+                  DropdownMenuItem(value: false, child: Text('リーグ', maxLines: 1, softWrap: false, overflow: TextOverflow.clip, style: TextStyle(fontSize: 11, color: Colors.black87, fontWeight: FontWeight.bold))),
+                  DropdownMenuItem(value: true, child: Text('項目', maxLines: 1, softWrap: false, overflow: TextOverflow.clip, style: TextStyle(fontSize: 11, color: Colors.black87, fontWeight: FontWeight.bold))),
                 ],
                 onChanged: (value) {
                   if (value == null || value == _viewByItem) return;
@@ -504,6 +520,7 @@ class _PredictionPageState extends State<PredictionPage> {
     if (_itemTab == 0) {
       return BothLeagueGameDay(
         games: games,
+        playerStats: npbPlayerStatsActual,
         initialDate: DateFormatUtil.ymdWithOffset(0),
         leading: showPostseasonBoard ? [_postseasonBracket(), const SizedBox(height: 6)] : const [],
       );

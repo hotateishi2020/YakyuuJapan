@@ -4,12 +4,21 @@ class Headers {
   static Widget globalHeader(double h, Color color, String title, double padding_vertical, double padding_horizontal) {
     return Container(
       height: h,
-      decoration: BoxDecoration(
-        color: color,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [Color(0xFFE10600), Color(0xFFFF9800)],
+        ),
       ),
       alignment: Alignment.centerLeft,
-      padding: EdgeInsets.only(left: padding_horizontal),
-      child: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+      padding: EdgeInsets.symmetric(horizontal: padding_horizontal, vertical: padding_vertical),
+      child: Image.asset(
+        'backend/assets/images/logo_yakyuu_japan.png',
+        fit: BoxFit.contain,
+        alignment: Alignment.centerLeft,
+        semanticLabel: title,
+      ),
     );
   }
 }

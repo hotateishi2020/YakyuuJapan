@@ -693,14 +693,20 @@ class FetchURL {
                     continue;
                   }
 
+                  final pitcherHeads = section.querySelectorAll('table thead th').map((cell) => cell.text.trim()).toList();
+                  String cellOf(Element row, String header) {
+                    final index = pitcherHeads.indexOf(header);
+                    final cells = row.querySelectorAll('td');
+                    if (index < 0 || index >= cells.length) return '';
+                    return cells[index].text.trim();
+                  }
+
                   for (var game_summary_pitcher_row in game_summary_pitcher) {
-                    var code_result_pitcher = game_summary_pitcher_row.querySelectorAll('td')[0].text.trim();
-                    var idx_minus = 0;
-                    print("code_result_pitcher:" + code_result_pitcher.length.toString());
-                    if (code_result_pitcher.length >= 2) {
-                      idx_minus = -1;
-                    }
-                    var txt_pitcher = game_summary_pitcher_row.querySelectorAll('td')[1 + idx_minus].text.trim();
+                    final cells = game_summary_pitcher_row.querySelectorAll('td');
+                    if (cells.length < 2) continue;
+                    var code_result_pitcher = cells.first.text.trim();
+                    var txt_pitcher = cellOf(game_summary_pitcher_row, '選手名');
+                    if (txt_pitcher.isEmpty) txt_pitcher = cells[1].text.trim();
                     print("投手名：" + txt_pitcher);
                     final result_player = await Postgres.execute(conn, AppSql.selectPlayerWhereFullNameAndTeamID(), data: [StringTool.noSpace(txt_pitcher), id_team_pitcher]);
                     if (result_player.isEmpty) {
@@ -722,26 +728,25 @@ class FetchURL {
                       game_summary_pitcher.code_result_pitcher = Value.CodeGameResultPitcher.WIN;
                     } else if (code_result_pitcher.contains('敗')) {
                       game_summary_pitcher.code_result_pitcher = Value.CodeGameResultPitcher.LOSE;
-                    } else if (code_result_pitcher.contains('Ｓ')) {
+                    } else if (code_result_pitcher.contains('Ｓ') || code_result_pitcher.contains('セーブ')) {
                       game_summary_pitcher.code_result_pitcher = Value.CodeGameResultPitcher.SAVE;
-                    } else if (code_result_pitcher.contains('H')) {
+                    } else if (code_result_pitcher.contains('H') || code_result_pitcher.contains('ホールド')) {
                       game_summary_pitcher.code_result_pitcher = Value.CodeGameResultPitcher.HOLD;
                     }
 
                     game_summary_pitcher.id_game = game.id;
                     game_summary_pitcher.id_player = id_player_result;
-                    game_summary_pitcher.double_inning_pitch = double.tryParse(game_summary_pitcher_row.querySelectorAll('td')[3 + idx_minus].text.trim()) ?? 0.0;
-                    game_summary_pitcher.int_pitch = int.tryParse(game_summary_pitcher_row.querySelectorAll('td')[4 + idx_minus].text.trim()) ?? 0;
-                    game_summary_pitcher.int_hit = int.tryParse(game_summary_pitcher_row.querySelectorAll('td')[6 + idx_minus].text.trim()) ?? 0;
-                    game_summary_pitcher.int_strike_out = int.tryParse(game_summary_pitcher_row.querySelectorAll('td')[8 + idx_minus].text.trim()) ?? 0;
-                    game_summary_pitcher.int_four = int.tryParse(game_summary_pitcher_row.querySelectorAll('td')[9 + idx_minus].text.trim()) ?? 0;
-                    game_summary_pitcher.int_dead_pitching = int.tryParse(game_summary_pitcher_row.querySelectorAll('td')[10 + idx_minus].text.trim()) ?? 0;
-                    game_summary_pitcher.int_balk = int.tryParse(game_summary_pitcher_row.querySelectorAll('td')[11 + idx_minus].text.trim()) ?? 0;
-                    game_summary_pitcher.int_runs = int.tryParse(game_summary_pitcher_row.querySelectorAll('td')[12 + idx_minus].text.trim()) ?? 0;
-                    game_summary_pitcher.int_runs_earned = int.tryParse(game_summary_pitcher_row.querySelectorAll('td')[13 + idx_minus].text.trim()) ?? 0;
+                    game_summary_pitcher.double_inning_pitch = double.tryParse(cellOf(game_summary_pitcher_row, '投球回')) ?? 0.0;
+                    game_summary_pitcher.int_pitch = int.tryParse(cellOf(game_summary_pitcher_row, '投球数')) ?? 0;
+                    game_summary_pitcher.int_hit = int.tryParse(cellOf(game_summary_pitcher_row, '被安打')) ?? 0;
+                    game_summary_pitcher.int_strike_out = int.tryParse(cellOf(game_summary_pitcher_row, '奪三振')) ?? 0;
+                    game_summary_pitcher.int_four = int.tryParse(cellOf(game_summary_pitcher_row, '与四球')) ?? 0;
+                    game_summary_pitcher.int_dead_pitching = int.tryParse(cellOf(game_summary_pitcher_row, '与死球')) ?? 0;
+                    game_summary_pitcher.int_balk = int.tryParse(cellOf(game_summary_pitcher_row, 'ボーク')) ?? 0;
+                    game_summary_pitcher.int_runs = int.tryParse(cellOf(game_summary_pitcher_row, '失点')) ?? 0;
+                    game_summary_pitcher.int_runs_earned = int.tryParse(cellOf(game_summary_pitcher_row, '自責点')) ?? 0;
 
                     list_game_summary.add(game_summary_pitcher);
-                    // print(game_summary_pitcher.toMap());
                   } //for row
                   id_team_pitcher = id_team_home;
                 } //for sections
@@ -822,7 +827,9 @@ class FetchURL {
     final statsUrl = pageUrl.resolve(urlHref.replaceFirst('index', 'stats'));
     final res = await http.get(statsUrl);
     if (res.statusCode == 200) {
-      plates = parseBoxPlates(parse(_decodeHtml(res)), idTeamAway, idTeamHome);
+      final doc = parse(_decodeHtml(res));
+      plates = parseBoxPlates(doc, idTeamAway, idTeamHome);
+      await _saveOfficialLineScore(conn, doc, gameId);
     }
     await _saveGameLiveText(
       conn,
@@ -2055,6 +2062,51 @@ bool _sameTeamName(String a, String b) {
   return left == right || left.contains(right) || right.contains(left);
 }
 
+/// 出場成績のイニング得点を、保存済みの試合サマリーへそのまま書く。
+Future<void> _saveOfficialLineScore(Connection conn, Document doc, int gameId) async {
+  final names = await Postgres.execute(
+    conn,
+    '''
+      SELECT home.name_short AS name_home, away.name_short AS name_away
+      FROM t_game g
+      JOIN m_team home ON home.id = g.id_team_home
+      JOIN m_team away ON away.id = g.id_team_away
+      WHERE g.id = \$1
+    ''',
+    data: [gameId],
+  );
+  if (names.isEmpty) return;
+  final row = names.first.toColumnMap();
+  final line = _parseLineScore(doc, '${row['name_home'] ?? ''}', '${row['name_away'] ?? ''}');
+  if (line == null) return;
+  await Postgres.execute(
+    conn,
+    '''
+      UPDATE t_game_summary
+      SET txt_scores_home = \$1,
+          txt_scores_away = \$2,
+          int_runs_home = \$3,
+          int_runs_away = \$4,
+          int_hit_home = \$5,
+          int_hit_away = \$6,
+          int_error_home = \$7,
+          int_error_away = \$8
+      WHERE id_game = \$9
+    ''',
+    data: [
+      line.scoresHome,
+      line.scoresAway,
+      line.runsHome,
+      line.runsAway,
+      line.hitsHome,
+      line.hitsAway,
+      line.errorsHome,
+      line.errorsAway,
+      gameId,
+    ],
+  );
+}
+
 /// 出場成績ページのイニング得点表。未実施の回は空欄なので除き、カンマ区切りにする。
 _LineScore? _parseLineScore(Document doc, String homeName, String awayName) {
   final table = doc.querySelector('#ing_brd');
@@ -2070,6 +2122,11 @@ _LineScore? _parseLineScore(Document doc, String homeName, String awayName) {
     for (var i = 1; i < totalAt && i < cells.length; i++) {
       final text = cells[i].trim();
       if (text.isEmpty) continue;
+      final walkoff = RegExp(r'^(\d+)\s*[xX×]$').firstMatch(text);
+      if (walkoff != null) {
+        innings.add('${walkoff.group(1)}x');
+        continue;
+      }
       if (text == 'X' || text == 'x' || text == '×') {
         innings.add('X');
         continue;

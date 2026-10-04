@@ -7,12 +7,22 @@ class AppSql {
   static String selectStatsDetails() {
     return '''
       SELECT
-        id_stats,
-        id_league,
-        url,
-        int_idx_col 
-      FROM m_stats_details
-      WHERE flg_predict = TRUE
+        d.id_stats,
+        d.id_league,
+        d.url,
+        d.int_idx_col,
+        s.title
+      FROM m_stats_details d
+      JOIN m_stats s ON s.id = d.id_stats
+      WHERE d.flg_predict = TRUE
+         OR (
+           d.id_league IN (1, 2)
+           AND COALESCE(d.url, '') <> ''
+           AND s.title IN (
+             '最多安打', '長打率', 'OPS', '盗塁成功率',
+             '奪三振率', '与四球率', '被打率', 'WHIP', 'QS率'
+           )
+         )
     ''';
   }
 
@@ -1135,9 +1145,11 @@ ORDER BY mt.id_league, tpt.int_rank
                END
         END AS name_player,
         CASE WHEN m_stats.code_display = 'INTEGER' THEN TRUNC(stats)::int::text
-             WHEN m_stats.code_display = 'INT_DEC_2' THEN to_char(stats, '0.00')
+             WHEN m_stats.code_display = 'INT_DEC_2' THEN to_char(stats, 'FM90.00')
              WHEN m_stats.code_display = 'INT_DEC_3' THEN to_char(stats, '0.000')
              WHEN m_stats.code_display = 'NUM_NO_ZERO_3' THEN regexp_replace(to_char(stats, 'FM0.000'), '^0(?=\.)', '')
+             WHEN m_stats.code_display = 'DEC_1' THEN to_char(stats, 'FM990.0')
+             WHEN m_stats.code_display = 'RATE_ATTEMPT' THEN to_char(stats, 'FM990.0') || ' (' || cnt_play::text || ')'
              ELSE to_char(stats, '')
         END AS stats,
         cnt_play,
@@ -1205,6 +1217,7 @@ ORDER BY mt.id_league, tpt.int_rank
                m_stats.int_index ASC, 
                CASE WHEN flg_positive = TRUE THEN tsp.stats END DESC,
                CASE WHEN flg_positive = FALSE THEN tsp.stats END ASC,
+               CASE WHEN flg_positive = TRUE THEN tsp.cnt_play END DESC,
                tsp.int_rank ASC;
     ''';
   }
@@ -1242,7 +1255,8 @@ ORDER BY mt.id_league, tpt.int_rank
           id_player,
           id_team,
           int_rank,
-          stats
+          stats,
+          cnt_play
         )
         ''';
     int cnt = 1;
@@ -1256,7 +1270,8 @@ ORDER BY mt.id_league, tpt.int_rank
           m_player.id AS id_player, 
           m_player.id_team,
           ${stat.int_rank} AS int_rank,
-          ${stat.stats} AS stats
+          ${stat.stats} AS stats,
+          ${stat.cnt_play} AS cnt_play
         FROM m_player
         LEFT OUTER JOIN m_team ON m_team.id = m_player.id_team
         WHERE m_team.name_shortest = '${stat.teamName}'

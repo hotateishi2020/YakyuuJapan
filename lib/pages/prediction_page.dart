@@ -421,28 +421,48 @@ class _PredictionPageState extends State<PredictionPage> {
         SizedBox(
           width: _leaguePickerWidth(context),
           height: TAB_BAR_H,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.black87),
+          child: Material(
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(color: Colors.black87),
               borderRadius: BorderRadius.circular(TAB_RADIUS),
             ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<bool>(
-                value: _viewByItem,
-                isDense: true,
-                isExpanded: true,
-                padding: const EdgeInsets.only(left: 6, right: 2),
-                style: const TextStyle(fontSize: 11, color: Colors.black87, fontWeight: FontWeight.bold),
-                items: const [
-                  DropdownMenuItem(value: false, child: Text('リーグ', maxLines: 1, softWrap: false, overflow: TextOverflow.clip, style: TextStyle(fontSize: 11, color: Colors.black87, fontWeight: FontWeight.bold))),
-                  DropdownMenuItem(value: true, child: Text('項目', maxLines: 1, softWrap: false, overflow: TextOverflow.clip, style: TextStyle(fontSize: 11, color: Colors.black87, fontWeight: FontWeight.bold))),
+            child: PopupMenuButton<bool>(
+              padding: EdgeInsets.zero,
+              tooltip: '',
+              initialValue: _viewByItem,
+              position: PopupMenuPosition.under,
+              onSelected: (value) {
+                if (value == _viewByItem) return;
+                setState(() => _viewByItem = value);
+                writeBrowserCookie(_viewCookie, value ? '1' : '0');
+              },
+              itemBuilder: (context) => const [
+                PopupMenuItem(
+                  value: false,
+                  child: Center(child: Text('リーグ', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, color: Colors.black87, fontWeight: FontWeight.bold))),
+                ),
+                PopupMenuItem(
+                  value: true,
+                  child: Center(child: Text('項目', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, color: Colors.black87, fontWeight: FontWeight.bold))),
+                ),
+              ],
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Text(
+                    _viewByItem ? '項目' : 'リーグ',
+                    maxLines: 1,
+                    softWrap: false,
+                    overflow: TextOverflow.clip,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 11, color: Colors.black87, fontWeight: FontWeight.bold),
+                  ),
+                  const Positioned(
+                    right: 2,
+                    child: Icon(Icons.arrow_drop_down, size: 18, color: Colors.black87),
+                  ),
                 ],
-                onChanged: (value) {
-                  if (value == null || value == _viewByItem) return;
-                  setState(() => _viewByItem = value);
-                  writeBrowserCookie(_viewCookie, value ? '1' : '0');
-                },
               ),
             ),
           ),

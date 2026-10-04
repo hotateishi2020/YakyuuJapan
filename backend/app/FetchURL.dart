@@ -1855,6 +1855,47 @@ class FetchURL {
     return double.tryParse(cell.text.replaceAll(RegExp(r'\s'), '')) ?? 0;
   }
 
+  /// 盗塁と盗塁死から成功率（%）。表示は小数1桁。企図が無ければ null。
+  static double? stolenBaseSuccessPercent(int steals, int caught) {
+    final attempts = steals + caught;
+    if (steals < 0 || caught < 0 || attempts <= 0) return null;
+    return (steals * 1000 / attempts).round() / 10;
+  }
+
+  /// 162.1 は 162回1/3。小数のまま割らない。
+  static double baseballInnings(String raw) {
+    final v = double.tryParse(raw.trim()) ?? 0;
+    if (v <= 0) return 0;
+    final whole = v.truncate();
+    final thirds = ((v - whole) * 10).round().clamp(0, 2);
+    return whole + thirds / 3.0;
+  }
+
+  /// 与四球と投球回から BB/9。表示は小数2桁。
+  static double? walksPerNine(int walks, String innings) {
+    final ip = baseballInnings(innings);
+    if (walks < 0 || ip <= 0) return null;
+    return (walks * 9 / ip * 100).round() / 100;
+  }
+
+  /// 同値は同じ順位。次の順位は人数分飛ばす。
+  static void assignCompetitionRanks(List<t_stats_player> rows, {required bool higherIsBetter}) {
+    rows.sort((a, b) {
+      final cmp = higherIsBetter ? b.stats.compareTo(a.stats) : a.stats.compareTo(b.stats);
+      if (cmp != 0) return cmp;
+      return b.cnt_play.compareTo(a.cnt_play);
+    });
+    var rank = 0;
+    double? prev;
+    for (var i = 0; i < rows.length; i++) {
+      if (prev == null || rows[i].stats != prev) {
+        rank = i + 1;
+        prev = rows[i].stats;
+      }
+      rows[i].int_rank = rank;
+    }
+  }
+
   static Future<Response> fetchStatsPlayerNPB(Connection conn) async {
     // t_stats_player は履歴用に削除せず INSERT のみ。
     // t_stats_player_latest のみ同内容で deleteInsert する。
@@ -1862,7 +1903,8 @@ class FetchURL {
     final stats = Postgres.toMap(results);
 
     for (final stat in stats) {
-      print('statsID:' + stat['id_stats'].toString());
+      final title = '${stat['title'] ?? ''}'.trim();
+      print('statsID:' + stat['id_stats'].toString() + ' ' + title);
       final url = stat['url'] as String;
       final res = await http.get(Uri.parse(url));
       if (res.statusCode != 200) {
@@ -1900,15 +1942,42 @@ class FetchURL {
           name_player = doc_player.querySelectorAll('ruby.bb-profile__ruby')[0].text.split('（')[0].trim();
         }
 
+        // Yahoo の個人成績表。野手は 18盗塁 19盗塁死、投手は 14投球回 19与四球。
+        double? value;
+        var attempts = 0;
+        int? rank = int.tryParse(cols[0]);
+        if (title == '盗塁成功率') {
+          final steals = int.tryParse(cols.elementAtOrNull(18) ?? '') ?? -1;
+          final caught = int.tryParse(cols.elementAtOrNull(19) ?? '') ?? -1;
+          value = stolenBaseSuccessPercent(steals, caught);
+          attempts = steals + caught;
+          rank = null;
+        } else if (title == '与四球率') {
+          final walks = int.tryParse(cols.elementAtOrNull(19) ?? '') ?? -1;
+          value = walksPerNine(walks, cols.elementAtOrNull(14) ?? '');
+          rank = null;
+        } else {
+          value = double.tryParse(cols[stat['int_idx_col'] as int]);
+        }
+        if (value == null) continue;
+
         t_stats_player statsPlayer = t_stats_player();
         statsPlayer.id_league = stat['id_league'] as int;
         statsPlayer.id_stats = stat['id_stats'] as int;
-        statsPlayer.stats = double.tryParse(cols[stat['int_idx_col'] as int]) ?? 0;
-        statsPlayer.int_rank = int.tryParse(cols[0]) ?? 0;
+        statsPlayer.stats = value;
+        statsPlayer.cnt_play = attempts;
+        statsPlayer.int_rank = rank ?? 0;
         statsPlayer.playerName = StringTool.noSpace(name_player);
         statsPlayer.teamName = cols[1].split(RegExp(r'[\s　]+'))[1].replaceAll("(", "").replaceAll(")", "");
         listStats.add(statsPlayer);
       } //for選手
+
+      if (title == '盗塁成功率') {
+        assignCompetitionRanks(listStats, higherIsBetter: true);
+      } else if (title == '与四球率') {
+        assignCompetitionRanks(listStats, higherIsBetter: false);
+      }
+      if (listStats.isEmpty) continue;
 
       var sql = AppSql.selectInsertStatsPlayer(listStats);
 

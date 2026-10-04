@@ -25,6 +25,7 @@ double pitcherPoints({
 }
 
 /// 投球回と失点は1ブロック、その右に四死球・被安打・奪三振を色分けして並べる。
+/// 0回でも投球数や被安打などがあればチップを出す（例: サヨナラ負けの1球）。
 String pitcherStatChips({
   required num innings,
   required int runs,
@@ -36,9 +37,11 @@ String pitcherStatChips({
   required bool starter,
 }) {
   final outs = baseballOuts(innings);
-  if (outs <= 0) return '';
-  final ip = outs / 3.0;
   final freePasses = walks + hbp;
+  final hasWork = outs > 0 || pitches > 0 || hits > 0 || freePasses > 0 || strikeouts > 0 || runs > 0;
+  if (!hasWork) return '';
+  // 0回は率の分母を1/3回にして、色分けだけ他投手と同じ基準に近づける。
+  final ip = outs > 0 ? outs / 3.0 : 1 / 3.0;
   final runsLabel = runs == 0 ? '無失点' : '$runs失点';
   final runsTone = _lowerTone(runs / ip, const [0, 0.15, 0.30, 0.45, 0.6, 0.75]);
   final parts = <String>[

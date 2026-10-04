@@ -418,8 +418,25 @@ class UnifiedGrid extends StatelessWidget {
                 ),
         ),
       );
-      final w1 = cell(txt1, highlight: hi1, borderColor: c1 != null ? Colors.transparent : null);
-      final w2 = cell(txt2, highlight: hi2, borderColor: c2 != null ? Colors.transparent : null);
+      // 予想選手はユーザーカラー背景。的中時は黄色（従来どおり）。
+      final code1 = _parseColorNameLocal(user1Rows.map((e) => '${e['code_color'] ?? ''}').firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
+      final code2 = _parseColorNameLocal(user2Rows.map((e) => '${e['code_color'] ?? ''}').firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
+      final w1 = cell(
+        txt1,
+        highlight: hi1,
+        bgColor: hi1 ? Colors.yellow : code1,
+        fgColor: hi1 ? Colors.blueAccent : (code1 != null ? Colors.white : null),
+        weight: (hi1 || code1 != null) ? FontWeight.bold : null,
+        borderColor: c1 != null ? Colors.transparent : null,
+      );
+      final w2 = cell(
+        txt2,
+        highlight: hi2,
+        bgColor: hi2 ? Colors.yellow : code2,
+        fgColor: hi2 ? Colors.redAccent : (code2 != null ? Colors.white : null),
+        weight: (hi2 || code2 != null) ? FontWeight.bold : null,
+        borderColor: c2 != null ? Colors.transparent : null,
+      );
 
       statsSection.add(SizedBox(
           height: rowHeight,

@@ -3,6 +3,7 @@ import '../config/app_design.dart';
 import '../tools/color_parse.dart';
 import 'Text.dart';
 import 'BlinkBg.dart';
+import 'Border.dart';
 import 'GamesBoard.dart';
 
 enum SeasonPane { combined, games, standings }
@@ -139,8 +140,8 @@ class SeasonTableBlock extends StatelessWidget {
     // リーグ見出しは非表示
 
     // 打撃/投手タイトル（画像に近い簡易版）: stats_player の形に合わせて抽出
-    const battingTitles = ['打率', '本塁打', '打点', '盗塁', '出塁率'];
-    const pitchingTitles = ['防御率', '最多勝', '奪三振', 'HP', 'セーブ'];
+    const battingTitles = ['打率', '本塁打', '打点', '盗塁', '出塁率', '最多安打', '盗塁成功率', '長打率', 'OPS'];
+    const pitchingTitles = ['防御率', '最多勝', '奪三振', 'HP', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'QS率'];
     final leagueStats = stats.where((e) => int.tryParse('${e['id_league']}') == leagueId).toList();
     final bat = leagueStats.where((e) => battingTitles.contains(((e['title'] ?? '').toString()))).toList();
     final pit = leagueStats.where((e) => pitchingTitles.contains(((e['title'] ?? '').toString()))).toList();
@@ -224,8 +225,8 @@ class SeasonTableBlock extends StatelessWidget {
         return (e.isNotEmpty ? (e['name_player'] ?? '') : '').toString();
       }
 
-      final battingCols = ['打率', '本塁打', '打点', '盗塁', '出塁率'];
-      final pitchingCols = ['防御率', '最多勝', '奪三振', 'ホールド', 'セーブ'];
+      final battingCols = ['打率', '本塁打', '打点', '盗塁', '出塁率', '最多安打', '盗塁成功率', '長打率', 'OPS'];
+      final pitchingCols = ['防御率', '最多勝', '奪三振', 'ホールド', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'QS率'];
 
       // 個人成績セル: ランク/チーム/選手/数値 を1セル内に表示
       // rank は「表示行のインデックス(1..5)」。SQL順を維持したリストの rank 番目を表示する。
@@ -879,18 +880,30 @@ class PlayerStatCell extends StatelessWidget {
           ),
       ],
     );
-    final isToday = row['flg_today'] == true;
+    final isToday = row['flg_today'] == true || row['flg_today'] == 'true' || row['flg_today'] == 't';
     final Widget nameWidget;
-    if (isToday) {
+    if (hasBg) {
+      // 予想色を常に残し、今日登板は枠だけ点滅させる（黄オーバーレイで赤が消えないようにする）
+      final colored = Container(decoration: decoration, alignment: Alignment.center, child: nameLine);
+      nameWidget = isToday
+          ? BlinkBorder(
+              color: const Color(0xFFFF9800),
+              radius: 4,
+              width: 2,
+              duration: const Duration(milliseconds: 700),
+              baseBgColor: Colors.transparent,
+              fillUseColor: true,
+              child: colored,
+            )
+          : colored;
+    } else if (isToday) {
       nameWidget = BlinkBg(
-        base: decoration ?? BoxDecoration(borderRadius: BorderRadius.circular(4), color: isNoRank ? noRankBg : null),
+        base: BoxDecoration(borderRadius: BorderRadius.circular(4), color: isNoRank ? noRankBg : null),
         color: const Color(0xFFFFF176),
         radius: 4,
         duration: const Duration(milliseconds: 700),
         child: Align(alignment: Alignment.center, child: nameLine),
       );
-    } else if (hasBg) {
-      nameWidget = Container(decoration: decoration, alignment: Alignment.center, child: nameLine);
     } else {
       nameWidget = cellBg(child: Align(alignment: Alignment.center, child: nameLine));
     }
@@ -950,7 +963,7 @@ class BothLeaguePersonalStats extends StatelessWidget {
 
   const BothLeaguePersonalStats({super.key, required this.stats, required this.pitcher});
 
-  static const _pitchingTitles = {'防御率', '最多勝', '奪三振', 'HP', 'ホールド', 'セーブ'};
+  static const _pitchingTitles = {'防御率', '最多勝', '奪三振', 'HP', 'ホールド', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'QS率'};
 
   bool _isPitcher(Map<String, dynamic> row) {
     final value = row['flg_pitcher'];

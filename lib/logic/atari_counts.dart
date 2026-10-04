@@ -1,47 +1,43 @@
+bool _isAtariFlag(dynamic value) {
+  if (value == true) return true;
+  if (value is num) return value != 0;
+  final text = '$value'.trim().toLowerCase();
+  return text == 'true' || text == 't' || text == '1';
+}
+
+/// 画面上の「当」と同じ数え方でスコアを出す。
+/// - チーム順位: flg_atari_tateishi / flg_atari_ejima
+/// - 個人成績: predict_player の flg_atari（現在1位と同じ選手を予想）
 Map<String, int> computeAtariCounts({
   required List<Map<String, dynamic>> npbPlayerStats,
-  required List<Map<String, dynamic>> npbPlayerStatsActual,
-  required List<Map<String, dynamic>> predictions,
   required List<Map<String, dynamic>> standings,
+  List<Map<String, dynamic>> npbPlayerStatsActual = const [],
+  List<Map<String, dynamic>> predictions = const [],
 }) {
   final counts = <String, int>{'1': 0, '2': 0};
 
-  void addFromPlayer(List<Map<String, dynamic>> src) {
-    for (final r in src) {
-      final id = '${r['id_user'] ?? ''}';
-      if (!counts.containsKey(id)) continue;
-      if (r['flg_atari'] == true) counts[id] = (counts[id] ?? 0) + 1;
+  // チーム順位: 表示の黄ハイライトと同じフラグ
+  for (final row in standings) {
+    if (_isAtariFlag(row['flg_atari_tateishi'])) {
+      counts['1'] = (counts['1'] ?? 0) + 1;
+    }
+    if (_isAtariFlag(row['flg_atari_ejima'])) {
+      counts['2'] = (counts['2'] ?? 0) + 1;
     }
   }
 
-  addFromPlayer(npbPlayerStats);
-  addFromPlayer(npbPlayerStatsActual);
-
-  bool teamHit(Map<String, dynamic>? pred, List<Map<String, dynamic>> curGroup) {
-    if (pred == null || pred.isEmpty || curGroup.isEmpty) return false;
-    final prdId = int.tryParse('${pred['id_team']}') ?? -1;
-    final prdName = (pred['name_team_short']?.toString() ?? pred['name_team']?.toString() ?? '').trim();
-    for (final cur in curGroup) {
-      final curId = int.tryParse('${cur['id_team']}') ?? -1;
-      final curName = (cur['name_team']?.toString() ?? '').trim();
-      if ((prdId >= 0 && curId >= 0 && prdId == curId) || (prdName.isNotEmpty && curName == prdName)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  for (final leagueId in [1, 2]) {
-    final curRows = standings.where((e) => int.tryParse('${e['id_league']}') == leagueId).toList();
-    final pred1 = predictions.where((e) => '${e['id_user']}' == '1' && (int.tryParse('${e['id_league']}') ?? 0) == leagueId).toList();
-    final pred2 = predictions.where((e) => '${e['id_user']}' == '2' && (int.tryParse('${e['id_league']}') ?? 0) == leagueId).toList();
-    for (int rk = 1; rk <= 6; rk++) {
-      final curGroup = curRows.where((e) => int.tryParse('${e['int_rank']}') == rk).toList();
-      final p1 = pred1.firstWhere((e) => int.tryParse('${e['int_rank']}') == rk, orElse: () => {});
-      final p2 = pred2.firstWhere((e) => int.tryParse('${e['int_rank']}') == rk, orElse: () => {});
-      if (teamHit(p1.isNotEmpty ? p1 : null, curGroup)) counts['1'] = (counts['1'] ?? 0) + 1;
-      if (teamHit(p2.isNotEmpty ? p2 : null, curGroup)) counts['2'] = (counts['2'] ?? 0) + 1;
-    }
+  // 個人成績: Grid と同じ flg_atari（予想者行のみ）
+  // 同一 league+stats で複数行あってもタイトル当は1回だけ数える
+  final seen = <String>{};
+  for (final row in npbPlayerStats) {
+    final id = '${row['id_user'] ?? ''}';
+    if (id != '1' && id != '2') continue;
+    if (!_isAtariFlag(row['flg_atari'])) continue;
+    final league = '${row['id_league'] ?? row['league_name'] ?? ''}';
+    final stats = '${row['id_stats'] ?? row['title'] ?? ''}';
+    final key = '$id|$league|$stats';
+    if (!seen.add(key)) continue;
+    counts[id] = (counts[id] ?? 0) + 1;
   }
 
   return counts;

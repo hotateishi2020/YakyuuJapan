@@ -905,6 +905,8 @@ class AppSql {
         WHEN id_user = 0 THEN '現在'
         ELSE m_user.name_last
       END AS username,
+      u.id_league,
+      u.id_stats,
       m_league.name_short AS league_name,
       m_stats.title,
       m_player.name_last || m_player.name_first AS player_name,

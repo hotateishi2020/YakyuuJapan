@@ -959,13 +959,13 @@ class _TableGameCard extends StatelessWidget {
     };
   }
 
-  /// 投手の役割マーク。先発=先、抑え(セーブ)=抑、それ以外の救援=継。
+  /// 投手の役割マーク。先発=先、抑え(セーブ)=抑、それ以外の救援=中。
   String _pitcherRoleMark(String name, String starterName, dynamic codeResult) {
     if (name.trim().isEmpty) return '';
     if (name.trim() == starterName.trim() && starterName.trim().isNotEmpty) return '先';
     final result = _resultMark(codeResult);
     if (result == 'S') return '抑';
-    return '継';
+    return '中';
   }
 
   Color _pale(Color? color, {bool lighter = false}) {
@@ -1048,8 +1048,8 @@ class _TableGameCard extends StatelessWidget {
 
   String _shownName(_PlayerLine player) {
     final role = player.role.trim();
-    // 投手の先/継/抑はバッジ表示。代打などの交代役割だけ名前に付ける。
-    if (role.isEmpty || role == '先' || role == '継' || role == '抑') return player.name;
+    // 投手の先/中/抑はバッジ表示。代打などの交代役割だけ名前に付ける。
+    if (role.isEmpty || role == '先' || role == '中' || role == '抑') return player.name;
     return '$role: ${player.name}';
   }
 
@@ -1934,9 +1934,9 @@ class _TableGameCard extends StatelessWidget {
     final statSize = (nameSize * 0.92).clamp(_minPlayerStatSize, 12.0);
     final rowH = _playerRowH;
     final badgeWidth = (nameSize + 2).clamp(9.0, 16.0);
-    const roleMarks = {'先', '継', '抑'};
+    const roleMarks = {'先', '中', '抑'};
 
-    // 投手(先/継/抑+勝負)と打者で名前の開始位置を揃えるため、先頭は常に2枠分。
+    // 投手(先/中/抑+勝負)と打者で名前の開始位置を揃えるため、先頭は常に2枠分。
     final leadingBadgesW = badgeWidth * 2 + 0.5;
 
     Widget pitcherBadges(_PlayerLine pitcher) {
@@ -2309,16 +2309,17 @@ class _TableGameCard extends StatelessWidget {
       '投' || '先' => const Color(0xFFFF4B7D),
       '捕' => const Color(0xFF1E88E5),
       '一' || '二' || '三' || '遊' => const Color(0xFFFFEB3B),
-      '左' || '中' || '右' => const Color(0xFF43A047),
+      // 中継ぎ「中」はホールド(H)と同じ緑。外野の「中」も同色。
+      '左' || '右' || '中' => Colors.green.shade700,
       '指' => const Color(0xFF8E24AA),
-      '継' => const Color(0xFFFF9800),
-      '抑' => const Color(0xFF5E35B1),
+      // 抑えはセーブ(S)と同じオレンジ。
+      '抑' => Colors.amber.shade700,
       _ => const Color(0xFFEEEEEE),
     };
   }
 
   Widget _lineupMark(String mark, double fontSize) {
-    const positions = {'投', '捕', '一', '二', '三', '遊', '左', '中', '右', '指', '先', '継', '抑'};
+    const positions = {'投', '捕', '一', '二', '三', '遊', '左', '中', '右', '指', '先', '抑'};
     if (!positions.contains(mark)) return _resultBadge(mark, fontSize);
     final bg = _positionColor(mark);
     final ink = bg.computeLuminance() > 0.55 ? Colors.black87 : Colors.white;

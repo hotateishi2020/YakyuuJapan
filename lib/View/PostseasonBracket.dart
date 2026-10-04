@@ -241,7 +241,9 @@ class PostseasonBracket extends StatelessWidget {
         : rankLabel.startsWith('セ')
             ? 'セ・リーグ${rankLabel.substring(1)}'
             : rankLabel;
-    final logo = unknown ? null : teamLogoAsset(team.name);
+    final logoVisual = unknown ? null : teamLogoVisual(team.name);
+    final logoAsset = logoVisual?.asset;
+    final logoUrl = logoVisual?.networkUrl;
     return Positioned(
       left: BracketGeom.xs[index] - BracketGeom.cardW / 2,
       top: BracketGeom.cardTop,
@@ -277,12 +279,17 @@ class PostseasonBracket extends StatelessWidget {
                           '未確定',
                           style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 13),
                         )
-                      : logo == null
-                      ? const SizedBox.shrink()
-                      : Padding(
+                      : logoAsset != null
+                      ? Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                          child: Image.asset(logo, fit: BoxFit.contain),
-                        ),
+                          child: Image.asset(logoAsset, fit: BoxFit.contain),
+                        )
+                      : logoUrl != null
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                          child: Image.network(logoUrl, fit: BoxFit.contain, errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+                        )
+                      : const SizedBox.shrink(),
                 ),
               ),
               ColoredBox(

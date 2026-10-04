@@ -16,6 +16,9 @@ class m_player extends DBModel {
   String path_img_face = '';
   String uniform_number = '';
   bool flg_rookie = false;
+  bool flg_ace = false;
+  int? id_country;
+  int? id_place_birth;
 
   @override
   String get tableName => 'm_player';
@@ -25,6 +28,7 @@ class m_player extends DBModel {
     return {
       "name_last": name_last,
       "name_first": name_first,
+      "name_full": name_full.isNotEmpty ? name_full : '$name_last$name_first',
       "name_middle": name_middle,
       "date_birth": date_birth,
       "id_team": id_team,
@@ -37,6 +41,9 @@ class m_player extends DBModel {
       "path_img_face": path_img_face,
       "uniform_number": uniform_number,
       "flg_rookie": flg_rookie,
+      "flg_ace": flg_ace,
+      "id_country": id_country,
+      "id_place_birth": id_place_birth,
     };
   }
 }

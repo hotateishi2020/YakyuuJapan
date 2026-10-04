@@ -76,6 +76,91 @@ String? teamLogoAsset(String name) {
   return null;
 }
 
+/// MLB 球団の略称。画像アセットが無いときのロゴ代わりに使う。
+String? mlbTeamAbbrev(String name) {
+  const map = <String, String>{
+    'フィリーズ': 'PHI',
+    'ブレーブス': 'ATL',
+    'メッツ': 'NYM',
+    'ナショナルズ': 'WSH',
+    'マーリンズ': 'MIA',
+    'ブリュワーズ': 'MIL',
+    'ブルワーズ': 'MIL',
+    'カージナルス': 'STL',
+    'カブス': 'CHC',
+    'レッズ': 'CIN',
+    'パイレーツ': 'PIT',
+    'ドジャース': 'LAD',
+    'ダイヤモンドバックス': 'AZ',
+    'Dバックス': 'AZ',
+    'パドレス': 'SD',
+    'ジャイアンツ': 'SF',
+    'ロッキーズ': 'COL',
+    'ヤンキース': 'NYY',
+    'オリオールズ': 'BAL',
+    'レッドソックス': 'BOS',
+    'Rソックス': 'BOS',
+    'レイズ': 'TB',
+    'ブルージェイズ': 'TOR',
+    'ガーディアンズ': 'CLE',
+    'ロイヤルズ': 'KC',
+    'ツインズ': 'MIN',
+    'タイガース': 'DET',
+    'ホワイトソックス': 'CWS',
+    'Wソックス': 'CWS',
+    'アストロズ': 'HOU',
+    'マリナーズ': 'SEA',
+    'レンジャーズ': 'TEX',
+    'アスレチックス': 'ATH',
+    'エンゼルス': 'LAA',
+  };
+  final trimmed = name.trim();
+  if (trimmed.isEmpty) return null;
+  if (RegExp(r'^[A-Z]{2,3}$').hasMatch(trimmed)) return trimmed;
+  final keys = map.keys.toList()..sort((a, b) => b.length.compareTo(a.length));
+  for (final key in keys) {
+    if (trimmed.contains(key)) return map[key];
+  }
+  return null;
+}
+
+const _mlbAbbrevCodes = {
+  'PHI', 'ATL', 'NYM', 'WSH', 'MIA', 'MIL', 'STL', 'CHC', 'CIN', 'PIT',
+  'LAD', 'AZ', 'SD', 'SF', 'COL', 'NYY', 'BAL', 'BOS', 'TB', 'TOR',
+  'CLE', 'KC', 'MIN', 'DET', 'CWS', 'HOU', 'SEA', 'TEX', 'ATH', 'LAA',
+};
+
+/// ESPN CDN の MLB ロゴ URL。表示は画像を使い、略称テキストは出さない。
+String? mlbTeamLogoUrl({String? abbrev, String? name}) {
+  var code = (abbrev ?? '').trim().toUpperCase();
+  if (code.isEmpty || !_mlbAbbrevCodes.contains(code)) {
+    code = mlbTeamAbbrev(name ?? '') ?? '';
+  }
+  if (code.isEmpty) return null;
+  const espn = <String, String>{
+    'AZ': 'ari',
+    'CWS': 'chw',
+    'ATH': 'ath',
+  };
+  final slug = espn[code] ?? code.toLowerCase();
+  return 'https://a.espncdn.com/i/teamlogos/mlb/500/$slug.png';
+}
+
+/// NPB はアセット画像、MLB はロゴ URL。略称テキストは出さない。
+/// `abbrev` が MLB 略称のときだけネットワークロゴを優先（巨人など NPB と名前が被る球団対策）。
+({String? asset, String? networkUrl}) teamLogoVisual(String name, {String? abbrev}) {
+  final code = (abbrev ?? '').trim().toUpperCase();
+  if (code.isNotEmpty && _mlbAbbrevCodes.contains(code)) {
+    final url = mlbTeamLogoUrl(abbrev: code);
+    if (url != null) return (asset: null, networkUrl: url);
+  }
+  final asset = teamLogoAsset(name);
+  if (asset != null) return (asset: asset, networkUrl: null);
+  final url = mlbTeamLogoUrl(name: name);
+  if (url != null) return (asset: null, networkUrl: url);
+  return (asset: null, networkUrl: null);
+}
+
 String _compactPlayerName(String name) {
   final cut = name.split(RegExp(r'[（(]')).first;
   return cut.replaceAll(RegExp(r'\s+'), '');
@@ -111,35 +196,42 @@ bool gameHasStarted(Map<String, dynamic> game) {
   return home >= 0 && away >= 0;
 }
 
-bool _isCentralOrPacificGame(Map<String, dynamic> game) {
+bool _isOrgPairGame(Map<String, dynamic> game, Set<int> leagueIds) {
   final home = _gameInt(game['id_league_home']);
   final away = _gameInt(game['id_league_away']);
-  return (home == 1 || home == 2) && (away == 1 || away == 2);
+  return leagueIds.contains(home) && leagueIds.contains(away);
 }
 
-Map<String, String> _todaysCentralPacificStates(List<Map<String, dynamic>> games, String today) {
+Map<String, String> _todaysOrgStates(List<Map<String, dynamic>> games, String today, Set<int> leagueIds) {
   final states = <String, String>{};
   for (final game in games) {
     if (gameDateOnly(game['date_game']) != today) continue;
-    if (!_isCentralOrPacificGame(game)) continue;
+    if (!_isOrgPairGame(game, leagueIds)) continue;
     states[gameMatchupKey(game)] = '${game['state'] ?? ''}'.trim();
   }
   return states;
 }
 
-/// 当日のセ・パ全試合が「試合終了」または「試合中止」。試合が1件もない日は false。
-bool centralPacificGamesAreSettled(List<Map<String, dynamic>> games, String today) {
-  final states = _todaysCentralPacificStates(games, today);
+/// 当日の対象リーグ全試合が「試合終了」または「試合中止」。試合が1件もない日は false。
+bool orgGamesAreSettled(List<Map<String, dynamic>> games, String today, Set<int> leagueIds) {
+  final states = _todaysOrgStates(games, today, leagueIds);
   if (states.isEmpty) return false;
   return states.values.every((state) => state == '試合終了' || state == '試合中止');
 }
 
-/// 当日のセ・パ全試合が「試合終了」。中止が残っている日は false。
-bool centralPacificGamesAllFinished(List<Map<String, dynamic>> games, String today) {
-  final states = _todaysCentralPacificStates(games, today);
+/// 当日の対象リーグ全試合が「試合終了」。中止が残っている日は false。
+bool orgGamesAllFinished(List<Map<String, dynamic>> games, String today, Set<int> leagueIds) {
+  final states = _todaysOrgStates(games, today, leagueIds);
   if (states.isEmpty) return false;
   return states.values.every((state) => state == '試合終了');
 }
+
+/// 互換: セ・パ向け。
+bool centralPacificGamesAreSettled(List<Map<String, dynamic>> games, String today) =>
+    orgGamesAreSettled(games, today, const {1, 2});
+
+bool centralPacificGamesAllFinished(List<Map<String, dynamic>> games, String today) =>
+    orgGamesAllFinished(games, today, const {1, 2});
 
 List<Map<String, dynamic>> expandGameRows(Map<String, dynamic> game) {
   final raw = game['summaries'];
@@ -363,14 +455,25 @@ class _GameDateSwitcherState extends State<GameDateSwitcher> {
   }
 }
 
-/// 項目ごとの試合情報。日付ヘッダーは一つで、セとパを縦に並べる。
+/// 項目ごとの試合情報。日付ヘッダーは一つで、団体内の2リーグを縦に並べる。
 class BothLeagueGameDay extends StatefulWidget {
   final List<Map<String, dynamic>> games;
   final List<Map<String, dynamic>> playerStats;
   final String? initialDate;
   final List<Widget> leading;
+  final List<({int id, String name, Color color})> leagues;
 
-  const BothLeagueGameDay({super.key, required this.games, this.playerStats = const [], this.initialDate, this.leading = const []});
+  const BothLeagueGameDay({
+    super.key,
+    required this.games,
+    this.playerStats = const [],
+    this.initialDate,
+    this.leading = const [],
+    this.leagues = const [
+      (id: 1, name: 'セ・リーグ', color: Color(0xFF0E8E2D)),
+      (id: 2, name: 'パ・リーグ', color: Color(0xFF01B1EA)),
+    ],
+  });
 
   @override
   State<BothLeagueGameDay> createState() => _BothLeagueGameDayState();
@@ -503,9 +606,10 @@ class _BothLeagueGameDayState extends State<BothLeagueGameDay> {
               ...widget.leading,
               header,
               const SizedBox(height: 4),
-              leagueBlock('セ・リーグ', const Color(0xFF0E8E2D), 1),
-              const SizedBox(height: 8),
-              leagueBlock('パ・リーグ', const Color(0xFF01B1EA), 2),
+              for (var i = 0; i < widget.leagues.length; i++) ...[
+                if (i > 0) const SizedBox(height: 8),
+                leagueBlock(widget.leagues[i].name, widget.leagues[i].color, widget.leagues[i].id),
+              ],
             ],
           ),
         ),
@@ -689,30 +793,6 @@ class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> {
   }
 }
 
-class _LeagueHeader extends StatelessWidget {
-  final String label;
-  const _LeagueHeader(this.label);
-
-  Color get _color => label == 'セ・リーグ'
-      ? const Color(0xFF19A974)
-      : label == 'パ・リーグ'
-          ? const Color(0xFF2CB1BC)
-          : const Color(0xFF6C63FF);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 28,
-      decoration: BoxDecoration(
-        color: _color,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      alignment: Alignment.centerLeft,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-    );
-  }
-}
 
 typedef _PlayerLine = ({String name, String role, String colors, String mark, String stat, String hrTotal, String predict, String plays, String achieve, String tone, String chips, int rbi});
 
@@ -793,17 +873,7 @@ class _TableGameCard extends StatelessWidget {
     return colors;
   }
 
-  /// 全試合でスタッツ名チップ幅を揃える（最長の「規定到達率」基準）。
-  double _seasonLabelWidth(double fontSize) {
-    final painter = TextPainter(
-      text: TextSpan(text: '規定到達率', style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold, height: 1)),
-      textDirection: TextDirection.ltr,
-      maxLines: 1,
-    )..layout();
-    return painter.width + 8;
-  }
-
-  Widget _seasonNameChip(String label, double fontSize, double width, List<Color> colors) {
+  Widget _seasonNameChip(String label, double fontSize, double? width, List<Color> colors) {
     final average = colors.isEmpty ? 0.0 : colors.map((color) => color.computeLuminance()).reduce((a, b) => a + b) / colors.length;
     final ink = colors.isEmpty || average <= 0.55 ? Colors.white : Colors.black87;
     final decoration = colors.length >= 2
@@ -817,6 +887,7 @@ class _TableGameCard extends StatelessWidget {
           );
     return Container(
       width: width,
+      padding: width == null ? const EdgeInsets.symmetric(horizontal: 4) : null,
       margin: const EdgeInsets.symmetric(vertical: 1),
       alignment: Alignment.center,
       decoration: decoration,
@@ -868,52 +939,33 @@ class _TableGameCard extends StatelessWidget {
     final lines = stat.split(RegExp(r'\s+')).where((part) => part.isNotEmpty).map(_seasonStat).toList();
     if (lines.isEmpty) return const SizedBox.shrink();
     final colors = _seasonChipColors(predict, lines.length);
-    // 全試合で同じ論理幅（規定到達率基準）。FittedBox で縮小しない。
-    final chipW = _seasonLabelWidth(fontSize);
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(
-          width: chipW,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (var i = 0; i < lines.length; i++)
-                SizedBox(
-                  height: _seasonLineH,
-                  child: _seasonNameChip(lines[i].label, fontSize, chipW, colors[i]),
-                ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 4),
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            for (final line in lines)
-              SizedBox(
-                height: _seasonLineH,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(text: line.value),
-                        TextSpan(text: _seasonRankNote(line.label, lines, pitcherName)),
-                      ],
-                    ),
-                    maxLines: 1,
-                    softWrap: false,
-                    overflow: TextOverflow.clip,
-                    style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600, color: Colors.black87, height: 1),
+        for (var i = 0; i < lines.length; i++)
+          SizedBox(
+            height: _seasonLineH,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _seasonNameChip(lines[i].label, fontSize, null, colors[i]),
+                const SizedBox(width: 3),
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(text: lines[i].value),
+                      TextSpan(text: _seasonRankNote(lines[i].label, lines, pitcherName)),
+                    ],
                   ),
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.clip,
+                  style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600, color: Colors.black87, height: 1),
                 ),
-              ),
-          ],
-        ),
+              ],
+            ),
+          ),
       ],
     );
   }
@@ -1051,6 +1103,29 @@ class _TableGameCard extends StatelessWidget {
     // 投手の先/中/抑はバッジ表示。代打などの交代役割だけ名前に付ける。
     if (role.isEmpty || role == '先' || role == '中' || role == '抑') return player.name;
     return '$role: ${player.name}';
+  }
+
+  bool _flagTrue(dynamic value) {
+    if (value == true) return true;
+    if (value is num) return value != 0;
+    final s = '$value'.trim().toLowerCase();
+    return s == 'true' || s == 't' || s == '1';
+  }
+
+  bool _isAcePitcher(String name, {int? teamId}) {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return false;
+    if (trimmed == _text('name_pitcher_home') && _flagTrue(game['flg_ace_pitcher_home'])) return true;
+    if (trimmed == _text('name_pitcher_away') && _flagTrue(game['flg_ace_pitcher_away'])) return true;
+    for (final row in rows) {
+      if ('${row['name_full_summary'] ?? ''}'.trim() != trimmed) continue;
+      if (teamId != null) {
+        final summaryTeam = int.tryParse('${row['id_team_summary']}') ?? -1;
+        if (summaryTeam != teamId) continue;
+      }
+      if (_flagTrue(row['flg_ace'])) return true;
+    }
+    return false;
   }
 
   String _toneOf(Map<String, dynamic> row) {
@@ -1754,19 +1829,28 @@ class _TableGameCard extends StatelessWidget {
     );
   }
 
-  Widget _logoMark(String? asset, double side) {
-    if (asset == null) return const SizedBox(width: 2);
+  Widget _logoMark({
+    String? asset,
+    String? networkUrl,
+    Color? bg,
+    Color? fg,
+    required double side,
+  }) {
+    Widget? image;
+    if (asset != null) {
+      image = Image.asset(asset, fit: BoxFit.contain, filterQuality: FilterQuality.medium);
+    } else if ((networkUrl ?? '').trim().isNotEmpty) {
+      image = Image.network(
+        networkUrl!.trim(),
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.medium,
+        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+      );
+    }
+    if (image == null) return const SizedBox(width: 2);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 1),
-      child: SizedBox(
-        width: side,
-        height: side,
-        child: Image.asset(
-          asset,
-          fit: BoxFit.contain,
-          filterQuality: FilterQuality.medium,
-        ),
-      ),
+      child: SizedBox(width: side, height: side, child: image),
     );
   }
 
@@ -1777,6 +1861,12 @@ class _TableGameCard extends StatelessWidget {
     required double scoreSize,
     required String homeName,
     required String awayName,
+    String? homeAbbrev,
+    String? awayAbbrev,
+    Color? homeBg,
+    Color? awayBg,
+    Color? homeFg,
+    Color? awayFg,
   }) {
     return _cell(
       color: Colors.white,
@@ -1789,6 +1879,8 @@ class _TableGameCard extends StatelessWidget {
         final innerW = constraints.maxWidth.isFinite ? constraints.maxWidth : preferred * 2 + gap * 2 + scoreMin;
         final fitted = math.max(0.0, (innerW - gap * 2 - scoreMin - logoPad * 2) / 2);
         final logoSide = math.min(preferred, fitted);
+        final homeLogo = teamLogoVisual(homeName, abbrev: homeAbbrev);
+        final awayLogo = teamLogoVisual(awayName, abbrev: awayAbbrev);
         final scoreColumn = Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1814,7 +1906,13 @@ class _TableGameCard extends StatelessWidget {
         );
         return Row(
           children: [
-            _logoMark(teamLogoAsset(homeName), logoSide),
+            _logoMark(
+              asset: homeLogo.asset,
+              networkUrl: homeLogo.networkUrl,
+              bg: homeBg,
+              fg: homeFg,
+              side: logoSide,
+            ),
             const SizedBox(width: gap),
             Expanded(
               child: FittedBox(
@@ -1823,7 +1921,13 @@ class _TableGameCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: gap),
-            _logoMark(teamLogoAsset(awayName), logoSide),
+            _logoMark(
+              asset: awayLogo.asset,
+              networkUrl: awayLogo.networkUrl,
+              bg: awayBg,
+              fg: awayFg,
+              side: logoSide,
+            ),
           ],
         );
       }),
@@ -1950,7 +2054,7 @@ class _TableGameCard extends StatelessWidget {
             SizedBox(
               width: badgeWidth,
               child: hasRole
-                  ? _lineupMark(role, nameSize)
+                  ? _lineupMark(role, nameSize, pitcherRole: true)
                   : (hasResult ? _resultBadge(pitcher.mark, nameSize) : const SizedBox()),
             ),
             SizedBox(
@@ -1990,7 +2094,7 @@ class _TableGameCard extends StatelessWidget {
                   return Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (hasRole) SizedBox(width: badgeWidth, child: _lineupMark(role, nameSize)),
+                      if (hasRole) SizedBox(width: badgeWidth, child: _lineupMark(role, nameSize, pitcherRole: true)),
                       if (hasRole && hasResult) const SizedBox(width: 0.5),
                       if (hasResult) SizedBox(width: badgeWidth, child: _resultBadge(pitcher.mark, nameSize)),
                       const SizedBox(width: 0.5),
@@ -2020,6 +2124,7 @@ class _TableGameCard extends StatelessWidget {
                                     baseSize: nameSize,
                                     minSize: _minPlayerNameSize,
                                     alignLeft: false,
+                                    showAce: _isAcePitcher(pitcher.name),
                                   ),
                                 ],
                               ),
@@ -2125,6 +2230,7 @@ class _TableGameCard extends StatelessWidget {
                                           baseSize: nameSize,
                                           minSize: _minPlayerNameSize,
                                           alignLeft: true,
+                                          showAce: _isAcePitcher(pitcher.name),
                                         ),
                                       ),
                                     ),
@@ -2304,24 +2410,34 @@ class _TableGameCard extends StatelessWidget {
     return label.replaceAll('邪飛', '邪').replaceAll('ポップ', '邪').replaceAll('ゴロ', 'ゴ').replaceAll('フライ', '飛').replaceAll('ライナー', '直').replaceAll('併殺', '併');
   }
 
-  Color _positionColor(String mark) {
+  // 中継ぎ/ホールド=黄っぽいオレンジ、抑え/セーブ=赤っぽいオレンジ、外野=黄緑。
+  static const _markYellowOrange = Color(0xFFFFB300);
+  static const _markRedOrange = Color(0xFFFF5722);
+  static const _markOutfield = Color(0xFFC6FF00);
+
+  Color _positionColor(String mark, {bool pitcherRole = false}) {
+    if (pitcherRole) {
+      return switch (mark) {
+        '先' => const Color(0xFFFF4B7D),
+        '中' => _markYellowOrange,
+        '抑' => _markRedOrange,
+        _ => const Color(0xFFEEEEEE),
+      };
+    }
     return switch (mark) {
-      '投' || '先' => const Color(0xFFFF4B7D),
+      '投' => const Color(0xFFFF4B7D),
       '捕' => const Color(0xFF1E88E5),
       '一' || '二' || '三' || '遊' => const Color(0xFFFFEB3B),
-      // 中継ぎ「中」はホールド(H)と同じ緑。外野の「中」も同色。
-      '左' || '右' || '中' => Colors.green.shade700,
+      '左' || '中' || '右' => _markOutfield,
       '指' => const Color(0xFF8E24AA),
-      // 抑えはセーブ(S)と同じオレンジ。
-      '抑' => Colors.amber.shade700,
       _ => const Color(0xFFEEEEEE),
     };
   }
 
-  Widget _lineupMark(String mark, double fontSize) {
+  Widget _lineupMark(String mark, double fontSize, {bool pitcherRole = false}) {
     const positions = {'投', '捕', '一', '二', '三', '遊', '左', '中', '右', '指', '先', '抑'};
     if (!positions.contains(mark)) return _resultBadge(mark, fontSize);
-    final bg = _positionColor(mark);
+    final bg = _positionColor(mark, pitcherRole: pitcherRole);
     final ink = bg.computeLuminance() > 0.55 ? Colors.black87 : Colors.white;
     final side = (fontSize + 1).clamp(10.0, 14.0);
     return Center(
@@ -2431,9 +2547,10 @@ class _TableGameCard extends StatelessWidget {
     final color = switch (mark) {
       '勝' => Colors.red,
       '負' => Colors.blue,
-      'H' => Colors.green.shade700,
+      'H' => _markYellowOrange,
+      'S' => _markRedOrange,
       'HR' => const Color(0xFFDC143C),
-      _ => Colors.amber.shade700,
+      _ => _markRedOrange,
     };
     final diameter = (fontSize + 2).clamp(9.0, 16.0);
     return Container(
@@ -2522,7 +2639,8 @@ class _TableGameCard extends StatelessWidget {
                 children: [
                   for (final ch in chars)
                     Text(
-                      ch,
+                      // 縦書きでは長音「ー」を縦棒向きにする
+                      (ch == 'ー' || ch == '―' || ch == 'ｰ' || ch == '−') ? '｜' : ch,
                       style: TextStyle(
                         color: fg,
                         fontWeight: FontWeight.bold,
@@ -2674,6 +2792,12 @@ class _TableGameCard extends StatelessWidget {
                         scoreSize: scoreSize,
                         homeName: _text('name_team_home'),
                         awayName: _text('name_team_away'),
+                        homeAbbrev: _text('name_shortest_home'),
+                        awayAbbrev: _text('name_shortest_away'),
+                        homeBg: homeBg,
+                        awayBg: awayBg,
+                        homeFg: homeFg,
+                        awayFg: awayFg,
                       ),
                     ),
                     Expanded(
@@ -2835,546 +2959,37 @@ class _TableGameCard extends StatelessWidget {
   }
 }
 
-class _GameCard extends StatelessWidget {
-  final Map<String, dynamic> g;
-  const _GameCard(this.g);
-
-  String get _home => g['name_team_home']?.toString() ?? '';
-  String get _away => g['name_team_away']?.toString() ?? '';
-  String get _stadium => g['name_stadium']?.toString() ?? '';
-  String get _time => g['time_game']?.toString() ?? '';
-  String get _win => g['name_pitcher_win']?.toString() ?? '';
-  String get _lose => g['name_pitcher_lose']?.toString() ?? '';
-  String get _save => g['name_pitcher_save']?.toString() ?? '';
-  String get _pHome => g['name_pitcher_home']?.toString() ?? '';
-  String get _pAway => g['name_pitcher_away']?.toString() ?? '';
-  String get _cPitchHome => g['colors_pitcher_home']?.toString() ?? '';
-  String get _cPitchAway => g['colors_pitcher_away']?.toString() ?? '';
-  String get _sHome => g['score_home']?.toString() ?? '';
-  String get _sAway => g['score_away']?.toString() ?? '';
-  String get _stateTxt => g['state']?.toString() ?? '';
-
-  int get _idTeamHome => int.tryParse('${g['id_team_home']}') ?? -1;
-  int get _idTeamAway => int.tryParse('${g['id_team_away']}') ?? -1;
-  int? get _idTeamPitchWin => g['id_team_pitcher_win'] == null ? null : int.tryParse('${g['id_team_pitcher_win']}');
-  int? get _idTeamPitchLose => g['id_team_pitcher_lose'] == null ? null : int.tryParse('${g['id_team_pitcher_lose']}');
-  int? get _idTeamPitchSave => g['id_team_pitcher_save'] == null ? null : int.tryParse('${g['id_team_pitcher_save']}');
-
-  int _parseScore(String s) => int.tryParse(s.trim()) ?? -1;
-
-  bool get _showScore {
-    final h = _parseScore(_sHome);
-    final a = _parseScore(_sAway);
-    if (h < 0 || a < 0) return false; // どちらかが -1 なら非表示
-    return true;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, c) {
-      final h = c.maxHeight.isFinite ? c.maxHeight : 120.0;
-      final vPad = (h * 0.04).clamp(2.0, 8.0);
-      final gap = (h * 0.03).clamp(2.0, 8.0);
-      final baseSmall = (h * 0.10).clamp(9.0, 13.0);
-      final baseMid = (h * 0.12).clamp(10.0, 15.0);
-      final baseBig = (h * 0.14).clamp(11.0, 16.0);
-
-      // チーム名セル用の色（試合JSONから）
-      Color? _parseColor(String? name) {
-        final n = (name ?? '').trim().toLowerCase();
-        if (n.isEmpty) return null;
-        const m = {
-          'red': 0xFFF44336,
-          'orange': 0xFFFF9800,
-          'yellow': 0xFFFFEB3B,
-          'green': 0xFF4CAF50,
-          'lightgreen': 0xFF8BC34A,
-          'blue': 0xFF0000FF,
-          'royalblue': 0xFF4169E1,
-          'mediumblue': 0xFF0000CD,
-          'midnightblue': 0xFF191970,
-          'darkblue': 0xFF00008B,
-          'dodgerblue': 0xFF1E90FF,
-          'navy': 0xFF001F3F,
-          'crimson': 0xFFDC143C,
-          'gold': 0xFFFFD700,
-          'lime': 0xFFCDDC39,
-          'gray': 0xFF9E9E9E,
-          'grey': 0xFF9E9E9E,
-          'black': 0xFF000000,
-          'white': 0xFFFFFFFF,
-        };
-        final v = m[n];
-        return v == null ? null : Color(v);
-      }
-
-      final Color? homeNameBg = _parseColor(g['color_back_home']?.toString());
-      final Color? awayNameBg = _parseColor(g['color_back_away']?.toString());
-      final Color? homeNameFg = _parseColor(g['color_font_home']?.toString());
-      final Color? awayNameFg = _parseColor(g['color_font_away']?.toString());
-
-      // チーム名チップの最小高さ（文字数が多くても高さを維持）
-      final double nameChipH = (baseMid + 6).clamp(18.0, 24.0);
-
-      // チーム名セルの横幅（カード幅の約2/5）
-      final double teamNameW = (c.maxWidth.isFinite ? c.maxWidth : 300.0) * 6.0;
-
-      // カード背景: ホーム/アウェイ色で二分割グラデーション
-      Color? _teamColor(String? name) {
-        final n = (name ?? '').trim().toLowerCase();
-        if (n.isEmpty) return null;
-        const m = {
-          'red': 0xFFF44336,
-          'orange': 0xFFFF9800,
-          'yellow': 0xFFFFEB3B,
-          'green': 0xFF4CAF50,
-          'lightgreen': 0xFF8BC34A,
-          'blue': 0xFF0000FF,
-          'royalblue': 0xFF4169E1,
-          'mediumblue': 0xFF0000CD,
-          'midnightblue': 0xFF191970,
-          'darkblue': 0xFF00008B,
-          'dodgerblue': 0xFF1E90FF,
-          'navy': 0xFF001F3F,
-          'crimson': 0xFFDC143C,
-          'gold': 0xFFFFD700,
-          'lime': 0xFFCDDC39,
-          'gray': 0xFF9E9E9E,
-          'grey': 0xFF9E9E9E,
-          'black': 0xFF000000,
-          'white': 0xFFFFFFFF,
-        };
-        final v = m[n];
-        return v == null ? null : Color(v);
-      }
-
-      final Color? homeBg = _teamColor(g['color_back_home']?.toString());
-      final Color? awayBg = _teamColor(g['color_back_away']?.toString());
-      // チーム名エリアまでは各色でべた塗り、その先からグラデーション
-      final double cardW = c.maxWidth.isFinite ? c.maxWidth : 300.0;
-      final double teamNameFracW = cardW * 2.0 / 5.0; // 既存チップ幅相当
-      final double frac = (teamNameFracW / cardW).clamp(0.05, 0.45);
-      const double eps = 0.04; // 適度なブレンド幅
-      final double fracSolid = (frac - 0.02).clamp(0.03, 0.45); // ベタ領域を少しだけ短く
-
-      final BoxDecoration? cardDecoration = (homeBg != null && awayBg != null)
-          ? (() {
-              // 10段階の緩やかなグラデーション（左右対称）
-              const int steps = 10; // 左右それぞれの段数
-              const double epsSolid = 0.01; // べた領域の終端を明示
-              final List<Color> gColors = [];
-              final List<double> gStops = [];
-
-              // 左: 0.0 〜 frac はホーム色をべた塗り
-              gColors.add(homeBg.withOpacity(1));
-              gStops.add(0.0);
-              gColors.add(homeBg.withOpacity(1));
-              gStops.add((fracSolid - epsSolid).clamp(0.0, 0.49));
-
-              // 左: frac → 0.5 まで徐々に透明へ
-              for (int i = 1; i <= steps; i++) {
-                final double t = i / steps; // 0→1
-                final double pos = fracSolid + (0.5 - fracSolid) * t; // 左ベタ終端→中央
-                final double opacity = (1.0 - t); // 1→0 線形
-                gColors.add(homeBg.withOpacity(opacity));
-                gStops.add(pos.clamp(0.0, 0.5));
-              }
-
-              // 中央透明
-              gColors.add(Colors.transparent);
-              gStops.add(0.5);
-              gColors.add(Colors.transparent);
-              gStops.add(0.5);
-
-              // 右: 0.5 → (1-frac) で徐々に色を濃く
-              for (int i = 1; i <= steps; i++) {
-                final double t = i / steps; // 0→1
-                final double pos = 0.5 + (0.5 - fracSolid) * t; // 0.5→(1-fracSolid)
-                final double opacity = t; // 中央から外側へ行くほど濃く
-                gColors.add(awayBg.withOpacity(opacity));
-                gStops.add(pos.clamp(0.5, 1.0));
-              }
-
-              // 右: (1-frac) 〜 1.0 はアウェイ色をべた塗り
-              gColors.add(awayBg.withOpacity(1));
-              gStops.add((1.0 - fracSolid + epsSolid).clamp(0.51, 1.0));
-              gColors.add(awayBg.withOpacity(1));
-              gStops.add(1.0);
-
-              return BoxDecoration(
-                gradient: LinearGradient(
-                  colors: gColors,
-                  stops: gStops,
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
-                borderRadius: BorderRadius.circular(6),
-              );
-            })()
-          : (homeBg != null || awayBg != null)
-              ? (() {
-                  final base = (homeBg ?? awayBg)!;
-                  const int steps = 10;
-                  const double epsSolid = 0.01;
-                  final List<Color> gColors = [];
-                  final List<double> gStops = [];
-
-                  // 左べた
-                  gColors.add(base.withOpacity(1));
-                  gStops.add(0.0);
-                  gColors.add(base.withOpacity(1));
-                  gStops.add((fracSolid - epsSolid).clamp(0.0, 0.49));
-
-                  // 左→中央
-                  for (int i = 1; i <= steps; i++) {
-                    final double t = i / steps;
-                    final double pos = fracSolid + (0.5 - fracSolid) * t;
-                    final double opacity = (1.0 - t);
-                    gColors.add(base.withOpacity(opacity));
-                    gStops.add(pos.clamp(0.0, 0.5));
-                  }
-
-                  // 中央透明
-                  gColors.add(Colors.transparent);
-                  gStops.add(0.5);
-                  gColors.add(Colors.transparent);
-                  gStops.add(1.0);
-
-                  return BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: gColors,
-                      stops: gStops,
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
-                    borderRadius: BorderRadius.circular(6),
-                  );
-                })()
-              : null;
-
-      // 球場名の表示幅はホーム側のベタ塗り領域（cardW * fracSolid）に合わせる
-      final double stadiumW = (cardW * (fracSolid - 0.01)).clamp(40.0, cardW);
-
-      // 先発投手の下のスペースの 11 分の 5 を 1 行の高さに
-      final double nameChipH2 = (baseMid + 6).clamp(18.0, 24.0);
-      final double _belowPitcherSpace = nameChipH2; // 近似: 同等の高さを確保
-      final double _rowH = (_belowPitcherSpace * 5.0 / 11.0).clamp(14.0, 28.0);
-      final double badgeD = (_rowH * 0.92).clamp(12.0, 24.0);
-      final double rowFont = (_rowH * 0.52).clamp(9.0, 16.0);
-
-      // 勝敗・S用の丸バッジ（中央表示）: 行フォントに合わせる
-      Widget _badge(String label, Color bg, double d) {
-        return Container(
-          width: d,
-          height: d,
-          decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
-          alignment: Alignment.center,
-          child: Text(label, style: TextStyle(color: Colors.white, fontSize: rowFont)),
-        );
-      }
-
-      final bool inProgress = _stateTxt.contains('回');
-      final inner = Container(
-        decoration: cardDecoration,
-        child: Padding(
-          padding: const EdgeInsets.all(2),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // 上段: 球場（左上：ホーム色）／ 時刻（右上：アウェイ色）
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: stadiumW,
-                    child: Container(
-                      margin: const EdgeInsets.only(left: 2, top: 2),
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: homeNameBg,
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                      child: OneLineShrinkText(
-                        _stadium,
-                        baseSize: baseSmall,
-                        minSize: 7,
-                        color: homeNameFg ?? Colors.black87,
-                        align: TextAlign.left,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.topRight,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: awayNameBg,
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                        child: OneLineShrinkText(
-                          _time.isNotEmpty ? _time : (_showScore ? '試合終了' : ''),
-                          baseSize: baseSmall,
-                          minSize: 7,
-                          weight: FontWeight.bold,
-                          color: awayNameFg ?? Colors.black87,
-                          align: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+/// クリムゾンの菱形に白文字「ACE」
+Widget _aceDiamond(double baseSize) {
+  final side = (baseSize * 1.55).clamp(12.0, 18.0);
+  final fontSize = (baseSize * 0.55).clamp(5.5, 8.0);
+  return SizedBox(
+    width: side,
+    height: side,
+    child: Transform.rotate(
+      angle: math.pi / 4,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: const Color(0xFFDC143C),
+          borderRadius: BorderRadius.circular(2),
+        ),
+        child: Transform.rotate(
+          angle: -math.pi / 4,
+          child: Center(
+            child: Text(
+              'ACE',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: fontSize,
+                fontWeight: FontWeight.w800,
+                height: 1,
               ),
-              const SizedBox(height: 2),
-
-              // 中段: ホーム / スコアorvs / ビジター
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                              width: teamNameW,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: null,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                constraints: BoxConstraints(minHeight: nameChipH2),
-                                padding: const EdgeInsets.symmetric(horizontal: 4),
-                                alignment: Alignment.center,
-                                width: double.infinity,
-                                child: OneLineShrinkText(_home, baseSize: baseMid, minSize: 8, weight: FontWeight.w600, color: homeNameFg ?? Colors.black87, align: TextAlign.center),
-                              )),
-                          if (_pHome.isNotEmpty)
-                            Padding(
-                              padding: EdgeInsets.only(top: gap * 0.3),
-                              child: _pitcherNameBox(
-                                name: _pHome,
-                                colorsRaw: _cPitchHome,
-                                baseSize: baseSmall,
-                                alignLeft: true,
-                                overrideTextColor: _cPitchHome.trim().isEmpty ? (homeNameFg ?? Colors.black87) : null,
-                                overrideWeight: _cPitchHome.trim().isEmpty ? FontWeight.w600 : null,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 72,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (_stateTxt.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 2),
-                            child: OneLineShrinkText(
-                              _stateTxt,
-                              baseSize: baseSmall,
-                              minSize: 7,
-                              color: Colors.black,
-                              shadows: [Shadow(color: Colors.white.withOpacity(0.85), blurRadius: 2, offset: Offset(0, 1))],
-                              align: TextAlign.center,
-                            ),
-                          ),
-                        Center(
-                          child: OneLineShrinkText(
-                            _showScore ? '$_sHome  -  $_sAway' : 'vs',
-                            baseSize: baseBig,
-                            minSize: 9,
-                            weight: FontWeight.bold,
-                            color: Colors.black,
-                            shadows: [Shadow(color: Colors.white.withOpacity(0.85), blurRadius: 2, offset: Offset(0, 1))],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          SizedBox(
-                              width: teamNameW,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: null,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                constraints: BoxConstraints(minHeight: nameChipH2),
-                                padding: const EdgeInsets.symmetric(horizontal: 4),
-                                alignment: Alignment.center,
-                                width: double.infinity,
-                                child: OneLineShrinkText(_away, baseSize: baseMid, minSize: 8, weight: FontWeight.w600, color: awayNameFg ?? Colors.black87, align: TextAlign.center),
-                              )),
-                          if (_pAway.isNotEmpty)
-                            Padding(
-                              padding: EdgeInsets.only(top: gap * 0.3),
-                              child: _pitcherNameBox(
-                                name: _pAway,
-                                colorsRaw: _cPitchAway,
-                                baseSize: baseSmall,
-                                alignLeft: false,
-                                overrideTextColor: _cPitchAway.trim().isEmpty ? (awayNameFg ?? Colors.black87) : null,
-                                overrideWeight: _cPitchAway.trim().isEmpty ? FontWeight.w600 : null,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: gap),
-
-              // 下段: 勝敗S投手（各サイドの先発投手行の下に表示）
-              if (_win.isNotEmpty || _lose.isNotEmpty || _save.isNotEmpty)
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 左側（ホーム）
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (_win.isNotEmpty && _idTeamPitchWin == _idTeamHome)
-                            SizedBox(
-                              height: _rowH,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  _badge('勝', Colors.red, badgeD),
-                                  const SizedBox(width: 3),
-                                  Flexible(
-                                    child: OneLineShrinkText(_win, baseSize: 15, minSize: 15, color: homeNameFg ?? Colors.black87, align: TextAlign.left),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          if (_lose.isNotEmpty && _idTeamPitchLose == _idTeamHome)
-                            SizedBox(
-                              height: _rowH,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  _badge('負', Colors.blue, badgeD),
-                                  const SizedBox(width: 3),
-                                  Flexible(
-                                    child: OneLineShrinkText(_lose, baseSize: 15, minSize: 15, color: homeNameFg ?? Colors.black87, align: TextAlign.left),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          if (_save.isNotEmpty && _idTeamPitchSave == _idTeamHome)
-                            SizedBox(
-                              height: _rowH,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  _badge('S', Colors.amber, badgeD),
-                                  const SizedBox(width: 3),
-                                  Flexible(
-                                    child: OneLineShrinkText(_save, baseSize: 15, minSize: 7, color: homeNameFg ?? Colors.black87, align: TextAlign.left),
-                                  ),
-                                ],
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                    // 中央スペーサ（スコア列の幅ぶん）
-                    SizedBox(width: 72),
-                    // 右側（ビジター）
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          if (_win.isNotEmpty && _idTeamPitchWin == _idTeamAway)
-                            SizedBox(
-                              height: _rowH,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  _badge('勝', Colors.red, badgeD),
-                                  const SizedBox(width: 6),
-                                  Flexible(
-                                    child: OneLineShrinkText(_win, baseSize: baseSmall + 2, minSize: 7, color: awayNameFg ?? Colors.black87, align: TextAlign.right),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          if (_lose.isNotEmpty && _idTeamPitchLose == _idTeamAway)
-                            SizedBox(
-                              height: _rowH,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  _badge('負', Colors.blue, badgeD),
-                                  const SizedBox(width: 6),
-                                  Flexible(
-                                    child: OneLineShrinkText(_lose, baseSize: baseSmall + 2, minSize: 7, color: awayNameFg ?? Colors.black87, align: TextAlign.right),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          if (_save.isNotEmpty && _idTeamPitchSave == _idTeamAway)
-                            SizedBox(
-                              height: _rowH,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  _badge('S', Colors.amber, badgeD),
-                                  const SizedBox(width: 6),
-                                  Flexible(
-                                    child: OneLineShrinkText(_save, baseSize: baseSmall + 2, minSize: 7, color: awayNameFg ?? Colors.black87, align: TextAlign.right),
-                                  ),
-                                ],
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-            ],
+            ),
           ),
         ),
-      );
-
-      final card = Card(
-        elevation: 0.5,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-        child: inProgress
-            ? BlinkBorder(
-                color: Colors.amber,
-                radius: 6,
-                width: 4,
-                duration: const Duration(milliseconds: 900),
-                baseBgColor: Colors.transparent,
-                fillUseColor: false,
-                child: inner,
-              )
-            : inner,
-      );
-      return card;
-    });
-  }
+      ),
+    ),
+  );
 }
 
 // 先発投手名の背景色を colors_user 形式で適用（/red/blue/ → グラデ）
@@ -3386,8 +3001,9 @@ Widget _pitcherNameBox({
   double minSize = 9,
   Color? overrideTextColor,
   FontWeight? overrideWeight,
+  bool showAce = false,
 }) {
-  return _PitcherNameBox(
+  final box = _PitcherNameBox(
     name: name,
     colorsRaw: colorsRaw,
     baseSize: baseSize,
@@ -3395,6 +3011,15 @@ Widget _pitcherNameBox({
     alignLeft: alignLeft,
     overrideTextColor: overrideTextColor,
     overrideWeight: overrideWeight,
+  );
+  if (!showAce) return box;
+  return Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      box,
+      const SizedBox(width: 3),
+      _aceDiamond(baseSize),
+    ],
   );
 }
 
@@ -3408,7 +3033,6 @@ class _PitcherNameBox extends StatefulWidget {
   final FontWeight? overrideWeight;
 
   const _PitcherNameBox({
-    super.key,
     required this.name,
     required this.colorsRaw,
     required this.baseSize,

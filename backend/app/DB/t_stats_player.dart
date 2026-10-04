@@ -13,6 +13,15 @@ class t_stats_player extends DBModel {
 
   String playerName = '';
   String teamName = '';
+  String playerUrl = '';
+
+  /// スクレイプ時の補助。DB カラムには載せない。
+  int seasonAppearances = 0;
+  int seasonStarts = 0;
+  double seasonInnings = 0;
+  int seasonWins = 0;
+  int seasonStrikeouts = 0;
+  double seasonEra = 0;
 
   Map<String, dynamic> toMap() {
     return super.toMap()

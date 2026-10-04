@@ -13,22 +13,30 @@ class BracketTeam {
   final int leagueId;
   final int rank;
   final String name;
+  final String nameShortest;
   final String colorBack;
   final String colorFont;
   final int wins;
   final int losses;
   final double? gamesBehind;
+  /// MLB 地区コード（EAST / CENTER / WEST）。NPB は空。
+  final String codeArea;
+  /// MLB 地区内順位（1〜）。NPB は 0。
+  final int divisionPlace;
 
   const BracketTeam({
     required this.id,
     required this.leagueId,
     required this.rank,
     required this.name,
+    this.nameShortest = '',
     required this.colorBack,
     required this.colorFont,
     required this.wins,
     required this.losses,
     required this.gamesBehind,
+    this.codeArea = '',
+    this.divisionPlace = 0,
   });
 
   double? get winRate {
@@ -115,6 +123,7 @@ const _placeholder = BracketTeam(
   leagueId: 0,
   rank: 0,
   name: '',
+  nameShortest: '',
   colorBack: '',
   colorFont: '',
   wins: 0,
@@ -265,6 +274,7 @@ BracketTeam _teamFromRow(Map<String, dynamic> row) {
     leagueId: _asInt(row['id_league']),
     rank: _asInt(row['int_rank']),
     name: nameShort.isNotEmpty ? nameShort : nameFull,
+    nameShortest: '${row['name_shortest'] ?? ''}'.trim(),
     colorBack: '${row['color_back'] ?? ''}',
     colorFont: '${row['color_font'] ?? ''}',
     wins: _asInt(row['int_win']),

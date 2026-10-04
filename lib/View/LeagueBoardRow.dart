@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../config/org_config.dart';
 import '../tools/date_format.dart';
 import 'SeasonTable.dart';
 
@@ -15,6 +16,7 @@ class LeagueBoardRow extends StatelessWidget {
   final String Function(String idUser) userNameFromPredictions;
   final bool compact;
   final bool portraitLayout;
+  final OrgConfig org;
 
   final String leagueLabelPrefix;
 
@@ -33,6 +35,7 @@ class LeagueBoardRow extends StatelessWidget {
     required this.userNameFromPredictions,
     required this.compact,
     this.portraitLayout = false,
+    this.org = OrgConfig.npb,
   });
 
   List<Map<String, dynamic>> get _leagueGames => games.where((g) => (int.tryParse('${g['id_league_home']}') ?? 0) == leagueId && (int.tryParse('${g['id_league_away']}') ?? 0) == leagueId).toList();
@@ -46,6 +49,7 @@ class LeagueBoardRow extends StatelessWidget {
       onlyLeagueId: leagueId,
       gamesDateFilter: DateFormatUtil.ymdWithOffset(0),
       portraitLayout: portraitLayout,
+      org: org,
     );
 
     // リーグ切替タブがあるため左のリーグ名ヘッダーは出さない

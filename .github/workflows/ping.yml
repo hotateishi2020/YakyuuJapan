@@ -37,3 +37,24 @@ jobs:
       - name: Call /fetchGamesNPB (D)
         if: ${{ github.event.schedule == '15 15-21 * * *' }}
         run: curl -fsS "https://yakyuujapan.onrender.com/fetchGamesNPB"
+
+      - name: Call /fetchStatsTeamMLB
+        if: ${{ github.event.schedule == '2 7-15 * * *' }}
+        run: curl -fsS "https://yakyuujapan.onrender.com/fetchStatsTeamMLB" || true
+
+      - name: Call /fetchStatsPlayerMLB
+        if: ${{ github.event.schedule == '13,43 7-15 * * *' }}
+        run: |
+          curl --silent --show-error \
+            --fail-with-body \
+            --location \
+            --retry 3 \
+            --retry-delay 10 \
+            --retry-all-errors \
+            --connect-timeout 30 \
+            --max-time 1800 \
+            "https://yakyuujapan.onrender.com/fetchStatsPlayerMLB" || true
+
+      - name: Call /fetchGamesMLB
+        if: ${{ github.event.schedule == '9/10 4-15 * * *' || github.event.schedule == '15 15-21 * * *' }}
+        run: curl -fsS "https://yakyuujapan.onrender.com/fetchGamesMLB" || true

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../config/app_design.dart';
+import '../config/org_config.dart';
 import '../tools/color_parse.dart';
 import 'Text.dart';
 import 'BlinkBg.dart';
@@ -12,10 +13,11 @@ class SeasonTableBlock extends StatelessWidget {
   final List<Map<String, dynamic>> standings;
   final List<Map<String, dynamic>> stats;
   final List<Map<String, dynamic>> games;
-  final int? onlyLeagueId; // 1: セ, 2: パ, null: 両方
+  final int? onlyLeagueId; // 団体内リーグ ID。null: 両方
   final String? gamesDateFilter; // "YYYY-MM-DD"（nullなら今日）
   final bool portraitLayout;
   final SeasonPane pane;
+  final OrgConfig org;
 
   const SeasonTableBlock({
     super.key,
@@ -26,6 +28,7 @@ class SeasonTableBlock extends StatelessWidget {
     this.gamesDateFilter,
     this.portraitLayout = false,
     this.pane = SeasonPane.combined,
+    this.org = OrgConfig.npb,
   });
 
   Color? _parseColorName(String? name) => parseColorNameOrNull(name);
@@ -45,59 +48,30 @@ class SeasonTableBlock extends StatelessWidget {
   // 文字→数値(表示用)
   String _num(dynamic v) => (v == null || '$v'.isEmpty) ? '—' : '$v';
 
-  bool _isTrue(dynamic v) {
-    if (v == true) return true;
-    if (v is num) return v != 0;
-    final s = '$v'.trim().toLowerCase();
-    return s == 'true' || s == 't' || s == '1';
-  }
-
-  List<String> _playerMarks(Map<String, dynamic> row) {
-    return [
-      if (_isTrue(row['flg_rookie'])) '🔰',
-      if (_isTrue(row['flg_career_this_year'])) '✨',
-      if (_isTrue(row['flg_under21'])) '🌱',
-      if (_isTrue(row['flg_age35'])) '🍁',
-    ];
-  }
-
-  /// 選手名の右に、付いている印をすべて並べる。名前だけ縮めて印は残す。
-  Widget _playerNameLine(Map<String, dynamic> row, String name, {required double baseSize, Color? color, FontWeight? weight}) {
-    final paren = name.indexOf('(');
-    final label = paren >= 0 ? name.substring(0, paren) : name;
-    final suffix = paren >= 0 ? name.substring(paren) : '';
-    final marks = _playerMarks(row);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Flexible(
-          fit: FlexFit.loose,
-          child: OneLineShrinkText(label.isEmpty ? '—' : label, baseSize: baseSize, minSize: 1, fast: true, color: color, weight: weight, align: TextAlign.center),
-        ),
-        for (final mark in marks)
-          Text(mark, style: TextStyle(fontSize: baseSize, height: 1.0, color: color)),
-        if (suffix.isNotEmpty)
-          Flexible(
-            fit: FlexFit.loose,
-            child: OneLineShrinkText(suffix, baseSize: baseSize, minSize: 1, fast: true, color: color, weight: weight, align: TextAlign.center),
-          ),
-      ],
-    );
-  }
-
   // リーグ別フィルタ
   List<Map<String, dynamic>> _standingsOf(int leagueId) => standings.where((e) => int.tryParse('${e['id_league']}') == leagueId).toList()..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0).compareTo(int.tryParse('${b['int_rank']}') ?? 0));
 
-  List<Map<String, dynamic>> _statsOf(int leagueId, {required bool pitcher}) => stats.where((e) => ((e['league_name'] ?? '').toString() == (leagueId == 1 ? 'セ・リーグ' : 'パ・リーグ')) && (e['flg_pitcher'] == pitcher)).toList();
-
-  // タイトル→選手名(なければ ?)
-  String _playerOf(List<Map<String, dynamic>> rows, String title) {
-    final r = rows.firstWhere(
-      (e) => (e['title'] ?? '').toString() == title,
-      orElse: () => const {},
-    );
-    final name = (r.isNotEmpty ? (r['name_player'] ?? '') : '').toString();
-    return name.isEmpty ? '?' : name;
+  /// MLB は東・中・西地区に分割。NPB はリーグ全体を1ブロック。
+  List<({String label, List<Map<String, dynamic>> rows})> _standingSections(int leagueId) {
+    final all = _standingsOf(leagueId);
+    if (org.kind != OrgKind.mlb) {
+      return [(label: '', rows: all)];
+    }
+    const areas = [
+      ('EAST', '東地区'),
+      ('CENTER', '中地区'),
+      ('WEST', '西地区'),
+    ];
+    final sections = <({String label, List<Map<String, dynamic>> rows})>[];
+    for (final area in areas) {
+      final rows = all.where((e) => '${e['code_area'] ?? ''}'.trim().toUpperCase() == area.$1).toList()
+        ..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0).compareTo(int.tryParse('${b['int_rank']}') ?? 0));
+      if (rows.isNotEmpty) sections.add((label: area.$2, rows: rows));
+    }
+    if (sections.isEmpty && all.isNotEmpty) {
+      return [(label: '', rows: all)];
+    }
+    return sections;
   }
 
   Widget _sectionHeader(String label, Color color) {
@@ -110,33 +84,9 @@ class SeasonTableBlock extends StatelessWidget {
     );
   }
 
-  // 簡易セル
-  Widget _cell(String text, {Color? bg, FontWeight? weight, Color? fg, double? h}) {
-    return Container(
-      height: h,
-      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
-      decoration: BoxDecoration(
-        color: bg,
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      alignment: Alignment.center,
-      child: OneLineShrinkText(text, baseSize: 10, minSize: 1, weight: weight, color: fg),
-    );
-  }
-
-  // 最小幅付きセル（数値列用）
-  Widget _minCell(String text, double min, {Color? bg, Color? fg, FontWeight? weight}) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(minWidth: min),
-      child: _cell(text, bg: bg, fg: fg, weight: weight),
-    );
-  }
-
   // 順位テーブル（上:順位行、下:スタッツ要約）
   Widget _leagueTable(int leagueId) {
-    final cur = _standingsOf(leagueId);
-    final Color leagueColor = leagueId == 1 ? const Color(0xFF0E8E2D) : const Color(0xFF01B1EA);
+    final Color leagueColor = org.leagueColor(leagueId);
     // リーグ見出しは非表示
 
     // 打撃/投手タイトル（画像に近い簡易版）: stats_player の形に合わせて抽出
@@ -166,172 +116,11 @@ class SeasonTableBlock extends StatelessWidget {
       );
     }
 
-    // タイトル列ごとに、クリック/ホバーで全ランキングを展開できるカラム
-    Widget _statsColumn({
-      required String title,
-      required double width,
-      required Color headerBg,
-      required List<Map<String, dynamic>> rows,
-      required Widget Function(Map<String, dynamic>) buildRow,
-    }) {
-      return _StatsColumn(
-        title: title,
-        width: width,
-        headerBg: headerBg,
-        rows: rows,
-        buildRow: buildRow,
-      );
-    }
-
-    Widget _bar(String label, Color color, {double h = 24, Color fg = Colors.white}) {
-      return Container(
-        height: h,
-        alignment: Alignment.centerLeft,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        decoration: BoxDecoration(color: color),
-        child: Text(label, style: TextStyle(color: fg, fontWeight: FontWeight.bold)),
-      );
-    }
-
     Widget _personalStatsSheet(int leagueId, List<Map<String, dynamic>> bat, List<Map<String, dynamic>> pit, double parentWidth) {
-      final leagueLabel = leagueId == 1 ? 'セ・リーグ' : 'パ・リーグ';
-
-      List<TableRow> _rankRows(List<String> cols, List<Map<String, dynamic>> src) {
-        String _normalizeTitle(String t) => t == 'ホールド' ? 'HP' : t;
-        String _nameBy(String title, int rank) {
-          final e = src.firstWhere((m) => (m['title']?.toString() ?? '') == _normalizeTitle(title) && (int.tryParse('${m['int_rank']}') ?? -1) == rank, orElse: () => const {});
-          return (e.isNotEmpty ? (e['name_player'] ?? '') : '').toString();
-        }
-
-        final rows = <TableRow>[];
-        for (int r = 1; r <= 5; r++) {
-          rows.add(TableRow(children: [
-            _gridCell('$r', bg: Colors.white, fg: Colors.black),
-            for (final t in cols) _gridCell(_nameBy(t, r)),
-          ]));
-        }
-        return rows;
-      }
-
-      // 1位の選手名（無ければ空文字）
-      String _pick(List<Map<String, dynamic>> src, String title) {
-        final v = src.firstWhere((e) => (e['title'] ?? '') == title, orElse: () => const {});
-        return (v.isNotEmpty ? (v['name_player'] ?? '') : '').toString();
-      }
-
       String _normalizeTitle(String t) => t == 'ホールド' ? 'HP' : t;
-      String _nameBy(List<Map<String, dynamic>> src, String title, int rank) {
-        final e = src.firstWhere((m) => (m['title']?.toString() ?? '') == _normalizeTitle(title) && (int.tryParse('${m['int_rank']}') ?? -1) == rank, orElse: () => const {});
-        return (e.isNotEmpty ? (e['name_player'] ?? '') : '').toString();
-      }
 
       final battingCols = ['打率', '本塁打', '打点', '盗塁', '出塁率', '最多安打', '盗塁成功率', '長打率', 'OPS'];
       final pitchingCols = ['防御率', '最多勝', '奪三振', 'ホールド', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'QS率'];
-
-      // 個人成績セル: ランク/チーム/選手/数値 を1セル内に表示
-      // rank は「表示行のインデックス(1..5)」。SQL順を維持したリストの rank 番目を表示する。
-      Widget _entryCell(List<Map<String, dynamic>> src, String title, int rank) {
-        final list = src.where((m) => (m['title']?.toString() ?? '') == _normalizeTitle(title)).toList();
-        final idx = (rank - 1).clamp(0, list.isNotEmpty ? list.length - 1 : 0);
-        final Map<String, dynamic> e = list.isNotEmpty && list.length >= rank ? list[idx] : const {};
-
-        final rankText = (e.isNotEmpty ? (e['int_rank']?.toString() ?? '') : '').toString();
-        final team = (e.isNotEmpty ? (e['name_team'] ?? '') : '').toString();
-        final name = (e.isNotEmpty ? (e['player_name'] ?? e['name_player'] ?? '') : '').toString();
-        final stat = _num(e.isNotEmpty ? e['stats'] : null);
-
-        // colors_user: "/red/blue/" のように / 区切りで色名が入る
-        // 1色なら単色背景、2色以上なら左→右のグラデーション
-        BoxDecoration? _nameBgDecoration() {
-          final raw = (e.isNotEmpty ? (e['colors_user'] ?? '') : '').toString();
-          if (raw.isEmpty) return null;
-          final parts = raw.split('/').map((s) => s.trim().toLowerCase()).where((s) => s.isNotEmpty).toList();
-          if (parts.isEmpty) return null;
-          final cols = <Color>[];
-          for (final p in parts) {
-            final c = _parseColorName(p);
-            if (c != null) cols.add(c);
-          }
-          if (cols.isEmpty) return null;
-          if (cols.length == 1) {
-            return BoxDecoration(
-              color: cols.first,
-              borderRadius: BorderRadius.circular(4),
-            );
-          }
-          return BoxDecoration(
-            gradient: LinearGradient(
-              colors: cols,
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-            borderRadius: BorderRadius.circular(4),
-          );
-        }
-
-        return SizedBox(
-          width: parentWidth * 0.2,
-          child: Container(
-            height: 20,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.black26, width: 1),
-            ),
-            // padding: const EdgeInsets.symmetric(horizontal: 2),
-            child: Row(children: [
-              Expanded(
-                  flex: STATS_PLAYER_RATIO_CELL_BLOCK_W[0],
-                  child: Center(
-                    child: () {
-                      if (rankText.trim() == '1') {
-                        return const FittedBox(
-                          fit: BoxFit.contain,
-                          child: Text('👑',
-                              style: TextStyle(
-                                fontSize: 25,
-                                height: 1.0,
-                              )),
-                        );
-                      } else if (rankText.trim() == '1000') {
-                        return const FittedBox(
-                          fit: BoxFit.contain,
-                          child: Text('-',
-                              style: TextStyle(
-                                fontSize: 25,
-                                height: 1.0,
-                              )),
-                        );
-                      }
-                      return OneLineShrinkText(rankText.isNotEmpty ? rankText : '—', baseSize: 15, minSize: 1, fast: true);
-                    }(),
-                  )),
-              Expanded(
-                  flex: STATS_PLAYER_RATIO_CELL_BLOCK_W[1],
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: _parseColorName(e['color_back']),
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                    alignment: Alignment.center,
-                    child: OneLineShrinkText(team, baseSize: 12, minSize: 1, fast: true, color: _parseColorName(e['color_font'])),
-                  )),
-              Expanded(
-                  flex: STATS_PLAYER_RATIO_CELL_BLOCK_W[2],
-                  child: Container(
-                    decoration: (() {
-                      final d = _nameBgDecoration();
-                      return d;
-                    })(),
-                    alignment: Alignment.center,
-                    child: (() {
-                      final hasBg = _nameBgDecoration() != null;
-                      return OneLineShrinkText(name, baseSize: 12, minSize: 1, fast: true, color: hasBg ? Colors.white : null, weight: hasBg ? FontWeight.bold : null);
-                    })(),
-                  )),
-              Expanded(flex: STATS_PLAYER_RATIO_CELL_BLOCK_W[3], child: OneLineShrinkText(stat, baseSize: 12, minSize: 1, fast: true)),
-            ]),
-          ),
-        );
-      }
 
       // 1行分（与えられた行データからそのまま描画）
       const double rowH = 20.8;
@@ -348,7 +137,11 @@ class SeasonTableBlock extends StatelessWidget {
       }
 
       Widget _entryCellFromRow(Map<String, dynamic> e) {
-        return PlayerStatCell(row: e, width: parentWidth * 0.2);
+        return PlayerStatCell(
+          row: e,
+          width: parentWidth * 0.2,
+          showJapanFlag: org.kind == OrgKind.mlb,
+        );
       }
 
       Widget _statsTitleColumns({
@@ -449,6 +242,12 @@ class SeasonTableBlock extends StatelessWidget {
     return LayoutBuilder(builder: (context, c) {
       Widget standingsTable() {
         return LayoutBuilder(builder: (context, lb) {
+          final sections = _standingSections(leagueId);
+          final bool showPredictCols = sections.any((section) => section.rows.any((row) {
+                final tateishi = '${row['team_name_tateishi'] ?? ''}'.trim();
+                final ejima = '${row['team_name_ejima'] ?? ''}'.trim();
+                return (tateishi.isNotEmpty && tateishi != '—') || (ejima.isNotEmpty && ejima != '—');
+              }));
           final double minNameW = _wChar6;
           // スクロール側（試合〜防御率）の固定幅合計
           final double scrollColsW = _wChar2 + // 試合
@@ -461,7 +260,7 @@ class SeasonTableBlock extends StatelessWidget {
               _wChar2 + // 盗塁
               _wChar3 + // 失策率
               _wChar2 * 3; // 防御率3列
-          final double pinnedBaseW = _wChar2 * 3; // 順位・立・江
+          final double pinnedBaseW = showPredictCols ? _wChar2 * 3 : _wChar2; // 順位(+立・江)
           final double parentW = lb.maxWidth.isFinite ? lb.maxWidth : (pinnedBaseW + minNameW + scrollColsW);
           final double availForName = parentW - pinnedBaseW - scrollColsW;
           final double wName = availForName > minNameW ? availForName : minNameW;
@@ -471,10 +270,19 @@ class SeasonTableBlock extends StatelessWidget {
           Widget pinnedHeader() {
             return Row(children: [
               SizedBox(width: _wChar2, child: _gridCell('順位', h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
-              SizedBox(width: _wChar2, child: _gridCell('立', h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
-              SizedBox(width: _wChar2, child: _gridCell('江', h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
+              if (showPredictCols) ...[
+                SizedBox(width: _wChar2, child: _gridCell('立', h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
+                SizedBox(width: _wChar2, child: _gridCell('江', h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
+              ],
               SizedBox(width: wName, child: _gridCell('チーム', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
             ]);
+          }
+
+          Widget divisionHeader(String label, double width) {
+            return SizedBox(
+              width: width,
+              child: _gridCell(label, h: gridBodyH, bg: const Color(0xFF37474F), fg: Colors.white, weight: FontWeight.bold, align: TextAlign.left),
+            );
           }
 
           Widget scrollHeader() {
@@ -504,9 +312,10 @@ class SeasonTableBlock extends StatelessWidget {
             ]);
           }
 
-          Widget pinnedBodyRow(int i) {
-            final row = cur[i];
-            final int rk = int.tryParse('${row['int_rank']}') ?? (i + 1);
+          Widget pinnedBodyRow(Map<String, dynamic> row, int divisionRank) {
+            final int rk = org.kind == OrgKind.mlb
+                ? divisionRank
+                : (int.tryParse('${row['int_rank']}') ?? divisionRank);
             final Color? teamBg = _parseColorName(row['color_back']);
             final Color? teamFg = _parseColorName(row['color_font']);
             final Color? teamBgTateishi = _parseColorName(row['team_color_back_tateishi']);
@@ -515,32 +324,33 @@ class SeasonTableBlock extends StatelessWidget {
             final Color? teamFgEjima = _parseColorName(row['team_color_font_ejima']);
             return Row(children: [
               SizedBox(width: _wChar2, child: _gridCell('$rk', h: gridBodyH, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
-              SizedBox(
-                width: _wChar2,
-                child: _gridCell(
-                  _num(row['team_name_tateishi']),
-                  h: gridBodyH,
-                  bg: row['flg_atari_tateishi'] == true ? Colors.yellowAccent : teamBgTateishi,
-                  fg: row['flg_atari_tateishi'] == true ? Colors.blueAccent : teamFgTateishi,
-                  weight: row['flg_atari_tateishi'] == true ? FontWeight.bold : null,
+              if (showPredictCols) ...[
+                SizedBox(
+                  width: _wChar2,
+                  child: _gridCell(
+                    _num(row['team_name_tateishi']),
+                    h: gridBodyH,
+                    bg: row['flg_atari_tateishi'] == true ? Colors.yellowAccent : teamBgTateishi,
+                    fg: row['flg_atari_tateishi'] == true ? Colors.blueAccent : teamFgTateishi,
+                    weight: row['flg_atari_tateishi'] == true ? FontWeight.bold : null,
+                  ),
                 ),
-              ),
-              SizedBox(
-                width: _wChar2,
-                child: _gridCell(
-                  _num(row['team_name_ejima']),
-                  h: gridBodyH,
-                  bg: row['flg_atari_ejima'] == true ? Colors.yellowAccent : teamBgEjima,
-                  fg: row['flg_atari_ejima'] == true ? Colors.redAccent : teamFgEjima,
-                  weight: row['flg_atari_ejima'] == true ? FontWeight.bold : null,
+                SizedBox(
+                  width: _wChar2,
+                  child: _gridCell(
+                    _num(row['team_name_ejima']),
+                    h: gridBodyH,
+                    bg: row['flg_atari_ejima'] == true ? Colors.yellowAccent : teamBgEjima,
+                    fg: row['flg_atari_ejima'] == true ? Colors.redAccent : teamFgEjima,
+                    weight: row['flg_atari_ejima'] == true ? FontWeight.bold : null,
+                  ),
                 ),
-              ),
+              ],
               SizedBox(width: wName, child: _gridCell(_num(row['name_team']), h: gridBodyH, bg: teamBg, fg: teamFg, weight: FontWeight.bold)),
             ]);
           }
 
-          Widget scrollBodyRow(int i) {
-            final row = cur[i];
+          Widget scrollBodyRow(Map<String, dynamic> row) {
             final Color? teamBg = _parseColorName(row['color_back']);
             final lotte = '${row['name_team'] ?? ''}'.contains('ロッテ');
             final Color paleBg = teamBg != null ? _paleOf(teamBg, lotte ? 0.9 : 0.72) : Colors.white;
@@ -618,12 +428,19 @@ class SeasonTableBlock extends StatelessWidget {
             ]);
           }
 
+          // MLB は地区ごとに「順位〜防御率」ヘッダーを繰り返す。NPB は先頭1回だけ。
+          final bool headerPerSection = org.kind == OrgKind.mlb && sections.any((s) => s.label.isNotEmpty);
+
           final Widget pinnedCol = Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              pinnedHeader(),
-              for (int i = 0; i < cur.length; i++) pinnedBodyRow(i),
+              if (!headerPerSection) pinnedHeader(),
+              for (final section in sections) ...[
+                if (section.label.isNotEmpty) divisionHeader(section.label, pinnedBaseW + wName),
+                if (headerPerSection) pinnedHeader(),
+                for (var i = 0; i < section.rows.length; i++) pinnedBodyRow(section.rows[i], i + 1),
+              ],
             ],
           );
 
@@ -631,8 +448,12 @@ class SeasonTableBlock extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              scrollHeader(),
-              for (int i = 0; i < cur.length; i++) scrollBodyRow(i),
+              if (!headerPerSection) scrollHeader(),
+              for (final section in sections) ...[
+                if (section.label.isNotEmpty) divisionHeader('', scrollColsW),
+                if (headerPerSection) scrollHeader(),
+                for (final row in section.rows) scrollBodyRow(row),
+              ],
             ],
           );
 
@@ -711,7 +532,7 @@ class SeasonTableBlock extends StatelessWidget {
         ],
       );
 
-      final leagueName = leagueId == 1 ? 'セ・リーグ' : 'パ・リーグ';
+      final leagueName = org.leagueName(leagueId);
       if (pane == SeasonPane.games) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -807,8 +628,15 @@ class PlayerStatCell extends StatelessWidget {
   final Map<String, dynamic> row;
   final double? width;
   final bool showRank;
+  final bool showJapanFlag;
 
-  const PlayerStatCell({super.key, required this.row, this.width, this.showRank = true});
+  const PlayerStatCell({
+    super.key,
+    required this.row,
+    this.width,
+    this.showRank = true,
+    this.showJapanFlag = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -832,7 +660,11 @@ class PlayerStatCell extends StatelessWidget {
       return text == 'true' || text == 't' || text == '1';
     }
 
+    final isJapan = showJapanFlag && isTrue(row['flg_japan']);
+    const japanBg = Color(0xFFF5C6CE); // 薄いクリムゾンレッド
+    final countryEmoji = '${row['emoji_country'] ?? ''}'.trim();
     final marks = [
+      if (isJapan) (countryEmoji.isNotEmpty ? countryEmoji : '🇯🇵'),
       if (isTrue(row['flg_rookie'])) '🔰',
       if (isTrue(row['flg_career_this_year'])) '✨',
       if (isTrue(row['flg_under21'])) '🌱',
@@ -846,7 +678,10 @@ class PlayerStatCell extends StatelessWidget {
       final raw = '${row['colors_user'] ?? ''}';
       final parts = raw.split('/').map((s) => s.trim().toLowerCase()).where((s) => s.isNotEmpty).toList();
       final cols = [for (final part in parts) if (parseColorNameOrNull(part) != null) parseColorNameOrNull(part)!];
-      if (cols.isEmpty) return null;
+      if (cols.isEmpty) {
+        if (isJapan) return BoxDecoration(color: japanBg, borderRadius: BorderRadius.circular(4));
+        return null;
+      }
       if (cols.length == 1) return BoxDecoration(color: cols.first, borderRadius: BorderRadius.circular(4));
       return BoxDecoration(
         gradient: LinearGradient(colors: cols, begin: Alignment.centerLeft, end: Alignment.centerRight),
@@ -863,8 +698,9 @@ class PlayerStatCell extends StatelessWidget {
 
     final decoration = nameBg();
     final hasBg = decoration != null;
-    final nameColor = hasBg ? Colors.white : null;
-    final nameWeight = hasBg ? FontWeight.bold : null;
+    final hasPredictColor = '${row['colors_user'] ?? ''}'.split('/').any((s) => s.trim().isNotEmpty);
+    final nameColor = hasPredictColor ? Colors.white : (isJapan ? const Color(0xFF8B0000) : null);
+    final nameWeight = (hasBg || isJapan) ? FontWeight.bold : null;
     final nameLine = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -912,20 +748,30 @@ class PlayerStatCell extends StatelessWidget {
       width: width,
       height: _statRowH,
       child: ColoredBox(
-        color: isNoRank ? noRankBg : Colors.transparent,
+        color: isNoRank ? noRankBg : (isJapan && !hasPredictColor ? japanBg : Colors.transparent),
         child: Container(
           decoration: BoxDecoration(border: Border.all(color: Colors.black26, width: 1)),
           child: Row(children: [
             if (showRank)
               Expanded(
                 flex: 2,
-                child: cellBg(
+                child: ColoredBox(
+                  color: Colors.black,
                   child: Center(
                     child: rankNum == 1
                         ? const FittedBox(fit: BoxFit.contain, child: Text('👑', style: TextStyle(fontSize: 12, height: 1.0)))
                         : isNoRank
-                            ? const FittedBox(fit: BoxFit.contain, child: Text('-', style: TextStyle(fontSize: 12, height: 1.0)))
-                            : OneLineShrinkText(rankText.isNotEmpty ? '$rankNum' : '—', baseSize: 10, minSize: 1, fast: true),
+                            ? const FittedBox(
+                                fit: BoxFit.contain,
+                                child: Text('-', style: TextStyle(fontSize: 12, height: 1.0, color: Colors.white)),
+                              )
+                            : OneLineShrinkText(
+                                rankText.isNotEmpty ? '$rankNum' : '—',
+                                baseSize: 10,
+                                minSize: 1,
+                                fast: true,
+                                color: Colors.white,
+                              ),
                   ),
                 ),
               ),
@@ -956,12 +802,18 @@ class PlayerStatCell extends StatelessWidget {
   }
 }
 
-/// 項目ごとの個人成績。タイトルを縦に並べ、左がセ・リーグ、右がパ・リーグ。
+/// 項目ごとの個人成績。タイトルを縦に並べ、左が第1リーグ、右が第2リーグ。
 class BothLeaguePersonalStats extends StatelessWidget {
   final List<Map<String, dynamic>> stats;
   final bool pitcher;
+  final OrgConfig org;
 
-  const BothLeaguePersonalStats({super.key, required this.stats, required this.pitcher});
+  const BothLeaguePersonalStats({
+    super.key,
+    required this.stats,
+    required this.pitcher,
+    this.org = OrgConfig.npb,
+  });
 
   static const _pitchingTitles = {'防御率', '最多勝', '奪三振', 'HP', 'ホールド', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'QS率'};
 
@@ -992,24 +844,6 @@ class BothLeaguePersonalStats extends StatelessWidget {
       return rows.where((row) => (int.tryParse('${row['id_league']}') ?? 0) == leagueId && '${row['title'] ?? ''}'.trim() == title).take(10).toList();
     }
 
-    const rankW = 28.0;
-    Widget rankMark(int index, List<Map<String, dynamic>> left, List<Map<String, dynamic>> right) {
-      final source = index < left.length ? left[index] : (index < right.length ? right[index] : null);
-      final raw = source?['int_rank'];
-      final rankNum = raw is int ? raw : raw is num ? raw.round() : int.tryParse('${raw ?? ''}') ?? (index + 1);
-      final mark = rankNum == 1 ? '👑' : (rankNum == 1000 ? '-' : '$rankNum');
-      return Container(
-        width: rankW,
-        height: _statRowH,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: const Color(0xFFBDBDBD),
-          border: Border.all(color: Colors.black26, width: 1),
-        ),
-        child: Text(mark, style: const TextStyle(fontSize: 11, height: 1.0)),
-      );
-    }
-
     return ListView(
       children: [
         for (final title in titles) ...[
@@ -1027,15 +861,16 @@ class BothLeaguePersonalStats extends StatelessWidget {
                 Expanded(
                   child: Container(
                     alignment: Alignment.center,
-                    color: const Color(0xFF0E8E2D),
-                    child: const Text('セ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                    color: org.leagues[0].color,
+                    child: Text(org.leagues[0].name.replaceAll('・リーグ', ''), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
                   ),
                 ),
+                const SizedBox(width: 2),
                 Expanded(
                   child: Container(
                     alignment: Alignment.center,
-                    color: const Color(0xFF01B1EA),
-                    child: const Text('パ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                    color: org.leagues[1].color,
+                    child: Text(org.leagues[1].name.replaceAll('・リーグ', ''), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
                   ),
                 ),
               ],
@@ -1043,16 +878,28 @@ class BothLeaguePersonalStats extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           for (var i = 0; i < 10; i++)
-            if (i < side(1, title).length || i < side(2, title).length)
+            if (i < side(org.leagues[0].id, title).length || i < side(org.leagues[1].id, title).length)
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: i < side(1, title).length ? PlayerStatCell(row: side(1, title)[i], showRank: false) : const SizedBox(height: _statRowH),
+                    child: i < side(org.leagues[0].id, title).length
+                        ? PlayerStatCell(
+                            row: side(org.leagues[0].id, title)[i],
+                            showRank: true,
+                            showJapanFlag: org.kind == OrgKind.mlb,
+                          )
+                        : const SizedBox(height: _statRowH),
                   ),
-                  rankMark(i, side(1, title), side(2, title)),
+                  const SizedBox(width: 2),
                   Expanded(
-                    child: i < side(2, title).length ? PlayerStatCell(row: side(2, title)[i], showRank: false) : const SizedBox(height: _statRowH),
+                    child: i < side(org.leagues[1].id, title).length
+                        ? PlayerStatCell(
+                            row: side(org.leagues[1].id, title)[i],
+                            showRank: true,
+                            showJapanFlag: org.kind == OrgKind.mlb,
+                          )
+                        : const SizedBox(height: _statRowH),
                   ),
                 ],
               ),
@@ -1063,58 +910,3 @@ class BothLeaguePersonalStats extends StatelessWidget {
   }
 }
 
-// 汎用: 個人成績1タイトルのカラム。ヘッダーをクリック/ホバーで全件展開。
-class _StatsColumn extends StatefulWidget {
-  final String title;
-  final double width;
-  final Color headerBg;
-  final List<Map<String, dynamic>> rows; // 既に並び替え済み推奨
-  final Widget Function(Map<String, dynamic>) buildRow;
-
-  const _StatsColumn({
-    super.key,
-    required this.title,
-    required this.width,
-    required this.headerBg,
-    required this.rows,
-    required this.buildRow,
-  });
-
-  @override
-  State<_StatsColumn> createState() => _StatsColumnState();
-}
-
-class _StatsColumnState extends State<_StatsColumn> {
-  bool _expanded = false;
-
-  void _toggle() => setState(() => _expanded = !_expanded);
-
-  @override
-  Widget build(BuildContext context) {
-    const double _rowH = 13.5;
-    const double _headerH = 20.0;
-    final double _baseH = _headerH + _rowH * 5;
-
-    final header = Container(
-      height: _headerH,
-      width: widget.width,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(color: widget.headerBg),
-      child: OneLineShrinkText(widget.title, baseSize: 12, minSize: 6),
-    );
-
-    final firstFive = widget.rows.length <= 5 ? widget.rows : widget.rows.sublist(0, 5);
-    final extras = widget.rows.length <= 5 ? const <Map<String, dynamic>>[] : widget.rows.sublist(5);
-
-    // Revert to simple scroll version behavior at column level (no overlay expansion here).
-    return SizedBox(
-      width: widget.width,
-      child: Column(
-        children: [
-          header,
-          for (final r in firstFive) widget.buildRow(r),
-        ],
-      ),
-    );
-  }
-}

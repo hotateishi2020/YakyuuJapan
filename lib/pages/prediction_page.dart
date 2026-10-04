@@ -7,6 +7,7 @@ import '../tools/app_logger.dart';
 import '../tools/browser_cookie.dart';
 import '../tools/color_parse.dart';
 import '../config/app_design.dart';
+import '../config/org_config.dart';
 import '../tools/json_utils.dart';
 import '../tools/date_format.dart';
 import '../logic/atari_counts.dart';
@@ -15,6 +16,7 @@ import '../View/Text.dart';
 import '../View/LeagueBoardRow.dart';
 import '../View/GamesBoard.dart';
 import '../View/SeasonTable.dart';
+import '../View/MlbPostseasonBracket.dart';
 import '../View/PostseasonBracket.dart';
 import '../logic/postseason_bracket.dart';
 
@@ -47,7 +49,9 @@ class _PredictionPageState extends State<PredictionPage> {
   bool _infoExpanded = true;
   static const _infoCookie = 'koko_info_open';
   static const _viewCookie = 'koko_view_by_item';
-  // 縦型: 0=セ・リーグ, 1=パ・リーグ
+  static const _orgCookie = 'koko_org';
+  OrgKind _orgKind = OrgKind.npb;
+  // 縦型: 0=第1リーグ, 1=第2リーグ
   int _portraitLeagueTab = 0;
   bool _viewByItem = false;
   int _itemTab = 0;
@@ -55,6 +59,8 @@ class _PredictionPageState extends State<PredictionPage> {
   Timer? _gamesRefreshTimer;
   bool _gamesRefreshRunning = false;
   bool _seasonStatsRefreshStarted = false;
+
+  OrgConfig get _org => OrgConfig.of(_orgKind);
 
   // 個人成績の id_user → 表示名
   String _usernameForId(String idUser) => lookupField(npbPlayerStats, 'id_user', idUser, 'username');
@@ -74,7 +80,23 @@ class _PredictionPageState extends State<PredictionPage> {
     if (saved == '0') _infoExpanded = false;
     if (saved == '1') _infoExpanded = true;
     if (readBrowserCookie(_viewCookie) == '1') _viewByItem = true;
+    if (readBrowserCookie(_orgCookie) == 'mlb') _orgKind = OrgKind.mlb;
     _loadThenWatchGames();
+  }
+
+  Future<void> _changeOrg(OrgKind kind) async {
+    if (kind == _orgKind) return;
+    writeBrowserCookie(_orgCookie, OrgConfig.of(kind).label.toLowerCase());
+    setState(() {
+      _orgKind = kind;
+      _portraitLeagueTab = 0;
+      _itemTab = 0;
+      _seasonStatsRefreshStarted = false;
+      isLoading = true;
+      error = null;
+    });
+    _gamesRefreshTimer?.cancel();
+    await _loadThenWatchGames();
   }
 
   void _toggleInfo() {
@@ -160,10 +182,12 @@ class _PredictionPageState extends State<PredictionPage> {
     return '${now.year}-$month-$day';
   }
 
+  String _predictionsPath() => '/predictions?org=${_org.label.toLowerCase()}';
+
   Future<void> _loadThenWatchGames() async {
     await fetchData();
     if (!mounted || error != null) return;
-    if (centralPacificGamesAllFinished(games, _todayKey())) {
+    if (orgGamesAllFinished(games, _todayKey(), _org.leagueIds)) {
       _refreshSeasonStatsOnce();
     }
     _gamesRefreshTimer?.cancel();
@@ -176,8 +200,8 @@ class _PredictionPageState extends State<PredictionPage> {
   Future<void> _refreshGames() async {
     if (!mounted || _gamesRefreshRunning || isLoading) return;
     final today = _todayKey();
-    if (centralPacificGamesAreSettled(games, today)) {
-      if (centralPacificGamesAllFinished(games, today)) {
+    if (orgGamesAreSettled(games, today, _org.leagueIds)) {
+      if (orgGamesAllFinished(games, today, _org.leagueIds)) {
         await _refreshSeasonStatsOnce();
       }
       return;
@@ -186,7 +210,7 @@ class _PredictionPageState extends State<PredictionPage> {
     var refreshStats = false;
     try {
       // 11日分の取得は3分を超える。途中で切るとDBだけ更新されて画面が古いままになる。
-      final scrape = await http.get(Env.api('/fetchGamesNPB')).timeout(const Duration(minutes: 10));
+      final scrape = await http.get(Env.api(_org.gamesFetchPath)).timeout(const Duration(minutes: 10));
       if (!mounted || scrape.statusCode != 200) {
         logger.w('試合スクレイピング失敗: ${scrape.statusCode}');
         return;
@@ -195,22 +219,25 @@ class _PredictionPageState extends State<PredictionPage> {
         _gamesRefreshTimer?.cancel();
         return;
       }
-      final res = await http.get(Env.api('/predictions')).timeout(const Duration(seconds: 30));
+      final res = await http.get(Env.api(_predictionsPath())).timeout(const Duration(seconds: 30));
       if (!mounted || res.statusCode != 200) return;
       final map = jsonDecode(res.body) as Map<String, dynamic>;
       final nextGames = normalizeGames(listMapFromJson(map['games']));
       setState(() {
-        predictions = listMapFromJson(map['predict_team']);
-        standings = listMapFromJson(map['stats_team']);
-        npbPlayerStats = listMapFromJson(map['predict_player']);
-        npbPlayerStatsActual = listMapFromJson(map['stats_player']);
-        games = nextGames;
+        predictions = listMapFromJson(map['predict_team']).where(_org.rowBelongs).toList();
+        standings = listMapFromJson(map['stats_team']).where(_org.rowBelongs).toList();
+        npbPlayerStats = listMapFromJson(map['predict_player']).where(_org.rowBelongs).toList();
+        npbPlayerStatsActual = listMapFromJson(map['stats_player']).where(_org.rowBelongs).toList();
+        games = nextGames.where(_org.gameBelongs).toList();
         postseasonGames = listMapFromJson(map['postseason_games']);
-        showPostseasonBoard = postseasonBoardVisible(serverFlag: map['show_postseason_board'] == true, today: DateTime.now());
-        events = listMapFromJson(map['events']);
-        notifications = listMapFromJson(map['notification']);
+        showPostseasonBoard = postseasonBoardVisible(
+          serverFlag: map['show_postseason_board'] == true,
+          today: DateTime.now(),
+        );
+        events = _orgKind == OrgKind.npb ? listMapFromJson(map['events']) : const [];
+        notifications = _orgKind == OrgKind.npb ? listMapFromJson(map['notification']) : const [];
       });
-      refreshStats = centralPacificGamesAllFinished(nextGames, today);
+      refreshStats = orgGamesAllFinished(games, today, _org.leagueIds);
     } catch (e, st) {
       logger.w('試合情報の定期更新に失敗: $e\n$st');
     } finally {
@@ -221,10 +248,10 @@ class _PredictionPageState extends State<PredictionPage> {
 
   Future<void> _refreshSeasonStatsOnce() async {
     if (!mounted || _seasonStatsRefreshStarted) return;
-    if (!centralPacificGamesAllFinished(games, _todayKey())) return;
+    if (!orgGamesAllFinished(games, _todayKey(), _org.leagueIds)) return;
     _seasonStatsRefreshStarted = true;
     try {
-      final team = await http.get(Env.api('/fetchStatsTeamNPB')).timeout(const Duration(minutes: 5));
+      final team = await http.get(Env.api(_org.teamStatsFetchPath)).timeout(const Duration(minutes: 5));
       if (!mounted || team.statusCode != 200) {
         logger.w('チーム成績スクレイピング失敗: ${team.statusCode}');
         _seasonStatsRefreshStarted = false;
@@ -234,13 +261,13 @@ class _PredictionPageState extends State<PredictionPage> {
         _gamesRefreshTimer?.cancel();
         return;
       }
-      final player = await http.get(Env.api('/fetchStatsPlayerNPB')).timeout(const Duration(minutes: 20));
+      final player = await http.get(Env.api(_org.playerStatsFetchPath)).timeout(const Duration(minutes: 20));
       if (!mounted || player.statusCode != 200) {
         logger.w('個人成績スクレイピング失敗: ${player.statusCode}');
         _seasonStatsRefreshStarted = false;
         return;
       }
-      final res = await http.get(Env.api('/predictions')).timeout(const Duration(seconds: 30));
+      final res = await http.get(Env.api(_predictionsPath())).timeout(const Duration(seconds: 30));
       if (!mounted || res.statusCode != 200) {
         _seasonStatsRefreshStarted = false;
         return;
@@ -258,7 +285,7 @@ class _PredictionPageState extends State<PredictionPage> {
 
   Future<void> fetchData() async {
     try {
-      final uri = Uri.parse('${Env.baseUrl()}/predictions');
+      final uri = Uri.parse('${Env.baseUrl()}${_predictionsPath()}');
       final res = await http.get(uri);
 
       if (res.statusCode != 200) {
@@ -281,15 +308,19 @@ class _PredictionPageState extends State<PredictionPage> {
       final notifs = listMapFromJson(map['notification']);
 
       setState(() {
-        predictions = users;
-        standings = npb;
-        npbPlayerStats = statsPredict; // 左
-        npbPlayerStatsActual = statsActual; // 中央
-        games = normalizeGames(gms);
+        // サーバが org 未対応でも、団体内リーグだけ残す。
+        predictions = users.where(_org.rowBelongs).toList();
+        standings = npb.where(_org.rowBelongs).toList();
+        npbPlayerStats = statsPredict.where(_org.rowBelongs).toList();
+        npbPlayerStatsActual = statsActual.where(_org.rowBelongs).toList();
+        games = normalizeGames(gms).where(_org.gameBelongs).toList();
         postseasonGames = listMapFromJson(map['postseason_games']);
-        showPostseasonBoard = postseasonBoardVisible(serverFlag: map['show_postseason_board'] == true, today: DateTime.now());
-        events = evts;
-        notifications = notifs;
+        showPostseasonBoard = postseasonBoardVisible(
+          serverFlag: map['show_postseason_board'] == true,
+          today: DateTime.now(),
+        );
+        events = _orgKind == OrgKind.npb ? evts : const [];
+        notifications = _orgKind == OrgKind.npb ? notifs : const [];
         isLoading = false;
       });
     } catch (e, st) {
@@ -308,8 +339,9 @@ class _PredictionPageState extends State<PredictionPage> {
     required int selectedIndex,
     required ValueChanged<int> onSelected,
     Color? selectedColor,
-    Map<int, String> leadingAssets = const {},
+    Map<int, String>? leadingAssets,
   }) {
+    final assets = leadingAssets ?? const <int, String>{};
     final Color active = selectedColor ?? ALL_COLOR_APP;
     return SizedBox(
       height: TAB_BAR_H,
@@ -331,7 +363,7 @@ class _PredictionPageState extends State<PredictionPage> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      if (leadingAssets[tabs[i].$2] case final asset?) ...[
+                      if (assets[tabs[i].$2] case final asset?) ...[
                         SizedBox(
                           width: 20,
                           height: 20,
@@ -507,6 +539,7 @@ class _PredictionPageState extends State<PredictionPage> {
       gamesDateFilter: DateFormatUtil.ymdWithOffset(0),
       portraitLayout: portraitLayout,
       pane: pane,
+      org: _org,
     );
   }
 
@@ -532,6 +565,7 @@ class _PredictionPageState extends State<PredictionPage> {
             child: BothLeaguePersonalStats(
               stats: npbPlayerStatsActual,
               pitcher: _batterPitcherTab == 1,
+              org: _org,
             ),
           ),
         ],
@@ -543,46 +577,81 @@ class _PredictionPageState extends State<PredictionPage> {
         playerStats: npbPlayerStatsActual,
         initialDate: DateFormatUtil.ymdWithOffset(0),
         leading: showPostseasonBoard ? [_postseasonBracket(), const SizedBox(height: 6)] : const [],
+        leagues: [
+          for (final league in _org.leagues) (id: league.id, name: league.name, color: league.color),
+        ],
       );
     }
     return ListView(
       children: [
-        _leaguePane(leagueId: 1, pane: SeasonPane.standings, portraitLayout: true),
-        const SizedBox(height: 8),
-        _leaguePane(leagueId: 2, pane: SeasonPane.standings, portraitLayout: true),
+        for (var i = 0; i < _org.leagues.length; i++) ...[
+          if (i > 0) const SizedBox(height: 8),
+          _leaguePane(leagueId: _org.leagues[i].id, pane: SeasonPane.standings, portraitLayout: true),
+        ],
       ],
     );
+  }
+
+  static const _mlbPostseasonCodes = {
+    'WC', 'DS', 'LCS', 'WS',
+    'ALWC', 'NLWC', 'ALWC36', 'ALWC45', 'NLWC36', 'NLWC45',
+    'ALDS', 'NLDS', 'ALDS1', 'ALDS2', 'NLDS1', 'NLDS2',
+    'ALCS', 'NLCS',
+  };
+
+  /// postseason_games に加え、直近ゲームに付いた MLB ポストシーズン code も使う。
+  List<Map<String, dynamic>> _mlbBracketGames() {
+    final byId = <String, Map<String, dynamic>>{};
+    void add(Map<String, dynamic> row) {
+      final id = '${row['id_game'] ?? row['id'] ?? ''}';
+      final key = id.isNotEmpty ? id : '${row['code_game']}_${row['id_team_home']}_${row['id_team_away']}_${row['date_game'] ?? ''}';
+      byId.putIfAbsent(key, () => row);
+    }
+
+    for (final row in postseasonGames) {
+      add(row);
+    }
+    for (final row in games) {
+      final code = '${row['code_game'] ?? ''}'.trim().toUpperCase();
+      if (_mlbPostseasonCodes.contains(code)) add(row);
+    }
+    return byId.values.toList();
   }
 
   Widget _postseasonBracket() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final width = constraints.maxWidth.isFinite ? constraints.maxWidth : BracketGeom.w;
+        final isMlb = _orgKind == OrgKind.mlb;
+        final boardW = isMlb ? MlbBracketGeom.w : BracketGeom.w;
+        final boardH = isMlb ? MlbBracketGeom.h : BracketGeom.h;
+        final width = constraints.maxWidth.isFinite ? constraints.maxWidth : boardW;
         return SizedBox(
           width: width,
-          height: width * BracketGeom.h / BracketGeom.w,
-          child: PostseasonBracket(standings: standings, games: postseasonGames),
+          height: width * boardH / boardW,
+          child: isMlb
+              ? MlbPostseasonBracket(standings: standings, games: _mlbBracketGames())
+              : PostseasonBracket(standings: standings, games: postseasonGames),
         );
       },
     );
   }
 
   Widget _portraitLeagueTabBar() {
+    final assets = <int, String>{
+      for (var i = 0; i < _org.leagues.length; i++)
+        if (_org.leagues[i].logoAsset != null) i: _org.leagues[i].logoAsset!,
+    };
     return _portraitTabBar(
-      tabs: const [
-        ('セ・リーグ', 0),
-        ('パ・リーグ', 1),
+      tabs: [
+        for (var i = 0; i < _org.leagues.length; i++) (_org.leagues[i].name, i),
       ],
       selectedIndex: _portraitLeagueTab,
       onSelected: (i) {
         if (i == _portraitLeagueTab) return;
         setState(() => _portraitLeagueTab = i);
       },
-      selectedColor: _portraitLeagueTab == 0 ? const Color(0xFF0E8E2D) : const Color(0xFF01B1EA),
-      leadingAssets: const {
-        0: 'backend/assets/images/k-central.webp',
-        1: 'backend/assets/images/k-pacific.webp',
-      },
+      selectedColor: _org.leagueAt(_portraitLeagueTab).color,
+      leadingAssets: assets.isEmpty ? null : assets,
     );
   }
 
@@ -1251,6 +1320,7 @@ class _PredictionPageState extends State<PredictionPage> {
             userNameFromPredictions: _userNameFromPredictions,
             compact: compact,
             portraitLayout: isPortrait,
+            org: _org,
           );
         }
 
@@ -1302,18 +1372,13 @@ class _PredictionPageState extends State<PredictionPage> {
                         : IndexedStack(
                             index: _portraitLeagueTab,
                             children: [
-                              portraitLeaguePage(
-                                leagueId: 1,
-                                leagueColor: const Color(0xFF0E8E2D),
-                                logoAsset: 'assets/images/logo_league_central.webp',
-                                leagueLabelPrefix: 'セ',
-                              ),
-                              portraitLeaguePage(
-                                leagueId: 2,
-                                leagueColor: const Color(0xFF01B1EA),
-                                logoAsset: 'assets/images/logo_league_pacific.png',
-                                leagueLabelPrefix: 'パ',
-                              ),
+                              for (final league in _org.leagues)
+                                portraitLeaguePage(
+                                  leagueId: league.id,
+                                  leagueColor: league.color,
+                                  logoAsset: league.logoAsset ?? '',
+                                  leagueLabelPrefix: league.name.replaceAll('・リーグ', ''),
+                                ),
                             ],
                           ),
                   ),
@@ -1335,19 +1400,17 @@ class _PredictionPageState extends State<PredictionPage> {
                     flex: ALL_RATIO_BLOCK_H[1] * 2,
                     child: _viewByItem
                         ? _itemBoard()
-                        : (_portraitLeagueTab == 0
-                            ? centralLeagueBoard(
-                                leagueId: 1,
-                                leagueColor: const Color(0xFF0E8E2D),
-                                logoAsset: 'assets/images/logo_league_central.webp',
-                                leagueLabelPrefix: 'セ',
-                              )
-                            : centralLeagueBoard(
-                                leagueId: 2,
-                                leagueColor: const Color(0xFF01B1EA),
-                                logoAsset: 'assets/images/logo_league_pacific.png',
-                                leagueLabelPrefix: 'パ',
-                              )),
+                        : Builder(
+                            builder: (context) {
+                              final league = _org.leagueAt(_portraitLeagueTab);
+                              return centralLeagueBoard(
+                                leagueId: league.id,
+                                leagueColor: league.color,
+                                logoAsset: league.logoAsset ?? '',
+                                leagueLabelPrefix: league.name.replaceAll('・リーグ', ''),
+                              );
+                            },
+                          ),
                   ),
                 ],
               );
@@ -1365,7 +1428,15 @@ class _PredictionPageState extends State<PredictionPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Headers.globalHeader(HEADER_GLOBAL_H, ALL_COLOR_APP, HEADER_TITLE, HEADER_PAD_VERTICAL, ALL_MARGIN_LEFT),
+                    Headers.globalHeader(
+                      HEADER_GLOBAL_H,
+                      ALL_COLOR_APP,
+                      HEADER_TITLE,
+                      HEADER_PAD_VERTICAL,
+                      ALL_MARGIN_LEFT,
+                      orgKind: _orgKind,
+                      onOrgChanged: _changeOrg,
+                    ),
                     Expanded(
                       child: Padding(
                         padding: EdgeInsets.only(bottom: ALL_SPACE_BLOCK, left: ALL_MARGIN_LEFT, right: ALL_MARGIN_LEFT),

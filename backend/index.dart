@@ -16,20 +16,35 @@ import 'app/DB/t_system_log_error.dart';
 import 'app/DB/m_user.dart';
 import 'app/AppSql.dart';
 import 'app/Achieve.dart';
+import 'app/AceEvaluator.dart';
 import 'app/FetchURL.dart';
+import 'app/FetchMLB.dart';
 import 'app/Lineup.dart';
+import 'app/OrgLeague.dart';
 import 'app/PlayLabel.dart';
 import 'app/Postseason.dart';
 import 'app/Value.dart';
 
-/// /predictions 用の短TTLキャッシュ（同一プロセス内）
-String? _predictionsCacheBody;
-DateTime? _predictionsCacheAt;
+/// /predictions 用の短TTLキャッシュ（同一プロセス内・団体別）
+final Map<String, String> _predictionsCacheBody = {};
+final Map<String, DateTime> _predictionsCacheAt = {};
 const Duration _predictionsCacheTtl = Duration(seconds: 45);
 
 void _clearPredictionsCache() {
-  _predictionsCacheBody = null;
-  _predictionsCacheAt = null;
+  _predictionsCacheBody.clear();
+  _predictionsCacheAt.clear();
+}
+
+bool _rowInLeagues(Map<String, dynamic> row, List<int> leagueIds, {List<String> keys = const ['id_league']}) {
+  for (final key in keys) {
+    final id = int.tryParse('${row[key] ?? ''}') ?? 0;
+    if (leagueIds.contains(id)) return true;
+  }
+  return false;
+}
+
+List<Map<String, dynamic>> _filterByLeagues(List<Map<String, dynamic>> rows, List<int> leagueIds, {List<String> keys = const ['id_league']}) {
+  return [for (final row in rows) if (_rowInLeagues(row, leagueIds, keys: keys)) row];
 }
 
 bool _showPostseasonBoard(List<Map<String, dynamic>> rows) {
@@ -340,7 +355,9 @@ void main() async {
           return Response.ok('offseason', headers: {'x-offseason': '1'});
         }
         await FetchURL.fetchStatsPlayerNPB(conn);
-        return await FetchURL.fetchStatsPlayerNPB(conn);
+        final scraped = await FetchURL.fetchStatsPlayerNPB(conn);
+        await AceEvaluator.refresh(conn, OrgKind.npb.leagueIds);
+        return scraped;
       });
       if (response.statusCode == 200 && response.headers['x-offseason'] != '1') _clearPredictionsCache();
       return response;
@@ -374,16 +391,56 @@ void main() async {
       });
     });
 
+    app.get('/fetchStatsTeamMLB', (Request request) async {
+      final response = await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.STATS_TEAM, (conn) async {
+        return await FetchMLB.fetchStatsTeam(conn);
+      });
+      if (response.statusCode == 200) _clearPredictionsCache();
+      return response;
+    });
+
+    app.get('/fetchStatsPlayerMLB', (Request request) async {
+      final response = await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.STATS_PLAYER, (conn) async {
+        final scraped = await FetchMLB.fetchStatsPlayer(conn);
+        await AceEvaluator.refresh(conn, OrgKind.mlb.leagueIds);
+        return scraped;
+      });
+      if (response.statusCode == 200) _clearPredictionsCache();
+      return response;
+    });
+
+    app.get('/refreshAceFlags', (Request request) async {
+      return await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.STATS_PLAYER, (conn) async {
+        await AceEvaluator.refreshAll(conn);
+        return Response.ok('ok');
+      });
+    });
+
+    app.get('/fetchGamesMLB', (Request request) async {
+      print('fetchGamesMLB');
+      final response = await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.GAMES, (conn) async {
+        return await FetchMLB.fetchGames(conn);
+      });
+      if (response.statusCode == 200) _clearPredictionsCache();
+      return response;
+    });
+
     //タイトル予想画面の表示（並列取得・短TTLキャッシュ・読み取り専用で高速化）
+    // ?org=npb|mlb で団体を切り替える（省略時は npb）
     app.get('/predictions', (Request request) async {
       return await tryCatchAPIReadonly(request, log.Prediction.NAME, log.Prediction.Codes.ENTER_NPB, () async {
+        final org = OrgKind.parse(request.url.queryParameters['org']);
+        final cacheKey = org.code;
         final now = DateTime.now();
-        if (_predictionsCacheBody != null && _predictionsCacheAt != null && now.difference(_predictionsCacheAt!) < _predictionsCacheTtl) {
+        final cachedBody = _predictionsCacheBody[cacheKey];
+        final cachedAt = _predictionsCacheAt[cacheKey];
+        if (cachedBody != null && cachedAt != null && now.difference(cachedAt) < _predictionsCacheTtl) {
           return Response.ok(
-            _predictionsCacheBody!,
+            cachedBody,
             headers: {
               'content-type': 'application/json; charset=utf-8',
               'x-cache': 'HIT',
+              'x-org': org.code,
             },
           );
         }
@@ -445,25 +502,29 @@ void main() async {
           game['lineup'] = lineups[_asInt(game['id_game'])] ?? const <Map<String, dynamic>>[];
         }
         // print(games);
+        final leagueIds = org.leagueIds;
+        final filteredGames = _filterByLeagues(games, leagueIds, keys: const ['id_league_home', 'id_league_away']);
         final payload = <String, dynamic>{
-          'predict_team': Postgres.toJson(results[0]),
-          'predict_player': Postgres.toJson(results[1]),
-          'stats_team': Postgres.toJson(results[2]),
-          'stats_player': Postgres.toJson(results[3]),
-          'games': games,
-          'events': Postgres.toJson(results[6]),
-          'notification': Postgres.toJson(results[7]),
+          'org': org.code,
+          'predict_team': _filterByLeagues(Postgres.toJson(results[0]), leagueIds),
+          'predict_player': _filterByLeagues(Postgres.toJson(results[1]), leagueIds),
+          'stats_team': _filterByLeagues(Postgres.toJson(results[2]), leagueIds),
+          'stats_player': _filterByLeagues(Postgres.toJson(results[3]), leagueIds),
+          'games': filteredGames,
+          'events': org.code == 'npb' ? Postgres.toJson(results[6]) : const <Map<String, dynamic>>[],
+          'notification': org.code == 'npb' ? Postgres.toJson(results[7]) : const <Map<String, dynamic>>[],
           'postseason_games': Postgres.toJson(results[8]),
           'show_postseason_board': _showPostseasonBoard(Postgres.toJson(results[9])),
         };
         final body = jsonEncode(payload);
-        _predictionsCacheBody = body;
-        _predictionsCacheAt = DateTime.now();
+        _predictionsCacheBody[cacheKey] = body;
+        _predictionsCacheAt[cacheKey] = DateTime.now();
         return Response.ok(
           body,
           headers: {
             'content-type': 'application/json; charset=utf-8',
             'x-cache': 'MISS',
+            'x-org': org.code,
           },
         );
       });

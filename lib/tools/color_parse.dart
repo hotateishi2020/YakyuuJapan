@@ -43,6 +43,17 @@ Color? parseColorNameOrNull(String? name) {
     'grey': 0xFF9E9E9E,
     'black': 0xFF000000,
     'white': 0xFFFFFFFF,
+    'tomato': 0xFFFF6347,
+    'firebrick': 0xFFB22222,
+    'sienna': 0xFFA0522D,
+    'khaki': 0xFFF0E68C,
+    'lightyellow': 0xFFFFFFE0,
+    'teal': 0xFF008080,
+    'gainsboro': 0xFFDCDCDC,
+    'darkgreen': 0xFF006400,
+    'darkslateblue': 0xFF483D8B,
+    'darkred': 0xFF8B0000,
+    'lightskyblue': 0xFF87CEFA,
   };
   final v = m[n];
   return v == null ? null : Color(v);

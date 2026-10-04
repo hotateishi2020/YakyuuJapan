@@ -59,3 +59,45 @@ services:
         value: games
       - key: PING_BASE_URL
         value: https://yakyuujapan.onrender.com
+
+  # E: MLB チーム成績（JST 17/13/19 相当）
+  - type: cron
+    name: koko-ping-stats-team-mlb
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile.cron
+    dockerContext: ./backend
+    schedule: "5 4,8,10 * * *"
+    plan: 0.5c-512mb
+    envVars:
+      - key: CRON_JOB
+        value: stats-team-mlb
+      - key: PING_BASE_URL
+        value: https://yakyuujapan.onrender.com
+
+  # F: MLB 個人成績（JST 8/12/15 相当）
+  - type: cron
+    name: koko-ping-stats-player-mlb
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile.cron
+    dockerContext: ./backend
+    schedule: "10 23,3,6 * * *"
+    plan: 0.5c-512mb
+    envVars:
+      - key: CRON_JOB
+        value: stats-player-mlb
+      - key: PING_BASE_URL
+        value: https://yakyuujapan.onrender.com
+
+  # G: MLB 試合（日中10分間隔）
+  - type: cron
+    name: koko-ping-games-mlb-day
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile.cron
+    dockerContext: ./backend
+    schedule: "4,14,24,34,44,54 4-15 * * *"
+    plan: 0.5c-512mb
+    envVars:
+      - key: CRON_JOB
+        value: games-mlb
+      - key: PING_BASE_URL
+        value: https://yakyuujapan.onrender.com

@@ -49,6 +49,44 @@ class BirthPlaceRegistry {
     return null;
   }
 
+  /// Yahoo の `生年月日（満年齢）` → `1998年8月17日（28歳）` を DateTime にする。
+  static DateTime? extractBirthDate(Document doc) {
+    for (final dt in doc.querySelectorAll('dt')) {
+      final label = dt.text.replaceAll(RegExp(r'\s+'), ' ').trim();
+      if (!label.contains('生年月日')) continue;
+      final value = dt.nextElementSibling?.text.replaceAll(RegExp(r'\s+'), ' ').trim() ?? '';
+      final parsed = parseBirthDateText(value);
+      if (parsed != null) return parsed;
+    }
+    return null;
+  }
+
+  static DateTime? parseBirthDateText(String raw) {
+    final m = RegExp(r'(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日').firstMatch(raw);
+    if (m == null) return null;
+    final year = int.parse(m.group(1)!);
+    final month = int.parse(m.group(2)!);
+    final day = int.parse(m.group(3)!);
+    if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+    return DateTime(year, month, day);
+  }
+
+  static Future<void> applyBirthDate(Connection conn, int playerId, DateTime? birth) async {
+    if (playerId <= 0 || birth == null) return;
+    final ymd =
+        '${birth.year.toString().padLeft(4, '0')}-${birth.month.toString().padLeft(2, '0')}-${birth.day.toString().padLeft(2, '0')}';
+    await conn.execute(
+      '''
+        UPDATE m_player
+        SET date_birth = \$1::date,
+            updat = NOW()
+        WHERE id = \$2::int
+          AND date_birth IS DISTINCT FROM \$1::date
+      ''',
+      parameters: [ymd, playerId],
+    );
+  }
+
   /// 選手に出身地を反映。未登録の国・県/州は作成する。既に両方入っている選手はスキップ。
   static Future<void> applyToPlayer(Connection conn, int playerId, String? birthplaceRaw) async {
     if (playerId <= 0) return;

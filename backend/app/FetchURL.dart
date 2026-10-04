@@ -930,10 +930,7 @@ class FetchURL {
                 } else {
                   runs = event.linguisticRuns;
                 }
-                final timelyHit = event.timely &&
-                    (event.result == Value.CodeGameResult.HIT_SINGLE ||
-                        event.result == Value.CodeGameResult.HIT_DOUBLE ||
-                        event.result == Value.CodeGameResult.HIT_TRIPLE);
+                final timelyHit = event.timely && (event.result == Value.CodeGameResult.HIT_SINGLE || event.result == Value.CodeGameResult.HIT_DOUBLE || event.result == Value.CodeGameResult.HIT_TRIPLE);
                 if (timelyHit && runs < 1) runs = 1;
                 runsAssigned = true;
                 plateRuns = runs;
@@ -1060,10 +1057,7 @@ class FetchURL {
           final batterId = playerId(extra.batterName, extra.teamId);
           if (batterId == 0) continue;
           final pitchingTeam = bottom ? idTeamAway : idTeamHome;
-          final onBattingSide = extra.extra.result == Value.CodeGameResult.PINCH_HITTER ||
-              extra.extra.result == Value.CodeGameResult.PINCH_RUNNER ||
-              extra.extra.result == Value.CodeGameResult.STEAL_BASE_SAFE ||
-              extra.extra.result == Value.CodeGameResult.STEAL_BASE_OUT;
+          final onBattingSide = extra.extra.result == Value.CodeGameResult.PINCH_HITTER || extra.extra.result == Value.CodeGameResult.PINCH_RUNNER || extra.extra.result == Value.CodeGameResult.STEAL_BASE_SAFE || extra.extra.result == Value.CodeGameResult.STEAL_BASE_OUT;
           final nameTeam = onBattingSide ? extra.teamId : pitchingTeam;
           final detail = t_game_details();
           detail.id_game = gameId;
@@ -1381,10 +1375,7 @@ class FetchURL {
             detail.code_position_from = _starterPosition(parsed, half.bottom, plate.batterName);
           }
 
-          final onBattingSide = event.result == Value.CodeGameResult.PINCH_HITTER ||
-              event.result == Value.CodeGameResult.PINCH_RUNNER ||
-              event.result == Value.CodeGameResult.STEAL_BASE_SAFE ||
-              event.result == Value.CodeGameResult.STEAL_BASE_OUT;
+          final onBattingSide = event.result == Value.CodeGameResult.PINCH_HITTER || event.result == Value.CodeGameResult.PINCH_RUNNER || event.result == Value.CodeGameResult.STEAL_BASE_SAFE || event.result == Value.CodeGameResult.STEAL_BASE_OUT;
           final nameTeam = onBattingSide ? battingTeam : pitchingTeam;
           if (event.exitName.isNotEmpty) {
             final exitId = playerId(event.exitName, nameTeam);
@@ -1413,10 +1404,7 @@ class FetchURL {
               detail.int_runs = event.linguisticRuns;
             }
             plateRuns = detail.int_runs;
-            final timelyHit = event.timely &&
-                (event.result == Value.CodeGameResult.HIT_SINGLE ||
-                    event.result == Value.CodeGameResult.HIT_DOUBLE ||
-                    event.result == Value.CodeGameResult.HIT_TRIPLE);
+            final timelyHit = event.timely && (event.result == Value.CodeGameResult.HIT_SINGLE || event.result == Value.CodeGameResult.HIT_DOUBLE || event.result == Value.CodeGameResult.HIT_TRIPLE);
             if (timelyHit && detail.int_runs < 1) {
               detail.int_runs = 1;
             }
@@ -1804,7 +1792,18 @@ class FetchURL {
     return false;
   }
 
-  static int? _matchClubId(String raw, List<CareerClub> clubs) {
+  static int? matchCareerClubId(
+    String raw,
+    List<CareerClub> clubs, {
+    bool preferMlb = false,
+  }) =>
+      _matchClubId(raw, clubs, preferMlb: preferMlb);
+
+  static int? _matchClubId(
+    String raw,
+    List<CareerClub> clubs, {
+    bool preferMlb = false,
+  }) {
     final name = raw.replaceAll(RegExp(r'[\s　]'), '').replaceAll('・', '');
     if (name.isEmpty) return null;
     int? bestId;
@@ -1816,7 +1815,10 @@ class FetchURL {
       if (short.length >= 2 && name.contains(short)) score = short.length * 10;
       if (name.length >= 2 && full.contains(name)) score = max(score, name.length * 10 + 1);
       if (score == 0) continue;
-      final total = score * 10 + ((club.league == 1 || club.league == 2) ? 1 : 0);
+      final leagueBonus = preferMlb
+          ? ((club.league == 3 || club.league == 4) ? 1 : 0)
+          : ((club.league == 1 || club.league == 2) ? 1 : 0);
+      final total = score * 10 + leagueBonus;
       if (total > bestScore) {
         bestScore = total;
         bestId = club.id;
@@ -2042,11 +2044,11 @@ class FetchURL {
           statsPlayer.seasonWins = wins;
           statsPlayer.seasonStrikeouts = strikeouts;
           statsPlayer.seasonEra = era;
-          final playerHref = tds[1].querySelector('a')?.attributes['href']?.trim() ?? '';
+          final playerHref = tds[1].querySelector('a[href*="/mlb/player/"]')?.attributes['href']?.trim() ??
+              tds[1].querySelector('a')?.attributes['href']?.trim() ??
+              '';
           if (playerHref.isNotEmpty) {
-            statsPlayer.playerUrl = playerHref.startsWith('http')
-                ? playerHref
-                : 'https://baseball.yahoo.co.jp$playerHref';
+            statsPlayer.playerUrl = playerHref.startsWith('http') ? playerHref : 'https://baseball.yahoo.co.jp$playerHref';
           }
           listStats.add(statsPlayer);
         } catch (e) {
@@ -2201,11 +2203,29 @@ class FetchURL {
 
   /// MLB 個人成績用。略称（NYY 等）または name_short で球団を引き、未登録選手を作る。
   /// [playerUrl] があれば出身地を取り、国・県/州を登録する。
+  /// [fetchProfile] が false のときは URL 紐づけのみ（ランキング横断の一括補完用）。
+  static Future<void> ensureMlbRankingPlayer(
+    Connection conn,
+    String playerName,
+    String teamToken, {
+    String? playerUrl,
+    bool fetchProfile = true,
+  }) async {
+    await _ensureMlbRankingPlayer(
+      conn,
+      playerName,
+      teamToken,
+      playerUrl: playerUrl,
+      fetchProfile: fetchProfile,
+    );
+  }
+
   static Future<void> _ensureMlbRankingPlayer(
     Connection conn,
     String playerName,
     String teamToken, {
     String? playerUrl,
+    bool fetchProfile = true,
   }) async {
     final name = StringTool.noSpace(playerName);
     final teamKey = teamToken.trim();
@@ -2221,19 +2241,56 @@ class FetchURL {
     final teamId = teamRows.first.toColumnMap()['id'] as int;
     final existing = await conn.execute(
       '''
-        SELECT id, name_full, id_country, url FROM m_player
+        SELECT id, name_full, id_country, url, date_birth FROM m_player
         WHERE id_team = \$1::int
+          AND COALESCE(flg_delete, FALSE) = FALSE
           AND (
             name_full = \$2::text
             OR name_last = \$2::text
             OR COALESCE(name_last, '') || COALESCE(name_first, '') = \$2::text
+            OR name_full LIKE \$2::text || '%'
+            OR \$2::text LIKE name_full || '%'
+            OR (
+              COALESCE(name_last, '') <> ''
+              AND length(name_last) >= 2
+              AND \$2::text LIKE '%' || name_last
+            )
+            OR (
+              length(regexp_replace(\$2::text, '^.*?[\\.．]', '')) >= 2
+              AND (
+                name_full LIKE '%' || regexp_replace(\$2::text, '^.*?[\\.．]', '')
+                OR regexp_replace(name_full, '^.*・', '')
+                     = regexp_replace(\$2::text, '^.*?[\\.．]', '')
+                OR name_last = regexp_replace(\$2::text, '^.*?[\\.．]', '')
+              )
+            )
+            OR (
+              position('・' in name_full) > 0
+              AND length(regexp_replace(name_full, '^.*・', '')) >= 2
+              AND (
+                \$2::text LIKE '%' || regexp_replace(name_full, '^.*・', '')
+                OR regexp_replace(\$2::text, '^.*?[\\.．]', '')
+                     = regexp_replace(name_full, '^.*・', '')
+              )
+            )
           )
+        ORDER BY
+          CASE
+            WHEN name_full = \$2::text THEN 0
+            WHEN COALESCE(name_last, '') || COALESCE(name_first, '') = \$2::text THEN 1
+            WHEN name_last = \$2::text THEN 2
+            WHEN name_full LIKE \$2::text || '%' THEN 3
+            WHEN \$2::text LIKE name_full || '%' THEN 4
+            ELSE 5
+          END,
+          length(COALESCE(name_full, '')) DESC
         LIMIT 1
       ''',
       parameters: [teamId, name],
     );
     var playerId = 0;
     var needsCountry = true;
+    var needsBirth = true;
     var storedUrl = '';
     if (existing.isNotEmpty) {
       final row = existing.first.toColumnMap();
@@ -2241,6 +2298,7 @@ class FetchURL {
       storedUrl = '${row['url'] ?? ''}'.trim();
       final countryRaw = row['id_country'];
       needsCountry = countryRaw == null || '$countryRaw' == '0';
+      needsBirth = row['date_birth'] == null;
       final full = '${row['name_full'] ?? ''}';
       if (full.isEmpty) {
         await conn.execute(
@@ -2278,16 +2336,18 @@ class FetchURL {
       );
     }
 
-    if (!needsCountry) return;
-    final profileUrl = url.isNotEmpty ? url : storedUrl;
+    if (!fetchProfile) return;
+    if (!needsCountry && !needsBirth) return;
+    final profileUrl = (url.isNotEmpty ? url : storedUrl).replaceFirst(RegExp(r'/top/?$'), '/');
     if (profileUrl.isEmpty) return;
     try {
       final res = await http.get(Uri.parse(profileUrl)).timeout(const Duration(seconds: 25));
       if (res.statusCode != 200) return;
       final doc = parse(_decodeHtml(res));
-      await BirthPlaceRegistry.applyFromProfile(conn, playerId, doc);
+      if (needsCountry) await BirthPlaceRegistry.applyFromProfile(conn, playerId, doc);
+      if (needsBirth) await BirthPlaceRegistry.applyBirthDate(conn, playerId, BirthPlaceRegistry.extractBirthDate(doc));
     } catch (e) {
-      print('MLB出身地取得スキップ ($name): $e');
+      print('MLBプロフィール取得スキップ ($name): $e');
     }
   }
 
@@ -2402,8 +2462,7 @@ class FetchURL {
   }
 
   /// Yahoo ランキング表の「選手名 (球団)」セルを NPB/MLB 共通で分解する。
-  static ({String player, String team}) parseYahooRankingPlayerCell(String raw) =>
-      _parseYahooRankingPlayerCell(raw);
+  static ({String player, String team}) parseYahooRankingPlayerCell(String raw) => _parseYahooRankingPlayerCell(raw);
 
   /// Yahoo ランキング表の「選手名 (球団)」セルを NPB/MLB 共通で分解する。
   static ({String player, String team}) _parseYahooRankingPlayerCell(String raw) {
@@ -2634,23 +2693,7 @@ class _PlateDir {
 
 bool _isBoxPlate(String result) {
   final r = Value.CodeGameResult;
-  return result == r.HIT_SINGLE ||
-      result == r.HIT_DOUBLE ||
-      result == r.HIT_TRIPLE ||
-      result == r.HOME_RUN ||
-      result == r.OUT_FLY ||
-      result == r.OUT_GROUND ||
-      result == r.OUT_POP_UP ||
-      result == r.OUT_DOUBLE_PLAY ||
-      result == r.OUT_LINE_DRIVE ||
-      result == r.SACRIFICE_BUNT ||
-      result == r.SACRIFICE_FLY ||
-      result == r.SQUEEZE ||
-      result == r.STRIKE_OUT ||
-      result == r.WALK_BALL ||
-      result == r.WALK_DEAD ||
-      result == r.WALK_ERROR ||
-      result == r.ERROR_FIELDING;
+  return result == r.HIT_SINGLE || result == r.HIT_DOUBLE || result == r.HIT_TRIPLE || result == r.HOME_RUN || result == r.OUT_FLY || result == r.OUT_GROUND || result == r.OUT_POP_UP || result == r.OUT_DOUBLE_PLAY || result == r.OUT_LINE_DRIVE || result == r.SACRIFICE_BUNT || result == r.SACRIFICE_FLY || result == r.SQUEEZE || result == r.STRIKE_OUT || result == r.WALK_BALL || result == r.WALK_DEAD || result == r.WALK_ERROR || result == r.ERROR_FIELDING;
 }
 
 /// 出場成績の表記（左２、中安、二ゴロ）が、テキスト速報で付いた結果コードと同じ打席か。
@@ -2732,9 +2775,7 @@ Future<void> _fillMissingDirections(Connection conn, int idGame, Map<String, Lis
       var matched = -1;
       if (_boxMatches(box[bi], plate.result)) {
         matched = bi;
-      } else if (bi + 1 < box.length &&
-          _boxMatches(box[bi + 1], plate.result) &&
-          (i + 1 >= live.length || !_boxMatches(box[bi], live[i + 1].result))) {
+      } else if (bi + 1 < box.length && _boxMatches(box[bi + 1], plate.result) && (i + 1 >= live.length || !_boxMatches(box[bi], live[i + 1].result))) {
         matched = bi + 1;
       } else if (i + 1 < live.length && _boxMatches(box[bi], live[i + 1].result)) {
         continue;
@@ -2812,14 +2853,7 @@ class _StoredPlate {
   }
 
   bool sameSituation(_StoredDetail row) {
-    return inning == row.inning &&
-        bottom == row.bottom &&
-        order == row.order &&
-        batter == row.batter &&
-        outs == row.outs &&
-        runnerFirst == row.runnerFirst &&
-        runnerSecond == row.runnerSecond &&
-        runnerThird == row.runnerThird;
+    return inning == row.inning && bottom == row.bottom && order == row.order && batter == row.batter && outs == row.outs && runnerFirst == row.runnerFirst && runnerSecond == row.runnerSecond && runnerThird == row.runnerThird;
   }
 }
 

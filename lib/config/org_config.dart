@@ -20,6 +20,9 @@ class OrgLeague {
 class OrgConfig {
   final OrgKind kind;
   final String label;
+  final String logoAsset;
+  final Color tabColor;
+  final Color tabForeground;
   final List<OrgLeague> leagues;
   final String gamesFetchPath;
   final String teamStatsFetchPath;
@@ -28,6 +31,9 @@ class OrgConfig {
   const OrgConfig({
     required this.kind,
     required this.label,
+    required this.logoAsset,
+    required this.tabColor,
+    required this.tabForeground,
     required this.leagues,
     required this.gamesFetchPath,
     required this.teamStatsFetchPath,
@@ -64,9 +70,16 @@ class OrgConfig {
     return leagues.any((league) => league.name == name);
   }
 
+  /// 非選択時のタブ背景（薄いグレー）。
+  static const tabIdleColor = Color(0xFFE8E8ED);
+
   static const npb = OrgConfig(
     kind: OrgKind.npb,
     label: 'NPB',
+    logoAsset: 'backend/assets/images/logo_npb.png',
+    // 添付 NPB ロゴの赤（#CB0115）
+    tabColor: Color(0xFFCB0115),
+    tabForeground: Colors.white,
     leagues: [
       OrgLeague(id: 1, name: 'セ・リーグ', color: Color(0xFF0E8E2D), logoAsset: 'backend/assets/images/k-central.webp'),
       OrgLeague(id: 2, name: 'パ・リーグ', color: Color(0xFF01B1EA), logoAsset: 'backend/assets/images/k-pacific.webp'),
@@ -79,9 +92,12 @@ class OrgConfig {
   static const mlb = OrgConfig(
     kind: OrgKind.mlb,
     label: 'MLB',
+    logoAsset: 'backend/assets/images/logo_mlb.webp',
+    tabColor: Color(0xFF002D72),
+    tabForeground: Colors.white,
     leagues: [
-      OrgLeague(id: 3, name: 'ア・リーグ', color: Color(0xFF002D72)),
-      OrgLeague(id: 4, name: 'ナ・リーグ', color: Color(0xFFC8102E)),
+      OrgLeague(id: 3, name: 'ア・リーグ', color: Color(0xFFC8102E)),
+      OrgLeague(id: 4, name: 'ナ・リーグ', color: Color(0xFF002D72)),
     ],
     gamesFetchPath: '/fetchGamesMLB',
     teamStatsFetchPath: '/fetchStatsTeamMLB',

@@ -13,8 +13,13 @@ class YahooTeamNames {
   };
 
   static String normalize(String raw) {
-    final text = raw.replaceAll(RegExp(r'\s+'), '').trim();
+    var text = raw.replaceAll(RegExp(r'\s+'), '').trim();
     if (text.isEmpty) return text;
+    // 「ボストン・レッドソックス」→「レッドソックス」
+    if (text.contains('・')) {
+      final parts = text.split('・').where((e) => e.isNotEmpty).toList();
+      if (parts.isNotEmpty) text = parts.last;
+    }
     return _aliases[text] ?? text;
   }
 }

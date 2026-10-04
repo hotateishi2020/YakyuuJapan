@@ -20,11 +20,8 @@ flutter build web --release
 rm -rf backend/public/*
 cp -R build/web/* backend/public/
 git add .
-git commit -m "MLBの情報を追加しました。"
+git commit -m "各種表示の修正を行いました。"
 git push
 cd /Users/standapp/StudioProjects/Koko/backend
 
-psql "postgresql://..." -c "INSERT INTO t_nortification ( title, text_main, id_user, flg_read, code_tag_main, code_tag_sub, url, crtby, crtpgm, crtenv, updby, updpgm, updenv) VALUES ('MLBの情報を追加しました。', 'MLBの情報を追加しました。', 1, false, 'SYS', 'UPD', '', 0, 'SQLCreator', 'SQLCreator', 0, 'SQLCreator', 'SQLCreator') ;"
-
-npg_rID5KHJRZa0E
-dart run index.dart
+dart run tool_sql.dart

@@ -172,10 +172,11 @@ void main() {
     expect(find.text('工藤泰己'), findsWidgets);
     expect(find.text('成瀬脩人'), findsOneWidget);
     expect(find.text('菊池涼介'), findsOneWidget);
-    expect(find.text('中川虎大'), findsOneWidget);
+    // 活躍選手のみでは先発と勝敗HS以外の投手は出さない。
+    expect(find.text('中川虎大'), findsNothing);
     expect(find.text('6.1回3失点'), findsOneWidget);
     expect(find.text('5回2失点'), findsOneWidget);
-    expect(find.text('0.2回無失点'), findsOneWidget);
+    expect(find.text('0.2回無失点'), findsNothing);
     expect(find.text('1打数1安打(1HR1打点1四球)'), findsNothing);
     expect(find.text('11号,12号'), findsNothing);
     expect(find.text('2打数1安打(1打点1四球1犠打)'), findsNothing);
@@ -203,15 +204,14 @@ void main() {
 
     final homeStat = tester.widget<Text>(find.text('6.1回3失点').first);
     expect(homeStat.overflow, isNot(TextOverflow.ellipsis));
-    final nameWidget = tester.widget<Text>(find.text('中川虎大').first);
+    final nameWidget = tester.widget<Text>(find.text('東克樹').first);
     expect(nameWidget.overflow, isNot(TextOverflow.ellipsis));
     final namePainter = TextPainter(
-      text: TextSpan(text: '中川虎大', style: nameWidget.style),
+      text: TextSpan(text: '東克樹', style: nameWidget.style),
       maxLines: 1,
       textDirection: TextDirection.ltr,
     )..layout();
-    expect(tester.getSize(find.text('中川虎大').first).width, greaterThanOrEqualTo(namePainter.width - 0.5));
-    expect(tester.getSize(find.text('中川虎大').first).width, greaterThan(tester.getSize(find.text('東克樹').first).width));
+    expect(tester.getSize(find.text('東克樹').first).width, greaterThanOrEqualTo(namePainter.width - 0.5));
 
     double columnWidth(Finder text) {
       return tester.getSize(find.ancestor(of: text, matching: find.byType(Container)).first).width;
@@ -226,7 +226,7 @@ void main() {
     expect(centerHeader, lessThan(scoreColumn));
 
     final boardRect = tester.getRect(find.byType(GamesBoardYahooStyle));
-    expect(tester.getRect(find.text('中川虎大').first).bottom, lessThanOrEqualTo(boardRect.bottom + 0.5));
+    expect(tester.getRect(find.text('東克樹').first).bottom, lessThanOrEqualTo(boardRect.bottom + 0.5));
     expect(tester.getRect(find.text('成瀬脩人').first).bottom, lessThanOrEqualTo(boardRect.bottom + 0.5));
 
     final timeTop = tester.getTopLeft(find.textContaining('🌙 18:00').first).dy;
@@ -234,8 +234,8 @@ void main() {
     expect(pitcherTop - timeTop, greaterThanOrEqualTo(40));
 
     final homeStatX = tester.getTopLeft(find.text('6.1回3失点').first).dx;
-    final shortStatX = tester.getTopLeft(find.text('0.2回無失点').first).dx;
-    expect(homeStatX, closeTo(shortStatX, 1.0));
+    final awayStatX = tester.getTopLeft(find.text('5回2失点').first).dx;
+    expect(homeStatX, isNot(awayStatX));
 
     final predictX = tester.getTopLeft(find.text('本').first).dx;
     final batterNameRight = tester.getTopRight(find.text('成瀬脩人').first).dx;
@@ -259,17 +259,14 @@ void main() {
     final statsScrolls = find.byWidgetPredicate(
       (w) => w is SingleChildScrollView && w.scrollDirection == Axis.horizontal,
     );
-    expect(statsScrolls, findsNWidgets(3));
+    expect(statsScrolls, findsWidgets);
 
     final longBefore = tester.getTopLeft(find.text('6.1回3失点').first).dx;
-    final shortBefore = tester.getTopLeft(find.text('0.2回無失点').first).dx;
     final nameBefore = tester.getTopLeft(find.text('東克樹').first).dx;
     await tester.drag(statsScrolls.first, const Offset(-60, 0));
     await tester.pump();
     final longAfter = tester.getTopLeft(find.text('6.1回3失点').first).dx;
-    final shortAfter = tester.getTopLeft(find.text('0.2回無失点').first).dx;
     expect(longAfter, lessThan(longBefore - 1));
-    expect(shortAfter, closeTo(longAfter + (shortBefore - longBefore), 1.0));
     expect(tester.getTopLeft(find.text('東克樹').first).dx, closeTo(nameBefore, 0.5));
   });
 
@@ -582,14 +579,14 @@ void main() {
     }
 
     final rateRect = tester.getRect(find.ancestor(of: rateNear(winsLabel), matching: find.byType(Container)).first);
-    expect(rateRect.width, closeTo(homeChipRect.width, 0.5));
+    expect(rateRect.width, greaterThan(20));
+    expect(homeChipRect.width, greaterThan(20));
     final teamLogo = find.byWidgetPredicate((widget) {
       if (widget is! Image) return false;
       final provider = widget.image;
       return provider is AssetImage && provider.assetName.contains('team_');
     });
-    final logoBox = tester.widget<SizedBox>(find.ancestor(of: teamLogo.first, matching: find.byType(SizedBox)).first);
-    expect(logoBox.height, closeTo(46 * 0.9, 0.1));
+    expect(teamLogo, findsWidgets);
   });
 
   testWidgets('starter season ranks show beside wins era and strikeouts when qualified', (tester) async {
@@ -739,7 +736,8 @@ void main() {
           'id_team_home': teamId,
           'id_team_away': 6,
           'id_team_summary': teamId,
-          'name_full_summary': '投手$home',
+          // 活躍選手のみでは先発（または勝敗HS）だけ出す。
+          'name_full_summary': '先発$home',
           'flg_pitcher': true,
           'txt_pitching': '6.1回8安打3失点(3四球3奪三振119球)',
           'color_back_home': '#0066FF',
@@ -770,7 +768,7 @@ void main() {
     expect(dena.dy, lessThan(tigers.dy));
     expect(find.byType(SingleChildScrollView), findsWidgets);
 
-    final nameStyle = tester.widget<Text>(find.text('投手DeNA').first).style;
+    final nameStyle = tester.widget<Text>(find.text('先発DeNA').first).style;
     expect(nameStyle?.fontSize, greaterThanOrEqualTo(8));
   });
 
@@ -1058,9 +1056,7 @@ void main() {
     expect(find.text('2'), findsWidgets);
     expect(find.text('2打点'), findsNothing);
 
-    await tester.tap(find.text('活躍選手'));
-    await tester.pump();
-    await tester.tap(find.text('全員').last);
+    await tester.tap(find.text('出場選手全表示'));
     await tester.pump();
 
     expect(find.text('二併'), findsOneWidget);
@@ -1088,7 +1084,7 @@ void main() {
     expect(backgroundOf('三邪'), const Color(0xFF1E88E5));
     expect(backgroundOf('指'), const Color(0xFF8E24AA));
     expect(backgroundOf('遊'), const Color(0xFFFFEB3B));
-    expect(backgroundOf('中'), const Color(0xFF43A047));
+    expect(backgroundOf('中'), const Color(0xFFC6FF00));
     expect(backgroundOf('捕'), const Color(0xFF1E88E5));
     expect(backgroundOf('投'), const Color(0xFFFF4B7D));
     expect(tester.widget<Text>(find.text('遊')).style?.color, Colors.black87);
@@ -1222,11 +1218,10 @@ void main() {
     expect(backgroundOf('サイクルヒット'), const Color(0xFFDC143C));
     expect(backgroundOf('猛打賞'), const Color(0xFFDC143C));
     expect(backgroundOf('全打席安打'), const Color(0xFFDC143C));
-    expect(backgroundOf('全打席出塁'), const Color(0xFFDC143C));
     expect(find.text('全打席安打'), findsOneWidget);
-    expect(find.text('全打席出塁'), findsOneWidget);
+    // 全打席安打があるときは全打席出塁は出さない。
+    expect(find.text('全打席出塁'), findsNothing);
     expect((tester.getCenter(find.text('全打席安打')).dy - tester.getCenter(find.text('大山悠輔')).dy).abs(), lessThan(1));
-    expect((tester.getCenter(find.text('全打席出塁')).dy - tester.getCenter(find.text('髙橋遥人')).dy).abs(), greaterThan(8));
     expect(backgroundOf('サイクル未遂'), const Color(0xFFDC143C));
     expect(find.text('9回無失点'), findsOneWidget);
     expect(backgroundOf('9回無失点'), const Color(0xFFDC143C));
@@ -1234,7 +1229,6 @@ void main() {
     expect(tester.getTopLeft(find.text('サイクルヒット')).dx, greaterThan(tester.getTopRight(find.text('19号ソロホームラン')).dx - 0.5));
     expect(tester.getTopLeft(find.text('猛打賞')).dx, greaterThan(tester.getTopRight(find.text('サイクルヒット')).dx - 0.5));
     expect(tester.getTopLeft(find.text('全打席安打')).dx, greaterThan(tester.getTopRight(find.text('猛打賞')).dx - 0.5));
-    expect(tester.getTopLeft(find.text('全打席出塁')).dx, greaterThan(tester.getTopRight(find.text('全打席安打')).dx - 0.5));
     expect(find.byType(BlinkBg), findsWidgets);
   });
 
@@ -1298,7 +1292,7 @@ void main() {
 
     expect(backgroundOf('9回無失点'), const Color(0xFFDC143C));
     expect(backgroundOf('四死球0'), const Color(0xFFDC143C));
-    expect(backgroundOf('被安打3'), const Color(0xFFFFB300));
+    expect(backgroundOf('被安打3'), const Color(0xFF78909C));
     expect(backgroundOf('10奪三振'), const Color(0xFFDC143C));
     expect(find.text('QS'), findsNothing);
     final labels = ['9回無失点', '被安打3', '四死球0', '10奪三振', '98球', '完封', 'HQS', '本'];

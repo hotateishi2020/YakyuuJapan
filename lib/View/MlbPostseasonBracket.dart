@@ -7,9 +7,9 @@ import 'GamesBoard.dart';
 
 const _eliminatedBg = Color(0xFFBDBDBD);
 
-/// OrgConfig と同じ: ア・リーグ＝紺、ナ・リーグ＝赤。
-const _alColor = Color(0xFF002D72);
-const _nlColor = Color(0xFFC8102E);
+/// OrgConfig と同じ: ア・リーグ＝赤、ナ・リーグ＝紺。
+const _alColor = Color(0xFFC8102E);
+const _nlColor = Color(0xFF002D72);
 const _winLine = Color(0xFFFFD600);
 
 /// NPB 同様、下のチームカードから上へ勝ち上がる配置。
@@ -119,6 +119,14 @@ class MlbPostseasonBracket extends StatelessWidget {
               size: const Size(MlbBracketGeom.boardW, MlbBracketGeom.h),
               painter: _MlbBracketLinePainter(board),
             ),
+            _cornerLeagueLogo(
+              left: 10,
+              asset: 'backend/assets/images/logo_al.png',
+            ),
+            _cornerLeagueLogo(
+              left: MlbBracketGeom.boardW - 10 - 88,
+              asset: 'backend/assets/images/logo_nl.png',
+            ),
             _stageBox(MlbBracketGeom.ws, 'WORLD SERIES', fontSize: 14, background: const Color(0xFF111111)),
             _stageBox(MlbBracketGeom.alCs, 'ALCS', background: _alColor),
             _stageBox(MlbBracketGeom.nlCs, 'NLCS', background: _nlColor),
@@ -195,6 +203,23 @@ class MlbPostseasonBracket extends StatelessWidget {
       _starsOnLine(MlbBracketGeom.nlDs1X, nlCs.center.dy, nlDs1.top, toLeft: false, wins: board.nlCs.winsHigh, slots: 4),
       _starsOnLine(MlbBracketGeom.nlCsX, ws.center.dy, nlCs.top, toLeft: false, wins: board.worldSeries.winsLow, slots: 4),
     ];
+  }
+
+  /// 左上＝ア・リーグ、右上＝ナ・リーグ。背景透過 PNG。
+  Widget _cornerLeagueLogo({required double left, required String asset}) {
+    const size = 88.0;
+    return Positioned(
+      left: left,
+      top: 6,
+      width: size,
+      height: size,
+      child: Image.asset(
+        asset,
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.high,
+        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+      ),
+    );
   }
 
   Widget _starsOnLine(double lineX, double y1, double y2, {required bool toLeft, required int wins, required int slots}) {
@@ -308,17 +333,24 @@ class MlbPostseasonBracket extends StatelessWidget {
           child: Column(
             children: [
               ColoredBox(
-                color: leagueColor,
+                color: out ? _eliminatedBg : leagueColor,
                 child: SizedBox(
                   height: 18,
                   width: double.infinity,
                   child: Center(
-                    child: Text(
-                      rankLabel,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: rankLabel.length >= 4 ? 9 : 10,
-                        fontWeight: FontWeight.bold,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                        child: Text(
+                          rankLabel,
+                          maxLines: 1,
+                          style: TextStyle(
+                            color: out ? Colors.black87 : Colors.white,
+                            fontSize: rankLabel.length >= 10 ? 7 : (rankLabel.length >= 5 ? 8 : 10),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -341,11 +373,30 @@ class MlbPostseasonBracket extends StatelessWidget {
                   child: Center(
                     child: unknown
                         ? const SizedBox.shrink()
-                        : Text(
-                            team.name,
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            style: TextStyle(color: nameFg, fontWeight: FontWeight.bold, fontSize: 9, height: 1.1),
+                        : Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 2),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    team.name,
+                                    textAlign: TextAlign.center,
+                                    maxLines: 1,
+                                    softWrap: false,
+                                    style: TextStyle(
+                                      color: nameFg,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: team.name.length >= 7 ? 8 : 9,
+                                      height: 1.1,
+                                    ),
+                                  ),
+                                  if (team.hasJapanPlayer)
+                                    const Text(' 🇯🇵', style: TextStyle(fontSize: 10, height: 1)),
+                                ],
+                              ),
+                            ),
                           ),
                   ),
                 ),

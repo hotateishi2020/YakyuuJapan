@@ -174,7 +174,7 @@ List<BoxPlate> parseBoxPlates(Document doc, int idTeamAway, int idTeamHome) {
     final position = _badgePosition(tds.first.text);
     final name = StringTool.noSpace(tds[1].text);
     if (name.isEmpty) continue;
-    // (右) や (中左) は新しい打順。(三) ではなく「三」「走左」は直前の枠の途中出場。
+    // (右) や (右一)/(中左) は先発枠（括弧内は先発→途中の守備）。「三」「走左」「右」は直前の枠の途中出場。
     if (_isStarterSlot(tds.first.text) && order < 9) order++;
     if (order < 1) continue;
     var inning = 0;
@@ -307,9 +307,11 @@ bool _isStarterSlot(String raw) {
   return text.isNotEmpty && text.split('').every(_positionMarks.contains);
 }
 
+/// Yahoo の出場成績バッジから守備位置を取る。
+/// `(右一)` / `(中左)` は先発位置→途中移籍なので先頭の守備記号を使う（末尾だと一塁が二重になる）。
 String _badgePosition(String raw) {
   final text = raw.replaceAll(RegExp(r'[（）()\s]'), '');
-  for (var i = text.length - 1; i >= 0; i--) {
+  for (var i = 0; i < text.length; i++) {
     if (_positionMarks.contains(text[i])) return text[i];
   }
   return '';

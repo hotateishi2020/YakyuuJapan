@@ -62,6 +62,7 @@ BracketTeam _teamFromRow(
     gamesBehind: gamesBehindOf(row['game_behind']),
     codeArea: codeArea,
     divisionPlace: divisionPlace,
+    hasJapanPlayer: rowHasJapanPlayer(row),
   );
 }
 
@@ -97,7 +98,7 @@ int _compareStandingsRows(Map<String, dynamic> a, Map<String, dynamic> b) {
 
 String _areaOf(Map<String, dynamic> row) => '${row['code_area'] ?? ''}'.trim().toUpperCase();
 
-/// カード見出し用。順位表の地区順位と一致させる（例: NL中1, AL東2）。
+/// カード見出し用。順位表の地区順位と一致させる（例: NL中1位（勝率1位）, AL東2位（WC1位））。
 String mlbBracketLabel(String leagueCode, BracketTeam team) {
   final area = switch (team.codeArea) {
     'EAST' => '東',
@@ -105,8 +106,21 @@ String mlbBracketLabel(String leagueCode, BracketTeam team) {
     'WEST' => '西',
     _ => '',
   };
-  if (area.isEmpty || team.divisionPlace <= 0) return '$leagueCode${team.rank}';
-  return '$leagueCode$area${team.divisionPlace}';
+  final base = (area.isEmpty || team.divisionPlace <= 0)
+      ? '$leagueCode${team.rank}位'
+      : '$leagueCode$area${team.divisionPlace}位';
+  if (team.divisionPlace == 1 && team.rank > 0) {
+    // 地区1位どうしの勝率順位 = シード1〜3。
+    return '$base（勝率${team.rank}位）';
+  }
+  if (team.divisionPlace > 1 && team.rank >= 4) {
+    // WC はシード4〜6 → WC1〜3位。
+    return '$base（WC${team.rank - 3}位）';
+  }
+  if (team.divisionPlace > 1 && team.rank > 0) {
+    return '$base（WC${team.rank}位）';
+  }
+  return base;
 }
 
 /// 地区優勝3＋ワイルドカード3。

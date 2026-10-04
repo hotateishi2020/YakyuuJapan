@@ -280,6 +280,7 @@ List<Map<String, dynamic>> _summariesOf(
           'txt_pitching': row['txt_pitching'],
           'txt_homerun_total': row['txt_homerun_total'],
           'flg_pitcher': row['flg_pitcher'],
+          'flg_japan': row['flg_japan'],
           'code_result_pitcher': row['code_result_pitcher'],
           'colors_summary': row['colors_summary'],
           'titles_predict': row['titles_predict'],

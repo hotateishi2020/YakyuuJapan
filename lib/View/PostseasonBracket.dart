@@ -101,10 +101,13 @@ class PostseasonBracket extends StatelessWidget {
   }
 
   /// セ・パそれぞれの、日本シリーズの下で両リーグのあいだに空いている内側。
+  /// アセットは「マーク＋リーグ名」なので、下の文字は切り落としてマークのみ出す。
   Widget _leagueLogo({required bool central}) {
-    const width = 132.0;
-    const height = 86.0;
-    const gap = 18.0;
+    const width = 110.0;
+    const height = 78.0;
+    const gap = 22.0;
+    // webp 全体のうちマーク部分のおおよそ上側（文字は下部）
+    const markFraction = 0.62;
     final center = BracketGeom.boardW / 2;
     final top = BracketGeom.js.bottom + 10;
     return Positioned(
@@ -112,9 +115,17 @@ class PostseasonBracket extends StatelessWidget {
       top: top,
       width: width,
       height: height,
-      child: Image.asset(
-        central ? 'backend/assets/images/k-central.webp' : 'backend/assets/images/k-pacific.webp',
-        fit: BoxFit.contain,
+      child: ClipRect(
+        child: Align(
+          alignment: Alignment.topCenter,
+          heightFactor: markFraction,
+          child: Image.asset(
+            central ? 'backend/assets/images/k-central.webp' : 'backend/assets/images/k-pacific.webp',
+            width: width,
+            fit: BoxFit.fitWidth,
+            alignment: Alignment.topCenter,
+          ),
+        ),
       ),
     );
   }
@@ -260,14 +271,21 @@ class PostseasonBracket extends StatelessWidget {
           child: Column(
             children: [
               DecoratedBox(
-                decoration: BoxDecoration(color: leagueColor),
+                decoration: BoxDecoration(color: out ? _eliminatedBg : leagueColor),
                 child: SizedBox(
                   height: 22,
                   width: double.infinity,
                   child: Center(
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
-                      child: Text(rankTitle, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                      child: Text(
+                        rankTitle,
+                        style: TextStyle(
+                          color: out ? Colors.black87 : Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -302,11 +320,27 @@ class PostseasonBracket extends StatelessWidget {
                         ? const SizedBox.shrink()
                         : Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 2),
-                            child: Text(
-                              team.name,
-                              textAlign: TextAlign.center,
-                              maxLines: 2,
-                              style: TextStyle(color: nameFg, fontWeight: FontWeight.bold, fontSize: 11, height: 1.15),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    team.name,
+                                    textAlign: TextAlign.center,
+                                    maxLines: 1,
+                                    softWrap: false,
+                                    style: TextStyle(
+                                      color: nameFg,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: team.name.length >= 7 ? 9 : 11,
+                                      height: 1.15,
+                                    ),
+                                  ),
+                                  if (team.hasJapanPlayer)
+                                    const Text(' 🇯🇵', style: TextStyle(fontSize: 11, height: 1)),
+                                ],
+                              ),
                             ),
                           ),
                   ),

@@ -78,6 +78,43 @@ void main() {
     expect(plates.firstWhere((plate) => plate.name == '丸佳浩').result, Value.CodeGameResult.WALK_BALL);
   });
 
+  test('複合守備バッジは先発位置を取り、途中移籍の末尾位置を使わない', () {
+    final doc = parse('''
+      <div id="async-gameBatterStats"><table><tbody>
+        <tr>
+          <td>(右一)</td><td><a>澤井 廉</a></td>
+          <td class="bb-statsTable__data--inning"><div class="bb-statsTable__dataDetail">左安</div></td>
+        </tr>
+        <tr>
+          <td>走一</td><td><a>赤羽 由紘</a></td>
+          <td class="bb-statsTable__data--inning"></td>
+        </tr>
+        <tr>
+          <td>(中)</td><td><a>並木 秀尊</a></td>
+          <td class="bb-statsTable__data--inning"><div class="bb-statsTable__dataDetail">中飛</div></td>
+        </tr>
+        <tr>
+          <td>(一)</td><td><a>山田 哲人</a></td>
+          <td class="bb-statsTable__data--inning"><div class="bb-statsTable__dataDetail">右飛</div></td>
+        </tr>
+        <tr>
+          <td>右</td><td><a>丸山 和郁</a></td>
+          <td class="bb-statsTable__data--inning"><div class="bb-statsTable__dataDetail">四球</div></td>
+        </tr>
+      </tbody></table></div>
+    ''');
+    final plates = parseBoxPlates(doc, 1, 2);
+    final sawai = plates.firstWhere((plate) => plate.name == '澤井廉');
+    final yamada = plates.firstWhere((plate) => plate.name == '山田哲人');
+    final maruyama = plates.firstWhere((plate) => plate.name == '丸山和郁');
+    expect(sawai.order, 1);
+    expect(sawai.position, '右');
+    expect(yamada.order, 3);
+    expect(yamada.position, '一');
+    expect(maruyama.order, 3);
+    expect(maruyama.position, '右');
+  });
+
   test('速報の打点が違う結果は打席を増やさず、盗塁だけ足す', () {
     final doc = parse('''
       <div id="async-gameBatterStats"><table><tbody>

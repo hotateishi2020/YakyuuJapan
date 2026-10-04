@@ -482,6 +482,7 @@ class AppSql {
         txt_homerun_total,
         flg_pitcher,
         v_game_summary.flg_ace,
+        v_game_summary.flg_japan,
         code_result_pitcher,
         colors_summary,
         titles_predict,
@@ -564,6 +565,13 @@ class AppSql {
             CASE WHEN t_predict_player.id_player IS NULL THEN FALSE ELSE TRUE END AS flg_predict,
             CASE WHEN double_inning_pitch > 0 OR int_pitch > 0 OR BTRIM(COALESCE(code_result_pitcher, '')) <> '' THEN TRUE ELSE FALSE END AS flg_pitcher,
             COALESCE(m_player.flg_ace, FALSE) AS flg_ace,
+            EXISTS (
+              SELECT 1
+              FROM m_country jc
+              WHERE jc.id = m_player.id_country
+                AND COALESCE(jc.flg_delete, FALSE) = FALSE
+                AND jc.name = '日本'
+            ) AS flg_japan,
             code_result_pitcher,
             '/' || STRING_AGG(DISTINCT code_color, '/' ORDER BY code_color DESC) || '/' AS colors_summary,
             COALESCE(
@@ -601,7 +609,23 @@ class AppSql {
             OR int_rbi >= 1
             OR (CASE WHEN t_predict_player.id_player IS NULL THEN FALSE ELSE TRUE END = TRUE AND NOT (double_inning_pitch > 0 OR int_pitch > 0 OR BTRIM(COALESCE(code_result_pitcher, '')) <> '')) 
             OR double_inning_pitch > 0 OR int_pitch > 0 OR BTRIM(COALESCE(code_result_pitcher, '')) <> ''
-          GROUP BY t_predict_player.id_player, id_game, m_player.id_team, name_full, m_player.flg_ace, int_batting, int_hit1, int_fourball, int_homerun, 
+            -- MLB: 打席に立った日本人打者は活躍点に達しなくても常に載せる
+            OR (
+              COALESCE(int_batting, 0) > 0
+              AND NOT (double_inning_pitch > 0 OR int_pitch > 0 OR BTRIM(COALESCE(code_result_pitcher, '')) <> '')
+              AND EXISTS (
+                SELECT 1 FROM m_country jc
+                WHERE jc.id = m_player.id_country
+                  AND COALESCE(jc.flg_delete, FALSE) = FALSE
+                  AND jc.name = '日本'
+              )
+              AND EXISTS (
+                SELECT 1 FROM m_team mt
+                WHERE mt.id = m_player.id_team
+                  AND mt.id_league IN (3, 4)
+              )
+            )
+          GROUP BY t_predict_player.id_player, id_game, m_player.id_team, name_full, m_player.flg_ace, m_player.id_country, int_batting, int_hit1, int_fourball, int_homerun, 
             int_rbi, int_steal_base, int_dead_batting, int_sacrifice, double_inning_pitch, int_runs,
             int_pitch, int_four, int_dead_pitching, int_strike_out, code_result_pitcher, int_hit, int_runs_earned, int_balk, t_game_summary.id, t_game_summary.txt_homerun_total
           ORDER BY id_game, m_player.id_team, flg_pitcher DESC, point_total DESC, t_game_summary.id 
@@ -612,7 +636,7 @@ class AppSql {
                team_home.id_league, team_away.id_league, team_home.color_font, team_home.color_back, team_away.color_font,
                team_away.color_back, team_home.id, team_away.id, pitcher_win.id_team, pitcher_lose.id_team, pitcher_save.name_full, 
                pitcher_save.id_team, t_game.state, v_game_summary.id_game_summary, id_team_summary, name_full_summary, 
-               txt_batting, txt_pitching, txt_homerun_total, code_result_pitcher, colors_summary, titles_predict, flg_pitcher, v_game_summary.flg_ace, point_total,
+               txt_batting, txt_pitching, txt_homerun_total, code_result_pitcher, colors_summary, titles_predict, flg_pitcher, v_game_summary.flg_ace, v_game_summary.flg_japan, point_total,
                double_inning_pitch, int_pitch, int_hit_allowed, int_strike_out, int_walk_pitch, int_hbp_pitch, int_runs_pitch, int_runs_earned, int_balk, int_hit_batting,
                txt_scores_home, txt_scores_away, int_runs_home, int_runs_away, int_error_home, int_error_away, int_hit_home, int_hit_away
       ORDER BY to_char(t_game.datetime_start, 'YYYY-MM-DD'), t_game.id, id_team_summary, CASE WHEN flg_pitcher = TRUE THEN v_game_summary.id_game_summary END ASC, CASE WHEN flg_pitcher = FALSE THEN v_game_summary.point_total END DESC;
@@ -1061,6 +1085,15 @@ SELECT
         COALESCE(m_team.code_area, '') AS code_area,
         m_team.name_shortest AS name_shortest,
         m_league.name_short AS name_league,
+        EXISTS (
+          SELECT 1
+          FROM m_player jp
+          JOIN m_country jc ON jc.id = jp.id_country
+            AND COALESCE(jc.flg_delete, FALSE) = FALSE
+          WHERE jp.id_team = m_team.id
+            AND COALESCE(jp.flg_delete, FALSE) = FALSE
+            AND jc.name = '日本'
+        ) AS flg_japan,
         int_game,
         int_win,
         int_lose,
@@ -1163,6 +1196,7 @@ ORDER BY mt.id_league, tpt.int_rank
                     ELSE m_player.name_full || '(' || ROUND(LEAST(cnt_play::numeric / (int_game * 3.1) * 100, 100), 1) || '%)'
                END
         END AS name_player,
+        COALESCE(m_player.name_last, '') AS name_last,
         CASE WHEN m_stats.code_display = 'INTEGER' THEN TRUNC(stats)::int::text
              WHEN m_stats.code_display = 'INT_DEC_2' THEN to_char(stats, 'FM90.00')
              WHEN m_stats.code_display = 'INT_DEC_3' THEN to_char(stats, '0.000')
@@ -1180,8 +1214,18 @@ ORDER BY mt.id_league, tpt.int_rank
         CASE WHEN t_game_home.id_pitcher_home > 0 THEN TRUE
              WHEN t_game_away.id_pitcher_away > 0 THEN TRUE
              ELSE FALSE END AS flg_today,
-        COALESCE(BOOL_OR(m_player.flg_rookie), FALSE) AS flg_rookie,
-        COALESCE(BOOL_OR(career_first.min_year = \$1), FALSE) AS flg_career_this_year,
+        -- NPB: m_player.flg_rookie。
+        -- MLB: 前年以前のメジャー打数≦130 かつ投球回≦50（新人王有資格）。
+        -- 前年未登録（新加入含む）は 0 打数・0 投球回として有資格扱い。
+        CASE
+          WHEN MAX(tsp.id_league) IN (3, 4) THEN
+            (COALESCE(MAX(mlb_career.prior_ab), 0) <= 130
+             AND COALESCE(MAX(mlb_career.prior_ip), 0) <= 50)
+          ELSE COALESCE(BOOL_OR(m_player.flg_rookie), FALSE)
+        END AS flg_rookie,
+        -- ✨は「表示中団体（NPB/MLB）での初年度」。全経歴のMINだとNPB歴のあるMLB1年目が落ち、
+        -- ランキング補完の今季1行だけの選手が誤って付く。
+        COALESCE(BOOL_OR(career_org.min_year = \$1), FALSE) AS flg_career_this_year,
         COALESCE(BOOL_OR(
           m_player.date_birth IS NOT NULL
           AND m_player.date_birth::date <= (CURRENT_DATE - INTERVAL '35 years')
@@ -1210,11 +1254,30 @@ ORDER BY mt.id_league, tpt.int_rank
         LEFT JOIN m_country ON m_country.id = m_player.id_country
           AND COALESCE(m_country.flg_delete, FALSE) = FALSE
         LEFT JOIN (
-          SELECT id_player, MIN(int_year) AS min_year
-          FROM m_player_career
-          WHERE COALESCE(flg_delete, FALSE) = FALSE
-          GROUP BY id_player
-        ) career_first ON career_first.id_player = tsp.id_player
+          SELECT
+            c.id_player,
+            CASE WHEN t.id_league IN (3, 4) THEN 'mlb' ELSE 'npb' END AS org_key,
+            MIN(c.int_year) AS min_year
+          FROM m_player_career c
+          JOIN m_team t ON t.id = c.id_team
+          WHERE COALESCE(c.flg_delete, FALSE) = FALSE
+          GROUP BY
+            c.id_player,
+            CASE WHEN t.id_league IN (3, 4) THEN 'mlb' ELSE 'npb' END
+        ) career_org
+          ON career_org.id_player = tsp.id_player
+         AND career_org.org_key = CASE WHEN tsp.id_league IN (3, 4) THEN 'mlb' ELSE 'npb' END
+        LEFT JOIN (
+          SELECT
+            c.id_player,
+            COALESCE(SUM(COALESCE(c.int_batting, 0)), 0) AS prior_ab,
+            COALESCE(SUM(COALESCE(c.double_inning, 0)), 0) AS prior_ip
+          FROM m_player_career c
+          JOIN m_team t ON t.id = c.id_team AND t.id_league IN (3, 4)
+          WHERE COALESCE(c.flg_delete, FALSE) = FALSE
+            AND c.int_year < \$1
+          GROUP BY c.id_player
+        ) mlb_career ON mlb_career.id_player = tsp.id_player
         LEFT JOIN m_league  ON m_league.id  = m_team.id_league
         LEFT JOIN t_predict_player
           ON t_predict_player.id_player = tsp.id_player
@@ -1230,6 +1293,7 @@ ORDER BY mt.id_league, tpt.int_rank
         m_team.color_font,
         m_team.color_back,
         m_player.name_full,
+        m_player.name_last,
         tsp.stats,
         tsp.id_league,
         tsp.cnt_play,

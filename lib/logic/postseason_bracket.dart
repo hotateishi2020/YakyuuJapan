@@ -23,6 +23,8 @@ class BracketTeam {
   final String codeArea;
   /// MLB 地区内順位（1〜）。NPB は 0。
   final int divisionPlace;
+  /// 日本国籍選手が在籍するとき true。
+  final bool hasJapanPlayer;
 
   const BracketTeam({
     required this.id,
@@ -37,6 +39,7 @@ class BracketTeam {
     required this.gamesBehind,
     this.codeArea = '',
     this.divisionPlace = 0,
+    this.hasJapanPlayer = false,
   });
 
   double? get winRate {
@@ -266,6 +269,14 @@ StageResult scoreSeries({
   );
 }
 
+bool rowHasJapanPlayer(Map<String, dynamic> row) {
+  final v = row['flg_japan'];
+  if (v == true) return true;
+  if (v is num) return v != 0;
+  final s = '$v'.trim().toLowerCase();
+  return s == 'true' || s == 't' || s == '1';
+}
+
 BracketTeam _teamFromRow(Map<String, dynamic> row) {
   final nameShort = '${row['name_team'] ?? ''}'.trim();
   final nameFull = '${row['name_team_full'] ?? ''}'.trim();
@@ -280,6 +291,7 @@ BracketTeam _teamFromRow(Map<String, dynamic> row) {
     wins: _asInt(row['int_win']),
     losses: _asInt(row['int_lose']),
     gamesBehind: gamesBehindOf(row['game_behind']),
+    hasJapanPlayer: rowHasJapanPlayer(row),
   );
 }
 

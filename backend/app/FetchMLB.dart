@@ -9,11 +9,14 @@ import '../tools/StringTool.dart';
 import 'AppSql.dart';
 import 'BirthPlaceRegistry.dart';
 import 'DB/m_player.dart';
+import 'DB/m_player_career.dart';
 import 'DB/m_stadium.dart';
 import 'DB/t_game.dart';
+import 'DB/t_game_summary.dart';
 import 'DB/t_stats_team.dart';
 import 'FetchURL.dart';
 import 'OrgLeague.dart';
+import 'Value.dart';
 import 'YahooHtml.dart';
 import 'YahooTeamNames.dart';
 
@@ -45,21 +48,32 @@ class FetchMLB {
           continue;
         }
         final map = teamRow.first.toColumnMap();
+        final rankCell = cells[0].text.trim();
+        final gbCell = cells[7].text.trim();
+        final clinched = rankCell == '優勝' || gbCell == '優勝' || gbCell.toUpperCase() == 'W';
         final team = t_stats_team()
           ..year = DateTimeTool.getThisYear()
           ..id_team = map['id'] as int
-          ..int_rank = int.tryParse(cells[0].text.trim()) ?? 0
+          ..int_rank = clinched ? 1 : (int.tryParse(rankCell) ?? 0)
           ..int_game = int.tryParse(cells[2].text.trim()) ?? 0
           ..int_win = int.tryParse(cells[3].text.trim()) ?? 0
           ..int_lose = int.tryParse(cells[4].text.trim()) ?? 0
           ..int_draw = int.tryParse(cells[5].text.trim()) ?? 0
-          ..game_behind = cells[7].text.trim();
-        // MLB Yahoo 順位表は打率・防御率列が無い／異なる場合がある
-        if (cells.length > 13) {
-          team.num_avg_batting = double.tryParse('0${cells[13].text.trim()}') ?? 0;
+          // 優勝確定は '優勝' で保持（画面側で MLB は「W」表示）。
+          ..game_behind = clinched ? '優勝' : gbCell;
+        // Yahoo MLB: 0順位 1球団 2試合 3勝 4敗 5分 6勝率 7勝差
+        // 8得点 9失点 10本塁打 11盗塁 12打率 13防御率 14失策
+        if (cells.length > 10) {
+          team.int_homerun = int.tryParse(cells[10].text.trim()) ?? 0;
         }
-        if (cells.length > 14) {
-          team.num_era_total = double.tryParse(cells[14].text.trim()) ?? 0;
+        if (cells.length > 11) {
+          team.int_sh = int.tryParse(cells[11].text.trim()) ?? 0;
+        }
+        if (cells.length > 12) {
+          team.num_avg_batting = double.tryParse('0${cells[12].text.trim()}') ?? 0;
+        }
+        if (cells.length > 13) {
+          team.num_era_total = double.tryParse(cells[13].text.trim()) ?? 0;
         }
         byLeague[leagueId]!.add(team);
         print('MLB順位登録: $teamName (league=$leagueId)');
@@ -93,7 +107,419 @@ class FetchMLB {
   /// m_stats_details の MLB URL（リーグ 3/4）を巡回して個人成績を登録。
   static Future<Response> fetchStatsPlayer(Connection conn) async {
     await ensureMlbStatsDetails(conn);
-    return FetchURL.fetchStatsPlayerForLeagues(conn, _org.leagueIds);
+    await syncJapanesePlayers(conn);
+    final res = await FetchURL.fetchStatsPlayerForLeagues(conn, _org.leagueIds);
+    await enrichMlbPlayersForMarks(conn);
+    return res;
+  }
+
+  /// 🍁🌱🔰用に、個人成績に出ている MLB 選手の生年月日・年度別成績をプロフィールから補完。
+  static Future<void> enrichMlbPlayersForMarks(Connection conn) async {
+    await harvestMlbPlayerUrlsFromRankings(conn);
+
+    final clubRows = await conn.execute(AppSql.selectTeams());
+    final clubs = clubRows
+        .map((row) => CareerClub(
+              id: row[0] as int,
+              league: row[1] as int,
+              shortName: '${row[2] ?? ''}',
+              fullName: '${row[3] ?? ''}',
+              url: '${row[4] ?? ''}',
+            ))
+        .toList();
+    final year = DateTimeTool.getThisYear();
+    // 生年月日未登録、または前年MLB年が無い選手を補完。
+    final players = await conn.execute(
+      '''
+        SELECT p.id, p.url, p.date_birth, p.name_full
+        FROM m_player p
+        WHERE COALESCE(p.flg_delete, FALSE) = FALSE
+          AND COALESCE(p.url, '') <> ''
+          AND EXISTS (
+            SELECT 1 FROM t_stats_player_latest tsp
+            WHERE tsp.id_player = p.id AND tsp.id_league IN (3, 4)
+          )
+          AND (
+            p.date_birth IS NULL
+            OR NOT EXISTS (
+              SELECT 1 FROM m_player_career c
+              JOIN m_team t ON t.id = c.id_team AND t.id_league IN (3, 4)
+              WHERE c.id_player = p.id
+                AND c.int_year < \$1
+                AND COALESCE(c.flg_delete, FALSE) = FALSE
+            )
+          )
+        ORDER BY
+          CASE WHEN p.date_birth IS NULL THEN 0 ELSE 1 END,
+          p.id
+        LIMIT 500
+      ''',
+      parameters: [year],
+    );
+    var birthN = 0;
+    var careerN = 0;
+    var okN = 0;
+    final total = players.length;
+    for (var i = 0; i < players.length; i++) {
+      final map = players[i].toColumnMap();
+      final playerId = map['id'] as int;
+      var url = '${map['url'] ?? ''}'.trim();
+      if (url.isEmpty) continue;
+      url = url.replaceFirst(RegExp(r'/top/?$'), '/');
+      try {
+        final doc = await YahooHtml.fetchDocument(Uri.parse(url));
+        if (map['date_birth'] == null) {
+          final birth = BirthPlaceRegistry.extractBirthDate(doc);
+          if (birth != null) {
+            await BirthPlaceRegistry.applyBirthDate(conn, playerId, birth);
+            birthN++;
+          }
+        }
+        final added = await upsertYahooMlbYearCareers(conn, playerId, doc, clubs);
+        careerN += added;
+        if (added > 0) okN++;
+        if ((i + 1) % 25 == 0 || i + 1 == total) {
+          print('MLB年度別成績: ${i + 1}/$total （累計 $careerN 行）');
+        }
+      } catch (e) {
+        print('MLBマーク補完スキップ (${map['name_full']}): $e');
+      }
+    }
+    print('MLBマーク補完: 生年月日 $birthN 人 / 年度別 $careerN 行 / 成功 $okN 人 / 対象 $total 人');
+  }
+
+  /// 個人成績ランキングページから、既存 m_player へプロフィール URL を紐づける（新規作成しない）。
+  static Future<int> harvestMlbPlayerUrlsFromRankings(Connection conn) async {
+    final pages = await conn.execute('''
+      SELECT DISTINCT url
+      FROM m_stats_details
+      WHERE id_league IN (3, 4)
+        AND COALESCE(flg_delete, FALSE) = FALSE
+        AND COALESCE(url, '') <> ''
+    ''');
+    var updated = 0;
+    var pageN = 0;
+    final seenPages = <String>{};
+    final seenPlayers = <String>{};
+    for (final row in pages) {
+      final pageUrl = '${row.toColumnMap()['url'] ?? ''}'.trim();
+      if (pageUrl.isEmpty || !seenPages.add(pageUrl)) continue;
+      pageN++;
+      try {
+        final doc = await YahooHtml.fetchDocument(Uri.parse(pageUrl));
+        var pageHit = 0;
+        for (final member in doc.querySelectorAll('p.bb-playerTable__member')) {
+          final playerA = member.querySelector('a[href*="/mlb/player/"]');
+          final href = playerA?.attributes['href']?.trim() ?? '';
+          if (href.isEmpty) continue;
+          final parsed = FetchURL.parseYahooRankingPlayerCell(member.text);
+          if (parsed.player.isEmpty || parsed.team.isEmpty) continue;
+          final profileUrl = (href.startsWith('http') ? href : 'https://baseball.yahoo.co.jp$href')
+              .replaceFirst(RegExp(r'/top/?$'), '/');
+          if (!seenPlayers.add(profileUrl)) continue;
+          final name = StringTool.noSpace(parsed.player);
+          final team = parsed.team.trim();
+          // ランキング「A.ブレグマン」⇔ DB「アレックス・ブレグマン」を姓で結ぶ。
+          final result = await conn.execute(
+            '''
+              UPDATE m_player p
+              SET url = \$1::text,
+                  updat = NOW()
+              FROM m_team t
+              WHERE p.id_team = t.id
+                AND t.name_shortest = \$2::text
+                AND COALESCE(p.flg_delete, FALSE) = FALSE
+                AND COALESCE(p.url, '') = ''
+                AND (
+                  p.name_full = \$3::text
+                  OR p.name_last = \$3::text
+                  OR COALESCE(p.name_last, '') || COALESCE(p.name_first, '') = \$3::text
+                  OR p.name_full LIKE \$3::text || '%'
+                  OR \$3::text LIKE p.name_full || '%'
+                  OR (
+                    COALESCE(p.name_last, '') <> ''
+                    AND length(p.name_last) >= 2
+                    AND \$3::text LIKE '%' || p.name_last
+                  )
+                  OR (
+                    length(regexp_replace(\$3::text, '^.*?[\\.．]', '')) >= 2
+                    AND (
+                      p.name_full LIKE '%' || regexp_replace(\$3::text, '^.*?[\\.．]', '')
+                      OR regexp_replace(p.name_full, '^.*・', '')
+                           = regexp_replace(\$3::text, '^.*?[\\.．]', '')
+                      OR p.name_last = regexp_replace(\$3::text, '^.*?[\\.．]', '')
+                    )
+                  )
+                  OR (
+                    position('・' in p.name_full) > 0
+                    AND length(regexp_replace(p.name_full, '^.*・', '')) >= 2
+                    AND (
+                      \$3::text LIKE '%' || regexp_replace(p.name_full, '^.*・', '')
+                      OR regexp_replace(\$3::text, '^.*?[\\.．]', '')
+                           = regexp_replace(p.name_full, '^.*・', '')
+                    )
+                  )
+                )
+            ''',
+            parameters: [profileUrl, team, name],
+          );
+          if (result.affectedRows > 0) {
+            updated += result.affectedRows;
+            pageHit += result.affectedRows;
+          }
+        }
+        print('MLBランキングURL: $pageN/${pages.length} +$pageHit ($pageUrl)');
+      } catch (e) {
+        print('MLBランキングURL取得スキップ ($pageUrl): $e');
+      }
+    }
+    print('MLBランキングURL紐づけ: ${seenPages.length} ページ / URL更新 $updated 人 / ユニーク選手 ${seenPlayers.length}');
+    return updated;
+  }
+
+  /// Yahoo「MLB日本人選手」一覧から国籍（日本）・URL・正式名・年度別成績を補完する。
+  /// 試合速報由来の短縮名（松井 / 吉田 / 今井 など）でも球団一致＋姓一致で紐づける。
+  static Future<int> syncJapanesePlayers(Connection conn) async {
+    final listUrl = Uri.parse('https://baseball.yahoo.co.jp/mlb/japanese/players/');
+    final doc = await YahooHtml.fetchDocument(listUrl);
+    final clubRows = await conn.execute(AppSql.selectTeams());
+    final clubs = clubRows
+        .map((row) => CareerClub(
+              id: row[0] as int,
+              league: row[1] as int,
+              shortName: '${row[2] ?? ''}',
+              fullName: '${row[3] ?? ''}',
+              url: '${row[4] ?? ''}',
+            ))
+        .toList();
+    var updated = 0;
+    var careers = 0;
+    for (final item in doc.querySelectorAll('li.bb-japanesePlayer__item')) {
+      final href = item.querySelector('a')?.attributes['href']?.trim() ?? '';
+      final rawName = item.querySelector('.bb-japanesePlayer__name')?.text.trim() ?? '';
+      final rawTeam = item.querySelector('.bb-japanesePlayer__team')?.text.trim() ?? '';
+      final name = StringTool.noSpace(rawName);
+      final teamName = YahooTeamNames.normalize(rawTeam);
+      if (name.isEmpty || teamName.isEmpty || href.isEmpty) continue;
+
+      final teamRows = await Postgres.execute(conn, AppSql.selectTeamsWhereName(), data: [teamName]);
+      if (teamRows.isEmpty) {
+        print('MLB日本人: 未知の球団 "$rawTeam" → "$teamName" ($name)');
+        continue;
+      }
+      final teamId = teamRows.first.toColumnMap()['id'] as int;
+      final profileUrl = href.startsWith('http') ? href : listUrl.resolve(href).toString();
+      // /top 付きでもプロフィール本文は取れるが、出身地は index 相当を優先
+      final profileIndex = profileUrl.replaceFirst(RegExp(r'/top/?$'), '/');
+
+      final players = await conn.execute(
+        '''
+          SELECT id, name_full, id_country, url
+          FROM m_player
+          WHERE id_team = \$1::int
+            AND COALESCE(flg_delete, FALSE) = FALSE
+            AND (
+              name_full = \$2::text
+              OR name_last = \$2::text
+              OR COALESCE(name_last, '') || COALESCE(name_first, '') = \$2::text
+              OR \$2::text LIKE name_full || '%'
+              OR name_full LIKE \$2::text || '%'
+            )
+          ORDER BY
+            CASE
+              WHEN name_full = \$2::text THEN 0
+              WHEN COALESCE(name_last, '') || COALESCE(name_first, '') = \$2::text THEN 1
+              WHEN \$2::text LIKE name_full || '%' THEN 2
+              ELSE 3
+            END,
+            length(COALESCE(name_full, '')) DESC
+          LIMIT 3
+        ''',
+        parameters: [teamId, name],
+      );
+
+      var playerId = 0;
+      if (players.isEmpty) {
+        playerId = await _ensurePlayer(conn, rawName, teamId);
+      } else {
+        playerId = players.first.toColumnMap()['id'] as int;
+        final current = '${players.first.toColumnMap()['name_full'] ?? ''}'.trim();
+        if (current.isEmpty || (name.length > current.length && name.startsWith(current))) {
+          final parts = rawName.trim().split(RegExp(r'\s+'));
+          final last = StringTool.noSpace(parts.isNotEmpty ? parts.first : name);
+          final first = StringTool.noSpace(parts.length >= 2 ? parts.sublist(1).join() : '');
+          await conn.execute(
+            '''
+              UPDATE m_player
+              SET name_full = \$1::text,
+                  name_last = \$2::text,
+                  name_first = \$3::text,
+                  updat = NOW()
+              WHERE id = \$4::int
+            ''',
+            parameters: [name, last, first, playerId],
+          );
+        }
+      }
+      if (playerId <= 0) continue;
+
+      await conn.execute(
+        '''
+          UPDATE m_player
+          SET url = CASE WHEN COALESCE(url, '') = '' THEN \$1::text ELSE url END,
+              updat = NOW()
+          WHERE id = \$2::int
+        ''',
+        parameters: [profileIndex, playerId],
+      );
+
+      try {
+        final profileDoc = await YahooHtml.fetchDocument(Uri.parse(profileIndex));
+        final birthPlace = BirthPlaceRegistry.extractFromProfile(profileDoc) ?? BirthPlaceRegistry.japanName;
+        await BirthPlaceRegistry.applyToPlayer(conn, playerId, birthPlace);
+        await BirthPlaceRegistry.applyBirthDate(conn, playerId, BirthPlaceRegistry.extractBirthDate(profileDoc));
+        final added = await upsertYahooMlbYearCareers(conn, playerId, profileDoc, clubs);
+        careers += added;
+        if (added > 0) print('MLB年度別成績: $name +$added行');
+      } catch (e) {
+        await BirthPlaceRegistry.applyToPlayer(conn, playerId, BirthPlaceRegistry.japanName);
+        print('MLB日本人プロフィール取得スキップ ($name): $e');
+      }
+      updated++;
+      print('MLB日本人補完: $name @ $teamName');
+    }
+    print('MLB日本人補完: ${updated}件 / 年度別成績新規: $careers行');
+    return updated;
+  }
+
+  /// Yahoo MLB 選手ページの `#year_b` / `#year_p` から年度別所属を m_player_career へ入れる。
+  /// ✨・🔰判定のため、MLB年の打数・投球回も残す。
+  static Future<int> upsertYahooMlbYearCareers(
+    Connection conn,
+    int playerId,
+    Document doc,
+    List<CareerClub> clubs,
+  ) async {
+    final byKey = <String, m_player_career>{};
+
+    void takeTable(String tableId, {required bool batting}) {
+      final table = doc.querySelector('#$tableId');
+      if (table == null) return;
+      for (final tr in table.querySelectorAll('tbody tr')) {
+        final yearText = tr.querySelector('.bb-playerStatsTable__dataLabel')?.text.trim() ?? '';
+        final year = int.tryParse(yearText.replaceAll(RegExp(r'\s'), '')) ?? 0;
+        if (year < 1900 || year > 2100) continue;
+        final teamRaw = tr.querySelector('.bb-playerStatsTable__data--team')?.text.trim() ?? '';
+        // チーム列が空でもセル配列の2番目に球団名がある（MLB年は <a> 表記）。
+        final cells = tr.querySelectorAll('td.bb-playerStatsTable__data');
+        final teamFromCell = cells.length > 1 ? cells[1].text.trim() : '';
+        final teamSource = teamRaw.isNotEmpty
+            ? teamRaw
+            : (teamFromCell.isNotEmpty ? teamFromCell : '');
+        final teamLabel = YahooTeamNames.normalize(teamSource.replaceAll(RegExp(r'\s'), ''));
+        final teamId = FetchURL.matchCareerClubId(
+              teamLabel.isEmpty ? teamSource : teamLabel,
+              clubs,
+              preferMlb: true,
+            ) ??
+            FetchURL.matchCareerClubId(teamSource, clubs, preferMlb: true);
+        // マイナー等は m_team に無いのでスキップ（MLB/NPB 球団のみ登録）
+        if (teamId == null) continue;
+        final key = '$year|$teamId';
+        final row = byKey.putIfAbsent(key, () {
+          final created = m_player_career()
+            ..id_player = playerId
+            ..int_year = year
+            ..id_team = teamId;
+          return created;
+        });
+        // year_b: 打率,試合,打席,打数… / year_p: 防御率,登板,先発,…,投球回(15)
+        // cells[0]=年度 cells[1]=チーム 以降が成績
+        if (batting && cells.length >= 6) {
+          row.double_average_batting = _yahooStatDouble(cells, 2);
+          row.int_games = _yahooStatInt(cells, 3);
+          row.int_appearance = _yahooStatInt(cells, 4);
+          row.int_batting = _yahooStatInt(cells, 5);
+        } else if (!batting && cells.length >= 16) {
+          row.double_average_earned_runs = _yahooStatDouble(cells, 2);
+          row.int_pitching = _yahooStatInt(cells, 3);
+          row.int_games = _yahooStatInt(cells, 4);
+          row.int_win = _yahooStatInt(cells, 9);
+          row.double_inning = _yahooStatDouble(cells, 15);
+          row.int_strike_out_pitcher = _yahooStatInt(cells, 19);
+        }
+      }
+    }
+
+    takeTable('year_b', batting: true);
+    takeTable('year_p', batting: false);
+    if (byKey.isEmpty) return 0;
+
+    var upserted = 0;
+    for (final row in byKey.values) {
+      final existing = await conn.execute(
+        '''
+          SELECT id FROM m_player_career
+          WHERE id_player = \$1::int
+            AND int_year = \$2::int
+            AND id_team = \$3::int
+            AND COALESCE(flg_delete, FALSE) = FALSE
+          LIMIT 1
+        ''',
+        parameters: [row.id_player, row.int_year, row.id_team],
+      );
+      if (existing.isEmpty) {
+        await Postgres.insert(conn, row);
+        upserted++;
+        continue;
+      }
+      await conn.execute(
+        '''
+          UPDATE m_player_career
+          SET int_games = GREATEST(COALESCE(int_games, 0), \$1::int),
+              int_appearance = GREATEST(COALESCE(int_appearance, 0), \$2::int),
+              int_batting = GREATEST(COALESCE(int_batting, 0), \$3::int),
+              int_pitching = GREATEST(COALESCE(int_pitching, 0), \$4::int),
+              double_inning = GREATEST(COALESCE(double_inning, 0), \$5::float8),
+              int_win = GREATEST(COALESCE(int_win, 0), \$6::int),
+              int_strike_out_pitcher = GREATEST(COALESCE(int_strike_out_pitcher, 0), \$7::int),
+              double_average_batting = CASE
+                WHEN \$8::float8 > 0 THEN \$8::float8 ELSE COALESCE(double_average_batting, 0) END,
+              double_average_earned_runs = CASE
+                WHEN \$9::float8 > 0 THEN \$9::float8 ELSE COALESCE(double_average_earned_runs, 0) END,
+              updat = NOW()
+          WHERE id = \$10::int
+        ''',
+        parameters: [
+          row.int_games,
+          row.int_appearance,
+          row.int_batting,
+          row.int_pitching,
+          row.double_inning,
+          row.int_win,
+          row.int_strike_out_pitcher,
+          row.double_average_batting,
+          row.double_average_earned_runs,
+          existing.first.toColumnMap()['id'],
+        ],
+      );
+      upserted++;
+    }
+    return upserted;
+  }
+
+  static int _yahooStatInt(List<Element> cells, int index) {
+    if (index >= cells.length) return 0;
+    final text = cells[index].text.trim().replaceAll(',', '');
+    if (text.isEmpty || text == '-') return 0;
+    return int.tryParse(text) ?? 0;
+  }
+
+  static double _yahooStatDouble(List<Element> cells, int index) {
+    if (index >= cells.length) return 0;
+    final text = cells[index].text.trim().replaceAll(',', '');
+    if (text.isEmpty || text == '-') return 0;
+    return double.tryParse(text) ?? 0;
   }
 
   /// NPB(league=1) を雛形に MLB の URL・列番号・flg_predict を揃える。
@@ -157,8 +583,10 @@ class FetchMLB {
   /// 日程カード＋試合トップから試合情報を登録。ポストシーズンも含める。
   static Future<Response> fetchGames(Connection conn) async {
     final now = DateTime.now();
-    final dates = [for (var i = 0; i <= 10; i++) now.add(Duration(days: i))];
+    // 成績サマリーは直近数日分も取り直す（ポストシーズン閲覧用）。
+    final dates = [for (var i = -3; i <= 10; i++) now.add(Duration(days: i))];
     final formatter = DateFormat('yyyy-MM-dd');
+    final todayKey = formatter.format(now);
 
     for (final date in dates) {
       final formatted = formatter.format(date);
@@ -325,10 +753,125 @@ class FetchMLB {
             await Postgres.update(conn, game);
             print('MLB試合更新: $homeName vs $awayName');
           }
+
+          final started = matchState.contains('回') || matchState.contains('試合終了') || matchState.contains('終了');
+          final scrapeStats = started && (formatted.compareTo(todayKey) <= 0);
+          if (scrapeStats && href.isNotEmpty && game.id > 0) {
+            try {
+              final statsUrl = url.resolve(href.replaceFirst('index', 'stats').replaceFirst('top', 'stats'));
+              await _saveGameBoxSummary(conn, statsUrl, game.id, idTeamHome, idTeamAway);
+            } catch (e, st) {
+              print('MLB出場成績スキップ ($homeName vs $awayName): $e');
+              print(st);
+            }
+          }
         }
       }
     }
     return Response.ok('ok');
+  }
+
+  /// Yahoo MLB 出場成績から t_game_summary を入れ直す。
+  static Future<void> _saveGameBoxSummary(
+    Connection conn,
+    Uri statsUrl,
+    int gameId,
+    int idTeamHome,
+    int idTeamAway,
+  ) async {
+    final doc = await YahooHtml.fetchDocument(statsUrl);
+    final batterRows = doc.querySelectorAll('#async-gameBatterStats .bb-blowResultsTable table tbody tr');
+    if (batterRows.isEmpty) return;
+
+    final list = <t_game_summary>[];
+    var teamId = idTeamAway;
+    for (final row in batterRows) {
+      if (row.querySelectorAll('th').isNotEmpty) {
+        teamId = idTeamHome;
+        continue;
+      }
+      final cells = row.querySelectorAll('td');
+      if (cells.length < 14) continue;
+      final name = StringTool.noSpace(cells[1].text);
+      if (name.isEmpty) continue;
+      final playerId = await _ensurePlayer(conn, cells[1].text.trim(), teamId);
+      if (playerId <= 0) continue;
+      final summary = t_game_summary()
+        ..id_game = gameId
+        ..id_player = playerId
+        ..int_batting = int.tryParse(cells[3].text.trim()) ?? 0
+        ..int_hit1 = int.tryParse(cells[5].text.trim()) ?? 0
+        ..int_rbi = int.tryParse(cells[6].text.trim()) ?? 0
+        ..int_fourball = int.tryParse(cells[8].text.trim()) ?? 0
+        ..int_dead_batting = int.tryParse(cells[9].text.trim()) ?? 0
+        ..int_sacrifice = int.tryParse(cells[10].text.trim()) ?? 0
+        ..int_steal_base = int.tryParse(cells[11].text.trim()) ?? 0
+        ..int_error = int.tryParse(cells[12].text.trim()) ?? 0
+        ..int_homerun = int.tryParse(cells[13].text.trim()) ?? 0;
+      list.add(summary);
+    }
+
+    var pitcherTeam = idTeamAway;
+    for (final section in doc.querySelectorAll('#async-gamePitcherStats section')) {
+      final rows = section.querySelectorAll('table tbody tr');
+      if (rows.isEmpty) {
+        pitcherTeam = idTeamHome;
+        continue;
+      }
+      final heads = section.querySelectorAll('table thead th').map((cell) => cell.text.trim()).toList();
+      String cellOf(Element row, String header) {
+        final index = heads.indexOf(header);
+        final cells = row.querySelectorAll('td');
+        if (index < 0 || index >= cells.length) return '';
+        return cells[index].text.trim();
+      }
+
+      for (final row in rows) {
+        final cells = row.querySelectorAll('td');
+        if (cells.length < 2) continue;
+        final resultText = cells.first.text.trim();
+        var pitcherName = cellOf(row, '選手名');
+        if (pitcherName.isEmpty) pitcherName = cells[1].text.trim();
+        final playerId = await _ensurePlayer(conn, pitcherName, pitcherTeam);
+        if (playerId <= 0) continue;
+
+        var summary = t_game_summary();
+        for (var i = 0; i < list.length; i++) {
+          if (list[i].id_player == playerId) {
+            summary = list.removeAt(i);
+            break;
+          }
+        }
+        if (resultText.contains('勝')) {
+          summary.code_result_pitcher = Value.CodeGameResultPitcher.WIN;
+        } else if (resultText.contains('敗')) {
+          summary.code_result_pitcher = Value.CodeGameResultPitcher.LOSE;
+        } else if (resultText.contains('Ｓ') || resultText.contains('セーブ')) {
+          summary.code_result_pitcher = Value.CodeGameResultPitcher.SAVE;
+        } else if (resultText.contains('H') || resultText.contains('ホールド')) {
+          summary.code_result_pitcher = Value.CodeGameResultPitcher.HOLD;
+        }
+        summary
+          ..id_game = gameId
+          ..id_player = playerId
+          ..double_inning_pitch = double.tryParse(cellOf(row, '投球回')) ?? 0
+          ..int_pitch = int.tryParse(cellOf(row, '投球数')) ?? 0
+          ..int_hit = int.tryParse(cellOf(row, '被安打')) ?? 0
+          ..int_strike_out = int.tryParse(cellOf(row, '奪三振')) ?? 0
+          ..int_four = int.tryParse(cellOf(row, '与四球')) ?? 0
+          ..int_dead_pitching = int.tryParse(cellOf(row, '与死球')) ?? 0
+          ..int_balk = int.tryParse(cellOf(row, 'ボーク')) ?? 0
+          ..int_runs = int.tryParse(cellOf(row, '失点')) ?? 0
+          ..int_runs_earned = int.tryParse(cellOf(row, '自責点')) ?? 0;
+        list.add(summary);
+      }
+      pitcherTeam = idTeamHome;
+    }
+
+    if (list.isEmpty) return;
+    await Postgres.execute(conn, AppSql.deleteGameSummary(), data: [gameId]);
+    await Postgres.insertMulti(conn, list);
+    print('MLB出場成績を登録: game=$gameId (${list.length}人)');
   }
 
   static String _mlbGameCode(String sectionTitle, int homeLeague, int awayLeague) {
@@ -401,11 +944,17 @@ class FetchMLB {
         '''
           SELECT id, name_full FROM m_player
           WHERE id_team = \$1::int
+            AND COALESCE(flg_delete, FALSE) = FALSE
             AND (
               name_full = \$2::text
               OR name_last = \$2::text
               OR COALESCE(name_last, '') || COALESCE(name_first, '') = \$2::text
+              OR \$2::text LIKE name_full || '%'
+              OR name_full LIKE \$2::text || '%'
             )
+          ORDER BY
+            CASE WHEN name_full = \$2::text THEN 0 ELSE 1 END,
+            length(COALESCE(name_full, '')) DESC
           LIMIT 1
         ''',
         parameters: [teamId, name],
@@ -413,7 +962,8 @@ class FetchMLB {
       if (existing.isNotEmpty) {
         final row = existing.first.toColumnMap();
         final id = row['id'] as int;
-        if ('${row['name_full'] ?? ''}'.isEmpty) {
+        final current = '${row['name_full'] ?? ''}'.trim();
+        if (current.isEmpty || (name.length > current.length && name.startsWith(current))) {
           await conn.execute(
             '''
               UPDATE m_player

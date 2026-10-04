@@ -30,7 +30,8 @@ class AceEvaluator {
       byLeague.putIfAbsent(p.leagueId, () => []).add(p);
     }
 
-    final aceIds = <int>{};
+    // playerId -> 最高エースポイント（リーグ跨ぎでも1人1点）
+    final bestByPlayer = <int, _AcePitcher>{};
     for (final entry in byLeague.entries) {
       final pool = entry.value;
       _assignRelativeScores(pool);
@@ -40,17 +41,9 @@ class AceEvaluator {
             0.15 * p.scoreK9 +
             0.10 * p.scoreIpPerApp +
             0.05 * p.scoreWins;
-      }
-
-      final byTeam = <int, List<_AcePitcher>>{};
-      for (final p in pool) {
-        byTeam.putIfAbsent(p.teamId, () => []).add(p);
-      }
-      for (final teamPitchers in byTeam.values) {
-        teamPitchers.sort((a, b) => b.acePoint.compareTo(a.acePoint));
-        final top = teamPitchers.first;
-        if (top.acePoint + 1e-9 >= aceThreshold) {
-          aceIds.add(top.playerId);
+        final prev = bestByPlayer[p.playerId];
+        if (prev == null || p.acePoint > prev.acePoint) {
+          bestByPlayer[p.playerId] = p;
         }
       }
 
@@ -64,6 +57,39 @@ class AceEvaluator {
         );
       }
     }
+
+    // 現在所属チーム（m_player.id_team）で1チーム1人に正規化する。
+    final currentTeams = <int, int>{}; // playerId -> id_team
+    if (bestByPlayer.isNotEmpty) {
+      final idList = bestByPlayer.keys.join(',');
+      final teamRows = await conn.execute(
+        '''
+          SELECT id, id_team
+          FROM m_player
+          WHERE id IN ($idList)
+        ''',
+      );
+      for (final row in teamRows) {
+        final m = row.toColumnMap();
+        final pid = m['id'];
+        final tid = m['id_team'];
+        final playerId = pid is int ? pid : int.tryParse('$pid') ?? 0;
+        final teamId = tid is int ? tid : int.tryParse('$tid') ?? 0;
+        if (playerId > 0 && teamId > 0) currentTeams[playerId] = teamId;
+      }
+    }
+
+    final aceByTeam = <int, _AcePitcher>{}; // id_team -> best qualifying
+    for (final p in bestByPlayer.values) {
+      if (p.acePoint + 1e-9 < aceThreshold) continue;
+      final teamId = currentTeams[p.playerId] ?? p.teamId;
+      if (teamId <= 0) continue;
+      final existing = aceByTeam[teamId];
+      if (existing == null || p.acePoint > existing.acePoint) {
+        aceByTeam[teamId] = p;
+      }
+    }
+    final aceIds = {for (final p in aceByTeam.values) p.playerId};
 
     final cleared = await conn.execute(
       '''
@@ -89,6 +115,29 @@ class AceEvaluator {
         ''',
       );
       setCount = set.affectedRows;
+
+      // 同一チームに複数残っていたら、今回選んだ id を優先して1人に絞る。
+      await conn.execute(
+        '''
+          UPDATE m_player AS p
+          SET flg_ace = FALSE,
+              updat = NOW()
+          FROM m_team AS t
+          WHERE t.id = p.id_team
+            AND t.id_league IN ($leagueIn)
+            AND COALESCE(p.flg_ace, FALSE) = TRUE
+            AND p.id NOT IN (
+              SELECT DISTINCT ON (p2.id_team) p2.id
+              FROM m_player AS p2
+              JOIN m_team AS t2 ON t2.id = p2.id_team
+              WHERE t2.id_league IN ($leagueIn)
+                AND COALESCE(p2.flg_ace, FALSE) = TRUE
+              ORDER BY p2.id_team,
+                       CASE WHEN p2.id IN ($idList) THEN 0 ELSE 1 END,
+                       p2.id
+            )
+        ''',
+      );
     }
 
     print(
@@ -216,9 +265,10 @@ class AceEvaluator {
         SELECT
           p.id AS id_player,
           p.name_full,
-          COALESCE(c.id_team, p.id_team) AS id_team,
+          p.id_team AS id_team,
           t.id_league,
           COALESCE(c.int_pitching, 0) AS appearances,
+          COALESCE(c.int_games, 0) AS starts,
           COALESCE(c.double_inning, 0) AS innings,
           COALESCE(c.int_win, 0) AS wins,
           COALESCE(c.int_strike_out_pitcher, 0) AS strikeouts,
@@ -226,11 +276,11 @@ class AceEvaluator {
           COALESCE(tg.int_game, 0) AS team_games
         FROM m_player_career c
         JOIN m_player p ON p.id = c.id_player
-        JOIN m_team t ON t.id = COALESCE(c.id_team, p.id_team)
+        JOIN m_team t ON t.id = p.id_team
         LEFT JOIN LATERAL (
           SELECT st.int_game
           FROM t_stats_team st
-          WHERE st.id_team = COALESCE(c.id_team, p.id_team)
+          WHERE st.id_team = p.id_team
           ORDER BY st.crtat DESC NULLS LAST
           LIMIT 1
         ) tg ON TRUE
@@ -259,6 +309,7 @@ class AceEvaluator {
     for (final row in rows) {
       final m = row.toColumnMap();
       final appearances = asInt(m['appearances']);
+      final starts = asInt(m['starts']);
       final rawIp = asDouble(m['innings']);
       final ip = FetchURL.baseballInnings('$rawIp');
       if (appearances <= 0 || ip <= 0) continue;
@@ -268,8 +319,11 @@ class AceEvaluator {
       final ipPerApp = ip / appearances;
       final teamGames = asInt(m['team_games']);
       // 先発: 登板あたり投球回 >= 4 かつ 投球回 >= チーム試合数 * 0.5
+      // 投球回の少ない中継ぎ（短い救援）は候補に入れない。
       if (ipPerApp < 4) continue;
       if (teamGames > 0 && ip < teamGames * 0.5) continue;
+      // 先発数が分かるときは、登板の半数未満しか先発していない投手を除外。
+      if (starts > 0 && appearances > 0 && starts < appearances * 0.5) continue;
 
       final so = asInt(m['strikeouts']);
       out.add(

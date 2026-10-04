@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../logic/show_user_predictions.dart';
 import '../tools/color_parse.dart';
 import '../tools/date_format.dart';
 import 'Text.dart';
@@ -1429,10 +1430,12 @@ class _TableGameCard extends StatelessWidget {
   List<_PlayerLine> _players({
     required bool home,
     required bool pitcher,
+    bool showUserPredictions = true,
   }) {
     final teamId = _int(home ? 'id_team_home' : 'id_team_away');
     final starterName = _text(home ? 'name_pitcher_home' : 'name_pitcher_away');
-    final starterColors = _text(home ? 'colors_pitcher_home' : 'colors_pitcher_away');
+    final starterColors =
+        showUserPredictions ? _text(home ? 'colors_pitcher_home' : 'colors_pitcher_away') : '';
     final result = <_PlayerLine>[];
 
     void add(String name, String playerColors, String mark, [String stat = '', String hrTotal = '', String predict = '', String plays = '', String achieve = '', String tone = '', String chips = '', int rbi = 0, String roleOverride = '']) {
@@ -1443,20 +1446,21 @@ class _TableGameCard extends StatelessWidget {
               ? _pitcherRoleMark(name, starterName, '')
               : _enterRole(name, teamId);
       final index = result.indexWhere((player) => player.name == name);
-      final labels = _predictLabel(predict);
+      final labels = showUserPredictions ? _predictLabel(predict) : '';
+      final colors = showUserPredictions ? playerColors : '';
       if (index < 0) {
-        result.add((name: name, role: role, colors: playerColors, mark: mark, stat: stat, hrTotal: hrTotal, predict: labels, plays: plays, achieve: achieve, tone: tone, chips: chips, rbi: rbi));
+        result.add((name: name, role: role, colors: colors, mark: mark, stat: stat, hrTotal: hrTotal, predict: labels, plays: plays, achieve: achieve, tone: tone, chips: chips, rbi: rbi));
         return;
       }
       final current = result[index];
       result[index] = (
         name: current.name,
         role: current.role.isNotEmpty ? current.role : role,
-        colors: current.colors.isNotEmpty ? current.colors : playerColors,
+        colors: current.colors.isNotEmpty ? current.colors : colors,
         mark: current.mark.isNotEmpty ? current.mark : mark,
         stat: current.stat.isNotEmpty ? current.stat : stat,
         hrTotal: current.hrTotal.isNotEmpty ? current.hrTotal : hrTotal,
-        predict: _predictLabel('${current.predict},$labels'),
+        predict: showUserPredictions ? _predictLabel('${current.predict},$labels') : '',
         plays: current.plays.isNotEmpty ? current.plays : plays,
         achieve: current.achieve.isNotEmpty ? current.achieve : achieve,
         tone: current.tone.isNotEmpty ? current.tone : tone,
@@ -1491,7 +1495,9 @@ class _TableGameCard extends StatelessWidget {
       );
     }
 
-    final starterTitles = pitcher ? _text(home ? 'titles_pitcher_home' : 'titles_pitcher_away') : '';
+    final starterTitles = (pitcher && showUserPredictions)
+        ? _text(home ? 'titles_pitcher_home' : 'titles_pitcher_away')
+        : '';
     if (pitcher && starterTitles.isNotEmpty && result.any((player) => player.name == starterName)) {
       add(starterName, starterColors, '', '', '', starterTitles, '', '', '', '', 0, '先');
     }
@@ -1521,7 +1527,7 @@ class _TableGameCard extends StatelessWidget {
     return result;
   }
 
-  List<_LineupSlot> _lineupSlots({required bool home}) {
+  List<_LineupSlot> _lineupSlots({required bool home, bool showUserPredictions = true}) {
     final teamId = _int(home ? 'id_team_home' : 'id_team_away');
     final byOrder = <int, List<_PlayerLine>>{};
     final raw = game['lineup'];
@@ -1540,7 +1546,15 @@ class _TableGameCard extends StatelessWidget {
             final name = '${player['name'] ?? ''}'.trim();
             if (name.isEmpty) continue;
             final role = '${player['role'] ?? ''}'.trim();
-            players.add(_lineupPlayer(name, '${player['plays'] ?? ''}', teamId, role == 'null' ? '' : role, '${player['pos'] ?? ''}', player.containsKey('rbi') ? int.tryParse('${player['rbi']}') ?? 0 : null));
+            players.add(_lineupPlayer(
+              name,
+              '${player['plays'] ?? ''}',
+              teamId,
+              role == 'null' ? '' : role,
+              '${player['pos'] ?? ''}',
+              player.containsKey('rbi') ? int.tryParse('${player['rbi']}') ?? 0 : null,
+              showUserPredictions: showUserPredictions,
+            ));
           }
         }
         byOrder[order] = players;
@@ -1553,7 +1567,15 @@ class _TableGameCard extends StatelessWidget {
     return int.tryParse(RegExp(r'(\d+)打点').firstMatch(raw)?.group(1) ?? '') ?? 0;
   }
 
-  _PlayerLine _lineupPlayer(String name, String plays, int teamId, String role, String position, int? listedRbi) {
+  _PlayerLine _lineupPlayer(
+    String name,
+    String plays,
+    int teamId,
+    String role,
+    String position,
+    int? listedRbi, {
+    bool showUserPredictions = true,
+  }) {
     Map<String, dynamic>? summary;
     for (final row in rows) {
       if ('${row['name_full_summary'] ?? ''}'.trim() != name) continue;
@@ -1569,7 +1591,7 @@ class _TableGameCard extends StatelessWidget {
     if (summary == null) {
       return (name: name, role: shownRole, colors: '', mark: pos, stat: '', hrTotal: '', predict: '', plays: rawPlays, achieve: '', tone: '', chips: '', rbi: rbi);
     }
-    final colors = '${summary['colors_summary'] ?? ''}'.trim();
+    final colors = showUserPredictions ? '${summary['colors_summary'] ?? ''}'.trim() : '';
     final summaryPlays = _playsOf(summary);
     return (
       name: name,
@@ -1578,7 +1600,7 @@ class _TableGameCard extends StatelessWidget {
       mark: pos,
       stat: '',
       hrTotal: '',
-      predict: _predictLabel('${summary['titles_predict'] ?? ''}'),
+      predict: showUserPredictions ? _predictLabel('${summary['titles_predict'] ?? ''}') : '',
       plays: summaryPlays.isNotEmpty ? summaryPlays : rawPlays,
       achieve: _achieveOf(summary),
       tone: '',
@@ -2737,12 +2759,13 @@ class _TableGameCard extends StatelessWidget {
         if (_text('time_game').isNotEmpty) _text('time_game'),
         if (_text('name_stadium').isNotEmpty) _text('name_stadium'),
       ].join(' ');
-      final homePitchers = _players(home: true, pitcher: true);
-      final awayPitchers = _players(home: false, pitcher: true);
-      final homeBatters = allBatters ? const <_PlayerLine>[] : _players(home: true, pitcher: false);
-      final awayBatters = allBatters ? const <_PlayerLine>[] : _players(home: false, pitcher: false);
-      final homeLineup = allBatters ? _lineupSlots(home: true) : const <_LineupSlot>[];
-      final awayLineup = allBatters ? _lineupSlots(home: false) : const <_LineupSlot>[];
+      final showUserPredictions = ShowUserPredictions.of(context);
+      final homePitchers = _players(home: true, pitcher: true, showUserPredictions: showUserPredictions);
+      final awayPitchers = _players(home: false, pitcher: true, showUserPredictions: showUserPredictions);
+      final homeBatters = allBatters ? const <_PlayerLine>[] : _players(home: true, pitcher: false, showUserPredictions: showUserPredictions);
+      final awayBatters = allBatters ? const <_PlayerLine>[] : _players(home: false, pitcher: false, showUserPredictions: showUserPredictions);
+      final homeLineup = allBatters ? _lineupSlots(home: true, showUserPredictions: showUserPredictions) : const <_LineupSlot>[];
+      final awayLineup = allBatters ? _lineupSlots(home: false, showUserPredictions: showUserPredictions) : const <_LineupSlot>[];
       final homeNameColW = _nameColumnWidth([...homePitchers, ...homeBatters], detailSize, context);
       final awayNameColW = _nameColumnWidth([...awayPitchers, ...awayBatters], detailSize, context);
       final pitcherN = math.max(1, math.max(homePitchers.length, awayPitchers.length));

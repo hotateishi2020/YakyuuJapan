@@ -12,7 +12,11 @@ String? readBrowserCookie(String name) {
   return null;
 }
 
-void writeBrowserCookie(String name, String value) {
+void writeBrowserCookie(String name, String value, {int maxAgeSeconds = 31536000}) {
   final encoded = Uri.encodeComponent(value);
-  document.cookie = '$name=$encoded; path=/; max-age=31536000; SameSite=Lax';
+  document.cookie = '$name=$encoded; path=/; max-age=$maxAgeSeconds; SameSite=Lax';
+}
+
+void clearBrowserCookie(String name) {
+  document.cookie = '$name=; path=/; max-age=0; SameSite=Lax';
 }

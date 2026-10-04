@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../config/app_design.dart';
 import '../config/org_config.dart';
+import '../logic/show_user_predictions.dart';
 import '../tools/browser_cookie.dart';
 import '../tools/color_parse.dart';
 import 'Text.dart';
@@ -35,6 +36,9 @@ class SeasonTableBlock extends StatelessWidget {
   final OrgConfig org;
   final PersonalStatsLayout personalStatsLayout;
   final ValueChanged<PersonalStatsLayout>? onPersonalStatsLayoutChanged;
+  final bool loadingStandings;
+  final bool loadingStats;
+  final bool loadingGames;
 
   const SeasonTableBlock({
     super.key,
@@ -48,7 +52,17 @@ class SeasonTableBlock extends StatelessWidget {
     this.org = OrgConfig.npb,
     this.personalStatsLayout = PersonalStatsLayout.segment,
     this.onPersonalStatsLayoutChanged,
+    this.loadingStandings = false,
+    this.loadingStats = false,
+    this.loadingGames = false,
   });
+
+  Widget _sectionLoading({double height = 120}) {
+    return SizedBox(
+      height: height,
+      child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+    );
+  }
 
   Color? _parseColorName(String? name) => parseColorNameOrNull(name);
 
@@ -192,11 +206,12 @@ class SeasonTableBlock extends StatelessWidget {
       Widget standingsTable() {
         return LayoutBuilder(builder: (context, lb) {
           final sections = _standingSections(leagueId);
-          final bool showPredictCols = sections.any((section) => section.rows.any((row) {
-                final tateishi = '${row['team_name_tateishi'] ?? ''}'.trim();
-                final ejima = '${row['team_name_ejima'] ?? ''}'.trim();
-                return (tateishi.isNotEmpty && tateishi != '—') || (ejima.isNotEmpty && ejima != '—');
-              }));
+          final bool showPredictCols = ShowUserPredictions.of(context) &&
+              sections.any((section) => section.rows.any((row) {
+                    final tateishi = '${row['team_name_tateishi'] ?? ''}'.trim();
+                    final ejima = '${row['team_name_ejima'] ?? ''}'.trim();
+                    return (tateishi.isNotEmpty && tateishi != '—') || (ejima.isNotEmpty && ejima != '—');
+                  }));
           // MLB は「ホワイトソックス」等が入るのでチーム名列を広めに取る。
           final double minNameW = org.kind == OrgKind.mlb ? _kChar * 9 : _wChar6;
           // スクロール側（試合〜防御率）の固定幅合計
@@ -446,18 +461,25 @@ class SeasonTableBlock extends StatelessWidget {
         });
       }
 
-      final Widget gamesSwitcher = GameDateSwitcher(
-        games: games,
-        playerStats: stats,
-        initialDate: gamesDateFilter,
-        headerColor: leagueColor,
-        horizontal: true,
-      );
+      final Widget gamesSwitcher = loadingGames
+          ? _sectionLoading(height: portraitLayout ? 160 : 220)
+          : GameDateSwitcher(
+              games: games,
+              playerStats: stats,
+              initialDate: gamesDateFilter,
+              headerColor: leagueColor,
+              horizontal: true,
+            );
 
       // 縦型は試合カードが選手人数で伸びる
       final Widget gamesBlock = portraitLayout
           ? gamesSwitcher
           : Expanded(child: gamesSwitcher);
+
+      final Widget standingsBody = loadingStandings ? _sectionLoading(height: 140) : standingsTable();
+      final Widget personalBody = loadingStats
+          ? _sectionLoading(height: 180)
+          : _personalStatsSheet(bat, pit);
 
       final Widget teamPanel = Column(
         mainAxisSize: portraitLayout ? MainAxisSize.min : MainAxisSize.max,
@@ -465,7 +487,7 @@ class SeasonTableBlock extends StatelessWidget {
         children: [
           _sectionHeader('チーム順位', leagueColor),
           const SizedBox(height: 4),
-          standingsTable(),
+          standingsBody,
           const SizedBox(height: 6),
           gamesBlock,
         ],
@@ -476,7 +498,7 @@ class SeasonTableBlock extends StatelessWidget {
         children: [
           _sectionHeader('個人成績', leagueColor),
           const SizedBox(height: 4),
-          Expanded(child: _personalStatsSheet(bat, pit)),
+          Expanded(child: personalBody),
         ],
       );
 
@@ -497,7 +519,7 @@ class SeasonTableBlock extends StatelessWidget {
           children: [
             _sectionHeader(leagueName, leagueColor),
             const SizedBox(height: 4),
-            standingsTable(),
+            standingsBody,
           ],
         );
       }
@@ -514,13 +536,13 @@ class SeasonTableBlock extends StatelessWidget {
             const SizedBox(height: 6),
             _sectionHeader('チーム順位', leagueColor),
             const SizedBox(height: 4),
-            standingsTable(),
+            standingsBody,
             const SizedBox(height: 6),
             _sectionHeader('個人成績', leagueColor),
             const SizedBox(height: 4),
             SizedBox(
               height: personalSectionHeight,
-              child: _personalStatsSheet(bat, pit),
+              child: personalBody,
             ),
           ],
         );
@@ -562,6 +584,8 @@ class SeasonTableBlock extends StatelessWidget {
 const double _statRowH = 20.8;
 const int _statsScrollVisibleRows = 10;
 const double _statsScrollBodyH = _statRowH * _statsScrollVisibleRows;
+/// MLB 個人成績の短縮チーム名列（半角3文字 + 余白）
+const double _mlbTeamAbbrevColW = 34.0;
 
 class PlayerStatCell extends StatelessWidget {
   final Map<String, dynamic> row;
@@ -599,6 +623,7 @@ class PlayerStatCell extends StatelessWidget {
       return text == 'true' || text == 't' || text == '1';
     }
 
+    final showUserPredictions = ShowUserPredictions.of(context);
     final isJapan = showJapanFlag && isTrue(row['flg_japan']);
     const japanBg = Color(0xFFF5C6CE); // 薄いクリムゾンレッド
     final countryEmoji = '${row['emoji_country'] ?? ''}'.trim();
@@ -614,7 +639,7 @@ class PlayerStatCell extends StatelessWidget {
     final suffix = paren >= 0 ? name.substring(paren) : '';
 
     BoxDecoration? nameBg() {
-      final raw = '${row['colors_user'] ?? ''}';
+      final raw = showUserPredictions ? '${row['colors_user'] ?? ''}' : '';
       final parts = raw.split('/').map((s) => s.trim().toLowerCase()).where((s) => s.isNotEmpty).toList();
       final cols = [for (final part in parts) if (parseColorNameOrNull(part) != null) parseColorNameOrNull(part)!];
       if (cols.isEmpty) {
@@ -637,8 +662,9 @@ class PlayerStatCell extends StatelessWidget {
 
     final decoration = nameBg();
     final hasBg = decoration != null;
-    final hasPredictColor = '${row['colors_user'] ?? ''}'.split('/').any((s) => s.trim().isNotEmpty);
-    final nameColor = hasPredictColor ? Colors.white : (isJapan ? const Color(0xFF8B0000) : null);
+    final hasPredictColor =
+        showUserPredictions && '${row['colors_user'] ?? ''}'.split('/').any((s) => s.trim().isNotEmpty);
+    final nameColor = hasPredictColor ? Colors.white : (isJapan ? Colors.black : null);
     final nameWeight = (hasBg || isJapan) ? FontWeight.bold : null;
     final nameLine = Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -695,7 +721,7 @@ class PlayerStatCell extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: ColoredBox(
-                  color: Colors.black,
+                  color: const Color(0xFF424242),
                   child: Center(
                     child: rankNum == 1
                         ? const FittedBox(fit: BoxFit.contain, child: Text('👑', style: TextStyle(fontSize: 12, height: 1.0)))
@@ -714,16 +740,29 @@ class PlayerStatCell extends StatelessWidget {
                   ),
                 ),
               ),
-            Expanded(
-              flex: 2,
-              child: cellBg(
-                overlay: parseColorNameOrNull('${row['color_back'] ?? ''}') ?? (isNoRank ? noRankBg : Colors.transparent),
-                child: Align(
-                  alignment: Alignment.center,
-                  child: OneLineShrinkText(team, baseSize: 10, minSize: 1, fast: true, color: parseColorNameOrNull('${row['color_font'] ?? ''}')),
+            // MLB略称（NYY 等）: 半角3文字 + 余白。NPB は従来どおり flex。
+            if (showJapanFlag)
+              SizedBox(
+                width: _mlbTeamAbbrevColW,
+                child: cellBg(
+                  overlay: parseColorNameOrNull('${row['color_back'] ?? ''}') ?? (isNoRank ? noRankBg : Colors.transparent),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: OneLineShrinkText(team, baseSize: 10, minSize: 1, fast: true, color: parseColorNameOrNull('${row['color_font'] ?? ''}')),
+                  ),
+                ),
+              )
+            else
+              Expanded(
+                flex: 2,
+                child: cellBg(
+                  overlay: parseColorNameOrNull('${row['color_back'] ?? ''}') ?? (isNoRank ? noRankBg : Colors.transparent),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: OneLineShrinkText(team, baseSize: 10, minSize: 1, fast: true, color: parseColorNameOrNull('${row['color_font'] ?? ''}')),
+                  ),
                 ),
               ),
-            ),
             Expanded(flex: 10, child: nameWidget),
             Expanded(
               flex: 4,

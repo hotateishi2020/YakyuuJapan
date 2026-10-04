@@ -24,15 +24,145 @@ import 'app/OrgLeague.dart';
 import 'app/PlayLabel.dart';
 import 'app/Postseason.dart';
 import 'app/Value.dart';
+import 'app/Auth.dart';
+import 'app/EventReadReset.dart';
 
 /// /predictions 用の短TTLキャッシュ（同一プロセス内・団体別）
 final Map<String, String> _predictionsCacheBody = {};
 final Map<String, DateTime> _predictionsCacheAt = {};
+/// /predictions/part 用（org|part）
+final Map<String, String> _predictionsPartCacheBody = {};
+final Map<String, DateTime> _predictionsPartCacheAt = {};
 const Duration _predictionsCacheTtl = Duration(seconds: 45);
 
 void _clearPredictionsCache() {
   _predictionsCacheBody.clear();
   _predictionsCacheAt.clear();
+  _predictionsPartCacheBody.clear();
+  _predictionsPartCacheAt.clear();
+}
+
+Future<Map<String, dynamic>> _buildPredictionsPartInfo(OrgKind org) async {
+  final currentYear = DateTimeTool.getThisYear();
+  final results = await Postgres.mapParallel([
+    (conn) => Postgres.execute(conn, AppSql.selectEventsDetails()),
+    (conn) => Postgres.execute(conn, AppSql.selectNotification()),
+    (conn) => Postgres.execute(conn, AppSql.selectPredictNPBTeams(), data: [currentYear]),
+  ]);
+  final leagueIds = org.leagueIds;
+  return {
+    'org': org.code,
+    'part': 'info',
+    'events': org.code == 'npb' ? Postgres.toJson(results[0]) : const <Map<String, dynamic>>[],
+    'notification': org.code == 'npb' ? Postgres.toJson(results[1]) : const <Map<String, dynamic>>[],
+    'predict_team': _filterByLeagues(Postgres.toJson(results[2]), leagueIds),
+  };
+}
+
+Future<Map<String, dynamic>> _buildPredictionsPartStandings(OrgKind org) async {
+  final currentYear = DateTimeTool.getThisYear();
+  final results = await Postgres.mapParallel([
+    (conn) => Postgres.execute(conn, AppSql.selectPredictNPBTeams(), data: [currentYear]),
+    (conn) => Postgres.execute(conn, AppSql.selectStatsTeam(), data: [currentYear]),
+  ]);
+  final leagueIds = org.leagueIds;
+  return {
+    'org': org.code,
+    'part': 'standings',
+    'predict_team': _filterByLeagues(Postgres.toJson(results[0]), leagueIds),
+    'stats_team': _filterByLeagues(Postgres.toJson(results[1]), leagueIds),
+  };
+}
+
+Future<Map<String, dynamic>> _buildPredictionsPartPlayers(OrgKind org) async {
+  final currentYear = DateTimeTool.getThisYear();
+  final results = await Postgres.mapParallel([
+    (conn) => Postgres.execute(conn, AppSql.selectPredictPlayer(), data: [currentYear]),
+    (conn) => Postgres.execute(conn, AppSql.selectStatsPlayer(), data: [currentYear]),
+  ]);
+  final leagueIds = org.leagueIds;
+  return {
+    'org': org.code,
+    'part': 'players',
+    'predict_player': _filterByLeagues(Postgres.toJson(results[0]), leagueIds),
+    'stats_player': _filterByLeagues(Postgres.toJson(results[1]), leagueIds),
+  };
+}
+
+Future<Map<String, dynamic>> _buildPredictionsPartGames(OrgKind org) async {
+  final currentYear = DateTimeTool.getThisYear();
+  final results = await Postgres.mapParallel([
+    (conn) => Postgres.execute(conn, AppSql.selectGames(), data: [currentYear]),
+    (conn) => Postgres.execute(conn, AppSql.selectGamePlayRows()),
+    (conn) => Postgres.execute(conn, AppSql.selectPostseasonGames(), data: [currentYear]),
+    (conn) => Postgres.execute(conn, AppSql.selectPostseasonBoard(), data: [
+      Value.SystemCode.Code.ADMIN,
+      Value.SystemCode.Key.DATE_FINAL_GAME,
+      Value.SystemCode.Key.DATE_OPEN_GAME,
+    ]),
+    (conn) => Postgres.execute(conn, AppSql.selectBattingLines()),
+  ]);
+  final playRows = Postgres.toJson(results[1]);
+  final gameRows = Postgres.toJson(results[0]);
+  final battingLines = _battingLinesOf(Postgres.toJson(results[4]));
+  final playLabels = playLabelsByPlayer(playRows);
+  for (final entry in battingLines.entries) {
+    final filled = playsFilledFromLine(
+      playLabels[entry.key] ?? '',
+      singles: _asInt(entry.value['int_hit1']),
+      doubles: _asInt(entry.value['int_hit2']),
+      triples: _asInt(entry.value['int_hit3']),
+      homers: _asInt(entry.value['int_homerun']),
+    );
+    final numbered = playsWithHomerNumbers(filled, '${entry.value['txt_homerun_total'] ?? ''}');
+    if (numbered.isNotEmpty) playLabels[entry.key] = numbered;
+  }
+  final plateFeats = <String, String>{};
+  for (final entry in plateFeatMarksByPlayer(playRows).entries) {
+    final text = _plateFeatConfirmed(entry.value, battingLines[entry.key]);
+    if (text.isNotEmpty) plateFeats[entry.key] = text;
+  }
+  final games = _collapseGames(
+    gameRows,
+    playLabels,
+    cycleMarksByPlayer(playRows),
+    hitCountsByPlayer(playRows),
+    plateFeats,
+    maxInningByGame(playRows),
+  );
+  _fillMissingLineScores(games, playRows);
+  final lineups = battingLineupsOf(
+    playRows,
+    plays: playLabels,
+    pitchers: pitcherKeysOf(gameRows),
+    rbi: {for (final entry in battingLines.entries) entry.key: _asInt(entry.value['int_rbi'])},
+  );
+  for (final game in games) {
+    game['lineup'] = lineups[_asInt(game['id_game'])] ?? const <Map<String, dynamic>>[];
+  }
+  final leagueIds = org.leagueIds;
+  return {
+    'org': org.code,
+    'part': 'games',
+    'games': _filterByLeagues(games, leagueIds, keys: const ['id_league_home', 'id_league_away']),
+    'postseason_games': Postgres.toJson(results[2]),
+    'show_postseason_board': _showPostseasonBoard(Postgres.toJson(results[3])),
+  };
+}
+
+Future<Map<String, dynamic>> _buildPredictionsPart(String part, OrgKind org) {
+  switch (part) {
+    case 'info':
+      return _buildPredictionsPartInfo(org);
+    case 'standings':
+      return _buildPredictionsPartStandings(org);
+    case 'players':
+      return _buildPredictionsPartPlayers(org);
+    case 'games':
+      return _buildPredictionsPartGames(org);
+    default:
+      throw ArgumentError('unknown part: $part');
+  }
 }
 
 bool _rowInLeagues(Map<String, dynamic> row, List<int> leagueIds, {List<String> keys = const ['id_league']}) {
@@ -426,6 +556,171 @@ void main() async {
       return response;
     });
 
+    app.post('/auth/register', (Request request) async {
+      try {
+        return await Auth.register(request);
+      } catch (e, st) {
+        print('auth/register ERROR: $e\n$st');
+        return Response.internalServerError(
+          body: jsonEncode({'ok': false, 'error': '登録に失敗しました'}),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+    });
+
+    app.post('/auth/login', (Request request) async {
+      try {
+        return await Auth.login(request);
+      } catch (e, st) {
+        print('auth/login ERROR: $e\n$st');
+        return Response.internalServerError(
+          body: jsonEncode({'ok': false, 'error': 'ログインに失敗しました'}),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+    });
+
+    app.get('/auth/me', (Request request) async {
+      try {
+        return await Auth.me(request);
+      } catch (e, st) {
+        print('auth/me ERROR: $e\n$st');
+        return Response.internalServerError(
+          body: jsonEncode({'ok': false, 'error': '認証確認に失敗しました'}),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+    });
+
+    app.post('/auth/logout', (Request request) async {
+      try {
+        return await Auth.logout(request);
+      } catch (e, st) {
+        print('auth/logout ERROR: $e\n$st');
+        return Response.ok(
+          jsonEncode({'ok': true}),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+    });
+
+    app.post('/auth/change-password', (Request request) async {
+      try {
+        return await Auth.changePassword(request);
+      } catch (e, st) {
+        print('auth/change-password ERROR: $e\n$st');
+        return Response.internalServerError(
+          body: jsonEncode({'ok': false, 'error': 'パスワード変更に失敗しました'}),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+    });
+
+    app.post('/auth/profile', (Request request) async {
+      try {
+        return await Auth.updateProfile(request);
+      } catch (e, st) {
+        print('auth/profile ERROR: $e\n$st');
+        return Response.internalServerError(
+          body: jsonEncode({'ok': false, 'error': '基本設定の保存に失敗しました'}),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+    });
+
+    app.post('/auth/notifications', (Request request) async {
+      try {
+        return await Auth.updateNotifications(request);
+      } catch (e, st) {
+        print('auth/notifications ERROR: $e\n$st');
+        return Response.internalServerError(
+          body: jsonEncode({'ok': false, 'error': '通知設定の保存に失敗しました'}),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+    });
+
+    app.post('/auth/mark-read', (Request request) async {
+      try {
+        return await Auth.markRead(request);
+      } catch (e, st) {
+        print('auth/mark-read ERROR: $e\n$st');
+        return Response.internalServerError(
+          body: jsonEncode({'ok': false, 'error': '既読更新に失敗しました'}),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+    });
+
+    app.get('/auth/teams', (Request request) async {
+      try {
+        return await Auth.listTeams(request);
+      } catch (e, st) {
+        print('auth/teams ERROR: $e\n$st');
+        return Response.internalServerError(
+          body: jsonEncode({'ok': false, 'error': 'チーム一覧の取得に失敗しました'}),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+    });
+
+    app.get('/auth/players', (Request request) async {
+      try {
+        return await Auth.listPlayers(request);
+      } catch (e, st) {
+        print('auth/players ERROR: $e\n$st');
+        return Response.internalServerError(
+          body: jsonEncode({'ok': false, 'error': '選手一覧の取得に失敗しました'}),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+    });
+
+    // 画面セクション単位の軽量取得（info / standings / players / games）
+    // 初回表示を段階的に進めるため、重い games を待たずに他を返せる
+    app.get('/predictions/part', (Request request) async {
+      return await tryCatchAPIReadonly(request, log.Prediction.NAME, log.Prediction.Codes.ENTER_NPB, () async {
+        final org = OrgKind.parse(request.url.queryParameters['org']);
+        final part = (request.url.queryParameters['part'] ?? '').trim().toLowerCase();
+        const allowed = {'info', 'standings', 'players', 'games'};
+        if (!allowed.contains(part)) {
+          return Response(
+            400,
+            body: jsonEncode({'ok': false, 'error': 'part は info|standings|players|games のいずれか'}),
+            headers: {'content-type': 'application/json; charset=utf-8'},
+          );
+        }
+        final cacheKey = '${org.code}|$part';
+        final now = DateTime.now();
+        final cachedBody = _predictionsPartCacheBody[cacheKey];
+        final cachedAt = _predictionsPartCacheAt[cacheKey];
+        if (cachedBody != null && cachedAt != null && now.difference(cachedAt) < _predictionsCacheTtl) {
+          return Response.ok(
+            cachedBody,
+            headers: {
+              'content-type': 'application/json; charset=utf-8',
+              'x-cache': 'HIT',
+              'x-org': org.code,
+              'x-part': part,
+            },
+          );
+        }
+        final payload = await _buildPredictionsPart(part, org);
+        final body = jsonEncode(payload);
+        _predictionsPartCacheBody[cacheKey] = body;
+        _predictionsPartCacheAt[cacheKey] = DateTime.now();
+        return Response.ok(
+          body,
+          headers: {
+            'content-type': 'application/json; charset=utf-8',
+            'x-cache': 'MISS',
+            'x-org': org.code,
+            'x-part': part,
+          },
+        );
+      });
+    });
+
     //タイトル予想画面の表示（並列取得・短TTLキャッシュ・読み取り専用で高速化）
     // ?org=npb|mlb で団体を切り替える（省略時は npb）
     app.get('/predictions', (Request request) async {
@@ -586,6 +881,12 @@ void main() async {
     final server = await io.serve(handler, InternetAddress.anyIPv4, port);
     print('✅ Server running on http://${server.address.host}:${server.port}'
         ' (serveStatic=${publicDir != null})');
+
+    // イベント開始日・最終日に flg_read_event をリセット（15分ごと）
+    unawaited(EventReadReset.tick());
+    Timer.periodic(const Duration(minutes: 15), (_) {
+      unawaited(EventReadReset.tick());
+    });
   } catch (e, st) {
     print('🔥 void main ERROR: $e\n$st');
     stderr.writeln('🔥 /void main ERROR: $e\n$st');

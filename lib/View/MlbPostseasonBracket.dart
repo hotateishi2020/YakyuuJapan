@@ -83,8 +83,15 @@ class MlbBracketGeom {
 class MlbPostseasonBracket extends StatelessWidget {
   final List<Map<String, dynamic>> standings;
   final List<Map<String, dynamic>> games;
+  /// 順位未取得中は「未確定」ではなくグルグルを出す
+  final bool loadingTeams;
 
-  const MlbPostseasonBracket({super.key, required this.standings, required this.games});
+  const MlbPostseasonBracket({
+    super.key,
+    required this.standings,
+    required this.games,
+    this.loadingTeams = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -273,6 +280,7 @@ class MlbPostseasonBracket extends StatelessWidget {
 
   Widget _team(double cx, MlbPostseasonBoard board, BracketTeam team, String rankLabel, Color leagueColor) {
     final unknown = team.name.isEmpty;
+    final pending = unknown && loadingTeams;
     final out = !unknown && board.eliminated(team.id);
     final nameBg = out ? _eliminatedBg : (unknown ? Colors.white : (parseColorNameOrNull(team.colorBack) ?? Colors.white));
     final nameFg = out || unknown ? Colors.black87 : (parseColorNameOrNull(team.colorFont) ?? Colors.black87);
@@ -281,7 +289,13 @@ class MlbPostseasonBracket extends StatelessWidget {
     final logoUrl = logoVisual?.networkUrl;
 
     Widget logo;
-    if (unknown) {
+    if (pending) {
+      logo = const SizedBox(
+        width: 18,
+        height: 18,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      );
+    } else if (unknown) {
       logo = const Text('未確定', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold));
     } else if (logoAsset != null) {
       logo = Image.asset(logoAsset, fit: BoxFit.contain);
@@ -371,7 +385,13 @@ class MlbPostseasonBracket extends StatelessWidget {
                   height: 32,
                   width: double.infinity,
                   child: Center(
-                    child: unknown
+                    child: pending
+                        ? const SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : unknown
                         ? const SizedBox.shrink()
                         : Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 2),

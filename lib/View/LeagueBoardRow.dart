@@ -19,6 +19,9 @@ class LeagueBoardRow extends StatelessWidget {
   final OrgConfig org;
   final PersonalStatsLayout personalStatsLayout;
   final ValueChanged<PersonalStatsLayout>? onPersonalStatsLayoutChanged;
+  final bool loadingStandings;
+  final bool loadingStats;
+  final bool loadingGames;
 
   final String leagueLabelPrefix;
 
@@ -40,6 +43,9 @@ class LeagueBoardRow extends StatelessWidget {
     this.org = OrgConfig.npb,
     this.personalStatsLayout = PersonalStatsLayout.segment,
     this.onPersonalStatsLayoutChanged,
+    this.loadingStandings = false,
+    this.loadingStats = false,
+    this.loadingGames = false,
   });
 
   List<Map<String, dynamic>> get _leagueGames => games.where((g) => (int.tryParse('${g['id_league_home']}') ?? 0) == leagueId && (int.tryParse('${g['id_league_away']}') ?? 0) == leagueId).toList();
@@ -56,6 +62,9 @@ class LeagueBoardRow extends StatelessWidget {
       org: org,
       personalStatsLayout: personalStatsLayout,
       onPersonalStatsLayoutChanged: onPersonalStatsLayoutChanged,
+      loadingStandings: loadingStandings,
+      loadingStats: loadingStats,
+      loadingGames: loadingGames,
     );
 
     // リーグ切替タブがあるため左のリーグ名ヘッダーは出さない

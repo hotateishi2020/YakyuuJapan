@@ -11,6 +11,8 @@ import '../config/org_config.dart';
 import '../tools/json_utils.dart';
 import '../tools/date_format.dart';
 import '../logic/atari_counts.dart';
+import '../logic/auth_session.dart';
+import '../logic/show_user_predictions.dart';
 import '../View/Headers.dart';
 import '../View/Text.dart';
 import '../View/LeagueBoardRow.dart';
@@ -18,6 +20,7 @@ import '../View/GamesBoard.dart';
 import '../View/SeasonTable.dart';
 import '../View/MlbPostseasonBracket.dart';
 import '../View/PostseasonBracket.dart';
+import '../View/BlinkNewMark.dart';
 import '../logic/postseason_bracket.dart';
 
 class PredictionPage extends StatefulWidget {
@@ -27,6 +30,8 @@ class PredictionPage extends StatefulWidget {
   State<PredictionPage> createState() => _PredictionPageState();
 }
 
+enum _LoadPart { info, standings, players, games }
+
 class _OrgBundle {
   List<Map<String, dynamic>> predictions;
   List<Map<String, dynamic>> standings;
@@ -35,6 +40,7 @@ class _OrgBundle {
   List<Map<String, dynamic>> games;
   List<Map<String, dynamic>> postseasonGames;
   bool showPostseasonBoard;
+  final Set<_LoadPart> readyParts;
 
   _OrgBundle({
     required this.predictions,
@@ -44,7 +50,16 @@ class _OrgBundle {
     required this.games,
     required this.postseasonGames,
     required this.showPostseasonBoard,
-  });
+    Set<_LoadPart>? readyParts,
+  }) : readyParts = readyParts ??
+            {
+              _LoadPart.info,
+              _LoadPart.standings,
+              _LoadPart.players,
+              _LoadPart.games,
+            };
+
+  bool partReady(_LoadPart part) => readyParts.contains(part);
 }
 
 class _PredictionPageState extends State<PredictionPage> {
@@ -70,6 +85,9 @@ class _PredictionPageState extends State<PredictionPage> {
   /// 初回表示後はヘッダー〜団体タブを残し、タブ下だけローディングする。
   bool _shellReady = false;
   String? error;
+  /// 団体ごとのセクション準備状況（準備できたものから描画）
+  final Map<OrgKind, Set<_LoadPart>> _readyParts = {};
+  final Map<String, Future<void>> _partLoadFutures = {};
 
   bool _newsExpanded = false;
   bool _eventsExpanded = false;
@@ -110,7 +128,49 @@ class _PredictionPageState extends State<PredictionPage> {
       _orgKind = OrgKind.npb;
     }
     _personalStatsLayout = readPersonalStatsLayout();
-    _loadThenWatchGames();
+    // ヘッダー〜団体タブはデータ待ちせず先に出す
+    _shellReady = true;
+    _bootstrapWithAuth();
+  }
+
+  bool get _showUserPredictions => AuthSession.instance.isLoggedIn;
+
+  bool _partReady(_LoadPart part, [OrgKind? kind]) =>
+      _readyParts[kind ?? _orgKind]?.contains(part) ?? false;
+
+  bool get _boardContentReady =>
+      _partReady(_LoadPart.standings) || _partReady(_LoadPart.games) || _partReady(_LoadPart.players);
+
+  Future<void> _bootstrapWithAuth() async {
+    // 認証復元とデータ取得を並列（認証完了を待たない）
+    unawaited(AuthSession.instance.restore().then((_) {
+      if (mounted) setState(() {});
+    }));
+    await _loadThenWatchGames();
+  }
+
+  void _onAuthChanged() {
+    if (!mounted) return;
+    setState(() {});
+  }
+
+  Future<void> _markRead(String target) async {
+    if (!AuthSession.instance.isLoggedIn) return;
+    final err = await AuthSession.instance.markRead(target);
+    if (!mounted) return;
+    if (err == null) setState(() {});
+  }
+
+  void _toggleNewsSection() {
+    final opening = !_newsExpanded;
+    setState(() => _newsExpanded = opening);
+    if (opening) unawaited(_markRead('news'));
+  }
+
+  void _toggleEventsSection() {
+    final opening = !_eventsExpanded;
+    setState(() => _eventsExpanded = opening);
+    if (opening) unawaited(_markRead('event'));
   }
 
   void _setPersonalStatsLayout(PersonalStatsLayout layout) {
@@ -119,7 +179,7 @@ class _PredictionPageState extends State<PredictionPage> {
     setState(() => _personalStatsLayout = layout);
   }
 
-  void _applyBundle(_OrgBundle bundle) {
+  void _applyBundle(_OrgBundle bundle, {OrgKind? kind}) {
     predictions = bundle.predictions;
     standings = bundle.standings;
     npbPlayerStats = bundle.playerStats;
@@ -127,6 +187,7 @@ class _PredictionPageState extends State<PredictionPage> {
     games = bundle.games;
     postseasonGames = bundle.postseasonGames;
     showPostseasonBoard = bundle.showPostseasonBoard;
+    _readyParts[kind ?? _orgKind] = {...bundle.readyParts};
     // 予想者名は取れたいずれかの団体データから Info に蓄える（空で上書きしない）
     _captureInfoUsers(bundle.predictions, bundle.playerStats);
   }
@@ -174,6 +235,7 @@ class _PredictionPageState extends State<PredictionPage> {
         games: games,
         postseasonGames: postseasonGames,
         showPostseasonBoard: showPostseasonBoard,
+        readyParts: {...(_readyParts[_orgKind] ?? const <_LoadPart>{})},
       );
 
   Future<void> _changeOrg(OrgKind kind) async {
@@ -187,15 +249,23 @@ class _PredictionPageState extends State<PredictionPage> {
       _itemTab = 0;
       error = null;
       if (cached != null) {
-        _applyBundle(cached);
+        _applyBundle(cached, kind: kind);
         isLoading = false;
         _shellReady = true;
       } else {
         isLoading = true;
+        predictions = [];
+        standings = [];
+        npbPlayerStats = [];
+        npbPlayerStatsActual = [];
+        games = [];
+        postseasonGames = [];
+        showPostseasonBoard = false;
+        _readyParts[kind] = <_LoadPart>{};
       }
     });
     _gamesRefreshTimer?.cancel();
-    if (cached != null) {
+    if (cached != null && cached.partReady(_LoadPart.games)) {
       await _startGamesWatch();
       unawaited(_prefetchOtherOrg());
       return;
@@ -215,6 +285,7 @@ class _PredictionPageState extends State<PredictionPage> {
   }
 
   Widget _infoShell({required Widget child, required bool expand}) {
+    final showInfoNew = !_infoExpanded && AuthSession.instance.showInfoNew;
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -250,6 +321,10 @@ class _PredictionPageState extends State<PredictionPage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      if (showInfoNew) ...[
+                        const SizedBox(width: 8),
+                        const BlinkNewMark(fontSize: 10),
+                      ],
                     ],
                   ),
                 ),
@@ -310,14 +385,13 @@ class _PredictionPageState extends State<PredictionPage> {
   Future<void> _loadThenWatchGames() async {
     await fetchData();
     if (!mounted) return;
-    // 通信失敗でもヘッダー〜団体タブは出す
-    if (!_shellReady) {
+    if (!_shellReady || isLoading) {
       setState(() {
         _shellReady = true;
         isLoading = false;
       });
     }
-    if (error != null) return;
+    if (error != null && !_boardContentReady) return;
     await _startGamesWatch();
     unawaited(_prefetchOtherOrg());
   }
@@ -359,6 +433,12 @@ class _PredictionPageState extends State<PredictionPage> {
           serverFlag: map['show_postseason_board'] == true,
           today: DateTime.now(),
         ),
+        readyParts: {
+          _LoadPart.info,
+          _LoadPart.standings,
+          _LoadPart.players,
+          _LoadPart.games,
+        },
       );
       _orgCache[_orgKind] = bundle;
       setState(() {
@@ -431,7 +511,7 @@ class _PredictionPageState extends State<PredictionPage> {
       final cached = _orgCache[target];
       if (cached != null && target == _orgKind) {
         setState(() {
-          _applyBundle(cached);
+          _applyBundle(cached, kind: target);
           isLoading = false;
           _shellReady = true;
           error = null;
@@ -440,7 +520,7 @@ class _PredictionPageState extends State<PredictionPage> {
       return;
     }
 
-    final future = _fetchOrgBundle(target, background: background);
+    final future = _fetchOrgParts(target, background: background);
     _orgLoadFutures[target] = future;
     try {
       await future;
@@ -449,61 +529,130 @@ class _PredictionPageState extends State<PredictionPage> {
     }
   }
 
-  Future<void> _fetchOrgBundle(OrgKind target, {required bool background}) async {
+  _OrgBundle _ensureCache(OrgKind target) {
+    return _orgCache.putIfAbsent(
+      target,
+      () => _OrgBundle(
+        predictions: const [],
+        standings: const [],
+        playerStats: const [],
+        playerStatsActual: const [],
+        games: const [],
+        postseasonGames: const [],
+        showPostseasonBoard: false,
+        readyParts: <_LoadPart>{},
+      ),
+    );
+  }
+
+  String _partPath(OrgKind kind, String part) =>
+      '/predictions/part?org=${OrgConfig.of(kind).label.toLowerCase()}&part=$part';
+
+  Future<void> _fetchOrgParts(OrgKind target, {required bool background}) async {
+    _ensureCache(target);
+    // 軽いものから並列開始。完了したパートから setState して描画を進める。
+    await Future.wait([
+      _fetchPart(target, _LoadPart.info, background: background),
+      _fetchPart(target, _LoadPart.standings, background: background),
+      _fetchPart(target, _LoadPart.players, background: background),
+      _fetchPart(target, _LoadPart.games, background: background),
+    ]);
+  }
+
+  Future<void> _fetchPart(OrgKind target, _LoadPart part, {required bool background}) async {
+    final key = '${target.name}|${part.name}';
+    final inflight = _partLoadFutures[key];
+    if (inflight != null) {
+      await inflight;
+      return;
+    }
+    final future = _fetchPartOnce(target, part, background: background);
+    _partLoadFutures[key] = future;
+    try {
+      await future;
+    } finally {
+      _partLoadFutures.remove(key);
+    }
+  }
+
+  Future<void> _fetchPartOnce(OrgKind target, _LoadPart part, {required bool background}) async {
     final org = OrgConfig.of(target);
     try {
-      final uri = Uri.parse('${Env.baseUrl()}${_predictionsPath(target)}');
-      final res = await http.get(uri);
-
+      final res = await http.get(Env.api(_partPath(target, part.name))).timeout(const Duration(seconds: 60));
       if (res.statusCode != 200) {
-        if (!background && target == _orgKind && mounted) {
+        if (!background && target == _orgKind && mounted && !_boardContentReady) {
           setState(() {
             error = 'HTTPエラー: ${res.statusCode}';
             isLoading = false;
             _shellReady = true;
           });
         }
-        logger.w('HTTP ${res.statusCode} body: ${res.body.substring(0, res.body.length.clamp(0, 400))}');
+        logger.w('part ${part.name} HTTP ${res.statusCode}');
         return;
       }
-
       final map = jsonDecode(res.body) as Map<String, dynamic>;
+      final bundle = _ensureCache(target);
 
-      final users = listMapFromJson(map['predict_team']);
-      final npb = listMapFromJson(map['stats_team']);
-      final statsPredict = listMapFromJson(map['predict_player']);
-      final statsActual = listMapFromJson(map['stats_player']);
-      final gms = listMapFromJson(map['games']);
-      final bundle = _OrgBundle(
-        predictions: users.where(org.rowBelongs).toList(),
-        standings: npb.where(org.rowBelongs).toList(),
-        playerStats: statsPredict.where(org.rowBelongs).toList(),
-        playerStatsActual: statsActual.where(org.rowBelongs).toList(),
-        games: normalizeGames(gms).where(org.gameBelongs).toList(),
-        postseasonGames: listMapFromJson(map['postseason_games']),
-        showPostseasonBoard: postseasonBoardVisible(
-          serverFlag: map['show_postseason_board'] == true,
-          today: DateTime.now(),
-        ),
-      );
-      _orgCache[target] = bundle;
+      switch (part) {
+        case _LoadPart.info:
+          if (target == _orgKind || !_partReady(_LoadPart.info)) {
+            // Info は共通。裏読みでも反映
+          }
+          break;
+        case _LoadPart.standings:
+          bundle.predictions = listMapFromJson(map['predict_team']).where(org.rowBelongs).toList();
+          bundle.standings = listMapFromJson(map['stats_team']).where(org.rowBelongs).toList();
+          break;
+        case _LoadPart.players:
+          bundle.playerStats = listMapFromJson(map['predict_player']).where(org.rowBelongs).toList();
+          bundle.playerStatsActual = listMapFromJson(map['stats_player']).where(org.rowBelongs).toList();
+          break;
+        case _LoadPart.games:
+          bundle.games = normalizeGames(listMapFromJson(map['games'])).where(org.gameBelongs).toList();
+          bundle.postseasonGames = listMapFromJson(map['postseason_games']);
+          bundle.showPostseasonBoard = postseasonBoardVisible(
+            serverFlag: map['show_postseason_board'] == true,
+            today: DateTime.now(),
+          );
+          break;
+      }
+      bundle.readyParts.add(part);
+      _readyParts.putIfAbsent(target, () => <_LoadPart>{}).add(part);
 
       if (!mounted) return;
-      if (target == _orgKind) {
-        setState(() {
-          _applyBundle(bundle);
+      setState(() {
+        if (part == _LoadPart.info) {
           _applySharedInfo(map);
+          _captureInfoUsers(listMapFromJson(map['predict_team']));
+        }
+        if (target == _orgKind) {
+          switch (part) {
+            case _LoadPart.info:
+              break;
+            case _LoadPart.standings:
+              predictions = bundle.predictions;
+              standings = bundle.standings;
+              _captureInfoUsers(bundle.predictions, bundle.playerStats);
+              break;
+            case _LoadPart.players:
+              npbPlayerStats = bundle.playerStats;
+              npbPlayerStatsActual = bundle.playerStatsActual;
+              _captureInfoUsers(bundle.predictions, bundle.playerStats);
+              break;
+            case _LoadPart.games:
+              games = bundle.games;
+              postseasonGames = bundle.postseasonGames;
+              showPostseasonBoard = bundle.showPostseasonBoard;
+              break;
+          }
           isLoading = false;
           _shellReady = true;
           if (!background) error = null;
-        });
-      } else {
-        // 裏読み込みでも Info は共通なので取れたら反映
-        setState(() => _applySharedInfo(map));
-      }
+        }
+      });
     } catch (e, st) {
-      logger.e('通信/解析エラー: $e\n$st');
-      if (!background && target == _orgKind && mounted) {
+      logger.e('part ${part.name} 通信/解析エラー: $e\n$st');
+      if (!background && target == _orgKind && mounted && !_boardContentReady) {
         setState(() {
           error = '通信エラー: $e';
           isLoading = false;
@@ -822,11 +971,17 @@ class _PredictionPageState extends State<PredictionPage> {
       org: _org,
       personalStatsLayout: _personalStatsLayout,
       onPersonalStatsLayoutChanged: _setPersonalStatsLayout,
+      loadingStandings: !_partReady(_LoadPart.standings),
+      loadingStats: !_partReady(_LoadPart.players),
+      loadingGames: !_partReady(_LoadPart.games),
     );
   }
 
   Widget _itemBoard({bool wideLayout = false}) {
     if (_itemTab == 2) {
+      if (!_partReady(_LoadPart.players)) {
+        return const Center(child: CircularProgressIndicator());
+      }
       // 横長は打者上段・投手下段の全グリッド。縦長のみセグメント／スクロール切替。
       if (wideLayout) {
         return DualBandBothLeaguePersonalStats(
@@ -842,6 +997,9 @@ class _PredictionPageState extends State<PredictionPage> {
       );
     }
     if (_itemTab == 0) {
+      if (!_partReady(_LoadPart.games)) {
+        return const Center(child: CircularProgressIndicator());
+      }
       return BothLeagueGameDay(
         games: games,
         playerStats: npbPlayerStatsActual,
@@ -851,6 +1009,9 @@ class _PredictionPageState extends State<PredictionPage> {
           for (final league in _org.leagues) (id: league.id, name: league.name, color: league.color),
         ],
       );
+    }
+    if (!_partReady(_LoadPart.standings)) {
+      return const Center(child: CircularProgressIndicator());
     }
     return ListView(
       children: [
@@ -895,12 +1056,21 @@ class _PredictionPageState extends State<PredictionPage> {
         final boardW = isMlb ? MlbBracketGeom.w : BracketGeom.w;
         final boardH = isMlb ? MlbBracketGeom.h : BracketGeom.h;
         final width = constraints.maxWidth.isFinite ? constraints.maxWidth : boardW;
+        final loadingTeams = !_partReady(_LoadPart.standings);
         return SizedBox(
           width: width,
           height: width * boardH / boardW,
           child: isMlb
-              ? MlbPostseasonBracket(standings: standings, games: _mlbBracketGames())
-              : PostseasonBracket(standings: standings, games: postseasonGames),
+              ? MlbPostseasonBracket(
+                  standings: standings,
+                  games: _mlbBracketGames(),
+                  loadingTeams: loadingTeams,
+                )
+              : PostseasonBracket(
+                  standings: standings,
+                  games: postseasonGames,
+                  loadingTeams: loadingTeams,
+                ),
         );
       },
     );
@@ -930,6 +1100,7 @@ class _PredictionPageState extends State<PredictionPage> {
     required bool expanded,
     required VoidCallback onToggle,
     required Widget child,
+    bool showNew = false,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
@@ -966,6 +1137,10 @@ class _PredictionPageState extends State<PredictionPage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      if (showNew) ...[
+                        const SizedBox(width: 6),
+                        const BlinkNewMark(fontSize: 9),
+                      ],
                     ],
                   ),
                 ),
@@ -986,7 +1161,9 @@ class _PredictionPageState extends State<PredictionPage> {
   Map<String, int> _infoAtariCounts() {
     final totals = <String, int>{'1': 0, '2': 0};
     for (final kind in OrgKind.values) {
-      final bundle = (kind == _orgKind && !isLoading) ? _snapshotCurrent() : _orgCache[kind];
+      final ready = _partReady(_LoadPart.standings, kind) || _partReady(_LoadPart.players, kind);
+      if (!ready) continue;
+      final bundle = (kind == _orgKind) ? _snapshotCurrent() : _orgCache[kind];
       if (bundle == null) continue;
       final part = computeAtariCounts(
         npbPlayerStats: bundle.playerStats,
@@ -1001,17 +1178,33 @@ class _PredictionPageState extends State<PredictionPage> {
   // 上部: Score + News + イベント日程（NPB/MLB 共通。団体タブでは内容を切り替えない）
   Widget _scoreNewsEventsRow({required bool portrait}) {
     final counts = _infoAtariCounts();
+    final infoLoading = !_partReady(_LoadPart.info);
+    final scoreLoading = !_partReady(_LoadPart.standings) || !_partReady(_LoadPart.players);
+    final namesLoading = infoLoading && !_partReady(_LoadPart.standings);
+
+    Widget _miniSpinner({double size = 18}) => SizedBox(
+          width: size,
+          height: size,
+          child: const CircularProgressIndicator(strokeWidth: 2),
+        );
+
     Widget _scoreBox({bool hideHeader = false, bool portraitCompact = false}) {
-      final name1 = _infoName1;
-      final name2 = _infoName2;
-      final score1 = '${counts['1'] ?? 0}';
-      final score2 = '${counts['2'] ?? 0}';
-      final color1 = _infoColor1 ?? Colors.blue;
-      final color2 = _infoColor2 ?? Colors.red;
+      // ログインユーザーを左、相手を右に並べる（id=1/2 の予想者）
+      final loginId = AuthSession.instance.user?.id;
+      final selfLeft = loginId == 2;
+      final leftKey = selfLeft ? '2' : '1';
+      final rightKey = selfLeft ? '1' : '2';
+      final name1 = selfLeft ? _infoName2 : _infoName1;
+      final name2 = selfLeft ? _infoName1 : _infoName2;
+      final score1 = '${counts[leftKey] ?? 0}';
+      final score2 = '${counts[rightKey] ?? 0}';
+      final color1 = (selfLeft ? _infoColor2 : _infoColor1) ?? Colors.blue;
+      final color2 = (selfLeft ? _infoColor1 : _infoColor2) ?? Colors.red;
       const double vBorder = 1.0;
       const double cellPad = 6.0;
 
       Widget _nameCell(String name, Color background, {bool leftBorder = false}) {
+        final showSpinner = namesLoading && name.trim().isEmpty;
         return Expanded(
           child: Container(
             decoration: BoxDecoration(
@@ -1020,13 +1213,15 @@ class _PredictionPageState extends State<PredictionPage> {
             ),
             alignment: Alignment.center,
             padding: const EdgeInsets.symmetric(horizontal: cellPad, vertical: 4),
-            child: OneLineShrinkText(
-              name,
-              baseSize: 20,
-              minSize: 10,
-              weight: FontWeight.bold,
-              color: Colors.white,
-            ),
+            child: showSpinner
+                ? _miniSpinner(size: 16)
+                : OneLineShrinkText(
+                    name,
+                    baseSize: 20,
+                    minSize: 10,
+                    weight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
           ),
         );
       }
@@ -1085,13 +1280,15 @@ class _PredictionPageState extends State<PredictionPage> {
                       child: Container(
                         padding: const EdgeInsets.all(cellPad),
                         alignment: Alignment.center,
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            score1,
-                            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, height: 1.0),
-                          ),
-                        ),
+                        child: scoreLoading
+                            ? _miniSpinner(size: 20)
+                            : FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  score1,
+                                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, height: 1.0),
+                                ),
+                              ),
                       ),
                     ),
                     Expanded(
@@ -1101,13 +1298,15 @@ class _PredictionPageState extends State<PredictionPage> {
                         ),
                         padding: const EdgeInsets.all(cellPad),
                         alignment: Alignment.center,
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            score2,
-                            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, height: 1.0),
-                          ),
-                        ),
+                        child: scoreLoading
+                            ? _miniSpinner(size: 20)
+                            : FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  score2,
+                                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, height: 1.0),
+                                ),
+                              ),
                       ),
                     ),
                   ],
@@ -1132,15 +1331,17 @@ class _PredictionPageState extends State<PredictionPage> {
                         ),
                         padding: const EdgeInsets.all(cellPad),
                         alignment: Alignment.center,
-                        child: Text(
-                          value,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: scoreSize,
-                            fontWeight: FontWeight.w800,
-                            height: 1.0,
-                          ),
-                        ),
+                        child: scoreLoading
+                            ? _miniSpinner(size: 22)
+                            : Text(
+                                value,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: scoreSize,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.0,
+                                ),
+                              ),
                       ),
                     );
                   }
@@ -1217,34 +1418,42 @@ class _PredictionPageState extends State<PredictionPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (!hideHeader)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF757575),
+              Material(
+                color: const Color(0xFF757575),
+                borderRadius: BorderRadius.circular(3),
+                child: InkWell(
+                  onTap: AuthSession.instance.showNewsNew ? () => unawaited(_markRead('news')) : null,
                   borderRadius: BorderRadius.circular(3),
-                ),
-                child: Row(
-                  children: [
-                    const Text('News', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerRight,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
-                            decoration: BoxDecoration(
-                              color: Colors.grey,
-                              borderRadius: BorderRadius.circular(4),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    child: Row(
+                      children: [
+                        const Text('News', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                        if (AuthSession.instance.showNewsNew) ...[
+                          const SizedBox(width: 8),
+                          const BlinkNewMark(fontSize: 10),
+                        ],
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerRight,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Text('未読メッセージを一覧表示', style: TextStyle(color: Colors.white, fontSize: 11)),
+                              ),
                             ),
-                            child: const Text('未読メッセージを一覧表示', style: TextStyle(color: Colors.white, fontSize: 11)),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             Expanded(
@@ -1256,43 +1465,45 @@ class _PredictionPageState extends State<PredictionPage> {
                     const Divider(height: 1),
                     const SizedBox(height: 4),
                     Expanded(
-                      child: ListView(
-                        padding: EdgeInsets.zero,
-                        primary: false,
-                        children: [
-                          for (final n in notifications)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 2),
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                primary: false,
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    newsTag(
-                                      (n['tag_main_title'] ?? '').toString(),
-                                      parse(n['tag_main_color_back'], Colors.grey.shade300),
-                                      parse(n['tag_main_color_font'], Colors.white),
+                      child: infoLoading
+                          ? Center(child: _miniSpinner(size: 22))
+                          : ListView(
+                              padding: EdgeInsets.zero,
+                              primary: false,
+                              children: [
+                                for (final n in notifications)
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 2),
+                                    child: SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      primary: false,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          newsTag(
+                                            (n['tag_main_title'] ?? '').toString(),
+                                            parse(n['tag_main_color_back'], Colors.grey.shade300),
+                                            parse(n['tag_main_color_font'], Colors.white),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          newsTag(
+                                            (n['tag_sub_title'] ?? '').toString(),
+                                            parse(n['tag_sub_color_back'], Colors.grey.shade300),
+                                            parse(n['tag_sub_color_font'], Colors.white),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            (n['title'] ?? '').toString(),
+                                            maxLines: 1,
+                                            softWrap: false,
+                                            style: const TextStyle(fontSize: 12, height: 1.1, color: Colors.black87),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    const SizedBox(width: 6),
-                                    newsTag(
-                                      (n['tag_sub_title'] ?? '').toString(),
-                                      parse(n['tag_sub_color_back'], Colors.grey.shade300),
-                                      parse(n['tag_sub_color_font'], Colors.white),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      (n['title'] ?? '').toString(),
-                                      maxLines: 1,
-                                      softWrap: false,
-                                      style: const TextStyle(fontSize: 12, height: 1.1, color: Colors.black87),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                                  ),
+                              ],
                             ),
-                        ],
-                      ),
                     ),
                   ],
                 ),
@@ -1354,19 +1565,33 @@ class _PredictionPageState extends State<PredictionPage> {
             if (!hideHeader)
               SizedBox(
                 width: double.infinity,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF757575),
+                child: Material(
+                  color: const Color(0xFF757575),
+                  borderRadius: BorderRadius.circular(3),
+                  child: InkWell(
+                    onTap: AuthSession.instance.showEventNew ? () => unawaited(_markRead('event')) : null,
                     borderRadius: BorderRadius.circular(3),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      child: Row(
+                        children: [
+                          const Text('イベント日程', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                          if (AuthSession.instance.showEventNew) ...[
+                            const SizedBox(width: 8),
+                            const BlinkNewMark(fontSize: 10),
+                          ],
+                        ],
+                      ),
+                    ),
                   ),
-                  child: const Text('イベント日程', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                 ),
               ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(10, 4, 10, 6),
-                child: LayoutBuilder(
+                child: infoLoading
+                    ? Center(child: _miniSpinner(size: 22))
+                    : LayoutBuilder(
                   builder: (context, constraints) {
                     double measureTextWidth(String text) {
                       final painter = TextPainter(
@@ -1517,16 +1742,18 @@ class _PredictionPageState extends State<PredictionPage> {
           _portraitCollapsibleSection(
             title: 'News',
             expanded: _newsExpanded,
-            onToggle: () => setState(() => _newsExpanded = !_newsExpanded),
+            onToggle: _toggleNewsSection,
+            showNew: AuthSession.instance.showNewsNew,
             child: _newsBox(hideHeader: true, boxHeight: panelH),
           ),
           _portraitCollapsibleSection(
             title: 'イベント日程',
             expanded: _eventsExpanded,
-            onToggle: () => setState(() => _eventsExpanded = !_eventsExpanded),
+            onToggle: _toggleEventsSection,
+            showNew: AuthSession.instance.showEventNew,
             child: _eventsBox(hideHeader: true, boxHeight: panelH),
           ),
-          _scoreBox(hideHeader: true, portraitCompact: true),
+          if (_showUserPredictions) _scoreBox(hideHeader: true, portraitCompact: true),
         ],
       );
     }
@@ -1555,8 +1782,10 @@ class _PredictionPageState extends State<PredictionPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   _eventsBox(),
-                  const SizedBox(height: 6),
-                  _scoreBox(hideHeader: true, portraitCompact: true),
+                  if (_showUserPredictions) ...[
+                    const SizedBox(height: 6),
+                    _scoreBox(hideHeader: true, portraitCompact: true),
+                  ],
                 ],
               ),
             ),
@@ -1579,7 +1808,8 @@ class _PredictionPageState extends State<PredictionPage> {
         final designWidth = constraints.maxWidth;
         const double scale = 1.0;
         final compact = false;
-        final orgContentLoading = isLoading && _shellReady;
+        // 1セクションも来ていなければタブ下にグルグル。来たものから描画する。
+        final orgContentLoading = !_boardContentReady && error == null;
 
         final shortestSide = constraints.maxWidth < constraints.maxHeight ? constraints.maxWidth : constraints.maxHeight;
         final isPortrait = constraints.maxHeight / constraints.maxWidth >= PORTRAIT_ASPECT_RATIO || shortestSide < COMPACT_LAYOUT_PX;
@@ -1607,6 +1837,9 @@ class _PredictionPageState extends State<PredictionPage> {
             org: _org,
             personalStatsLayout: _personalStatsLayout,
             onPersonalStatsLayoutChanged: _setPersonalStatsLayout,
+            loadingStandings: !_partReady(_LoadPart.standings),
+            loadingStats: !_partReady(_LoadPart.players),
+            loadingGames: !_partReady(_LoadPart.games),
           );
         }
 
@@ -1700,32 +1933,37 @@ class _PredictionPageState extends State<PredictionPage> {
         );
 
         // レイアウトを「リーグ×2行、各行に 予想・成績・試合情報」を配置
-        return Container(
-          alignment: Alignment.topCenter,
-          child: Transform.scale(
-            scale: scale,
+        return ShowUserPredictions(
+          value: _showUserPredictions,
+          child: Container(
             alignment: Alignment.topCenter,
-            child: ConstrainedBox(
-              constraints: BoxConstraints.tightFor(width: designWidth),
-              child: SizedBox(
-                height: constraints.maxHeight,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Headers.globalHeader(
-                      HEADER_GLOBAL_H,
-                      ALL_COLOR_APP,
-                      HEADER_TITLE,
-                      HEADER_PAD_VERTICAL,
-                      ALL_MARGIN_LEFT,
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.only(bottom: ALL_SPACE_BLOCK, left: ALL_MARGIN_LEFT, right: ALL_MARGIN_LEFT),
-                        child: bodyContent,
+            child: Transform.scale(
+              scale: scale,
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: BoxConstraints.tightFor(width: designWidth),
+                child: SizedBox(
+                  height: constraints.maxHeight,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Headers.globalHeader(
+                        context,
+                        HEADER_GLOBAL_H,
+                        ALL_COLOR_APP,
+                        HEADER_TITLE,
+                        HEADER_PAD_VERTICAL,
+                        ALL_MARGIN_LEFT,
+                        onAuthChanged: _onAuthChanged,
                       ),
-                    ),
-                  ],
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(bottom: ALL_SPACE_BLOCK, left: ALL_MARGIN_LEFT, right: ALL_MARGIN_LEFT),
+                          child: bodyContent,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

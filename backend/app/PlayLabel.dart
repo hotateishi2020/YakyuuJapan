@@ -1,8 +1,9 @@
+import '../tools/StringTool.dart';
 import 'Value.dart';
 
 /// 試合とチームと選手名から、打席結果の表示文を引くキー。
 String playPlayerKey(dynamic idGame, dynamic idTeam, dynamic name) {
-  return '${_asInt(idGame)}|${_asInt(idTeam)}|${'$name'.trim()}';
+  return '${_asInt(idGame)}|${_asInt(idTeam)}|${StringTool.noSpace('$name')}';
 }
 
 /// t_game_details の行から、選手ごとの打席結果（選手名の右に並べる文言）を作る。
@@ -71,7 +72,7 @@ int _chipCount(String plays, bool Function(String kind) match) {
     if (part.isEmpty) continue;
     final bar = part.lastIndexOf('|');
     final kind = bar < 0 ? '' : part.substring(bar + 1);
-    if (match(kind)) count++;
+    if (match(kind.split('/').first)) count++;
   }
   return count;
 }
@@ -243,12 +244,6 @@ int _leadoffOrder(List<Map<String, dynamic>> rows) {
   return start;
 }
 
-String _halfInning(Map<String, dynamic> row) {
-  final inning = _asInt(row['int_inning']);
-  if (inning <= 0) return '';
-  return '$inning回${_asBool(row['flg_bottom']) ? '裏' : '表'}';
-}
-
 String _plateKey(Map<String, dynamic> row) {
   return [
     _asInt(row['int_inning']),
@@ -269,18 +264,21 @@ List<({String text, String kind})> _chipsForPlate(List<Map<String, dynamic>> pla
     if (_isBattingResult('${row['code_result'] ?? ''}')) batting = row;
   }
   final chips = <({String text, String kind})>[];
+  var stealSafe = false;
+  var stealOut = false;
+  ({String text, String kind})? battingChip;
   for (final row in plate) {
     final result = '${row['code_result'] ?? ''}';
     if (result == Value.CodeGameResult.STEAL_BASE_SAFE) {
-      chips.add((text: '盗塁', kind: 'steal'));
+      stealSafe = true;
       continue;
     }
     if (result == Value.CodeGameResult.STEAL_BASE_OUT) {
-      chips.add((text: '盗塁失敗', kind: 'stealout'));
+      stealOut = true;
       continue;
     }
     if (!identical(row, batting)) continue;
-    final chip = _formatResult(
+    battingChip = _formatResult(
       result: result,
       pinch: pinch,
       state: _stateWord('${row['code_state_score'] ?? ''}'),
@@ -288,9 +286,17 @@ List<({String text, String kind})> _chipsForPlate(List<Map<String, dynamic>> pla
       runs: _asInt(row['int_runs']),
       homerNumber: _asInt(row['cnt_homerun']),
       direction: _direction('${row['code_direction_batting'] ?? ''}'),
-      inning: _halfInning(row),
     );
-    if (chip != null) chips.add(chip);
+  }
+  if (battingChip != null) {
+    var kind = battingChip.kind;
+    if (stealSafe) kind = '$kind/steal';
+    if (stealOut) kind = '$kind/stealout';
+    if (pinch) kind = '$kind/pinch';
+    chips.add((text: battingChip.text, kind: kind));
+  } else {
+    if (stealSafe) chips.add((text: '盗塁', kind: 'steal'));
+    if (stealOut) chips.add((text: '盗塁失敗', kind: 'stealout'));
   }
   return chips;
 }
@@ -326,6 +332,7 @@ bool _isBattingResult(String result) {
     'WALK_DEAD',
     'ERROR_FIELDING',
     'INTERFERENCE_BATTING',
+    'FIELDERS_CHOICE',
   };
   return results.contains(result);
 }
@@ -338,7 +345,6 @@ bool _isBattingResult(String result) {
   required int runs,
   required int homerNumber,
   required String direction,
-  required String inning,
 }) {
   final head = '$state${goodbye ? 'サヨナラ' : ''}';
   final pinchHead = '${pinch ? '代打' : ''}$head';
@@ -351,7 +357,7 @@ bool _isBattingResult(String result) {
     };
     final number = homerNumber > 0 ? '$homerNumber号' : '';
     final mark = direction.isEmpty ? '' : '^$direction';
-    return (text: '$inning$number$pinchHead$kindホームラン$mark', kind: 'hr');
+    return (text: '$number$pinchHead$kindホームラン$mark', kind: 'hr');
   }
 
   if (result == Value.CodeGameResult.HIT_SINGLE || result == Value.CodeGameResult.HIT_DOUBLE || result == Value.CodeGameResult.HIT_TRIPLE) {
@@ -361,8 +367,8 @@ bool _isBattingResult(String result) {
       _ => 'ヒット',
     };
     final short = switch (result) {
-      'HIT2' => '${direction}2',
-      'HIT3' => '${direction}3',
+      'HIT2' => '${direction}２',
+      'HIT3' => '${direction}３',
       _ => direction.isEmpty ? '安' : '${direction}安',
     };
     if (runs > 0) {
@@ -370,15 +376,16 @@ bool _isBattingResult(String result) {
       // 速報が「タイムリーヒット」でも、ヒットよりタイムリーを優先する。二塁打・三塁打は種類を残す。
       final body = result == Value.CodeGameResult.HIT_SINGLE ? 'タイムリー' : 'タイムリー$hit';
       final mark = direction.isEmpty ? '' : '^$direction';
-      return (text: '$inning$pinchHead$points$body$mark', kind: 'timely');
+      return (text: '$pinchHead$points$body$mark', kind: 'timely');
     }
     final hitKind = switch (result) {
       'HIT3' => 'triple',
       'HIT2' => 'double',
       _ => 'single',
     };
+    final mark = direction.isEmpty ? '' : '^$direction';
     if (state.isNotEmpty || goodbye) {
-      return (text: '$head$hit', kind: hitKind);
+      return (text: '$head$hit$mark', kind: hitKind);
     }
     return (text: '$head$short', kind: hitKind);
   }
@@ -407,14 +414,16 @@ bool _isBattingResult(String result) {
     'SACRIFICE_BUNT' => squeeze ? 'スクイズ' : '犠打',
     'SACRIFICE_FLY' => '犠飛',
     'ERROR' || 'ERROR_FIELDING' => direction.isEmpty ? '失策' : '${direction}失',
+    'FIELDERS_CHOICE' => direction.isEmpty ? '野選' : '${direction}野選',
     'INTERFERENCE_BATTING' => '打撃妨害',
     _ => '',
   };
   if (body.isEmpty) return null;
   final kind = switch (result) {
     'WALK' => 'walk',
-    'WALK_DEAD' || 'INTERFERENCE_BATTING' => 'dead',
     'ERROR' || 'ERROR_FIELDING' => 'error',
+    'FIELDERS_CHOICE' => 'fc',
+    'WALK_DEAD' || 'INTERFERENCE_BATTING' => 'dead',
     'SACRIFICE_FLY' => 'sacfly',
     'SQUEEZE' || 'SACRIFICE_BUNT' => squeeze ? 'squeeze' : 'sacbunt',
     _ => 'out',

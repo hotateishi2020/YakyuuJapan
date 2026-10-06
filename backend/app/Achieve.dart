@@ -43,12 +43,12 @@ String pitcherStatChips({
   // 0回は率の分母を1/3回にして、色分けだけ他投手と同じ基準に近づける。
   final ip = outs > 0 ? outs / 3.0 : 1 / 3.0;
   final runsLabel = runs == 0 ? '無失点' : '$runs失点';
-  final runsTone = _lowerTone(runs / ip, const [0, 0.15, 0.30, 0.45, 0.6, 0.75]);
+  final runsTone = _runsAllowedTone(runs / ip);
   final parts = <String>[
     '${_inningsLabel(innings)}$runsLabel|${runsTone == 'gray' ? 'dgray' : runsTone}',
     '被安打$hits|${_lowerTone(hits / ip, const [0, 0.3, 0.6, 0.9, 1.2, 1.5])}',
-    '四死球$freePasses|${_lowerTone(freePasses / ip, const [0, 0.15, 0.30, 0.45, 0.6, 0.75])}',
-    '$strikeouts奪三振|${starter ? _higherTone(strikeouts / ip, const [1, 0.85, 0.7, 0.55, 0.4, 0.25]) : _reliefStrikeoutTone(strikeouts / ip)}',
+    '${freePasses}四死|${_walksAllowedTone(freePasses / ip)}',
+    '${strikeouts}K|${starter ? _higherTone(strikeouts / ip, const [1, 0.85, 0.7, 0.55, 0.4, 0.25]) : _reliefStrikeoutTone(strikeouts / ip)}',
   ];
   if (pitches > 0) parts.add('$pitches球|');
   return parts.join(' ');
@@ -60,6 +60,18 @@ String _inningsLabel(num innings) {
   if (thirds <= 0) return '$whole回';
   if (thirds > 2) thirds = 2;
   return '$whole.$thirds回';
+}
+
+/// 失点率（失点 / 投球回）。1回あたり2失点以上は黒、2/9/3失点以内は橙系。
+String _runsAllowedTone(double rate) {
+  if (rate >= 2 - 1e-9) return 'alert';
+  return _lowerTone(rate, const [0.0, 2 / 9, 3 / 9, 4.5 / 9, 6 / 9, 1.0]);
+}
+
+/// 四死球率（四死球 / 投球回）。1回あたり1.5以上は黒地に赤文字。
+String _walksAllowedTone(double rate) {
+  if (rate >= 1.5 - 1e-9) return 'alert';
+  return _lowerTone(rate, const [0, 0.15, 0.30, 0.45, 0.6, 0.75]);
 }
 
 /// 小さいほど良い指標。境界は各色の上限。
@@ -150,9 +162,9 @@ String doubleDigitStrikeouts(int strikeouts) => strikeouts >= 10 ? '２ケタ奪
 /// 単打・二塁打・三塁打・本塁打が3本以上なら猛打賞。
 String multiHitMark(int hits) => hits >= 3 ? '猛打賞|multihit' : '';
 
-/// 打席が2つ以上あり、すべて安打なら全打席安打、すべて出塁なら全打席出塁。
+/// 打席が4つ以上あり、すべて安打なら全打席安打、すべて出塁なら全打席出塁。
 String plateFeatMarks({required int plates, required int reached, required int hits}) {
-  if (plates < 2) return '';
+  if (plates < 4) return '';
   final marks = <String>[];
   if (hits == plates) marks.add('全打席安打|allhit');
   if (reached == plates) marks.add('全打席出塁|allreach');

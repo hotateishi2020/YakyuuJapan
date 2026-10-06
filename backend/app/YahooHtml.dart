@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
@@ -9,7 +10,7 @@ import 'package:html/parser.dart' show parse;
 /// Yahoo 野球ページ共通の HTML 取得・デコード。
 class YahooHtml {
   static Future<Document> fetchDocument(Uri url) async {
-    final res = await http.get(url, headers: {'User-Agent': 'Mozilla/5.0'});
+    final res = await http.get(url, headers: {'User-Agent': 'Mozilla/5.0'}).timeout(const Duration(seconds: 12));
     if (res.statusCode != 200) {
       throw Exception('HTTP ${res.statusCode} for $url');
     }

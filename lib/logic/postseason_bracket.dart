@@ -1,3 +1,5 @@
+import 'game_dedupe.dart';
+
 /// 1シーズンの試合数。日程が最後まで入っていないときの残り試合の下限に使う。
 const npbSeasonGames = 143;
 
@@ -201,8 +203,9 @@ StageResult scoreSeries({
   var closed = 0;
 
   for (final game in games) {
-    final involves = game.homeId == high.id || game.awayId == high.id || game.homeId == low.id || game.awayId == low.id;
-    if (!involves || high.id == 0 || low.id == 0) continue;
+    final involvesHigh = game.homeId == high.id || game.awayId == high.id;
+    final involvesLow = game.homeId == low.id || game.awayId == low.id;
+    if (!involvesHigh || !involvesLow || high.id == 0 || low.id == 0) continue;
     final state = game.state.trim();
     if (state == '試合中止') {
       closed += 1;
@@ -433,6 +436,7 @@ PostseasonBoard buildPostseasonBoard({
   required List<Map<String, dynamic>> standings,
   required List<Map<String, dynamic>> games,
 }) {
+  games = dedupeSameDayMatchupRows(games);
   final c1 = _pick(standings, 1, 1);
   final c2 = _pick(standings, 1, 2);
   final c3 = _pick(standings, 1, 3);

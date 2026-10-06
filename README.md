@@ -20,7 +20,7 @@ flutter build web --release
 rm -rf backend/public/*
 cp -R build/web/* backend/public/
 git add .
-git commit -m "各種表示の修正を行いました。"
+git commit -m "読み込み処理の速度向上を実施しました。"
 git push
 cd /Users/standapp/StudioProjects/Koko/backend
 

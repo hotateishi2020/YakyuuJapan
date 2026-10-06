@@ -1,3 +1,4 @@
+import 'game_dedupe.dart';
 import 'postseason_bracket.dart';
 
 /// MLB ポストシーズン用ボード。ア／ナ各6シードと WS までの枠。
@@ -268,6 +269,7 @@ MlbPostseasonBoard buildMlbPostseasonBoard({
   required List<Map<String, dynamic>> standings,
   required List<Map<String, dynamic>> games,
 }) {
+  games = dedupeSameDayMatchupRows(games);
   final al = mlbSeeds(standings, 3);
   final nl = mlbSeeds(standings, 4);
 

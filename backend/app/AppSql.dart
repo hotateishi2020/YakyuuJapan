@@ -30,11 +30,20 @@ class AppSql {
   //m_player
   static String selectPlayerWhereFullNameAndTeamID() {
     return '''
-      SELECT 
-        id 
-      FROM m_player 
-      WHERE name_full = \$1 
-      AND id_team = \$2 
+      SELECT
+        m_player.id
+      FROM m_player
+      WHERE regexp_replace(m_player.name_full, '[[:space:]]', '', 'g')
+          = regexp_replace(\$1, '[[:space:]]', '', 'g')
+        AND m_player.id_team = \$2
+        AND COALESCE(m_player.flg_delete, FALSE) = FALSE
+      ORDER BY (
+        SELECT COALESCE(MAX(c.double_inning), -1)
+        FROM m_player_career c
+        WHERE c.id_player = m_player.id
+          AND COALESCE(c.flg_delete, FALSE) = FALSE
+      ) DESC,
+      m_player.id
       LIMIT 1
     ''';
   }
@@ -358,8 +367,16 @@ class AppSql {
     ''';
   }
 
+  /// スペースを除いた選手名。`C.セール` は先頭イニシャルを落として `セール`。
+  static String _playerNameKey(String expr) {
+    return "regexp_replace(regexp_replace($expr, '[[:space:]]', '', 'g'), '^[A-Za-z]{1,3}[\\.．]', '')";
+  }
+
   /// 予告先発の今季成績。勝敗、防御率、奪三振、規定投球回到達率。
+  /// 同一チームの表記ゆれ（C.セール / クリス・セール）の career も拾う。
   static String _seasonPitcherLine(String pitcher) {
+    final selfKey = _playerNameKey('$pitcher.name_full');
+    final mateKey = _playerNameKey('p2.name_full');
     return '''
       (
         SELECT TRIM(
@@ -384,10 +401,24 @@ class AppSql {
           ORDER BY st.crtat DESC
           LIMIT 1
         ) tg ON TRUE
-        WHERE c.id_player = $pitcher.id
-          AND c.int_year = \$1
+        WHERE c.int_year = \$1
           AND COALESCE(c.flg_delete, FALSE) = FALSE
-        ORDER BY c.double_inning DESC NULLS LAST
+          AND c.id_player IN (
+            SELECT p2.id
+            FROM m_player p2
+            WHERE COALESCE(p2.flg_delete, FALSE) = FALSE
+              AND p2.id_team = $pitcher.id_team
+              AND (
+                p2.id = $pitcher.id
+                OR $mateKey = $selfKey
+                OR (
+                  length($selfKey) >= 2
+                  AND ($mateKey LIKE '%' || $selfKey OR $selfKey LIKE '%' || $mateKey)
+                )
+              )
+          )
+        ORDER BY CASE WHEN c.id_player = $pitcher.id THEN 0 ELSE 1 END,
+                 c.double_inning DESC NULLS LAST
         LIMIT 1
       )
     ''';
@@ -420,13 +451,59 @@ class AppSql {
     ''';
   }
 
+  /// 当年は今日±10日。過去年はその年の最終試合日から10日前〜最終日。
+  static String gameDateWindow({String alias = 't_game'}) {
+    return '''
+      $alias.datetime_start::date BETWEEN
+        CASE
+          WHEN \$1 = EXTRACT(YEAR FROM CURRENT_DATE)::int THEN CURRENT_DATE - 10
+          ELSE COALESCE(
+            (SELECT MAX(gw.datetime_start)::date - 10 FROM t_game gw
+             WHERE EXTRACT(YEAR FROM gw.datetime_start) = \$1
+               AND COALESCE(gw.flg_delete, FALSE) = FALSE),
+            make_date(\$1, 10, 1)
+          )
+        END
+        AND
+        CASE
+          WHEN \$1 = EXTRACT(YEAR FROM CURRENT_DATE)::int THEN CURRENT_DATE + 10
+          ELSE COALESCE(
+            (SELECT MAX(gw.datetime_start)::date FROM t_game gw
+             WHERE EXTRACT(YEAR FROM gw.datetime_start) = \$1
+               AND COALESCE(gw.flg_delete, FALSE) = FALSE),
+            make_date(\$1, 10, 31)
+          )
+        END
+    ''';
+  }
+
   static String selectGames() {
     return '''
+      WITH team_games AS (
+        SELECT id, code_game, datetime_start, id_team_home AS id_team
+        FROM t_game
+        WHERE code_game IN ('NM', 'EX', 'OP') AND COALESCE(flg_delete, FALSE) = FALSE
+        UNION ALL
+        SELECT id, code_game, datetime_start, id_team_away AS id_team
+        FROM t_game
+        WHERE code_game IN ('NM', 'EX', 'OP') AND COALESCE(flg_delete, FALSE) = FALSE
+      ),
+      game_boundaries AS (
+        SELECT
+          id_team,
+          code_game,
+          EXTRACT(YEAR FROM datetime_start)::int AS game_year,
+          (ARRAY_AGG(id ORDER BY datetime_start ASC, id ASC))[1] AS first_id,
+          (ARRAY_AGG(id ORDER BY datetime_start DESC, id DESC))[1] AS last_id
+        FROM team_games
+        GROUP BY id_team, code_game, EXTRACT(YEAR FROM datetime_start)
+      )
       SELECT 
         t_game.id AS id_game,
         to_char(t_game.datetime_start, 'YYYY-MM-DD') AS date_game,
         CASE WHEN to_char(t_game.datetime_start, 'HH24:MI') BETWEEN '06:00' AND '16:59' THEN '☀️ ' || to_char(t_game.datetime_start, 'HH24:MI')
-             WHEN to_char(t_game.datetime_start, 'HH24:MI') BETWEEN '17:00' AND '24:00' THEN '🌙 ' || to_char(t_game.datetime_start, 'HH24:MI')
+             WHEN to_char(t_game.datetime_start, 'HH24:MI') BETWEEN '17:00' AND '23:59' THEN '🌙 ' || to_char(t_game.datetime_start, 'HH24:MI')
+             WHEN to_char(t_game.datetime_start, 'HH24:MI') BETWEEN '00:00' AND '05:59' THEN '🌙 ' || to_char(t_game.datetime_start, 'HH24:MI')
              ELSE '' END AS time_game,
         team_home.name_short AS name_team_home,
         team_away.name_short AS name_team_away,
@@ -436,6 +513,23 @@ class AppSql {
         team_home.color_back AS color_back_home,
         team_away.color_font AS color_font_away,
         team_away.color_back AS color_back_away,
+        t_game.code_game,
+        CONCAT_WS('・',
+          CASE WHEN t_game.code_game = 'NM' AND EXTRACT(MONTH FROM t_game.datetime_start) <= 4 AND t_game.id = boundary_home.first_id THEN 'シーズン開幕戦' END,
+          CASE WHEN t_game.code_game = 'NM' AND EXTRACT(MONTH FROM t_game.datetime_start) >= 9 AND t_game.id = boundary_home.last_id THEN 'シーズン最終戦' END,
+          CASE WHEN t_game.code_game = 'EX' AND EXTRACT(MONTH FROM t_game.datetime_start) BETWEEN 5 AND 6 AND t_game.id = boundary_home.first_id THEN '交流戦開幕戦' END,
+          CASE WHEN t_game.code_game = 'EX' AND EXTRACT(MONTH FROM t_game.datetime_start) BETWEEN 5 AND 6 AND t_game.id = boundary_home.last_id THEN '交流戦最終戦' END,
+          CASE WHEN t_game.code_game = 'OP' AND EXTRACT(MONTH FROM t_game.datetime_start) <= 3 AND t_game.id = boundary_home.first_id THEN 'オープン戦開幕戦' END,
+          CASE WHEN t_game.code_game = 'OP' AND EXTRACT(MONTH FROM t_game.datetime_start) <= 3 AND t_game.id = boundary_home.last_id THEN 'オープン戦最終試合' END
+        ) AS milestone_home,
+        CONCAT_WS('・',
+          CASE WHEN t_game.code_game = 'NM' AND EXTRACT(MONTH FROM t_game.datetime_start) <= 4 AND t_game.id = boundary_away.first_id THEN 'シーズン開幕戦' END,
+          CASE WHEN t_game.code_game = 'NM' AND EXTRACT(MONTH FROM t_game.datetime_start) >= 9 AND t_game.id = boundary_away.last_id THEN 'シーズン最終戦' END,
+          CASE WHEN t_game.code_game = 'EX' AND EXTRACT(MONTH FROM t_game.datetime_start) BETWEEN 5 AND 6 AND t_game.id = boundary_away.first_id THEN '交流戦開幕戦' END,
+          CASE WHEN t_game.code_game = 'EX' AND EXTRACT(MONTH FROM t_game.datetime_start) BETWEEN 5 AND 6 AND t_game.id = boundary_away.last_id THEN '交流戦最終戦' END,
+          CASE WHEN t_game.code_game = 'OP' AND EXTRACT(MONTH FROM t_game.datetime_start) <= 3 AND t_game.id = boundary_away.first_id THEN 'オープン戦開幕戦' END,
+          CASE WHEN t_game.code_game = 'OP' AND EXTRACT(MONTH FROM t_game.datetime_start) <= 3 AND t_game.id = boundary_away.last_id THEN 'オープン戦最終試合' END
+        ) AS milestone_away,
         pitcher_home.name_full AS name_pitcher_home,
         pitcher_away.name_full AS name_pitcher_away,
         COALESCE(pitcher_home.flg_ace, FALSE) AS flg_ace_pitcher_home,
@@ -496,6 +590,7 @@ class AppSql {
         int_runs_earned,
         int_balk,
         int_hit_batting,
+        int_velo_max,
         txt_scores_home,
         txt_scores_away,
         int_runs_home,
@@ -513,6 +608,14 @@ class AppSql {
         LEFT OUTER JOIN m_player AS pitcher_lose ON pitcher_lose.id = t_game.id_pitcher_lose
         LEFT OUTER JOIN m_player AS pitcher_save ON pitcher_save.id = t_game.id_pitcher_save
         LEFT OUTER JOIN m_stadium ON m_stadium.id = t_game.id_stadium
+        LEFT OUTER JOIN game_boundaries AS boundary_home
+          ON boundary_home.id_team = t_game.id_team_home
+          AND boundary_home.code_game = t_game.code_game
+          AND boundary_home.game_year = EXTRACT(YEAR FROM t_game.datetime_start)::int
+        LEFT OUTER JOIN game_boundaries AS boundary_away
+          ON boundary_away.id_team = t_game.id_team_away
+          AND boundary_away.code_game = t_game.code_game
+          AND boundary_away.game_year = EXTRACT(YEAR FROM t_game.datetime_start)::int
         LEFT OUTER JOIN (
           SELECT
             t_predict_player.id_player,
@@ -542,7 +645,7 @@ class AppSql {
         LEFT OUTER JOIN (
           SELECT 
             t_game_summary.id AS id_game_summary,
-            id_game,
+            t_game_summary.id_game AS id_game,
             m_player.id_team AS id_team_summary,
             name_full AS name_full_summary,
             int_batting::text || '打数' || CASE WHEN int_hit1 = 0 THEN '無' ELSE int_hit1::text END || '安打' || 
@@ -591,6 +694,7 @@ class AppSql {
             int_runs_earned,
             int_balk,
             int_hit1 AS int_hit_batting,
+            MAX(velo.int_velo_max) AS int_velo_max,
             MAX(COALESCE(t_game_summary.txt_scores_home, '')) AS txt_scores_home,
             MAX(COALESCE(t_game_summary.txt_scores_away, '')) AS txt_scores_away,
             MAX(COALESCE(t_game_summary.int_runs_home, 0)) AS int_runs_home,
@@ -600,10 +704,24 @@ class AppSql {
             MAX(COALESCE(t_game_summary.int_hit_home, 0)) AS int_hit_home,
             MAX(COALESCE(t_game_summary.int_hit_away, 0)) AS int_hit_away
           FROM t_game_summary
+            INNER JOIN t_game sg ON sg.id = t_game_summary.id_game
+              AND COALESCE(sg.flg_delete, FALSE) = FALSE
+              AND ${gameDateWindow(alias: 'sg')}
             LEFT OUTER JOIN t_predict_player on t_predict_player.id_player = t_game_summary.id_player AND t_predict_player.year =  \$1
             LEFT OUTER JOIN m_player on m_player.id = t_game_summary.id_player
             LEFT OUTER JOIN m_stats on m_stats.id = t_predict_player.id_stats
             LEFT OUTER JOIN m_user on m_user.id = t_predict_player.id_user
+            LEFT OUTER JOIN (
+              SELECT d.id_game, d.id_pitcher, MAX(d.int_velo) AS int_velo_max
+              FROM t_game_details d
+                INNER JOIN t_game vg ON vg.id = d.id_game
+                  AND COALESCE(vg.flg_delete, FALSE) = FALSE
+              WHERE COALESCE(d.flg_delete, FALSE) = FALSE
+                AND COALESCE(d.int_velo, 0) > 0
+                AND ${gameDateWindow(alias: 'vg')}
+              GROUP BY d.id_game, d.id_pitcher
+            ) velo ON velo.id_game = t_game_summary.id_game
+                  AND velo.id_pitcher = t_game_summary.id_player
           WHERE (int_hit1 + int_homerun * 5 + int_rbi * 2 + int_steal_base + int_fourball * 0.8 + int_dead_batting * 0.2 + int_sacrifice * 0.2) >= 3.5 
             OR int_hit1 >= 3
             OR int_rbi >= 1
@@ -625,20 +743,21 @@ class AppSql {
                   AND mt.id_league IN (3, 4)
               )
             )
-          GROUP BY t_predict_player.id_player, id_game, m_player.id_team, name_full, m_player.flg_ace, m_player.id_country, int_batting, int_hit1, int_fourball, int_homerun, 
+          GROUP BY t_predict_player.id_player, t_game_summary.id_game, m_player.id_team, name_full, m_player.flg_ace, m_player.id_country, int_batting, int_hit1, int_fourball, int_homerun, 
             int_rbi, int_steal_base, int_dead_batting, int_sacrifice, double_inning_pitch, int_runs,
-            int_pitch, int_four, int_dead_pitching, int_strike_out, code_result_pitcher, int_hit, int_runs_earned, int_balk, t_game_summary.id, t_game_summary.txt_homerun_total
-          ORDER BY id_game, m_player.id_team, flg_pitcher DESC, point_total DESC, t_game_summary.id 
+            int_pitch, int_four, int_dead_pitching, int_strike_out, code_result_pitcher, int_hit, int_runs_earned, int_balk, t_game_summary.id, t_game_summary.id_player, t_game_summary.txt_homerun_total
+          ORDER BY t_game_summary.id_game, m_player.id_team, flg_pitcher DESC, point_total DESC, t_game_summary.id 
         ) AS v_game_summary ON v_game_summary.id_game = t_game.id 
-      WHERE t_game.datetime_start::date BETWEEN (CURRENT_DATE - 10) AND (CURRENT_DATE + 10)
+      WHERE ${gameDateWindow(alias: 't_game')}
       GROUP BY t_game.id, t_game.datetime_start, team_home.name_short, team_away.name_short, team_home.name_shortest, team_away.name_shortest, pitcher_home.id, pitcher_home.name_full, pitcher_home.flg_ace, pitcher_away.id, pitcher_away.name_full, pitcher_away.flg_ace,
                pitcher_win.name_full, pitcher_lose.name_full, m_stadium.name_short, t_game.score_home, t_game.score_away,
                team_home.id_league, team_away.id_league, team_home.color_font, team_home.color_back, team_away.color_font,
                team_away.color_back, team_home.id, team_away.id, pitcher_win.id_team, pitcher_lose.id_team, pitcher_save.name_full, 
-               pitcher_save.id_team, t_game.state, v_game_summary.id_game_summary, id_team_summary, name_full_summary, 
+               pitcher_save.id_team, t_game.state, t_game.code_game, boundary_home.first_id, boundary_home.last_id,
+               boundary_away.first_id, boundary_away.last_id, v_game_summary.id_game_summary, id_team_summary, name_full_summary,
                txt_batting, txt_pitching, txt_homerun_total, code_result_pitcher, colors_summary, titles_predict, flg_pitcher, v_game_summary.flg_ace, v_game_summary.flg_japan, point_total,
                double_inning_pitch, int_pitch, int_hit_allowed, int_strike_out, int_walk_pitch, int_hbp_pitch, int_runs_pitch, int_runs_earned, int_balk, int_hit_batting,
-               txt_scores_home, txt_scores_away, int_runs_home, int_runs_away, int_error_home, int_error_away, int_hit_home, int_hit_away
+               txt_scores_home, txt_scores_away, int_runs_home, int_runs_away, int_error_home, int_error_away, int_hit_home, int_hit_away, int_velo_max
       ORDER BY to_char(t_game.datetime_start, 'YYYY-MM-DD'), t_game.id, id_team_summary, CASE WHEN flg_pitcher = TRUE THEN v_game_summary.id_game_summary END ASC, CASE WHEN flg_pitcher = FALSE THEN v_game_summary.point_total END DESC;
 
     ''';
@@ -665,7 +784,7 @@ class AppSql {
       FROM t_game_summary s
       JOIN m_player p ON p.id = s.id_player
       JOIN t_game g ON g.id = s.id_game
-      WHERE g.datetime_start::date BETWEEN (CURRENT_DATE - 10) AND (CURRENT_DATE + 10)
+      WHERE ${gameDateWindow(alias: 'g')}
     ''';
   }
 
@@ -676,6 +795,7 @@ class AppSql {
         t_game.id AS id_game,
         t_game.code_game,
         to_char(t_game.datetime_start, 'YYYY-MM-DD') AS date_game,
+        to_char(t_game.datetime_start, 'HH24:MI') AS time_game,
         t_game.score_home,
         t_game.score_away,
         t_game.state,
@@ -837,7 +957,7 @@ class AppSql {
         INNER JOIN t_game g ON g.id = d.id_game
       WHERE COALESCE(d.flg_delete, false) = false
         AND d.id_batter <> 0
-        AND g.datetime_start::date BETWEEN (CURRENT_DATE - 10) AND (CURRENT_DATE + 10)
+        AND ${gameDateWindow(alias: 'g')}
       ORDER BY d.id_game, d.id
     ''';
   }
@@ -859,7 +979,8 @@ class AppSql {
 
   static String selectPlayersByTeams() {
     return '''
-      SELECT id, id_team, name_full
+      SELECT id, id_team, name_full, name_last, name_first,
+             COALESCE(name_first_initial, '') AS name_first_initial
       FROM m_player
       WHERE id_team IN (\$1, \$2)
         AND COALESCE(flg_delete, false) = false
@@ -1071,8 +1192,8 @@ class AppSql {
 SELECT
         t_stats_team.int_rank,
         m_team.id AS id_team,
-        m_team.name_short AS name_team,
-        m_team.name_full AS name_team_full,
+        COALESCE(NULLIF(t_stats_team.name_team, ''), m_team.name_short) AS name_team,
+        COALESCE(NULLIF(t_stats_team.name_team, ''), m_team.name_full) AS name_team_full,
         v_predict_team.team_name_tateishi,
         CASE WHEN m_team.id = v_predict_team.team_id_tateishi THEN true ELSE false END AS flg_atari_tateishi,
         v_predict_team.team_color_back_tateishi,
@@ -1083,9 +1204,9 @@ SELECT
         v_predict_team.team_color_font_ejima,
         m_team.color_font,
         m_team.color_back,
-        m_team.id_league,
-        COALESCE(m_team.code_area, '') AS code_area,
-        m_team.name_shortest AS name_shortest,
+        COALESCE(t_stats_team.id_league, m_team.id_league) AS id_league,
+        COALESCE(NULLIF(t_stats_team.code_area, ''), m_team.code_area, '') AS code_area,
+        COALESCE(NULLIF(t_stats_team.name_shortest, ''), m_team.name_shortest) AS name_shortest,
         m_league.name_short AS name_league,
         EXISTS (
           SELECT 1
@@ -1134,27 +1255,27 @@ SELECT
         to_char(num_era_relief, '0.00') AS num_era_relief,
         to_char((1 -num_avg_fielding) * 100, 'FM990.0') || '%' AS num_avg_fielding,
   
-        CASE WHEN num_avg_batting = MAX(num_avg_batting) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_top_num_avg_batting,
-        CASE WHEN int_homerun = MAX(int_homerun) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_top_int_homerun,
-        CASE WHEN int_rbi = MAX(int_rbi) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_top_int_rbi,
-        CASE WHEN int_sh = MAX(int_sh) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_top_int_sh,
-        CASE WHEN num_era_total = MIN(num_era_total) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_top_num_era_total,
-        CASE WHEN num_era_starter = MIN(num_era_starter) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_top_num_era_starter,
-        CASE WHEN num_era_relief = MIN(num_era_relief) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_top_num_era_relief,
-        CASE WHEN num_avg_fielding = MAX(num_avg_fielding) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_top_num_avg_fielding,
+        CASE WHEN num_avg_batting = MAX(num_avg_batting) OVER (PARTITION BY COALESCE(t_stats_team.id_league, m_team.id_league)) THEN TRUE ELSE FALSE END AS flg_top_num_avg_batting,
+        CASE WHEN int_homerun = MAX(int_homerun) OVER (PARTITION BY COALESCE(t_stats_team.id_league, m_team.id_league)) THEN TRUE ELSE FALSE END AS flg_top_int_homerun,
+        CASE WHEN int_rbi = MAX(int_rbi) OVER (PARTITION BY COALESCE(t_stats_team.id_league, m_team.id_league)) THEN TRUE ELSE FALSE END AS flg_top_int_rbi,
+        CASE WHEN int_sh = MAX(int_sh) OVER (PARTITION BY COALESCE(t_stats_team.id_league, m_team.id_league)) THEN TRUE ELSE FALSE END AS flg_top_int_sh,
+        CASE WHEN num_era_total = MIN(num_era_total) OVER (PARTITION BY COALESCE(t_stats_team.id_league, m_team.id_league)) THEN TRUE ELSE FALSE END AS flg_top_num_era_total,
+        CASE WHEN num_era_starter = MIN(num_era_starter) OVER (PARTITION BY COALESCE(t_stats_team.id_league, m_team.id_league)) THEN TRUE ELSE FALSE END AS flg_top_num_era_starter,
+        CASE WHEN num_era_relief = MIN(num_era_relief) OVER (PARTITION BY COALESCE(t_stats_team.id_league, m_team.id_league)) THEN TRUE ELSE FALSE END AS flg_top_num_era_relief,
+        CASE WHEN num_avg_fielding = MAX(num_avg_fielding) OVER (PARTITION BY COALESCE(t_stats_team.id_league, m_team.id_league)) THEN TRUE ELSE FALSE END AS flg_top_num_avg_fielding,
 
-        CASE WHEN num_avg_batting = MIN(num_avg_batting) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_worst_num_avg_batting,
-        CASE WHEN int_homerun = MIN(int_homerun) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_worst_int_homerun,
-        CASE WHEN int_rbi = MIN(int_rbi) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_worst_int_rbi,
-        CASE WHEN int_sh = MIN(int_sh) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_worst_int_sh,
-        CASE WHEN num_era_total = MAX(num_era_total) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_worst_num_era_total,
-        CASE WHEN num_era_starter = MAX(num_era_starter) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_worst_num_era_starter,
-        CASE WHEN num_era_relief = MAX(num_era_relief) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_worst_num_era_relief,
-        CASE WHEN num_avg_fielding = MIN(num_avg_fielding) OVER (PARTITION BY m_team.id_league) THEN TRUE ELSE FALSE END AS flg_worst_num_avg_fielding
+        CASE WHEN num_avg_batting = MIN(num_avg_batting) OVER (PARTITION BY COALESCE(t_stats_team.id_league, m_team.id_league)) THEN TRUE ELSE FALSE END AS flg_worst_num_avg_batting,
+        CASE WHEN int_homerun = MIN(int_homerun) OVER (PARTITION BY COALESCE(t_stats_team.id_league, m_team.id_league)) THEN TRUE ELSE FALSE END AS flg_worst_int_homerun,
+        CASE WHEN int_rbi = MIN(int_rbi) OVER (PARTITION BY COALESCE(t_stats_team.id_league, m_team.id_league)) THEN TRUE ELSE FALSE END AS flg_worst_int_rbi,
+        CASE WHEN int_sh = MIN(int_sh) OVER (PARTITION BY COALESCE(t_stats_team.id_league, m_team.id_league)) THEN TRUE ELSE FALSE END AS flg_worst_int_sh,
+        CASE WHEN num_era_total = MAX(num_era_total) OVER (PARTITION BY COALESCE(t_stats_team.id_league, m_team.id_league)) THEN TRUE ELSE FALSE END AS flg_worst_num_era_total,
+        CASE WHEN num_era_starter = MAX(num_era_starter) OVER (PARTITION BY COALESCE(t_stats_team.id_league, m_team.id_league)) THEN TRUE ELSE FALSE END AS flg_worst_num_era_starter,
+        CASE WHEN num_era_relief = MAX(num_era_relief) OVER (PARTITION BY COALESCE(t_stats_team.id_league, m_team.id_league)) THEN TRUE ELSE FALSE END AS flg_worst_num_era_relief,
+        CASE WHEN num_avg_fielding = MIN(num_avg_fielding) OVER (PARTITION BY COALESCE(t_stats_team.id_league, m_team.id_league)) THEN TRUE ELSE FALSE END AS flg_worst_num_avg_fielding
 
       FROM t_stats_team
         LEFT OUTER JOIN m_team ON m_team.id = t_stats_team.id_team
-        LEFT OUTER JOIN m_league ON m_league.id = m_team.id_league
+        LEFT OUTER JOIN m_league ON m_league.id = COALESCE(t_stats_team.id_league, m_team.id_league)
         LEFT OUTER JOIN (
          SELECT
     mt.id_league,
@@ -1173,29 +1294,45 @@ WHERE tpt.int_year = \$1
 GROUP BY mt.id_league, tpt.int_rank
 ORDER BY mt.id_league, tpt.int_rank
         ) AS v_predict_team
-          ON v_predict_team.int_rank = t_stats_team.int_rank AND v_predict_team.id_league = m_team.id_league
-      WHERE t_stats_team.crtat = (
+          ON v_predict_team.int_rank = t_stats_team.int_rank
+         AND v_predict_team.id_league = COALESCE(t_stats_team.id_league, m_team.id_league)
+      WHERE t_stats_team.year = \$1
+        AND t_stats_team.crtat = (
         SELECT MAX(st2.crtat)
         FROM t_stats_team st2
         WHERE st2.id_team = t_stats_team.id_team
+          AND st2.year = \$1
       )
-      ORDER BY m_team.id_league, int_rank
+      ORDER BY COALESCE(t_stats_team.id_league, m_team.id_league), int_rank
     ''';
   }
 
   //t_stats_player / t_stats_player_latest
   static String selectStatsPlayer() {
     return '''
+      WITH selected_stats AS (
+        SELECT
+          id_league, id_stats, id_player, id_team, int_rank, stats, cnt_play
+        FROM t_stats_player_latest
+        WHERE \$1 = EXTRACT(YEAR FROM CURRENT_DATE)::int
+        UNION ALL
+        SELECT
+          id_league, id_stats, id_player, id_team, int_rank, stats, cnt_play
+        FROM t_stats_player
+        WHERE int_year = \$1
+          AND \$1 <> EXTRACT(YEAR FROM CURRENT_DATE)::int
+          AND COALESCE(flg_delete, FALSE) = FALSE
+      )
       SELECT
         m_stats.title,
         tsp.int_rank,
         m_team.name_shortest AS name_team,
         m_team.color_font,
         m_team.color_back,
-        CASE WHEN tsp.int_rank < 1000 THEN m_player.name_full 
+        CASE WHEN tsp.int_rank < 1000 THEN regexp_replace(COALESCE(m_player.name_full, ''), E'[\\s　]+', '', 'g')
              ELSE
-               CASE WHEN m_stats.flg_pitcher = TRUE THEN m_player.name_full || '(' || ROUND(LEAST(cnt_play::numeric / int_game * 100, 100), 1) || '%)' 
-                    ELSE m_player.name_full || '(' || ROUND(LEAST(cnt_play::numeric / (int_game * 3.1) * 100, 100), 1) || '%)'
+               CASE WHEN m_stats.flg_pitcher = TRUE THEN regexp_replace(COALESCE(m_player.name_full, ''), E'[\\s　]+', '', 'g') || '(' || ROUND(LEAST(cnt_play::numeric / int_game * 100, 100), 1) || '%)' 
+                    ELSE regexp_replace(COALESCE(m_player.name_full, ''), E'[\\s　]+', '', 'g') || '(' || ROUND(LEAST(cnt_play::numeric / (int_game * 3.1) * 100, 100), 1) || '%)'
                END
         END AS name_player,
         COALESCE(m_player.name_last, '') AS name_last,
@@ -1213,36 +1350,43 @@ ORDER BY mt.id_league, tpt.int_rank
                                 ORDER BY t_predict_player.id_user::text) || '/', '') AS id_users,
         COALESCE('/' || string_agg(DISTINCT m_user.code_color, '/' 
                                 ORDER BY m_user.code_color) || '/', '') AS colors_user,
-        CASE WHEN t_game_home.id_pitcher_home > 0 THEN TRUE
+        CASE WHEN \$1 <> EXTRACT(YEAR FROM CURRENT_DATE)::int THEN FALSE
+             WHEN t_game_home.id_pitcher_home > 0 THEN TRUE
              WHEN t_game_away.id_pitcher_away > 0 THEN TRUE
              ELSE FALSE END AS flg_today,
-        -- NPB: m_player.flg_rookie。
-        -- MLB: 前年以前のメジャー打数≦130 かつ投球回≦50（新人王有資格）。
+        -- NPB: 表示年時点の新人（初年度から5年・前年までの打席≦60・投球回≦30）。経歴が無い今季は flg_rookie。
+        -- MLB: 表示年より前のメジャー打数≦130 かつ投球回≦50（新人王有資格）。
         -- 前年未登録（新加入含む）は 0 打数・0 投球回として有資格扱い。
         CASE
           WHEN MAX(tsp.id_league) IN (3, 4) THEN
             (COALESCE(MAX(mlb_career.prior_ab), 0) <= 130
              AND COALESCE(MAX(mlb_career.prior_ip), 0) <= 50)
-          ELSE COALESCE(BOOL_OR(m_player.flg_rookie), FALSE)
+          WHEN BOOL_OR(npb_rookie.id_player IS NOT NULL) THEN
+            COALESCE(BOOL_OR(npb_rookie.is_rookie), FALSE)
+          ELSE
+            (\$1 = EXTRACT(YEAR FROM CURRENT_DATE)::int
+             AND COALESCE(BOOL_OR(m_player.flg_rookie), FALSE))
         END AS flg_rookie,
         -- ✨は「表示中団体（NPB/MLB）での初年度」。全経歴のMINだとNPB歴のあるMLB1年目が落ち、
         -- ランキング補完の今季1行だけの選手が誤って付く。
         COALESCE(BOOL_OR(career_org.min_year = \$1), FALSE) AS flg_career_this_year,
+        -- 🍁🌱は「表示年の年末時点でその年齢に達しているか」。今日の年齢は使わない。
         COALESCE(BOOL_OR(
           m_player.date_birth IS NOT NULL
-          AND m_player.date_birth::date <= (CURRENT_DATE - INTERVAL '35 years')
+          AND EXTRACT(YEAR FROM age(make_date(\$1, 12, 31), m_player.date_birth::date)) >= 35
         ), FALSE) AS flg_age35,
         COALESCE(BOOL_OR(
           m_player.date_birth IS NOT NULL
-          AND m_player.date_birth::date > (CURRENT_DATE - INTERVAL '21 years')
+          AND EXTRACT(YEAR FROM age(make_date(\$1, 12, 31), m_player.date_birth::date)) <= 21
         ), FALSE) AS flg_under21,
+        COALESCE(BOOL_OR(m_player.year_retire = \$1), FALSE) AS flg_retired,
         COALESCE(BOOL_OR(m_country.name = '日本'), FALSE) AS flg_japan,
         COALESCE(MAX(m_country.emoji), '') AS emoji_country,
         tsp.id_league,
         tsp.cnt_play,
         m_stats.int_index,
         tsp.id_stats
-      FROM t_stats_player_latest tsp
+      FROM selected_stats tsp
         LEFT JOIN m_stats   ON m_stats.id   = tsp.id_stats
         LEFT JOIN m_team    ON m_team.id    = tsp.id_team
         LEFT JOIN t_stats_team ON t_stats_team.id_team = m_team.id
@@ -1250,7 +1394,7 @@ ORDER BY mt.id_league, tpt.int_rank
             SELECT MAX(st2.crtat)
             FROM t_stats_team st2
             WHERE st2.id_team = m_team.id
-              AND EXTRACT(YEAR FROM st2.crtat) = \$1
+              AND st2.year = \$1
           )
         LEFT JOIN m_player  ON m_player.id  = tsp.id_player
         LEFT JOIN m_country ON m_country.id = m_player.id_country
@@ -1280,6 +1424,36 @@ ORDER BY mt.id_league, tpt.int_rank
             AND c.int_year < \$1
           GROUP BY c.id_player
         ) mlb_career ON mlb_career.id_player = tsp.id_player
+        LEFT JOIN (
+          SELECT
+            x.id_player,
+            (
+              x.first_year + 4 >= \$1
+              AND x.prior_pa <= 60
+              AND x.prior_thirds <= 90
+              AND NOT x.prior_mlb
+            ) AS is_rookie
+          FROM (
+            SELECT
+              c.id_player,
+              MIN(c.int_year) FILTER (WHERE COALESCE(t.id_league, 0) NOT IN (3, 4)) AS first_year,
+              COALESCE(SUM(COALESCE(c.int_appearance, 0)) FILTER (
+                WHERE COALESCE(t.id_league, 0) NOT IN (3, 4) AND c.int_year < \$1
+              ), 0) AS prior_pa,
+              COALESCE(SUM(
+                trunc(COALESCE(c.double_inning, 0))::int * 3
+                + LEAST(2, GREATEST(0, round((COALESCE(c.double_inning, 0) - trunc(COALESCE(c.double_inning, 0))) * 10)::int))
+              ) FILTER (
+                WHERE COALESCE(t.id_league, 0) NOT IN (3, 4) AND c.int_year < \$1
+              ), 0) AS prior_thirds,
+              COALESCE(BOOL_OR(t.id_league IN (3, 4) AND c.int_year < \$1), FALSE) AS prior_mlb
+            FROM m_player_career c
+            LEFT JOIN m_team t ON t.id = c.id_team
+            WHERE COALESCE(c.flg_delete, FALSE) = FALSE
+            GROUP BY c.id_player
+          ) x
+          WHERE x.first_year IS NOT NULL
+        ) npb_rookie ON npb_rookie.id_player = tsp.id_player
         LEFT JOIN m_league  ON m_league.id  = m_team.id_league
         LEFT JOIN t_predict_player
           ON t_predict_player.id_player = tsp.id_player
@@ -1342,12 +1516,14 @@ ORDER BY mt.id_league, tpt.int_rank
 
   static String selectInsertStatsPlayer(List<t_stats_player> stats, {String? tableName}) {
     final into = tableName ?? stats.first.tableName;
+    final storesYear = into == t_stats_player().tableName;
     String sql = '''
         INSERT INTO $into (
           id_league,
           id_stats,
           id_player,
           id_team,
+          ${storesYear ? 'int_year,' : ''}
           int_rank,
           stats,
           cnt_play
@@ -1363,6 +1539,7 @@ ORDER BY mt.id_league, tpt.int_rank
           ${stat.id_stats} AS id_stats,
           m_player.id AS id_player, 
           m_player.id_team,
+          ${storesYear ? '${stat.int_year == 0 ? DateTime.now().year : stat.int_year} AS int_year,' : ''}
           ${stat.int_rank} AS int_rank,
           ${stat.stats} AS stats,
           ${stat.cnt_play} AS cnt_play

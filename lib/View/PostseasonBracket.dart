@@ -357,8 +357,6 @@ class PostseasonBracket extends StatelessWidget {
                                       height: 1.15,
                                     ),
                                   ),
-                                  if (team.hasJapanPlayer)
-                                    const Text(' 🇯🇵', style: TextStyle(fontSize: 11, height: 1)),
                                 ],
                               ),
                             ),

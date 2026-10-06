@@ -4,6 +4,7 @@ class t_stats_team extends DBModel {
   String tableName = 't_stats_team';
   int year = 0;
   int id_team = 0;
+  int id_league = 0;
   int int_rank = 0;
   int int_game = 0;
   int int_win = 0;
@@ -24,6 +25,7 @@ class t_stats_team extends DBModel {
       ..addAll({
         "year": year,
         "id_team": id_team,
+        "id_league": id_league == 0 ? null : id_league,
         "int_rank": int_rank,
         "int_game": int_game,
         "int_win": int_win,

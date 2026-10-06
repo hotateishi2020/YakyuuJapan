@@ -59,52 +59,53 @@ Future<Map<String, dynamic>> _buildPredictionsPartInfo(OrgKind org) async {
   };
 }
 
-Future<Map<String, dynamic>> _buildPredictionsPartStandings(OrgKind org) async {
-  final currentYear = DateTimeTool.getThisYear();
+Future<Map<String, dynamic>> _buildPredictionsPartStandings(OrgKind org, int year) async {
   final results = await Postgres.mapParallel([
-    (conn) => Postgres.execute(conn, AppSql.selectPredictNPBTeams(), data: [currentYear]),
-    (conn) => Postgres.execute(conn, AppSql.selectStatsTeam(), data: [currentYear]),
+    (conn) => Postgres.execute(conn, AppSql.selectPredictNPBTeams(), data: [year]),
+    (conn) => Postgres.execute(conn, AppSql.selectStatsTeam(), data: [year]),
   ]);
   final leagueIds = org.leagueIds;
   return {
     'org': org.code,
+    'year': year,
     'part': 'standings',
     'predict_team': _filterByLeagues(Postgres.toJson(results[0]), leagueIds),
     'stats_team': _filterByLeagues(Postgres.toJson(results[1]), leagueIds),
   };
 }
 
-Future<Map<String, dynamic>> _buildPredictionsPartPlayers(OrgKind org) async {
-  final currentYear = DateTimeTool.getThisYear();
+Future<Map<String, dynamic>> _buildPredictionsPartPlayers(OrgKind org, int year) async {
   final results = await Postgres.mapParallel([
-    (conn) => Postgres.execute(conn, AppSql.selectPredictPlayer(), data: [currentYear]),
-    (conn) => Postgres.execute(conn, AppSql.selectStatsPlayer(), data: [currentYear]),
+    (conn) => Postgres.execute(conn, AppSql.selectPredictPlayer(), data: [year]),
+    (conn) => Postgres.execute(conn, AppSql.selectStatsPlayer(), data: [year]),
   ]);
   final leagueIds = org.leagueIds;
   return {
     'org': org.code,
+    'year': year,
     'part': 'players',
     'predict_player': _filterByLeagues(Postgres.toJson(results[0]), leagueIds),
     'stats_player': _filterByLeagues(Postgres.toJson(results[1]), leagueIds),
   };
 }
 
-Future<Map<String, dynamic>> _buildPredictionsPartGames(OrgKind org) async {
-  final currentYear = DateTimeTool.getThisYear();
+Future<Map<String, dynamic>> _buildPredictionsPartGames(OrgKind org, int year) async {
   final results = await Postgres.mapParallel([
-    (conn) => Postgres.execute(conn, AppSql.selectGames(), data: [currentYear]),
-    (conn) => Postgres.execute(conn, AppSql.selectGamePlayRows()),
-    (conn) => Postgres.execute(conn, AppSql.selectPostseasonGames(), data: [currentYear]),
+    (conn) => Postgres.execute(conn, AppSql.selectGames(), data: [year]),
+    (conn) => Postgres.execute(conn, AppSql.selectGamePlayRows(), data: [year]),
+    (conn) => Postgres.execute(conn, AppSql.selectBattingLines(), data: [year]),
+  ]);
+  final extras = await Postgres.mapParallel([
+    (conn) => Postgres.execute(conn, AppSql.selectPostseasonGames(), data: [year]),
     (conn) => Postgres.execute(conn, AppSql.selectPostseasonBoard(), data: [
       Value.SystemCode.Code.ADMIN,
       Value.SystemCode.Key.DATE_FINAL_GAME,
       Value.SystemCode.Key.DATE_OPEN_GAME,
     ]),
-    (conn) => Postgres.execute(conn, AppSql.selectBattingLines()),
   ]);
   final playRows = Postgres.toJson(results[1]);
   final gameRows = Postgres.toJson(results[0]);
-  final battingLines = _battingLinesOf(Postgres.toJson(results[4]));
+  final battingLines = _battingLinesOf(Postgres.toJson(results[2]));
   final playLabels = playLabelsByPlayer(playRows);
   for (final entry in battingLines.entries) {
     final filled = playsFilledFromLine(
@@ -122,14 +123,14 @@ Future<Map<String, dynamic>> _buildPredictionsPartGames(OrgKind org) async {
     final text = _plateFeatConfirmed(entry.value, battingLines[entry.key]);
     if (text.isNotEmpty) plateFeats[entry.key] = text;
   }
-  final games = _collapseGames(
+  final games = _dedupeSameDayMatchups(_collapseGames(
     gameRows,
     playLabels,
     cycleMarksByPlayer(playRows),
     hitCountsByPlayer(playRows),
     plateFeats,
     maxInningByGame(playRows),
-  );
+  ));
   _fillMissingLineScores(games, playRows);
   final lineups = battingLineupsOf(
     playRows,
@@ -143,26 +144,38 @@ Future<Map<String, dynamic>> _buildPredictionsPartGames(OrgKind org) async {
   final leagueIds = org.leagueIds;
   return {
     'org': org.code,
+    'year': year,
     'part': 'games',
     'games': _filterByLeagues(games, leagueIds, keys: const ['id_league_home', 'id_league_away']),
-    'postseason_games': Postgres.toJson(results[2]),
-    'show_postseason_board': _showPostseasonBoard(Postgres.toJson(results[3])),
+    'postseason_games': _dedupeSameDayMatchups(Postgres.toJson(extras[0])),
+    'show_postseason_board':
+        Postgres.toJson(extras[0]).isNotEmpty || _showPostseasonBoard(Postgres.toJson(extras[1])),
   };
 }
 
-Future<Map<String, dynamic>> _buildPredictionsPart(String part, OrgKind org) {
+Future<Map<String, dynamic>> _buildPredictionsPart(String part, OrgKind org, int year) {
   switch (part) {
     case 'info':
       return _buildPredictionsPartInfo(org);
     case 'standings':
-      return _buildPredictionsPartStandings(org);
+      return _buildPredictionsPartStandings(org, year);
     case 'players':
-      return _buildPredictionsPartPlayers(org);
+      return _buildPredictionsPartPlayers(org, year);
     case 'games':
-      return _buildPredictionsPartGames(org);
+      return _buildPredictionsPartGames(org, year);
     default:
       throw ArgumentError('unknown part: $part');
   }
+}
+
+int _seasonYear(Request request, OrgKind org) {
+  final current = DateTimeTool.getThisYear();
+  final year = int.tryParse(request.url.queryParameters['year'] ?? '') ?? current;
+  final first = org == OrgKind.mlb ? 1876 : 1936;
+  if (year < first || year > current) {
+    throw FormatException('${org.code} の年度は $first〜$current を指定してください');
+  }
+  return year;
 }
 
 bool _rowInLeagues(Map<String, dynamic> row, List<int> leagueIds, {List<String> keys = const ['id_league']}) {
@@ -195,6 +208,153 @@ String _gameMatchupKey(Map<String, dynamic> game) {
     '${game['id_team_home'] ?? ''}'.trim(),
     '${game['id_team_away'] ?? ''}'.trim(),
   ].join('|');
+}
+
+String _dateOnly(dynamic value) {
+  final match = RegExp(r'\d{4}-\d{2}-\d{2}').firstMatch('$value');
+  return match?.group(0) ?? '$value'.trim();
+}
+
+String _gameNightDate(Map<String, dynamic> game) {
+  final date = _dateOnly(game['date_game']);
+  final time = '${game['time_game'] ?? game['datetime_start'] ?? ''}';
+  final match = RegExp(r'(\d{1,2}):(\d{2})').firstMatch(time);
+  if (match == null) return date;
+  final hour = int.tryParse(match.group(1) ?? '') ?? 12;
+  if (hour <= 0 || hour >= 8) return date;
+  final parsed = DateTime.tryParse(date);
+  if (parsed == null) return date;
+  final prev = parsed.subtract(const Duration(days: 1));
+  final month = prev.month.toString().padLeft(2, '0');
+  final day = prev.day.toString().padLeft(2, '0');
+  return '${prev.year}-$month-$day';
+}
+
+String _dayMatchupKey(Map<String, dynamic> game) {
+  final home = _asInt(game['id_team_home']);
+  final away = _asInt(game['id_team_away']);
+  final a = home <= away ? home : away;
+  final b = home <= away ? away : home;
+  final code = '${game['code_game'] ?? ''}'.trim().toUpperCase();
+  return '${_gameNightDate(game)}|$a|$b|$code';
+}
+
+bool _rowFinished(Map<String, dynamic> game) => '${game['state'] ?? ''}'.contains('試合終了');
+
+int _gameRowQuality(Map<String, dynamic> game) {
+  var score = 0;
+  final state = '${game['state'] ?? ''}';
+  if (state.contains('試合終了')) score += 50;
+  if (state.contains('試合中')) score += 40;
+  if ('${game['time_game'] ?? ''}'.trim().isNotEmpty) score += 20;
+  final summaries = game['summaries'];
+  if (summaries is List) score += summaries.length * 5;
+  final idGame = _asInt(game['id_game'] ?? game['id']);
+  if (idGame > 0 && idGame < 2000) score += 25;
+  if ('${game['name_pitcher_home'] ?? ''}'.trim().isNotEmpty) score += 4;
+  if ('${game['name_pitcher_away'] ?? ''}'.trim().isNotEmpty) score += 4;
+  return score;
+}
+
+List<Map<String, dynamic>> _dedupeSameDayMatchups(List<Map<String, dynamic>> games) {
+  if (games.length <= 1) return games;
+  final buckets = <String, List<Map<String, dynamic>>>{};
+  final order = <String>[];
+  for (final game in games) {
+    final key = _dayMatchupKey(game);
+    if (!buckets.containsKey(key)) {
+      order.add(key);
+      buckets[key] = [];
+    }
+    buckets[key]!.add(game);
+  }
+  final out = <Map<String, dynamic>>[];
+  for (final key in order) {
+    final group = buckets[key]!;
+    if (group.length == 1) {
+      out.add(group.first);
+      continue;
+    }
+    group.sort((a, b) => _gameRowQuality(b).compareTo(_gameRowQuality(a)));
+    final finished = group.where(_rowFinished).toList();
+    final distinctScores = finished.map((g) => '${g['score_home']}|${g['score_away']}').toSet();
+    if (distinctScores.length > 1) {
+      final best = <String, Map<String, dynamic>>{};
+      for (final game in finished) {
+        final scoreKey = '${game['score_home']}|${game['score_away']}';
+        final prev = best[scoreKey];
+        if (prev == null || _gameRowQuality(game) > _gameRowQuality(prev)) best[scoreKey] = game;
+      }
+      out.addAll(best.values);
+      continue;
+    }
+    final hasYahoo = group.any(_yahooGameSource);
+    final hasHistorical = group.any((game) => !_yahooGameSource(game) && _asInt(game['id_game'] ?? game['id']) >= 2000);
+    if (hasYahoo && hasHistorical) {
+      out.add(group.first);
+      continue;
+    }
+    out.add(group.first);
+  }
+  return _mergeAdjacentScoreDupes(out);
+}
+
+bool _yahooGameSource(Map<String, dynamic> game) {
+  final id = _asInt(game['id_game'] ?? game['id']);
+  return id > 0 && id < 2000;
+}
+
+String _matchupCodeKey(Map<String, dynamic> game) {
+  final home = _asInt(game['id_team_home']);
+  final away = _asInt(game['id_team_away']);
+  final a = home <= away ? home : away;
+  final b = home <= away ? away : home;
+  final code = '${game['code_game'] ?? ''}'.trim().toUpperCase();
+  return '$a|$b|$code';
+}
+
+bool _yahooHistoricalMix(Map<String, dynamic> a, Map<String, dynamic> b) {
+  return _yahooGameSource(a) != _yahooGameSource(b);
+}
+
+bool _rowUnstarted(Map<String, dynamic> game) => !_rowFinished(game);
+
+bool _nearSameGameDay(Map<String, dynamic> a, Map<String, dynamic> b) {
+  String dateOnly(dynamic value) {
+    final match = RegExp(r'\d{4}-\d{2}-\d{2}').firstMatch('$value');
+    return match?.group(0) ?? '$value'.trim();
+  }
+
+  if (dateOnly(a['date_game']) == dateOnly(b['date_game'])) return true;
+  final left = DateTime.tryParse(_gameNightDate(a));
+  final right = DateTime.tryParse(_gameNightDate(b));
+  if (left == null || right == null) return false;
+  return left.difference(right).inDays.abs() <= 1;
+}
+
+List<Map<String, dynamic>> _mergeAdjacentScoreDupes(List<Map<String, dynamic>> games) {
+  if (games.length <= 1) return games;
+  final used = List<bool>.filled(games.length, false);
+  final out = <Map<String, dynamic>>[];
+  for (var i = 0; i < games.length; i++) {
+    if (used[i]) continue;
+    var best = games[i];
+    final key = _matchupCodeKey(best);
+    for (var j = i + 1; j < games.length; j++) {
+      if (used[j] || _matchupCodeKey(games[j]) != key) continue;
+      final other = games[j];
+      final finishedPair = _rowFinished(best) &&
+          _rowFinished(other) &&
+          '${best['score_home']}|${best['score_away']}' == '${other['score_home']}|${other['score_away']}';
+      final importPregame = _rowUnstarted(best) && _rowUnstarted(other) && _yahooHistoricalMix(best, other);
+      if (!finishedPair && !importPregame) continue;
+      if (!_nearSameGameDay(best, other)) continue;
+      used[j] = true;
+      if (_gameRowQuality(other) > _gameRowQuality(best)) best = other;
+    }
+    out.add(best);
+  }
+  return out;
 }
 
 bool _summaryIsPitcher(dynamic value) {
@@ -423,6 +583,7 @@ List<Map<String, dynamic>> _summariesOf(
           'txt_achieve': _summaryAchieve(row, cycles, hits, plateFeats, maxInning),
           'txt_pitch_tone': _summaryPitchTone(row),
           'txt_pitch_chips': _summaryPitchChips(row),
+          'int_velo_max': row['int_velo_max'],
         },
   ];
   final gameId = rows.isEmpty ? 0 : _asInt(rows.first['id_game']);
@@ -500,6 +661,7 @@ void main() async {
         if (await FetchURL.isOfficialSeasonBreak(conn)) {
           if (await Postseason.shouldKeepUpdating(conn)) {
             await Postseason.sync(conn);
+            await FetchURL.refreshRecentPostseasonDetails(conn);
             return Response.ok('postseason');
           }
           print('シーズンオフのため試合情報のスクレイピングを行いません');
@@ -681,6 +843,7 @@ void main() async {
     app.get('/predictions/part', (Request request) async {
       return await tryCatchAPIReadonly(request, log.Prediction.NAME, log.Prediction.Codes.ENTER_NPB, () async {
         final org = OrgKind.parse(request.url.queryParameters['org']);
+        final year = _seasonYear(request, org);
         final part = (request.url.queryParameters['part'] ?? '').trim().toLowerCase();
         const allowed = {'info', 'standings', 'players', 'games'};
         if (!allowed.contains(part)) {
@@ -690,22 +853,24 @@ void main() async {
             headers: {'content-type': 'application/json; charset=utf-8'},
           );
         }
-        final cacheKey = '${org.code}|$part';
+        final cacheKey = '${org.code}|$part|$year';
         final now = DateTime.now();
-        final cachedBody = _predictionsPartCacheBody[cacheKey];
-        final cachedAt = _predictionsPartCacheAt[cacheKey];
-        if (cachedBody != null && cachedAt != null && now.difference(cachedAt) < _predictionsCacheTtl) {
-          return Response.ok(
-            cachedBody,
-            headers: {
-              'content-type': 'application/json; charset=utf-8',
-              'x-cache': 'HIT',
-              'x-org': org.code,
-              'x-part': part,
-            },
-          );
+        if (request.url.queryParameters['fresh'] != '1') {
+          final cachedBody = _predictionsPartCacheBody[cacheKey];
+          final cachedAt = _predictionsPartCacheAt[cacheKey];
+          if (cachedBody != null && cachedAt != null && now.difference(cachedAt) < _predictionsCacheTtl) {
+            return Response.ok(
+              cachedBody,
+              headers: {
+                'content-type': 'application/json; charset=utf-8',
+                'x-cache': 'HIT',
+                'x-org': org.code,
+                'x-part': part,
+              },
+            );
+          }
         }
-        final payload = await _buildPredictionsPart(part, org);
+        final payload = await _buildPredictionsPart(part, org, year);
         final body = jsonEncode(payload);
         _predictionsPartCacheBody[cacheKey] = body;
         _predictionsPartCacheAt[cacheKey] = DateTime.now();
@@ -726,7 +891,8 @@ void main() async {
     app.get('/predictions', (Request request) async {
       return await tryCatchAPIReadonly(request, log.Prediction.NAME, log.Prediction.Codes.ENTER_NPB, () async {
         final org = OrgKind.parse(request.url.queryParameters['org']);
-        final cacheKey = org.code;
+        final selectedYear = _seasonYear(request, org);
+        final cacheKey = '${org.code}|$selectedYear';
         final now = DateTime.now();
         final cachedBody = _predictionsCacheBody[cacheKey];
         final cachedAt = _predictionsCacheAt[cacheKey];
@@ -741,14 +907,14 @@ void main() async {
           );
         }
 
-        final current_year = DateTimeTool.getThisYear();
+        final current_year = selectedYear;
         final results = await Postgres.mapParallel([
           (conn) => Postgres.execute(conn, AppSql.selectPredictNPBTeams(), data: [current_year]),
           (conn) => Postgres.execute(conn, AppSql.selectPredictPlayer(), data: [current_year]),
           (conn) => Postgres.execute(conn, AppSql.selectStatsTeam(), data: [current_year]),
           (conn) => Postgres.execute(conn, AppSql.selectStatsPlayer(), data: [current_year]),
           (conn) => Postgres.execute(conn, AppSql.selectGames(), data: [current_year]),
-          (conn) => Postgres.execute(conn, AppSql.selectGamePlayRows()),
+          (conn) => Postgres.execute(conn, AppSql.selectGamePlayRows(), data: [current_year]),
           (conn) => Postgres.execute(conn, AppSql.selectEventsDetails()),
           (conn) => Postgres.execute(conn, AppSql.selectNotification()),
           (conn) => Postgres.execute(conn, AppSql.selectPostseasonGames(), data: [current_year]),
@@ -757,7 +923,7 @@ void main() async {
             Value.SystemCode.Key.DATE_FINAL_GAME,
             Value.SystemCode.Key.DATE_OPEN_GAME,
           ]),
-          (conn) => Postgres.execute(conn, AppSql.selectBattingLines()),
+          (conn) => Postgres.execute(conn, AppSql.selectBattingLines(), data: [current_year]),
         ]);
         final playRows = Postgres.toJson(results[5]);
         final gameRows = Postgres.toJson(results[4]);
@@ -779,14 +945,14 @@ void main() async {
           final text = _plateFeatConfirmed(entry.value, battingLines[entry.key]);
           if (text.isNotEmpty) plateFeats[entry.key] = text;
         }
-        final games = _collapseGames(
+        final games = _dedupeSameDayMatchups(_collapseGames(
           gameRows,
           playLabels,
           cycleMarksByPlayer(playRows),
           hitCountsByPlayer(playRows),
           plateFeats,
           maxInningByGame(playRows),
-        );
+        ));
         _fillMissingLineScores(games, playRows);
         final lineups = battingLineupsOf(
           playRows,
@@ -802,6 +968,7 @@ void main() async {
         final filteredGames = _filterByLeagues(games, leagueIds, keys: const ['id_league_home', 'id_league_away']);
         final payload = <String, dynamic>{
           'org': org.code,
+          'year': current_year,
           'predict_team': _filterByLeagues(Postgres.toJson(results[0]), leagueIds),
           'predict_player': _filterByLeagues(Postgres.toJson(results[1]), leagueIds),
           'stats_team': _filterByLeagues(Postgres.toJson(results[2]), leagueIds),
@@ -809,8 +976,9 @@ void main() async {
           'games': filteredGames,
           'events': org.code == 'npb' ? Postgres.toJson(results[6]) : const <Map<String, dynamic>>[],
           'notification': org.code == 'npb' ? Postgres.toJson(results[7]) : const <Map<String, dynamic>>[],
-          'postseason_games': Postgres.toJson(results[8]),
-          'show_postseason_board': _showPostseasonBoard(Postgres.toJson(results[9])),
+          'postseason_games': _dedupeSameDayMatchups(Postgres.toJson(results[8])),
+          'show_postseason_board':
+              Postgres.toJson(results[8]).isNotEmpty || _showPostseasonBoard(Postgres.toJson(results[9])),
         };
         final body = jsonEncode(payload);
         _predictionsCacheBody[cacheKey] = body;
@@ -909,6 +1077,7 @@ Future<Response> tryCatchAPIReadonly(
     user.category_system = category_system;
     user.code_system = code_system;
     user.flg_user = false;
+    await FetchURL.ensureGameDetailsVelo();
     response = await callback();
   } catch (e, st) {
     print("⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️");
@@ -977,6 +1146,7 @@ Future<Response> tryCatchAPI(Request request, String category_system, String cod
         user.category_system = category_system;
         user.code_system = code_system;
         user.flg_user = false;
+        await FetchURL.ensureGameDetailsVelo(conn);
 
         response = await callback(conn);
       } catch (e, st) {

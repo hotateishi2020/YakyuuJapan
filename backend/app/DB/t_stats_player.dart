@@ -6,6 +6,7 @@ class t_stats_player extends DBModel {
   int id_stats = 0;
   int id_player = 0;
   int id_team = 0;
+  int int_year = 0;
   int int_rank = 0;
   double stats = 0;
   String code_category = '';
@@ -30,6 +31,7 @@ class t_stats_player extends DBModel {
         "id_stats": id_stats,
         "id_player": id_player,
         "id_team": id_team,
+        "int_year": int_year == 0 ? DateTime.now().year : int_year,
         "int_rank": int_rank,
         "cnt_play": cnt_play,
         "stats": stats,

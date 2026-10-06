@@ -22,6 +22,8 @@ class LeagueBoardRow extends StatelessWidget {
   final bool loadingStandings;
   final bool loadingStats;
   final bool loadingGames;
+  final int seasonYear;
+  final String? gamesDateFilter;
 
   final String leagueLabelPrefix;
 
@@ -46,6 +48,8 @@ class LeagueBoardRow extends StatelessWidget {
     this.loadingStandings = false,
     this.loadingStats = false,
     this.loadingGames = false,
+    this.seasonYear = 0,
+    this.gamesDateFilter,
   });
 
   List<Map<String, dynamic>> get _leagueGames => games.where((g) => (int.tryParse('${g['id_league_home']}') ?? 0) == leagueId && (int.tryParse('${g['id_league_away']}') ?? 0) == leagueId).toList();
@@ -57,7 +61,7 @@ class LeagueBoardRow extends StatelessWidget {
       stats: npbPlayerStatsActual,
       games: _leagueGames,
       onlyLeagueId: leagueId,
-      gamesDateFilter: DateFormatUtil.ymdWithOffset(0),
+      gamesDateFilter: gamesDateFilter ?? DateFormatUtil.ymdWithOffset(0),
       portraitLayout: portraitLayout,
       org: org,
       personalStatsLayout: personalStatsLayout,
@@ -65,6 +69,7 @@ class LeagueBoardRow extends StatelessWidget {
       loadingStandings: loadingStandings,
       loadingStats: loadingStats,
       loadingGames: loadingGames,
+      seasonYear: seasonYear,
     );
 
     // リーグ切替タブがあるため左のリーグ名ヘッダーは出さない

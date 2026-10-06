@@ -4,12 +4,18 @@ import 'package:postgres/postgres.dart';
 import '../tools/DateTimeTool.dart';
 import 'FetchURL.dart';
 import 'OrgLeague.dart';
+import 'PlayerName.dart';
 
 /// エースポイント算出と m_player.flg_ace の更新。
-/// Ace Point = 0.35I + 0.35E + 0.15K + 0.10L + 0.05W
-/// （各指標は同一リーグ・同一年の先発内で 0–100 相対評価）
+/// Ace Point = 0.20I + 0.50E + 0.15K + 0.10L + 0.05W
+/// （各指標は同一リーグ・同一年の先発内で 0–100 相対評価。防御率を勝ち数・投球回より優先）
 class AceEvaluator {
   static const double aceThreshold = 75.0;
+  static const double ipWeight = 0.20;
+  static const double eraWeight = 0.50;
+  static const double k9Weight = 0.15;
+  static const double ipPerAppWeight = 0.10;
+  static const double winsWeight = 0.05;
 
   /// 指定リーグについてエース判定を行い flg_ace を更新する。
   static Future<int> refresh(Connection conn, List<int> leagueIds) async {
@@ -36,11 +42,11 @@ class AceEvaluator {
       final pool = entry.value;
       _assignRelativeScores(pool);
       for (final p in pool) {
-        p.acePoint = 0.35 * p.scoreIp +
-            0.35 * p.scoreEra +
-            0.15 * p.scoreK9 +
-            0.10 * p.scoreIpPerApp +
-            0.05 * p.scoreWins;
+        p.acePoint = ipWeight * p.scoreIp +
+            eraWeight * p.scoreEra +
+            k9Weight * p.scoreK9 +
+            ipPerAppWeight * p.scoreIpPerApp +
+            winsWeight * p.scoreWins;
         final prev = bestByPlayer[p.playerId];
         if (prev == null || p.acePoint > prev.acePoint) {
           bestByPlayer[p.playerId] = p;
@@ -116,7 +122,48 @@ class AceEvaluator {
       );
       setCount = set.affectedRows;
 
-      // 同一チームに複数残っていたら、今回選んだ id を優先して1人に絞る。
+      // C.セール / クリス・セール のように同一チームの表記ゆれもエースにする。
+      // 試合の先発 id が略称側・フルネーム側のどちらでも flg_ace が立つように、ゆれ分は残す。
+      final protected = {...aceIds};
+      for (final p in aceByTeam.values) {
+        final teamId = currentTeams[p.playerId] ?? p.teamId;
+        if (teamId <= 0) continue;
+        final mates = await conn.execute(
+          '''
+            SELECT id, name_full, COALESCE(name_last, '') AS name_last,
+                   COALESCE(name_first_initial, '') AS ini
+            FROM m_player
+            WHERE id_team = \$1
+              AND COALESCE(flg_delete, FALSE) = FALSE
+          ''',
+          parameters: [teamId],
+        );
+        final extra = <int>[];
+        for (final row in mates) {
+          final m = row.toColumnMap();
+          final id = m['id'];
+          final playerId = id is int ? id : int.tryParse('$id') ?? 0;
+          if (playerId <= 0 || playerId == p.playerId) continue;
+          if (playerNameMatches(
+            query: p.name,
+            nameFull: '${m['name_full'] ?? ''}',
+            nameLast: '${m['name_last'] ?? ''}',
+            storedInitial: '${m['ini'] ?? ''}',
+          )) {
+            extra.add(playerId);
+          }
+        }
+        if (extra.isNotEmpty) {
+          final extras = await conn.execute(
+            'UPDATE m_player SET flg_ace = TRUE, updat = NOW() WHERE id IN (${extra.join(',')})',
+          );
+          setCount += extras.affectedRows;
+          protected.addAll(extra);
+        }
+      }
+
+      // 別人のエースが同一チームに残っていたら、今回選んだ id（と表記ゆれ）を優先して落とす。
+      final keepList = protected.join(',');
       await conn.execute(
         '''
           UPDATE m_player AS p
@@ -126,16 +173,7 @@ class AceEvaluator {
           WHERE t.id = p.id_team
             AND t.id_league IN ($leagueIn)
             AND COALESCE(p.flg_ace, FALSE) = TRUE
-            AND p.id NOT IN (
-              SELECT DISTINCT ON (p2.id_team) p2.id
-              FROM m_player AS p2
-              JOIN m_team AS t2 ON t2.id = p2.id_team
-              WHERE t2.id_league IN ($leagueIn)
-                AND COALESCE(p2.flg_ace, FALSE) = TRUE
-              ORDER BY p2.id_team,
-                       CASE WHEN p2.id IN ($idList) THEN 0 ELSE 1 END,
-                       p2.id
-            )
+            AND p.id NOT IN ($keepList)
         ''',
       );
     }

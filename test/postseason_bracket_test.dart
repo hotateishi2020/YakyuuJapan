@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/View/PostseasonBracket.dart';
+import 'package:Yakyuu_Japan/logic/game_dedupe.dart';
+import 'package:Yakyuu_Japan/logic/mlb_postseason_bracket.dart';
 import 'package:Yakyuu_Japan/logic/postseason_bracket.dart';
 
 String _verticalName(WidgetTester tester, String key) {
@@ -64,6 +66,8 @@ Map<String, dynamic> game({
   required int scoreHome,
   required int scoreAway,
   String state = '試合終了',
+  String date = '',
+  String time = '',
 }) {
   return {
     'code_game': code,
@@ -72,6 +76,8 @@ Map<String, dynamic> game({
     'score_home': scoreHome,
     'score_away': scoreAway,
     'state': state,
+    'date_game': date,
+    'time_game': time,
   };
 }
 
@@ -367,5 +373,170 @@ void main() {
       ),
     );
     expect(blank.color, Colors.white);
+  });
+
+  test('同一日の重複試合は星を二重に数えない', () {
+    final board = buildPostseasonBoard(
+      standings: [
+        standing(id: 1, league: 1, rank: 1, name: '阪神タイガース'),
+        standing(id: 2, league: 1, rank: 2, name: '読売ジャイアンツ', behind: '3.0'),
+        standing(id: 3, league: 1, rank: 3, name: '横浜DeNAベイスターズ', behind: '5.0', wins: 70, losses: 70),
+        standing(id: 7, league: 2, rank: 1, name: '福岡ソフトバンクホークス'),
+        standing(id: 8, league: 2, rank: 2, name: '埼玉西武ライオンズ', behind: '2.0'),
+        standing(id: 9, league: 2, rank: 3, name: '北海道日本ハムファイターズ', behind: '4.0'),
+      ],
+      games: [
+        game(code: 'CS1', home: 2, away: 3, scoreHome: 4, scoreAway: 1, date: '2026-10-11'),
+        game(code: 'CS1', home: 2, away: 3, scoreHome: 4, scoreAway: 1, date: '2026-10-11'),
+        game(code: 'CS1', home: 2, away: 3, scoreHome: 2, scoreAway: 0, date: '2026-10-12'),
+        game(code: 'CS1', home: 2, away: 3, scoreHome: 2, scoreAway: 0, date: '2026-10-12'),
+      ],
+    );
+    expect(board.cs1Central.winsHigh, 2);
+    expect(board.cs1Central.winnerId, 2);
+  });
+
+  test('タイムゾーンずれの同一試合は地区シリーズの3勝に数えない', () {
+    final rows = dedupeSameDayMatchupRows([
+      game(code: 'DS', home: 1, away: 2, scoreHome: 0, scoreAway: 3, date: '2026-10-03', time: '🌙 17:00'),
+      game(code: 'DS', home: 1, away: 2, scoreHome: 0, scoreAway: 3, date: '2026-10-04', time: '☀️ 02:00'),
+      game(code: 'DS', home: 1, away: 2, scoreHome: 3, scoreAway: 4, date: '2026-10-05', time: '🌙 21:00'),
+      game(code: 'DS', home: 1, away: 2, scoreHome: 3, scoreAway: 4, date: '2026-10-06', time: '☀️ 06:00'),
+      game(code: 'DS', home: 1, away: 2, scoreHome: -1, scoreAway: -1, state: '試合前', date: '2026-10-07', time: '🌙 20:00'),
+      game(code: 'DS', home: 1, away: 2, scoreHome: -1, scoreAway: -1, state: '試合前', date: '2026-10-08', time: '☀️ 05:00'),
+    ]);
+    final result = scoreSeries(
+      high: team(id: 1, league: 3, rank: 1),
+      low: team(id: 2, league: 3, rank: 4),
+      games: [
+        for (final row in rows)
+          BracketGame(
+            code: '${row['code_game']}',
+            homeId: row['id_team_home'] as int,
+            awayId: row['id_team_away'] as int,
+            scoreHome: row['score_home'] as int,
+            scoreAway: row['score_away'] as int,
+            state: '${row['state']}',
+          ),
+      ],
+      advantageHigh: 0,
+      winsNeeded: 3,
+      maxGames: 5,
+      tieGoesToHigh: true,
+    );
+    expect(result.winsLow, 2);
+    expect(result.winsHigh, 0);
+    expect(result.decided, isFalse);
+  });
+
+  test('別カードの試合はシリーズの勝敗に数えない', () {
+    final result = scoreSeries(
+      high: team(id: 1, league: 3, rank: 1),
+      low: team(id: 2, league: 3, rank: 4),
+      games: const [
+        BracketGame(code: 'DS', homeId: 1, awayId: 2, scoreHome: 0, scoreAway: 3, state: '試合終了'),
+        BracketGame(code: 'DS', homeId: 1, awayId: 2, scoreHome: 3, scoreAway: 4, state: '試合終了'),
+        BracketGame(code: 'DS', homeId: 9, awayId: 8, scoreHome: 2, scoreAway: 5, state: '試合終了'),
+        BracketGame(code: 'DS', homeId: 2, awayId: 7, scoreHome: 6, scoreAway: 1, state: '試合終了'),
+      ],
+      advantageHigh: 0,
+      winsNeeded: 3,
+      maxGames: 5,
+      tieGoesToHigh: true,
+    );
+    expect(result.winsLow, 2);
+    expect(result.decided, isFalse);
+  });
+
+  test('前後日の同スコア重複は地区シリーズの3勝に数えない', () {
+    final rows = dedupeSameDayMatchupRows([
+      game(code: 'DS', home: 16, away: 15, scoreHome: 1, scoreAway: 0, date: '2026-10-03'),
+      game(code: 'DS', home: 16, away: 15, scoreHome: 1, scoreAway: 0, date: '2026-10-04'),
+      game(code: 'DS', home: 16, away: 15, scoreHome: 5, scoreAway: 2, date: '2026-10-06', time: '☀️ 09:00'),
+      game(code: 'DS', home: 16, away: 15, scoreHome: 5, scoreAway: 2, date: '2026-10-06', time: '🌙 00:00'),
+    ]);
+    final result = scoreSeries(
+      high: team(id: 16, league: 3, rank: 1),
+      low: team(id: 15, league: 3, rank: 4),
+      games: [
+        for (final row in rows)
+          BracketGame(
+            code: '${row['code_game']}',
+            homeId: row['id_team_home'] as int,
+            awayId: row['id_team_away'] as int,
+            scoreHome: row['score_home'] as int,
+            scoreAway: row['score_away'] as int,
+            state: '${row['state']}',
+          ),
+      ],
+      advantageHigh: 0,
+      winsNeeded: 3,
+      maxGames: 5,
+      tieGoesToHigh: true,
+    );
+    expect(rows, hasLength(2));
+    expect(result.winsHigh, 2);
+    expect(result.winsLow, 0);
+    expect(result.decided, isFalse);
+  });
+
+  test('ブルワーズのパドレス戦2勝はDSの星に残る', () {
+    Map<String, dynamic> nl({
+      required int id,
+      required int rank,
+      required String name,
+      required String area,
+      required int wins,
+      required int losses,
+    }) {
+      return {
+        'id_team': id,
+        'id_league': 4,
+        'int_rank': rank,
+        'name_team': name,
+        'code_area': area,
+        'int_win': wins,
+        'int_lose': losses,
+        'game_behind': '0',
+        'color_back': 'navy',
+        'color_font': 'white',
+      };
+    }
+
+    final board = buildMlbPostseasonBoard(
+      standings: [
+        nl(id: 35, rank: 1, name: 'ブルワーズ', area: 'CENTER', wins: 103, losses: 59),
+        nl(id: 40, rank: 2, name: 'ドジャース', area: 'WEST', wins: 100, losses: 62),
+        nl(id: 28, rank: 3, name: 'ブレーブス', area: 'EAST', wins: 94, losses: 68),
+        nl(id: 41, rank: 4, name: 'パドレス', area: 'WEST', wins: 91, losses: 71),
+        nl(id: 33, rank: 5, name: 'カブス', area: 'CENTER', wins: 89, losses: 73),
+        nl(id: 31, rank: 6, name: 'フィリーズ', area: 'EAST', wins: 88, losses: 74),
+      ],
+      games: [
+        game(code: 'WC', home: 41, away: 33, scoreHome: 8, scoreAway: 0),
+        game(code: 'WC', home: 41, away: 33, scoreHome: 4, scoreAway: 1),
+        {
+          ...game(code: 'DS', home: 35, away: 41, scoreHome: 3, scoreAway: 2, date: '2026-10-04', time: '☀️ 09:30'),
+          'id_game': 646,
+        },
+        {
+          ...game(code: 'DS', home: 35, away: 41, scoreHome: 3, scoreAway: 2, date: '2026-10-04', time: '🌙 00:30'),
+          'id_game': 3320,
+        },
+        {
+          ...game(code: 'DS', home: 35, away: 41, scoreHome: 4, scoreAway: 3, date: '2026-10-05', time: '☀️ 05:00'),
+          'id_game': 647,
+        },
+        {
+          ...game(code: 'DS', home: 35, away: 41, scoreHome: 4, scoreAway: 3, date: '2026-10-04', time: '🌙 20:00'),
+          'id_game': 3321,
+        },
+      ],
+    );
+    expect(board.national.first.id, 35);
+    expect(board.nlWc45.winnerId, 41);
+    expect(board.nlDs1.winsHigh, 2);
+    expect(board.nlDs1.winsLow, 0);
+    expect(board.nlDs1.decided, isFalse);
   });
 }

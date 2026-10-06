@@ -219,4 +219,200 @@ void main() {
     expect(hit.stateScore, Value.CodeStateScore.FIRST);
     expect(hit.linguisticRuns, 1);
   });
+
+  test('MLBの適時打と逆転サヨナラを読み分ける', () {
+    final doc = parse('''
+      <div id="text_live">
+        <section class="bb-liveText">
+          <div class="bb-liveText__inning">9回裏</div>
+          <li class="bb-liveText__item">
+            <p class="bb-liveText__batter"><span class="bb-liveText__order">1番</span><a class="bb-liveText__player">J.チョウリオ</a><span class="bb-liveText__state">一死二三塁</span></p>
+            <p class="bb-liveText__summary"><span>センターへの逆転サヨナラ2点適時打！ MIL 4-3 CHC</span></p>
+          </li>
+        </section>
+      </div>
+    ''');
+    final hit = LiveText.parse(doc).halves.single.plates.single.events.single;
+    expect(hit.result, Value.CodeGameResult.HIT_SINGLE);
+    expect(hit.timely, isTrue);
+    expect(hit.stateScore, Value.CodeStateScore.REVERSE);
+    expect(hit.goodbye, isTrue);
+    expect(hit.scoreLeft, 4);
+    expect(hit.scoreRight, 3);
+    expect(hit.linguisticRuns, 2);
+  });
+
+  test('MLBのタイムリーヒットとサヨナラを本文どおり読む', () {
+    final doc = parse('''
+      <div id="text_live">
+        <section class="bb-liveText">
+          <div class="bb-liveText__inning">9回裏</div>
+          <li class="bb-liveText__item">
+            <p class="bb-liveText__batter"><span class="bb-liveText__order">1番</span><a class="bb-liveText__player">J.チョウリオ</a><span class="bb-liveText__state">一死二三塁</span></p>
+            <p class="bb-liveText__summary"><span>6球目を打ってセンターへのタイムリーヒット MIL 4-3 SD サヨナラ！</span></p>
+          </li>
+        </section>
+      </div>
+    ''');
+    final hit = LiveText.parse(doc).halves.single.plates.single.events.single;
+    expect(hit.result, Value.CodeGameResult.HIT_SINGLE);
+    expect(hit.timely, isTrue);
+    expect(hit.goodbye, isTrue);
+    expect(hit.direction, Value.CodePosition.CF);
+    expect(hit.scoreLeft, 4);
+    expect(hit.scoreRight, 3);
+    expect(hit.linguisticRuns, 2);
+  });
+
+  test('略称の速報打者をフルネームの出場成績へ写す', () {
+    final plates = [
+      BoxPlate(
+        teamId: 102,
+        bottom: true,
+        order: 1,
+        name: 'ジャクソン・チョウリオ',
+        position: '中',
+        inning: 9,
+        label: '中安',
+        result: Value.CodeGameResult.HIT_SINGLE,
+        direction: Value.CodePosition.CF,
+        totalBases: 1,
+        seq: 0,
+      ),
+    ];
+    attachLiveNotes(plates, [
+      LivePlateNote(
+        inning: 9,
+        bottom: true,
+        teamId: 102,
+        batterName: 'J.チョウリオ',
+        battingOrder: 1,
+        outs: 1,
+        runnerFirst: false,
+        runnerSecond: true,
+        runnerThird: true,
+        battingResult: Value.CodeGameResult.HIT_SINGLE,
+        runs: 2,
+        homerNumber: 0,
+        stateScore: Value.CodeStateScore.REVERSE,
+        goodbye: true,
+        direction: Value.CodePosition.CF,
+        scoreHome: 4,
+        scoreAway: 3,
+        pitcherId: 0,
+        extras: const [],
+      ),
+    ]);
+    expect(plates.single.matched, isTrue);
+    expect(plates.single.runs, 2);
+    expect(plates.single.goodbye, isTrue);
+    expect(plates.single.stateScore, Value.CodeStateScore.REVERSE);
+  });
+
+  test('得点推移から本文にない逆転状況を補う', () {
+    expect(
+      scoreStateFromTransition(
+        bottom: true,
+        beforeHome: 2,
+        beforeAway: 3,
+        afterHome: 4,
+        afterAway: 3,
+      ),
+      Value.CodeStateScore.REVERSE,
+    );
+    expect(
+      scoreStateFromTransition(
+        bottom: false,
+        beforeHome: 2,
+        beforeAway: 1,
+        afterHome: 2,
+        afterAway: 2,
+      ),
+      Value.CodeStateScore.TIE,
+    );
+  });
+
+  test('MLB のチーム別テーブルは合計行なしでも先攻後攻を分ける', () {
+    final doc = parse('''
+      <div id="async-gameBatterStats">
+        <table class="bb-statsTable">
+          <thead><tr><th>位置</th><th>選手名</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="bb-statsTable__data--bat">(指)</td>
+              <td>ベン・ライス</td>
+              <td class="bb-statsTable__data--inning"></td>
+              <td class="bb-statsTable__data--inning"></td>
+              <td class="bb-statsTable__data--inning"></td>
+              <td class="bb-statsTable__data--inning"><div class="bb-statsTable__dataDetail">右本</div></td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="bb-teamScoreTable"><tbody><tr><th>計</th></tr></tbody></table>
+        <table class="bb-statsTable">
+          <thead><tr><th>位置</th><th>選手名</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="bb-statsTable__data--bat">(中)</td>
+              <td>ヨナタン・アランダ</td>
+              <td class="bb-statsTable__data--inning"><div class="bb-statsTable__dataDetail">中安</div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    ''');
+    final plates = parseBoxPlates(doc, 10, 30);
+    final rice = plates.firstWhere((plate) => plate.name == 'ベン・ライス');
+    expect(rice.teamId, 10);
+    expect(rice.bottom, isFalse);
+    expect(rice.inning, 4);
+    expect(rice.result, Value.CodeGameResult.HOME_RUN);
+    final aranda = plates.firstWhere((plate) => plate.name == 'ヨナタン・アランダ');
+    expect(aranda.teamId, 30);
+    expect(aranda.bottom, isTrue);
+    expect(aranda.inning, 1);
+  });
+
+  test('B.モンゴメリーの速報をフル名の出場成績へ写す', () {
+    final doc = parse('''
+      <div id="async-gameBatterStats"><table><tbody>
+        <tr>
+          <td>(左)</td><td>ブレーデン・モンゴメリー</td>
+          <td class="bb-statsTable__data--inning"><div class="bb-statsTable__dataDetail">右安</div></td>
+        </tr>
+      </tbody></table></div>
+    ''');
+    final plates = parseBoxPlates(doc, 1, 2);
+    attachLiveNotes(plates, [
+      LivePlateNote(
+        inning: 1,
+        bottom: false,
+        teamId: 1,
+        batterName: 'B.モンゴメリー',
+        battingOrder: 1,
+        outs: 0,
+        runnerFirst: false,
+        runnerSecond: true,
+        runnerThird: false,
+        battingResult: Value.CodeGameResult.HIT_SINGLE,
+        runs: 1,
+        homerNumber: 0,
+        stateScore: '',
+        goodbye: false,
+        direction: '',
+        scoreHome: 0,
+        scoreAway: 0,
+        pitcherId: 9,
+        extras: const [],
+      ),
+    ]);
+    expect(plates.single.matched, isTrue);
+    expect(plates.single.runs, 1);
+  });
+
+  test('打妨と野選を打席結果にする', () {
+    expect(classifyBoxPlay('打妨')?.result, Value.CodeGameResult.INTERFERENCE_BATTING);
+    expect(classifyBoxPlay('遊野選')?.result, Value.CodeGameResult.FIELDERS_CHOICE);
+    expect(classifyBoxPlay('遊野選')?.direction, Value.CodePosition.SS);
+  });
 }

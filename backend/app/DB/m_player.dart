@@ -5,6 +5,8 @@ class m_player extends DBModel {
   String name_first = '';
   String name_full = '';
   String name_middle = '';
+  /// MLB 略称（J.チョウリオ）照合用のファーストネーム頭文字（A–Z, 最大3文字）
+  String name_first_initial = '';
   DateTime? date_birth = null;
   int id_team = 0;
   int id_position = 0;
@@ -19,6 +21,7 @@ class m_player extends DBModel {
   bool flg_ace = false;
   int? id_country;
   int? id_place_birth;
+  int? year_retire;
 
   @override
   String get tableName => 'm_player';
@@ -30,6 +33,7 @@ class m_player extends DBModel {
       "name_first": name_first,
       "name_full": name_full.isNotEmpty ? name_full : '$name_last$name_first',
       "name_middle": name_middle,
+      "name_first_initial": name_first_initial.isEmpty ? null : name_first_initial,
       "date_birth": date_birth,
       "id_team": id_team,
       "id_position": id_position,
@@ -44,6 +48,7 @@ class m_player extends DBModel {
       "flg_ace": flg_ace,
       "id_country": id_country,
       "id_place_birth": id_place_birth,
+      "year_retire": year_retire,
     };
   }
 }

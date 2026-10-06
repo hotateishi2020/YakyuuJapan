@@ -23,6 +23,8 @@ Future<void> showAccountMenu(BuildContext context, {VoidCallback? onChanged}) as
       PopupMenuItem(value: 'password', child: Text('パスワード変更')),
       PopupMenuItem(value: 'notify', child: Text('通知設定')),
       PopupMenuItem(value: 'profile', child: Text('基本設定')),
+      PopupMenuDivider(),
+      PopupMenuItem(value: 'logout', child: Text('ログアウト')),
     ],
   );
   if (!context.mounted || action == null) return;
@@ -36,6 +38,10 @@ Future<void> showAccountMenu(BuildContext context, {VoidCallback? onChanged}) as
       break;
     case 'profile':
       await showBasicSettingsDialog(context, onChanged: onChanged);
+      break;
+    case 'logout':
+      await AuthSession.instance.logout();
+      onChanged?.call();
       break;
   }
 }

@@ -61,6 +61,29 @@ class ParsedLiveEvent {
   int? scoreRight;
 }
 
+/// 得点の前後から、速報本文に書かれていない「先制・同点・逆転・勝ち越し」を補う。
+String scoreStateFromTransition({
+  required bool bottom,
+  required int beforeHome,
+  required int beforeAway,
+  required int afterHome,
+  required int afterAway,
+}) {
+  final beforeBatting = bottom ? beforeHome : beforeAway;
+  final beforeFielding = bottom ? beforeAway : beforeHome;
+  final afterBatting = bottom ? afterHome : afterAway;
+  final afterFielding = bottom ? afterAway : afterHome;
+  final beforeDiff = beforeBatting - beforeFielding;
+  final afterDiff = afterBatting - afterFielding;
+
+  if (afterDiff == 0 && beforeDiff != 0) return Value.CodeStateScore.TIE;
+  if (afterDiff > 0 && beforeDiff < 0) return Value.CodeStateScore.REVERSE;
+  if (afterDiff > 0 && beforeDiff == 0) {
+    return beforeHome == 0 && beforeAway == 0 ? Value.CodeStateScore.FIRST : Value.CodeStateScore.GO_AHEAD;
+  }
+  return '';
+}
+
 final Set<String> livePlateFinishedResults = {
   Value.CodeGameResult.HIT_SINGLE,
   Value.CodeGameResult.HIT_DOUBLE,
@@ -163,7 +186,8 @@ class LiveText {
 
         final orderText = batter.querySelector('span.bb-liveText__order')?.text.trim() ?? '';
         final orderMatch = RegExp(r'(\d+)').firstMatch(orderText);
-        final state = batter.querySelector('span.bb-liveText__state')?.text.trim() ?? '';
+        final state = _normalizeLiveState(
+            batter.querySelector('span.bb-liveText__state')?.text.trim() ?? '');
         final runners = _runners(state);
 
         final events = <ParsedLiveEvent>[];
@@ -172,6 +196,16 @@ class LiveText {
           events.addAll(_eventsOf(summary));
         }
         if (events.isEmpty) continue;
+        for (final event in events) {
+          final timelyHit = event.timely &&
+              (event.result == Value.CodeGameResult.HIT_SINGLE ||
+                  event.result == Value.CodeGameResult.HIT_DOUBLE ||
+                  event.result == Value.CodeGameResult.HIT_TRIPLE);
+          // 二三塁からのタイムリーは本文に「2点」が無くても2打点（MLBサヨナラなど）。
+          if (timelyHit && event.linguisticRuns <= 1 && runners.$2 && runners.$3 && !RegExp(r'\d+\s*点').hasMatch(_digits(item.text))) {
+            event.linguisticRuns = 2;
+          }
+        }
         final homerNumber = _homerNumber(_digits(item.text));
         if (homerNumber > 0) {
           for (final event in events) {
@@ -349,7 +383,17 @@ class LiveText {
         case '守備固め':
           event.category = Value.CodeGameResultCategory.CHANGE_PLAYER;
           event.result = Value.CodeGameResult.PINCH_FIELDER;
-          event.enterName = following.isNotEmpty ? following[0] : (previous ?? '');
+          if (following.length >= 2) {
+            event.exitName = following[0];
+            event.enterName = following[1];
+          } else if (previous != null && following.isNotEmpty) {
+            event.exitName = previous;
+            event.enterName = following[0];
+          } else if (following.isNotEmpty) {
+            event.enterName = following[0];
+          } else if (previous != null) {
+            event.enterName = previous;
+          }
           event.positionTo = _position(betweenText).isNotEmpty ? _position(betweenText) : _position(afterPlayer);
           break;
         case '守備変更':
@@ -406,7 +450,11 @@ class LiveText {
       event.category = Value.CodeGameResultCategory.BATTING;
       event.result = Value.CodeGameResult.HIT_DOUBLE;
       event.totalBases = 2;
-    } else if ((digits.contains('ヒット') && !digits.contains('ヒット性')) || digits.contains('安打') || _safetyBuntHit(digits)) {
+    } else if ((digits.contains('ヒット') && !digits.contains('ヒット性')) ||
+        digits.contains('安打') ||
+        digits.contains('適時打') ||
+        digits.contains('適時') ||
+        _safetyBuntHit(digits)) {
       event.category = Value.CodeGameResultCategory.BATTING;
       event.result = Value.CodeGameResult.HIT_SINGLE;
       event.totalBases = 1;
@@ -455,7 +503,10 @@ class LiveText {
     } else if (digits.contains('捕逸')) {
       event.category = Value.CodeGameResultCategory.ERROR;
       event.result = Value.CodeGameResult.PASS_BALL;
-    } else if (digits.contains('打撃妨害')) {
+    } else if (digits.contains('野選')) {
+      event.category = Value.CodeGameResultCategory.BATTING;
+      event.result = Value.CodeGameResult.FIELDERS_CHOICE;
+    } else if (digits.contains('打妨') || digits.contains('打撃妨害')) {
       event.category = Value.CodeGameResultCategory.ERROR;
       event.result = Value.CodeGameResult.INTERFERENCE_BATTING;
     } else if (digits.contains('走塁妨害')) {
@@ -481,7 +532,7 @@ class LiveText {
     event.goodbye = digits.contains('サヨナラ') && !digits.contains('場面');
     event.stateScore = _stateScore(digits);
     event.homerNumber = _homerNumber(digits);
-    event.timely = digits.contains('タイムリー');
+    event.timely = digits.contains('タイムリー') || digits.contains('適時');
     if (event.result == Value.CodeGameResult.STEAL_BASE_SAFE || event.result == Value.CodeGameResult.STEAL_BASE_OUT) {
       event.enterName = _runnerName(summary, digits);
     }
@@ -497,10 +548,27 @@ class LiveText {
   }
 
   static int _outs(String state) {
-    if (state.contains('三死')) return 3;
-    if (state.contains('二死')) return 2;
-    if (state.contains('一死')) return 1;
+    final normalized = _normalizeLiveState(state);
+    if (normalized.contains('三死') || normalized.contains('3アウト')) return 3;
+    if (normalized.contains('二死') || normalized.contains('2アウト')) return 2;
+    if (normalized.contains('一死') || normalized.contains('1アウト')) return 1;
     return 0;
+  }
+
+  /// MLB 速報は「走者2,3塁」「走者1塁」と算用数字で書く。
+  static String _normalizeLiveState(String state) {
+    var text = state;
+    const numerals = {'1': '一', '2': '二', '3': '三'};
+    text = text.replaceAllMapped(RegExp(r'走者\s*([123])\s*,\s*([123])塁'), (match) {
+      return '${numerals[match.group(1)]}${numerals[match.group(2)]}塁';
+    });
+    text = text.replaceAllMapped(RegExp(r'走者\s*([123])塁'), (match) {
+      return '${numerals[match.group(1)]}塁';
+    });
+    text = text.replaceAllMapped(RegExp(r'(^|[^一二三])([123])塁'), (match) {
+      return '${match.group(1)}${numerals[match.group(2)]}塁';
+    });
+    return text;
   }
 
   static (bool, bool, bool) _runners(String state) {
@@ -531,7 +599,9 @@ class LiveText {
     if (text.contains('2ラン') || text.contains('ツーラン')) return 2;
     if (text.contains('ソロ')) return 1;
     if (result == Value.CodeGameResult.HOME_RUN) return 1;
-    if (text.contains('タイムリー')) return 1;
+    final points = RegExp(r'(\d+)\s*点').firstMatch(text);
+    if (points != null) return int.parse(points.group(1)!);
+    if (text.contains('タイムリー') || text.contains('適時')) return 1;
     return 0;
   }
 
@@ -558,7 +628,32 @@ class LiveText {
       });
       if (code.isNotEmpty) return code;
     }
-    const words = ['左中間', '右中間', 'レフト線', 'ライト線', 'レフト', 'ライト', 'センター', 'ファースト', 'セカンド', 'サード', 'ショート', 'ピッチャー', 'キャッチャー', '中堅'];
+    const words = [
+      '左中間',
+      '右中間',
+      'レフト線',
+      'ライト線',
+      'レフト前',
+      'ライト前',
+      'センター前',
+      '中前',
+      '左前',
+      '右前',
+      'レフト',
+      'ライト',
+      'センター',
+      'ファースト',
+      'セカンド',
+      'サード',
+      'ショート',
+      'ピッチャー',
+      'キャッチャー',
+      '中堅',
+      '左翼',
+      '右翼',
+      '左翼線',
+      '右翼線',
+    ];
     for (final word in words) {
       if (text.contains(word)) {
         final code = _position(word);
@@ -709,6 +804,65 @@ class LiveText {
       buffer.write(tokens[i].text);
     }
     return buffer.toString();
+  }
+
+  /// 一球速報の球速表記を km/h に揃える。取れなければ null。
+  static int? kmhFromSpeedText(String raw) {
+    final km = RegExp(r'(\d{2,3})\s*km(?:\s*/\s*h)?', caseSensitive: false).firstMatch(raw);
+    if (km != null) {
+      final n = int.parse(km.group(1)!);
+      if (n >= 80 && n <= 200) return n;
+    }
+    final mph = RegExp(r'(\d{2,3})\s*(?:mph|マイル)', caseSensitive: false).firstMatch(raw);
+    if (mph != null) {
+      final n = int.parse(mph.group(1)!);
+      if (n >= 50 && n <= 120) return (n * 1.60934).round();
+    }
+    return null;
+  }
+
+  static String scorePitcherName(Document doc) {
+    final gm = doc.querySelector('#gm_rslt a')?.text.trim() ?? '';
+    if (gm.isNotEmpty) return gm;
+    return doc.querySelector('.nm a')?.text.trim() ?? '';
+  }
+
+  /// 一打席の一球速報ページから、その投手の当該打席での最速（km/h）。
+  static ({String pitcher, int kmh})? maxKmhOnScorePage(Document doc) {
+    var max = 0;
+    for (final td in doc.querySelectorAll('td.bb-splitsTable__data--speed')) {
+      final kmh = kmhFromSpeedText(td.text);
+      if (kmh != null && kmh > max) max = kmh;
+    }
+    if (max <= 0) {
+      for (final match in RegExp(r'(\d{2,3})\s*(?:km(?:\s*/\s*h)?|mph|マイル)', caseSensitive: false).allMatches(doc.body?.text ?? '')) {
+        final kmh = kmhFromSpeedText(match.group(0)!);
+        if (kmh != null && kmh > max) max = kmh;
+      }
+    }
+    final pitcher = scorePitcherName(doc);
+    if (pitcher.isEmpty || max <= 0) return null;
+    return (pitcher: pitcher, kmh: max);
+  }
+
+  static String? nextScoreIndex(Document doc) {
+    final a = doc.querySelector('dd.next a');
+    if (a == null) return null;
+    final idx = (a.attributes['index'] ?? '').trim();
+    if (idx.isNotEmpty) return idx;
+    return RegExp(r'index=(\d+)').firstMatch(a.attributes['href'] ?? '')?.group(1);
+  }
+
+  static Set<String> scorePlateIndexes(Document doc) {
+    final out = <String>{};
+    for (final a in doc.querySelectorAll('a[href*="index="], a[index]')) {
+      final raw = (a.attributes['index'] ?? '').trim();
+      final href = a.attributes['href'] ?? '';
+      final idx = raw.isNotEmpty ? raw : (RegExp(r'index=(\d{7})').firstMatch(href)?.group(1) ?? '');
+      if (idx.length != 7 || idx.endsWith('0000')) continue;
+      out.add(idx);
+    }
+    return out;
   }
 }
 

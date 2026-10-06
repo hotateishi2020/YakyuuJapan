@@ -7,6 +7,7 @@ import '../tools/Env.dart';
 import '../tools/browser_cookie.dart';
 
 const authTokenCookie = 'koko_auth_token';
+const authUserCookie = 'koko_auth_user';
 const _sessionMaxAge = 30 * 24 * 60 * 60; // 30日
 
 /// デバッグ起動時の自動ログイン（本番ビルドでは使わない）
@@ -86,6 +87,24 @@ class AuthUser {
         readNews: _asBool(json['flg_read_news']),
         readEvent: _asBool(json['flg_read_event']),
       );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name_last': nameLast,
+        'name_first': nameFirst,
+        'nickname': nickname,
+        'name_handle': nameHandle,
+        'mailaddress': mailaddress,
+        'code_color': codeColor,
+        'id_team_fav': idTeamFav,
+        'id_player_fav': idPlayerFav,
+        'name_team_fav': nameTeamFav,
+        'name_player_fav': namePlayerFav,
+        'flg_notify_news': notifyNews,
+        'flg_notify_event': notifyEvent,
+        'flg_read_news': readNews,
+        'flg_read_event': readEvent,
+      };
 }
 
 class AuthSession {
@@ -115,13 +134,18 @@ class AuthSession {
       return;
     }
     token = saved;
+    user = _readCachedUser();
     try {
       final res = await http.get(
         Env.api('/auth/me'),
         headers: {'Authorization': 'Bearer $saved'},
       ).timeout(const Duration(seconds: 15));
-      if (res.statusCode != 200) {
+      if (res.statusCode == 401 || res.statusCode == 403) {
         clearLocal();
+        await _debugAutoLoginIfNeeded();
+        return;
+      }
+      if (res.statusCode != 200) {
         await _debugAutoLoginIfNeeded();
         return;
       }
@@ -132,8 +156,8 @@ class AuthSession {
         return;
       }
       user = AuthUser.fromJson(Map<String, dynamic>.from(map['user'] as Map));
+      _persistSession();
     } catch (_) {
-      clearLocal();
       await _debugAutoLoginIfNeeded();
     }
   }
@@ -334,14 +358,33 @@ class AuthSession {
   void _applyAuthResponse(Map<String, dynamic> map) {
     token = '${map['token'] ?? ''}';
     user = AuthUser.fromJson(Map<String, dynamic>.from(map['user'] as Map));
+    _persistSession();
+  }
+
+  void _persistSession() {
     if (token != null && token!.isNotEmpty) {
       writeBrowserCookie(authTokenCookie, token!, maxAgeSeconds: _sessionMaxAge);
     }
+    if (user != null) {
+      writeBrowserCookie(authUserCookie, jsonEncode(user!.toJson()), maxAgeSeconds: _sessionMaxAge);
+    }
+  }
+
+  AuthUser? _readCachedUser() {
+    final raw = readBrowserCookie(authUserCookie);
+    if (raw == null || raw.isEmpty) return null;
+    try {
+      final map = jsonDecode(raw);
+      if (map is Map<String, dynamic>) return AuthUser.fromJson(map);
+      if (map is Map) return AuthUser.fromJson(Map<String, dynamic>.from(map));
+    } catch (_) {}
+    return null;
   }
 
   void clearLocal() {
     user = null;
     token = null;
     clearBrowserCookie(authTokenCookie);
+    clearBrowserCookie(authUserCookie);
   }
 }

@@ -1,4 +1,6 @@
+import '../tools/StringTool.dart';
 import 'PlayLabel.dart';
+import 'PlayerName.dart';
 
 const _changeResults = {
   'PINCH_HITTER',
@@ -37,6 +39,20 @@ String _name(dynamic value) {
   final text = '$value'.trim();
   if (text.isEmpty || text == 'null') return '';
   return text;
+}
+
+String _lineupCompact(String name) {
+  return StringTool.noSpace(name).replaceAll(RegExp(r'[・･·]'), '');
+}
+
+/// ダスティン・ハリス ↔ ダスティンハリス、J.メリル ↔ ジャクソン・メリル を同一選手とみなす。
+bool _sameLineupName(String left, String right) {
+  final a = _lineupCompact(left);
+  final b = _lineupCompact(right);
+  if (a.isEmpty || b.isEmpty) return false;
+  if (a == b) return true;
+  return playerNameMatches(query: left, nameFull: right) ||
+      playerNameMatches(query: right, nameFull: left);
 }
 
 /// 打順1〜9。各枠は先発打者から、代打・代走・代守で入った選手の順。
@@ -81,20 +97,28 @@ List<Map<String, dynamic>> _lineupOf(
   bool listed(int team, String name) {
     for (var order = 1; order <= 9; order++) {
       final slot = slots['$team|$order'];
-      if (slot != null && slot.contains(name)) return true;
+      if (slot == null) continue;
+      for (final existing in slot) {
+        if (_sameLineupName(existing, name)) return true;
+      }
     }
     return false;
   }
 
   void place(int team, int order, String name) {
     if (team <= 0 || order < 1 || order > 9 || name.isEmpty || listed(team, name)) return;
-    slots.putIfAbsent('$team|$order', () => <String>[]).add(name);
+    final slot = slots.putIfAbsent('$team|$order', () => <String>[]);
+    // 打順枠に後から入ったのに代打・代走の記録がない選手は、代守（守備交代後の打席）とみなす。
+    if (slot.isNotEmpty) {
+      roles.putIfAbsent('$team|$name', () => '代守');
+    }
+    slot.add(name);
   }
 
   int? occupiedBy(int team, String name) {
     for (var order = 1; order <= 9; order++) {
       final slot = slots['$team|$order'];
-      if (slot != null && slot.isNotEmpty && slot.last == name) return order;
+      if (slot != null && slot.isNotEmpty && _sameLineupName(slot.last, name)) return order;
     }
     return null;
   }
@@ -122,8 +146,12 @@ List<Map<String, dynamic>> _lineupOf(
   }
 
   void pinch(int team, String exit, String enter, String role) {
-    if (team <= 0 || enter.isEmpty || listed(team, enter)) return;
-    if (role.isNotEmpty) roles['$team|$enter'] = role;
+    if (team <= 0 || enter.isEmpty) return;
+    // すでに出場している選手の守備位置変更・同選手の別名は、代守にしない。
+    if (_sameLineupName(enter, exit) || listed(team, enter)) return;
+    if (role == '代打' || role == '代走') {
+      roles['$team|$enter'] = role;
+    }
     if (exit.isNotEmpty) {
       final order = occupiedBy(team, exit);
       if (order != null) {
@@ -150,7 +178,7 @@ List<Map<String, dynamic>> _lineupOf(
 
     if (code == 'PINCH_HITTER') {
       final who = enter.isNotEmpty ? enter : batter;
-      if (who.isNotEmpty) roles.putIfAbsent('$battingTeam|$who', () => '代打');
+      if (who.isNotEmpty) roles['$battingTeam|$who'] = '代打';
       final replaced = exit.isNotEmpty ? occupiedBy(battingTeam, exit) : null;
       final slotOrder = replaced ?? (order >= 1 && order <= 9 ? order : null);
       if (slotOrder != null) {
@@ -165,6 +193,10 @@ List<Map<String, dynamic>> _lineupOf(
       continue;
     }
     if (code == 'PINCH_FIELDER') {
+      pinch(fieldingTeam, exit, enter, '代守');
+      continue;
+    }
+    if (code == 'CHANGE_POSITION' && enter.isNotEmpty && exit.isNotEmpty && !_sameLineupName(enter, exit)) {
       pinch(fieldingTeam, exit, enter, '代守');
       continue;
     }
@@ -216,6 +248,15 @@ void _fillBattingOrders(List<Map<String, dynamic>> rows) {
     final ordered = _halfSequence(group);
     final used = <int>{};
     final byName = <String, int>{};
+    int? knownOrder(String name) {
+      final direct = byName[name];
+      if (direct != null) return direct;
+      for (final entry in byName.entries) {
+        if (_sameLineupName(entry.key, name)) return entry.value;
+      }
+      return null;
+    }
+
     var last = 0;
     for (final row in ordered) {
       final code = '${row['code_result'] ?? ''}'.trim();
@@ -229,7 +270,7 @@ void _fillBattingOrders(List<Map<String, dynamic>> rows) {
         continue;
       }
       if (name.isEmpty) continue;
-      final known = byName[name];
+      final known = knownOrder(name);
       if (known != null) {
         row['int_batting_order'] = known;
         continue;
@@ -245,7 +286,7 @@ void _fillBattingOrders(List<Map<String, dynamic>> rows) {
       if (code != 'PINCH_HITTER' && code != 'PINCH_RUNNER') continue;
       if (_asInt(row['int_batting_order']) >= 1) continue;
       final name = _name(row['name_enter']).isNotEmpty ? _name(row['name_enter']) : _name(row['name_full']);
-      final known = byName[name];
+      final known = knownOrder(name);
       if (known != null) row['int_batting_order'] = known;
     }
   }

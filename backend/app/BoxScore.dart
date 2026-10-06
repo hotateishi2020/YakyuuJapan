@@ -1,6 +1,7 @@
 import 'package:html/dom.dart';
 
 import '../tools/StringTool.dart';
+import 'PlayerName.dart';
 import 'Value.dart';
 
 /// 出場成績の1打席。打順・イニング・結果はここが正本。
@@ -152,53 +153,83 @@ class _BoxPlay {
 }
 
 /// 出場成績の打者表。先発の守備位置で打順を進め、位置の無い行はその枠の途中出場。
+/// MLB はチームごとに `table.bb-statsTable` が分かれる。NPB は1表で合計行で切り替わる。
+List<({int teamId, bool bottom, List<Element> rows, bool switchOnTh})> batterStatsGroups(
+  Document doc,
+  int idTeamAway,
+  int idTeamHome,
+) {
+  final tables = doc.querySelectorAll('#async-gameBatterStats table.bb-statsTable');
+  if (tables.length >= 2) {
+    return [
+      for (var i = 0; i < 2; i++)
+        (
+          teamId: i == 0 ? idTeamAway : idTeamHome,
+          bottom: i == 1,
+          rows: tables[i].querySelectorAll('tbody tr'),
+          switchOnTh: false,
+        ),
+    ];
+  }
+  return [
+    (
+      teamId: idTeamAway,
+      bottom: false,
+      rows: doc.querySelectorAll('#async-gameBatterStats tbody tr'),
+      switchOnTh: true,
+    ),
+  ];
+}
+
 List<BoxPlate> parseBoxPlates(Document doc, int idTeamAway, int idTeamHome) {
   final plates = <BoxPlate>[];
-  var teamId = idTeamAway;
-  var bottom = false;
-  var switched = false;
-  var order = 0;
   var seq = 0;
-  for (final row in doc.querySelectorAll('#async-gameBatterStats tbody tr')) {
-    if (row.querySelector('th') != null) {
-      if (!switched) {
-        teamId = idTeamHome;
-        bottom = true;
-        switched = true;
-        order = 0;
+  for (final group in batterStatsGroups(doc, idTeamAway, idTeamHome)) {
+    var teamId = group.teamId;
+    var bottom = group.bottom;
+    var switched = false;
+    var order = 0;
+    for (final row in group.rows) {
+      if (row.querySelector('th') != null) {
+        if (group.switchOnTh && !switched) {
+          teamId = idTeamHome;
+          bottom = true;
+          switched = true;
+          order = 0;
+        }
+        continue;
       }
-      continue;
-    }
-    final tds = row.querySelectorAll('td');
-    if (tds.length < 2) continue;
-    final position = _badgePosition(tds.first.text);
-    final name = StringTool.noSpace(tds[1].text);
-    if (name.isEmpty) continue;
-    // (右) や (右一)/(中左) は先発枠（括弧内は先発→途中の守備）。「三」「走左」「右」は直前の枠の途中出場。
-    if (_isStarterSlot(tds.first.text) && order < 9) order++;
-    if (order < 1) continue;
-    var inning = 0;
-    for (final cell in row.querySelectorAll('td.bb-statsTable__data--inning')) {
-      inning++;
-      final details = cell.querySelectorAll('.bb-statsTable__dataDetail');
-      final labels = details.isEmpty ? [cell.text.trim()] : [for (final detail in details) detail.text.trim()];
-      for (final label in labels) {
-        if (label.isEmpty) continue;
-        final play = classifyBoxPlay(label);
-        if (play == null) continue;
-        plates.add(BoxPlate(
-          teamId: teamId,
-          bottom: bottom,
-          order: order,
-          name: name,
-          position: position,
-          inning: inning,
-          label: label,
-          result: play.result,
-          direction: play.direction,
-          totalBases: play.totalBases,
-          seq: seq++,
-        ));
+      final tds = row.querySelectorAll('td');
+      if (tds.length < 2) continue;
+      final position = _badgePosition(tds.first.text);
+      final name = StringTool.noSpace(tds[1].text);
+      if (name.isEmpty) continue;
+      // (右) や (右一)/(中左) は先発枠（括弧内は先発→途中の守備）。「三」「走左」「右」は直前の枠の途中出場。
+      if (_isStarterSlot(tds.first.text) && order < 9) order++;
+      if (order < 1) continue;
+      var inning = 0;
+      for (final cell in row.querySelectorAll('td.bb-statsTable__data--inning')) {
+        inning++;
+        final details = cell.querySelectorAll('.bb-statsTable__dataDetail');
+        final labels = details.isEmpty ? [cell.text.trim()] : [for (final detail in details) detail.text.trim()];
+        for (final label in labels) {
+          if (label.isEmpty) continue;
+          final play = classifyBoxPlay(label);
+          if (play == null) continue;
+          plates.add(BoxPlate(
+            teamId: teamId,
+            bottom: bottom,
+            order: order,
+            name: name,
+            position: position,
+            inning: inning,
+            label: label,
+            result: play.result,
+            direction: play.direction,
+            totalBases: play.totalBases,
+            seq: seq++,
+          ));
+        }
       }
     }
   }
@@ -211,6 +242,8 @@ _BoxPlay? classifyBoxPlay(String raw) {
   if (text.isEmpty) return null;
   final r = Value.CodeGameResult;
   final direction = _boxDirection(text);
+  if (text.contains('打妨') || text.contains('打撃妨害')) return _BoxPlay(r.INTERFERENCE_BATTING, '', 0);
+  if (text.contains('野選')) return _BoxPlay(r.FIELDERS_CHOICE, direction, 0);
   if (text.contains('三振')) return _BoxPlay(r.STRIKE_OUT, '', 0);
   if (text.contains('振逃') || text.contains('振り逃げ')) return _BoxPlay(r.DROPPED_THIRD, '', 0);
   if (text.contains('四球') || text.contains('故意四') || text.contains('敬遠')) return _BoxPlay(r.WALK_BALL, '', 0);
@@ -294,7 +327,9 @@ bool _sameBatter(String boxName, String liveName) {
   final box = StringTool.noSpace(boxName);
   final live = StringTool.noSpace(liveName);
   if (box.isEmpty || live.isEmpty) return false;
-  return box == live || box.startsWith(live) || live.startsWith(box);
+  if (box == live || box.startsWith(live) || live.startsWith(box)) return true;
+  return playerNameMatches(query: live, nameFull: box) ||
+      playerNameMatches(query: box, nameFull: live);
 }
 
 const _positionMarks = {'投', '捕', '一', '二', '三', '遊', '左', '中', '右', '指'};

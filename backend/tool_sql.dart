@@ -26,8 +26,6 @@ INSERT INTO t_nortification (
 ) VALUES 
 ('読み込み処理の速度向上を実施しました。', '読み込み処理の速度向上を実施しました。', 1, false, 'SYS', 'UPD', '', 0, 'SQLCreator', 'SQLCreator', 0, 'SQLCreator', 'SQLCreator') 
 RETURNING id;
-UPDATE m_user SET 
-  flg_read_news = false;
 ''';
 
   print('--- SQL ---');

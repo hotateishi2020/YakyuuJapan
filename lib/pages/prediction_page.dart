@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math' as math;
 import '../tools/Env.dart';
 import '../tools/app_logger.dart';
 import '../tools/browser_cookie.dart';
+import '../tools/page_visibility.dart';
 import '../tools/color_parse.dart';
 import '../config/app_design.dart';
 import '../config/org_config.dart';
@@ -22,6 +24,7 @@ import '../View/MlbPostseasonBracket.dart';
 import '../View/PostseasonBracket.dart';
 import '../View/BlinkNewMark.dart';
 import '../logic/postseason_bracket.dart';
+import '../logic/game_dedupe.dart';
 
 class PredictionPage extends StatefulWidget {
   const PredictionPage({super.key});
@@ -60,9 +63,26 @@ class _OrgBundle {
             };
 
   bool partReady(_LoadPart part) => readyParts.contains(part);
+
+  /// 画面に出せるコンテンツが1つでもあるか（空のプレースホルダキャッシュを除外）
+  bool get hasContent =>
+      readyParts.contains(_LoadPart.standings) ||
+      readyParts.contains(_LoadPart.players) ||
+      readyParts.contains(_LoadPart.games);
+
+  _OrgBundle copy() => _OrgBundle(
+        predictions: List<Map<String, dynamic>>.from(predictions),
+        standings: List<Map<String, dynamic>>.from(standings),
+        playerStats: List<Map<String, dynamic>>.from(playerStats),
+        playerStatsActual: List<Map<String, dynamic>>.from(playerStatsActual),
+        games: List<Map<String, dynamic>>.from(games),
+        postseasonGames: List<Map<String, dynamic>>.from(postseasonGames),
+        showPostseasonBoard: showPostseasonBoard,
+        readyParts: {...readyParts},
+      );
 }
 
-class _PredictionPageState extends State<PredictionPage> {
+class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObserver {
   // 左カラム
   List<Map<String, dynamic>> predictions = [];
   List<Map<String, dynamic>> standings = []; // ← フラット行（id_league/name_league入り）
@@ -102,9 +122,13 @@ class _PredictionPageState extends State<PredictionPage> {
   int _portraitLeagueTab = 0;
   bool _viewByItem = false;
   int _itemTab = 0;
+  int _seasonYear = DateTime.now().year;
+  final Map<String, int> _loadedPartYears = {};
   PersonalStatsLayout _personalStatsLayout = PersonalStatsLayout.segment;
   Timer? _gamesRefreshTimer;
+  Timer? _gamesPollTimer;
   bool _gamesRefreshRunning = false;
+  bool _gamesPollRunning = false;
   final Set<OrgKind> _seasonStatsRefreshStarted = {};
 
   OrgConfig get _org => OrgConfig.of(_orgKind);
@@ -117,6 +141,8 @@ class _PredictionPageState extends State<PredictionPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    bindPageVisibility(_onPageBecameVisible);
     final saved = readBrowserCookie(_infoCookie);
     if (saved == '0') _infoExpanded = false;
     if (saved == '1') _infoExpanded = true;
@@ -180,16 +206,31 @@ class _PredictionPageState extends State<PredictionPage> {
   }
 
   void _applyBundle(_OrgBundle bundle, {OrgKind? kind}) {
-    predictions = bundle.predictions;
-    standings = bundle.standings;
-    npbPlayerStats = bundle.playerStats;
-    npbPlayerStatsActual = bundle.playerStatsActual;
-    games = bundle.games;
-    postseasonGames = bundle.postseasonGames;
+    // キャッシュと表示用リストを分離し、他団体表示中のクリアで消えないようにする
+    predictions = List<Map<String, dynamic>>.from(bundle.predictions);
+    standings = List<Map<String, dynamic>>.from(bundle.standings);
+    npbPlayerStats = List<Map<String, dynamic>>.from(bundle.playerStats);
+    npbPlayerStatsActual = List<Map<String, dynamic>>.from(bundle.playerStatsActual);
+    games = List<Map<String, dynamic>>.from(bundle.games);
+    postseasonGames = List<Map<String, dynamic>>.from(bundle.postseasonGames);
     showPostseasonBoard = bundle.showPostseasonBoard;
     _readyParts[kind ?? _orgKind] = {...bundle.readyParts};
     // 予想者名は取れたいずれかの団体データから Info に蓄える（空で上書きしない）
-    _captureInfoUsers(bundle.predictions, bundle.playerStats);
+    _captureInfoUsers(predictions, npbPlayerStats);
+  }
+
+  bool _cacheUsable(OrgKind kind) {
+    final cached = _orgCache[kind];
+    if (cached == null || !cached.hasContent) return false;
+    return _partLoadedForYear(kind, _LoadPart.games) ||
+        _partLoadedForYear(kind, _LoadPart.standings) ||
+        _partLoadedForYear(kind, _LoadPart.players);
+  }
+
+  /// キャッシュへ保存（リストはコピーして参照共有を避ける）
+  void _storeCache(OrgKind kind, _OrgBundle bundle) {
+    _orgCache[kind] = bundle.copy();
+    _readyParts[kind] = {...bundle.readyParts};
   }
 
   /// Info（ニュース・イベント・予想者名）は NPB/MLB 共通。空応答で消さない。
@@ -228,12 +269,12 @@ class _PredictionPageState extends State<PredictionPage> {
   }
 
   _OrgBundle _snapshotCurrent() => _OrgBundle(
-        predictions: predictions,
-        standings: standings,
-        playerStats: npbPlayerStats,
-        playerStatsActual: npbPlayerStatsActual,
-        games: games,
-        postseasonGames: postseasonGames,
+        predictions: List<Map<String, dynamic>>.from(predictions),
+        standings: List<Map<String, dynamic>>.from(standings),
+        playerStats: List<Map<String, dynamic>>.from(npbPlayerStats),
+        playerStatsActual: List<Map<String, dynamic>>.from(npbPlayerStatsActual),
+        games: List<Map<String, dynamic>>.from(games),
+        postseasonGames: List<Map<String, dynamic>>.from(postseasonGames),
         showPostseasonBoard: showPostseasonBoard,
         readyParts: {...(_readyParts[_orgKind] ?? const <_LoadPart>{})},
       );
@@ -241,14 +282,16 @@ class _PredictionPageState extends State<PredictionPage> {
   Future<void> _changeOrg(OrgKind kind) async {
     if (kind == _orgKind) return;
     writeBrowserCookie(_orgCookie, OrgConfig.of(kind).label.toLowerCase());
-    _orgCache[_orgKind] = _snapshotCurrent();
+    // 離れる団体の表示内容を必ず保持
+    _storeCache(_orgKind, _snapshotCurrent());
     final cached = _orgCache[kind];
+    final usable = cached != null && cached.hasContent;
     setState(() {
       _orgKind = kind;
       _portraitLeagueTab = 0;
       _itemTab = 0;
       error = null;
-      if (cached != null) {
+      if (usable) {
         _applyBundle(cached, kind: kind);
         isLoading = false;
         _shellReady = true;
@@ -261,21 +304,36 @@ class _PredictionPageState extends State<PredictionPage> {
         games = [];
         postseasonGames = [];
         showPostseasonBoard = false;
+        // プレースホルダだけ残っている場合は ready を捨てて取り直す
+        if (cached != null && !cached.hasContent) {
+          cached.readyParts.clear();
+        }
         _readyParts[kind] = <_LoadPart>{};
       }
     });
     _gamesRefreshTimer?.cancel();
-    if (cached != null && cached.partReady(_LoadPart.games)) {
+    _gamesPollTimer?.cancel();
+    if (usable) {
+      // 足りないパートだけ補完。取得済みは再取得しない
+      final missing = <_LoadPart>[
+        for (final part in _LoadPart.values)
+          if (!cached.partReady(part)) part,
+      ];
+      if (missing.isNotEmpty) {
+        unawaited(_fetchOrgParts(kind, background: false, only: missing));
+      }
+      unawaited(_ensureSeasonYearLoaded());
       await _startGamesWatch();
       unawaited(_prefetchOtherOrg());
       return;
     }
     await _loadThenWatchGames();
+    unawaited(_ensureSeasonYearLoaded());
   }
 
   Future<void> _prefetchOtherOrg() async {
     final other = _orgKind == OrgKind.npb ? OrgKind.mlb : OrgKind.npb;
-    if (_orgCache.containsKey(other)) return;
+    if (_cacheUsable(other) || _orgLoadFutures.containsKey(other)) return;
     await fetchData(kind: other, background: true);
   }
 
@@ -356,8 +414,20 @@ class _PredictionPageState extends State<PredictionPage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _gamesRefreshTimer?.cancel();
+    _gamesPollTimer?.cancel();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _onPageBecameVisible();
+  }
+
+  void _onPageBecameVisible() {
+    if (!mounted) return;
+    unawaited(_pollDisplayedGames());
   }
 
   String _todayKey() {
@@ -368,18 +438,36 @@ class _PredictionPageState extends State<PredictionPage> {
   }
 
   String _predictionsPath([OrgKind? kind]) =>
-      '/predictions?org=${OrgConfig.of(kind ?? _orgKind).label.toLowerCase()}';
+      '/predictions?org=${OrgConfig.of(kind ?? _orgKind).label.toLowerCase()}&year=$_seasonYear';
 
   Future<void> _startGamesWatch() async {
-    if (!mounted || error != null) return;
+    if (!mounted) return;
+    // 一部パート失敗の error があっても、取れたデータがあれば監視は続ける
+    if (error != null && !_boardContentReady) return;
     if (orgGamesAllFinished(games, _todayKey(), _org.leagueIds)) {
       _refreshSeasonStatsOnce();
     }
     _gamesRefreshTimer?.cancel();
+    _gamesPollTimer?.cancel();
+    unawaited(_pollDisplayedGames());
     _refreshGames();
+    _gamesPollTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      unawaited(_pollDisplayedGames());
+    });
     _gamesRefreshTimer = Timer.periodic(const Duration(minutes: 3), (_) {
       _refreshGames();
     });
+  }
+
+  Future<void> _pollDisplayedGames() async {
+    if (!mounted || _gamesPollRunning) return;
+    if (_seasonYear != DateTime.now().year) return;
+    _gamesPollRunning = true;
+    try {
+      await _fetchPart(_orgKind, _LoadPart.games, _seasonYear, background: true, force: true);
+    } finally {
+      _gamesPollRunning = false;
+    }
   }
 
   Future<void> _loadThenWatchGames() async {
@@ -398,6 +486,7 @@ class _PredictionPageState extends State<PredictionPage> {
 
   Future<void> _refreshGames() async {
     if (!mounted || _gamesRefreshRunning || isLoading) return;
+    if (_seasonYear != DateTime.now().year) return;
     final today = _todayKey();
     if (orgGamesAreSettled(games, today, _org.leagueIds)) {
       if (orgGamesAllFinished(games, today, _org.leagueIds)) {
@@ -410,41 +499,15 @@ class _PredictionPageState extends State<PredictionPage> {
     try {
       // 11日分の取得は3分を超える。途中で切るとDBだけ更新されて画面が古いままになる。
       final scrape = await http.get(Env.api(_org.gamesFetchPath)).timeout(const Duration(minutes: 10));
-      if (!mounted || scrape.statusCode != 200) {
+      if (!mounted) return;
+      if (scrape.statusCode != 200) {
         logger.w('試合スクレイピング失敗: ${scrape.statusCode}');
-        return;
-      }
-      if (scrape.body.contains('offseason')) {
+      } else if (scrape.body.contains('offseason')) {
         _gamesRefreshTimer?.cancel();
+        _gamesPollTimer?.cancel();
         return;
       }
-      final res = await http.get(Env.api(_predictionsPath())).timeout(const Duration(seconds: 30));
-      if (!mounted || res.statusCode != 200) return;
-      final map = jsonDecode(res.body) as Map<String, dynamic>;
-      final nextGames = normalizeGames(listMapFromJson(map['games']));
-      final bundle = _OrgBundle(
-        predictions: listMapFromJson(map['predict_team']).where(_org.rowBelongs).toList(),
-        standings: listMapFromJson(map['stats_team']).where(_org.rowBelongs).toList(),
-        playerStats: listMapFromJson(map['predict_player']).where(_org.rowBelongs).toList(),
-        playerStatsActual: listMapFromJson(map['stats_player']).where(_org.rowBelongs).toList(),
-        games: nextGames.where(_org.gameBelongs).toList(),
-        postseasonGames: listMapFromJson(map['postseason_games']),
-        showPostseasonBoard: postseasonBoardVisible(
-          serverFlag: map['show_postseason_board'] == true,
-          today: DateTime.now(),
-        ),
-        readyParts: {
-          _LoadPart.info,
-          _LoadPart.standings,
-          _LoadPart.players,
-          _LoadPart.games,
-        },
-      );
-      _orgCache[_orgKind] = bundle;
-      setState(() {
-        _applyBundle(bundle);
-        _applySharedInfo(map);
-      });
+      await _pollDisplayedGames();
       refreshStats = orgGamesAllFinished(games, today, _org.leagueIds);
     } catch (e, st) {
       logger.w('試合情報の定期更新に失敗: $e\n$st');
@@ -468,6 +531,7 @@ class _PredictionPageState extends State<PredictionPage> {
       }
       if (team.body.contains('offseason')) {
         _gamesRefreshTimer?.cancel();
+        _gamesPollTimer?.cancel();
         return;
       }
       final player = await http.get(Env.api(_org.playerStatsFetchPath)).timeout(const Duration(minutes: 20));
@@ -509,7 +573,7 @@ class _PredictionPageState extends State<PredictionPage> {
       await inflight;
       if (!mounted) return;
       final cached = _orgCache[target];
-      if (cached != null && target == _orgKind) {
+      if (cached != null && cached.hasContent && target == _orgKind) {
         setState(() {
           _applyBundle(cached, kind: target);
           isLoading = false;
@@ -533,71 +597,141 @@ class _PredictionPageState extends State<PredictionPage> {
     return _orgCache.putIfAbsent(
       target,
       () => _OrgBundle(
-        predictions: const [],
-        standings: const [],
-        playerStats: const [],
-        playerStatsActual: const [],
-        games: const [],
-        postseasonGames: const [],
+        predictions: <Map<String, dynamic>>[],
+        standings: <Map<String, dynamic>>[],
+        playerStats: <Map<String, dynamic>>[],
+        playerStatsActual: <Map<String, dynamic>>[],
+        games: <Map<String, dynamic>>[],
+        postseasonGames: <Map<String, dynamic>>[],
         showPostseasonBoard: false,
         readyParts: <_LoadPart>{},
       ),
     );
   }
 
-  String _partPath(OrgKind kind, String part) =>
-      '/predictions/part?org=${OrgConfig.of(kind).label.toLowerCase()}&part=$part';
+  String _partPath(OrgKind kind, String part, int year, {bool fresh = false}) =>
+      '/predictions/part?org=${OrgConfig.of(kind).label.toLowerCase()}&part=$part&year=$year${fresh ? '&fresh=1' : ''}';
 
-  Future<void> _fetchOrgParts(OrgKind target, {required bool background}) async {
-    _ensureCache(target);
-    // 軽いものから並列開始。完了したパートから setState して描画を進める。
-    await Future.wait([
-      _fetchPart(target, _LoadPart.info, background: background),
-      _fetchPart(target, _LoadPart.standings, background: background),
-      _fetchPart(target, _LoadPart.players, background: background),
-      _fetchPart(target, _LoadPart.games, background: background),
-    ]);
+  _LoadPart _partForItem(int item) {
+    if (item == 0) return _LoadPart.games;
+    if (item == 1) return _LoadPart.standings;
+    return _LoadPart.players;
   }
 
-  Future<void> _fetchPart(OrgKind target, _LoadPart part, {required bool background}) async {
-    final key = '${target.name}|${part.name}';
+  bool _partLoadedForYear(OrgKind kind, _LoadPart part) {
+    return (_orgCache[kind]?.partReady(part) ?? false) &&
+        _loadedPartYears['${kind.name}|${part.name}'] == _seasonYear;
+  }
+
+  void _invalidateYearParts() {
+    for (final kind in OrgKind.values) {
+      _orgCache[kind]?.readyParts.remove(_LoadPart.games);
+      _orgCache[kind]?.readyParts.remove(_LoadPart.standings);
+      _orgCache[kind]?.readyParts.remove(_LoadPart.players);
+      _readyParts[kind]?.remove(_LoadPart.games);
+      _readyParts[kind]?.remove(_LoadPart.standings);
+      _readyParts[kind]?.remove(_LoadPart.players);
+      _loadedPartYears.remove('${kind.name}|${_LoadPart.games.name}');
+      _loadedPartYears.remove('${kind.name}|${_LoadPart.standings.name}');
+      _loadedPartYears.remove('${kind.name}|${_LoadPart.players.name}');
+    }
+  }
+
+  Future<void> _ensureItemYearLoaded(int item) async {
+    await _ensureSeasonYearLoaded(only: [_partForItem(item)]);
+  }
+
+  Future<void> _ensureSeasonYearLoaded({List<_LoadPart>? only}) async {
+    final parts = only ?? const [_LoadPart.games, _LoadPart.standings, _LoadPart.players];
+    final missing = [
+      for (final part in parts)
+        if (!_partLoadedForYear(_orgKind, part)) part,
+    ];
+    if (missing.isEmpty) return;
+    if (mounted) {
+      setState(() {
+        final bundle = _ensureCache(_orgKind);
+        for (final part in missing) {
+          bundle.readyParts.remove(part);
+          _readyParts[_orgKind]?.remove(part);
+        }
+      });
+    }
+    await _fetchOrgParts(_orgKind, background: false, only: missing);
+  }
+
+  Future<void> _selectItemYear(int year) async {
+    if (_seasonYear == year) return;
+    setState(() {
+      _seasonYear = year;
+      _invalidateYearParts();
+    });
+    await _ensureSeasonYearLoaded();
+    if (year == DateTime.now().year) {
+      unawaited(_startGamesWatch());
+    } else {
+      _gamesRefreshTimer?.cancel();
+      _gamesPollTimer?.cancel();
+    }
+    unawaited(_prefetchOtherOrg());
+  }
+
+  Future<void> _restoreCurrentBoardParts() async {
+    await _ensureSeasonYearLoaded();
+  }
+
+  Future<void> _fetchOrgParts(
+    OrgKind target, {
+    required bool background,
+    List<_LoadPart>? only,
+  }) async {
+    _ensureCache(target);
+    final parts = only ?? _LoadPart.values;
+    // 取得済みパートはスキップ。未取得だけ並列で取り、完了したものから描画する。
+    final jobs = <Future<void>>[
+      for (final part in parts)
+        if (!_partLoadedForYear(target, part))
+          _fetchPart(target, part, _seasonYear, background: background),
+    ];
+    if (jobs.isEmpty) return;
+    await Future.wait(jobs);
+  }
+
+  Future<void> _fetchPart(OrgKind target, _LoadPart part, int year, {required bool background, bool force = false}) async {
+    final key = '${target.name}|${part.name}|$year';
     final inflight = _partLoadFutures[key];
     if (inflight != null) {
       await inflight;
-      return;
+      if (!force) return;
     }
-    final future = _fetchPartOnce(target, part, background: background);
+    final future = _fetchPartOnce(target, part, year, background: background, fresh: force);
     _partLoadFutures[key] = future;
     try {
       await future;
     } finally {
-      _partLoadFutures.remove(key);
+      if (identical(_partLoadFutures[key], future)) {
+        _partLoadFutures.remove(key);
+      }
     }
   }
 
-  Future<void> _fetchPartOnce(OrgKind target, _LoadPart part, {required bool background}) async {
+  Future<void> _fetchPartOnce(OrgKind target, _LoadPart part, int year, {required bool background, bool fresh = false}) async {
     final org = OrgConfig.of(target);
     try {
-      final res = await http.get(Env.api(_partPath(target, part.name))).timeout(const Duration(seconds: 60));
+      final res = await http.get(Env.api(_partPath(target, part.name, year, fresh: fresh))).timeout(const Duration(seconds: 60));
       if (res.statusCode != 200) {
-        if (!background && target == _orgKind && mounted && !_boardContentReady) {
-          setState(() {
-            error = 'HTTPエラー: ${res.statusCode}';
-            isLoading = false;
-            _shellReady = true;
-          });
-        }
         logger.w('part ${part.name} HTTP ${res.statusCode}');
+        _maybeSetPartError(target, background, 'HTTPエラー: ${res.statusCode}');
         return;
       }
       final map = jsonDecode(res.body) as Map<String, dynamic>;
+      if (part != _LoadPart.info && year != _seasonYear) {
+        return;
+      }
       final bundle = _ensureCache(target);
 
       switch (part) {
         case _LoadPart.info:
-          if (target == _orgKind || !_partReady(_LoadPart.info)) {
-            // Info は共通。裏読みでも反映
-          }
           break;
         case _LoadPart.standings:
           bundle.predictions = listMapFromJson(map['predict_team']).where(org.rowBelongs).toList();
@@ -609,7 +743,7 @@ class _PredictionPageState extends State<PredictionPage> {
           break;
         case _LoadPart.games:
           bundle.games = normalizeGames(listMapFromJson(map['games'])).where(org.gameBelongs).toList();
-          bundle.postseasonGames = listMapFromJson(map['postseason_games']);
+          bundle.postseasonGames = dedupeSameDayMatchupRows(listMapFromJson(map['postseason_games']));
           bundle.showPostseasonBoard = postseasonBoardVisible(
             serverFlag: map['show_postseason_board'] == true,
             today: DateTime.now(),
@@ -617,6 +751,7 @@ class _PredictionPageState extends State<PredictionPage> {
           break;
       }
       bundle.readyParts.add(part);
+      _loadedPartYears['${target.name}|${part.name}'] = year;
       _readyParts.putIfAbsent(target, () => <_LoadPart>{}).add(part);
 
       if (!mounted) return;
@@ -630,18 +765,18 @@ class _PredictionPageState extends State<PredictionPage> {
             case _LoadPart.info:
               break;
             case _LoadPart.standings:
-              predictions = bundle.predictions;
-              standings = bundle.standings;
-              _captureInfoUsers(bundle.predictions, bundle.playerStats);
+              predictions = List<Map<String, dynamic>>.from(bundle.predictions);
+              standings = List<Map<String, dynamic>>.from(bundle.standings);
+              _captureInfoUsers(predictions, npbPlayerStats);
               break;
             case _LoadPart.players:
-              npbPlayerStats = bundle.playerStats;
-              npbPlayerStatsActual = bundle.playerStatsActual;
-              _captureInfoUsers(bundle.predictions, bundle.playerStats);
+              npbPlayerStats = List<Map<String, dynamic>>.from(bundle.playerStats);
+              npbPlayerStatsActual = List<Map<String, dynamic>>.from(bundle.playerStatsActual);
+              _captureInfoUsers(predictions, npbPlayerStats);
               break;
             case _LoadPart.games:
-              games = bundle.games;
-              postseasonGames = bundle.postseasonGames;
+              games = List<Map<String, dynamic>>.from(bundle.games);
+              postseasonGames = List<Map<String, dynamic>>.from(bundle.postseasonGames);
               showPostseasonBoard = bundle.showPostseasonBoard;
               break;
           }
@@ -652,14 +787,20 @@ class _PredictionPageState extends State<PredictionPage> {
       });
     } catch (e, st) {
       logger.e('part ${part.name} 通信/解析エラー: $e\n$st');
-      if (!background && target == _orgKind && mounted && !_boardContentReady) {
-        setState(() {
-          error = '通信エラー: $e';
-          isLoading = false;
-          _shellReady = true;
-        });
-      }
+      _maybeSetPartError(target, background, '通信エラー: $e');
     }
+  }
+
+  /// コンテンツが1つも無いときだけ全面エラーにする（他パート成功時は残す）
+  void _maybeSetPartError(OrgKind target, bool background, String message) {
+    if (background || target != _orgKind || !mounted) return;
+    final hasContent = _boardContentReady || (_orgCache[target]?.hasContent ?? false);
+    if (hasContent) return;
+    setState(() {
+      error = message;
+      isLoading = false;
+      _shellReady = true;
+    });
   }
 
   // flg_atari の合計（予想者のみ: id_user 1/2、セ+パ合算）
@@ -781,6 +922,68 @@ class _PredictionPageState extends State<PredictionPage> {
     return textW + 18;
   }
 
+  String _gamesInitialDate() {
+    final now = DateTime.now();
+    if (_seasonYear == now.year) return DateFormatUtil.ymdWithOffset(0);
+    DateTime? latest;
+    void consider(dynamic raw) {
+      final text = gameDateOnly(raw);
+      final parsed = DateTime.tryParse(text);
+      if (parsed == null) return;
+      if (latest == null || parsed.isAfter(latest!)) latest = parsed;
+    }
+    for (final game in games) {
+      consider(game['date_game']);
+    }
+    for (final game in postseasonGames) {
+      consider(game['date_game']);
+    }
+    latest ??= DateTime(_seasonYear, 10, 15);
+    return DateFormatUtil.ymd(latest!);
+  }
+
+  Widget _yearPicker() {
+    final selected = _seasonYear;
+    final first = _orgKind == OrgKind.mlb ? 1876 : 1936;
+    return SizedBox(
+      width: 76,
+      height: TAB_BAR_H,
+      child: Material(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(TAB_RADIUS),
+        clipBehavior: Clip.antiAlias,
+        child: PopupMenuButton<int>(
+          tooltip: '年度を選択',
+          color: Colors.black,
+          initialValue: selected,
+          position: PopupMenuPosition.under,
+          onSelected: (year) => unawaited(_selectItemYear(year)),
+          itemBuilder: (_) => [
+            for (var year = DateTime.now().year; year >= first; year--)
+              PopupMenuItem<int>(
+                value: year,
+                height: 34,
+                child: Text(
+                  '$year年度',
+                  style: const TextStyle(color: Colors.white, fontSize: 11),
+                ),
+              ),
+          ],
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '$selected年度',
+                style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+              ),
+              const Icon(Icons.arrow_drop_down, color: Colors.white, size: 15),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   /// Info と項目タブのあいだ。選択時は団体色＋ロゴ、非選択は薄いグレー。
   Widget _orgTabBar() {
     return SizedBox(
@@ -864,6 +1067,8 @@ class _PredictionPageState extends State<PredictionPage> {
     final byLeague = !_viewByItem;
     return Row(
       children: [
+        _yearPicker(),
+        const SizedBox(width: ALL_SPACE_BLOCK),
         SizedBox(
           width: _leaguePickerWidth(context),
           height: TAB_BAR_H,
@@ -883,6 +1088,11 @@ class _PredictionPageState extends State<PredictionPage> {
                 if (value == _viewByItem) return;
                 setState(() => _viewByItem = value);
                 writeBrowserCookie(_viewCookie, value ? '1' : '0');
+                if (value) {
+                  unawaited(_ensureItemYearLoaded(_itemTab));
+                } else {
+                  unawaited(_restoreCurrentBoardParts());
+                }
               },
               itemBuilder: (context) => const [
                 PopupMenuItem(
@@ -927,7 +1137,6 @@ class _PredictionPageState extends State<PredictionPage> {
             ),
           ),
         ),
-        const SizedBox(width: ALL_SPACE_BLOCK),
         Expanded(
           child: byLeague
               ? _portraitLeagueTabBar()
@@ -941,6 +1150,7 @@ class _PredictionPageState extends State<PredictionPage> {
                   onSelected: (i) {
                     if (i == _itemTab) return;
                     setState(() => _itemTab = i);
+                    unawaited(_ensureItemYearLoaded(i));
                   },
                   selectedColor: _org.tabColor,
                   selectedForeground: _org.tabForeground,
@@ -965,7 +1175,7 @@ class _PredictionPageState extends State<PredictionPage> {
       stats: npbPlayerStatsActual,
       games: gamesForLeague,
       onlyLeagueId: leagueId,
-      gamesDateFilter: DateFormatUtil.ymdWithOffset(0),
+      gamesDateFilter: _gamesInitialDate(),
       portraitLayout: portraitLayout,
       pane: pane,
       org: _org,
@@ -974,6 +1184,7 @@ class _PredictionPageState extends State<PredictionPage> {
       loadingStandings: !_partReady(_LoadPart.standings),
       loadingStats: !_partReady(_LoadPart.players),
       loadingGames: !_partReady(_LoadPart.games),
+      seasonYear: _seasonYear,
     );
   }
 
@@ -1001,9 +1212,10 @@ class _PredictionPageState extends State<PredictionPage> {
         return const Center(child: CircularProgressIndicator());
       }
       return BothLeagueGameDay(
+        key: ValueKey('both-$_seasonYear-${_gamesInitialDate()}'),
         games: games,
         playerStats: npbPlayerStatsActual,
-        initialDate: DateFormatUtil.ymdWithOffset(0),
+        initialDate: _gamesInitialDate(),
         leading: showPostseasonBoard ? [_postseasonBracket(), const SizedBox(height: 6)] : const [],
         leagues: [
           for (final league in _org.leagues) (id: league.id, name: league.name, color: league.color),
@@ -1179,7 +1391,10 @@ class _PredictionPageState extends State<PredictionPage> {
   Widget _scoreNewsEventsRow({required bool portrait}) {
     final counts = _infoAtariCounts();
     final infoLoading = !_partReady(_LoadPart.info);
-    final scoreLoading = !_partReady(_LoadPart.standings) || !_partReady(_LoadPart.players);
+    // SCORE は NPB / MLB の合算値。片方だけの途中値を確定値のように見せない。
+    final scoreLoading = OrgKind.values.any(
+      (kind) => !_partReady(_LoadPart.standings, kind) || !_partReady(_LoadPart.players, kind),
+    );
     final namesLoading = infoLoading && !_partReady(_LoadPart.standings);
 
     Widget _miniSpinner({double size = 18}) => SizedBox(
@@ -1548,8 +1763,6 @@ class _PredictionPageState extends State<PredictionPage> {
             );
       }
 
-      const catW = 64.0; // 主・サブの列幅（同一）
-
       final h = boxHeight ?? 120.0;
       final content = Container(
         height: fill ? null : h,
@@ -1613,17 +1826,14 @@ class _PredictionPageState extends State<PredictionPage> {
                       if (w > rawMaxTitleW) rawMaxTitleW = w;
                     }
 
-                    // 固定列幅計算
-                    const double spacing = 6 + 6 + 4; // cat間+title-date間
-                    const double minDate = 48;
-                    final double fixedCats = catW * 2;
-                    double titleColW = rawMaxTitleW;
-                    final maxAllowed = constraints.maxWidth - fixedCats - spacing - minDate;
-                    if (titleColW > maxAllowed) titleColW = maxAllowed;
-                    if (titleColW < 60) titleColW = 60;
-
-                    double dateMaxW = constraints.maxWidth - fixedCats - spacing - titleColW;
-                    if (dateMaxW < minDate) dateMaxW = minDate;
+                    // 狭い比率でも固定幅の合計が親幅を超えないよう、全列を利用可能幅から配分する。
+                    const double spacing = 14; // category間6 + title前6 + date前2
+                    final usableW = math.max(0.0, constraints.maxWidth - spacing);
+                    final catW = math.min(64.0, usableW * 0.20);
+                    final textW = math.max(0.0, usableW - catW * 2);
+                    final wantedTitleW = rawMaxTitleW.clamp(0.0, textW);
+                    final titleColW = math.min(wantedTitleW, textW * 0.62);
+                    final dateColW = math.max(0.0, textW - titleColW);
 
                     return SingleChildScrollView(
                       child: Column(
@@ -1706,8 +1916,8 @@ class _PredictionPageState extends State<PredictionPage> {
                                 ),
                                 const SizedBox(width: 2),
                                 // 日付（左詰め・最小/最大幅内で縮小）
-                                Expanded(
-                                  // constraints: BoxConstraints(minWidth: minDate, maxWidth: dateMaxW),
+                                SizedBox(
+                                  width: dateColW,
                                   child: Align(
                                     alignment: Alignment.centerLeft,
                                     child: OneLineShrinkText(
@@ -1840,6 +2050,8 @@ class _PredictionPageState extends State<PredictionPage> {
             loadingStandings: !_partReady(_LoadPart.standings),
             loadingStats: !_partReady(_LoadPart.players),
             loadingGames: !_partReady(_LoadPart.games),
+            seasonYear: _seasonYear,
+            gamesDateFilter: _gamesInitialDate(),
           );
         }
 
@@ -1881,9 +2093,10 @@ class _PredictionPageState extends State<PredictionPage> {
           );
         }
 
+        // 取れたデータがあるときはエラー表示で消さない
         final Widget orgBody = orgContentLoading
             ? const Center(child: CircularProgressIndicator())
-            : error != null
+            : (error != null && !_boardContentReady)
                 ? Center(child: Text(error!))
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,

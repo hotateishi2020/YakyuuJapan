@@ -215,6 +215,7 @@ Future<Map<String, dynamic>> _buildPredictionsPartGames(
     plays: playLabels,
     pitchers: pitcherKeysOf(gameRows),
     rbi: {for (final entry in battingLines.entries) entry.key: _asInt(entry.value['int_rbi'])},
+    errors: {for (final entry in battingLines.entries) entry.key: _asInt(entry.value['int_error'])},
     starters: _lineupStartersOf(battingLines),
   );
   for (final game in games) {
@@ -829,8 +830,9 @@ List<Map<String, dynamic>> _summariesOf(
 
 Future<void> _warmSchemaInBackground() async {
   try {
-    await FetchURL.ensureGameDetailsVelo().timeout(FetchURL.schemaEnsureTimeout);
-    await FetchURL.ensureAppColumns().timeout(FetchURL.schemaEnsureTimeout);
+    await FetchURL.ensureGameDetailsVelo();
+    await FetchURL.ensureAppColumns();
+    unawaited(FetchURL.seedStadiumImagesAndTeamColors());
   } catch (e, st) {
     print('schema warm failed: $e\n$st');
   }
@@ -1167,6 +1169,7 @@ void main() async {
           plays: playLabels,
           pitchers: pitcherKeysOf(gameRows),
           rbi: {for (final entry in battingLines.entries) entry.key: _asInt(entry.value['int_rbi'])},
+          errors: {for (final entry in battingLines.entries) entry.key: _asInt(entry.value['int_error'])},
           starters: _lineupStartersOf(battingLines),
         );
         for (final game in games) {
@@ -1368,7 +1371,7 @@ Future<Response> tryCatchAPIReadonly(
   user.flg_user = false;
   try {
     print("🌐Routing...【" + request.requestedUri.toString() + "】");
-    // 初期表示は SQL 読み取りを優先。DDL 待ちで 8080 が無応答にならないようにする。
+    // DDL は待たない。列確認・seed は裏で進め、試合 SELECT を先に返す。
     FetchURL.kickSchemaEnsures();
     response = await callback();
   } catch (e, st) {
@@ -1395,6 +1398,8 @@ Future<Response> tryCatchAPI(Request request, String category_system, String cod
   user.code_system = code_system;
   user.flg_user = false;
   try {
+    await FetchURL.ensureGameDetailsVelo();
+    await FetchURL.ensureAppColumns();
     await Postgres.openConnection((conn) async {
       await Postgres.transactionCommit(conn, () async {
         print("🌐Routing...【" + request.requestedUri.toString() + "】");
@@ -1403,8 +1408,6 @@ Future<Response> tryCatchAPI(Request request, String category_system, String cod
         user.category_system = category_system;
         user.code_system = code_system;
         user.flg_user = false;
-        await FetchURL.ensureGameDetailsVelo(conn);
-        await FetchURL.ensureAppColumns(conn);
         response = await callback(conn);
       });
     });

@@ -27,7 +27,7 @@ cp -R build/web/* backend/public/
 
 git add . 
 
-git commit -m "ログイン時に不具合を修正しました。" 
+git commit -m "個人成績読み込み修正" 
 
 git push 
 

@@ -28,6 +28,7 @@ class t_game_details extends DBModel {
   bool flg_goodbye = false;
   String code_direction_batting = '';
   int int_velo = 0;
+  bool flg_fine_play = false;
 
   @override
   Map<String, dynamic> toMap() {
@@ -58,6 +59,7 @@ class t_game_details extends DBModel {
         "flg_goodbye": flg_goodbye,
         "code_direction_batting": code_direction_batting,
         "int_velo": int_velo,
+        "flg_fine_play": flg_fine_play,
       });
   }
 }

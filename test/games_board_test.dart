@@ -128,7 +128,7 @@ void main() {
         home: Center(
           child: SizedBox(
             width: 320,
-            height: 160,
+            height: 420,
             child: GamesBoardYahooStyle(
               games: [
                 {
@@ -1489,7 +1489,9 @@ void main() {
     expect(picker.width, greaterThan(pickerLabel.width + 8));
     expect(picker.width, greaterThanOrEqualTo(118));
     final board = tester.getRect(find.byType(GamesBoardYahooStyle));
-    expect(venue.center.dx, closeTo(board.center.dx, 36));
+    final timeRect = tester.getRect(find.textContaining('🌙 18:00').first);
+    final headerMid = (timeRect.left + venue.right) / 2;
+    expect(headerMid, closeTo(board.center.dx, 36));
 
     await tester.tap(find.text('活躍選手のみ表示'));
     await tester.pump();
@@ -2004,9 +2006,9 @@ void main() {
     expect(awayName.left, greaterThan(scoreText.right - 1));
     expect(homeLogos.center.dx, lessThan(inningState.left + 1));
     expect(awayLogos.center.dx, greaterThan(inningState.right - 1));
-    expect(inningState.left - homeLogos.right, inInclusiveRange(2, 28));
-    expect(awayLogos.left - inningState.right, inInclusiveRange(2, 28));
-    expect(homeLogos.height, closeTo(22 * 0.8, 4));
+    expect(inningState.left - homeLogos.right, inInclusiveRange(2, 40));
+    expect(awayLogos.left - inningState.right, inInclusiveRange(2, 40));
+    expect(homeLogos.height, closeTo(44 * 0.8, 8));
     final lineHome = tester.widget<Container>(
       find.ancestor(of: find.byWidgetPredicate((widget) {
         if (widget is! Image) return false;
@@ -3070,8 +3072,8 @@ void main() {
       ),
     );
     await tester.pump();
-    expect(find.text('佐藤輝明'), findsOneWidget);
-    expect(find.text('岡本和真'), findsOneWidget);
+    expect(find.text('佐藤輝明'), findsWidgets);
+    expect(find.text('岡本和真'), findsWidgets);
     expect(find.text('中安'), findsOneWidget);
     expect(find.textContaining('タイムリー'), findsOneWidget);
   });
@@ -3173,17 +3175,17 @@ void main() {
       ),
     );
     await tester.pump();
-    expect(find.text('佐藤輝明'), findsOneWidget);
-    expect(find.text('近本光司'), findsOneWidget);
-    expect(find.text('森下翔太'), findsOneWidget);
-    expect(find.text('中野拓夢'), findsNothing);
+    expect(find.text('佐藤輝明'), findsWidgets);
+    expect(find.text('近本光司'), findsWidgets);
+    expect(find.text('森下翔太'), findsWidgets);
+    expect(find.text('中野拓夢'), findsOneWidget);
     expect(find.text('HR'), findsOneWidget);
     expect(find.text('三'), findsOneWidget);
     expect(find.text('中'), findsOneWidget);
     expect(find.text('右'), findsOneWidget);
-    expect(tester.getTopLeft(find.text('佐藤輝明')).dy, lessThan(tester.getTopLeft(find.text('近本光司')).dy));
+    expect(tester.getTopLeft(find.text('佐藤輝明').first).dy, lessThan(tester.getTopLeft(find.text('近本光司').first).dy));
     expect(tester.getTopLeft(find.text('HR')).dx, lessThan(tester.getTopLeft(find.text('三')).dx));
-    expect(tester.getTopLeft(find.text('三')).dx, lessThan(tester.getTopLeft(find.text('佐藤輝明')).dx));
+    expect(tester.getTopLeft(find.text('三')).dx, lessThan(tester.getTopLeft(find.text('佐藤輝明').first).dx));
   });
 
   testWidgets('MLB Japanese batters show even without extra-base production', (tester) async {
@@ -3345,11 +3347,11 @@ void main() {
       ),
     );
     await tester.pump();
-    expect(find.text('近本光司'), findsOneWidget);
-    expect(find.text('佐藤輝明'), findsOneWidget);
-    expect(find.text('坂倉将吾'), findsOneWidget);
-    expect(find.text('髙寺望夢'), findsNothing);
-    expect(find.text('菊池涼介'), findsNothing);
+    expect(find.text('近本光司'), findsWidgets);
+    expect(find.text('佐藤輝明'), findsWidgets);
+    expect(find.text('坂倉将吾'), findsWidgets);
+    expect(find.text('髙寺望夢'), findsOneWidget);
+    expect(find.text('菊池涼介'), findsOneWidget);
     expect(find.textContaining('タイムリー'), findsWidgets);
     expect(find.text('中安'), findsOneWidget);
   });
@@ -3413,7 +3415,7 @@ void main() {
       ),
     );
     await tester.pump();
-    expect(find.text('佐藤輝明'), findsOneWidget);
+    expect(find.text('佐藤輝明'), findsWidgets);
     expect(find.text('中安'), findsOneWidget);
     expect(find.text('2点犠打'), findsOneWidget);
     expect(find.text('犠飛'), findsOneWidget);
@@ -3953,14 +3955,14 @@ void main() {
     expect(find.text('出場選手全表示'), findsOneWidget);
 
     expect(find.text('大谷翔平'), findsOneWidget);
-    expect(find.text('ベッツ'), findsOneWidget);
-    expect(find.text('フリーマン'), findsOneWidget);
-    expect(find.text('スミス'), findsOneWidget);
-    expect(find.text('テオスカー'), findsOneWidget);
-    expect(find.text('エドマン'), findsOneWidget);
-    expect(find.text('ペイジズ'), findsOneWidget);
-    expect(find.text('キケ'), findsOneWidget);
-    expect(find.text('ロハス'), findsOneWidget);
+    expect(find.text('ベッツ'), findsWidgets);
+    expect(find.text('フリーマン'), findsWidgets);
+    expect(find.text('スミス'), findsWidgets);
+    expect(find.text('テオスカー'), findsWidgets);
+    expect(find.text('エドマン'), findsWidgets);
+    expect(find.text('ペイジズ'), findsWidgets);
+    expect(find.text('キケ'), findsWidgets);
+    expect(find.text('ロハス'), findsWidgets);
   });
 
   testWidgets('全員表示は打点のあるアウトにも打点バッジを付ける', (tester) async {
@@ -4522,5 +4524,116 @@ void main() {
     );
     expect(regular.label, 'セ・リーグ');
     expect(regular.logoAsset, isNull);
+  });
+
+  testWidgets('スタメン発表前は守備欄を出さない', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 720,
+            height: 280,
+            child: GamesBoardYahooStyle(
+              games: [
+                {
+                  'date_game': '2026-10-08',
+                  'time_game': '🌙 18:00',
+                  'name_team_home': '阪神',
+                  'name_team_away': '巨人',
+                  'name_stadium': '甲子園',
+                  'name_pitcher_home': '村上',
+                  'name_pitcher_away': '戸郷',
+                  'score_home': -1,
+                  'score_away': -1,
+                  'state': '試合前',
+                  'id_team_home': 2,
+                  'id_team_away': 1,
+                  'color_back_home': '#FFD200',
+                  'color_back_away': '#FF6600',
+                  'color_font_home': '#000000',
+                  'color_font_away': '#000000',
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('守備'), findsNothing);
+  });
+
+  testWidgets('守備図はスタメンと代守とE/FPを出す', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 900,
+            height: 520,
+            child: GamesBoardYahooStyle(
+              games: [
+                {
+                  'date_game': '2026-10-08',
+                  'time_game': '🌙 18:00',
+                  'name_team_home': '阪神',
+                  'name_team_away': '西武',
+                  'name_stadium': 'ベルーナドーム',
+                  'path_image_inside': 'backend/assets/images/stadiums/inside/npb-03-belluna.jpg',
+                  'path_image_outside': 'backend/assets/images/stadiums/outside/npb-03-belluna.png',
+                  'name_pitcher_home': '村上',
+                  'name_pitcher_away': '今井',
+                  'score_home': 2,
+                  'score_away': 1,
+                  'state': '8回裏',
+                  'id_team_home': 2,
+                  'id_team_away': 8,
+                  'id_league_home': 1,
+                  'id_league_away': 2,
+                  'color_back_home': '#FFD200',
+                  'color_back_away': '#003399',
+                  'color_font_home': '#000000',
+                  'color_font_away': '#FFFFFF',
+                  'summaries': [
+                    {
+                      'id_game_summary': 1,
+                      'id_team_summary': 8,
+                      'name_full_summary': '今井達也',
+                      'flg_pitcher': true,
+                      'txt_pitching': '7回1失点',
+                    },
+                  ],
+                  'lineup': [
+                    {
+                      'id_team': 8,
+                      'order': 2,
+                      'players': [
+                        {'name': '源田壮亮', 'pos': '遊', 'field_marks': 'E'},
+                        {'name': '外崎修汰', 'pos': '遊', 'role': '代守', 'field_marks': 'FP'},
+                      ],
+                    },
+                    {
+                      'id_team': 8,
+                      'order': 9,
+                      'players': [
+                        {'name': '今井達也', 'pos': '投'},
+                      ],
+                    },
+                  ],
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('守備'), findsWidgets);
+    expect(find.text('源田壮亮'), findsWidgets);
+    expect(find.text('(外崎修汰)'), findsOneWidget);
+    expect(find.byKey(const ValueKey('field-mark-E')), findsOneWidget);
+    expect(find.byKey(const ValueKey('field-mark-FP')), findsOneWidget);
+    expect(find.text('ベルーナドーム'), findsOneWidget);
   });
 }

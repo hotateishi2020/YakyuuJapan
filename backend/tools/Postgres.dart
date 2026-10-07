@@ -178,7 +178,7 @@ class Postgres {
       } catch (e, st) {
         lastError = e;
         lastStack = st;
-        await release(conn, broken: true);
+        await release(conn, broken: isBrokenConnection(e));
         released = true;
         if (attempt >= 2 || !isBrokenConnection(e)) {
           Error.throwWithStackTrace(e, st);

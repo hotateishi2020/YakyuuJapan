@@ -88,9 +88,27 @@ class GameStatsLoad {
   }
 
   static Future<void> ensureColumn(Connection conn) async {
-    await conn.execute(
-      'ALTER TABLE t_game ADD COLUMN IF NOT EXISTS flg_stats_loaded boolean NOT NULL DEFAULT FALSE',
+    final rows = await conn.execute(
+      '''
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 't_game'
+          AND column_name = 'flg_stats_loaded'
+        LIMIT 1
+      ''',
     );
+    if (rows.isNotEmpty) return;
+    await conn.execute("SET lock_timeout = '2s'");
+    try {
+      await conn.execute(
+        'ALTER TABLE t_game ADD COLUMN IF NOT EXISTS flg_stats_loaded boolean NOT NULL DEFAULT FALSE',
+      );
+    } finally {
+      try {
+        await conn.execute("SET lock_timeout = '0'");
+      } catch (_) {}
+    }
   }
 
   static Future<bool> isLoaded(Connection conn, int gameId) async {

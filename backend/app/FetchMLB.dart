@@ -16,6 +16,7 @@ import 'DB/t_game_summary.dart';
 import 'DB/t_stats_team.dart';
 import 'BoxScore.dart';
 import 'FetchURL.dart';
+import 'StadiumImages.dart';
 import 'GameFetchSchedule.dart';
 import 'GameStatsLoad.dart';
 import 'OrgLeague.dart';
@@ -878,9 +879,12 @@ class FetchMLB {
           final stadiumName = venue.isEmpty ? 'MLB' : venue;
           final stadiumRows = await Postgres.execute(conn, AppSql.selectStadium(), data: ['%$stadiumName%']);
           if (stadiumRows.isEmpty) {
+            final paths = StadiumImages.lookup(stadiumName);
             final stadium = m_stadium()
               ..name_short = stadiumName
-              ..id_team = idTeamHome;
+              ..id_team = idTeamHome
+              ..path_image_inside = paths.inside
+              ..path_image_outside = paths.outside;
             idStadium = await Postgres.insert(conn, stadium);
           } else {
             idStadium = stadiumRows.first.toColumnMap()['id'] as int;

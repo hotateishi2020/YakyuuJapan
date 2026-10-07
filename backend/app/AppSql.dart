@@ -492,10 +492,12 @@ class AppSql {
         SELECT id, code_game, datetime_start, id_team_home AS id_team
         FROM t_game
         WHERE code_game IN ('NM', 'EX', 'OP') AND COALESCE(flg_delete, FALSE) = FALSE
+          AND EXTRACT(YEAR FROM datetime_start)::int = \$1::int
         UNION ALL
         SELECT id, code_game, datetime_start, id_team_away AS id_team
         FROM t_game
         WHERE code_game IN ('NM', 'EX', 'OP') AND COALESCE(flg_delete, FALSE) = FALSE
+          AND EXTRACT(YEAR FROM datetime_start)::int = \$1::int
       ),
       game_boundaries AS (
         SELECT
@@ -547,6 +549,8 @@ class AppSql {
         pitcher_lose.name_full AS name_pitcher_lose,
         pitcher_save.name_full AS name_pitcher_save,
         m_stadium.name_short AS name_stadium,
+        COALESCE(m_stadium.path_image_inside, '') AS path_image_inside,
+        COALESCE(m_stadium.path_image_outside, '') AS path_image_outside,
         t_game.score_home,
         t_game.score_away,
         team_home.id AS id_team_home,
@@ -759,7 +763,7 @@ class AppSql {
         ) AS v_game_summary ON v_game_summary.id_game = t_game.id 
       WHERE ${gameDateWindow(alias: 't_game', ranged: ranged)}
       GROUP BY t_game.id, t_game.datetime_start, team_home.name_short, team_away.name_short, team_home.name_shortest, team_away.name_shortest, pitcher_home.id, pitcher_home.name_full, pitcher_home.flg_ace, pitcher_away.id, pitcher_away.name_full, pitcher_away.flg_ace,
-               pitcher_win.name_full, pitcher_lose.name_full, m_stadium.name_short, t_game.score_home, t_game.score_away,
+               pitcher_win.name_full, pitcher_lose.name_full, m_stadium.name_short, m_stadium.path_image_inside, m_stadium.path_image_outside, t_game.score_home, t_game.score_away,
                team_home.id_league, team_away.id_league, team_home.color_font, team_home.color_back, team_away.color_font,
                team_away.color_back, team_home.id, team_away.id, pitcher_win.id_team, pitcher_lose.id_team, pitcher_save.name_full, 
                pitcher_save.id_team, t_game.state, t_game.code_game, boundary_home.first_id, boundary_home.last_id,
@@ -953,6 +957,7 @@ class AppSql {
         d.flg_goodbye,
         d.code_direction_batting,
         d.code_position_from,
+        COALESCE(d.flg_fine_play, FALSE) AS flg_fine_play,
         runner.name_full AS name_runner,
         runner.id_team AS id_team_runner,
         g.id_team_home,

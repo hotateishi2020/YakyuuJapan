@@ -16,6 +16,9 @@ Map<String, dynamic> _row({
   String enter = '',
   String exit = '',
   String direction = '',
+  String positionFrom = '',
+  String positionTo = '',
+  bool finePlay = false,
 }) {
   return {
     'id': id,
@@ -32,7 +35,9 @@ Map<String, dynamic> _row({
     'name_full': batter,
     'name_enter': enter,
     'name_exit': exit,
-    'code_position_from': '',
+    'code_position_from': positionFrom,
+    'code_position_to': positionTo,
+    'flg_fine_play': finePlay,
   };
 }
 
@@ -358,5 +363,70 @@ void main() {
         for (final player in (row['players'] as List)) player['name'],
     ];
     expect(namesOnNine, isNot(contains('小野寺暖')));
+  });
+
+  test('代守は入った守備位置を持ち、失策とファインプレーは守備側に付く', () {
+    final lineups = battingLineupsOf(
+      [
+        _row(
+          id: 1,
+          result: Value.CodeGameResult.STRIKE_OUT,
+          batter: '源田壮亮',
+          order: 2,
+          team: 201,
+          home: 202,
+          away: 201,
+          positionFrom: 'SS',
+        ),
+        _row(
+          id: 2,
+          result: Value.CodeGameResult.ERROR_FIELDING,
+          batter: '佐藤輝明',
+          order: 4,
+          team: 202,
+          home: 202,
+          away: 201,
+          bottom: true,
+          inning: 3,
+          direction: 'SS',
+        ),
+        _row(
+          id: 3,
+          result: Value.CodeGameResult.PINCH_FIELDER,
+          batter: '佐藤輝明',
+          order: 4,
+          team: 202,
+          home: 202,
+          away: 201,
+          bottom: true,
+          inning: 7,
+          enter: '外崎修汰',
+          exit: '源田壮亮',
+          positionTo: 'SS',
+        ),
+        _row(
+          id: 4,
+          result: Value.CodeGameResult.OUT_FLY,
+          batter: '近本光司',
+          order: 1,
+          team: 202,
+          home: 202,
+          away: 201,
+          bottom: true,
+          inning: 8,
+          direction: 'SS',
+          finePlay: true,
+        ),
+      ],
+      plays: const {},
+      pitchers: const {},
+    );
+    final players = _playersOf(lineups, 2);
+    expect(players.first['pos'], '遊');
+    expect(players.first['field_marks'], 'E');
+    expect(players.last['name'], '外崎修汰');
+    expect(players.last['role'], '代守');
+    expect(players.last['pos'], '遊');
+    expect(players.last['field_marks'], 'FP');
   });
 }

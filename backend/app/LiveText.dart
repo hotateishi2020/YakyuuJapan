@@ -59,6 +59,7 @@ class ParsedLiveEvent {
   String scoreRightName = '';
   int? scoreLeft;
   int? scoreRight;
+  bool finePlay = false;
 }
 
 /// 得点の前後から、速報本文に書かれていない「先制・同点・逆転・勝ち越し」を補う。
@@ -624,6 +625,7 @@ class LiveText {
     }
 
     event.direction = _direction(digits);
+    event.finePlay = digits.contains('ファインプレー');
     event.goodbye = digits.contains('サヨナラ') && !digits.contains('場面');
     event.stateScore = _stateScore(digits);
     event.homerNumber = _homerNumber(digits);

@@ -17,6 +17,7 @@ void main() {
     expect(sql, contains(r'$2::date'));
     expect(sql, contains(r'$3::date'));
     expect(sql, contains(r'$1::int'));
+    expect(sql, contains('EXTRACT(YEAR FROM datetime_start)::int = \$1::int'));
     expect(AppSql.selectGamePlayRows(ranged: true), contains(r'$2::date'));
     expect(AppSql.selectGamePlayRows(ranged: true), contains(r'$1::int'));
     expect(AppSql.selectBattingLines(ranged: true), contains(r'$2::date'));

@@ -28,6 +28,7 @@ import 'package:postgres/postgres.dart';
 import 'package:shelf/shelf.dart';
 import 'BirthPlaceRegistry.dart';
 import 'GameFetchSchedule.dart';
+import 'StadiumImages.dart';
 import 'GameStatsLoad.dart';
 import 'OrgLeague.dart';
 import 'Postseason.dart';
@@ -64,9 +65,40 @@ class FetchURL {
   static bool _veloColumnSkip = false;
   static bool _appColumnsReady = false;
   static bool _appColumnsSkip = false;
+  static bool _imageSeedStarted = false;
   static Future<void>? _veloFlight;
   static Future<void>? _appColumnsFlight;
   static const Duration schemaEnsureTimeout = Duration(seconds: 8);
+
+  static Future<Set<String>> _columnNames(Connection c, String table) async {
+    final rows = await c.execute(
+      '''
+        SELECT column_name::text
+        FROM information_schema.columns
+        WHERE table_schema = 'public' AND table_name = \$1
+      ''',
+      parameters: [table],
+    );
+    return {for (final row in rows) '${row[0]}'.toLowerCase()};
+  }
+
+  static Future<void> _addColumnIfMissing(
+    Connection c,
+    String table,
+    String column,
+    String ddl,
+  ) async {
+    final have = await _columnNames(c, table);
+    if (have.contains(column.toLowerCase())) return;
+    await c.execute("SET lock_timeout = '2s'");
+    try {
+      await c.execute(ddl);
+    } finally {
+      try {
+        await c.execute("SET lock_timeout = '0'");
+      } catch (_) {}
+    }
+  }
 
   static Future<void> _runOnce({
     required bool ready,
@@ -75,7 +107,6 @@ class FetchURL {
     required void Function(Future<void>? next) setFlight,
     required void Function() markSkipped,
     required Future<void> Function(Connection c) run,
-    Connection? conn,
   }) async {
     if (ready || skipped) return;
     final existing = flight;
@@ -83,24 +114,16 @@ class FetchURL {
       try {
         await existing.timeout(schemaEnsureTimeout);
       } on TimeoutException {
-        markSkipped();
+        // 初期表示は待たない。進行中の DDL は裏で続け、接続は切らない。
       }
       return;
     }
     final done = Completer<void>();
     setFlight(done.future);
     try {
-      Future<void> work(Connection c) => run(c).timeout(schemaEnsureTimeout);
-      if (conn != null) {
-        await work(conn);
-      } else {
-        await Postgres.withConnection(work);
-      }
-      done.complete();
-    } on TimeoutException {
-      print('schema ensure timed out; continuing without DDL');
-      markSkipped();
-      setFlight(null);
+      // ALTER は呼び出し元のトランザクションに載せない。
+      // scrape 中に AccessExclusiveLock が残ると初期表示の SELECT が止まる。
+      await Postgres.withConnection(run, urgent: true);
       done.complete();
     } catch (e, st) {
       setFlight(null);
@@ -111,7 +134,42 @@ class FetchURL {
 
   static void kickSchemaEnsures() {
     unawaited(ensureGameDetailsVelo());
-    unawaited(ensureAppColumns());
+    unawaited(() async {
+      await ensureAppColumns();
+      unawaited(seedStadiumImagesAndTeamColors());
+    }());
+  }
+
+  /// 球場画像パスと近鉄のチーム色。初期表示の SELECT を止めない。
+  static Future<void> seedStadiumImagesAndTeamColors() async {
+    if (_imageSeedStarted) return;
+    _imageSeedStarted = true;
+    try {
+      await Postgres.withConnection((c) async {
+        await StadiumImages.seed(c);
+        await c.execute('''
+          UPDATE m_team
+          SET color_back = 'crimson', color_font = 'white', updat = NOW()
+          WHERE COALESCE(flg_delete, FALSE) = FALSE
+            AND (
+              source_key = 'npb:franchise:kintetsu'
+              OR (
+                (COALESCE(name_full, '') LIKE '%近鉄%'
+                  OR COALESCE(name_short, '') LIKE '%近鉄%'
+                  OR COALESCE(name_shortest, '') LIKE '%近鉄%')
+                AND COALESCE(name_full, '') NOT LIKE '%オリックス%'
+              )
+            )
+            AND (
+              color_back IS DISTINCT FROM 'crimson'
+              OR color_font IS DISTINCT FROM 'white'
+            )
+        ''');
+      }, urgent: true);
+    } catch (e, st) {
+      _imageSeedStarted = false;
+      print('stadium/team seed failed: $e\n$st');
+    }
   }
 
   static Future<void> ensureGameDetailsVelo([Connection? conn]) async {
@@ -122,9 +180,13 @@ class FetchURL {
       flight: _veloFlight,
       setFlight: (next) => _veloFlight = next,
       markSkipped: () => _veloColumnSkip = true,
-      conn: conn,
       run: (c) async {
-        await c.execute('ALTER TABLE t_game_details ADD COLUMN IF NOT EXISTS int_velo integer');
+        await _addColumnIfMissing(
+          c,
+          't_game_details',
+          'int_velo',
+          'ALTER TABLE t_game_details ADD COLUMN IF NOT EXISTS int_velo integer',
+        );
         _veloColumnReady = true;
       },
     );
@@ -139,17 +201,30 @@ class FetchURL {
       flight: _appColumnsFlight,
       setFlight: (next) => _appColumnsFlight = next,
       markSkipped: () => _appColumnsSkip = true,
-      conn: conn,
       run: (c) async {
-        // ADD COLUMN のみ。ALTER COLUMN TYPE は AccessExclusiveLock で
-        // 初期の試合 SELECT を止めるので起動パスではやらない。
+        // 列が既にあるときは information_schema だけ見て ALTER しない。
+        // ADD COLUMN IF NOT EXISTS でも AccessExclusiveLock が付き、
+        // 初期の試合 SELECT が待たされる。
         await GameStatsLoad.ensureColumn(c);
-        await c.execute(
+        await _addColumnIfMissing(
+          c,
+          't_game_summary',
+          'int_batting_order',
           'ALTER TABLE t_game_summary ADD COLUMN IF NOT EXISTS int_batting_order integer NOT NULL DEFAULT 0',
         );
-        await c.execute(
+        await _addColumnIfMissing(
+          c,
+          't_game_summary',
+          'code_position_from',
           "ALTER TABLE t_game_summary ADD COLUMN IF NOT EXISTS code_position_from varchar(8) NOT NULL DEFAULT ''",
         );
+        await _addColumnIfMissing(
+          c,
+          't_game_details',
+          'flg_fine_play',
+          'ALTER TABLE t_game_details ADD COLUMN IF NOT EXISTS flg_fine_play BOOLEAN NOT NULL DEFAULT FALSE',
+        );
+        await StadiumImages.ensureColumns(c);
         _appColumnsReady = true;
       },
     );
@@ -844,6 +919,9 @@ class FetchURL {
                 var stadium = m_stadium();
                 stadium.name_short = name_stadium;
                 stadium.id_team = id_team_home;
+                final paths = StadiumImages.lookup(name_stadium);
+                stadium.path_image_inside = paths.inside;
+                stadium.path_image_outside = paths.outside;
                 id_stadium = await Postgres.insert(conn, stadium);
               } else {
                 //DBに存在するスタジアムの場合
@@ -1789,6 +1867,7 @@ class FetchURL {
           detail.code_state_score = event.stateScore;
           detail.flg_goodbye = event.goodbye;
           detail.code_direction_batting = event.direction;
+          detail.flg_fine_play = event.finePlay;
           detail.code_position_from = event.positionFrom;
           detail.code_position_to = event.positionTo;
           if (detail.code_position_from.isEmpty && livePlateFinishedResults.contains(event.result)) {

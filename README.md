@@ -15,8 +15,6 @@ For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
-
-
 ↓デプロイ記述↓
 
 cd /Users/standapp/StudioProjects/Koko 
@@ -29,7 +27,7 @@ cp -R build/web/* backend/public/
 
 git add . 
 
-git commit -m "表示に不具合を修正しました。" 
+git commit -m "ログイン時に不具合を修正しました。" 
 
 git push 
 

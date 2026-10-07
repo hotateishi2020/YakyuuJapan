@@ -967,6 +967,50 @@ void main() {
     expect(homeLogo.height / 46.0, closeTo(0.8, 0.15));
   });
 
+  testWidgets('finished game state cell is about twice the old score-on-board height', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 520,
+            height: 320,
+            child: GamesBoardYahooStyle(
+              games: [
+                {
+                  'date_game': '2026-10-07',
+                  'time_game': '18:00',
+                  'name_team_home': 'ヤクルト',
+                  'name_team_away': '巨人',
+                  'name_stadium': '神宮',
+                  'name_pitcher_home': '吉村貢司郎',
+                  'name_pitcher_away': '戸郷翔征',
+                  'score_home': 3,
+                  'score_away': 1,
+                  'state': '試合終了',
+                  'id_team_home': 4,
+                  'id_team_away': 1,
+                  'color_back_home': '#1D4E89',
+                  'color_back_away': '#F15A22',
+                  'color_font_home': 'white',
+                  'color_font_away': 'black',
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('試合終了'), findsOneWidget);
+    final homeLogo = tester.getRect(find.byWidgetPredicate((widget) {
+      if (widget is! Image) return false;
+      final provider = widget.image;
+      return provider is AssetImage && provider.assetName == 'backend/assets/images/team_s.png';
+    }).first);
+    expect(homeLogo.height, closeTo(44 * 0.8, 6));
+  });
+
   testWidgets('starter season ranks show beside wins era and strikeouts when qualified', (tester) async {
     Map<String, dynamic> stat(String title, String name, int rank) {
       return {'title': title, 'name_player': name, 'int_rank': rank, 'id_league': 1};
@@ -2026,7 +2070,7 @@ void main() {
     expect(homeTeamChar.dx, lessThan(pitcherLabel.dx));
   });
 
-  testWidgets('pregame starting pitchers stack on a narrow screen', (tester) async {
+  testWidgets('pregame starting pitchers stay side by side on a narrow screen', (tester) async {
     tester.view.physicalSize = const Size(360, 800);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -2068,11 +2112,11 @@ void main() {
     expect(tester.takeException(), isNull);
     final home = tester.getCenter(find.text('古謝樹'));
     final away = tester.getCenter(find.text('東晃平'));
-    expect(home.dy, lessThan(away.dy - 8));
-    expect(home.dx, closeTo(away.dx, 24));
+    expect(home.dx, lessThan(away.dx - 8));
+    expect((home.dy - away.dy).abs(), lessThan(24));
   });
 
-  testWidgets('narrow pregame pitcher season stats stack label above value', (tester) async {
+  testWidgets('narrow pregame pitcher season stats keep label beside value', (tester) async {
     tester.view.physicalSize = const Size(360, 800);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -2123,7 +2167,8 @@ void main() {
       var nearest = 1000.0;
       for (var i = 0; i < 2; i++) {
         final center = tester.getCenter(find.text('勝敗').at(i));
-        final gap = (center.dx - record.dx).abs() + (record.dy - center.dy).abs() / 1000;
+        if (center.dx > record.dx) continue;
+        final gap = (center.dy - record.dy).abs() + (record.dx - center.dx) / 1000;
         if (gap < nearest) {
           nearest = gap;
           nearestLabel = find.text('勝敗').at(i);
@@ -2133,8 +2178,71 @@ void main() {
     }
 
     final winsLabel = labelNear('10勝5敗');
-    expect(tester.getBottomLeft(winsLabel).dy, lessThanOrEqualTo(tester.getTopLeft(find.text('10勝5敗')).dy + 1));
-    expect((tester.getCenter(winsLabel).dx - tester.getCenter(find.text('10勝5敗')).dx).abs(), lessThan(12));
+    expect(tester.getTopRight(winsLabel).dx, lessThan(tester.getTopLeft(find.text('10勝5敗')).dx + 1));
+    expect((tester.getCenter(winsLabel).dy - tester.getCenter(find.text('10勝5敗')).dy).abs(), lessThan(8));
+  });
+
+  testWidgets('narrow screens stack pregame match cards', (tester) async {
+    tester.view.physicalSize = const Size(360, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 360,
+            height: 520,
+            child: GamesBoardYahooStyle(
+              games: [
+                {
+                  'date_game': '2026-10-08',
+                  'time_game': '18:00',
+                  'name_team_home': '阪神',
+                  'name_team_away': 'ヤクルト',
+                  'name_stadium': '甲子園',
+                  'name_pitcher_home': 'ルーカス',
+                  'name_pitcher_away': '中村優',
+                  'state': '予想先発',
+                  'id_team_home': 2,
+                  'id_team_away': 4,
+                  'id_game': 1,
+                  'color_back_home': '#FFD200',
+                  'color_back_away': '#00A040',
+                  'color_font_home': '#000000',
+                  'color_font_away': '#FFFFFF',
+                },
+                {
+                  'date_game': '2026-10-08',
+                  'time_game': '18:00',
+                  'name_team_home': '巨人',
+                  'name_team_away': 'DeNA',
+                  'name_stadium': '東京ドーム',
+                  'name_pitcher_home': '戸郷翔征',
+                  'name_pitcher_away': '東克樹',
+                  'state': '予想先発',
+                  'id_team_home': 1,
+                  'id_team_away': 3,
+                  'id_game': 2,
+                  'color_back_home': '#FF6600',
+                  'color_back_away': '#003399',
+                  'color_font_home': '#000000',
+                  'color_font_away': '#FFFFFF',
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    final first = tester.getTopLeft(find.text('ルーカス'));
+    final second = tester.getTopLeft(find.text('戸郷翔征'));
+    expect(first.dy, lessThan(second.dy - 24));
+    expect(first.dx, closeTo(second.dx, 24));
   });
 
   testWidgets('活躍表示は打球方向と打点・盗塁バッチを出す', (tester) async {
@@ -4251,6 +4359,28 @@ void main() {
       ].contains(const Color(0xFFFFD700)),
       isTrue,
     );
+    expect(find.text('👑'), findsNWidgets(2));
+    Finder crownNear(String value) {
+      final origin = tester.getCenter(find.textContaining(value).first);
+      Finder nearest = find.text('👑').first;
+      var best = 1e9;
+      for (var i = 0; i < find.text('👑').evaluate().length; i++) {
+        final crown = find.text('👑').at(i);
+        final center = tester.getCenter(crown);
+        if (center.dx <= origin.dx) continue;
+        final gap = (center.dy - origin.dy).abs() * 20 + (center.dx - origin.dx);
+        if (gap < best) {
+          best = gap;
+          nearest = crown;
+        }
+      }
+      return nearest;
+    }
+
+    expect(tester.getTopLeft(crownNear('0.98')).dx, greaterThan(tester.getTopRight(find.text('0.98')).dx - 2));
+    expect((tester.getCenter(crownNear('0.98')).dy - tester.getCenter(find.text('0.98')).dy).abs(), lessThan(8));
+    final eraValue = find.textContaining('2.41');
+    expect(tester.getTopLeft(crownNear('2.41')).dx, greaterThan(tester.getTopRight(eraValue).dx - 2));
   });
 
   testWidgets('失策の得点は青バッジで打点にはしない', (tester) async {

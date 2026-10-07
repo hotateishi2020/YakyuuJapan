@@ -11,7 +11,8 @@ import 'Text.dart';
 import 'Border.dart';
 import 'BlinkBg.dart';
 
-/// Phone portrait and other narrow windows stack the two teams' stats.
+/// Phone portrait and other narrow windows stack in-progress team stats,
+/// and always put match cards in a single column.
 const stackedTeamsMaxWidth = 600.0;
 
 String gameDateOnly(dynamic value) {
@@ -1130,10 +1131,10 @@ class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> {
         final heights = [
           for (final rows in grouped)
             _card(rows).intrinsicHeight(
-              stackedTeams: narrow,
+              stackedTeams: narrow && gameHasStarted(rows.first),
             ),
         ];
-        if (started) {
+        if (started || narrow) {
           final needed = heights.fold<double>(0, (sum, h) => sum + h) + 2 * math.max(0, grouped.length - 1);
           final canFit = constraints.maxHeight.isFinite && constraints.maxHeight + 0.5 >= needed;
           Widget column({required bool expand}) {
@@ -1259,7 +1260,7 @@ class _TableGameCard extends StatelessWidget {
   static const _minTeamRowH = 46.0;
   static const _playerRowH = 18.0;
   static const _lineScoreH = 84.0;
-  static const _scoreOnBoardH = 22.0;
+  static const _scoreOnBoardH = 44.0;
   static const _lineupOrderW = 14.0;
   static const _seasonGap = 6.0;
   static const _seasonLineH = 16.0;
@@ -1444,7 +1445,7 @@ class _TableGameCard extends StatelessWidget {
     return out;
   }
 
-  Widget _seasonStatTable(String stat, String predict, double fontSize, {required String pitcherName, bool stacked = false}) {
+  Widget _seasonStatTable(String stat, String predict, double fontSize, {required String pitcherName}) {
     final lines = _seasonDisplayLines(stat, pitcherName);
     if (lines.isEmpty) return const SizedBox.shrink();
     final colors = _seasonChipColors(predict, lines.length);
@@ -1464,23 +1465,11 @@ class _TableGameCard extends StatelessWidget {
         maxLines: 1,
         softWrap: false,
         overflow: TextOverflow.clip,
-        textAlign: stacked ? TextAlign.center : TextAlign.start,
+        textAlign: TextAlign.start,
         style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600, color: Colors.black87, height: 1),
       );
     }
 
-    if (stacked) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (var i = 0; i < lines.length; i++) ...[
-            _seasonNameChip(lines[i].label, fontSize, null, lines[i].leader ? const [_goldLeader] : colors[i]),
-            valueText(i),
-          ],
-        ],
-      );
-    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -1494,6 +1483,8 @@ class _TableGameCard extends StatelessWidget {
                 _seasonNameChip(lines[i].label, fontSize, labelW, lines[i].leader ? const [_goldLeader] : colors[i]),
                 const SizedBox(width: 3),
                 valueText(i),
+                if (lines[i].leader)
+                  Text('👑', style: TextStyle(fontSize: fontSize, height: 1)),
               ],
             ),
           ),
@@ -1501,18 +1492,14 @@ class _TableGameCard extends StatelessWidget {
     );
   }
 
-  bool _stackSeasonStats(BuildContext context) {
-    return MediaQuery.sizeOf(context).shortestSide < COMPACT_LAYOUT_PX;
-  }
-
-  double _seasonBlockH({bool stacked = false}) {
+  double _seasonBlockH() {
     if (gameHasStarted(game)) return 0;
     final lines = math.max(
       _seasonDisplayLines(_seasonLine(true), _text('name_pitcher_home')).length,
       _seasonDisplayLines(_seasonLine(false), _text('name_pitcher_away')).length,
     );
     if (lines == 0) return 0;
-    return _seasonGap + lines * (stacked ? _seasonLineH * 2 : _seasonLineH);
+    return _seasonGap + lines * _seasonLineH;
   }
 
   int _int(String key) => int.tryParse('${game[key]}') ?? -1;
@@ -2769,7 +2756,7 @@ class _TableGameCard extends StatelessWidget {
     return 9;
   }
 
-  double _pitcherBlockH(int count, {bool stackedSeason = false}) => math.max(1, count) * _playerRowH + _seasonBlockH(stacked: stackedSeason);
+  double _pitcherBlockH(int count) => math.max(1, count) * _playerRowH + _seasonBlockH();
 
   double intrinsicHeight({bool stackedTeams = false}) {
     final homePitchers = _players(home: true, pitcher: true);
@@ -2784,8 +2771,7 @@ class _TableGameCard extends StatelessWidget {
     final batterHomeH = _showBatterStats ? math.max(1, batterHome) * _playerRowH : 0.0;
     final batterAwayH = _showBatterStats ? math.max(1, batterAway) * _playerRowH : 0.0;
     if (stackedTeams) {
-      final stackedSeason = !gameHasStarted(game);
-      return head + _pitcherBlockH(homePitchers.length, stackedSeason: stackedSeason) + batterHomeH + _pitcherBlockH(awayPitchers.length, stackedSeason: stackedSeason) + batterAwayH + sectionPad * (_showBatterStats ? 4 : 2);
+      return head + _pitcherBlockH(homePitchers.length) + batterHomeH + _pitcherBlockH(awayPitchers.length) + batterAwayH + sectionPad * (_showBatterStats ? 4 : 2);
     }
     final pitcherN = math.max(1, math.max(homePitchers.length, awayPitchers.length));
     final batterH = _showBatterStats ? math.max(1, math.max(batterHome, batterAway)) * _playerRowH : 0.0;
@@ -3387,7 +3373,6 @@ class _TableGameCard extends StatelessWidget {
                 return const SizedBox.expand();
               }
 
-              final stackSeason = centerNames && _stackSeasonStats(context);
               if (centerNames) {
                 Widget centerBadges(_PlayerLine pitcher) {
                   final role = pitcher.role.trim();
@@ -3434,29 +3419,12 @@ class _TableGameCard extends StatelessWidget {
                           if (_seasonDisplayLines(pitcher.stat, pitcher.name).isNotEmpty)
                             Padding(
                               padding: const EdgeInsets.only(top: _seasonGap),
-                              child: _seasonStatTable(pitcher.stat, pitcher.predict, statSize, pitcherName: pitcher.name, stacked: stackSeason),
+                              child: _seasonStatTable(pitcher.stat, pitcher.predict, statSize, pitcherName: pitcher.name),
                             ),
                         ],
                       ),
                   ],
                 );
-
-                if (stackSeason) {
-                  return SizedBox(
-                    width: cellW,
-                    height: maxH.isFinite ? maxH : null,
-                    child: ClipRect(
-                      child: SingleChildScrollView(
-                        primary: false,
-                        physics: const ClampingScrollPhysics(),
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(minWidth: cellW, minHeight: maxH.isFinite ? maxH : 0),
-                          child: Align(alignment: Alignment.center, child: body),
-                        ),
-                      ),
-                    ),
-                  );
-                }
 
                 return SizedBox(
                   width: cellW,
@@ -4292,7 +4260,8 @@ class _TableGameCard extends StatelessWidget {
     return LayoutBuilder(builder: (context, constraints) {
       final state = _text('state');
       final started = gameHasStarted(game) && !gameIsPregameState(state);
-      final stackedTeams = MediaQuery.sizeOf(context).width < stackedTeamsMaxWidth;
+      // 試合前は投手欄を横並びのままにする。狭い画面では試合カード自体を1列にする。
+      final stackedTeams = MediaQuery.sizeOf(context).width < stackedTeamsMaxWidth && started;
       final height = constraints.maxHeight.isFinite ? constraints.maxHeight : intrinsicHeight(stackedTeams: stackedTeams);
       final headerSize = (height * 0.10).clamp(10.0, 14.0);
       final teamSize = (height * 0.11).clamp(11.0, 16.0);
@@ -4326,11 +4295,10 @@ class _TableGameCard extends StatelessWidget {
       final awayNameColW = _nameColumnWidth([...awayPitchers, ...awayBatters, ...[for (final slot in awayLineup) if (slot.players.isNotEmpty) slot.players.first]], detailSize, context);
       final pitcherN = math.max(1, math.max(homePitchers.length, awayPitchers.length));
       final batterN = allBatters ? 9 : math.max(1, math.max(homeBatters.length, awayBatters.length));
-      final stackSeason = !started && _stackSeasonStats(context);
-      final pitcherFlex = math.max(1, (pitcherN * _playerRowH + _seasonBlockH(stacked: stackSeason)).round());
+      final pitcherFlex = math.max(1, (pitcherN * _playerRowH + _seasonBlockH()).round());
       final batterFlex = math.max(1, (batterN * _playerRowH).round());
-      final homePitcherFlex = math.max(1, _pitcherBlockH(homePitchers.length, stackedSeason: stackSeason).round());
-      final awayPitcherFlex = math.max(1, _pitcherBlockH(awayPitchers.length, stackedSeason: stackSeason).round());
+      final homePitcherFlex = math.max(1, _pitcherBlockH(homePitchers.length).round());
+      final awayPitcherFlex = math.max(1, _pitcherBlockH(awayPitchers.length).round());
       final homeBatterFlex = math.max(1, ((allBatters ? 9 : math.max(1, homeBatters.length)) * _playerRowH).round());
       final awayBatterFlex = math.max(1, ((allBatters ? 9 : math.max(1, awayBatters.length)) * _playerRowH).round());
       final roleHeaderW = _roleHeaderWidth(labelSize, context);

@@ -26,6 +26,7 @@ import 'app/Postseason.dart';
 import 'app/Value.dart';
 import 'app/Auth.dart';
 import 'app/EventReadReset.dart';
+import 'app/PlayerStatsSchedule.dart';
 
 /// /predictions 用の短TTLキャッシュ（同一プロセス内・団体別）
 final Map<String, String> _predictionsCacheBody = {};
@@ -1266,6 +1267,8 @@ void main() async {
     Timer.periodic(const Duration(minutes: 15), (_) {
       unawaited(EventReadReset.tick());
     });
+    // 個人成績は初期表示では取らず、起動の数分後から定期登録する。
+    PlayerStatsSchedule.start(onUpdated: _clearPredictionsCache);
   } catch (e, st) {
     print('🔥 void main ERROR: $e\n$st');
     stderr.writeln('🔥 /void main ERROR: $e\n$st');

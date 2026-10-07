@@ -589,12 +589,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         _gamesPollTimer?.cancel();
         return;
       }
-      final player = await http.get(Env.api(_org.playerStatsFetchPath)).timeout(const Duration(minutes: 20));
-      if (!mounted || player.statusCode != 200) {
-        logger.w('個人成績スクレイピング失敗: ${player.statusCode}');
-        _seasonStatsRefreshStarted.remove(kind);
-        return;
-      }
       final res = await http.get(Env.api(_predictionsPath(kind))).timeout(const Duration(seconds: 30));
       if (!mounted || res.statusCode != 200) {
         _seasonStatsRefreshStarted.remove(kind);

@@ -1400,7 +1400,9 @@ ORDER BY mt.id_league, tpt.int_rank
         CASE
           WHEN MAX(tsp.id_league) IN (3, 4) THEN
             (COALESCE(MAX(mlb_career.prior_ab), 0) <= 130
-             AND COALESCE(MAX(mlb_career.prior_ip), 0) <= 50)
+             AND COALESCE(MAX(mlb_career.prior_ip), 0) <= 50
+             AND NOT COALESCE(BOOL_OR(mlb_overseas.id_player IS NOT NULL), FALSE)
+             AND NOT COALESCE(BOOL_OR(m_player.flg_rookie IS FALSE), FALSE))
           WHEN BOOL_OR(npb_rookie.id_player IS NOT NULL) THEN
             COALESCE(BOOL_OR(npb_rookie.is_rookie), FALSE)
           ELSE
@@ -1464,6 +1466,13 @@ ORDER BY mt.id_league, tpt.int_rank
             AND c.int_year < \$1
           GROUP BY c.id_player
         ) mlb_career ON mlb_career.id_player = tsp.id_player
+        LEFT JOIN (
+          SELECT DISTINCT c.id_player
+          FROM m_player_career c
+          JOIN m_team t ON t.id = c.id_team
+          WHERE COALESCE(c.flg_delete, FALSE) = FALSE
+            AND t.id_league IN (1, 2)
+        ) mlb_overseas ON mlb_overseas.id_player = tsp.id_player
         LEFT JOIN (
           SELECT
             x.id_player,

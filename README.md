@@ -15,13 +15,24 @@ For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
-cd /Users/standapp/StudioProjects/Koko
-flutter build web --release
-rm -rf backend/public/*
-cp -R build/web/* backend/public/
-git add .
-git commit -m "リロードせずに画面を表示した状態でも定期的に情報が更新されるようにしました。"
-git push
+
+
+↓デプロイ記述↓
+
+cd /Users/standapp/StudioProjects/Koko 
+
+flutter build web --release 
+
+rm -rf backend/public/* 
+
+cp -R build/web/* backend/public/ 
+
+git add . 
+
+git commit -m "表示に不具合を修正しました。" 
+
+git push 
+
 cd /Users/standapp/StudioProjects/Koko/backend
 
 dart run tool_sql.dart

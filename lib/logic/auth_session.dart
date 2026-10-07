@@ -10,6 +10,14 @@ const authTokenCookie = 'koko_auth_token';
 const authUserCookie = 'koko_auth_user';
 const _sessionMaxAge = 30 * 24 * 60 * 60; // 30日
 
+String authNetworkError(Object e, String action) {
+  final text = e.toString().toLowerCase();
+  if (text.contains('timeoutexception') || text.contains('timed out')) {
+    return '$actionがタイムアウトしました。少し待って再度お試しください';
+  }
+  return '通信エラー: $e';
+}
+
 /// デバッグ起動時の自動ログイン（本番ビルドでは使わない）
 const _debugLoginMail = 'hotateishi2018@gmail.com';
 const _debugLoginPassword = 'tate0224';
@@ -184,7 +192,7 @@ class AuthSession {
       _applyAuthResponse(map);
       return null;
     } catch (e) {
-      return '通信エラー: $e';
+      return authNetworkError(e, 'ログイン');
     }
   }
 
@@ -214,7 +222,7 @@ class AuthSession {
       _applyAuthResponse(map);
       return null;
     } catch (e) {
-      return '通信エラー: $e';
+      return authNetworkError(e, '登録');
     }
   }
 

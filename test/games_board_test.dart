@@ -3968,6 +3968,7 @@ void main() {
     await tester.pump();
     expect(find.text('出場選手全表示'), findsOneWidget);
     expect(find.byKey(const ValueKey('live-batter-stats')), findsOneWidget);
+    expect(find.text('Now'), findsOneWidget);
   });
 
   testWidgets('非打撃の得点は直後の打撃の左上に青バッジを付け打点にはしない', (tester) async {
@@ -4250,5 +4251,146 @@ void main() {
       ].contains(const Color(0xFFFFD700)),
       isTrue,
     );
+  });
+
+  testWidgets('失策の得点は青バッジで打点にはしない', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 640,
+            height: 420,
+            child: GamesBoardYahooStyle(
+              games: [
+                {
+                  'date_game': '2026-10-07',
+                  'time_game': '☀️ 08:00',
+                  'name_team_home': 'カブス',
+                  'name_team_away': 'パドレス',
+                  'score_home': 3,
+                  'score_away': 4,
+                  'state': '7回表',
+                  'id_team_home': 20,
+                  'id_team_away': 41,
+                  'id_league_home': 4,
+                  'id_league_away': 4,
+                  'color_back_home': '#0E3386',
+                  'color_back_away': '#2F241D',
+                  'color_font_home': '#FFFFFF',
+                  'color_font_away': '#FFFFFF',
+                  'lineup': [
+                    {
+                      'id_team': 41,
+                      'order': 7,
+                      'players': [
+                        {'name': 'アンドゥハー', 'pos': '左', 'role': '代打', 'plays': '遊失|error/run', 'rbi': 0},
+                      ],
+                    },
+                  ],
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.byKey(const ValueKey('run-badge-1')), findsOneWidget);
+    expect(find.byKey(const ValueKey('rbi-badge-1')), findsNothing);
+    expect(find.text('遊失'), findsOneWidget);
+  });
+
+  testWidgets('タティスの打点は2打席目の遊ゴにつける', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 720,
+            height: 420,
+            child: GamesBoardYahooStyle(
+              games: [
+                {
+                  'date_game': '2026-10-07',
+                  'time_game': '☀️ 08:00',
+                  'name_team_home': 'カブス',
+                  'name_team_away': 'パドレス',
+                  'score_home': 3,
+                  'score_away': 4,
+                  'state': '試合終了',
+                  'id_team_home': 20,
+                  'id_team_away': 41,
+                  'id_league_home': 4,
+                  'id_league_away': 4,
+                  'color_back_home': '#0E3386',
+                  'color_back_away': '#2F241D',
+                  'color_font_home': '#FFFFFF',
+                  'color_font_away': '#FFFFFF',
+                  'lineup': [
+                    {
+                      'id_team': 41,
+                      'order': 2,
+                      'players': [
+                        {
+                          'name': 'タティス',
+                          'pos': '右',
+                          'plays': '三振|out 遊ゴロ|out/rbi 中飛|out 遊ゴロ|out',
+                          'rbi': 1,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.tap(find.text('活躍選手のみ表示'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.text('出場選手全表示').last);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.byKey(const ValueKey('rbi-badge-1')), findsOneWidget);
+    expect(find.text('遊ゴ'), findsNWidgets(2));
+    expect(
+      tester.getTopLeft(find.byKey(const ValueKey('rbi-badge-1'))).dx,
+      closeTo(tester.getTopLeft(find.text('遊ゴ').first).dx, 16),
+    );
+  });
+
+  test('クライマックスの見出しはCSステージ名と緑青グラデーション', () {
+    final central = npbClimaxHeader(
+      leagueId: 1,
+      fallbackLabel: 'セ・リーグ',
+      games: [
+        {'code_game': 'CS1', 'date_game': '2026-10-11', 'id_league_home': 1, 'id_league_away': 1},
+      ],
+    );
+    expect(central.label, 'CS 1st STAGE');
+    expect(central.logoAsset, 'backend/assets/images/logo_cs_central.png');
+    expect(central.gradient, isNotNull);
+    final pacific = npbClimaxHeader(
+      leagueId: 2,
+      fallbackLabel: 'パ・リーグ',
+      games: [
+        {'code_game': 'CS2', 'date_game': '2026-10-15', 'id_league_home': 2, 'id_league_away': 2},
+      ],
+    );
+    expect(pacific.label, 'CS FINAL STAGE');
+    expect(pacific.logoAsset, 'backend/assets/images/logo_cs_pacific.png');
+    final regular = npbClimaxHeader(
+      leagueId: 1,
+      fallbackLabel: 'セ・リーグ',
+      games: [
+        {'code_game': 'NM', 'date_game': '2026-09-01'},
+      ],
+    );
+    expect(regular.label, 'セ・リーグ');
+    expect(regular.logoAsset, isNull);
   });
 }

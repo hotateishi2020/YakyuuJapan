@@ -990,15 +990,7 @@ class HistoricalBaseballImporter {
   }
 
   static bool isBrokenConnectionError(Object error) {
-    final text = error.toString().toLowerCase();
-    return text.contains('connection is not open') ||
-        text.contains('connection closed') ||
-        text.contains('closed connection') ||
-        text.contains('connection reset') ||
-        text.contains('connection timed out') ||
-        text.contains('socketexception') ||
-        text.contains('failed host lookup') ||
-        text.contains('broken pipe');
+    return Postgres.isBrokenConnection(error);
   }
 
   Future<void> _runOptionalDataset({

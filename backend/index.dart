@@ -826,14 +826,17 @@ List<Map<String, dynamic>> _summariesOf(
   return summaries;
 }
 
+Future<void> _warmSchemaInBackground() async {
+  try {
+    await FetchURL.ensureGameDetailsVelo().timeout(FetchURL.schemaEnsureTimeout);
+    await FetchURL.ensureAppColumns().timeout(FetchURL.schemaEnsureTimeout);
+  } catch (e, st) {
+    print('schema warm failed: $e\n$st');
+  }
+}
+
 void main() async {
   try {
-    try {
-      await FetchURL.ensureGameDetailsVelo();
-      await FetchURL.ensureAppColumns();
-    } catch (e, st) {
-      print('schema warm failed: $e\n$st');
-    }
     final app = Router();
     final log = Value.SystemCode.Log;
 
@@ -936,10 +939,7 @@ void main() async {
         return await Auth.register(request);
       } catch (e, st) {
         print('auth/register ERROR: $e\n$st');
-        return Response.internalServerError(
-          body: jsonEncode({'ok': false, 'error': '登録に失敗しました'}),
-          headers: {'content-type': 'application/json; charset=utf-8'},
-        );
+        return _authBusyOrError(e, '登録に失敗しました');
       }
     });
 
@@ -948,10 +948,7 @@ void main() async {
         return await Auth.login(request);
       } catch (e, st) {
         print('auth/login ERROR: $e\n$st');
-        return Response.internalServerError(
-          body: jsonEncode({'ok': false, 'error': 'ログインに失敗しました'}),
-          headers: {'content-type': 'application/json; charset=utf-8'},
-        );
+        return _authBusyOrError(e, 'ログインに失敗しました');
       }
     });
 
@@ -960,10 +957,7 @@ void main() async {
         return await Auth.me(request);
       } catch (e, st) {
         print('auth/me ERROR: $e\n$st');
-        return Response.internalServerError(
-          body: jsonEncode({'ok': false, 'error': '認証確認に失敗しました'}),
-          headers: {'content-type': 'application/json; charset=utf-8'},
-        );
+        return _authBusyOrError(e, '認証確認に失敗しました');
       }
     });
 
@@ -1264,7 +1258,9 @@ void main() async {
     final server = await io.serve(handler, InternetAddress.anyIPv4, port);
     print('✅ Server running on http://${server.address.host}:${server.port}'
         ' (serveStatic=${publicDir != null})');
+    stdout.flush();
 
+    unawaited(_warmSchemaInBackground());
     // イベント開始日・最終日に flg_read_event をリセット（15分ごと）
     unawaited(EventReadReset.tick());
     Timer.periodic(const Duration(minutes: 15), (_) {
@@ -1275,6 +1271,18 @@ void main() async {
     stderr.writeln('🔥 /void main ERROR: $e\n$st');
   }
 } // void main
+
+Response _authBusyOrError(Object e, String fallback) {
+  final busy = e is TimeoutException || Postgres.isBrokenConnection(e);
+  return Response(
+    busy ? 503 : 500,
+    body: jsonEncode({
+      'ok': false,
+      'error': busy ? 'ログインが混み合っています。少し待って再度お試しください' : fallback,
+    }),
+    headers: {'content-type': 'application/json; charset=utf-8'},
+  );
+}
 
 String _clipDb(String value, int max) {
   if (value.length <= max) return value;
@@ -1357,8 +1365,8 @@ Future<Response> tryCatchAPIReadonly(
   user.flg_user = false;
   try {
     print("🌐Routing...【" + request.requestedUri.toString() + "】");
-    await FetchURL.ensureGameDetailsVelo();
-    await FetchURL.ensureAppColumns();
+    // 初期表示は SQL 読み取りを優先。DDL 待ちで 8080 が無応答にならないようにする。
+    FetchURL.kickSchemaEnsures();
     response = await callback();
   } catch (e, st) {
     _printRequestError(request, e, st);

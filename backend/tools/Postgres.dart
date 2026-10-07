@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:io';
 import 'package:postgres/postgres.dart';
 import 'DBModel.dart';
 
@@ -13,10 +14,13 @@ class Postgres {
 
   /// 同時に保持する最大アイドル接続数（並列クエリ用に複数確保）
   static const int _maxPoolSize = 8;
+  static const Duration _acquireWait = Duration(seconds: 4);
+  static const Duration _pingTimeout = Duration(seconds: 1);
 
   static final Queue<Connection> _idle = Queue<Connection>();
   static int _opened = 0;
   static final List<Completer<Connection>> _waiters = [];
+  static final Set<Connection> _overflow = <Connection>{};
 
   static Endpoint get _endpoint => Endpoint(
         host: _host,
@@ -29,6 +33,7 @@ class Postgres {
   static ConnectionSettings get _settings => const ConnectionSettings(
         sslMode: SslMode.require,
         queryMode: QueryMode.extended,
+        connectTimeout: Duration(seconds: 8),
       );
 
   static Future<Connection> _openFresh() async {
@@ -38,42 +43,96 @@ class Postgres {
     return conn;
   }
 
+  static Future<Connection> _openCounted() async {
+    _opened++;
+    try {
+      return await _openFresh();
+    } catch (_) {
+      _opened--;
+      rethrow;
+    }
+  }
+
+  static bool isBrokenConnection(Object error) {
+    if (error is TimeoutException) return false;
+    if (error is SocketException) return true;
+    final text = error.toString().toLowerCase();
+    return text.contains('connection is not open') ||
+        text.contains('connection closed') ||
+        text.contains('closed connection') ||
+        text.contains('connection reset') ||
+        text.contains('connection timed out') ||
+        text.contains('socketexception') ||
+        text.contains('failed host lookup') ||
+        text.contains('broken pipe') ||
+        text.contains("can't assign requested address") ||
+        text.contains('cannot assign requested address');
+  }
+
+  static Future<bool> _isAlive(Connection conn) async {
+    try {
+      if (!conn.isOpen) return false;
+      await conn.execute('SELECT 1').timeout(_pingTimeout);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static Future<void> _closeNow(Connection conn) async {
+    final overflow = _overflow.remove(conn);
+    if (!overflow) {
+      _opened = (_opened - 1).clamp(0, _maxPoolSize);
+    }
+    try {
+      await conn.close().timeout(const Duration(seconds: 1));
+    } catch (_) {}
+  }
+
   /// プールから接続を借りる（なければ新規オープン）
-  static Future<Connection> acquire() async {
-    if (_idle.isNotEmpty) {
-      return _idle.removeFirst();
+  static Future<Connection> acquire({bool urgent = false}) async {
+    var discarded = 0;
+    while (_idle.isNotEmpty) {
+      final conn = _idle.removeLast();
+      if (await _isAlive(conn)) return conn;
+      await _closeNow(conn);
+      discarded++;
+      if (urgent || discarded >= 2) break;
     }
+
     if (_opened < _maxPoolSize) {
-      _opened++;
-      try {
-        return await _openFresh();
-      } catch (e) {
-        _opened--;
-        rethrow;
-      }
+      return _openCounted();
     }
-    final c = Completer<Connection>();
-    _waiters.add(c);
-    return c.future;
+
+    if (urgent) {
+      final conn = await _openFresh();
+      _overflow.add(conn);
+      return conn;
+    }
+
+    final waiter = Completer<Connection>();
+    _waiters.add(waiter);
+    try {
+      return await waiter.future.timeout(_acquireWait);
+    } on TimeoutException {
+      final stillWaiting = _waiters.remove(waiter);
+      if (!stillWaiting && waiter.isCompleted) {
+        return waiter.future;
+      }
+      if (_opened < _maxPoolSize) {
+        return _openCounted();
+      }
+      final conn = await _openFresh();
+      _overflow.add(conn);
+      return conn;
+    }
   }
 
   /// 接続をプールへ返却（壊れていれば破棄）
   static Future<void> release(Connection conn, {bool broken = false}) async {
-    if (broken) {
-      _opened = (_opened - 1).clamp(0, _maxPoolSize);
-      try {
-        await conn.close();
-      } catch (_) {}
-      if (_waiters.isNotEmpty && _opened < _maxPoolSize) {
-        final waiter = _waiters.removeAt(0);
-        _opened++;
-        try {
-          waiter.complete(await _openFresh());
-        } catch (e, st) {
-          _opened--;
-          waiter.completeError(e, st);
-        }
-      }
+    if (broken || _overflow.contains(conn) || !conn.isOpen) {
+      await _closeNow(conn);
+      await _serveWaiter();
       return;
     }
 
@@ -85,24 +144,50 @@ class Postgres {
       _idle.addLast(conn);
       return;
     }
-    _opened = (_opened - 1).clamp(0, _maxPoolSize);
-    try {
-      await conn.close();
-    } catch (_) {}
+    await _closeNow(conn);
+  }
+
+  static Future<void> _serveWaiter() async {
+    if (_waiters.isEmpty) return;
+    if (_idle.isNotEmpty) {
+      _waiters.removeAt(0).complete(_idle.removeLast());
+      return;
+    }
+    if (_opened < _maxPoolSize) {
+      final waiter = _waiters.removeAt(0);
+      try {
+        waiter.complete(await _openCounted());
+      } catch (e, st) {
+        waiter.completeError(e, st);
+      }
+    }
   }
 
   /// 1本の接続で処理し、終了後にプールへ戻す
-  static Future<T> withConnection<T>(Future<T> Function(Connection conn) callback) async {
-    final conn = await acquire();
-    var broken = false;
-    try {
-      return await callback(conn);
-    } catch (e) {
-      broken = true;
-      rethrow;
-    } finally {
-      await release(conn, broken: broken);
+  static Future<T> withConnection<T>(
+    Future<T> Function(Connection conn) callback, {
+    bool urgent = false,
+  }) async {
+    Object? lastError;
+    StackTrace? lastStack;
+    for (var attempt = 1; attempt <= 2; attempt++) {
+      final conn = await acquire(urgent: urgent);
+      var released = false;
+      try {
+        return await callback(conn);
+      } catch (e, st) {
+        lastError = e;
+        lastStack = st;
+        await release(conn, broken: true);
+        released = true;
+        if (attempt >= 2 || !isBrokenConnection(e)) {
+          Error.throwWithStackTrace(e, st);
+        }
+      } finally {
+        if (!released) await release(conn);
+      }
     }
+    Error.throwWithStackTrace(lastError!, lastStack!);
   }
 
   /// 後方互換: 従来どおり callback に接続を渡す（クローズせずプール返却）

@@ -115,6 +115,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   bool isLoading = true;
   /// 初回表示後はヘッダー〜団体タブを残し、タブ下だけローディングする。
   bool _shellReady = false;
+  /// 初期 SQL が終わるまで Login を出さず、認証リクエストで回線を奪わない。
+  bool _authEntryReady = false;
   String? error;
   /// 団体ごとのセクション準備状況（準備できたものから描画）
   final Map<OrgKind, Set<_LoadPart>> _readyParts = {};
@@ -191,11 +193,22 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       _partReady(_LoadPart.standings) || _partReady(_LoadPart.games) || _partReady(_LoadPart.players);
 
   Future<void> _bootstrapWithAuth() async {
-    // 認証復元とデータ取得を並列（認証完了を待たない）
-    unawaited(AuthSession.instance.restore().then((_) {
-      if (mounted) setState(() {});
-    }));
-    await _loadThenWatchGames();
+    try {
+      await _loadThenWatchGames().timeout(const Duration(seconds: 45));
+    } catch (_) {}
+    if (!mounted) return;
+    try {
+      await Future.wait([
+        for (final part in _LoadPart.values)
+          _fetchPart(_orgKind, part, _seasonYear, background: true),
+      ]).timeout(const Duration(seconds: 20));
+    } catch (_) {}
+    if (!mounted) return;
+    try {
+      await AuthSession.instance.restore().timeout(const Duration(seconds: 15));
+    } catch (_) {}
+    if (!mounted) return;
+    setState(() => _authEntryReady = true);
   }
 
   void _onAuthChanged() {
@@ -2353,6 +2366,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                         HEADER_PAD_VERTICAL,
                         ALL_MARGIN_LEFT,
                         onAuthChanged: _onAuthChanged,
+                        authReady: _authEntryReady,
                         actions: [
                           _yearPicker(),
                           const SizedBox(width: 6),

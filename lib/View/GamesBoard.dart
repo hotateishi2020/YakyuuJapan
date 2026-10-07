@@ -19,6 +19,45 @@ String gameDateOnly(dynamic value) {
   return match?.group(0) ?? '${value ?? ''}'.trim();
 }
 
+const _csCentralGradient = [Color(0xFF8CFAF7), Color(0xFF2BCFAD), Color(0xFF14C4C0)];
+const _csPacificGradient = [Color(0xFF5AD8EA), Color(0xFF1E6FE0), Color(0xFF1F52EB)];
+
+/// クライマックスの試合日はリーグ名の代わりにステージ名とCSロゴを出す。
+({String label, String? logoAsset, List<Color>? gradient}) npbClimaxHeader({
+  required int leagueId,
+  required String fallbackLabel,
+  required List<Map<String, dynamic>> games,
+}) {
+  final codes = [
+    for (final game in games) '${game['code_game'] ?? ''}'.trim().toUpperCase(),
+  ];
+  final hasCs1 = codes.contains('CS1');
+  final hasFinal = codes.contains('CS2') || codes.contains('CS');
+  final hasJs = codes.contains('JS');
+  if (!hasCs1 && !hasFinal && !hasJs) {
+    return (label: fallbackLabel, logoAsset: null, gradient: null);
+  }
+  final label = hasJs && !hasCs1 && !hasFinal
+      ? 'JAPAN SERIES'
+      : hasFinal && !hasCs1
+          ? 'CS FINAL STAGE'
+          : 'CS 1st STAGE';
+  final central = leagueId == 1;
+  return (
+    label: label,
+    logoAsset: central
+        ? 'backend/assets/images/logo_cs_central.png'
+        : leagueId == 2
+            ? 'backend/assets/images/logo_cs_pacific.png'
+            : null,
+    gradient: central
+        ? _csCentralGradient
+        : leagueId == 2
+            ? _csPacificGradient
+            : null,
+  );
+}
+
 int _gameInt(dynamic value) {
   if (value is int) return value;
   if (value is num) return value.round();
@@ -556,6 +595,8 @@ class GameDateSwitcher extends StatefulWidget {
   final List<Map<String, dynamic>> games;
   final List<Map<String, dynamic>> playerStats;
   final Color headerColor;
+  final int leagueId;
+  final String? leagueLabel;
   final String? initialDate;
   final bool horizontal;
   final Future<void> Function(DateTime date)? onNeedGameDate;
@@ -569,6 +610,8 @@ class GameDateSwitcher extends StatefulWidget {
     required this.games,
     this.playerStats = const [],
     required this.headerColor,
+    this.leagueId = 0,
+    this.leagueLabel,
     this.initialDate,
     this.horizontal = true,
     this.onNeedGameDate,
@@ -671,11 +714,19 @@ class _GameDateSwitcherState extends State<GameDateSwitcher> {
     final dayGames = normalizeGames(
       widget.games.where((game) => gameDateOnly(game['date_game']) == date).toList(),
     );
+    final climax = npbClimaxHeader(
+      leagueId: widget.leagueId,
+      fallbackLabel: widget.leagueLabel ?? '',
+      games: dayGames,
+    );
     final header = Container(
       height: 42,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: widget.headerColor,
+        gradient: climax.gradient == null
+            ? null
+            : LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: climax.gradient!),
+        color: climax.gradient == null ? widget.headerColor : null,
         borderRadius: BorderRadius.circular(4),
       ),
       child: Row(
@@ -693,14 +744,24 @@ class _GameDateSwitcherState extends State<GameDateSwitcher> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        _dayLabel(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          height: 1.1,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (climax.logoAsset != null) ...[
+                            Image.asset(climax.logoAsset!, height: 18, fit: BoxFit.contain),
+                            const SizedBox(width: 6),
+                          ],
+                          Text(
+                            climax.logoAsset != null ? climax.label : _dayLabel(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              height: 1.1,
+                            ),
+                          ),
+                        ],
                       ),
                       OneLineShrinkText(
                         '（${_jaDate(selectedDate)}）',
@@ -913,14 +974,29 @@ class _BothLeagueGameDayState extends State<BothLeagueGameDay> {
     );
 
     Widget leagueBlock(String label, Color color, int leagueId, List<Map<String, dynamic>> leagueGames) {
+      final climax = npbClimaxHeader(leagueId: leagueId, fallbackLabel: label, games: leagueGames);
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
             height: 32,
             alignment: Alignment.center,
-            color: color,
-            child: Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+            decoration: BoxDecoration(
+              gradient: climax.gradient == null
+                  ? null
+                  : LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: climax.gradient!),
+              color: climax.gradient == null ? color : null,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (climax.logoAsset != null) ...[
+                  Image.asset(climax.logoAsset!, height: 22, fit: BoxFit.contain),
+                  const SizedBox(width: 8),
+                ],
+                Text(climax.label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+              ],
+            ),
           ),
           const SizedBox(height: 4),
           GamesBoardYahooStyle(
@@ -2189,7 +2265,24 @@ class _TableGameCard extends StatelessWidget {
       color: const Color(0xFFFFF176),
       radius: 2,
       duration: const Duration(milliseconds: 700),
-      child: child,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(right: 4),
+            child: Text(
+              'Now',
+              style: TextStyle(
+                color: Color(0xFFB71C1C),
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                height: 1,
+              ),
+            ),
+          ),
+          child,
+        ],
+      ),
     );
   }
 
@@ -2553,12 +2646,10 @@ class _TableGameCard extends StatelessWidget {
     if (kind == 'sacfly' || kind == 'squeeze') return true;
     if (kind == 'sac' || kind == 'sacbunt') {
       final label = _playText(encoded);
-      return rbi > 0 ||
-          _rbiOnPlay(_playBody(_playLabel(label, kind)).body, kind) > 0 ||
-          label.contains('スクイズ');
+      return rbi > 0 || _rbiOfEncoded(encoded) > 0 || label.contains('スクイズ');
     }
     if (kind == 'out' || kind == 'walk' || kind == 'fc') {
-      return _rbiOnPlay(_playBody(_playLabel(_playText(encoded), kind)).body, kind) > 0;
+      return _rbiOfEncoded(encoded) > 0;
     }
     return false;
   }
@@ -2575,8 +2666,7 @@ class _TableGameCard extends StatelessWidget {
     for (final part in player.plays.split(' ')) {
       if (part.isEmpty) continue;
       final kind = _playKind(part);
-      final label = _playText(part);
-      final rbi = _rbiOnPlay(_playBody(_playLabel(label, kind)).body, kind);
+      final rbi = _rbiOfEncoded(part);
       points += switch (kind) {
         'hr' => 1 + 5 + rbi * 2,
         'timely' || 'single' || 'double' || 'triple' || 'extra' => 1 + rbi * 2,
@@ -3702,16 +3792,25 @@ class _TableGameCard extends StatelessWidget {
     return notable;
   }
 
+  int _rbiOfEncoded(String encoded) {
+    final kind = _playKind(encoded);
+    if (kind == 'error') return 0;
+    final flags = _playFlags(encoded);
+    for (final flag in flags) {
+      if (flag == 'rbi') return 1;
+      final match = RegExp(r'^rbi(\d+)$').firstMatch(flag);
+      if (match != null) return int.parse(match.group(1)!);
+    }
+    return _rbiOnPlay(_playBody(_playLabel(_playText(encoded), kind)).body, kind);
+  }
+
   int _extraRbiIndex(List<String> parts, int rbi) {
     if (rbi <= 0) return -1;
-    final sum = parts.fold<int>(0, (a, part) {
-      final kind = _playKind(part);
-      return a + _rbiOnPlay(_playBody(_playLabel(_playText(part), kind)).body, kind);
-    });
+    final sum = parts.fold<int>(0, (a, part) => a + _rbiOfEncoded(part));
     if (sum > 0) return -1;
     return parts.lastIndexWhere((part) {
       final kind = _playKind(part);
-      return kind != 'steal' && kind != 'stealout';
+      return kind != 'steal' && kind != 'stealout' && kind != 'error' && kind != 'fc';
     });
   }
 
@@ -4029,7 +4128,7 @@ class _TableGameCard extends StatelessWidget {
     final bg = _playColor(kind, parsed.body);
     final ink = parsed.body.contains('併殺') ? const Color(0xFFE53935) : _inkOn(bg);
     final chipSize = (fontSize - 1).clamp(8.0, 11.0);
-    final rbi = rbiOverride >= 0 ? rbiOverride : _rbiOnPlay(parsed.body, kind);
+    final rbi = kind == 'error' ? 0 : (rbiOverride >= 0 ? rbiOverride : _rbiOfEncoded(encoded));
     final steal = flags.contains('steal');
     final stealOut = flags.contains('stealout');
     final pinchIndex = _pinchFlagIndex(flags, pinchOverride: pinchOverride);

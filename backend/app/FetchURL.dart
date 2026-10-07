@@ -61,31 +61,46 @@ class FetchURL {
   }
 
   static bool _veloColumnReady = false;
+  static bool _veloColumnSkip = false;
   static bool _appColumnsReady = false;
+  static bool _appColumnsSkip = false;
   static Future<void>? _veloFlight;
   static Future<void>? _appColumnsFlight;
+  static const Duration schemaEnsureTimeout = Duration(seconds: 8);
 
   static Future<void> _runOnce({
     required bool ready,
+    required bool skipped,
     required Future<void>? flight,
     required void Function(Future<void>? next) setFlight,
+    required void Function() markSkipped,
     required Future<void> Function(Connection c) run,
     Connection? conn,
   }) async {
-    if (ready) return;
+    if (ready || skipped) return;
     final existing = flight;
     if (existing != null) {
-      await existing;
+      try {
+        await existing.timeout(schemaEnsureTimeout);
+      } on TimeoutException {
+        markSkipped();
+      }
       return;
     }
     final done = Completer<void>();
     setFlight(done.future);
     try {
+      Future<void> work(Connection c) => run(c).timeout(schemaEnsureTimeout);
       if (conn != null) {
-        await run(conn);
+        await work(conn);
       } else {
-        await Postgres.withConnection(run);
+        await Postgres.withConnection(work);
       }
+      done.complete();
+    } on TimeoutException {
+      print('schema ensure timed out; continuing without DDL');
+      markSkipped();
+      setFlight(null);
       done.complete();
     } catch (e, st) {
       setFlight(null);
@@ -94,11 +109,19 @@ class FetchURL {
     }
   }
 
+  static void kickSchemaEnsures() {
+    unawaited(ensureGameDetailsVelo());
+    unawaited(ensureAppColumns());
+  }
+
   static Future<void> ensureGameDetailsVelo([Connection? conn]) async {
+    if (_veloColumnReady || _veloColumnSkip) return;
     await _runOnce(
       ready: _veloColumnReady,
+      skipped: _veloColumnSkip,
       flight: _veloFlight,
       setFlight: (next) => _veloFlight = next,
+      markSkipped: () => _veloColumnSkip = true,
       conn: conn,
       run: (c) async {
         await c.execute('ALTER TABLE t_game_details ADD COLUMN IF NOT EXISTS int_velo integer');
@@ -109,14 +132,17 @@ class FetchURL {
 
   /// 国名「ドミニカ共和国」や長い試合状態が varchar 上限で落ちないようにする。
   static Future<void> ensureAppColumns([Connection? conn]) async {
+    if (_appColumnsReady || _appColumnsSkip) return;
     await _runOnce(
       ready: _appColumnsReady,
+      skipped: _appColumnsSkip,
       flight: _appColumnsFlight,
       setFlight: (next) => _appColumnsFlight = next,
+      markSkipped: () => _appColumnsSkip = true,
       conn: conn,
       run: (c) async {
-        await BirthPlaceRegistry.ensureSchema(c);
-        await c.execute('ALTER TABLE t_game ALTER COLUMN state TYPE varchar(80)');
+        // ADD COLUMN のみ。ALTER COLUMN TYPE は AccessExclusiveLock で
+        // 初期の試合 SELECT を止めるので起動パスではやらない。
         await GameStatsLoad.ensureColumn(c);
         await c.execute(
           'ALTER TABLE t_game_summary ADD COLUMN IF NOT EXISTS int_batting_order integer NOT NULL DEFAULT 0',

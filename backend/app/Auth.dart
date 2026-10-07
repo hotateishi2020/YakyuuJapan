@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
@@ -14,21 +15,56 @@ class Auth {
     'red', 'blue', 'green', 'orange', 'purple', 'teal', 'crimson', 'navy', 'gold',
   ];
 
+  static bool _schemaReady = false;
+  static Future<void>? _schemaFlight;
+
   static Future<void> ensureSchema(Connection conn) async {
-    await conn.execute('''
-      CREATE TABLE IF NOT EXISTS t_user_session (
-        token VARCHAR(80) PRIMARY KEY,
-        id_user INTEGER NOT NULL,
-        expire_at TIMESTAMPTZ NOT NULL,
-        crtat TIMESTAMPTZ DEFAULT NOW()
-      )
-    ''');
-    await conn.execute("ALTER TABLE m_user ADD COLUMN IF NOT EXISTS nickname VARCHAR(100) DEFAULT ''");
-    await conn.execute("ALTER TABLE m_user ADD COLUMN IF NOT EXISTS name_handle VARCHAR(100) DEFAULT ''");
-    await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS id_team_fav INTEGER');
-    await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS id_player_fav INTEGER');
-    await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS flg_notify_news BOOLEAN DEFAULT TRUE');
-    await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS flg_notify_event BOOLEAN DEFAULT TRUE');
+    if (_schemaReady) return;
+    final existing = _schemaFlight;
+    if (existing != null) {
+      await existing;
+      return;
+    }
+    final done = Completer<void>();
+    _schemaFlight = done.future;
+    try {
+      await conn.execute('''
+        CREATE TABLE IF NOT EXISTS t_user_session (
+          token VARCHAR(80) PRIMARY KEY,
+          id_user INTEGER NOT NULL,
+          expire_at TIMESTAMPTZ NOT NULL,
+          crtat TIMESTAMPTZ DEFAULT NOW()
+        )
+      ''');
+      await conn.execute("ALTER TABLE m_user ADD COLUMN IF NOT EXISTS nickname VARCHAR(100) DEFAULT ''");
+      await conn.execute("ALTER TABLE m_user ADD COLUMN IF NOT EXISTS name_handle VARCHAR(100) DEFAULT ''");
+      await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS id_team_fav INTEGER');
+      await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS id_player_fav INTEGER');
+      await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS flg_notify_news BOOLEAN DEFAULT TRUE');
+      await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS flg_notify_event BOOLEAN DEFAULT TRUE');
+      _schemaReady = true;
+      done.complete();
+    } catch (e, st) {
+      _schemaFlight = null;
+      done.completeError(e, st);
+      rethrow;
+    }
+  }
+
+  static Future<Response> _withAuthDb(Future<Response> Function(Connection conn) fn) async {
+    final work = Postgres.withConnection(fn, urgent: true);
+    try {
+      return await work.timeout(const Duration(seconds: 12));
+    } on TimeoutException {
+      unawaited(work.catchError((_) => _json(503, {
+            'ok': false,
+            'error': 'ログインが混み合っています。少し待って再度お試しください',
+          })));
+      return _json(503, {
+        'ok': false,
+        'error': 'ログインが混み合っています。少し待って再度お試しください',
+      });
+    }
   }
 
   /// 先頭の @ を除いたログインID / ハンドル
@@ -161,7 +197,7 @@ class Auth {
   }
 
   static Future<Response> register(Request request) async {
-    return Postgres.withConnection((conn) async {
+    return _withAuthDb((conn) async {
       await ensureSchema(conn);
       final body = jsonDecode(await request.readAsString()) as Map<String, dynamic>;
       final mail = '${body['mailaddress'] ?? ''}'.trim().toLowerCase();
@@ -228,7 +264,7 @@ class Auth {
   }
 
   static Future<Response> login(Request request) async {
-    return Postgres.withConnection((conn) async {
+    return _withAuthDb((conn) async {
       await ensureSchema(conn);
       final body = jsonDecode(await request.readAsString()) as Map<String, dynamic>;
       final rawLogin = '${body['login'] ?? body['mailaddress'] ?? body['name_handle'] ?? ''}'.trim();
@@ -272,7 +308,7 @@ class Auth {
   }
 
   static Future<Response> me(Request request) async {
-    return Postgres.withConnection((conn) async {
+    return _withAuthDb((conn) async {
       final userId = await _requireUserId(conn, request);
       if (userId == null) return _json(401, {'ok': false, 'error': '未ログイン'});
       final user = await _userById(conn, userId);
@@ -282,7 +318,7 @@ class Auth {
   }
 
   static Future<Response> logout(Request request) async {
-    return Postgres.withConnection((conn) async {
+    return _withAuthDb((conn) async {
       await ensureSchema(conn);
       final token = _bearer(request);
       if (token != null) {
@@ -293,7 +329,7 @@ class Auth {
   }
 
   static Future<Response> changePassword(Request request) async {
-    return Postgres.withConnection((conn) async {
+    return _withAuthDb((conn) async {
       final userId = await _requireUserId(conn, request);
       if (userId == null) return _json(401, {'ok': false, 'error': '未ログイン'});
       final body = jsonDecode(await request.readAsString()) as Map<String, dynamic>;
@@ -324,7 +360,7 @@ class Auth {
   }
 
   static Future<Response> updateProfile(Request request) async {
-    return Postgres.withConnection((conn) async {
+    return _withAuthDb((conn) async {
       final userId = await _requireUserId(conn, request);
       if (userId == null) return _json(401, {'ok': false, 'error': '未ログイン'});
       final body = jsonDecode(await request.readAsString()) as Map<String, dynamic>;
@@ -378,7 +414,7 @@ class Auth {
   }
 
   static Future<Response> markRead(Request request) async {
-    return Postgres.withConnection((conn) async {
+    return _withAuthDb((conn) async {
       final userId = await _requireUserId(conn, request);
       if (userId == null) return _json(401, {'ok': false, 'error': '未ログイン'});
       final body = jsonDecode(await request.readAsString()) as Map<String, dynamic>;
@@ -403,7 +439,7 @@ class Auth {
   }
 
   static Future<Response> updateNotifications(Request request) async {
-    return Postgres.withConnection((conn) async {
+    return _withAuthDb((conn) async {
       final userId = await _requireUserId(conn, request);
       if (userId == null) return _json(401, {'ok': false, 'error': '未ログイン'});
       final body = jsonDecode(await request.readAsString()) as Map<String, dynamic>;
@@ -425,7 +461,7 @@ class Auth {
   }
 
   static Future<Response> listTeams(Request request) async {
-    return Postgres.withConnection((conn) async {
+    return _withAuthDb((conn) async {
       final rows = await conn.execute('''
         SELECT t.id, t.name_short, t.name_shortest, t.id_league,
                COALESCE(l.name_short, l.name_shortest, '') AS name_league
@@ -450,7 +486,7 @@ class Auth {
   }
 
   static Future<Response> listPlayers(Request request) async {
-    return Postgres.withConnection((conn) async {
+    return _withAuthDb((conn) async {
       final teamId = int.tryParse(request.url.queryParameters['id_team'] ?? '');
       final q = (request.url.queryParameters['q'] ?? '').trim();
       if (teamId == null || teamId <= 0) {

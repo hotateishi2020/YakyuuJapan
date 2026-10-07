@@ -4,6 +4,7 @@ import '../config/org_config.dart';
 import '../logic/show_user_predictions.dart';
 import '../tools/browser_cookie.dart';
 import '../tools/color_parse.dart';
+import '../tools/date_format.dart';
 import 'Text.dart';
 import 'BlinkBg.dart';
 import 'Border.dart';
@@ -206,13 +207,28 @@ class SeasonTableBlock extends StatelessWidget {
     return sections;
   }
 
-  Widget _sectionHeader(String label, Color color) {
+  Widget _sectionHeader(String label, Color color, {String? logoAsset, List<Color>? gradient}) {
     return Container(
       height: 32,
-      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(4)),
+      decoration: BoxDecoration(
+        gradient: gradient == null
+            ? null
+            : LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: gradient),
+        color: gradient == null ? color : null,
+        borderRadius: BorderRadius.circular(4),
+      ),
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (logoAsset != null) ...[
+            Image.asset(logoAsset, height: 22, fit: BoxFit.contain),
+            const SizedBox(width: 8),
+          ],
+          Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        ],
+      ),
     );
   }
 
@@ -573,6 +589,8 @@ class SeasonTableBlock extends StatelessWidget {
               playerStats: stats,
               initialDate: gamesDateFilter,
               headerColor: leagueColor,
+              leagueId: leagueId,
+              leagueLabel: org.leagueName(leagueId),
               horizontal: true,
               onNeedGameDate: onNeedGameDate,
               shouldLoadGameDate: shouldLoadGameDate,
@@ -609,11 +627,18 @@ class SeasonTableBlock extends StatelessWidget {
       );
 
       final leagueName = org.leagueName(leagueId);
+      final selectedDay = DateTime.tryParse(gamesDateFilter ?? '') ?? DateTime.now();
+      final day = DateFormatUtil.ymd(selectedDay.add(Duration(days: gameDateOffset)));
+      final climax = npbClimaxHeader(
+        leagueId: leagueId,
+        fallbackLabel: leagueName,
+        games: games.where((game) => gameDateOnly(game['date_game']) == day).toList(),
+      );
       if (pane == SeasonPane.games) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _sectionHeader(leagueName, leagueColor),
+            _sectionHeader(climax.label, leagueColor, logoAsset: climax.logoAsset, gradient: climax.gradient),
             const SizedBox(height: 4),
             gamesBlock,
           ],

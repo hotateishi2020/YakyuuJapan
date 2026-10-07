@@ -94,12 +94,12 @@ void main() {
     );
   });
 
-  test('打点1のゴロは点数を書かず方向だけ残す', () {
+  test('打点1のゴロは点数を書かず rbi フラグを付ける', () {
     expect(
       formatPlayLabels([
         _row(result: Value.CodeGameResult.OUT_GROUND, direction: 'SS', runs: 1),
       ]),
-      '遊ゴロ|out',
+      '遊ゴロ|out/rbi',
     );
   });
 
@@ -163,6 +163,15 @@ void main() {
         _row(result: Value.CodeGameResult.WALK_BALL)..['id'] = 2,
       ]),
       '四球|walk/run',
+    );
+  });
+
+  test('失策で走者が生還しても打点ではなく run を付ける', () {
+    expect(
+      formatPlayLabels([
+        _row(result: Value.CodeGameResult.ERROR_FIELDING, direction: 'SS', runs: 1),
+      ]),
+      '遊失|error/run',
     );
   });
 

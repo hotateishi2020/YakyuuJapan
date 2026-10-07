@@ -331,9 +331,17 @@ List<({String text, String kind})> _chipsForPlate(List<Map<String, dynamic>> pla
     if (stealSafe) kind = '$kind/steal';
     if (stealOut) kind = '$kind/stealout';
     if (pinch) kind = '$kind/pinch';
+    final battingRuns = batting == null ? 0 : _asInt(batting['int_runs']);
+    final baseKind = battingChip.kind;
+    // 失策の得点は打点ではない。凡退・野選の得点は打点バッジ用に残す。
+    if (baseKind == 'error' && battingRuns > 0) {
+      kind = battingRuns == 1 ? '$kind/run' : '$kind/run$battingRuns';
+    } else if (battingRuns > 0 && (baseKind == 'out' || baseKind == 'fc' || baseKind == 'sacbunt')) {
+      kind = battingRuns == 1 ? '$kind/rbi' : '$kind/rbi$battingRuns';
+    }
     final nonRbi = batting == null ? 0 : _asInt(batting['_nonBattingRuns']);
-    if (nonRbi == 1) kind = '$kind/run';
-    if (nonRbi > 1) kind = '$kind/run$nonRbi';
+    if (nonRbi == 1 && !kind.split('/').contains('run')) kind = '$kind/run';
+    if (nonRbi > 1 && !kind.contains('/run')) kind = '$kind/run$nonRbi';
     chips.add((text: battingChip.text, kind: kind));
   } else {
     if (stealSafe) chips.add((text: '盗塁', kind: 'steal'));

@@ -31,6 +31,8 @@ void main() {
     expect(liveBlinkHalf('4回表3アウト'), (inning: 4, bottom: true));
     expect(liveBlinkHalf('4回裏1アウト'), (inning: 4, bottom: true));
     expect(liveBlinkHalf('9回裏3アウト'), (inning: 10, bottom: false));
+    expect(liveBlinkHalf('5回表', outs: 3), (inning: 5, bottom: true));
+    expect(liveBlinkHalf('5回裏三死'), (inning: 6, bottom: false));
   });
 
   testWidgets('compact game cards do not overflow', (tester) async {
@@ -3259,7 +3261,7 @@ void main() {
       ),
     );
     await tester.pump();
-    expect(find.text('S.大谷'), findsOneWidget);
+    expect(find.text('S.大谷'), findsWidgets);
     expect(find.text('M.Rojas'), findsNothing);
     expect(find.text('指'), findsOneWidget);
   });
@@ -3954,7 +3956,7 @@ void main() {
     await tester.pump();
     expect(find.text('出場選手全表示'), findsOneWidget);
 
-    expect(find.text('大谷翔平'), findsOneWidget);
+    expect(find.text('大谷翔平'), findsWidgets);
     expect(find.text('ベッツ'), findsWidgets);
     expect(find.text('フリーマン'), findsWidgets);
     expect(find.text('スミス'), findsWidgets);
@@ -4079,6 +4081,75 @@ void main() {
     expect(find.text('出場選手全表示'), findsOneWidget);
     expect(find.byKey(const ValueKey('live-batter-stats')), findsOneWidget);
     expect(find.text('Now'), findsOneWidget);
+    final now = tester.getRect(find.byKey(const ValueKey('now-play-chip')));
+    final blink = tester.getRect(find.byKey(const ValueKey('live-batter-stats')));
+    final hit = tester.getRect(find.text('右安'));
+    expect(now.left, greaterThan(hit.right));
+    expect(now.width, closeTo(hit.width + 6, 2));
+    expect(blink.left, greaterThan(hit.right - 1));
+    expect(blink.width, closeTo(now.width, 2));
+  });
+
+  testWidgets('3アウトでNowは次に攻撃するチームへ移る', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 640,
+            height: 520,
+            child: GamesBoardYahooStyle(
+              games: [
+                {
+                  'date_game': '2026-10-07',
+                  'time_game': '☀️ 07:00',
+                  'name_team_home': 'ブレーブス',
+                  'name_team_away': 'ドジャース',
+                  'name_stadium': 'トゥルイストパーク',
+                  'name_pitcher_home': 'A',
+                  'name_pitcher_away': 'B',
+                  'score_home': 0,
+                  'score_away': 1,
+                  'state': '5回表3アウト',
+                  'id_team_home': 28,
+                  'id_team_away': 40,
+                  'id_league_home': 4,
+                  'id_league_away': 4,
+                  'name_batter': '大谷',
+                  'id_team_batter': 40,
+                  'color_back_home': '#CE1141',
+                  'color_back_away': '#005A9C',
+                  'color_font_home': '#FFFFFF',
+                  'color_font_away': '#FFFFFF',
+                  'lineup': [
+                    {
+                      'id_team': 40,
+                      'order': 1,
+                      'players': [
+                        {'name': '大谷', 'role': '', 'pos': '指', 'plays': '三振|out', 'rbi': 0},
+                      ],
+                    },
+                    {
+                      'id_team': 28,
+                      'order': 1,
+                      'players': [
+                        {'name': 'プロファー', 'role': '', 'pos': '左', 'plays': '', 'rbi': 0},
+                      ],
+                    },
+                  ],
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('Now'), findsOneWidget);
+    final now = tester.getCenter(find.byKey(const ValueKey('now-play-chip')));
+    final homeName = tester.getCenter(find.text('プロファー').first);
+    final awayName = tester.getCenter(find.text('大谷').first);
+    expect((now - homeName).distance, lessThan((now - awayName).distance));
   });
 
   testWidgets('非打撃の得点は直後の打撃の左上に青バッジを付け打点にはしない', (tester) async {
@@ -4614,9 +4685,45 @@ void main() {
                     },
                     {
                       'id_team': 8,
+                      'order': 4,
+                      'players': [
+                        {'name': '山川穂高', 'pos': '一'},
+                      ],
+                    },
+                    {
+                      'id_team': 8,
+                      'order': 5,
+                      'players': [
+                        {'name': '渡部健人', 'pos': '三'},
+                      ],
+                    },
+                    {
+                      'id_team': 8,
+                      'order': 6,
+                      'players': [
+                        {'name': '森友哉', 'pos': '捕'},
+                      ],
+                    },
+                    {
+                      'id_team': 8,
+                      'order': 3,
+                      'players': [
+                        {'name': 'コルデロ', 'pos': '指'},
+                      ],
+                    },
+                    {
+                      'id_team': 8,
+                      'order': 7,
+                      'players': [
+                        {'name': '西川愛也', 'pos': '左'},
+                      ],
+                    },
+                    {
+                      'id_team': 8,
                       'order': 9,
                       'players': [
                         {'name': '今井達也', 'pos': '投'},
+                        {'name': '平良海馬', 'pos': '投', 'role': '代守'},
                       ],
                     },
                   ],
@@ -4635,5 +4742,28 @@ void main() {
     expect(find.byKey(const ValueKey('field-mark-E')), findsOneWidget);
     expect(find.byKey(const ValueKey('field-mark-FP')), findsOneWidget);
     expect(find.text('ベルーナドーム'), findsOneWidget);
+    Color bgOf(String name) {
+      final box = tester.widget<Container>(find.byKey(ValueKey('defense-bg-$name')));
+      return (box.decoration! as BoxDecoration).color!;
+    }
+
+    expect(bgOf('源田壮亮'), const Color(0xFFFFEB3B));
+    expect(bgOf('西川愛也'), const Color(0xFFC6FF00));
+    expect(bgOf('森友哉'), const Color(0xFF1E88E5));
+    expect(bgOf('コルデロ'), const Color(0xFF8E24AA));
+    expect(find.byKey(const ValueKey('defense-name-平良海馬')), findsOneWidget);
+    expect(find.byKey(const ValueKey('defense-name-今井達也')), findsNothing);
+    final first = tester.getCenter(find.byKey(const ValueKey('defense-name-山川穂高')));
+    final third = tester.getCenter(find.byKey(const ValueKey('defense-name-渡部健人')));
+    final pitcher = tester.getCenter(find.byKey(const ValueKey('defense-name-平良海馬')));
+    final catcher = tester.getCenter(find.byKey(const ValueKey('defense-name-森友哉')));
+    final dh = tester.getCenter(find.byKey(const ValueKey('defense-name-コルデロ')));
+    expect(first.dy, greaterThan(pitcher.dy + 8));
+    expect(third.dy, greaterThan(pitcher.dy + 8));
+    expect(first.dx, greaterThan(pitcher.dx));
+    expect(third.dx, lessThan(pitcher.dx));
+    expect(catcher.dy, greaterThan(third.dy + 8));
+    expect(dh.dy, greaterThan(third.dy + 8));
+    expect(dh.dx, lessThan(catcher.dx - 4));
   });
 }

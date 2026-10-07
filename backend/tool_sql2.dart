@@ -9,7 +9,7 @@ Future<void> main(List<String> args) async {
   final query = args.isNotEmpty
       ? args.join(' ')
       : '''
-UPFATE t_nortification SET flg_read_news = TRUE;
+UPDATE m_user SET flg_read_news = TRUE;
 ''';
 
   print('--- SQL ---');

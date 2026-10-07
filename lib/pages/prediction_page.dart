@@ -340,14 +340,14 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     _storeCache(_orgKind, _snapshotCurrent());
     final cached = _orgCache[kind];
     final usable = cached != null && cached.hasContent;
-    setState(() {
+        setState(() {
       _orgKind = kind;
       _portraitLeagueTab = 0;
       _itemTab = 0;
       error = null;
       if (usable) {
         _applyBundle(cached, kind: kind);
-        isLoading = false;
+          isLoading = false;
         _shellReady = true;
       } else {
         isLoading = true;
@@ -379,7 +379,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       unawaited(_ensureSeasonYearLoaded());
       await _startGamesWatch();
       unawaited(_prefetchOtherOrg());
-      return;
+        return;
     }
     await _loadThenWatchGames();
     unawaited(_ensureSeasonYearLoaded());
@@ -604,7 +604,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         cached.playerStatsActual = nextActual;
       }
       if (kind == _orgKind) {
-        setState(() {
+      setState(() {
           standings = nextStandings;
           npbPlayerStatsActual = nextActual;
         });
@@ -625,7 +625,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       if (cached != null && cached.hasContent && target == _orgKind) {
         setState(() {
           _applyBundle(cached, kind: target);
-          isLoading = false;
+        isLoading = false;
           _shellReady = true;
           error = null;
         });
@@ -1520,15 +1520,15 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
-      decoration: BoxDecoration(
-        color: Colors.white,
+          decoration: BoxDecoration(
+            color: Colors.white,
         border: Border.all(color: Colors.black87, width: 1.5),
         borderRadius: BorderRadius.circular(10),
-      ),
+          ),
       clipBehavior: Clip.antiAlias,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
           Material(
             color: Colors.black,
             child: InkWell(
@@ -1625,12 +1625,12 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       Widget _nameCell(String name, Color background, {bool leftBorder = false}) {
         final showSpinner = namesLoading && name.trim().isEmpty;
         return Expanded(
-          child: Container(
+                child: Container(
             decoration: BoxDecoration(
               color: background,
               border: leftBorder ? const Border(left: BorderSide(color: Colors.black45, width: vBorder)) : null,
             ),
-            alignment: Alignment.center,
+                  alignment: Alignment.center,
             padding: const EdgeInsets.symmetric(horizontal: cellPad, vertical: 4),
             child: showSpinner
                 ? _miniSpinner(size: 16)
@@ -1641,7 +1641,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                     weight: FontWeight.bold,
                     color: Colors.white,
                   ),
-          ),
+                ),
         );
       }
 
@@ -1652,28 +1652,28 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           borderRadius: BorderRadius.circular(10),
         ),
         clipBehavior: Clip.antiAlias,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: portraitCompact ? MainAxisSize.min : MainAxisSize.max,
-          children: [
+                  children: [
             if (!hideHeader)
-              Container(
+                    Container(
                 height: 30,
                 decoration: const BoxDecoration(
                   color: Colors.black,
                   border: Border(bottom: BorderSide(color: Colors.black45, width: vBorder)),
                 ),
-                alignment: Alignment.center,
+                      alignment: Alignment.center,
                 padding: const EdgeInsets.symmetric(horizontal: cellPad, vertical: 4),
                 child: const OneLineShrinkText(
                   'SCORE',
                   baseSize: 20,
-                  minSize: 10,
-                  weight: FontWeight.bold,
+                        minSize: 10,
+                        weight: FontWeight.bold,
                   align: TextAlign.center,
-                  color: Colors.white,
-                ),
-              ),
+                        color: Colors.white,
+                      ),
+                    ),
             // 2行目: 立石 | 江島
             Container(
               height: portraitCompact ? 26 : 32,
@@ -1706,17 +1706,17 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                                 child: Text(
                                   score1,
                                   style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, height: 1.0),
-                                ),
-                              ),
+                        ),
                       ),
+                    ),
                     ),
                     Expanded(
                       child: Container(
-                        decoration: const BoxDecoration(
-                          border: Border(left: BorderSide(color: Colors.black45, width: vBorder)),
-                        ),
+                decoration: const BoxDecoration(
+                  border: Border(left: BorderSide(color: Colors.black45, width: vBorder)),
+                ),
                         padding: const EdgeInsets.all(cellPad),
-                        alignment: Alignment.center,
+                      alignment: Alignment.center,
                         child: scoreLoading
                             ? _miniSpinner(size: 20)
                             : FittedBox(
@@ -1732,7 +1732,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                 ),
               )
             else
-              Expanded(
+                    Expanded(
                 child: LayoutBuilder(builder: (context, c) {
                   final double halfW = c.maxWidth / 2;
                   final double availW = (halfW - cellPad * 2).clamp(0.0, double.infinity);
@@ -1745,7 +1745,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                     return Expanded(
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                        color: Colors.white,
                           border: leftBorder ? const Border(left: BorderSide(color: Colors.black45, width: vBorder)) : null,
                         ),
                         padding: const EdgeInsets.all(cellPad),
@@ -1759,9 +1759,9 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                                   fontSize: scoreSize,
                                   fontWeight: FontWeight.w800,
                                   height: 1.0,
-                                ),
-                              ),
+                        ),
                       ),
+                    ),
                     );
                   }
 
@@ -1807,7 +1807,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       const double tagH = 20.0;
 
       Widget newsTag(String title, Color back, Color font) {
-        return Container(
+      return Container(
           constraints: const BoxConstraints(minWidth: tagW, minHeight: tagH),
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
@@ -1845,8 +1845,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                   borderRadius: BorderRadius.circular(3),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    child: Row(
-                      children: [
+              child: Row(
+                children: [
                         const Text('News', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                         if (AuthSession.instance.showNewsNew) ...[
                           const SizedBox(width: 8),
@@ -1860,29 +1860,29 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                               fit: BoxFit.scaleDown,
                               alignment: Alignment.centerRight,
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: const Text('未読メッセージを一覧表示', style: TextStyle(color: Colors.white, fontSize: 11)),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text('未読メッセージを一覧表示', style: TextStyle(color: Colors.white, fontSize: 11)),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                  ),
+                ],
                     ),
                   ),
-                ),
               ),
+            ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(10, 4, 10, 6),
-                child: Column(
+                  child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Divider(height: 1),
-                    const SizedBox(height: 4),
+                    children: [
+                      const Divider(height: 1),
+                      const SizedBox(height: 4),
                     Expanded(
                       child: infoLoading
                           ? Center(child: _miniSpinner(size: 22))
@@ -1890,41 +1890,41 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                               padding: EdgeInsets.zero,
                               primary: false,
                               children: [
-                                for (final n in notifications)
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 2),
+                      for (final n in notifications)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 2),
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       primary: false,
-                                      child: Row(
+                          child: Row(
                                         mainAxisSize: MainAxisSize.min,
-                                        children: [
+                            children: [
                                           newsTag(
-                                            (n['tag_main_title'] ?? '').toString(),
+                                  (n['tag_main_title'] ?? '').toString(),
                                             parse(n['tag_main_color_back'], Colors.grey.shade300),
                                             parse(n['tag_main_color_font'], Colors.white),
-                                          ),
-                                          const SizedBox(width: 6),
+                              ),
+                              const SizedBox(width: 6),
                                           newsTag(
-                                            (n['tag_sub_title'] ?? '').toString(),
+                                  (n['tag_sub_title'] ?? '').toString(),
                                             parse(n['tag_sub_color_back'], Colors.grey.shade300),
                                             parse(n['tag_sub_color_font'], Colors.white),
-                                          ),
-                                          const SizedBox(width: 6),
+                              ),
+                              const SizedBox(width: 6),
                                           Text(
-                                            (n['title'] ?? '').toString(),
+                                  (n['title'] ?? '').toString(),
                                             maxLines: 1,
                                             softWrap: false,
                                             style: const TextStyle(fontSize: 12, height: 1.1, color: Colors.black87),
                                           ),
                                         ],
                                       ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                    ),
-                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
                 ),
               ),
             ),
@@ -1980,8 +1980,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (!hideHeader)
-              SizedBox(
-                width: double.infinity,
+            SizedBox(
+              width: double.infinity,
                 child: Material(
                   color: const Color(0xFF757575),
                   borderRadius: BorderRadius.circular(3),
@@ -2001,8 +2001,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                       ),
                     ),
                   ),
-                ),
               ),
+            ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(10, 4, 10, 6),
@@ -2358,12 +2358,12 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         return ShowUserPredictions(
           value: _showUserPredictions,
           child: Container(
+          alignment: Alignment.topCenter,
+          child: Transform.scale(
+            scale: scale,
             alignment: Alignment.topCenter,
-            child: Transform.scale(
-              scale: scale,
-              alignment: Alignment.topCenter,
-              child: ConstrainedBox(
-                constraints: BoxConstraints.tightFor(width: designWidth),
+            child: ConstrainedBox(
+              constraints: BoxConstraints.tightFor(width: designWidth),
                 child: SizedBox(
                   height: constraints.maxHeight,
                   child: Column(

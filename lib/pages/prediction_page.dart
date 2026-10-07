@@ -213,7 +213,24 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
 
   void _onAuthChanged() {
     if (!mounted) return;
-    setState(() {});
+    if (AuthSession.instance.isLoggedIn) {
+      setState(() => _authEntryReady = true);
+      return;
+    }
+    unawaited(_holdLoginUntilBoardReady());
+  }
+
+  Future<void> _holdLoginUntilBoardReady() async {
+    if (!mounted) return;
+    setState(() => _authEntryReady = false);
+    try {
+      await Future.wait([
+        for (final part in _LoadPart.values)
+          _fetchPart(_orgKind, part, _seasonYear, background: false, force: true),
+      ]).timeout(const Duration(seconds: 45));
+    } catch (_) {}
+    if (!mounted) return;
+    setState(() => _authEntryReady = true);
   }
 
   Future<void> _markRead(String target) async {

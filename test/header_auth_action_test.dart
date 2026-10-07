@@ -15,6 +15,28 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 
+  testWidgets('logout keeps the spinner until reload finishes', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: HeaderAuthAction(loggedIn: false, boardReady: false),
+        ),
+      ),
+    );
+    expect(find.text('Login'), findsNothing);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: HeaderAuthAction(loggedIn: false, boardReady: true),
+        ),
+      ),
+    );
+    expect(find.text('Login'), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+  });
+
   testWidgets('Login appears after the board is ready', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(

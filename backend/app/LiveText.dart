@@ -463,17 +463,26 @@ class LiveText {
           if (following.length >= 2) {
             event.exitName = following[0];
             event.enterName = following[1];
-          } else if (previous != null && following.isNotEmpty) {
-            event.exitName = previous;
-            event.enterName = following[0];
           } else if (following.isNotEmpty) {
             event.enterName = following[0];
-          } else if (previous != null) {
+            // 投手交代の直後に続く代守は、新しい投手ではなく外れた野手の打順に入る。
+            if (previous != null && !_isPitcherChangeName(events, previous)) {
+              event.exitName = previous;
+            }
+          } else if (previous != null && !_isPitcherChangeName(events, previous)) {
             event.enterName = previous;
           }
           event.positionTo = _position(betweenText).isNotEmpty ? _position(betweenText) : _position(afterPlayer);
           break;
         case '守備変更':
+          if (following.length >= 2 && following[0] != following[1]) {
+            event.category = Value.CodeGameResultCategory.CHANGE_PLAYER;
+            event.result = Value.CodeGameResult.PINCH_FIELDER;
+            event.exitName = following[0];
+            event.enterName = following[1];
+            event.positionTo = _position(afterPlayer).isNotEmpty ? _position(afterPlayer) : _position(betweenText);
+            break;
+          }
           event.category = Value.CodeGameResultCategory.CHANGE_POSITION;
           event.result = Value.CodeGameResult.CHANGE_POSITION;
           event.enterName = following.isNotEmpty ? following[0] : (previous ?? '');
@@ -806,6 +815,15 @@ class LiveText {
       }
     }
     return '';
+  }
+
+  static bool _isPitcherChangeName(List<ParsedLiveEvent> events, String name) {
+    for (var i = events.length - 1; i >= 0; i--) {
+      final event = events[i];
+      if (event.result != Value.CodeGameResult.CHANGE_PITCHER) continue;
+      return event.enterName == name || event.exitName == name;
+    }
+    return false;
   }
 
   static (String, String) _move(String text) {

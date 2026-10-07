@@ -984,13 +984,13 @@ class FetchMLB {
     for (final group in groups) {
     var teamId = group.teamId;
     var switched = false;
-    var order = 0;
+    final battingTracker = BoxBattingOrderTracker();
     for (final row in group.rows) {
       if (row.querySelectorAll('th').isNotEmpty) {
         if (group.switchOnTh && !switched) {
           teamId = idTeamHome;
           switched = true;
-          order = 0;
+          battingTracker.reset();
         }
         continue;
       }
@@ -998,8 +998,7 @@ class FetchMLB {
       if (cells.length < 14) continue;
       final name = StringTool.noSpace(cells[1].text);
       if (name.isEmpty) continue;
-      final starterSlot = isBoxStarterSlot(cells.first.text);
-      if (starterSlot && order < 9) order++;
+      final battingSlot = battingTracker.take(cells.first.text);
       final playerId = await _ensurePlayer(conn, cells[1].text.trim(), teamId);
       if (playerId <= 0) continue;
       final summary = t_game_summary()
@@ -1014,7 +1013,7 @@ class FetchMLB {
         ..int_steal_base = int.tryParse(cells[11].text.trim()) ?? 0
         ..int_error = int.tryParse(cells[12].text.trim()) ?? 0
         ..int_homerun = int.tryParse(cells[13].text.trim()) ?? 0
-        ..int_batting_order = starterSlot ? order : 0
+        ..int_batting_order = battingSlot.originalStarter ? battingSlot.order : 0
         ..code_position_from = boxBadgePosition(cells.first.text);
       list.add(summary);
     }

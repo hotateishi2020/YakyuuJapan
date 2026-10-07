@@ -85,6 +85,98 @@ void main() {
     ]);
   });
 
+  test('守備変更の代守は括弧なし複合守備でも直前の先発と同じ打順', () {
+    final doc = parse('''
+      <div id="async-gameBatterStats"><table><tbody>
+        <tr>
+          <td>(中)</td><td><a>近本 光司</a></td>
+          <td class="bb-statsTable__data--inning"><div class="bb-statsTable__dataDetail">中安</div></td>
+        </tr>
+        <tr>
+          <td>(二)</td><td><a>木浪 聖也</a></td>
+          <td class="bb-statsTable__data--inning"><div class="bb-statsTable__dataDetail">二ゴロ</div></td>
+        </tr>
+        <tr>
+          <td>(右)</td><td><a>森下 翔太</a></td>
+          <td class="bb-statsTable__data--inning"><div class="bb-statsTable__dataDetail">右飛</div></td>
+        </tr>
+        <tr>
+          <td>投</td><td><a>及川 雅貴</a></td>
+          <td class="bb-statsTable__data--inning"></td>
+        </tr>
+        <tr>
+          <td>打</td><td><a>伏見 寅威</a></td>
+          <td class="bb-statsTable__data--inning"><div class="bb-statsTable__dataDetail">四球</div></td>
+        </tr>
+        <tr>
+          <td>(三)</td><td><a>佐藤 輝明</a></td>
+          <td class="bb-statsTable__data--inning"><div class="bb-statsTable__dataDetail">三振</div></td>
+        </tr>
+        <tr>
+          <td>一右</td><td><a>小野寺 暖</a></td>
+          <td class="bb-statsTable__data--inning"><div class="bb-statsTable__dataDetail">遊ゴロ</div></td>
+        </tr>
+        <tr>
+          <td>(一)</td><td><a>大山 悠輔</a></td>
+          <td class="bb-statsTable__data--inning"><div class="bb-statsTable__dataDetail">左飛</div></td>
+        </tr>
+        <tr>
+          <td>(投)</td><td><a>西 勇輝</a></td>
+          <td class="bb-statsTable__data--inning"><div class="bb-statsTable__dataDetail">犠打</div></td>
+        </tr>
+        <tr>
+          <td>(三)</td><td><a>代守 三塁</a></td>
+          <td class="bb-statsTable__data--inning"><div class="bb-statsTable__dataDetail">四球</div></td>
+        </tr>
+      </tbody></table></div>
+    ''');
+    final plates = parseBoxPlates(doc, 1, 2);
+    expect(plates.firstWhere((plate) => plate.name == '佐藤輝明').order, 4);
+    expect(plates.firstWhere((plate) => plate.name == '小野寺暖').order, 4);
+    expect(plates.firstWhere((plate) => plate.name == '大山悠輔').order, 5);
+    expect(plates.firstWhere((plate) => plate.name == '西勇輝').order, 6);
+    expect(plates.firstWhere((plate) => plate.name == '代守三塁').order, 4);
+    final starters = parseBoxStarters(doc, 1, 2);
+    expect(starters.map((starter) => '${starter.order}${starter.name}').toList(), [
+      '1近本光司',
+      '2木浪聖也',
+      '3森下翔太',
+      '4佐藤輝明',
+      '5大山悠輔',
+      '6西勇輝',
+    ]);
+  });
+
+  test('投手交代に続く守備交代は新しい投手を代守の交代相手にしない', () {
+    final doc = parse('''
+      <div id="text_live">
+        <section class="bb-liveText">
+          <div class="bb-liveText__inning">8回表</div>
+          <li class="bb-liveText__item">
+            <p class="bb-liveText__batter"><span class="bb-liveText__order">1番</span><a class="bb-liveText__player">坂倉 将吾</a><span class="bb-liveText__state">無死走者なし</span></p>
+            <p class="bb-liveText__summary bb-liveText__summary--change">
+              <span>投手交代:</span><a>岩崎</a><span>→</span><a>木下</a>
+              <span>　守備交代:ファースト</span><a>小野寺</a>
+              <span>　守備変更:</span><a>熊谷</a><span>ファースト→サード</span>
+            </p>
+            <p class="bb-liveText__summary"><span>空振り三振</span></p>
+          </li>
+        </section>
+      </div>
+    ''');
+    final events = LiveText.parse(doc).halves.single.plates.single.events;
+    final pinch = events.where((event) => event.result == Value.CodeGameResult.PINCH_FIELDER).toList();
+    expect(pinch, hasLength(1));
+    expect(pinch.single.enterName, '小野寺');
+    expect(pinch.single.exitName, isNot('木下'));
+    expect(pinch.single.exitName, isNot('岩崎'));
+    final move = events.where((event) => event.result == Value.CodeGameResult.CHANGE_POSITION).single;
+    expect(move.enterName, '熊谷');
+    expect(move.exitName, '熊谷');
+    expect(move.positionFrom, Value.CodePosition.FIRST);
+    expect(move.positionTo, Value.CodePosition.THIRD);
+  });
+
   test('複合守備バッジは先発位置を取り、途中移籍の末尾位置を使わない', () {
     final doc = parse('''
       <div id="async-gameBatterStats"><table><tbody>

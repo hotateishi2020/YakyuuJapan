@@ -117,8 +117,25 @@ List<Map<String, dynamic>> _lineupOf(
     return false;
   }
 
+  int? slotOf(int team, String name) {
+    for (var order = 1; order <= 9; order++) {
+      final slot = slots['$team|$order'];
+      if (slot == null) continue;
+      for (final existing in slot) {
+        if (_sameLineupName(existing, name)) return order;
+      }
+    }
+    return null;
+  }
+
   void place(int team, int order, String name) {
-    if (team <= 0 || order < 1 || order > 9 || name.isEmpty || listed(team, name)) return;
+    if (team <= 0 || order < 1 || order > 9 || name.isEmpty) return;
+    final current = slotOf(team, name);
+    if (current == order) return;
+    if (current != null) {
+      // 投手交代直後の代守が9番に載っていたら、打席の打順（守備変更で外れた野手の枠）へ移す。
+      slots['$team|$current']?.removeWhere((existing) => _sameLineupName(existing, name));
+    }
     final slot = slots.putIfAbsent('$team|$order', () => <String>[]);
     // 打順枠に後から入ったのに代打・代走の記録がない選手は、代守（守備交代後の打席）とみなす。
     if (slot.isNotEmpty) {
@@ -157,7 +174,7 @@ List<Map<String, dynamic>> _lineupOf(
     return 9;
   }
 
-  void pinch(int team, String exit, String enter, String role) {
+  void pinch(int team, String exit, String enter, String role, {bool pitcherSlotFallback = true}) {
     if (team <= 0 || enter.isEmpty) return;
     // すでに出場している選手の守備位置変更・同選手の別名は、代守にしない。
     if (_sameLineupName(enter, exit) || listed(team, enter)) return;
@@ -170,7 +187,8 @@ List<Map<String, dynamic>> _lineupOf(
         place(team, order, enter);
         return;
       }
-      if (listedPitcher(team, exit)) {
+      // 代守は投手交代で入った投手の9番枠に載せない。守備変更で外れた野手の打順は打席側で付ける。
+      if (pitcherSlotFallback && listedPitcher(team, exit)) {
         place(team, pitcherSlot(team), enter);
       }
     }
@@ -205,7 +223,7 @@ List<Map<String, dynamic>> _lineupOf(
       continue;
     }
     if (code == 'PINCH_FIELDER') {
-      pinch(fieldingTeam, exit, enter, '代守');
+      pinch(fieldingTeam, exit, enter, '代守', pitcherSlotFallback: false);
       continue;
     }
     if (code == 'CHANGE_POSITION' && enter.isNotEmpty && exit.isNotEmpty && !_sameLineupName(enter, exit)) {

@@ -8,6 +8,7 @@ import '../tools/browser_cookie.dart';
 
 const authTokenCookie = 'koko_auth_token';
 const authUserCookie = 'koko_auth_user';
+const authManualLogoutCookie = 'koko_manual_logout';
 const _sessionMaxAge = 30 * 24 * 60 * 60; // 30日
 
 String authNetworkError(Object e, String action) {
@@ -171,8 +172,10 @@ class AuthSession {
   }
 
   /// デバッグ時のみ、未ログインなら固定アカウントでログインする。
+  /// ユーザーが明示ログアウトしたあとの再読み込みでは自動ログインしない。
   Future<void> _debugAutoLoginIfNeeded() async {
     if (!kDebugMode || isLoggedIn) return;
+    if (readBrowserCookie(authManualLogoutCookie) == '1') return;
     await login(login: _debugLoginMail, password: _debugLoginPassword);
   }
 
@@ -229,6 +232,7 @@ class AuthSession {
   Future<void> logout() async {
     final t = token;
     clearLocal();
+    writeBrowserCookie(authManualLogoutCookie, '1');
     if (t == null || t.isEmpty) return;
     try {
       await http
@@ -364,6 +368,7 @@ class AuthSession {
   }
 
   void _applyAuthResponse(Map<String, dynamic> map) {
+    clearBrowserCookie(authManualLogoutCookie);
     token = '${map['token'] ?? ''}';
     user = AuthUser.fromJson(Map<String, dynamic>.from(map['user'] as Map));
     _persistSession();

@@ -182,6 +182,39 @@ List<({int teamId, bool bottom, List<Element> rows, bool switchOnTh})> batterSta
   ];
 }
 
+/// Yahoo 出場成績の打順。`(三)` は先発枠。同じ守備記号の2人目の `(三)` は代守で先発と同じ打順。
+class BoxBattingSlot {
+  final int order;
+  final bool originalStarter;
+  const BoxBattingSlot(this.order, this.originalStarter);
+}
+
+class BoxBattingOrderTracker {
+  int _order = 0;
+  final Map<String, int> _firstPos = {};
+
+  void reset() {
+    _order = 0;
+    _firstPos.clear();
+  }
+
+  BoxBattingSlot take(String badge) {
+    if (!_isStarterSlot(badge)) {
+      return BoxBattingSlot(_order, false);
+    }
+    final pos = _badgePosition(badge);
+    final existing = pos.isEmpty ? null : _firstPos[pos];
+    if (existing != null) {
+      return BoxBattingSlot(existing, false);
+    }
+    if (_order < 9) {
+      _order++;
+      if (pos.isNotEmpty) _firstPos[pos] = _order;
+    }
+    return BoxBattingSlot(_order, true);
+  }
+}
+
 List<BoxPlate> parseBoxPlates(Document doc, int idTeamAway, int idTeamHome) {
   final plates = <BoxPlate>[];
   var seq = 0;
@@ -189,6 +222,7 @@ List<BoxPlate> parseBoxPlates(Document doc, int idTeamAway, int idTeamHome) {
     var teamId = group.teamId;
     var bottom = group.bottom;
     var switched = false;
+    final tracker = BoxBattingOrderTracker();
     var order = 0;
     for (final row in group.rows) {
       if (row.querySelector('th') != null) {
@@ -196,17 +230,21 @@ List<BoxPlate> parseBoxPlates(Document doc, int idTeamAway, int idTeamHome) {
           teamId = idTeamHome;
           bottom = true;
           switched = true;
+          tracker.reset();
           order = 0;
         }
         continue;
       }
       final tds = row.querySelectorAll('td');
       if (tds.length < 2) continue;
-      final position = _badgePosition(tds.first.text);
+      final badge = tds.first.text;
+      final position = _badgePosition(badge);
       final name = StringTool.noSpace(tds[1].text);
       if (name.isEmpty) continue;
-      // (右) や (右一)/(中左) は先発枠（括弧内は先発→途中の守備）。「三」「走左」「右」は直前の枠の途中出場。
-      if (_isStarterSlot(tds.first.text) && order < 9) order++;
+      // (右) は先発枠。(三) が先発の三塁と同じ記号なら守備変更の代守で、打順は進めない。
+      // 「三」「走左」「一右」は括弧なしの途中出場で直前の枠。
+      final slot = tracker.take(badge);
+      order = slot.order;
       if (order < 1) continue;
       var inning = 0;
       for (final cell in row.querySelectorAll('td.bb-statsTable__data--inning')) {
@@ -257,13 +295,13 @@ List<BoxStarter> parseBoxStarters(Document doc, int idTeamAway, int idTeamHome) 
   for (final group in batterStatsGroups(doc, idTeamAway, idTeamHome)) {
     var teamId = group.teamId;
     var switched = false;
-    var order = 0;
+    final tracker = BoxBattingOrderTracker();
     for (final row in group.rows) {
       if (row.querySelector('th') != null) {
         if (group.switchOnTh && !switched) {
           teamId = idTeamHome;
           switched = true;
-          order = 0;
+          tracker.reset();
         }
         continue;
       }
@@ -271,11 +309,11 @@ List<BoxStarter> parseBoxStarters(Document doc, int idTeamAway, int idTeamHome) 
       if (tds.length < 2) continue;
       final name = StringTool.noSpace(tds[1].text);
       if (name.isEmpty) continue;
-      if (!_isStarterSlot(tds.first.text) || order >= 9) continue;
-      order++;
+      final slot = tracker.take(tds.first.text);
+      if (!slot.originalStarter || slot.order < 1 || slot.order > 9) continue;
       starters.add(BoxStarter(
         teamId: teamId,
-        order: order,
+        order: slot.order,
         name: name,
         position: _badgePosition(tds.first.text),
       ));

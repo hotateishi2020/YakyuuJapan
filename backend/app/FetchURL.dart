@@ -913,12 +913,12 @@ class FetchURL {
 
                 // var idx_col = 0;
                 var id_team = id_team_away;
-                var battingOrder = 0;
+                final battingTracker = BoxBattingOrderTracker();
                 for (var game_summary_away_row in game_summary_away_batting) {
                   //もしrow直下にthがある場合はスキップ
                   if (game_summary_away_row.querySelectorAll('th').isNotEmpty) {
                     id_team = id_team_home;
-                    battingOrder = 0;
+                    battingTracker.reset();
                     continue;
                   }
                   var txt_batter = game_summary_away_row.querySelectorAll('td')[1].text.trim();
@@ -930,13 +930,12 @@ class FetchURL {
                   }
                   final id_player_result = result_player.first.toColumnMap()['id'];
                   final badge = game_summary_away_row.querySelectorAll('td').first.text;
-                  final starterSlot = isBoxStarterSlot(badge);
-                  if (starterSlot && battingOrder < 9) battingOrder++;
+                  final battingSlot = battingTracker.take(badge);
 
                   var game_summary = t_game_summary();
                   game_summary.id_game = game.id;
                   game_summary.id_player = id_player_result;
-                  game_summary.int_batting_order = starterSlot ? battingOrder : 0;
+                  game_summary.int_batting_order = battingSlot.originalStarter ? battingSlot.order : 0;
                   game_summary.code_position_from = boxBadgePosition(badge);
                   game_summary.int_batting = int.tryParse(game_summary_away_row.querySelectorAll('td')[3].text.trim()) ?? 0;
                   game_summary.int_homerun = int.tryParse(game_summary_away_row.querySelectorAll('td')[13].text.trim()) ?? 0;

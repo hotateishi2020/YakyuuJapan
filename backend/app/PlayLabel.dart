@@ -10,6 +10,7 @@ String playPlayerKey(dynamic idGame, dynamic idTeam, dynamic name) {
 /// 各結果は「表示|種別」。その選手の最初の打席から記録順。
 Map<String, String> playLabelsByPlayer(List<Map<String, dynamic>> rows) {
   _assignTimeline(rows);
+  _attachNonBattingRunFlags(rows);
   final grouped = <String, List<Map<String, dynamic>>>{};
   for (final row in rows) {
     final steal = _isSteal('${row['code_result'] ?? ''}');
@@ -42,6 +43,9 @@ String formatPlayLabels(Iterable<Map<String, dynamic>> rows) {
       if (byOrder != 0) return byOrder;
       return _asInt(a['id']).compareTo(_asInt(b['id']));
     });
+  if (!ordered.any((row) => row.containsKey('_nonBattingRuns'))) {
+    _attachNonBattingRunFlags(ordered);
+  }
   final labels = <({String text, String kind})>[];
   final plate = <Map<String, dynamic>>[];
   String? plateKey;
@@ -66,6 +70,49 @@ String formatPlayLabels(Iterable<Map<String, dynamic>> rows) {
   return labels.map((chip) => '${chip.text}|${chip.kind}').join(' ');
 }
 
+bool _isNonBattingRunResult(String result) {
+  return result == Value.CodeGameResult.WILD_PITCH ||
+      result == Value.CodeGameResult.PASS_BALL ||
+      result == Value.CodeGameResult.BALK ||
+      result == Value.CodeGameResult.PICKOFF ||
+      result == Value.CodeGameResult.STEAL_BASE_SAFE ||
+      result == Value.CodeGameResult.STEAL_BASE_OUT;
+}
+
+bool _isNonBattingRunEvent(Map<String, dynamic> row) {
+  if (_asInt(row['int_runs']) <= 0) return false;
+  return _isNonBattingRunResult('${row['code_result'] ?? ''}');
+}
+
+void _attachNonBattingRunFlags(List<Map<String, dynamic>> rows) {
+  for (final row in rows) {
+    row.remove('_nonBattingRuns');
+  }
+  final ordered = rows.toList()
+    ..sort((a, b) {
+      final bySeq = _asInt(a['_seq']).compareTo(_asInt(b['_seq']));
+      if (a.containsKey('_seq') && b.containsKey('_seq') && bySeq != 0) return bySeq;
+      final byInning = _asInt(a['int_inning']).compareTo(_asInt(b['int_inning']));
+      if (byInning != 0) return byInning;
+      final byHalf = (_asBool(a['flg_bottom']) ? 1 : 0).compareTo(_asBool(b['flg_bottom']) ? 1 : 0);
+      if (byHalf != 0) return byHalf;
+      final byOrder = _asInt(a['int_batting_order']).compareTo(_asInt(b['int_batting_order']));
+      if (byOrder != 0) return byOrder;
+      return _asInt(a['id']).compareTo(_asInt(b['id']));
+    });
+  var pending = 0;
+  for (final row in ordered) {
+    if (_isNonBattingRunEvent(row)) {
+      pending += _asInt(row['int_runs']);
+      continue;
+    }
+    if (pending > 0 && _isBattingResult('${row['code_result'] ?? ''}')) {
+      row['_nonBattingRuns'] = pending;
+      pending = 0;
+    }
+  }
+}
+
 int _chipCount(String plays, bool Function(String kind) match) {
   var count = 0;
   for (final part in plays.split(' ')) {
@@ -77,24 +124,15 @@ int _chipCount(String plays, bool Function(String kind) match) {
   return count;
 }
 
-/// 速報に残っていない安打・本塁打を、公式成績の本数だけ補う。
+/// 速報に残っていない本塁打だけ、公式成績の本数で補う。安打は出場記録の打席を使う。
 String playsFilledFromLine(
   String plays, {
-  required int singles,
-  required int doubles,
-  required int triples,
   required int homers,
 }) {
   final extra = <String>[];
   final homerChips = _chipCount(plays, (kind) => kind == 'hr');
   for (var i = homerChips; i < homers; i++) {
     extra.add('ホームラン|hr');
-  }
-  final hitChips = _chipCount(plays, (kind) => kind == 'single' || kind == 'double' || kind == 'triple' || kind == 'timely');
-  // 公式の安打数に本塁打が含まれていても、本塁打の表示がすでにあるので「安」は足さない。
-  final expectedHits = singles + doubles + triples - homers;
-  for (var i = hitChips; i < expectedHits; i++) {
-    extra.add('安|single');
   }
   if (extra.isEmpty) return plays;
   return [plays, ...extra].where((part) => part.trim().isNotEmpty).join(' ');
@@ -293,6 +331,9 @@ List<({String text, String kind})> _chipsForPlate(List<Map<String, dynamic>> pla
     if (stealSafe) kind = '$kind/steal';
     if (stealOut) kind = '$kind/stealout';
     if (pinch) kind = '$kind/pinch';
+    final nonRbi = batting == null ? 0 : _asInt(batting['_nonBattingRuns']);
+    if (nonRbi == 1) kind = '$kind/run';
+    if (nonRbi > 1) kind = '$kind/run$nonRbi';
     chips.add((text: battingChip.text, kind: kind));
   } else {
     if (stealSafe) chips.add((text: '盗塁', kind: 'steal'));
@@ -403,7 +444,8 @@ bool _isBattingResult(String result) {
     };
     if (word.isEmpty) return null;
     final directed = result == 'STRIKE_OUT' || result == 'DROPPED_THIRD' || direction.isEmpty ? word : '$direction$word';
-    return (text: '$head$directed', kind: 'out');
+    final points = runs >= 2 ? '$runs点' : '';
+    return (text: '$head$points$directed', kind: 'out');
   }
 
   final squeeze = result == Value.CodeGameResult.SQUEEZE || (result == Value.CodeGameResult.SACRIFICE_BUNT && runs > 0);

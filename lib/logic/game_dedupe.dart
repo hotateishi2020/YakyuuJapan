@@ -131,7 +131,14 @@ bool _nearSameDay(Map<String, dynamic> a, Map<String, dynamic> b) {
   return left.difference(right).inDays.abs() <= 1;
 }
 
-/// 終了試合の同スコア重複、および Yahoo と歴史インポートの未開始重複を1件にする。
+bool _importDuplicateOf(Map<String, dynamic> a, Map<String, dynamic> b) {
+  if (!_importSourceMix(a, b) || !_nearSameDay(a, b)) return false;
+  // スコアが違う終了試合だけは連戦の別カード。取り込みの試合前はどれとも同一試合。
+  if (_finished(a) && _finished(b) && _scoreKey(a) != _scoreKey(b)) return false;
+  return true;
+}
+
+/// 終了試合の同スコア重複、および Yahoo と歴史インポートの取り込み重複を1件にする。
 List<Map<String, dynamic>> _mergeAdjacentScoreDupes(List<Map<String, dynamic>> games) {
   if (games.length <= 1) return games;
   final used = List<bool>.filled(games.length, false);
@@ -143,12 +150,9 @@ List<Map<String, dynamic>> _mergeAdjacentScoreDupes(List<Map<String, dynamic>> g
     for (var j = i + 1; j < games.length; j++) {
       if (used[j] || _matchupCodeKey(games[j]) != key) continue;
       final other = games[j];
-      final finishedPair = _finished(best) && _finished(other) && _scoreKey(best) == _scoreKey(other);
-      final importPregame = _unstarted(best) && _unstarted(other) && _importSourceMix(best, other);
-      final liveVsImport = ((_inProgress(best) && _unstarted(other)) || (_unstarted(best) && _inProgress(other))) &&
-          _importSourceMix(best, other);
-      if (!finishedPair && !importPregame && !liveVsImport) continue;
       if (!_nearSameDay(best, other)) continue;
+      final finishedPair = _finished(best) && _finished(other) && _scoreKey(best) == _scoreKey(other);
+      if (!finishedPair && !_importDuplicateOf(best, other)) continue;
       used[j] = true;
       if (_quality(other) > _quality(best)) best = other;
     }

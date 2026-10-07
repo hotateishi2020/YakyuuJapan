@@ -3,12 +3,12 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 
-const RESOURCES = {"flutter_bootstrap.js": "15c0aa15883d5cfe47aa8c7baa7097a6",
+const RESOURCES = {"flutter_bootstrap.js": "0f282453e347731d2619de6feccade6a",
 "version.json": "90f0a4de3d79c28df80f8b271963e5d5",
 "favicon.ico": "0b9debed17b8c64d19c3e6cc01959291",
 "index.html": "7cf889ae45c7066babaa5e102517599f",
 "/": "7cf889ae45c7066babaa5e102517599f",
-"main.dart.js": "3050bf05b9808440a6f532401b5cda13",
+"main.dart.js": "c04bf97d9869f7a26b3157abe3368523",
 "flutter.js": "888483df48293866f9f41d3d9274a779",
 "favicon.png": "48c2581436fbca85f692d8e41b7b851d",
 "icons/favicon-48.png": "cb488c05fb3a6bb83ef7065a4a388721",
@@ -30,7 +30,7 @@ const RESOURCES = {"flutter_bootstrap.js": "15c0aa15883d5cfe47aa8c7baa7097a6",
 "assets/backend/assets/images/team_l.png": "9dbcfd038a9117e47f6216d4329e22c8",
 "assets/backend/assets/images/logo_league_pacific.png": "e468b0f19a81f5b4eea51c99bbe45971",
 "assets/backend/assets/images/logo_mlb.png": "1d14695e6741ec2b02e9c19100e05f9c",
-"assets/backend/assets/images/logo_yakyuu_japan.png": "65b69142e3b54605eecaddb3911d115f",
+"assets/backend/assets/images/logo_yakyuu_japan.png": "524ac8ef17aeaa6ff8cf871ac65ee6ea",
 "assets/backend/assets/images/team_h.png": "b6decba1306bb86bda119c79808e5622",
 "assets/backend/assets/images/logo_mlb.webp": "1d89bfe61c15186b820138a3bf9c7704",
 "assets/backend/assets/images/k-pacific.webp": "d8b3f998b5fd86d8d3290149d82c43ed",

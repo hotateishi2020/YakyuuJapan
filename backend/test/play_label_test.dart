@@ -94,6 +94,15 @@ void main() {
     );
   });
 
+  test('打点1のゴロは点数を書かず方向だけ残す', () {
+    expect(
+      formatPlayLabels([
+        _row(result: Value.CodeGameResult.OUT_GROUND, direction: 'SS', runs: 1),
+      ]),
+      '遊ゴロ|out',
+    );
+  });
+
   test('先制2ランホームランは先制と2ランを残す', () {
     expect(
       formatPlayLabels([
@@ -124,6 +133,37 @@ void main() {
     expect(plateFeatMarks(plates: 3, reached: 3, hits: 3), isEmpty);
     expect(plateFeatMarks(plates: 4, reached: 4, hits: 4), contains('全打席安打'));
     expect(plateFeatsFromLine(atBats: 3, hits: 3, walks: 0, hbp: 0, sacrifices: 0, errors: 0), isEmpty);
+  });
+
+  test('非打撃の得点は直後の打撃に run を付け打点にはしない', () {
+    expect(
+      formatPlayLabels([
+        _row(result: Value.CodeGameResult.WILD_PITCH, runs: 1)..['id'] = 1,
+        _row(result: Value.CodeGameResult.HIT_SINGLE, direction: 'LF')..['id'] = 2,
+      ]),
+      '左安|single/run',
+    );
+    expect(
+      formatPlayLabels([
+        _row(result: Value.CodeGameResult.PASS_BALL, runs: 1)..['id'] = 1,
+        _row(result: Value.CodeGameResult.OUT_GROUND, direction: 'SS')..['id'] = 2,
+      ]),
+      '遊ゴロ|out/run',
+    );
+    expect(
+      formatPlayLabels([
+        _row(result: Value.CodeGameResult.STEAL_BASE_SAFE, runner: '走者', runs: 1)..['id'] = 1,
+        _row(result: Value.CodeGameResult.HIT_SINGLE, direction: 'CF', outs: 1)..['id'] = 2,
+      ]),
+      '盗塁|steal 中安|single/run',
+    );
+    expect(
+      formatPlayLabels([
+        _row(result: Value.CodeGameResult.PICKOFF, runs: 1)..['id'] = 1,
+        _row(result: Value.CodeGameResult.WALK_BALL)..['id'] = 2,
+      ]),
+      '四球|walk/run',
+    );
   });
 
   test('playPlayerKey ignores spaces in NPB names', () {

@@ -571,13 +571,19 @@ class LiveText {
     } else if (digits.contains('ゴロ')) {
       event.category = Value.CodeGameResultCategory.BATTING;
       event.result = Value.CodeGameResult.OUT_GROUND;
+    } else if (digits.contains('ボーク')) {
+      event.category = Value.CodeGameResultCategory.ERROR;
+      event.result = Value.CodeGameResult.BALK;
+    } else if (digits.contains('牽制')) {
+      event.category = Value.CodeGameResultCategory.ERROR;
+      event.result = Value.CodeGameResult.PICKOFF;
     } else if (digits.contains('悪送球') || digits.contains('ファンブル') || digits.contains('失策') || digits.contains('エラー') || digits.contains('後逸') || digits.contains('落球')) {
       event.category = Value.CodeGameResultCategory.ERROR;
       event.result = Value.CodeGameResult.ERROR_FIELDING;
     } else if (digits.contains('暴投')) {
       event.category = Value.CodeGameResultCategory.ERROR;
       event.result = Value.CodeGameResult.WILD_PITCH;
-    } else if (digits.contains('捕逸')) {
+    } else if (digits.contains('捕逸') || digits.contains('パスボール')) {
       event.category = Value.CodeGameResultCategory.ERROR;
       event.result = Value.CodeGameResult.PASS_BALL;
     } else if (digits.contains('野選')) {
@@ -592,6 +598,9 @@ class LiveText {
     } else if (digits.contains('守備妨害')) {
       event.category = Value.CodeGameResultCategory.BATTING;
       event.result = Value.CodeGameResult.INTERFERENCE_FIELDING;
+    } else if (digits.contains('ホームスチール') || digits.contains('本盗')) {
+      event.category = Value.CodeGameResultCategory.RUNNING_BASE;
+      event.result = Value.CodeGameResult.STEAL_BASE_SAFE;
     } else if (digits.contains('盗塁死') || (digits.contains('盗塁') && (digits.contains('アウト') || digits.contains('失敗') || digits.contains('刺さ')))) {
       event.category = Value.CodeGameResultCategory.RUNNING_BASE;
       event.result = Value.CodeGameResult.STEAL_BASE_OUT;

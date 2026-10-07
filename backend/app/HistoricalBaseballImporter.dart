@@ -1956,7 +1956,29 @@ class HistoricalBaseballImporter {
           ''',
           parameters: [game.sourceKey, game.externalId],
         );
+        Future<bool> yahooTwinExists() async {
+          final yahooTwin = await conn.execute(
+            '''
+              SELECT id FROM t_game
+              WHERE COALESCE(flg_delete, false) = false
+                AND (
+                  (id_team_home = \$1 AND id_team_away = \$2)
+                  OR (id_team_home = \$2 AND id_team_away = \$1)
+                )
+                AND datetime_start::date BETWEEN (\$3::date - 1) AND (\$3::date + 1)
+                AND id < 2000
+              ORDER BY id
+              LIMIT 1
+            ''',
+            parameters: [homeId, awayId, game.start],
+          );
+          return yahooTwin.isNotEmpty;
+        }
+
         if (found.isEmpty) {
+          if (await yahooTwinExists()) {
+            continue;
+          }
           await conn.execute(
             '''
               INSERT INTO t_game
@@ -1978,6 +2000,13 @@ class HistoricalBaseballImporter {
             ],
           );
         } else {
+          if (await yahooTwinExists()) {
+            await conn.execute(
+              'UPDATE t_game SET flg_delete = true, updat = now() WHERE id = \$1',
+              parameters: [found.first[0]],
+            );
+            continue;
+          }
           await conn.execute(
             '''
               UPDATE t_game SET id_team_home = \$1, id_team_away = \$2,

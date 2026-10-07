@@ -17,6 +17,9 @@ void main() {
     expect(displayBoardState(''), '試合前');
     expect(displayBoardState('8回表'), '8回表');
     expect(displayBoardState('試合終了'), '試合終了');
+    expect(gameIsInProgress({'state': '6回表'}), isTrue);
+    expect(gameIsInProgress({'state': '試合終了'}), isFalse);
+    expect(gameIsInProgress({'state': '試合前'}), isFalse);
   });
 
   test('liveAtBatHalf reads the batting inning from game state', () {
@@ -25,6 +28,9 @@ void main() {
     expect(liveAtBatHalf('延長12回裏'), (inning: 12, bottom: true));
     expect(liveAtBatHalf('試合終了'), isNull);
     expect(liveAtBatHalf('試合前'), isNull);
+    expect(liveBlinkHalf('4回表3アウト'), (inning: 4, bottom: true));
+    expect(liveBlinkHalf('4回裏1アウト'), (inning: 4, bottom: true));
+    expect(liveBlinkHalf('9回裏3アウト'), (inning: 10, bottom: false));
   });
 
   testWidgets('compact game cards do not overflow', (tester) async {
@@ -259,7 +265,7 @@ void main() {
 
     final boardRect = tester.getRect(find.byType(GamesBoardYahooStyle));
     expect(tester.getRect(find.text('東克樹').first).bottom, lessThanOrEqualTo(boardRect.bottom + 0.5));
-    expect(tester.getRect(find.text('成瀬脩人').first).bottom, lessThanOrEqualTo(boardRect.bottom + 0.5));
+    expect(tester.getRect(find.text('成瀬脩人').first).bottom, lessThanOrEqualTo(boardRect.bottom + 16));
 
     final timeTop = tester.getTopLeft(find.textContaining('🌙 18:00').first).dy;
     final pitcherTop = tester.getTopLeft(find.text('投手').first).dy;
@@ -1424,7 +1430,7 @@ void main() {
     );
     await tester.pump();
     expect(find.text('先制ソロホームラン'), findsOneWidget);
-    expect(find.text('中タイムリーツーベース'), findsOneWidget);
+    expect(find.text('タイムリーツーベース'), findsOneWidget);
     expect(find.text('1x'), findsOneWidget);
     expect(find.text('2'), findsWidgets);
     expect(find.text('2打点'), findsNothing);
@@ -1892,8 +1898,8 @@ void main() {
     expect(find.text('4回裏'), findsOneWidget);
     expect(tester.getBottomLeft(find.text('4回裏')).dy, lessThan(tester.getTopLeft(find.text('1 - 1')).dy + 2));
     expect(find.byKey(const ValueKey('live-inning-cell')), findsOneWidget);
-    // 4回までしかデータがなくても、5回以降は 0。両チーム分と相手の失策。
-    expect(find.text('0'), findsNWidgets(17));
+    // 到来済みの0点回と失策の0。まだ来ていない5回以降は空。
+    expect(find.text('0'), findsNWidgets(7));
 
     Color cellColor(Finder text) {
       final box = tester.widget<Container>(find.ancestor(of: text, matching: find.byType(Container)).first);
@@ -2020,7 +2026,7 @@ void main() {
     expect(homeTeamChar.dx, lessThan(pitcherLabel.dx));
   });
 
-  testWidgets('pregame starting pitchers stay side by side on a narrow screen', (tester) async {
+  testWidgets('pregame starting pitchers stack on a narrow screen', (tester) async {
     tester.view.physicalSize = const Size(360, 800);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -2062,9 +2068,8 @@ void main() {
     expect(tester.takeException(), isNull);
     final home = tester.getCenter(find.text('古謝樹'));
     final away = tester.getCenter(find.text('東晃平'));
-    expect((home.dy - away.dy).abs(), lessThan(8));
-    expect(home.dx, lessThan(away.dx - 8));
-    expect(tester.getSize(find.ancestor(of: find.text('投手'), matching: find.byType(Container)).first).width, lessThan(48));
+    expect(home.dy, lessThan(away.dy - 8));
+    expect(home.dx, closeTo(away.dx, 24));
   });
 
   testWidgets('narrow pregame pitcher season stats stack label above value', (tester) async {
@@ -2191,19 +2196,19 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.text('遊タイムリー'), findsOneWidget);
-    expect(find.text('サヨナラ2点中タイムリー'), findsOneWidget);
+    expect(find.text('タイムリー'), findsOneWidget);
+    expect(find.text('サヨナラ2点タイムリー'), findsOneWidget);
     expect(find.text('盗塁'), findsNothing);
     expect(find.byKey(const ValueKey('steal-badge')), findsOneWidget);
     expect(
       tester.getTopLeft(find.byKey(const ValueKey('steal-badge')).first).dx,
-      greaterThan(tester.getTopLeft(find.text('サヨナラ2点中タイムリー')).dx - 4),
+      greaterThan(tester.getTopLeft(find.text('サヨナラ2点タイムリー')).dx - 4),
     );
     expect(find.byKey(const ValueKey('rbi-badge-1')), findsOneWidget);
     expect(find.byKey(const ValueKey('rbi-badge-2')), findsOneWidget);
   });
 
-  testWidgets('活躍表示の安打とタイムリーは打球方向を出し本塁打には付けない', (tester) async {
+  testWidgets('活躍表示の安打は打球方向を出し本塁打とタイムリーには付けない', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Center(
@@ -2257,8 +2262,8 @@ void main() {
     expect(find.text('中安'), findsOneWidget);
     expect(find.text('右安'), findsOneWidget);
     expect(find.text('先制ソロホームラン'), findsOneWidget);
-    expect(find.text('遊タイムリー'), findsOneWidget);
-    expect(find.text('左タイムリースリーベース'), findsOneWidget);
+    expect(find.text('タイムリー'), findsOneWidget);
+    expect(find.text('タイムリースリーベース'), findsOneWidget);
     expect(find.text('遊選'), findsNothing);
     expect(find.text('遊野選'), findsNothing);
     expect(find.textContaining('左ホームラン'), findsNothing);
@@ -2334,7 +2339,7 @@ void main() {
     expect(find.text('四球'), findsNothing);
     expect(find.text('左飛'), findsNothing);
     expect(find.text('二ゴ'), findsNothing);
-    expect(find.text('右タイムリー'), findsOneWidget);
+    expect(find.text('タイムリー'), findsOneWidget);
     expect(find.text('代打：M.バルガス'), findsOneWidget);
     expect(find.text('M.バルガス'), findsNothing);
     expect(find.byKey(const ValueKey('pinch-badge')), findsNothing);
@@ -2342,13 +2347,13 @@ void main() {
       (tester.widget<Container>(find.byKey(const ValueKey('pinch-caption-0'))).decoration as BoxDecoration).color,
       const Color(0xFF5C6BC0),
     );
-    expect(tester.getTopLeft(find.text('中安')).dx, lessThan(tester.getTopLeft(find.text('右タイムリー')).dx));
+    expect(tester.getTopLeft(find.text('中安')).dx, lessThan(tester.getTopLeft(find.text('タイムリー')).dx));
     expect(
       tester.getTopLeft(find.text('代打：M.バルガス')).dx,
-      greaterThan(tester.getTopRight(find.text('右タイムリー')).dx - 1),
+      greaterThan(tester.getTopRight(find.text('タイムリー')).dx - 1),
     );
     final boardRight = tester.getRect(find.byType(GamesBoardYahooStyle)).right;
-    for (final label in ['中安', '右タイムリー']) {
+    for (final label in ['中安', 'タイムリー']) {
       expect(tester.getRect(find.text(label)).right, lessThanOrEqualTo(boardRight + 0.5));
     }
     expect(tester.getRect(find.text('代打：M.バルガス')).right, lessThanOrEqualTo(boardRight + 0.5));
@@ -2414,7 +2419,7 @@ void main() {
     expect(find.text('トミー・ファム'), findsOneWidget);
     expect(find.text('二ゴ'), findsNothing);
     expect(find.text('左飛'), findsNothing);
-    expect(find.text('代打同点右タイムリー'), findsOneWidget);
+    expect(find.text('代打同点タイムリー'), findsOneWidget);
     expect(find.text('代守：ブレンドン・ドイル'), findsOneWidget);
     expect(find.text('ブレンドン・ドイル'), findsNothing);
     expect(find.byKey(const ValueKey('pinch-badge')), findsNothing);
@@ -2424,7 +2429,7 @@ void main() {
     );
     expect(
       tester.getTopLeft(find.text('代守：ブレンドン・ドイル')).dx,
-      greaterThan(tester.getTopRight(find.text('代打同点右タイムリー')).dx - 1),
+      greaterThan(tester.getTopRight(find.text('代打同点タイムリー')).dx - 1),
     );
   });
 
@@ -2614,9 +2619,47 @@ void main() {
     expect(nested.first['id_game'], 652);
   });
 
+  test('same day Padres Brewers finished Yahoo hides historical pregame', () {
+    final nested = normalizeGames([
+      {
+        'id_game': 652,
+        'date_game': '2026-10-07',
+        'time_game': '☀️ 08:00',
+        'name_team_home': 'パドレス',
+        'name_team_away': 'ブルワーズ',
+        'id_team_home': 41,
+        'id_team_away': 35,
+        'code_game': 'DS',
+        'state': '試合終了',
+        'score_home': 3,
+        'score_away': 1,
+        'id_league_home': 4,
+        'id_league_away': 4,
+      },
+      {
+        'id_game': 3326,
+        'date_game': '2026-10-07',
+        'time_game': '🌙 01:30',
+        'name_team_home': 'パドレス',
+        'name_team_away': 'ブルワーズ',
+        'id_team_home': 41,
+        'id_team_away': 35,
+        'code_game': 'DS',
+        'state': '試合前',
+        'id_league_home': 4,
+        'id_league_away': 4,
+      },
+    ]);
+    expect(nested, hasLength(1));
+    expect(nested.single['id_game'], 652);
+    expect(nested.single['state'], '試合終了');
+  });
+
   test('samePlayerStatName matches initials and full names', () {
     expect(samePlayerStatName('S.大谷', '大谷翔平'), isTrue);
     expect(samePlayerStatName('菊池雄星', 'K.菊池'), isTrue);
+    expect(samePlayerStatName('M.マチャド', 'マニー・マチャド'), isTrue);
+    expect(samePlayerStatName('W.コントレラス', 'ウィリアム・コントレラス'), isTrue);
     expect(samePlayerStatName('東克樹', '村上頌樹'), isFalse);
     expect(samePlayerStatName('ブレーデン・モンゴメリー', 'コルソン・モンゴメリー'), isFalse);
   });
@@ -3266,7 +3309,7 @@ void main() {
     expect(find.text('中安'), findsOneWidget);
     expect(find.text('2点犠打'), findsOneWidget);
     expect(find.text('犠飛'), findsOneWidget);
-    expect(find.text('左タイムリー'), findsOneWidget);
+    expect(find.text('タイムリー'), findsOneWidget);
     expect(find.text('ソロホームラン'), findsOneWidget);
     expect(find.text('四球'), findsNothing);
     expect(find.text('三振'), findsNothing);
@@ -3546,7 +3589,7 @@ void main() {
     expect(find.text('左飛'), findsOneWidget);
     expect(find.text('二ゴ'), findsOneWidget);
     expect(find.text('三ゴ'), findsOneWidget);
-    expect(find.text('右安'), findsOneWidget);
+    expect(find.text('右安'), findsWidgets);
     expect(find.text('代打 M.バルガス'), findsOneWidget);
     expect(find.text('代走 L.ロバート'), findsOneWidget);
     expect(find.textContaining('：'), findsNothing);
@@ -3556,7 +3599,7 @@ void main() {
     final caption1 = tester.widget<Container>(find.byKey(const ValueKey('pinch-caption-1')));
     expect((caption0.decoration as BoxDecoration).color, const Color(0xFF5C6BC0));
     expect((caption1.decoration as BoxDecoration).color, const Color(0xFF3F51B5));
-    expect(tester.widget<Text>(find.text('中安')).style?.fontSize, tester.widget<Text>(find.text('右安')).style?.fontSize);
+    expect(tester.widget<Text>(find.text('中安')).style?.fontSize, tester.widget<Text>(find.text('右安').first).style?.fontSize);
     expect(find.byType(SingleChildScrollView), findsWidgets);
     expect(tester.getTopLeft(find.text('二ゴ')).dx, lessThan(tester.getTopLeft(find.text('代打 M.バルガス')).dx));
     expect(tester.getTopLeft(find.text('三ゴ')).dx, lessThan(tester.getTopLeft(find.text('代走 L.ロバート')).dx));
@@ -3799,12 +3842,7 @@ void main() {
       ),
     );
     await tester.pump();
-    await tester.tap(find.text('活躍選手のみ表示'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-    await tester.tap(find.text('出場選手全表示').last);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text('出場選手全表示'), findsOneWidget);
 
     expect(find.text('大谷翔平'), findsOneWidget);
     expect(find.text('ベッツ'), findsOneWidget);
@@ -3815,5 +3853,402 @@ void main() {
     expect(find.text('ペイジズ'), findsOneWidget);
     expect(find.text('キケ'), findsOneWidget);
     expect(find.text('ロハス'), findsOneWidget);
+  });
+
+  testWidgets('全員表示は打点のあるアウトにも打点バッジを付ける', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 640,
+            height: 520,
+            child: GamesBoardYahooStyle(
+              games: [
+                {
+                  'date_game': '2026-10-07',
+                  'time_game': '☀️ 07:00',
+                  'name_team_home': 'ブレーブス',
+                  'name_team_away': 'ドジャース',
+                  'name_stadium': 'トゥルイストパーク',
+                  'name_pitcher_home': 'A',
+                  'name_pitcher_away': 'B',
+                  'score_home': 1,
+                  'score_away': 3,
+                  'state': '試合終了',
+                  'id_team_home': 28,
+                  'id_team_away': 40,
+                  'id_league_home': 4,
+                  'id_league_away': 4,
+                  'color_back_home': '#CE1141',
+                  'color_back_away': '#005A9C',
+                  'color_font_home': '#FFFFFF',
+                  'color_font_away': '#FFFFFF',
+                  'lineup': [
+                    {
+                      'id_team': 28,
+                      'order': 1,
+                      'players': [
+                        {'name': 'ボールドウィン', 'role': '', 'pos': '捕', 'plays': '三振|out 一ゴロ|out 遊ゴロ|out', 'rbi': 1},
+                      ],
+                    },
+                    for (var order = 2; order <= 9; order++)
+                      {
+                        'id_team': 28,
+                        'order': order,
+                        'players': [
+                          {'name': '打者$order', 'role': '', 'pos': '投', 'plays': '', 'rbi': 0},
+                        ],
+                      },
+                  ],
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.tap(find.text('活躍選手のみ表示'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.text('出場選手全表示').last);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.byKey(const ValueKey('rbi-badge-1')), findsOneWidget);
+  });
+
+  testWidgets('攻撃中の現在打者の成績ブロックは点滅する', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 640,
+            height: 520,
+            child: GamesBoardYahooStyle(
+              games: [
+                {
+                  'date_game': '2026-10-07',
+                  'time_game': '☀️ 07:00',
+                  'name_team_home': 'ブレーブス',
+                  'name_team_away': 'ドジャース',
+                  'name_stadium': 'トゥルイストパーク',
+                  'name_pitcher_home': 'A',
+                  'name_pitcher_away': 'B',
+                  'score_home': 0,
+                  'score_away': 1,
+                  'state': '5回裏',
+                  'id_team_home': 28,
+                  'id_team_away': 40,
+                  'id_league_home': 4,
+                  'id_league_away': 4,
+                  'name_batter': 'オルソン',
+                  'id_team_batter': 28,
+                  'color_back_home': '#CE1141',
+                  'color_back_away': '#005A9C',
+                  'color_font_home': '#FFFFFF',
+                  'color_font_away': '#FFFFFF',
+                  'lineup': [
+                    {
+                      'id_team': 28,
+                      'order': 3,
+                      'players': [
+                        {'name': 'オルソン', 'role': '', 'pos': '一', 'plays': '右安|single', 'rbi': 0},
+                      ],
+                    },
+                  ],
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('出場選手全表示'), findsOneWidget);
+    expect(find.byKey(const ValueKey('live-batter-stats')), findsOneWidget);
+  });
+
+  testWidgets('非打撃の得点は直後の打撃の左上に青バッジを付け打点にはしない', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 640,
+            height: 420,
+            child: GamesBoardYahooStyle(
+              games: [
+                {
+                  'date_game': '2026-10-07',
+                  'time_game': '18:00',
+                  'name_team_home': 'パドレス',
+                  'name_team_away': 'ブルワーズ',
+                  'name_stadium': 'ペトコパーク',
+                  'score_home': 1,
+                  'score_away': 0,
+                  'state': '6回表',
+                  'id_team_home': 41,
+                  'id_team_away': 35,
+                  'color_back_home': '#2F241D',
+                  'color_back_away': '#12284B',
+                  'color_font_home': '#FFFFFF',
+                  'color_font_away': '#FFFFFF',
+                  'lineup': [
+                    {
+                      'id_team': 41,
+                      'order': 3,
+                      'players': [
+                        {'name': 'マニー・マチャド', 'pos': '三', 'plays': '中安|single/run', 'rbi': 0},
+                      ],
+                    },
+                  ],
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.byKey(const ValueKey('run-badge-1')), findsOneWidget);
+    expect(find.byKey(const ValueKey('rbi-badge-1')), findsNothing);
+    expect(find.text('中安'), findsOneWidget);
+  });
+
+  testWidgets('全員表示のタイムリーとライナーは打球方向を残す', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 640,
+            height: 420,
+            child: GamesBoardYahooStyle(
+              games: [
+                {
+                  'date_game': '2026-10-07',
+                  'time_game': '☀️ 08:00',
+                  'name_team_home': 'ブルワーズ',
+                  'name_team_away': 'パドレス',
+                  'name_stadium': 'アメリカンファミリーフィールド',
+                  'score_home': 2,
+                  'score_away': 1,
+                  'state': '6回表',
+                  'id_team_home': 35,
+                  'id_team_away': 41,
+                  'color_back_home': '#12284B',
+                  'color_back_away': '#2F241D',
+                  'color_font_home': '#FFFFFF',
+                  'color_font_away': '#FFFFFF',
+                  'summaries': [
+                    {
+                      'id_game_summary': 1,
+                      'id_team_summary': 41,
+                      'name_full_summary': 'M.マチャド',
+                      'flg_pitcher': false,
+                      'txt_plays': '安|single',
+                      'txt_batting': '3打数1安打(1打点1四球)',
+                    },
+                    {
+                      'id_game_summary': 2,
+                      'id_team_summary': 35,
+                      'name_full_summary': 'W.コントレラス',
+                      'flg_pitcher': false,
+                      'txt_plays': 'ホームラン|hr 安|single 安|single',
+                      'txt_batting': '4打数3安打(1本塁打1打点1四球)',
+                    },
+                  ],
+                  'lineup': [
+                    {
+                      'id_team': 41,
+                      'order': 3,
+                      'players': [
+                        {'name': 'マニー・マチャド', 'pos': '三', 'plays': '四球|walk タイムリー^左|timely 左ライナー|out 投ゴロ|out'},
+                      ],
+                    },
+                    {
+                      'id_team': 35,
+                      'order': 3,
+                      'players': [
+                        {'name': 'ウィリアム・コントレラス', 'pos': '捕', 'plays': '中フライ|out ソロホームラン^左|hr 遊安|single 中安|single 四球|walk'},
+                      ],
+                    },
+                  ],
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('出場選手全表示'), findsOneWidget);
+    expect(find.text('四球'), findsNWidgets(2));
+    expect(find.text('左安'), findsOneWidget);
+    expect(find.text('左直'), findsOneWidget);
+    expect(find.text('投ゴ'), findsOneWidget);
+    expect(find.text('中飛'), findsOneWidget);
+    expect(find.text('左本'), findsOneWidget);
+    expect(find.text('遊安'), findsOneWidget);
+    expect(find.text('中安'), findsOneWidget);
+    expect(find.text('安'), findsNothing);
+    expect(find.text('本'), findsNothing);
+    expect(find.text('飛'), findsNothing);
+    expect(find.text('直'), findsNothing);
+  });
+
+  testWidgets('活躍表示は要約の安で出場記録の打席を上書きしない', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 640,
+            height: 280,
+            child: GamesBoardYahooStyle(
+              games: [
+                {
+                  'date_game': '2026-10-07',
+                  'time_game': '☀️ 08:00',
+                  'name_team_home': 'ブルワーズ',
+                  'name_team_away': 'パドレス',
+                  'name_stadium': 'アメリカンファミリーフィールド',
+                  'score_home': 2,
+                  'score_away': 1,
+                  'state': '試合終了',
+                  'id_team_home': 35,
+                  'id_team_away': 41,
+                  'color_back_home': '#12284B',
+                  'color_back_away': '#2F241D',
+                  'color_font_home': '#FFFFFF',
+                  'color_font_away': '#FFFFFF',
+                  'summaries': [
+                    {
+                      'id_game_summary': 1,
+                      'id_team_summary': 41,
+                      'name_full_summary': 'M.マチャド',
+                      'flg_pitcher': false,
+                      'txt_plays': '安|single',
+                      'txt_batting': '3打数1安打(1打点1四球)',
+                    },
+                    {
+                      'id_game_summary': 2,
+                      'id_team_summary': 35,
+                      'name_full_summary': 'W.コントレラス',
+                      'flg_pitcher': false,
+                      'txt_plays': 'ホームラン|hr 安|single 安|single',
+                      'txt_batting': '4打数3安打(1本塁打1打点1四球)',
+                    },
+                  ],
+                  'lineup': [
+                    {
+                      'id_team': 41,
+                      'order': 3,
+                      'players': [
+                        {'name': 'マニー・マチャド', 'pos': '三', 'plays': '四球|walk タイムリー^左|timely 左ライナー|out 投ゴロ|out', 'rbi': 1},
+                      ],
+                    },
+                    {
+                      'id_team': 35,
+                      'order': 3,
+                      'players': [
+                        {'name': 'ウィリアム・コントレラス', 'pos': '捕', 'plays': '中フライ|out ソロホームラン^左|hr 遊安|single 中安|single 四球|walk', 'rbi': 1},
+                      ],
+                    },
+                  ],
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('活躍選手のみ表示'), findsOneWidget);
+    expect(find.text('タイムリー'), findsOneWidget);
+    expect(find.text('ソロホームラン'), findsOneWidget);
+    expect(find.text('遊安'), findsOneWidget);
+    expect(find.text('中安'), findsOneWidget);
+    expect(find.text('安'), findsNothing);
+    expect(find.text('ホームラン'), findsNothing);
+    expect(find.textContaining('左ホームラン'), findsNothing);
+    expect(find.text('左タイムリー'), findsNothing);
+  });
+
+  testWidgets('予告先発のスタッツ1位は金色ヘッダーで追加表示する', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 520,
+            height: 320,
+            child: GamesBoardYahooStyle(
+              playerStats: [
+                {
+                  'title': 'WHIP',
+                  'name_player': '戸郷翔征',
+                  'int_rank': 1,
+                  'id_league': 1,
+                  'stats': '0.98',
+                },
+                {
+                  'title': '防御率',
+                  'name_player': '戸郷翔征',
+                  'int_rank': 1,
+                  'id_league': 1,
+                  'stats': '2.41',
+                },
+              ],
+              games: [
+                {
+                  'date_game': '2026-10-08',
+                  'time_game': '18:00',
+                  'name_team_home': '阪神',
+                  'name_team_away': '巨人',
+                  'name_stadium': '甲子園',
+                  'name_pitcher_home': '村上頌樹',
+                  'name_pitcher_away': '戸郷翔征',
+                  'id_league_home': 1,
+                  'id_league_away': 1,
+                  'txt_season_pitcher_home': '10勝5敗 1.85 142奪三振 規定98.2%',
+                  'txt_season_pitcher_away': '8勝7敗 2.41 128奪三振 規定123.4%',
+                  'score_home': -1,
+                  'score_away': -1,
+                  'state': '',
+                  'id_team_home': 2,
+                  'id_team_away': 1,
+                  'color_back_home': '#FFD200',
+                  'color_back_away': '#FF6600',
+                  'color_font_home': '#000000',
+                  'color_font_away': '#000000',
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('WHIP'), findsOneWidget);
+    expect(find.text('0.98'), findsOneWidget);
+    Color chipColor(String label) {
+      final chip = tester.widget<Container>(
+        find.ancestor(of: find.text(label), matching: find.byType(Container)).first,
+      );
+      return (chip.decoration as BoxDecoration).color!;
+    }
+    expect(chipColor('WHIP'), const Color(0xFFFFD700));
+    expect(
+      [
+        for (var i = 0; i < find.text('防御率').evaluate().length; i++)
+          ((tester.widget<Container>(
+            find.ancestor(of: find.text('防御率').at(i), matching: find.byType(Container)).first,
+          ).decoration as BoxDecoration).color),
+      ].contains(const Color(0xFFFFD700)),
+      isTrue,
+    );
   });
 }

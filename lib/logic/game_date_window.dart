@@ -1,3 +1,5 @@
+import 'game_dedupe.dart';
+
 /// 当年の初期表示は今日から3日前〜10日後。それより前は「前の日」で都度読む。
 const kGamesSqlPastDays = 3;
 const kGamesSqlFutureDays = 10;
@@ -72,7 +74,7 @@ List<Map<String, dynamic>> mergeGamesForDateRange(
     for (final game in existing)
       if (_gameDateOutsideRange(game, from, to)) game,
   ];
-  return [...keep, ...incoming];
+  return dedupeSameDayMatchupRows([...keep, ...incoming]);
 }
 
 bool _gameDateOutsideRange(Map<String, dynamic> game, DateTime from, DateTime to) {

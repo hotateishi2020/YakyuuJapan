@@ -150,6 +150,8 @@ class _CodeGameResult {
   final String ERROR_FIELDING = 'ERROR_FIELDING';
   final String WILD_PITCH = 'WILD_PITCH';
   final String PASS_BALL = 'PASS_BALL';
+  final String BALK = 'BALK';
+  final String PICKOFF = 'PICKOFF';
   final String INTERFERENCE_BATTING = 'INTERFERENCE_BATTING';
   final String INTERFERENCE_RUNNING = 'INTERFERENCE_RUNNING';
   final String INTERFERENCE_FIELDING = 'INTERFERENCE_FIELDING';

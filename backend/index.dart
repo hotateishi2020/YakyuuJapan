@@ -94,12 +94,24 @@ String? _queryYmd(String? raw) {
   return RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(text) ? text : null;
 }
 
-({String? from, String? to}) _gamesQueryWindow(Request request) {
+({String? from, String? to}) _gamesQueryWindow(Request request, int year) {
   final date = _queryYmd(request.url.queryParameters['date']);
   final from = _queryYmd(request.url.queryParameters['from']) ?? date;
   final to = _queryYmd(request.url.queryParameters['to']) ?? date;
-  if (from == null || to == null) return (from: null, to: null);
-  return from.compareTo(to) <= 0 ? (from: from, to: to) : (from: to, to: from);
+  if (from != null && to != null) {
+    return from.compareTo(to) <= 0 ? (from: from, to: to) : (from: to, to: from);
+  }
+  return _currentYearGamesWindow(year) ?? (from: null, to: null);
+}
+
+({String from, String to})? _currentYearGamesWindow(int year) {
+  final now = DateTime.now();
+  if (year != now.year) return null;
+  final today = DateTime(now.year, now.month, now.day);
+  return (
+    from: _ymdOf(today.subtract(Duration(days: AppSql.gamesPastDays))),
+    to: _ymdOf(today.add(Duration(days: AppSql.gamesFutureDays))),
+  );
 }
 
 String _ymdOf(DateTime date) {
@@ -135,14 +147,21 @@ Future<Map<String, dynamic>> _buildPredictionsPartGames(
   String? from,
   String? to,
 }) async {
-  final ranged = from != null && to != null;
-  final data = ranged ? <Object>[year, from, to] : <Object>[year];
+  var windowFrom = from;
+  var windowTo = to;
+  if (windowFrom == null || windowTo == null) {
+    final fallback = _currentYearGamesWindow(year);
+    if (fallback != null) {
+      windowFrom = fallback.from;
+      windowTo = fallback.to;
+    }
+  }
+  final ranged = windowFrom != null && windowTo != null;
+  final data = ranged ? <Object>[year, windowFrom, windowTo] : <Object>[year];
   final results = await Postgres.mapParallel([
     (conn) => Postgres.execute(conn, AppSql.selectGames(ranged: ranged), data: data),
     (conn) => Postgres.execute(conn, AppSql.selectGamePlayRows(ranged: ranged), data: data),
     (conn) => Postgres.execute(conn, AppSql.selectBattingLines(ranged: ranged), data: data),
-  ]);
-  final extras = await Postgres.mapParallel([
     (conn) => Postgres.execute(conn, AppSql.selectPostseasonGames(), data: [year]),
     (conn) => Postgres.execute(conn, AppSql.selectPostseasonBoard(), data: [
       Value.SystemCode.Code.ADMIN,
@@ -150,16 +169,27 @@ Future<Map<String, dynamic>> _buildPredictionsPartGames(
       Value.SystemCode.Key.DATE_OPEN_GAME,
     ]),
   ]);
-  final playRows = Postgres.toJson(results[1]);
-  final gameRows = Postgres.toJson(results[0]);
-  final battingLines = _battingLinesOf(Postgres.toJson(results[2]));
+  final leagueIds = org.leagueIds;
+  final gameRows = _filterByLeagues(
+    Postgres.toJson(results[0]),
+    leagueIds,
+    keys: const ['id_league_home', 'id_league_away'],
+  );
+  final gameIds = <int>{
+    for (final game in gameRows) _asInt(game['id_game'] ?? game['id']),
+  };
+  final playRows = [
+    for (final row in Postgres.toJson(results[1]))
+      if (gameIds.contains(_asInt(row['id_game']))) row,
+  ];
+  final battingLines = _battingLinesOf([
+    for (final row in Postgres.toJson(results[2]))
+      if (gameIds.contains(_asInt(row['id_game']))) row,
+  ]);
   final playLabels = playLabelsByPlayer(playRows);
   for (final entry in battingLines.entries) {
     final filled = playsFilledFromLine(
       playLabels[entry.key] ?? '',
-      singles: _asInt(entry.value['int_hit1']),
-      doubles: _asInt(entry.value['int_hit2']),
-      triples: _asInt(entry.value['int_hit3']),
       homers: _asInt(entry.value['int_homerun']),
     );
     final numbered = playsWithHomerNumbers(filled, '${entry.value['txt_homerun_total'] ?? ''}');
@@ -189,22 +219,21 @@ Future<Map<String, dynamic>> _buildPredictionsPartGames(
   for (final game in games) {
     game['lineup'] = lineups[_asInt(game['id_game'])] ?? const <Map<String, dynamic>>[];
   }
-  final leagueIds = org.leagueIds;
-  final windowFrom = from;
-  final windowTo = to;
+  _attachLiveBatters(games, playRows);
   final window = windowFrom != null && windowTo != null
       ? (from: windowFrom, to: windowTo)
       : _defaultGamesWindow(year, games);
+  final postseason = Postgres.toJson(results[3]);
   return {
     'org': org.code,
     'year': year,
     'part': 'games',
     'from': window.from,
     'to': window.to,
-    'games': _filterByLeagues(games, leagueIds, keys: const ['id_league_home', 'id_league_away']),
-    'postseason_games': _dedupeSameDayMatchups(Postgres.toJson(extras[0])),
+    'games': games,
+    'postseason_games': _dedupeSameDayMatchups(postseason),
     'show_postseason_board':
-        Postgres.toJson(extras[0]).isNotEmpty || _showPostseasonBoard(Postgres.toJson(extras[1])),
+        postseason.isNotEmpty || _showPostseasonBoard(Postgres.toJson(results[4])),
   };
 }
 
@@ -398,6 +427,16 @@ bool _nearSameGameDay(Map<String, dynamic> a, Map<String, dynamic> b) {
   return left.difference(right).inDays.abs() <= 1;
 }
 
+bool _importDuplicateOf(Map<String, dynamic> a, Map<String, dynamic> b) {
+  if (!_yahooHistoricalMix(a, b) || !_nearSameGameDay(a, b)) return false;
+  if (_rowFinished(a) &&
+      _rowFinished(b) &&
+      '${a['score_home']}|${a['score_away']}' != '${b['score_home']}|${b['score_away']}') {
+    return false;
+  }
+  return true;
+}
+
 List<Map<String, dynamic>> _mergeAdjacentScoreDupes(List<Map<String, dynamic>> games) {
   if (games.length <= 1) return games;
   final used = List<bool>.filled(games.length, false);
@@ -409,15 +448,11 @@ List<Map<String, dynamic>> _mergeAdjacentScoreDupes(List<Map<String, dynamic>> g
     for (var j = i + 1; j < games.length; j++) {
       if (used[j] || _matchupCodeKey(games[j]) != key) continue;
       final other = games[j];
+      if (!_nearSameGameDay(best, other)) continue;
       final finishedPair = _rowFinished(best) &&
           _rowFinished(other) &&
           '${best['score_home']}|${best['score_away']}' == '${other['score_home']}|${other['score_away']}';
-      final importPregame = _rowUnstarted(best) && _rowUnstarted(other) && _yahooHistoricalMix(best, other);
-      final liveVsImport = ((_rowInProgress(best) && _rowUnstarted(other)) ||
-              (_rowUnstarted(best) && _rowInProgress(other))) &&
-          _yahooHistoricalMix(best, other);
-      if (!finishedPair && !importPregame && !liveVsImport) continue;
-      if (!_nearSameGameDay(best, other)) continue;
+      if (!finishedPair && !_importDuplicateOf(best, other)) continue;
       used[j] = true;
       if (_gameRowQuality(other) > _gameRowQuality(best)) best = other;
     }
@@ -433,6 +468,12 @@ bool _summaryIsPitcher(dynamic value) {
 }
 
 int _asInt(dynamic value) => int.tryParse('$value') ?? (value is int ? value : 0);
+
+bool _asBool(dynamic value) {
+  if (value == true) return true;
+  final text = '$value'.trim().toLowerCase();
+  return text == 'true' || text == 't' || text == '1';
+}
 
 double _asDouble(dynamic value) => double.tryParse('$value') ?? (value is num ? value.toDouble() : 0);
 
@@ -591,7 +632,6 @@ void _fillMissingLineScores(List<Map<String, dynamic>> games, List<Map<String, d
       }
     }
     if (maxInning <= 0) continue;
-    if (maxInning < 9) maxInning = 9;
     String line(Map<int, int> bucket) => [for (var i = 1; i <= maxInning; i++) '${bucket[i] ?? 0}'].join(',');
     int total(Map<int, int> bucket) => bucket.values.fold(0, (sum, n) => sum + n);
     if (homeBlank) {
@@ -604,6 +644,90 @@ void _fillMissingLineScores(List<Map<String, dynamic>> games, List<Map<String, d
       if (_asInt(game['int_runs_away']) <= 0) game['int_runs_away'] = total(awayRuns);
       if (_asInt(game['int_hit_away']) <= 0 && awayHits > 0) game['int_hit_away'] = awayHits;
     }
+  }
+}
+
+({int inning, bool bottom})? _liveHalf(String state) {
+  final match = RegExp(r'(\d+)\s*回\s*(表|裏)').firstMatch(state);
+  if (match == null) return null;
+  var inning = int.parse(match.group(1)!);
+  var bottom = match.group(2) == '裏';
+  final outs = RegExp(r'(\d+)\s*アウト').firstMatch(state);
+  if (outs != null && int.parse(outs.group(1)!) >= 3) {
+    if (!bottom) {
+      bottom = true;
+    } else {
+      inning += 1;
+      bottom = false;
+    }
+  }
+  return (inning: inning, bottom: bottom);
+}
+
+bool _isLiveBattingResult(String result) {
+  return const {
+    'HIT1', 'HIT2', 'HIT3', 'HOMERUN',
+    'OUT_FLY', 'OUT_GROUND', 'OUT_POP_UP', 'OUT_DOUBLE_PLAY', 'OUT_LINE_DRIVE',
+    'SACRIFICE_BUNT', 'SACRIFICE_FLY', 'SQUEEZE',
+    'STRIKE_OUT', 'DROPPED_THIRD', 'ERROR', 'WALK', 'WALK_DEAD',
+    'ERROR_FIELDING', 'INTERFERENCE_BATTING', 'FIELDERS_CHOICE',
+  }.contains(result);
+}
+
+void _attachLiveBatters(List<Map<String, dynamic>> games, List<Map<String, dynamic>> playRows) {
+  final byGame = <int, List<Map<String, dynamic>>>{};
+  for (final row in playRows) {
+    byGame.putIfAbsent(_asInt(row['id_game']), () => []).add(row);
+  }
+  for (final game in games) {
+    final half = _liveHalf('${game['state'] ?? ''}');
+    if (half == null) continue;
+    final teamId = half.bottom ? _asInt(game['id_team_home']) : _asInt(game['id_team_away']);
+    if (teamId <= 0) continue;
+    final rows = [
+      for (final row in byGame[_asInt(game['id_game'] ?? game['id'])] ?? const <Map<String, dynamic>>[])
+        if (_asInt(row['int_inning']) == half.inning &&
+            (_asBool(row['flg_bottom']) == half.bottom) &&
+            _isLiveBattingResult('${row['code_result'] ?? ''}'))
+          row,
+    ]..sort((a, b) => _asInt(a['id']).compareTo(_asInt(b['id'])));
+    var nextOrder = 1;
+    if (rows.isNotEmpty) {
+      final last = _asInt(rows.last['int_batting_order']);
+      nextOrder = last >= 9 ? 1 : last + 1;
+    } else {
+      final prevInning = half.bottom ? half.inning : half.inning - 1;
+      final prevBottom = !half.bottom;
+      if (prevInning > 0) {
+        final prev = [
+          for (final row in byGame[_asInt(game['id_game'] ?? game['id'])] ?? const <Map<String, dynamic>>[])
+            if (_asInt(row['int_inning']) == prevInning &&
+                _asBool(row['flg_bottom']) == prevBottom &&
+                _isLiveBattingResult('${row['code_result'] ?? ''}'))
+              row,
+        ]..sort((a, b) => _asInt(a['id']).compareTo(_asInt(b['id'])));
+        if (prev.isNotEmpty) {
+          final last = _asInt(prev.last['int_batting_order']);
+          nextOrder = last >= 9 ? 1 : last + 1;
+        }
+      }
+    }
+    var name = '';
+    final lineup = game['lineup'];
+    if (lineup is List) {
+      for (final item in lineup) {
+        if (item is! Map) continue;
+        if (_asInt(item['id_team']) != teamId) continue;
+        if (_asInt(item['order']) != nextOrder) continue;
+        final players = item['players'];
+        if (players is! List || players.isEmpty) continue;
+        final last = players.last;
+        if (last is Map) name = '${last['name'] ?? ''}'.trim();
+      }
+    }
+    if (name.isEmpty) continue;
+    game['name_batter'] = name;
+    game['id_team_batter'] = teamId;
   }
 }
 
@@ -704,6 +828,12 @@ List<Map<String, dynamic>> _summariesOf(
 
 void main() async {
   try {
+    try {
+      await FetchURL.ensureGameDetailsVelo();
+      await FetchURL.ensureAppColumns();
+    } catch (e, st) {
+      print('schema warm failed: $e\n$st');
+    }
     final app = Router();
     final log = Value.SystemCode.Log;
 
@@ -936,7 +1066,7 @@ void main() async {
             headers: {'content-type': 'application/json; charset=utf-8'},
           );
         }
-        final window = part == 'games' ? _gamesQueryWindow(request) : (from: null, to: null);
+        final window = part == 'games' ? _gamesQueryWindow(request, year) : (from: null, to: null);
         final cacheKey = window.from != null
             ? '${org.code}|$part|$year|${window.from}|${window.to}'
             : '${org.code}|$part|$year';
@@ -1018,9 +1148,6 @@ void main() async {
         for (final entry in battingLines.entries) {
           final filled = playsFilledFromLine(
             playLabels[entry.key] ?? '',
-            singles: _asInt(entry.value['int_hit1']),
-            doubles: _asInt(entry.value['int_hit2']),
-            triples: _asInt(entry.value['int_hit3']),
             homers: _asInt(entry.value['int_homerun']),
           );
           final numbered = playsWithHomerNumbers(filled, '${entry.value['txt_homerun_total'] ?? ''}');
@@ -1050,6 +1177,7 @@ void main() async {
         for (final game in games) {
           game['lineup'] = lineups[_asInt(game['id_game'])] ?? const <Map<String, dynamic>>[];
         }
+        _attachLiveBatters(games, playRows);
         // print(games);
         final leagueIds = org.leagueIds;
         final filteredGames = _filterByLeagues(games, leagueIds, keys: const ['id_league_home', 'id_league_away']);
@@ -1238,7 +1366,9 @@ Future<Response> tryCatchAPIReadonly(
     _notifyProgramError(e);
     response = Response.internalServerError(body: 'データベースエラー: $e');
   } finally {
-    unawaited(_saveAccessLog(request, user, id_error));
+    if (request.requestedUri.path != '/predictions/part') {
+      unawaited(_saveAccessLog(request, user, id_error));
+    }
     print("🌐Responsed Successfully‼️【" + request.requestedUri.toString() + "】");
   }
   print('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');

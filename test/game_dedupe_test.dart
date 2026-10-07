@@ -185,6 +185,34 @@ void main() {
     expect(rows.first['id_game'], 652);
   });
 
+  test('終了したYahoo試合と歴史の試合前はダブルヘッダーにしない', () {
+    final rows = dedupeSameDayMatchupRows([
+      {
+        'code_game': 'DS',
+        'id_team_home': 41,
+        'id_team_away': 35,
+        'score_home': 3,
+        'score_away': 1,
+        'state': '試合終了',
+        'date_game': '2026-10-07',
+        'time_game': '☀️ 08:00',
+        'id_game': 652,
+      },
+      {
+        'code_game': 'DS',
+        'id_team_home': 41,
+        'id_team_away': 35,
+        'state': '試合前',
+        'date_game': '2026-10-07',
+        'time_game': '🌙 01:30',
+        'id_game': 3326,
+      },
+    ]);
+    expect(rows, hasLength(1));
+    expect(rows.single['id_game'], 652);
+    expect(rows.single['state'], '試合終了');
+  });
+
   test('進行中のYahoo試合は歴史の試合前より優先する', () {
     final rows = dedupeSameDayMatchupRows([
       {

@@ -13,6 +13,7 @@ class Headers {
     double padding_vertical,
     double padding_horizontal, {
     VoidCallback? onAuthChanged,
+    List<Widget> actions = const [],
   }) {
     final loggedIn = AuthSession.instance.isLoggedIn;
 
@@ -39,6 +40,7 @@ class Headers {
               ),
             ),
           ),
+          ...actions,
           if (loggedIn)
             Builder(
               builder: (iconContext) {

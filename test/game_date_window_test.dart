@@ -42,4 +42,37 @@ void main() {
     );
     expect(merged.map((game) => game['id_game']).toList(), [1, 3]);
   });
+
+  test('merge drops historical pregame when Yahoo game already finished', () {
+    final merged = mergeGamesForDateRange(
+      [
+        {'id_game': 1, 'date_game': '2026-10-03', 'name_team_home': '旧日'},
+      ],
+      [
+        {
+          'id_game': 652,
+          'date_game': '2026-10-07',
+          'time_game': '☀️ 08:00',
+          'id_team_home': 41,
+          'id_team_away': 35,
+          'code_game': 'DS',
+          'state': '試合終了',
+          'score_home': 3,
+          'score_away': 1,
+        },
+        {
+          'id_game': 3326,
+          'date_game': '2026-10-07',
+          'time_game': '🌙 01:30',
+          'id_team_home': 41,
+          'id_team_away': 35,
+          'code_game': 'DS',
+          'state': '試合前',
+        },
+      ],
+      DateTime(2026, 10, 4),
+      DateTime(2026, 10, 17),
+    );
+    expect(merged.map((game) => game['id_game']).toList(), [1, 652]);
+  });
 }

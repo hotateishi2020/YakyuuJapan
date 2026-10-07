@@ -649,13 +649,26 @@ void _fillMissingLineScores(List<Map<String, dynamic>> games, List<Map<String, d
   }
 }
 
-({int inning, bool bottom})? _liveHalf(String state) {
+({int inning, bool bottom})? _statedHalf(String state) {
   final match = RegExp(r'(\d+)\s*回\s*(表|裏)').firstMatch(state);
   if (match == null) return null;
-  var inning = int.parse(match.group(1)!);
-  var bottom = match.group(2) == '裏';
-  final outs = RegExp(r'(\d+)\s*アウト').firstMatch(state);
-  if (outs != null && int.parse(outs.group(1)!) >= 3) {
+  return (inning: int.parse(match.group(1)!), bottom: match.group(2) == '裏');
+}
+
+int? _outsInState(String state) {
+  final match = RegExp(r'(\d+)\s*アウト').firstMatch(state);
+  if (match != null) return int.parse(match.group(1)!);
+  if (state.contains('三死') || state.contains('三アウト')) return 3;
+  return null;
+}
+
+({int inning, bool bottom})? _liveHalf(String state, {int? playOuts}) {
+  final stated = _statedHalf(state);
+  if (stated == null) return null;
+  var inning = stated.inning;
+  var bottom = stated.bottom;
+  final outs = _outsInState(state) ?? ((playOuts != null && playOuts > 0) ? playOuts : null);
+  if (outs != null && outs >= 3) {
     if (!bottom) {
       bottom = true;
     } else {
@@ -682,12 +695,28 @@ void _attachLiveBatters(List<Map<String, dynamic>> games, List<Map<String, dynam
     byGame.putIfAbsent(_asInt(row['id_game']), () => []).add(row);
   }
   for (final game in games) {
-    final half = _liveHalf('${game['state'] ?? ''}');
+    final state = '${game['state'] ?? ''}';
+    final gameId = _asInt(game['id_game'] ?? game['id']);
+    final all = byGame[gameId] ?? const <Map<String, dynamic>>[];
+    final stated = _statedHalf(state);
+    var playOuts = 0;
+    if (stated != null) {
+      final statedRows = [
+        for (final row in all)
+          if (_asInt(row['int_inning']) == stated.inning &&
+              _asBool(row['flg_bottom']) == stated.bottom &&
+              _isLiveBattingResult('${row['code_result'] ?? ''}'))
+            row,
+      ]..sort((a, b) => _asInt(a['id']).compareTo(_asInt(b['id'])));
+      if (statedRows.isNotEmpty) playOuts = _asInt(statedRows.last['cnt_out']);
+    }
+    if (playOuts > 0) game['int_outs'] = playOuts;
+    final half = _liveHalf(state, playOuts: playOuts);
     if (half == null) continue;
     final teamId = half.bottom ? _asInt(game['id_team_home']) : _asInt(game['id_team_away']);
     if (teamId <= 0) continue;
     final rows = [
-      for (final row in byGame[_asInt(game['id_game'] ?? game['id'])] ?? const <Map<String, dynamic>>[])
+      for (final row in all)
         if (_asInt(row['int_inning']) == half.inning &&
             (_asBool(row['flg_bottom']) == half.bottom) &&
             _isLiveBattingResult('${row['code_result'] ?? ''}'))
@@ -698,11 +727,11 @@ void _attachLiveBatters(List<Map<String, dynamic>> games, List<Map<String, dynam
       final last = _asInt(rows.last['int_batting_order']);
       nextOrder = last >= 9 ? 1 : last + 1;
     } else {
-      final prevInning = half.bottom ? half.inning : half.inning - 1;
-      final prevBottom = !half.bottom;
+      final prevInning = half.inning - 1;
+      final prevBottom = half.bottom;
       if (prevInning > 0) {
         final prev = [
-          for (final row in byGame[_asInt(game['id_game'] ?? game['id'])] ?? const <Map<String, dynamic>>[])
+          for (final row in all)
             if (_asInt(row['int_inning']) == prevInning &&
                 _asBool(row['flg_bottom']) == prevBottom &&
                 _isLiveBattingResult('${row['code_result'] ?? ''}'))

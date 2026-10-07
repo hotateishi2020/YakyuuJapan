@@ -9,23 +9,7 @@ Future<void> main(List<String> args) async {
   final query = args.isNotEmpty
       ? args.join(' ')
       : '''
-INSERT INTO t_nortification ( 
-    title, 
-    text_main, 
-    id_user, 
-    flg_read, 
-    code_tag_main, 
-    code_tag_sub, 
-    url,
-    crtby,
-    crtpgm,
-    crtenv,
-    updby,
-    updpgm,
-    updenv
-) VALUES 
-('試合情報の守備位置を表示するようにしました。', '試合情報の守備位置を表示するようにしました。', 1, false, 'SYS', 'UPD', '', 0, 'SQLCreator', 'SQLCreator', 0, 'SQLCreator', 'SQLCreator') 
-RETURNING id;
+UPFATE t_nortification SET flg_read_news = TRUE;
 ''';
 
   print('--- SQL ---');

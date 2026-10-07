@@ -24,7 +24,7 @@ INSERT INTO t_nortification (
     updpgm,
     updenv
 ) VALUES 
-('読み込み処理の速度向上を実施しました。', '読み込み処理の速度向上を実施しました。', 1, false, 'SYS', 'UPD', '', 0, 'SQLCreator', 'SQLCreator', 0, 'SQLCreator', 'SQLCreator') 
+('リロードせずに画面を表示した状態でも定期的に情報が更新されるようにしました。', 'リロードせずに画面を表示した状態でも定期的に情報が更新されるようにしました。', 1, false, 'SYS', 'UPD', '', 0, 'SQLCreator', 'SQLCreator', 0, 'SQLCreator', 'SQLCreator') 
 RETURNING id;
 ''';
 

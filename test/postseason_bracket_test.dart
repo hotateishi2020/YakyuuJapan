@@ -259,6 +259,8 @@ void main() {
     expect(stageBorder.top.width, 2);
     expect(find.text('CS FINAL STAGE'), findsNWidgets(2));
     expect(find.text('CS 1st STAGE'), findsNWidgets(2));
+    expect(logo('backend/assets/images/team_t.png'), findsOneWidget);
+    expect(logo('backend/assets/images/team_g.png'), findsOneWidget);
     expect(_verticalName(tester, 'postseason-team-1-セ1位'), '阪神タイガース');
     expect(find.text('セ・リーグ1位'), findsOneWidget);
     expect(find.text('パ・リーグ1位'), findsOneWidget);

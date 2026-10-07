@@ -62,14 +62,25 @@ Map<int, List<Map<String, dynamic>>> battingLineupsOf(
   required Map<String, String> plays,
   required Set<String> pitchers,
   Map<String, int> rbi = const {},
+  List<Map<String, dynamic>> starters = const [],
 }) {
   final byGame = <int, List<Map<String, dynamic>>>{};
   for (final row in rows) {
     byGame.putIfAbsent(_asInt(row['id_game']), () => []).add(row);
   }
+  for (final starter in starters) {
+    byGame.putIfAbsent(_asInt(starter['id_game']), () => []);
+  }
   final lineups = <int, List<Map<String, dynamic>>>{};
   for (final entry in byGame.entries) {
-    lineups[entry.key] = _lineupOf(entry.key, entry.value, plays: plays, pitchers: pitchers, rbi: rbi);
+    lineups[entry.key] = _lineupOf(
+      entry.key,
+      entry.value,
+      plays: plays,
+      pitchers: pitchers,
+      rbi: rbi,
+      starters: starters.where((row) => _asInt(row['id_game']) == entry.key).toList(),
+    );
   }
   return lineups;
 }
@@ -80,6 +91,7 @@ List<Map<String, dynamic>> _lineupOf(
   required Map<String, String> plays,
   required Set<String> pitchers,
   Map<String, int> rbi = const {},
+  List<Map<String, dynamic>> starters = const [],
 }) {
   _fillBattingOrders(rows);
   final slots = <String, List<String>>{};
@@ -206,6 +218,18 @@ List<Map<String, dynamic>> _lineupOf(
     final pos = _defenseLabel('${row['code_position_from'] ?? ''}');
     if (pos.isNotEmpty && batter.isNotEmpty) positions.putIfAbsent('$batting|$batter', () => pos);
     place(batting, order, batter);
+  }
+
+  for (final starter in starters) {
+    final team = _asInt(starter['id_team']);
+    final order = _asInt(starter['int_batting_order']);
+    final name = _name(starter['name_full'] ?? starter['name']);
+    final pos = _defenseLabel('${starter['code_position_from'] ?? starter['pos'] ?? ''}');
+    if (team <= 0 || order < 1 || order > 9 || name.isEmpty) continue;
+    if (pos.isNotEmpty) positions.putIfAbsent('$team|$name', () => pos);
+    if (listed(team, name)) continue;
+    final slot = slots.putIfAbsent('$team|$order', () => <String>[]);
+    slot.insert(0, name);
   }
 
   final result = <Map<String, dynamic>>[];

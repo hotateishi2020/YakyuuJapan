@@ -80,6 +80,10 @@ bool playerNameMatches({
     // イニシャル未登録でも、姓一致を候補に（後段で一意なら採用）
     if (_surnameMatches(full, qSur) || _surnameMatches(last, qSur)) return true;
   } else {
+    // ブレーデン・モンゴメリー ↔ コルソン・モンゴメリー は別人。
+    if (_isFullPersonalName(q) && _isFullPersonalName(fullParts) && q.compact != fullParts.compact) {
+      return false;
+    }
     // モンゴメリー ↔ ブレーデン・モンゴメリー
     if (_surnameMatches(full, q.compact) || _surnameMatches(last, q.compact)) return true;
     if (_surnameMatches(q.compact, fullParts.surname) || _surnameMatches(q.compact, lastParts.surname)) return true;
@@ -92,6 +96,11 @@ bool playerNameMatches({
     }
   }
   return false;
+}
+
+bool _isFullPersonalName(PlayerNameParts parts) {
+  if (parts.hasInitial) return false;
+  return parts.compact.contains('・') && parts.surname.isNotEmpty && parts.core != parts.surname;
 }
 
 bool _surnameMatches(String fullOrLast, String surname) {

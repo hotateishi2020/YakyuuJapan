@@ -84,6 +84,46 @@ String scoreStateFromTransition({
   return '';
 }
 
+/// 速報本文の「ツーラン」・走者・スコア差のうち、いちばん大きい打点を採用する。
+/// スコア差だけだと走者なしソロに落ちることがある。
+int preferredLiveRuns({
+  required String result,
+  required int linguisticRuns,
+  required bool runnerFirst,
+  required bool runnerSecond,
+  required bool runnerThird,
+  int scoreDelta = 0,
+}) {
+  var runs = scoreDelta > 0 ? scoreDelta : 0;
+  if (linguisticRuns > runs) runs = linguisticRuns;
+  if (result == Value.CodeGameResult.HOME_RUN) {
+    final fromRunners = 1 + (runnerFirst ? 1 : 0) + (runnerSecond ? 1 : 0) + (runnerThird ? 1 : 0);
+    if (fromRunners > runs) runs = fromRunners;
+  }
+  return runs;
+}
+
+String richerStateScore(String current, String incoming) {
+  if (current == Value.CodeStateScore.FIRST) return current;
+  if (incoming.isNotEmpty) return incoming;
+  return current;
+}
+
+int halfOrd(int inning, bool bottom) => inning * 2 + (bottom ? 1 : 0);
+
+/// 出場成績の打席数が増えた最初の半回から書き直す。それより前は残す。
+int resumeHalfOrd({
+  required Map<int, int> storedCounts,
+  required Map<int, int> boxCounts,
+}) {
+  if (storedCounts.isEmpty) return 0;
+  final ords = boxCounts.keys.toList()..sort();
+  for (final ord in ords) {
+    if ((storedCounts[ord] ?? 0) < (boxCounts[ord] ?? 0)) return ord;
+  }
+  return ords.isEmpty ? 0 : ords.last;
+}
+
 final Set<String> livePlateFinishedResults = {
   Value.CodeGameResult.HIT_SINGLE,
   Value.CodeGameResult.HIT_DOUBLE,
@@ -233,7 +273,44 @@ class LiveText {
       ));
     }
 
-    return ParsedLiveText(halves: _withoutExtraPlates(halves), finished: finished, positions: positions);
+    return ParsedLiveText(halves: _withoutExtraPlates(_inPlayOrder(halves)), finished: finished, positions: positions);
+  }
+
+  /// Yahoo MLB のテキスト速報は新しいイニング・打席が先に来る。打席数の整合は古い順で見る。
+  static List<ParsedHalf> _inPlayOrder(List<ParsedHalf> halves) {
+    final sorted = [...halves]..sort((a, b) {
+      final byInning = a.inning.compareTo(b.inning);
+      if (byInning != 0) return byInning;
+      return (a.bottom ? 1 : 0).compareTo(b.bottom ? 1 : 0);
+    });
+    return [
+      for (final half in sorted)
+        ParsedHalf(inning: half.inning, bottom: half.bottom, plates: _inPlateOrder(half.plates)),
+    ];
+  }
+
+  static List<ParsedPlate> _inPlateOrder(List<ParsedPlate> plates) {
+    if (plates.length < 2 || !_platesNewestFirst(plates)) return plates;
+    return plates.reversed.toList();
+  }
+
+  static bool _platesNewestFirst(List<ParsedPlate> plates) {
+    if (plates.last.outs < plates.first.outs) return true;
+    if (plates.last.outs > plates.first.outs) return false;
+    var forward = 0;
+    var backward = 0;
+    for (var i = 0; i < plates.length - 1; i++) {
+      final from = plates[i].battingOrder;
+      final to = plates[i + 1].battingOrder;
+      if (from < 1 || from > 9 || to < 1 || to > 9 || from == to) continue;
+      final step = (to - from + 9) % 9;
+      if (step <= 4) {
+        forward++;
+      } else {
+        backward++;
+      }
+    }
+    return backward > forward;
   }
 
   static Map<bool, Map<String, String>> _starterPositions(Element root) {

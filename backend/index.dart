@@ -89,11 +89,58 @@ Future<Map<String, dynamic>> _buildPredictionsPartPlayers(OrgKind org, int year)
   };
 }
 
-Future<Map<String, dynamic>> _buildPredictionsPartGames(OrgKind org, int year) async {
+String? _queryYmd(String? raw) {
+  final text = (raw ?? '').trim();
+  return RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(text) ? text : null;
+}
+
+({String? from, String? to}) _gamesQueryWindow(Request request) {
+  final date = _queryYmd(request.url.queryParameters['date']);
+  final from = _queryYmd(request.url.queryParameters['from']) ?? date;
+  final to = _queryYmd(request.url.queryParameters['to']) ?? date;
+  if (from == null || to == null) return (from: null, to: null);
+  return from.compareTo(to) <= 0 ? (from: from, to: to) : (from: to, to: from);
+}
+
+String _ymdOf(DateTime date) {
+  final month = date.month.toString().padLeft(2, '0');
+  final day = date.day.toString().padLeft(2, '0');
+  return '${date.year}-$month-$day';
+}
+
+({String from, String to}) _defaultGamesWindow(int year, List<Map<String, dynamic>> games) {
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  if (year == today.year) {
+    return (
+      from: _ymdOf(today.subtract(Duration(days: AppSql.gamesPastDays))),
+      to: _ymdOf(today.add(Duration(days: AppSql.gamesFutureDays))),
+    );
+  }
+  DateTime? min;
+  DateTime? max;
+  for (final game in games) {
+    final parsed = DateTime.tryParse('${game['date_game'] ?? ''}');
+    if (parsed == null) continue;
+    final day = DateTime(parsed.year, parsed.month, parsed.day);
+    if (min == null || day.isBefore(min)) min = day;
+    if (max == null || day.isAfter(max)) max = day;
+  }
+  return (from: min == null ? '' : _ymdOf(min), to: max == null ? '' : _ymdOf(max));
+}
+
+Future<Map<String, dynamic>> _buildPredictionsPartGames(
+  OrgKind org,
+  int year, {
+  String? from,
+  String? to,
+}) async {
+  final ranged = from != null && to != null;
+  final data = ranged ? <Object>[year, from, to] : <Object>[year];
   final results = await Postgres.mapParallel([
-    (conn) => Postgres.execute(conn, AppSql.selectGames(), data: [year]),
-    (conn) => Postgres.execute(conn, AppSql.selectGamePlayRows(), data: [year]),
-    (conn) => Postgres.execute(conn, AppSql.selectBattingLines(), data: [year]),
+    (conn) => Postgres.execute(conn, AppSql.selectGames(ranged: ranged), data: data),
+    (conn) => Postgres.execute(conn, AppSql.selectGamePlayRows(ranged: ranged), data: data),
+    (conn) => Postgres.execute(conn, AppSql.selectBattingLines(ranged: ranged), data: data),
   ]);
   final extras = await Postgres.mapParallel([
     (conn) => Postgres.execute(conn, AppSql.selectPostseasonGames(), data: [year]),
@@ -137,15 +184,23 @@ Future<Map<String, dynamic>> _buildPredictionsPartGames(OrgKind org, int year) a
     plays: playLabels,
     pitchers: pitcherKeysOf(gameRows),
     rbi: {for (final entry in battingLines.entries) entry.key: _asInt(entry.value['int_rbi'])},
+    starters: _lineupStartersOf(battingLines),
   );
   for (final game in games) {
     game['lineup'] = lineups[_asInt(game['id_game'])] ?? const <Map<String, dynamic>>[];
   }
   final leagueIds = org.leagueIds;
+  final windowFrom = from;
+  final windowTo = to;
+  final window = windowFrom != null && windowTo != null
+      ? (from: windowFrom, to: windowTo)
+      : _defaultGamesWindow(year, games);
   return {
     'org': org.code,
     'year': year,
     'part': 'games',
+    'from': window.from,
+    'to': window.to,
     'games': _filterByLeagues(games, leagueIds, keys: const ['id_league_home', 'id_league_away']),
     'postseason_games': _dedupeSameDayMatchups(Postgres.toJson(extras[0])),
     'show_postseason_board':
@@ -153,7 +208,13 @@ Future<Map<String, dynamic>> _buildPredictionsPartGames(OrgKind org, int year) a
   };
 }
 
-Future<Map<String, dynamic>> _buildPredictionsPart(String part, OrgKind org, int year) {
+Future<Map<String, dynamic>> _buildPredictionsPart(
+  String part,
+  OrgKind org,
+  int year, {
+  String? from,
+  String? to,
+}) {
   switch (part) {
     case 'info':
       return _buildPredictionsPartInfo(org);
@@ -162,7 +223,7 @@ Future<Map<String, dynamic>> _buildPredictionsPart(String part, OrgKind org, int
     case 'players':
       return _buildPredictionsPartPlayers(org, year);
     case 'games':
-      return _buildPredictionsPartGames(org, year);
+      return _buildPredictionsPartGames(org, year, from: from, to: to);
     default:
       throw ArgumentError('unknown part: $part');
   }
@@ -241,11 +302,16 @@ String _dayMatchupKey(Map<String, dynamic> game) {
 
 bool _rowFinished(Map<String, dynamic> game) => '${game['state'] ?? ''}'.contains('試合終了');
 
+bool _rowInProgress(Map<String, dynamic> game) {
+  final state = '${game['state'] ?? ''}';
+  return state.contains('試合中') || RegExp(r'\d+\s*回').hasMatch(state);
+}
+
 int _gameRowQuality(Map<String, dynamic> game) {
   var score = 0;
   final state = '${game['state'] ?? ''}';
   if (state.contains('試合終了')) score += 50;
-  if (state.contains('試合中')) score += 40;
+  if (_rowInProgress(game)) score += 40;
   if ('${game['time_game'] ?? ''}'.trim().isNotEmpty) score += 20;
   final summaries = game['summaries'];
   if (summaries is List) score += summaries.length * 5;
@@ -317,7 +383,7 @@ bool _yahooHistoricalMix(Map<String, dynamic> a, Map<String, dynamic> b) {
   return _yahooGameSource(a) != _yahooGameSource(b);
 }
 
-bool _rowUnstarted(Map<String, dynamic> game) => !_rowFinished(game);
+bool _rowUnstarted(Map<String, dynamic> game) => !_rowFinished(game) && !_rowInProgress(game);
 
 bool _nearSameGameDay(Map<String, dynamic> a, Map<String, dynamic> b) {
   String dateOnly(dynamic value) {
@@ -347,7 +413,10 @@ List<Map<String, dynamic>> _mergeAdjacentScoreDupes(List<Map<String, dynamic>> g
           _rowFinished(other) &&
           '${best['score_home']}|${best['score_away']}' == '${other['score_home']}|${other['score_away']}';
       final importPregame = _rowUnstarted(best) && _rowUnstarted(other) && _yahooHistoricalMix(best, other);
-      if (!finishedPair && !importPregame) continue;
+      final liveVsImport = ((_rowInProgress(best) && _rowUnstarted(other)) ||
+              (_rowUnstarted(best) && _rowInProgress(other))) &&
+          _yahooHistoricalMix(best, other);
+      if (!finishedPair && !importPregame && !liveVsImport) continue;
       if (!_nearSameGameDay(best, other)) continue;
       used[j] = true;
       if (_gameRowQuality(other) > _gameRowQuality(best)) best = other;
@@ -373,6 +442,20 @@ bool _isStarter(Map<String, dynamic> row) {
   final name = '${row['name_full_summary'] ?? ''}'.trim();
   if (name.isEmpty) return false;
   return name == '${row['name_pitcher_home'] ?? ''}'.trim() || name == '${row['name_pitcher_away'] ?? ''}'.trim();
+}
+
+List<Map<String, dynamic>> _lineupStartersOf(Map<String, Map<String, dynamic>> lines) {
+  return [
+    for (final row in lines.values)
+      if (_asInt(row['int_batting_order']) >= 1 && _asInt(row['int_batting_order']) <= 9)
+        {
+          'id_game': row['id_game'],
+          'id_team': row['id_team'],
+          'name_full': row['name_full'],
+          'int_batting_order': row['int_batting_order'],
+          'code_position_from': row['code_position_from'] ?? '',
+        },
+  ];
 }
 
 Map<String, Map<String, dynamic>> _battingLinesOf(List<Map<String, dynamic>> rows) {
@@ -853,7 +936,10 @@ void main() async {
             headers: {'content-type': 'application/json; charset=utf-8'},
           );
         }
-        final cacheKey = '${org.code}|$part|$year';
+        final window = part == 'games' ? _gamesQueryWindow(request) : (from: null, to: null);
+        final cacheKey = window.from != null
+            ? '${org.code}|$part|$year|${window.from}|${window.to}'
+            : '${org.code}|$part|$year';
         final now = DateTime.now();
         if (request.url.queryParameters['fresh'] != '1') {
           final cachedBody = _predictionsPartCacheBody[cacheKey];
@@ -870,7 +956,7 @@ void main() async {
             );
           }
         }
-        final payload = await _buildPredictionsPart(part, org, year);
+        final payload = await _buildPredictionsPart(part, org, year, from: window.from, to: window.to);
         final body = jsonEncode(payload);
         _predictionsPartCacheBody[cacheKey] = body;
         _predictionsPartCacheAt[cacheKey] = DateTime.now();
@@ -959,6 +1045,7 @@ void main() async {
           plays: playLabels,
           pitchers: pitcherKeysOf(gameRows),
           rbi: {for (final entry in battingLines.entries) entry.key: _asInt(entry.value['int_rbi'])},
+          starters: _lineupStartersOf(battingLines),
         );
         for (final game in games) {
           game['lineup'] = lineups[_asInt(game['id_game'])] ?? const <Map<String, dynamic>>[];
@@ -1061,6 +1148,71 @@ void main() async {
   }
 } // void main
 
+String _clipDb(String value, int max) {
+  if (value.length <= max) return value;
+  return value.substring(0, max);
+}
+
+void _printRequestError(Request request, Object e, StackTrace st) {
+  print("⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️");
+  print('🔥 ${request.requestedUri.path} ERROR: $e\n$st');
+  stderr.writeln('🔥 ${request.requestedUri.path} ERROR: $e\n$st');
+}
+
+void _notifyProgramError(Object e) {
+  try {
+    final username = 'hotateishi2012@yahoo.co.jp';
+    final password = '199424';
+    sendMail(username, password, 'プログラム上でエラーが発生しました', e.toString());
+  } catch (_) {}
+}
+
+Future<int> _saveErrorLog(Object e, String stacktrace, m_user user) async {
+  try {
+    final id = await Postgres.withConnection((conn) async {
+      return insertLogError(conn, e, stacktrace, user);
+    });
+    print("エラーログのDBに登録しました。");
+    return id;
+  } catch (e2, st2) {
+    print("エラーログのDB登録に失敗しました。");
+    print('🔥 error-log ERROR: $e2\n$st2');
+    try {
+      File('error_log.txt').writeAsStringSync(
+        '${DateTimeTool.getNow("")}\n$e\n$stacktrace\n---\n$e2\n$st2\n\n',
+        mode: FileMode.append,
+      );
+      print("エラーログをローカルディレクトリに書き込みました。");
+    } catch (_) {}
+    return 0;
+  }
+}
+
+Future<void> _saveAccessLog(Request request, m_user user, int idError) async {
+  try {
+    await Postgres.withConnection((conn) async {
+      final log = t_system_log();
+      log.method = _clipDb(request.method, 20);
+      log.category = _clipDb(user.category_system, 20);
+      log.code = _clipDb(user.code_system, 20);
+      log.memo = '';
+      log.flg_user = user.flg_user;
+      log.url = request.requestedUri.toString();
+      log.url_pre = "";
+      log.id_log_error = idError;
+      log.flg_check = false;
+      log.crtby = user.id;
+      log.crtpgm = _clipDb(user.code_system, 30);
+      log.updby = user.id;
+      log.updpgm = _clipDb(user.code_system, 30);
+      await Postgres.insert(conn, log);
+    });
+    print("操作ログを登録しました。【${user.code_system}】");
+  } catch (e, st) {
+    print('操作ログ登録失敗: $e\n$st');
+  }
+}
+
 /// 読み取り専用API: トランザクションなし。ログINSERTのみ別接続で行う。
 Future<Response> tryCatchAPIReadonly(
   Request request,
@@ -1072,58 +1224,21 @@ Future<Response> tryCatchAPIReadonly(
   var id_error = 0;
   final user = m_user();
   var response = Response.ok('ok');
+  user.category_system = category_system;
+  user.code_system = code_system;
+  user.flg_user = false;
   try {
     print("🌐Routing...【" + request.requestedUri.toString() + "】");
-    user.category_system = category_system;
-    user.code_system = code_system;
-    user.flg_user = false;
     await FetchURL.ensureGameDetailsVelo();
+    await FetchURL.ensureAppColumns();
     response = await callback();
   } catch (e, st) {
-    print("⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️");
-    print('🔥 /predictions ERROR: $e\n$st');
-    stderr.writeln('🔥 /predictions ERROR: $e\n$st');
-    try {
-      await Postgres.withConnection((conn) async {
-        id_error = await insertLogError(conn, e, st.toString(), user);
-      });
-      print("エラーログのDBに登録しました。");
-    } catch (e2, st2) {
-      print("エラーログのDB登録に失敗しました。");
-      print('🔥 /predictions ERROR: $e2\n$st2');
-    }
-    try {
-      final username = 'hotateishi2012@yahoo.co.jp';
-      final password = '199424';
-      sendMail(username, password, 'プログラム上でエラーが発生しました', e.toString());
-    } catch (_) {}
+    _printRequestError(request, e, st);
+    id_error = await _saveErrorLog(e, st.toString(), user);
+    _notifyProgramError(e);
     response = Response.internalServerError(body: 'データベースエラー: $e');
   } finally {
-    // 操作ログは応答をブロックしない（キャッシュHIT時の体感を特に改善）
-    unawaited(() async {
-      try {
-        await Postgres.withConnection((conn) async {
-          final log = t_system_log();
-          log.method = request.method;
-          log.category = user.category_system;
-          log.code = user.code_system;
-          log.memo = '';
-          log.flg_user = user.flg_user;
-          log.url = request.requestedUri.toString();
-          log.url_pre = "";
-          log.id_log_error = id_error;
-          log.flg_check = false;
-          log.crtby = user.id;
-          log.crtpgm = user.code_system;
-          log.updby = user.id;
-          log.updpgm = user.code_system;
-          await Postgres.insert(conn, log);
-        });
-        print("操作ログを登録しました。【${user.code_system}】");
-      } catch (e, st) {
-        print('操作ログ登録失敗: $e\n$st');
-      }
-    }());
+    unawaited(_saveAccessLog(request, user, id_error));
     print("🌐Responsed Successfully‼️【" + request.requestedUri.toString() + "】");
   }
   print('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
@@ -1135,102 +1250,35 @@ Future<Response> tryCatchAPI(Request request, String category_system, String cod
   var id_error = 0;
   final user = m_user();
   var response = Response.ok('ok');
-  await Postgres.openConnection((conn) async {
-    await Postgres.transactionCommit(conn, () async {
-      try {
-        //ログインユーザー情報
+  user.category_system = category_system;
+  user.code_system = code_system;
+  user.flg_user = false;
+  try {
+    await Postgres.openConnection((conn) async {
+      await Postgres.transactionCommit(conn, () async {
         print("🌐Routing...【" + request.requestedUri.toString() + "】");
         print("");
-
         await user.loadProperty(conn, 0);
         user.category_system = category_system;
         user.code_system = code_system;
         user.flg_user = false;
         await FetchURL.ensureGameDetailsVelo(conn);
-
+        await FetchURL.ensureAppColumns(conn);
         response = await callback(conn);
-      } catch (e, st) {
-        var flg_db_error = false;
-        print("⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️");
-        print("👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇👇");
-        print('🔥 /predictions ERROR: $e\n$st');
-        stderr.writeln('🔥 /predictions ERROR: $e\n$st');
-        print("👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆");
-        print("⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️ ERROR ⚠️⚠️⚠️⚠️⚠️⚠️");
-        try {
-          id_error = await insertLogError(conn, e, st.toString(), user);
-          print("エラーログのDBに登録しました。");
-        } catch (e, st) {
-          //エラーログの登録に失敗
-          flg_db_error = true;
-          print("エラーログのDB登録に失敗しました。");
-          print('🔥 /predictions ERROR: $e\n$st');
-          stderr.writeln('🔥 /predictions ERROR: $e\n$st');
-        } finally {
-          try {
-            //callback()内ので発生したエラーをメールで通知
-            final username = 'hotateishi2012@yahoo.co.jp';
-            final password = '199424';
-            sendMail(username, password, 'プログラム上でエラーが発生しました', e.toString());
-            print("プログラム上でのエラーを通知するメール送信に成功しました。");
-
-            if (flg_db_error) {
-              //エラーログがDBに残せなかったことをメールで通知
-              user.category_system = Value.SystemCode.Log.Error.NAME;
-              user.code_system = Value.SystemCode.Log.Error.Codes.MAIL;
-              sendMail(username, password, 'エラーログの登録に失敗しました。', e.toString());
-              print("エラーログの登録に失敗したことを通知するメール送信に成功しました。");
-            }
-          } catch (e, st) {
-            //メール送信失敗
-            print('🔥 /predictions ERROR: $e\n$st');
-            stderr.writeln('🔥 /predictions ERROR: $e\n$st');
-            if (flg_db_error) {
-              //メール送信失敗のエラーログを残す
-              print("プログラム上でのエラーを通知するメール送信に失敗しました。");
-              user.category_system = Value.SystemCode.Log.Error.NAME;
-              user.code_system = Value.SystemCode.Log.Error.Codes.MAIL;
-              id_error = await insertLogError(conn, e, st.toString(), user);
-            } else {
-              print("DB接続もメール送信もできない状態です。webサーバーのネットワーク接続に問題がある可能性があります。");
-              //webサーバーのローカルディレクトリにエラーログを書き込む。
-              final log_error = DateTimeTool.getNow("").toString() + "\n" + e.toString() + "\n" + st.toString() + "\n";
-              final file = File('error_log.txt');
-              file.writeAsStringSync(log_error);
-              print("エラーログをローカルディレクトリに書き込みました。");
-            }
-          }
-        }
-        response = Response.internalServerError(body: 'データベースエラー: $e');
-      } finally {
-        //操作ログを残す
-        final log = t_system_log();
-        log.method = request.method;
-        log.category = user.category_system;
-        log.code = user.code_system;
-        log.memo = '';
-        log.flg_user = user.flg_user;
-        log.url = request.requestedUri.toString();
-        log.url_pre = "";
-        log.id_log_error = id_error;
-        log.flg_check = false;
-        log.crtby = user.id;
-        log.crtpgm = user.code_system;
-        log.updby = user.id;
-        log.updpgm = user.code_system;
-
-        await Postgres.insert(conn, log);
-
-        print("操作ログを登録しました。【${user.code_system}】");
-
-        print("");
-        print("🌐Responsed Successfully‼️【" + request.requestedUri.toString() + "】");
-      }
-    }); //transactionCommit
-  }); // connectionOpenClose
+      });
+    });
+  } catch (e, st) {
+    _printRequestError(request, e, st);
+    id_error = await _saveErrorLog(e, st.toString(), user);
+    _notifyProgramError(e);
+    response = Response.internalServerError(body: 'データベースエラー: $e');
+  } finally {
+    unawaited(_saveAccessLog(request, user, id_error));
+    print("🌐Responsed Successfully‼️【" + request.requestedUri.toString() + "】");
+  }
   print('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
   return response;
-} //commonTryCatch
+}
 
 void sendMail(String mailaddress, String password, String title, String text) async {
   // Yahoo SMTP
@@ -1257,10 +1305,10 @@ Future<int> insertLogError(Connection conn, Object e, String stacktrace, m_user 
   log_error.message_error = e.toString();
   log_error.stacktrace = stacktrace;
   log_error.flg_check = false;
-  log_error.code_log_system = user.code_system;
+  log_error.code_log_system = _clipDb(user.code_system, 20);
   log_error.crtby = user.id;
-  log_error.crtpgm = user.code_system;
+  log_error.crtpgm = _clipDb(user.code_system, 30);
   log_error.updby = user.id;
-  log_error.updpgm = user.code_system;
+  log_error.updpgm = _clipDb(user.code_system, 30);
   return await Postgres.insert(conn, log_error);
 }

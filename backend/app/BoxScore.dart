@@ -1,6 +1,7 @@
 import 'package:html/dom.dart';
 
 import '../tools/StringTool.dart';
+import 'LiveText.dart';
 import 'PlayerName.dart';
 import 'Value.dart';
 
@@ -236,6 +237,57 @@ List<BoxPlate> parseBoxPlates(Document doc, int idTeamAway, int idTeamHome) {
   return plates;
 }
 
+class BoxStarter {
+  final int teamId;
+  final int order;
+  final String name;
+  final String position;
+
+  const BoxStarter({
+    required this.teamId,
+    required this.order,
+    required this.name,
+    required this.position,
+  });
+}
+
+/// 出場成績の先発9人。まだ打席が無くても打順と守備位置を返す。
+List<BoxStarter> parseBoxStarters(Document doc, int idTeamAway, int idTeamHome) {
+  final starters = <BoxStarter>[];
+  for (final group in batterStatsGroups(doc, idTeamAway, idTeamHome)) {
+    var teamId = group.teamId;
+    var switched = false;
+    var order = 0;
+    for (final row in group.rows) {
+      if (row.querySelector('th') != null) {
+        if (group.switchOnTh && !switched) {
+          teamId = idTeamHome;
+          switched = true;
+          order = 0;
+        }
+        continue;
+      }
+      final tds = row.querySelectorAll('td');
+      if (tds.length < 2) continue;
+      final name = StringTool.noSpace(tds[1].text);
+      if (name.isEmpty) continue;
+      if (!_isStarterSlot(tds.first.text) || order >= 9) continue;
+      order++;
+      starters.add(BoxStarter(
+        teamId: teamId,
+        order: order,
+        name: name,
+        position: _badgePosition(tds.first.text),
+      ));
+    }
+  }
+  return starters;
+}
+
+bool isBoxStarterSlot(String raw) => _isStarterSlot(raw);
+
+String boxBadgePosition(String raw) => _badgePosition(raw);
+
 /// 出場成績の略記（遊ゴロ、左２、空三振、故意四）を結果コードにする。
 _BoxPlay? classifyBoxPlay(String raw) {
   final text = raw.replaceAll(RegExp(r'\s+'), '');
@@ -321,6 +373,132 @@ BoxPlate? _takePlate(List<BoxPlate> plates, LivePlateNote note) {
   }
   if (fallback != null) fallback.matched = true;
   return fallback;
+}
+
+int _orderDistance(int order, int start) {
+  if (order < 1 || order > 9) return 30;
+  return (order - start + 9) % 9;
+}
+
+/// 出場成績の seq は打者表の並びなので、イニング内は前の回の続きの打順で見る。
+List<BoxPlate> platesInPlayOrder(List<BoxPlate> plates) {
+  final halves = <({int inning, bool bottom, List<BoxPlate> plates})>[];
+  for (final plate in plates) {
+    final found = halves.where((half) => half.inning == plate.inning && half.bottom == plate.bottom);
+    if (found.isEmpty) {
+      halves.add((inning: plate.inning, bottom: plate.bottom, plates: [plate]));
+    } else {
+      found.first.plates.add(plate);
+    }
+  }
+  halves.sort((a, b) {
+    final byInning = a.inning.compareTo(b.inning);
+    if (byInning != 0) return byInning;
+    return (a.bottom ? 1 : 0).compareTo(b.bottom ? 1 : 0);
+  });
+  var startAway = 1;
+  var startHome = 1;
+  final ordered = <BoxPlate>[];
+  for (final half in halves) {
+    final start = half.bottom ? startHome : startAway;
+    half.plates.sort((a, b) {
+      final byDist = _orderDistance(a.order, start).compareTo(_orderDistance(b.order, start));
+      if (byDist != 0) return byDist;
+      return a.seq.compareTo(b.seq);
+    });
+    ordered.addAll(half.plates);
+    final last = half.plates.last.order;
+    if (last >= 1 && last <= 9) {
+      final next = last == 9 ? 1 : last + 1;
+      if (half.bottom) {
+        startHome = next;
+      } else {
+        startAway = next;
+      }
+    }
+  }
+  return ordered;
+}
+
+/// 速報が付いていない本塁打でも、直前の出塁から打点と先制などを補う。
+void applyBoxPlateScoring(List<BoxPlate> plates) {
+  if (plates.isEmpty) return;
+  final ordered = platesInPlayOrder(plates);
+  var first = false;
+  var second = false;
+  var third = false;
+  var inning = 0;
+  var bottom = false;
+  var scoreHome = 0;
+  var scoreAway = 0;
+  final r = Value.CodeGameResult;
+  for (final plate in ordered) {
+    if (plate.inning != inning || plate.bottom != bottom) {
+      first = false;
+      second = false;
+      third = false;
+      inning = plate.inning;
+      bottom = plate.bottom;
+    }
+    if (!plate.matched) {
+      plate.runnerFirst = first;
+      plate.runnerSecond = second;
+      plate.runnerThird = third;
+      plate.scoreHome = scoreHome;
+      plate.scoreAway = scoreAway;
+    }
+    if (plate.result == r.HOME_RUN) {
+      final fromRunners = 1 + (plate.runnerFirst ? 1 : 0) + (plate.runnerSecond ? 1 : 0) + (plate.runnerThird ? 1 : 0);
+      if (plate.runs < fromRunners) plate.runs = fromRunners;
+    }
+    if (plate.runs > 0 && plate.stateScore.isEmpty) {
+      final afterHome = plate.bottom ? scoreHome + plate.runs : scoreHome;
+      final afterAway = plate.bottom ? scoreAway : scoreAway + plate.runs;
+      plate.stateScore = scoreStateFromTransition(
+        bottom: plate.bottom,
+        beforeHome: scoreHome,
+        beforeAway: scoreAway,
+        afterHome: afterHome,
+        afterAway: afterAway,
+      );
+    }
+    if (plate.runs > 0) {
+      if (plate.bottom) {
+        scoreHome += plate.runs;
+      } else {
+        scoreAway += plate.runs;
+      }
+    }
+    if (plate.result == r.HOME_RUN) {
+      first = false;
+      second = false;
+      third = false;
+    } else if (plate.result == r.HIT_DOUBLE) {
+      third = first || second;
+      second = true;
+      first = false;
+    } else if (plate.result == r.HIT_TRIPLE) {
+      first = false;
+      second = false;
+      third = true;
+    } else if (plate.result == r.OUT_DOUBLE_PLAY) {
+      first = false;
+      second = false;
+      third = false;
+    } else if (plate.result == r.SACRIFICE_FLY) {
+      third = false;
+    } else if (plate.result == r.HIT_SINGLE ||
+        plate.result == r.WALK_BALL ||
+        plate.result == r.WALK_DEAD ||
+        plate.result == r.ERROR_FIELDING ||
+        plate.result == r.INTERFERENCE_BATTING ||
+        plate.result == r.FIELDERS_CHOICE ||
+        plate.result == r.DROPPED_THIRD) {
+      third = second;
+      second = first;
+      first = true;
+    }
+  }
 }
 
 bool _sameBatter(String boxName, String liveName) {

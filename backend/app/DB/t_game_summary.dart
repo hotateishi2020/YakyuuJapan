@@ -16,6 +16,8 @@ class t_game_summary extends DBModel {
   int int_rbi = 0;
   int int_steal_base = 0;
   int int_error = 0;
+  int int_batting_order = 0;
+  String code_position_from = '';
   double double_inning_pitch = 0.0;
   int int_pitch = 0;
   int int_hit = 0;
@@ -52,6 +54,8 @@ class t_game_summary extends DBModel {
         "int_rbi": int_rbi,
         "int_steal_base": int_steal_base,
         "int_error": int_error,
+        "int_batting_order": int_batting_order,
+        "code_position_from": code_position_from,
         "double_inning_pitch": double_inning_pitch,
         "int_pitch": int_pitch,
         "int_hit": int_hit,

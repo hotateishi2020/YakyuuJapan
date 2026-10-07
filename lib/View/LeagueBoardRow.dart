@@ -24,6 +24,11 @@ class LeagueBoardRow extends StatelessWidget {
   final bool loadingGames;
   final int seasonYear;
   final String? gamesDateFilter;
+  final Future<void> Function(DateTime date)? onNeedGameDate;
+  final bool Function(DateTime date)? shouldLoadGameDate;
+  final String? loadingGameDate;
+  final int gameDateOffset;
+  final ValueChanged<int>? onGameDateOffsetChanged;
 
   final String leagueLabelPrefix;
 
@@ -50,6 +55,11 @@ class LeagueBoardRow extends StatelessWidget {
     this.loadingGames = false,
     this.seasonYear = 0,
     this.gamesDateFilter,
+    this.onNeedGameDate,
+    this.shouldLoadGameDate,
+    this.loadingGameDate,
+    this.gameDateOffset = 0,
+    this.onGameDateOffsetChanged,
   });
 
   List<Map<String, dynamic>> get _leagueGames => games.where((g) => (int.tryParse('${g['id_league_home']}') ?? 0) == leagueId && (int.tryParse('${g['id_league_away']}') ?? 0) == leagueId).toList();
@@ -70,6 +80,11 @@ class LeagueBoardRow extends StatelessWidget {
       loadingStats: loadingStats,
       loadingGames: loadingGames,
       seasonYear: seasonYear,
+      onNeedGameDate: onNeedGameDate,
+      shouldLoadGameDate: shouldLoadGameDate,
+      loadingGameDate: loadingGameDate,
+      gameDateOffset: gameDateOffset,
+      onGameDateOffsetChanged: onGameDateOffsetChanged,
     );
 
     // リーグ切替タブがあるため左のリーグ名ヘッダーは出さない

@@ -184,4 +184,32 @@ void main() {
     expect(rows, hasLength(1));
     expect(rows.first['id_game'], 652);
   });
+
+  test('進行中のYahoo試合は歴史の試合前より優先する', () {
+    final rows = dedupeSameDayMatchupRows([
+      {
+        'code_game': 'DS',
+        'id_team_home': 41,
+        'id_team_away': 35,
+        'score_home': 0,
+        'score_away': 0,
+        'state': '2回表',
+        'date_game': '2026-10-07',
+        'time_game': '☀️ 07:00',
+        'id_game': 651,
+      },
+      {
+        'code_game': 'DS',
+        'id_team_home': 41,
+        'id_team_away': 35,
+        'state': '試合前',
+        'date_game': '2026-10-07',
+        'time_game': '🌙 22:00',
+        'id_game': 3328,
+      },
+    ]);
+    expect(rows, hasLength(1));
+    expect(rows.single['id_game'], 651);
+    expect(rows.single['state'], '2回表');
+  });
 }

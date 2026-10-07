@@ -27,6 +27,9 @@ import 'package:intl/intl.dart';
 import 'package:postgres/postgres.dart';
 import 'package:shelf/shelf.dart';
 import 'BirthPlaceRegistry.dart';
+import 'GameFetchSchedule.dart';
+import 'GameStatsLoad.dart';
+import 'OrgLeague.dart';
 import 'Postseason.dart';
 import 'Value.dart';
 import 'YahooTeamNames.dart';
@@ -58,19 +61,72 @@ class FetchURL {
   }
 
   static bool _veloColumnReady = false;
+  static bool _appColumnsReady = false;
+  static Future<void>? _veloFlight;
+  static Future<void>? _appColumnsFlight;
 
-  static Future<void> ensureGameDetailsVelo([Connection? conn]) async {
-    if (_veloColumnReady) return;
-    Future<void> run(Connection c) async {
-      await c.execute('ALTER TABLE t_game_details ADD COLUMN IF NOT EXISTS int_velo integer');
-      _veloColumnReady = true;
-    }
-
-    if (conn != null) {
-      await run(conn);
+  static Future<void> _runOnce({
+    required bool ready,
+    required Future<void>? flight,
+    required void Function(Future<void>? next) setFlight,
+    required Future<void> Function(Connection c) run,
+    Connection? conn,
+  }) async {
+    if (ready) return;
+    final existing = flight;
+    if (existing != null) {
+      await existing;
       return;
     }
-    await Postgres.withConnection(run);
+    final done = Completer<void>();
+    setFlight(done.future);
+    try {
+      if (conn != null) {
+        await run(conn);
+      } else {
+        await Postgres.withConnection(run);
+      }
+      done.complete();
+    } catch (e, st) {
+      setFlight(null);
+      done.completeError(e, st);
+      rethrow;
+    }
+  }
+
+  static Future<void> ensureGameDetailsVelo([Connection? conn]) async {
+    await _runOnce(
+      ready: _veloColumnReady,
+      flight: _veloFlight,
+      setFlight: (next) => _veloFlight = next,
+      conn: conn,
+      run: (c) async {
+        await c.execute('ALTER TABLE t_game_details ADD COLUMN IF NOT EXISTS int_velo integer');
+        _veloColumnReady = true;
+      },
+    );
+  }
+
+  /// 国名「ドミニカ共和国」や長い試合状態が varchar 上限で落ちないようにする。
+  static Future<void> ensureAppColumns([Connection? conn]) async {
+    await _runOnce(
+      ready: _appColumnsReady,
+      flight: _appColumnsFlight,
+      setFlight: (next) => _appColumnsFlight = next,
+      conn: conn,
+      run: (c) async {
+        await BirthPlaceRegistry.ensureSchema(c);
+        await c.execute('ALTER TABLE t_game ALTER COLUMN state TYPE varchar(80)');
+        await GameStatsLoad.ensureColumn(c);
+        await c.execute(
+          'ALTER TABLE t_game_summary ADD COLUMN IF NOT EXISTS int_batting_order integer NOT NULL DEFAULT 0',
+        );
+        await c.execute(
+          "ALTER TABLE t_game_summary ADD COLUMN IF NOT EXISTS code_position_from varchar(8) NOT NULL DEFAULT ''",
+        );
+        _appColumnsReady = true;
+      },
+    );
   }
 
   // Detect encoding (header/meta) and decode bytes accordingly (UTF-8 preferred)
@@ -361,6 +417,16 @@ class FetchURL {
     for (var i = -2; i <= 0; i++) {
       final date = now.add(Duration(days: i));
       final formatted = formatter.format(date);
+      if (await GameStatsLoad.skipPastSchedule(
+        conn,
+        org: 'npb',
+        date: date,
+        now: now,
+        leagueIds: OrgKind.npb.leagueIds,
+      )) {
+        print('NPBポストシーズン $formatted は成績済のためスキップ');
+        continue;
+      }
       final url = Uri.parse('https://baseball.yahoo.co.jp/npb/schedule/?date=$formatted');
       try {
         final document = await YahooHtml.fetchDocument(url);
@@ -405,32 +471,76 @@ class FetchURL {
       final existing = await Postgres.execute(conn, AppSql.selectGameOnDate(), data: [idHome, idAway, date]);
       if (existing.isEmpty) continue;
       final gameId = existing.first.toColumnMap()['id'] as int;
-      final haveVelo = await Postgres.execute(
-        conn,
-        'SELECT 1 FROM t_game_details WHERE id_game = \$1 AND COALESCE(int_velo, 0) > 0 LIMIT 1',
-        data: [gameId],
-      );
-      if (haveVelo.isNotEmpty && !state.contains('回')) continue;
+      final live = state.contains('回');
+      final loaded = await GameStatsLoad.isLoaded(conn, gameId);
+      if (!GameStatsLoad.needsRefresh(live: live, loaded: loaded)) continue;
       try {
-        await refreshGameDetails(conn, pageUrl, href, gameId, idHome, idAway, 0, 0);
+        await refreshGameDetails(conn, pageUrl, href, gameId, idHome, idAway, 0, 0, saveMaxVelo: state.contains('試合終了'));
+        await GameStatsLoad.markIfComplete(conn, gameId, finished: state.contains('試合終了'));
       } catch (e) {
         print('試合詳細の再取得に失敗しました ($awayName vs $homeName): $e');
       }
     }
   }
 
-  static Future<Response> fetchGamesNPB(Connection conn) async {
+  /// 今日の分だけ取り直し。全部読み終わっていたら次の 10 秒ループを止める。
+  static Future<bool> refreshTodayNPB() async {
+    var keep = true;
+    await Postgres.withConnection((conn) async {
+      await ensureGameDetailsVelo(conn);
+      await ensureAppColumns(conn);
+      try {
+        await Postgres.begin(conn);
+      } catch (_) {}
+      await fetchGamesNPB(conn, todayOnly: true);
+      try {
+        await Postgres.commit(conn);
+      } catch (_) {}
+      final key = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      keep = !await GameStatsLoad.isDateFullyLoaded(conn, key, OrgKind.npb.leagueIds);
+    });
+    return keep;
+  }
+
+  static Future<Response> fetchGamesNPB(Connection conn, {bool todayOnly = false}) async {
     await ensureGameDetailsVelo(conn);
     final now = DateTime.now();
-    final list_date = [
-      for (var i = -2; i <= 10; i++) now.add(Duration(days: i)),
-    ];
+    final includeFuture = !todayOnly && GameFetchSchedule.takeFuture('npb', now);
+    if (!todayOnly && !includeFuture) print('NPB明日以降は${GameFetchSchedule.futureInterval.inMinutes}分以内のためスキップ');
+    final list_date = todayOnly
+        ? [DateTime(now.year, now.month, now.day)]
+        : [
+            now,
+            for (var i = -2; i <= 10; i++)
+              if (i != 0 && (includeFuture || i <= 0)) now.add(Duration(days: i)),
+          ];
 
     for (var date in list_date) {
-      print(date.toString() + "の試合を取得します。");
-      var urlString = 'https://baseball.yahoo.co.jp/npb/schedule/?date=';
       final formatter = DateFormat('yyyy-MM-dd');
       final formatted = formatter.format(date);
+      final isToday = formatted == formatter.format(now);
+      var lockedToday = false;
+      if (isToday && !todayOnly) {
+        if (GameFetchSchedule.isTodayBusy('npb')) {
+          print('NPB $formatted は取得中のためスキップ');
+          continue;
+        }
+        GameFetchSchedule.markTodayBusy('npb', true);
+        lockedToday = true;
+      }
+      try {
+      if (await GameStatsLoad.skipPastSchedule(
+        conn,
+        org: 'npb',
+        date: date,
+        now: now,
+        leagueIds: OrgKind.npb.leagueIds,
+      )) {
+        print('NPB $formatted は成績済のためスキップ');
+        continue;
+      }
+      print(date.toString() + "の試合を取得します。");
+      var urlString = 'https://baseball.yahoo.co.jp/npb/schedule/?date=';
       final url = Uri.parse(urlString + formatted);
       final res = await http.get(url);
       print(urlString + formatted);
@@ -444,6 +554,15 @@ class FetchURL {
         final cardsRoot = document.querySelector('#gm_card');
         if (cardsRoot == null) {
           print('この日の試合カードはありません。');
+          if (GameFetchSchedule.isPastDay(date, now)) {
+            await GameStatsLoad.rememberPastDateIfSettled(
+              conn,
+              org: 'npb',
+              date: formatted,
+              leagueIds: OrgKind.npb.leagueIds,
+              emptySchedule: true,
+            );
+          }
           continue;
         }
         final leagues = cardsRoot.querySelectorAll('section');
@@ -737,8 +856,13 @@ class FetchURL {
               //DBに同じ日付、同じ組み合わせの試合が登録されている場合は更新する
               game.id = result_game.first.toColumnMap()['id'];
               await Postgres.update(conn, game);
-
-              if (date != now) {
+              final live = match_state.contains('回');
+              final loaded = await GameStatsLoad.isLoaded(conn, game.id);
+              if (!GameStatsLoad.needsRefresh(live: live, loaded: loaded)) {
+                print('NPB試合スキップ(成績済): $name_team_away vs $name_team_home');
+                continue;
+              }
+              if (date != now && !match_state.contains('試合終了') && !live) {
                 continue;
               }
               //打席結果を取得
@@ -763,10 +887,12 @@ class FetchURL {
 
                 // var idx_col = 0;
                 var id_team = id_team_away;
+                var battingOrder = 0;
                 for (var game_summary_away_row in game_summary_away_batting) {
                   //もしrow直下にthがある場合はスキップ
                   if (game_summary_away_row.querySelectorAll('th').isNotEmpty) {
                     id_team = id_team_home;
+                    battingOrder = 0;
                     continue;
                   }
                   var txt_batter = game_summary_away_row.querySelectorAll('td')[1].text.trim();
@@ -777,10 +903,15 @@ class FetchURL {
                     continue;
                   }
                   final id_player_result = result_player.first.toColumnMap()['id'];
+                  final badge = game_summary_away_row.querySelectorAll('td').first.text;
+                  final starterSlot = isBoxStarterSlot(badge);
+                  if (starterSlot && battingOrder < 9) battingOrder++;
 
                   var game_summary = t_game_summary();
                   game_summary.id_game = game.id;
                   game_summary.id_player = id_player_result;
+                  game_summary.int_batting_order = starterSlot ? battingOrder : 0;
+                  game_summary.code_position_from = boxBadgePosition(badge);
                   game_summary.int_batting = int.tryParse(game_summary_away_row.querySelectorAll('td')[3].text.trim()) ?? 0;
                   game_summary.int_homerun = int.tryParse(game_summary_away_row.querySelectorAll('td')[13].text.trim()) ?? 0;
                   game_summary.int_hit1 = int.tryParse(game_summary_away_row.querySelectorAll('td')[5].text.trim()) ?? 0;
@@ -898,6 +1029,7 @@ class FetchURL {
                   id_pitcher_home,
                   id_pitcher_away,
                   boxPlates: boxPlates,
+                  saveMaxVelo: match_state.contains('試合終了'),
                 );
               } catch (e, stacktrace) {
                 print('テキスト速報のスクレイピングに失敗しました。');
@@ -911,6 +1043,7 @@ class FetchURL {
                   print(stacktrace);
                 }
               }
+              await GameStatsLoad.markIfComplete(conn, game.id, finished: match_state.contains('試合終了'));
             }
           } //for card
         } //for league
@@ -922,6 +1055,20 @@ class FetchURL {
       print('');
       print(date.toString() + "の試合を全て取得しました。");
       print('');
+      if (GameFetchSchedule.isPastDay(date, now)) {
+        await GameStatsLoad.rememberPastDateIfSettled(
+          conn,
+          org: 'npb',
+          date: formatted,
+          leagueIds: OrgKind.npb.leagueIds,
+        );
+      }
+      } finally {
+        if (lockedToday) {
+          GameFetchSchedule.markTodayBusy('npb', false);
+          GameFetchSchedule.scheduleTodayAgain('npb', refreshTodayNPB);
+        }
+      }
     } //for 今日から10日後
     return Response.ok('ok');
   }
@@ -935,8 +1082,9 @@ class FetchURL {
     int idTeamHome,
     int idTeamAway,
     int idPitcherHome,
-    int idPitcherAway,
-  ) async {
+    int idPitcherAway, {
+    bool saveMaxVelo = true,
+  }) async {
     await ensureGameDetailsVelo(conn);
     var plates = <BoxPlate>[];
     final statsUrl = pageUrl.resolve(gamePageHref(urlHref, 'stats'));
@@ -957,6 +1105,7 @@ class FetchURL {
       idPitcherHome,
       idPitcherAway,
       boxPlates: plates,
+      saveMaxVelo: saveMaxVelo,
     );
   }
 
@@ -1044,7 +1193,14 @@ class FetchURL {
                   final newHome = resolved.home;
                   final newAway = resolved.away;
                   final delta = half.bottom ? newHome - scoreHome : newAway - scoreAway;
-                  runs = delta < 0 ? 0 : delta;
+                  runs = preferredLiveRuns(
+                    result: event.result,
+                    linguisticRuns: event.linguisticRuns,
+                    runnerFirst: plate.runnerFirst,
+                    runnerSecond: plate.runnerSecond,
+                    runnerThird: plate.runnerThird,
+                    scoreDelta: delta < 0 ? 0 : delta,
+                  );
                   absoluteHome = newHome;
                   absoluteAway = newAway;
                   if (stateScore.isEmpty && runs > 0) {
@@ -1057,7 +1213,22 @@ class FetchURL {
                     );
                   }
                 } else {
-                  runs = event.linguisticRuns;
+                  runs = preferredLiveRuns(
+                    result: event.result,
+                    linguisticRuns: event.linguisticRuns,
+                    runnerFirst: plate.runnerFirst,
+                    runnerSecond: plate.runnerSecond,
+                    runnerThird: plate.runnerThird,
+                  );
+                }
+                if (stateScore.isEmpty && runs > 0) {
+                  stateScore = scoreStateFromTransition(
+                    bottom: half.bottom,
+                    beforeHome: scoreHome,
+                    beforeAway: scoreAway,
+                    afterHome: half.bottom ? scoreHome + runs : scoreHome,
+                    afterAway: half.bottom ? scoreAway : scoreAway + runs,
+                  );
                 }
                 final timelyHit = event.timely && (event.result == Value.CodeGameResult.HIT_SINGLE || event.result == Value.CodeGameResult.HIT_DOUBLE || event.result == Value.CodeGameResult.HIT_TRIPLE);
                 if (timelyHit && runs < 1) runs = 1;
@@ -1120,6 +1291,33 @@ class FetchURL {
     }
 
     final placed = attachLiveNotes(boxPlates, notes);
+    applyBoxPlateScoring(boxPlates);
+    final storedRows = await Postgres.execute(conn, AppSql.selectGameDetails(), data: [gameId]);
+    final storedBatting = <({int inning, bool bottom, String result, int batter, int runs, String state})>[];
+    for (final row in storedRows) {
+      final map = row.toColumnMap();
+      final result = '${map['code_result'] ?? ''}';
+      if (!livePlateFinishedResults.contains(result)) continue;
+      storedBatting.add((
+        inning: _detailInt(map['int_inning']),
+        bottom: _detailBool(map['flg_bottom']),
+        result: result,
+        batter: _detailInt(map['id_batter']),
+        runs: _detailInt(map['int_runs']),
+        state: '${map['code_state_score'] ?? ''}',
+      ));
+    }
+    for (final plate in boxPlates) {
+      final batterId = playerId(plate.name, plate.teamId);
+      if (batterId == 0) continue;
+      for (final old in storedBatting) {
+        if (old.inning != plate.inning || old.bottom != plate.bottom || old.result != plate.result || old.batter != batterId) {
+          continue;
+        }
+        if (old.runs > plate.runs) plate.runs = old.runs;
+        plate.stateScore = richerStateScore(old.state, plate.stateScore);
+      }
+    }
     final details = <t_game_details>[];
     int dist(int order, int start) {
       if (order < 1 || order > 9) return 30;
@@ -1236,10 +1434,50 @@ class FetchURL {
       details.add(row.detail);
     }
     if (details.isEmpty) return;
+    final boxCounts = <int, int>{};
+    for (final plate in boxPlates) {
+      final ord = halfOrd(plate.inning, plate.bottom);
+      boxCounts[ord] = (boxCounts[ord] ?? 0) + 1;
+    }
+    final storedCounts = <int, int>{};
+    for (final old in storedBatting) {
+      final ord = halfOrd(old.inning, old.bottom);
+      storedCounts[ord] = (storedCounts[ord] ?? 0) + 1;
+    }
+    final resume = resumeHalfOrd(storedCounts: storedCounts, boxCounts: boxCounts);
     await Postgres.execute(conn, 'BEGIN');
     try {
-      await Postgres.execute(conn, AppSql.deleteGameDetails(), data: [gameId]);
-      await Postgres.insertMulti(conn, details);
+      if (resume <= 0) {
+        await Postgres.execute(conn, AppSql.deleteGameDetails(), data: [gameId]);
+        await Postgres.insertMulti(conn, details);
+      } else {
+        final resumeInning = resume ~/ 2;
+        final resumeBottom = resume.isOdd;
+        for (final plate in boxPlates) {
+          if (halfOrd(plate.inning, plate.bottom) >= resume) continue;
+          final batterId = playerId(plate.name, plate.teamId);
+          if (batterId == 0) continue;
+          if (plate.runs <= 0 && plate.stateScore.isEmpty) continue;
+          await Postgres.execute(conn, AppSql.enrichGameDetailScoring(), data: [
+            gameId,
+            plate.inning,
+            plate.bottom,
+            plate.result,
+            plate.runs,
+            plate.stateScore,
+            plate.runnerFirst,
+            plate.runnerSecond,
+            plate.runnerThird,
+            batterId,
+          ]);
+        }
+        await Postgres.execute(conn, AppSql.deleteGameDetailsFromHalf(), data: [gameId, resumeInning, resumeBottom]);
+        final fresh = [
+          for (final row in ordered)
+            if (halfOrd(row.inning, row.half == 1) >= resume) row.detail,
+        ];
+        if (fresh.isNotEmpty) await Postgres.insertMulti(conn, fresh);
+      }
       await Postgres.commit(conn);
     } catch (e) {
       await Postgres.rollback(conn);
@@ -1270,6 +1508,7 @@ class FetchURL {
     int idPitcherHome,
     int idPitcherAway, {
     List<BoxPlate> boxPlates = const [],
+    bool saveMaxVelo = true,
   }) async {
     await ensureGameDetailsVelo(conn);
     final urlText = pageUrl.resolve(gamePageHref(urlHref, 'text'));
@@ -1397,15 +1636,17 @@ class FetchURL {
         awayShortest: awayShortest,
         awayShort: awayShort,
       );
-      await _saveMaxPitchVelo(
-        conn: conn,
-        pageUrl: pageUrl,
-        urlHref: urlHref,
-        gameId: gameId,
-        playerId: playerId,
-        idTeamHome: idTeamHome,
-        idTeamAway: idTeamAway,
-      );
+      if (saveMaxVelo) {
+        await _saveMaxPitchVelo(
+          conn: conn,
+          pageUrl: pageUrl,
+          urlHref: urlHref,
+          gameId: gameId,
+          playerId: playerId,
+          idTeamHome: idTeamHome,
+          idTeamAway: idTeamAway,
+        );
+      }
       return;
     }
     if (parsed == null) return;
@@ -1560,7 +1801,14 @@ class FetchURL {
               final newHome = resolved.home;
               final newAway = resolved.away;
               final delta = half.bottom ? newHome - scoreHome : newAway - scoreAway;
-              detail.int_runs = delta < 0 ? 0 : delta;
+              detail.int_runs = preferredLiveRuns(
+                result: event.result,
+                linguisticRuns: event.linguisticRuns,
+                runnerFirst: plate.runnerFirst,
+                runnerSecond: plate.runnerSecond,
+                runnerThird: plate.runnerThird,
+                scoreDelta: delta < 0 ? 0 : delta,
+              );
               absoluteHome = newHome;
               absoluteAway = newAway;
               if (detail.code_state_score.isEmpty && detail.int_runs > 0) {
@@ -1573,7 +1821,22 @@ class FetchURL {
                 );
               }
             } else {
-              detail.int_runs = event.linguisticRuns;
+              detail.int_runs = preferredLiveRuns(
+                result: event.result,
+                linguisticRuns: event.linguisticRuns,
+                runnerFirst: plate.runnerFirst,
+                runnerSecond: plate.runnerSecond,
+                runnerThird: plate.runnerThird,
+              );
+            }
+            if (detail.code_state_score.isEmpty && detail.int_runs > 0) {
+              detail.code_state_score = scoreStateFromTransition(
+                bottom: half.bottom,
+                beforeHome: scoreHome,
+                beforeAway: scoreAway,
+                afterHome: half.bottom ? scoreHome + detail.int_runs : scoreHome,
+                afterAway: half.bottom ? scoreAway : scoreAway + detail.int_runs,
+              );
             }
             plateRuns = detail.int_runs;
             final timelyHit = event.timely && (event.result == Value.CodeGameResult.HIT_SINGLE || event.result == Value.CodeGameResult.HIT_DOUBLE || event.result == Value.CodeGameResult.HIT_TRIPLE);
@@ -1634,6 +1897,22 @@ class FetchURL {
     }
     if (pending.isEmpty) {
       print('テキスト速報に新しい打席はありません。');
+      if (saveMaxVelo) {
+        await _saveMaxPitchVelo(
+          conn: conn,
+          pageUrl: pageUrl,
+          urlHref: urlHref,
+          gameId: gameId,
+          playerId: playerId,
+          idTeamHome: idTeamHome,
+          idTeamAway: idTeamAway,
+        );
+      }
+      return;
+    }
+    await Postgres.insertMulti(conn, pending);
+    print('テキスト速報を${pending.length}件登録しました。');
+    if (saveMaxVelo) {
       await _saveMaxPitchVelo(
         conn: conn,
         pageUrl: pageUrl,
@@ -1643,19 +1922,7 @@ class FetchURL {
         idTeamHome: idTeamHome,
         idTeamAway: idTeamAway,
       );
-      return;
     }
-    await Postgres.insertMulti(conn, pending);
-    print('テキスト速報を${pending.length}件登録しました。');
-    await _saveMaxPitchVelo(
-      conn: conn,
-      pageUrl: pageUrl,
-      urlHref: urlHref,
-      gameId: gameId,
-      playerId: playerId,
-      idTeamHome: idTeamHome,
-      idTeamAway: idTeamAway,
-    );
   }
 
   /// 試合終了後に一球速報から投手ごとの最速球速を t_game_details.int_velo へ書く。

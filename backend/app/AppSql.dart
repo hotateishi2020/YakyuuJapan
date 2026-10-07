@@ -451,12 +451,21 @@ class AppSql {
     ''';
   }
 
-  /// 当年は今日±10日。過去年はその年の最終試合日から10日前〜最終日。
-  static String gameDateWindow({String alias = 't_game'}) {
+  /// 当年の初期表示は今日の3日前〜10日後。それより前は date/from/to で都度読む。
+  static const int gamesPastDays = 3;
+  static const int gamesFutureDays = 10;
+
+  static String gameDateWindow({String alias = 't_game', bool ranged = false}) {
+    if (ranged) {
+      return '''
+        $alias.datetime_start::date BETWEEN \$2::date AND \$3::date
+        AND EXTRACT(YEAR FROM $alias.datetime_start)::int = \$1::int
+      ''';
+    }
     return '''
       $alias.datetime_start::date BETWEEN
         CASE
-          WHEN \$1 = EXTRACT(YEAR FROM CURRENT_DATE)::int THEN CURRENT_DATE - 10
+          WHEN \$1 = EXTRACT(YEAR FROM CURRENT_DATE)::int THEN CURRENT_DATE - $gamesPastDays
           ELSE COALESCE(
             (SELECT MAX(gw.datetime_start)::date - 10 FROM t_game gw
              WHERE EXTRACT(YEAR FROM gw.datetime_start) = \$1
@@ -466,7 +475,7 @@ class AppSql {
         END
         AND
         CASE
-          WHEN \$1 = EXTRACT(YEAR FROM CURRENT_DATE)::int THEN CURRENT_DATE + 10
+          WHEN \$1 = EXTRACT(YEAR FROM CURRENT_DATE)::int THEN CURRENT_DATE + $gamesFutureDays
           ELSE COALESCE(
             (SELECT MAX(gw.datetime_start)::date FROM t_game gw
              WHERE EXTRACT(YEAR FROM gw.datetime_start) = \$1
@@ -477,7 +486,7 @@ class AppSql {
     ''';
   }
 
-  static String selectGames() {
+  static String selectGames({bool ranged = false}) {
     return '''
       WITH team_games AS (
         SELECT id, code_game, datetime_start, id_team_home AS id_team
@@ -706,7 +715,7 @@ class AppSql {
           FROM t_game_summary
             INNER JOIN t_game sg ON sg.id = t_game_summary.id_game
               AND COALESCE(sg.flg_delete, FALSE) = FALSE
-              AND ${gameDateWindow(alias: 'sg')}
+              AND ${gameDateWindow(alias: 'sg', ranged: ranged)}
             LEFT OUTER JOIN t_predict_player on t_predict_player.id_player = t_game_summary.id_player AND t_predict_player.year =  \$1
             LEFT OUTER JOIN m_player on m_player.id = t_game_summary.id_player
             LEFT OUTER JOIN m_stats on m_stats.id = t_predict_player.id_stats
@@ -718,7 +727,7 @@ class AppSql {
                   AND COALESCE(vg.flg_delete, FALSE) = FALSE
               WHERE COALESCE(d.flg_delete, FALSE) = FALSE
                 AND COALESCE(d.int_velo, 0) > 0
-                AND ${gameDateWindow(alias: 'vg')}
+                AND ${gameDateWindow(alias: 'vg', ranged: ranged)}
               GROUP BY d.id_game, d.id_pitcher
             ) velo ON velo.id_game = t_game_summary.id_game
                   AND velo.id_pitcher = t_game_summary.id_player
@@ -748,7 +757,7 @@ class AppSql {
             int_pitch, int_four, int_dead_pitching, int_strike_out, code_result_pitcher, int_hit, int_runs_earned, int_balk, t_game_summary.id, t_game_summary.id_player, t_game_summary.txt_homerun_total
           ORDER BY t_game_summary.id_game, m_player.id_team, flg_pitcher DESC, point_total DESC, t_game_summary.id 
         ) AS v_game_summary ON v_game_summary.id_game = t_game.id 
-      WHERE ${gameDateWindow(alias: 't_game')}
+      WHERE ${gameDateWindow(alias: 't_game', ranged: ranged)}
       GROUP BY t_game.id, t_game.datetime_start, team_home.name_short, team_away.name_short, team_home.name_shortest, team_away.name_shortest, pitcher_home.id, pitcher_home.name_full, pitcher_home.flg_ace, pitcher_away.id, pitcher_away.name_full, pitcher_away.flg_ace,
                pitcher_win.name_full, pitcher_lose.name_full, m_stadium.name_short, t_game.score_home, t_game.score_away,
                team_home.id_league, team_away.id_league, team_home.color_font, team_home.color_back, team_away.color_font,
@@ -764,7 +773,7 @@ class AppSql {
   }
 
   /// 表示中の試合について、全打席記録と欠けた打席表示を公式成績で確かめる。
-  static String selectBattingLines() {
+  static String selectBattingLines({bool ranged = false}) {
     return '''
       SELECT
         s.id_game,
@@ -780,11 +789,13 @@ class AppSql {
         s.int_sacrifice,
         s.int_rbi,
         s.int_error,
+        COALESCE(s.int_batting_order, 0) AS int_batting_order,
+        COALESCE(s.code_position_from, '') AS code_position_from,
         COALESCE(s.txt_homerun_total, '') AS txt_homerun_total
       FROM t_game_summary s
       JOIN m_player p ON p.id = s.id_player
       JOIN t_game g ON g.id = s.id_game
-      WHERE ${gameDateWindow(alias: 'g')}
+      WHERE ${gameDateWindow(alias: 'g', ranged: ranged)}
     ''';
   }
 
@@ -921,7 +932,7 @@ class AppSql {
     ''';
   }
 
-  static String selectGamePlayRows() {
+  static String selectGamePlayRows({bool ranged = false}) {
     return '''
       SELECT
         d.id,
@@ -957,7 +968,7 @@ class AppSql {
         INNER JOIN t_game g ON g.id = d.id_game
       WHERE COALESCE(d.flg_delete, false) = false
         AND d.id_batter <> 0
-        AND ${gameDateWindow(alias: 'g')}
+        AND ${gameDateWindow(alias: 'g', ranged: ranged)}
       ORDER BY d.id_game, d.id
     ''';
   }
@@ -974,6 +985,35 @@ class AppSql {
       DELETE FROM t_game_details
       WHERE id_game = \$1
         AND id >= \$2
+    ''';
+  }
+
+  static String deleteGameDetailsFromHalf() {
+    return '''
+      DELETE FROM t_game_details
+      WHERE id_game = \$1
+        AND (int_inning * 2 + CASE WHEN flg_bottom THEN 1 ELSE 0 END)
+          >= (\$2 * 2 + CASE WHEN \$3 THEN 1 ELSE 0 END)
+    ''';
+  }
+
+  static String enrichGameDetailScoring() {
+    return '''
+      UPDATE t_game_details
+      SET int_runs = CASE WHEN \$5::int > int_runs THEN \$5::int ELSE int_runs END,
+          code_state_score = CASE
+            WHEN code_state_score = 'FIRST' THEN code_state_score
+            WHEN COALESCE(\$6::text, '') <> '' THEN \$6::text
+            ELSE code_state_score
+          END,
+          flg_runner_first = flg_runner_first OR \$7::boolean,
+          flg_runner_second = flg_runner_second OR \$8::boolean,
+          flg_runner_third = flg_runner_third OR \$9::boolean
+      WHERE id_game = \$1
+        AND int_inning = \$2
+        AND flg_bottom = \$3
+        AND code_result = \$4
+        AND id_batter = \$10
     ''';
   }
 

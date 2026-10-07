@@ -15,6 +15,8 @@ class t_game extends DBModel {
   String state = '';
   String code_game = '';
   DateTime? datetime_start = null;
+  /// 終了試合の選手成績を取り終えたか。toMap には入れず、GameStatsLoad が単独で更新する。
+  bool flg_stats_loaded = false;
 
   Map<String, dynamic> toMap() {
     return super.toMap()

@@ -49,6 +49,11 @@ int _asInt(dynamic value) {
 
 bool _finished(Map<String, dynamic> game) => '${game['state'] ?? ''}'.contains('試合終了');
 
+bool _inProgress(Map<String, dynamic> game) {
+  final state = '${game['state'] ?? ''}';
+  return state.contains('試合中') || RegExp(r'\d+\s*回').hasMatch(state);
+}
+
 String _scoreKey(Map<String, dynamic> game) => '${game['score_home']}|${game['score_away']}';
 
 String _dayMatchupKey(Map<String, dynamic> game) {
@@ -64,7 +69,7 @@ int _quality(Map<String, dynamic> game) {
   var score = 0;
   final state = '${game['state'] ?? ''}';
   if (state.contains('試合終了')) score += 50;
-  if (state.contains('試合中')) score += 40;
+  if (_inProgress(game)) score += 40;
   if ('${game['time_game'] ?? ''}'.trim().isNotEmpty) score += 20;
   final summaries = game['summaries'];
   if (summaries is List) score += summaries.length * 5;
@@ -116,7 +121,7 @@ bool _importSourceMix(Map<String, dynamic> a, Map<String, dynamic> b) {
   return _yahooSource(a) != _yahooSource(b);
 }
 
-bool _unstarted(Map<String, dynamic> game) => !_finished(game);
+bool _unstarted(Map<String, dynamic> game) => !_finished(game) && !_inProgress(game);
 
 bool _nearSameDay(Map<String, dynamic> a, Map<String, dynamic> b) {
   if (_dateOnly(a['date_game']) == _dateOnly(b['date_game'])) return true;
@@ -140,7 +145,9 @@ List<Map<String, dynamic>> _mergeAdjacentScoreDupes(List<Map<String, dynamic>> g
       final other = games[j];
       final finishedPair = _finished(best) && _finished(other) && _scoreKey(best) == _scoreKey(other);
       final importPregame = _unstarted(best) && _unstarted(other) && _importSourceMix(best, other);
-      if (!finishedPair && !importPregame) continue;
+      final liveVsImport = ((_inProgress(best) && _unstarted(other)) || (_unstarted(best) && _inProgress(other))) &&
+          _importSourceMix(best, other);
+      if (!finishedPair && !importPregame && !liveVsImport) continue;
       if (!_nearSameDay(best, other)) continue;
       used[j] = true;
       if (_quality(other) > _quality(best)) best = other;

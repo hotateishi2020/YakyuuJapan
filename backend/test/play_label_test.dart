@@ -85,6 +85,25 @@ void main() {
     );
   });
 
+  test('三塁打のタイムリーは打球方向を残す', () {
+    expect(
+      formatPlayLabels([
+        _row(result: Value.CodeGameResult.HIT_TRIPLE, direction: 'LF', runs: 1, inning: 8),
+      ]),
+      'タイムリースリーベース^左|timely',
+    );
+  });
+
+  test('先制2ランホームランは先制と2ランを残す', () {
+    expect(
+      formatPlayLabels([
+        _row(result: Value.CodeGameResult.HOME_RUN, direction: 'LEFT', runs: 2)
+          ..['code_state_score'] = 'FIRST',
+      ]),
+      '先制2ランホームラン^左|hr',
+    );
+  });
+
   test('サヨナラ2点タイムリーは点数とサヨナラを残す', () {
     expect(
       formatPlayLabels([

@@ -90,6 +90,11 @@ class SeasonTableBlock extends StatelessWidget {
   final bool loadingStats;
   final bool loadingGames;
   final int seasonYear;
+  final Future<void> Function(DateTime date)? onNeedGameDate;
+  final bool Function(DateTime date)? shouldLoadGameDate;
+  final String? loadingGameDate;
+  final int gameDateOffset;
+  final ValueChanged<int>? onGameDateOffsetChanged;
 
   const SeasonTableBlock({
     super.key,
@@ -107,6 +112,11 @@ class SeasonTableBlock extends StatelessWidget {
     this.loadingStats = false,
     this.loadingGames = false,
     this.seasonYear = 0,
+    this.onNeedGameDate,
+    this.shouldLoadGameDate,
+    this.loadingGameDate,
+    this.gameDateOffset = 0,
+    this.onGameDateOffsetChanged,
   });
 
   Widget _sectionLoading({double height = 120}) {
@@ -558,12 +568,17 @@ class SeasonTableBlock extends StatelessWidget {
       final Widget gamesSwitcher = loadingGames
           ? _sectionLoading(height: portraitLayout ? 160 : 220)
           : GameDateSwitcher(
-              key: ValueKey('gds-$gamesDateFilter'),
+              key: ValueKey('gds-${org.kind.name}-$onlyLeagueId-$gamesDateFilter'),
               games: games,
               playerStats: stats,
               initialDate: gamesDateFilter,
               headerColor: leagueColor,
               horizontal: true,
+              onNeedGameDate: onNeedGameDate,
+              shouldLoadGameDate: shouldLoadGameDate,
+              loadingGameDate: loadingGameDate,
+              dateOffset: gameDateOffset,
+              onDateOffsetChanged: onGameDateOffsetChanged,
             );
 
       // 縦型は試合カードが選手人数で伸びる

@@ -16,6 +16,8 @@ import 'DB/t_game_summary.dart';
 import 'DB/t_stats_team.dart';
 import 'BoxScore.dart';
 import 'FetchURL.dart';
+import 'GameFetchSchedule.dart';
+import 'GameStatsLoad.dart';
 import 'OrgLeague.dart';
 import 'Value.dart';
 import 'YahooHtml.dart';
@@ -591,18 +593,120 @@ class FetchMLB {
     }
   }
 
+  /// 今日→昨日→先の日程→古い日。進行中の更新を後回しにしない。
+  static List<DateTime> scheduleDates(DateTime now, {bool includeFuture = true, bool todayOnly = false}) {
+    if (todayOnly) return [DateTime(now.year, now.month, now.day)];
+    final offsets = [for (var i = -3; i <= 10; i++) i];
+    offsets.sort((a, b) {
+      int rank(int offset) {
+        if (offset == 0) return 0;
+        if (offset == -1) return 1;
+        if (offset > 0) return 10 + offset;
+        return 20 + offset.abs();
+      }
+      return rank(a).compareTo(rank(b));
+    });
+    return [
+      for (final offset in offsets)
+        if (includeFuture || offset <= 0) now.add(Duration(days: offset)),
+    ];
+  }
+
+  /// 途中までの試合更新を読み取り側へ見せる。長時間の1トランザクションに閉じ込めない。
+  static Future<void> _publishProgress(Connection conn) async {
+    try {
+      await Postgres.commit(conn);
+    } catch (_) {}
+    try {
+      await Postgres.begin(conn);
+    } catch (_) {}
+  }
+
+  static Future<({int id, String state, bool loaded})?> _gameOnDate(
+    Connection conn,
+    int idTeamHome,
+    int idTeamAway,
+    String date,
+  ) async {
+    final rows = await conn.execute(
+      '''
+        SELECT
+          g.id,
+          COALESCE(g.state, '') AS state,
+          COALESCE(g.flg_stats_loaded, FALSE) AS loaded
+        FROM t_game g
+        WHERE g.id_team_home = \$1::int
+          AND g.id_team_away = \$2::int
+          AND g.datetime_start::date = \$3::date
+          AND COALESCE(g.flg_delete, FALSE) = FALSE
+        ORDER BY CASE WHEN g.id < 2000 THEN 0 ELSE 1 END, g.datetime_start
+        LIMIT 1
+      ''',
+      parameters: [idTeamHome, idTeamAway, date],
+    );
+    if (rows.isEmpty) return null;
+    final map = rows.first.toColumnMap();
+    return (
+      id: map['id'] as int,
+      state: '${map['state'] ?? ''}',
+      loaded: map['loaded'] == true,
+    );
+  }
+
+  /// 今日の分だけ取り直し。全部読み終わっていたら次の 10 秒ループを止める。
+  static Future<bool> refreshToday() async {
+    var keep = true;
+    await Postgres.withConnection((conn) async {
+      await FetchURL.ensureGameDetailsVelo(conn);
+      await FetchURL.ensureAppColumns(conn);
+      try {
+        await Postgres.begin(conn);
+      } catch (_) {}
+      await fetchGames(conn, todayOnly: true);
+      try {
+        await Postgres.commit(conn);
+      } catch (_) {}
+      final key = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      keep = !await GameStatsLoad.isDateFullyLoaded(conn, key, _org.leagueIds);
+    });
+    return keep;
+  }
+
   /// 日程カード＋試合トップから試合情報を登録。ポストシーズンも含める。
-  static Future<Response> fetchGames(Connection conn) async {
+  static Future<Response> fetchGames(Connection conn, {bool todayOnly = false}) async {
     await FetchURL.ensureGameDetailsVelo(conn);
+    await FetchURL.ensureAppColumns(conn);
     final now = DateTime.now();
-    // 成績サマリーは直近数日分も取り直す（ポストシーズン閲覧用）。
-    final dates = [for (var i = -3; i <= 10; i++) now.add(Duration(days: i))];
+    final includeFuture = !todayOnly && GameFetchSchedule.takeFuture('mlb', now);
+    if (!todayOnly && !includeFuture) print('MLB明日以降は${GameFetchSchedule.futureInterval.inMinutes}分以内のためスキップ');
+    final dates = scheduleDates(now, includeFuture: includeFuture, todayOnly: todayOnly);
     final formatter = DateFormat('yyyy-MM-dd');
     final todayKey = formatter.format(now);
     final clubs = await _careerClubs(conn);
 
     for (final date in dates) {
       final formatted = formatter.format(date);
+      final isToday = formatted == todayKey;
+      var lockedToday = false;
+      if (isToday && !todayOnly) {
+        if (GameFetchSchedule.isTodayBusy('mlb')) {
+          print('MLB $formatted は取得中のためスキップ');
+          continue;
+        }
+        GameFetchSchedule.markTodayBusy('mlb', true);
+        lockedToday = true;
+      }
+      try {
+      if (await GameStatsLoad.skipPastSchedule(
+        conn,
+        org: 'mlb',
+        date: date,
+        now: now,
+        leagueIds: _org.leagueIds,
+      )) {
+        print('MLB $formatted は成績済のためスキップ');
+        continue;
+      }
       print('MLB $formatted の試合を取得します。');
       final url = Uri.parse('${_org.scheduleUrlPrefix}$formatted');
       Document document;
@@ -616,6 +720,15 @@ class FetchMLB {
       final cardsRoot = document.querySelector('#gm_card');
       if (cardsRoot == null) {
         print('MLB: この日の試合カードはありません。');
+        if (GameFetchSchedule.isPastDay(date, now)) {
+          await GameStatsLoad.rememberPastDateIfSettled(
+            conn,
+            org: 'mlb',
+            date: formatted,
+            leagueIds: _org.leagueIds,
+            emptySchedule: true,
+          );
+        }
         continue;
       }
 
@@ -656,6 +769,13 @@ class FetchMLB {
           var start = gameStartOn(formatted, status);
           start ??= DateTime.tryParse('$formatted 00:00:00');
           if (start == null) continue;
+
+          final cardLive = status.contains('試合中') || RegExp(r'\d+\s*回').hasMatch(status);
+          final known = await _gameOnDate(conn, idTeamHome, idTeamAway, formatted);
+          if (!GameStatsLoad.needsRefresh(live: cardLive, loaded: known?.loaded == true)) {
+            print('MLB試合スキップ(成績済): $homeName vs $awayName');
+            continue;
+          }
 
           var idPitcherHome = 0;
           var idPitcherAway = 0;
@@ -722,18 +842,28 @@ class FetchMLB {
                   final result = ths.first.text.trim();
                   final teamSpan = tds.first.querySelector('span')?.text.trim() ?? '';
                   final teamName = YahooTeamNames.normalize(teamSpan);
-                  final hrefPlayer = tds.first.querySelector('a')?.attributes['href']?.trim() ?? '';
-                  if (hrefPlayer.isEmpty || teamName.isEmpty) continue;
+                  final anchor = tds.first.querySelector('a');
+                  final hrefPlayer = anchor?.attributes['href']?.trim() ?? '';
+                  var namePlayer = StringTool.noSpace(anchor?.text ?? '');
+                  if ((namePlayer.isEmpty && hrefPlayer.isEmpty) || teamName.isEmpty) continue;
                   final teamResult = await Postgres.execute(conn, AppSql.selectTeamsWhereName(), data: [teamName]);
                   if (teamResult.isEmpty) continue;
                   final idTeam = teamResult.first.toColumnMap()['id'] as int;
-                  final playerDoc = await YahooHtml.fetchDocument(detailUrl.resolve(hrefPlayer));
-                  final namePlayer = playerDoc.querySelectorAll('ruby.bb-profile__ruby').isEmpty
-                      ? ''
-                      : playerDoc.querySelectorAll('ruby.bb-profile__ruby').first.text.split('（').first.trim();
+                  if (namePlayer.isEmpty && hrefPlayer.isNotEmpty) {
+                    final playerDoc = await YahooHtml.fetchDocument(detailUrl.resolve(hrefPlayer));
+                    namePlayer = playerDoc.querySelectorAll('ruby.bb-profile__ruby').isEmpty
+                        ? ''
+                        : playerDoc.querySelectorAll('ruby.bb-profile__ruby').first.text.split('（').first.trim();
+                    if (namePlayer.isEmpty) continue;
+                    final idPlayer = await _ensurePlayer(conn, namePlayer, idTeam);
+                    await BirthPlaceRegistry.applyFromProfile(conn, idPlayer, playerDoc);
+                    if (result == '勝利投手') idPitcherWin = idPlayer;
+                    if (result == '敗戦投手') idPitcherLose = idPlayer;
+                    if (result == 'セーブ') idPitcherSave = idPlayer;
+                    continue;
+                  }
                   if (namePlayer.isEmpty) continue;
                   final idPlayer = await _ensurePlayer(conn, namePlayer, idTeam);
-                  await BirthPlaceRegistry.applyFromProfile(conn, idPlayer, playerDoc);
                   if (result == '勝利投手') idPitcherWin = idPlayer;
                   if (result == '敗戦投手') idPitcherLose = idPlayer;
                   if (result == 'セーブ') idPitcherSave = idPlayer;
@@ -772,17 +902,23 @@ class FetchMLB {
             ..id_pitcher_save = idPitcherSave
             ..code_game = _mlbGameCode(sectionTitle, homeLeague, awayLeague);
 
-          if (exists.isEmpty) {
-            game.id = await Postgres.insert(conn, game);
-            print('MLB試合新規: $homeName vs $awayName');
-          } else {
+          if (exists.isNotEmpty) {
             game.id = exists.first.toColumnMap()['id'] as int;
             await Postgres.update(conn, game);
             print('MLB試合更新: $homeName vs $awayName');
+          } else if (known != null) {
+            game.id = known.id;
+            await Postgres.update(conn, game);
+            print('MLB試合更新: $homeName vs $awayName');
+          } else {
+            game.id = await Postgres.insert(conn, game);
+            print('MLB試合新規: $homeName vs $awayName');
           }
 
-          final started = matchState.contains('回') || matchState.contains('試合終了') || matchState.contains('終了');
-          final scrapeStats = started && (formatted.compareTo(todayKey) <= 0);
+          final live = matchState.contains('試合中') || RegExp(r'\d+\s*回').hasMatch(matchState);
+          final finished = matchState.contains('試合終了');
+          final started = live || finished || matchState.contains('終了');
+          final scrapeStats = started && formatted.compareTo(todayKey) <= 0;
           if (scrapeStats && href.isNotEmpty && game.id > 0) {
             try {
               final statsUrl = url.resolve(FetchURL.gamePageHref(href, 'stats'));
@@ -791,7 +927,6 @@ class FetchMLB {
               print('MLB出場成績スキップ ($homeName vs $awayName): $e');
               print(st);
             }
-            // NPB と同様、出場成績の打席＋テキスト速報を t_game_details へ反映する
             try {
               await FetchURL.refreshGameDetails(
                 conn,
@@ -802,12 +937,31 @@ class FetchMLB {
                 idTeamAway,
                 idPitcherHome,
                 idPitcherAway,
+                saveMaxVelo: finished,
               );
             } catch (e, st) {
               print('MLB打席・テキスト速報スキップ ($homeName vs $awayName): $e');
               print(st);
             }
+            await GameStatsLoad.markIfComplete(conn, game.id, finished: finished);
           }
+          if (live || formatted == todayKey) {
+            await _publishProgress(conn);
+          }
+        }
+      }
+      if (GameFetchSchedule.isPastDay(date, now)) {
+        await GameStatsLoad.rememberPastDateIfSettled(
+          conn,
+          org: 'mlb',
+          date: formatted,
+          leagueIds: _org.leagueIds,
+        );
+      }
+      } finally {
+        if (lockedToday) {
+          GameFetchSchedule.markTodayBusy('mlb', false);
+          GameFetchSchedule.scheduleTodayAgain('mlb', refreshToday);
         }
       }
     }
@@ -830,11 +984,13 @@ class FetchMLB {
     for (final group in groups) {
     var teamId = group.teamId;
     var switched = false;
+    var order = 0;
     for (final row in group.rows) {
       if (row.querySelectorAll('th').isNotEmpty) {
         if (group.switchOnTh && !switched) {
           teamId = idTeamHome;
           switched = true;
+          order = 0;
         }
         continue;
       }
@@ -842,6 +998,8 @@ class FetchMLB {
       if (cells.length < 14) continue;
       final name = StringTool.noSpace(cells[1].text);
       if (name.isEmpty) continue;
+      final starterSlot = isBoxStarterSlot(cells.first.text);
+      if (starterSlot && order < 9) order++;
       final playerId = await _ensurePlayer(conn, cells[1].text.trim(), teamId);
       if (playerId <= 0) continue;
       final summary = t_game_summary()
@@ -855,7 +1013,9 @@ class FetchMLB {
         ..int_sacrifice = int.tryParse(cells[10].text.trim()) ?? 0
         ..int_steal_base = int.tryParse(cells[11].text.trim()) ?? 0
         ..int_error = int.tryParse(cells[12].text.trim()) ?? 0
-        ..int_homerun = int.tryParse(cells[13].text.trim()) ?? 0;
+        ..int_homerun = int.tryParse(cells[13].text.trim()) ?? 0
+        ..int_batting_order = starterSlot ? order : 0
+        ..code_position_from = boxBadgePosition(cells.first.text);
       list.add(summary);
     }
     }
@@ -956,6 +1116,21 @@ class FetchMLB {
     required List<CareerClub> clubs,
   }) async {
     if (playerId <= 0) return;
+    final year = DateTime.now().year;
+    try {
+      final have = await conn.execute(
+        '''
+          SELECT 1
+          FROM m_player_career
+          WHERE id_player = \$1::int
+            AND int_year = \$2::int
+            AND COALESCE(int_pitching, 0) > 0
+          LIMIT 1
+        ''',
+        parameters: [playerId, year],
+      );
+      if (have.isNotEmpty) return;
+    } catch (_) {}
     Uri? profileUrl;
     if (profileHref.isNotEmpty) {
       profileUrl = detailUrl.resolve(profileHref);

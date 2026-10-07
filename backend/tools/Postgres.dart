@@ -128,9 +128,11 @@ class Postgres {
       await Postgres.commit(conn);
       print("✅ トランザクション成功 → COMMIT されました");
     } catch (e, stacktrace) {
-      await Postgres.rollback(conn);
-      print("❌ ロールバックされました: $e, $stacktrace");
-      throw (e, stacktrace);
+      try {
+        await Postgres.rollback(conn);
+      } catch (_) {}
+      print("❌ ロールバックされました: $e");
+      Error.throwWithStackTrace(e, stacktrace);
     }
   }
 

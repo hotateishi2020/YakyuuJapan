@@ -297,12 +297,8 @@ class MlbPostseasonBracket extends StatelessWidget {
       );
     } else if (unknown) {
       logo = const Text('未確定', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold));
-    } else if (logoAsset != null) {
-      logo = Image.asset(logoAsset, fit: BoxFit.contain);
-    } else if (logoUrl != null) {
-      logo = Image.network(logoUrl, fit: BoxFit.contain, errorBuilder: (_, __, ___) => const SizedBox.shrink());
     } else {
-      logo = const SizedBox.shrink();
+      logo = teamLogoImage(asset: logoAsset, networkUrl: logoUrl);
     }
     if (out) {
       logo = ColorFiltered(

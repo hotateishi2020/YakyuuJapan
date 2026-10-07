@@ -25,6 +25,7 @@ import '../View/PostseasonBracket.dart';
 import '../View/BlinkNewMark.dart';
 import '../logic/postseason_bracket.dart';
 import '../logic/game_dedupe.dart';
+import '../logic/game_date_window.dart';
 
 class PredictionPage extends StatefulWidget {
   const PredictionPage({super.key});
@@ -43,6 +44,9 @@ class _OrgBundle {
   List<Map<String, dynamic>> games;
   List<Map<String, dynamic>> postseasonGames;
   bool showPostseasonBoard;
+  DateTime? gamesFrom;
+  DateTime? gamesTo;
+  final Set<String> extraGameDates;
   final Set<_LoadPart> readyParts;
 
   _OrgBundle({
@@ -53,8 +57,12 @@ class _OrgBundle {
     required this.games,
     required this.postseasonGames,
     required this.showPostseasonBoard,
+    this.gamesFrom,
+    this.gamesTo,
+    Set<String>? extraGameDates,
     Set<_LoadPart>? readyParts,
-  }) : readyParts = readyParts ??
+  })  : extraGameDates = extraGameDates ?? <String>{},
+        readyParts = readyParts ??
             {
               _LoadPart.info,
               _LoadPart.standings,
@@ -78,6 +86,9 @@ class _OrgBundle {
         games: List<Map<String, dynamic>>.from(games),
         postseasonGames: List<Map<String, dynamic>>.from(postseasonGames),
         showPostseasonBoard: showPostseasonBoard,
+        gamesFrom: gamesFrom,
+        gamesTo: gamesTo,
+        extraGameDates: {...extraGameDates},
         readyParts: {...readyParts},
       );
 }
@@ -129,7 +140,19 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   Timer? _gamesPollTimer;
   bool _gamesRefreshRunning = false;
   bool _gamesPollRunning = false;
+  final Map<OrgKind, int> _gameDayOffset = {};
+  final Map<OrgKind, String?> _loadingGameDateByOrg = {};
+  final Set<String> _pastDateInflight = {};
   final Set<OrgKind> _seasonStatsRefreshStarted = {};
+
+  int get _gameDateOffset => _gameDayOffset[_orgKind] ?? 0;
+
+  String? get _loadingGameDate => _loadingGameDateByOrg[_orgKind];
+
+  void _setGameDateOffset(int offset) {
+    if (_gameDayOffset[_orgKind] == offset) return;
+    setState(() => _gameDayOffset[_orgKind] = offset);
+  }
 
   OrgConfig get _org => OrgConfig.of(_orgKind);
 
@@ -217,6 +240,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     _readyParts[kind ?? _orgKind] = {...bundle.readyParts};
     // 予想者名は取れたいずれかの団体データから Info に蓄える（空で上書きしない）
     _captureInfoUsers(predictions, npbPlayerStats);
+    _scheduleTeamLogoPrecache(standings);
   }
 
   bool _cacheUsable(OrgKind kind) {
@@ -332,6 +356,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   Future<void> _prefetchOtherOrg() async {
+    await Future<void>.delayed(const Duration(seconds: 8));
+    if (!mounted) return;
     final other = _orgKind == OrgKind.npb ? OrgKind.mlb : OrgKind.npb;
     if (_cacheUsable(other) || _orgLoadFutures.containsKey(other)) return;
     await fetchData(kind: other, background: true);
@@ -449,13 +475,12 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     }
     _gamesRefreshTimer?.cancel();
     _gamesPollTimer?.cancel();
-    unawaited(_pollDisplayedGames());
-    _refreshGames();
-    _gamesPollTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+    _gamesPollTimer = Timer.periodic(const Duration(seconds: 10), (_) {
       unawaited(_pollDisplayedGames());
     });
-    _gamesRefreshTimer = Timer.periodic(const Duration(minutes: 3), (_) {
-      _refreshGames();
+    // 初期表示は SQL のみ。スクレイピングは描画後に始める。
+    _gamesRefreshTimer = Timer(const Duration(seconds: 5), () {
+      unawaited(_refreshGames());
     });
   }
 
@@ -497,7 +522,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     _gamesRefreshRunning = true;
     var refreshStats = false;
     try {
-      // 11日分の取得は3分を超える。途中で切るとDBだけ更新されて画面が古いままになる。
+      // 初回だけ全日程。今日の続きは backend が 10 秒後に今日だけ取りに行く。
       final scrape = await http.get(Env.api(_org.gamesFetchPath)).timeout(const Duration(minutes: 10));
       if (!mounted) return;
       if (scrape.statusCode != 200) {
@@ -609,8 +634,24 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     );
   }
 
-  String _partPath(OrgKind kind, String part, int year, {bool fresh = false}) =>
-      '/predictions/part?org=${OrgConfig.of(kind).label.toLowerCase()}&part=$part&year=$year${fresh ? '&fresh=1' : ''}';
+  String _partPath(
+    OrgKind kind,
+    String part,
+    int year, {
+    bool fresh = false,
+    String? date,
+    String? from,
+    String? to,
+  }) {
+    final path = StringBuffer(
+      '/predictions/part?org=${OrgConfig.of(kind).label.toLowerCase()}&part=$part&year=$year',
+    );
+    if (fresh) path.write('&fresh=1');
+    if (date != null && date.isNotEmpty) path.write('&date=$date');
+    if (from != null && from.isNotEmpty) path.write('&from=$from');
+    if (to != null && to.isNotEmpty) path.write('&to=$to');
+    return path.toString();
+  }
 
   _LoadPart _partForItem(int item) {
     if (item == 0) return _LoadPart.games;
@@ -625,9 +666,13 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
 
   void _invalidateYearParts() {
     for (final kind in OrgKind.values) {
-      _orgCache[kind]?.readyParts.remove(_LoadPart.games);
-      _orgCache[kind]?.readyParts.remove(_LoadPart.standings);
-      _orgCache[kind]?.readyParts.remove(_LoadPart.players);
+      final bundle = _orgCache[kind];
+      bundle?.readyParts.remove(_LoadPart.games);
+      bundle?.readyParts.remove(_LoadPart.standings);
+      bundle?.readyParts.remove(_LoadPart.players);
+      bundle?.extraGameDates.clear();
+      bundle?.gamesFrom = null;
+      bundle?.gamesTo = null;
       _readyParts[kind]?.remove(_LoadPart.games);
       _readyParts[kind]?.remove(_LoadPart.standings);
       _readyParts[kind]?.remove(_LoadPart.players);
@@ -635,6 +680,9 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       _loadedPartYears.remove('${kind.name}|${_LoadPart.standings.name}');
       _loadedPartYears.remove('${kind.name}|${_LoadPart.players.name}');
     }
+    _gameDayOffset.clear();
+    _loadingGameDateByOrg.clear();
+    _pastDateInflight.clear();
   }
 
   Future<void> _ensureItemYearLoaded(int item) async {
@@ -687,10 +735,18 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }) async {
     _ensureCache(target);
     final parts = only ?? _LoadPart.values;
-    // 取得済みパートはスキップ。未取得だけ並列で取り、完了したものから描画する。
-    final jobs = <Future<void>>[
+    final pending = [
       for (final part in parts)
-        if (!_partLoadedForYear(target, part))
+        if (!_partLoadedForYear(target, part)) part,
+    ];
+    if (pending.isEmpty) return;
+    // トーナメントのチームロゴは順位表から描けるので、先に取る。
+    if (pending.contains(_LoadPart.standings)) {
+      await _fetchPart(target, _LoadPart.standings, _seasonYear, background: background);
+    }
+    final jobs = [
+      for (final part in pending)
+        if (part != _LoadPart.standings)
           _fetchPart(target, part, _seasonYear, background: background),
     ];
     if (jobs.isEmpty) return;
@@ -742,12 +798,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           bundle.playerStatsActual = listMapFromJson(map['stats_player']).where(org.rowBelongs).toList();
           break;
         case _LoadPart.games:
-          bundle.games = normalizeGames(listMapFromJson(map['games'])).where(org.gameBelongs).toList();
-          bundle.postseasonGames = dedupeSameDayMatchupRows(listMapFromJson(map['postseason_games']));
-          bundle.showPostseasonBoard = postseasonBoardVisible(
-            serverFlag: map['show_postseason_board'] == true,
-            today: DateTime.now(),
-          );
+          _applyGamesPayload(bundle, map, org, year);
           break;
       }
       bundle.readyParts.add(part);
@@ -768,6 +819,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
               predictions = List<Map<String, dynamic>>.from(bundle.predictions);
               standings = List<Map<String, dynamic>>.from(bundle.standings);
               _captureInfoUsers(predictions, npbPlayerStats);
+              _scheduleTeamLogoPrecache(standings);
               break;
             case _LoadPart.players:
               npbPlayerStats = List<Map<String, dynamic>>.from(bundle.playerStats);
@@ -789,6 +841,103 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       logger.e('part ${part.name} 通信/解析エラー: $e\n$st');
       _maybeSetPartError(target, background, '通信エラー: $e');
     }
+  }
+
+  void _applyGamesPayload(
+    _OrgBundle bundle,
+    Map<String, dynamic> map,
+    OrgConfig org,
+    int year,
+  ) {
+    final incoming = normalizeGames(listMapFromJson(map['games'])).where(org.gameBelongs).toList();
+    final window = resolveGamesWindow(
+      fromText: '${map['from'] ?? ''}',
+      toText: '${map['to'] ?? ''}',
+      year: year,
+    );
+    final from = window.from;
+    final to = window.to;
+    final dayWindow = from != null && to != null && from == to;
+    if (from != null && to != null && (dayWindow || bundle.extraGameDates.isNotEmpty)) {
+      bundle.games = mergeGamesForDateRange(bundle.games, incoming, from, to);
+    } else {
+      bundle.games = incoming;
+    }
+    if (dayWindow) {
+      bundle.extraGameDates.add(ymdOf(from));
+    } else {
+      bundle.gamesFrom = from;
+      bundle.gamesTo = to;
+    }
+    bundle.postseasonGames = dedupeSameDayMatchupRows(listMapFromJson(map['postseason_games']));
+    bundle.showPostseasonBoard = postseasonBoardVisible(
+      serverFlag: map['show_postseason_board'] == true,
+      today: DateTime.now(),
+    );
+  }
+
+  bool _shouldLoadGameDate(DateTime date) {
+    final bundle = _orgCache[_orgKind];
+    final ymd = ymdOf(date);
+    final local = bundle?.games ?? games;
+    final hasGames = local.any((game) => gameDateOnly(game['date_game']) == ymd);
+    return gameDateNeedsSqlLoad(
+      date,
+      bundle?.gamesFrom,
+      bundle?.gamesTo,
+      bundle?.extraGameDates ?? const {},
+      hasGamesForDate: hasGames,
+    );
+  }
+
+  Future<void> _loadGameDate(DateTime date) async {
+    final kind = _orgKind;
+    final ymd = DateFormatUtil.ymd(date);
+    final inflightKey = '${kind.name}|$ymd';
+    if (_pastDateInflight.contains(inflightKey) || !_shouldLoadGameDate(date)) return;
+    _pastDateInflight.add(inflightKey);
+    if (mounted) setState(() => _loadingGameDateByOrg[kind] = ymd);
+    try {
+      final org = OrgConfig.of(kind);
+      final res = await http
+          .get(Env.api(_partPath(kind, 'games', _seasonYear, date: ymd, fresh: true)))
+          .timeout(const Duration(seconds: 60));
+      if (!mounted) return;
+      if (res.statusCode != 200) {
+        logger.w('past games $ymd HTTP ${res.statusCode}');
+        return;
+      }
+      final map = jsonDecode(res.body) as Map<String, dynamic>;
+      final bundle = _ensureCache(kind);
+      _applyGamesPayload(bundle, map, org, _seasonYear);
+      bundle.extraGameDates.add(ymd);
+      setState(() {
+        if (kind != _orgKind) return;
+        games = List<Map<String, dynamic>>.from(bundle.games);
+        postseasonGames = List<Map<String, dynamic>>.from(bundle.postseasonGames);
+        showPostseasonBoard = bundle.showPostseasonBoard;
+      });
+    } catch (e, st) {
+      logger.w('past games $ymd 失敗: $e\n$st');
+    } finally {
+      _pastDateInflight.remove(inflightKey);
+      if (mounted) {
+        setState(() {
+          if (_loadingGameDateByOrg[kind] == ymd) _loadingGameDateByOrg[kind] = null;
+        });
+      }
+    }
+  }
+
+  bool get _showPostseasonNow =>
+      showPostseasonBoard || postseasonBoardVisible(serverFlag: false, today: DateTime.now());
+
+  void _scheduleTeamLogoPrecache(List<Map<String, dynamic>> rows) {
+    if (rows.isEmpty) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      precacheTeamLogos(context, rows);
+    });
   }
 
   /// コンテンツが1つも無いときだけ全面エラーにする（他パート成功時は残す）
@@ -1185,6 +1334,11 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       loadingStats: !_partReady(_LoadPart.players),
       loadingGames: !_partReady(_LoadPart.games),
       seasonYear: _seasonYear,
+      onNeedGameDate: _loadGameDate,
+      shouldLoadGameDate: _shouldLoadGameDate,
+      loadingGameDate: _loadingGameDate,
+      gameDateOffset: _gameDateOffset,
+      onGameDateOffsetChanged: _setGameDateOffset,
     );
   }
 
@@ -1208,18 +1362,25 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       );
     }
     if (_itemTab == 0) {
-      if (!_partReady(_LoadPart.games)) {
+      final showBracket = _showPostseasonNow;
+      if (!_partReady(_LoadPart.games) && !showBracket) {
         return const Center(child: CircularProgressIndicator());
       }
       return BothLeagueGameDay(
-        key: ValueKey('both-$_seasonYear-${_gamesInitialDate()}'),
+        key: ValueKey('both-${_orgKind.name}-$_seasonYear-${_gamesInitialDate()}'),
         games: games,
         playerStats: npbPlayerStatsActual,
         initialDate: _gamesInitialDate(),
-        leading: showPostseasonBoard ? [_postseasonBracket(), const SizedBox(height: 6)] : const [],
+        leading: showBracket ? [_postseasonBracket(), const SizedBox(height: 6)] : const [],
         leagues: [
           for (final league in _org.leagues) (id: league.id, name: league.name, color: league.color),
         ],
+        onNeedGameDate: _loadGameDate,
+        shouldLoadGameDate: _shouldLoadGameDate,
+        loadingGameDate: _loadingGameDate,
+        loadingGames: !_partReady(_LoadPart.games),
+        dateOffset: _gameDateOffset,
+        onDateOffsetChanged: _setGameDateOffset,
       );
     }
     if (!_partReady(_LoadPart.standings)) {
@@ -2052,6 +2213,11 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
             loadingGames: !_partReady(_LoadPart.games),
             seasonYear: _seasonYear,
             gamesDateFilter: _gamesInitialDate(),
+            onNeedGameDate: _loadGameDate,
+            shouldLoadGameDate: _shouldLoadGameDate,
+            loadingGameDate: _loadingGameDate,
+            gameDateOffset: _gameDateOffset,
+            onGameDateOffsetChanged: _setGameDateOffset,
           );
         }
 

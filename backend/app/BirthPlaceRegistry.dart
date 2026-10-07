@@ -137,7 +137,16 @@ class BirthPlaceRegistry {
     await applyToPlayer(conn, playerId, extractFromProfile(doc));
   }
 
+  static bool _nameWidthReady = false;
+
+  static Future<void> ensureSchema(Connection conn) async {
+    if (_nameWidthReady) return;
+    await conn.execute('ALTER TABLE m_country ALTER COLUMN name TYPE varchar(80)');
+    _nameWidthReady = true;
+  }
+
   static Future<int> ensureCountry(Connection conn, String rawName) async {
+    await ensureSchema(conn);
     final name = _normalizeCountryName(rawName);
     if (name.isEmpty) return 0;
     final found = await conn.execute(

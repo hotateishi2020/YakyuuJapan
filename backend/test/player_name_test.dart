@@ -76,5 +76,13 @@ void main() {
       playerNameMatches(query: 'C.マイドロス', nameFull: 'チェース・マイドロス'),
       isTrue,
     );
+    expect(
+      playerNameMatches(query: 'ブレーデン・モンゴメリー', nameFull: 'コルソン・モンゴメリー'),
+      isFalse,
+    );
+    expect(
+      playerNameMatches(query: 'コルソン・モンゴメリー', nameFull: 'ブレーデン・モンゴメリー'),
+      isFalse,
+    );
   });
 }

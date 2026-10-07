@@ -311,17 +311,10 @@ class PostseasonBracket extends StatelessWidget {
                           '未確定',
                           style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 13),
                         )
-                      : logoAsset != null
-                      ? Padding(
+                      : Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                          child: Image.asset(logoAsset, fit: BoxFit.contain),
-                        )
-                      : logoUrl != null
-                      ? Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                          child: Image.network(logoUrl, fit: BoxFit.contain, errorBuilder: (_, __, ___) => const SizedBox.shrink()),
-                        )
-                      : const SizedBox.shrink(),
+                          child: teamLogoImage(asset: logoAsset, networkUrl: logoUrl),
+                        ),
                 ),
               ),
               ColoredBox(

@@ -411,6 +411,238 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('NPB and MLB date switchers keep their own day', (tester) async {
+    var npbOffset = -1;
+    var mlbOffset = 1;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) {
+            return Column(
+              children: [
+                SizedBox(
+                  width: 400,
+                  height: 90,
+                  child: GameDateSwitcher(
+                    games: const [],
+                    headerColor: Colors.red,
+                    initialDate: '2026-10-07',
+                    dateOffset: npbOffset,
+                    onDateOffsetChanged: (offset) => npbOffset = offset,
+                  ),
+                ),
+                SizedBox(
+                  width: 400,
+                  height: 90,
+                  child: GameDateSwitcher(
+                    games: const [],
+                    headerColor: Colors.blue,
+                    initialDate: '2026-10-07',
+                    dateOffset: mlbOffset,
+                    onDateOffsetChanged: (offset) => mlbOffset = offset,
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+
+    expect(find.textContaining('昨日'), findsOneWidget);
+    expect(find.textContaining('明日'), findsOneWidget);
+
+    await tester.tap(find.text('<< 前の日').last);
+    await tester.pump();
+    expect(npbOffset, -1);
+    expect(mlbOffset, 0);
+    expect(find.textContaining('昨日'), findsOneWidget);
+    expect(find.textContaining('今日'), findsOneWidget);
+  });
+
+  testWidgets('previous day outside the loaded window asks for SQL', (tester) async {
+    final needed = <String>[];
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SizedBox(
+          width: 400,
+          height: 180,
+          child: GameDateSwitcher(
+            games: const [],
+            headerColor: Colors.green,
+            initialDate: '2026-10-07',
+            shouldLoadGameDate: (date) => date.isBefore(DateTime(2026, 10, 4)),
+            onNeedGameDate: (date) async {
+              needed.add(
+                '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}',
+              );
+            },
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('<< 前の日'));
+    await tester.pump();
+    await tester.tap(find.text('<< 前の日'));
+    await tester.pump();
+    await tester.tap(find.text('<< 前の日'));
+    await tester.pump();
+    expect(needed, isEmpty);
+
+    await tester.tap(find.text('<< 前の日'));
+    await tester.pump();
+    expect(needed, ['2026-10-03']);
+    expect(find.textContaining('4日前'), findsOneWidget);
+  });
+
+  testWidgets('tournament leading stays visible while games are still loading', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: SizedBox(
+          width: 400,
+          height: 360,
+          child: BothLeagueGameDay(
+            games: [],
+            initialDate: '2026-10-07',
+            loadingGames: true,
+            leading: [Text('トーナメント')],
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('トーナメント'), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.text('この日の試合はありません'), findsNothing);
+  });
+
+  testWidgets('previous day shows loaded games instead of the empty label', (tester) async {
+    var games = <Map<String, dynamic>>[
+      {
+        'date_game': '2026-10-07',
+        'time_game': '18:00',
+        'name_team_home': '阪神',
+        'name_team_away': '巨人',
+        'name_stadium': '甲子園',
+        'name_pitcher_home': '村上',
+        'name_pitcher_away': '戸郷',
+        'score_home': 3,
+        'score_away': 1,
+        'state': '試合終了',
+        'id_team_home': 2,
+        'id_team_away': 1,
+        'id_league_home': 1,
+        'id_league_away': 1,
+        'color_back_home': '#FFD200',
+        'color_back_away': '#FF6600',
+        'color_font_home': '#000000',
+        'color_font_away': '#000000',
+      },
+    ];
+    Future<void> Function(DateTime date)? loadDate;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SizedBox(
+          width: 420,
+          height: 360,
+          child: StatefulBuilder(
+            builder: (context, setState) {
+              loadDate = (date) async {
+                setState(() {
+                  games = [
+                    ...games,
+                    {
+                      'date_game': '2026-10-06',
+                      'time_game': '18:00',
+                      'name_team_home': '広島',
+                      'name_team_away': '阪神',
+                      'name_stadium': 'マツダ',
+                      'name_pitcher_home': '森下',
+                      'name_pitcher_away': '才木',
+                      'score_home': 2,
+                      'score_away': 4,
+                      'state': '試合終了',
+                      'id_team_home': 5,
+                      'id_team_away': 2,
+                      'id_league_home': 1,
+                      'id_league_away': 1,
+                      'color_back_home': '#E50012',
+                      'color_back_away': '#FFD200',
+                      'color_font_home': '#FFFFFF',
+                      'color_font_away': '#000000',
+                    },
+                  ];
+                });
+              };
+              return BothLeagueGameDay(
+                games: games,
+                initialDate: '2026-10-07',
+                shouldLoadGameDate: (date) => date == DateTime(2026, 10, 6),
+                onNeedGameDate: (date) => loadDate!(date),
+                leagues: const [
+                  (id: 1, name: 'セ・リーグ', color: Color(0xFF0E8E2D)),
+                  (id: 2, name: 'パ・リーグ', color: Color(0xFF01B1EA)),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('<< 前の日'));
+    await tester.pump();
+    expect(find.text('この日の試合はありません'), findsNothing);
+    expect(find.text('広島'), findsOneWidget);
+    expect(find.text('阪神'), findsOneWidget);
+  });
+
+  testWidgets('interleague-only days still show the games', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: SizedBox(
+          width: 420,
+          height: 360,
+          child: BothLeagueGameDay(
+            games: [
+              {
+                'date_game': '2026-10-07',
+                'time_game': '18:00',
+                'name_team_home': '阪神',
+                'name_team_away': 'ソフトバンク',
+                'name_stadium': '甲子園',
+                'name_pitcher_home': '村上',
+                'name_pitcher_away': '有原',
+                'score_home': 3,
+                'score_away': 2,
+                'state': '試合終了',
+                'id_team_home': 2,
+                'id_team_away': 7,
+                'id_league_home': 1,
+                'id_league_away': 2,
+                'color_back_home': '#FFD200',
+                'color_back_away': '#FFD200',
+                'color_font_home': '#000000',
+                'color_font_away': '#000000',
+              },
+            ],
+            initialDate: '2026-10-07',
+            leagues: [
+              (id: 1, name: 'セ・リーグ', color: Color(0xFF0E8E2D)),
+              (id: 2, name: 'パ・リーグ', color: Color(0xFF01B1EA)),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('この日の試合はありません'), findsNothing);
+    expect(find.text('交流戦'), findsOneWidget);
+    expect(find.text('阪神'), findsOneWidget);
+    expect(find.text('ソフトバンク'), findsOneWidget);
+  });
+
   testWidgets('unstarted games stay side by side', (tester) async {
     Map<String, dynamic> game(String home) => {
           'date_game': '2026-09-29',
@@ -1192,7 +1424,7 @@ void main() {
     );
     await tester.pump();
     expect(find.text('先制ソロホームラン'), findsOneWidget);
-    expect(find.text('タイムリーツーベース'), findsOneWidget);
+    expect(find.text('中タイムリーツーベース'), findsOneWidget);
     expect(find.text('1x'), findsOneWidget);
     expect(find.text('2'), findsWidgets);
     expect(find.text('2打点'), findsNothing);
@@ -1835,13 +2067,18 @@ void main() {
     expect(tester.getSize(find.ancestor(of: find.text('投手'), matching: find.byType(Container)).first).width, lessThan(48));
   });
 
-  testWidgets('narrow pregame pitcher season stats scroll horizontally', (tester) async {
+  testWidgets('narrow pregame pitcher season stats stack label above value', (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
     await tester.pumpWidget(
       MaterialApp(
         home: Center(
           child: SizedBox(
-            width: 240,
-            height: 260,
+            width: 360,
+            height: 320,
             child: GamesBoardYahooStyle(
               games: [
                 {
@@ -1873,14 +2110,26 @@ void main() {
     );
     await tester.pump();
     expect(tester.takeException(), isNull);
-    final scrolls = find.byWidgetPredicate(
-      (w) => w is SingleChildScrollView && w.scrollDirection == Axis.horizontal,
-    );
-    expect(scrolls, findsWidgets);
-    final before = tester.getTopLeft(find.text('98.2%')).dx;
-    await tester.drag(scrolls.first, const Offset(-80, 0));
-    await tester.pump();
-    expect(tester.getTopLeft(find.text('98.2%')).dx, lessThan(before - 1));
+    expect(find.text('勝敗'), findsNWidgets(2));
+    expect(find.text('10勝5敗'), findsOneWidget);
+    Finder labelNear(String value) {
+      final record = tester.getCenter(find.text(value));
+      Finder nearestLabel = find.text('勝敗').at(0);
+      var nearest = 1000.0;
+      for (var i = 0; i < 2; i++) {
+        final center = tester.getCenter(find.text('勝敗').at(i));
+        final gap = (center.dx - record.dx).abs() + (record.dy - center.dy).abs() / 1000;
+        if (gap < nearest) {
+          nearest = gap;
+          nearestLabel = find.text('勝敗').at(i);
+        }
+      }
+      return nearestLabel;
+    }
+
+    final winsLabel = labelNear('10勝5敗');
+    expect(tester.getBottomLeft(winsLabel).dy, lessThanOrEqualTo(tester.getTopLeft(find.text('10勝5敗')).dy + 1));
+    expect((tester.getCenter(winsLabel).dx - tester.getCenter(find.text('10勝5敗')).dx).abs(), lessThan(12));
   });
 
   testWidgets('活躍表示は打球方向と打点・盗塁バッチを出す', (tester) async {
@@ -1942,19 +2191,19 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.text('タイムリー'), findsOneWidget);
-    expect(find.text('サヨナラ2点タイムリー'), findsOneWidget);
+    expect(find.text('遊タイムリー'), findsOneWidget);
+    expect(find.text('サヨナラ2点中タイムリー'), findsOneWidget);
     expect(find.text('盗塁'), findsNothing);
     expect(find.byKey(const ValueKey('steal-badge')), findsOneWidget);
     expect(
       tester.getTopLeft(find.byKey(const ValueKey('steal-badge')).first).dx,
-      greaterThan(tester.getTopLeft(find.text('サヨナラ2点タイムリー')).dx - 4),
+      greaterThan(tester.getTopLeft(find.text('サヨナラ2点中タイムリー')).dx - 4),
     );
     expect(find.byKey(const ValueKey('rbi-badge-1')), findsOneWidget);
     expect(find.byKey(const ValueKey('rbi-badge-2')), findsOneWidget);
   });
 
-  testWidgets('活躍表示の安打は打球方向を出し本塁打とタイムリーには付けない', (tester) async {
+  testWidgets('活躍表示の安打とタイムリーは打球方向を出し本塁打には付けない', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Center(
@@ -2008,13 +2257,13 @@ void main() {
     expect(find.text('中安'), findsOneWidget);
     expect(find.text('右安'), findsOneWidget);
     expect(find.text('先制ソロホームラン'), findsOneWidget);
-    expect(find.text('タイムリー'), findsOneWidget);
-    expect(find.text('タイムリースリーベース'), findsOneWidget);
+    expect(find.text('遊タイムリー'), findsOneWidget);
+    expect(find.text('左タイムリースリーベース'), findsOneWidget);
     expect(find.text('遊選'), findsNothing);
     expect(find.text('遊野選'), findsNothing);
     expect(find.textContaining('左ホームラン'), findsNothing);
-    expect(find.textContaining('遊タイムリー'), findsNothing);
-    expect(find.textContaining('左タイムリー'), findsNothing);
+    expect(find.text('四球'), findsNothing);
+    expect(find.text('三振'), findsNothing);
   });
 
   testWidgets('活躍表示は打順枠の打席を並べ代の二ゴを左飛の右隣に出す', (tester) async {
@@ -2085,7 +2334,7 @@ void main() {
     expect(find.text('四球'), findsNothing);
     expect(find.text('左飛'), findsNothing);
     expect(find.text('二ゴ'), findsNothing);
-    expect(find.text('タイムリー'), findsOneWidget);
+    expect(find.text('右タイムリー'), findsOneWidget);
     expect(find.text('代打：M.バルガス'), findsOneWidget);
     expect(find.text('M.バルガス'), findsNothing);
     expect(find.byKey(const ValueKey('pinch-badge')), findsNothing);
@@ -2093,13 +2342,13 @@ void main() {
       (tester.widget<Container>(find.byKey(const ValueKey('pinch-caption-0'))).decoration as BoxDecoration).color,
       const Color(0xFF5C6BC0),
     );
-    expect(tester.getTopLeft(find.text('中安')).dx, lessThan(tester.getTopLeft(find.text('タイムリー')).dx));
+    expect(tester.getTopLeft(find.text('中安')).dx, lessThan(tester.getTopLeft(find.text('右タイムリー')).dx));
     expect(
       tester.getTopLeft(find.text('代打：M.バルガス')).dx,
-      greaterThan(tester.getTopRight(find.text('タイムリー')).dx - 1),
+      greaterThan(tester.getTopRight(find.text('右タイムリー')).dx - 1),
     );
     final boardRight = tester.getRect(find.byType(GamesBoardYahooStyle)).right;
-    for (final label in ['中安', 'タイムリー']) {
+    for (final label in ['中安', '右タイムリー']) {
       expect(tester.getRect(find.text(label)).right, lessThanOrEqualTo(boardRight + 0.5));
     }
     expect(tester.getRect(find.text('代打：M.バルガス')).right, lessThanOrEqualTo(boardRight + 0.5));
@@ -2165,7 +2414,7 @@ void main() {
     expect(find.text('トミー・ファム'), findsOneWidget);
     expect(find.text('二ゴ'), findsNothing);
     expect(find.text('左飛'), findsNothing);
-    expect(find.text('代打同点タイムリー'), findsOneWidget);
+    expect(find.text('代打同点右タイムリー'), findsOneWidget);
     expect(find.text('代守：ブレンドン・ドイル'), findsOneWidget);
     expect(find.text('ブレンドン・ドイル'), findsNothing);
     expect(find.byKey(const ValueKey('pinch-badge')), findsNothing);
@@ -2175,7 +2424,7 @@ void main() {
     );
     expect(
       tester.getTopLeft(find.text('代守：ブレンドン・ドイル')).dx,
-      greaterThan(tester.getTopRight(find.text('代打同点タイムリー')).dx - 1),
+      greaterThan(tester.getTopRight(find.text('代打同点右タイムリー')).dx - 1),
     );
   });
 
@@ -2369,6 +2618,76 @@ void main() {
     expect(samePlayerStatName('S.大谷', '大谷翔平'), isTrue);
     expect(samePlayerStatName('菊池雄星', 'K.菊池'), isTrue);
     expect(samePlayerStatName('東克樹', '村上頌樹'), isFalse);
+    expect(samePlayerStatName('ブレーデン・モンゴメリー', 'コルソン・モンゴメリー'), isFalse);
+  });
+
+  testWidgets('White Sox 9th Montgomery keeps his own batting chips', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 640,
+            height: 360,
+            child: GamesBoardYahooStyle(
+              games: [
+                {
+                  'date_game': '2026-10-06',
+                  'time_game': '🌙 09:15',
+                  'name_team_home': 'ガーディアンズ',
+                  'name_team_away': 'ホワイトソックス',
+                  'name_stadium': 'プログレッシブフィールド',
+                  'name_pitcher_home': 'A',
+                  'name_pitcher_away': 'B',
+                  'score_home': 3,
+                  'score_away': 4,
+                  'state': '試合終了',
+                  'id_team_home': 202,
+                  'id_team_away': 201,
+                  'id_league_home': 3,
+                  'id_league_away': 3,
+                  'color_back_home': '#0C2340',
+                  'color_back_away': '#000000',
+                  'color_font_home': '#FFFFFF',
+                  'color_font_away': '#FFFFFF',
+                  'lineup': [
+                    {
+                      'id_team': 201,
+                      'order': 7,
+                      'players': [
+                        {'name': 'ブレーデン・モンゴメリー', 'pos': '右', 'plays': '空三振|out 右２|double'},
+                      ],
+                    },
+                    {
+                      'id_team': 201,
+                      'order': 9,
+                      'players': [
+                        {'name': 'コルソン・モンゴメリー', 'pos': '遊', 'plays': '四球|walk 空三振|out 見三振|out 三邪飛|out'},
+                      ],
+                    },
+                  ],
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.tap(find.text('活躍選手のみ表示'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.text('出場選手全表示').last);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.text('ブレーデン・モンゴメリー'), findsOneWidget);
+    expect(find.text('コルソン・モンゴメリー'), findsOneWidget);
+    expect(find.text('9'), findsWidgets);
+    expect(find.text('四球'), findsOneWidget);
+    expect(find.text('三邪'), findsOneWidget);
+    expect(tester.getTopLeft(find.text('コルソン・モンゴメリー')).dy, greaterThan(tester.getTopLeft(find.text('ブレーデン・モンゴメリー')).dy));
+    expect(tester.getTopLeft(find.text('四球')).dy, greaterThan(tester.getTopLeft(find.text('右２')).dy - 2));
   });
 
   testWidgets('MLB game cards put Japan flag to the right of Japanese names', (tester) async {
@@ -2475,7 +2794,8 @@ void main() {
     await tester.pump();
     expect(find.textContaining('👑'), findsOneWidget);
     expect(find.textContaining('🇯🇵'), findsOneWidget);
-    expect(tester.getTopLeft(find.textContaining('👑')).dx, greaterThan(tester.getTopLeft(find.textContaining('山本由伸')).dx));
+    expect(tester.getTopLeft(find.textContaining('🇯🇵')).dx, greaterThan(tester.getTopLeft(find.textContaining('山本由伸')).dx));
+    expect(tester.getTopLeft(find.textContaining('👑')).dx, greaterThan(tester.getTopLeft(find.textContaining('🇯🇵')).dx));
   });
 
   testWidgets('NPB regular season cards do not show Japan flag or crown', (tester) async {
@@ -2946,7 +3266,7 @@ void main() {
     expect(find.text('中安'), findsOneWidget);
     expect(find.text('2点犠打'), findsOneWidget);
     expect(find.text('犠飛'), findsOneWidget);
-    expect(find.text('タイムリー'), findsOneWidget);
+    expect(find.text('左タイムリー'), findsOneWidget);
     expect(find.text('ソロホームラン'), findsOneWidget);
     expect(find.text('四球'), findsNothing);
     expect(find.text('三振'), findsNothing);
@@ -3361,10 +3681,12 @@ void main() {
     await pumpVelo(157);
     await tester.pump();
     expect(find.text('157km'), findsOneWidget);
-    expect(find.byType(BlinkBg), findsWidgets);
+    expect(find.ancestor(of: find.text('157km'), matching: find.byType(BlinkBg)), findsOneWidget);
+    expect(tester.getTopLeft(find.text('157km')).dx, greaterThan(tester.getTopLeft(find.text('90球')).dx));
     await pumpVelo(162);
     await tester.pump();
     expect(find.text('162km'), findsOneWidget);
+    expect(find.ancestor(of: find.text('162km'), matching: find.byType(BlinkBg)), findsOneWidget);
     expect(find.text('157km'), findsNothing);
   });
 
@@ -3416,6 +3738,82 @@ void main() {
     );
     await tester.pump();
     expect(find.text('100mph'), findsOneWidget);
-    expect(find.byType(BlinkBg), findsWidgets);
+    expect(find.ancestor(of: find.text('100mph'), matching: find.byType(BlinkBg)), findsOneWidget);
+    expect(tester.getTopLeft(find.text('100mph')).dx, greaterThan(tester.getTopLeft(find.text('99球')).dx));
+  });
+
+  testWidgets('試合中の全員表示は未打席のスタメンも9人出す', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 640,
+            height: 420,
+            child: GamesBoardYahooStyle(
+              games: [
+                {
+                  'date_game': '2026-10-07',
+                  'time_game': '☀️ 07:00',
+                  'name_team_home': 'ブレーブス',
+                  'name_team_away': 'ドジャース',
+                  'name_stadium': 'トゥルイストパーク',
+                  'name_pitcher_home': 'L.トーマス',
+                  'name_pitcher_away': '山本',
+                  'score_home': 0,
+                  'score_away': 0,
+                  'state': '2回表',
+                  'id_team_home': 41,
+                  'id_team_away': 35,
+                  'id_league_home': 4,
+                  'id_league_away': 4,
+                  'color_back_home': '#CE1141',
+                  'color_back_away': '#005A9C',
+                  'color_font_home': '#FFFFFF',
+                  'color_font_away': '#FFFFFF',
+                  'lineup': [
+                    for (final entry in [
+                      (1, '大谷翔平', '指', '四球|walk'),
+                      (2, 'ベッツ', '遊', '中安|single'),
+                      (3, 'フリーマン', '一', ''),
+                      (4, 'スミス', '捕', ''),
+                      (5, 'テオスカー', '右', ''),
+                      (6, 'エドマン', '三', ''),
+                      (7, 'ペイジズ', '中', ''),
+                      (8, 'キケ', '左', ''),
+                      (9, 'ロハス', '二', ''),
+                    ])
+                      {
+                        'id_team': 35,
+                        'order': entry.$1,
+                        'players': [
+                          {'name': entry.$2, 'pos': entry.$3, 'plays': entry.$4},
+                        ],
+                      },
+                  ],
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.tap(find.text('活躍選手のみ表示'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.text('出場選手全表示').last);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.text('大谷翔平'), findsOneWidget);
+    expect(find.text('ベッツ'), findsOneWidget);
+    expect(find.text('フリーマン'), findsOneWidget);
+    expect(find.text('スミス'), findsOneWidget);
+    expect(find.text('テオスカー'), findsOneWidget);
+    expect(find.text('エドマン'), findsOneWidget);
+    expect(find.text('ペイジズ'), findsOneWidget);
+    expect(find.text('キケ'), findsOneWidget);
+    expect(find.text('ロハス'), findsOneWidget);
   });
 }

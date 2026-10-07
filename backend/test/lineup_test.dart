@@ -191,4 +191,75 @@ void main() {
     expect(players.map((player) => player['name']).toList(), ['ジャクソン・メリル']);
     expect(players.single['role'], '');
   });
+
+  test('同姓の先発打者は別の打順枠に残す', () {
+    final lineups = battingLineupsOf(
+      [
+        _row(id: 1, result: Value.CodeGameResult.STRIKE_OUT, batter: 'ブレーデン・モンゴメリー', order: 7),
+        _row(id: 2, result: Value.CodeGameResult.WALK_BALL, batter: 'コルソン・モンゴメリー', order: 9),
+        _row(id: 3, result: Value.CodeGameResult.STRIKE_OUT, batter: 'コルソン・モンゴメリー', order: 9, inning: 5),
+      ],
+      plays: const {
+        '1|201|ブレーデン・モンゴメリー': '空三振|out',
+        '1|201|コルソン・モンゴメリー': '四球|walk 空三振|out',
+      },
+      pitchers: const {},
+    );
+    final seventh = _playersOf(lineups, 7);
+    final ninth = _playersOf(lineups, 9);
+    expect(seventh.single['name'], 'ブレーデン・モンゴメリー');
+    expect(seventh.single['plays'], '空三振|out');
+    expect(ninth.single['name'], 'コルソン・モンゴメリー');
+    expect(ninth.single['plays'], '四球|walk 空三振|out');
+  });
+
+  test('試合中は未打席のスタメンも打順枠に残す', () {
+    final lineups = battingLineupsOf(
+      [
+        _row(id: 1, result: Value.CodeGameResult.HIT_SINGLE, batter: 'スティーブン・クワン', order: 1, team: 202, home: 202, away: 201),
+        _row(id: 2, result: Value.CodeGameResult.WALK_BALL, batter: 'ホセ・ラミレス', order: 2, team: 202, home: 202, away: 201),
+      ],
+      plays: const {
+        '1|202|スティーブン・クワン': '右安|single',
+      },
+      pitchers: const {},
+      starters: [
+        for (final entry in [
+          (1, 'スティーブン・クワン', '中'),
+          (2, 'ホセ・ラミレス', '三'),
+          (3, 'チェース・デローター', '右'),
+          (4, 'ジョ・アデル', '指'),
+          (5, 'ナサニエル・ロウ', '一'),
+          (6, 'アンヘル・マルティネス', '左'),
+          (7, 'トラビス・バザナ', '二'),
+          (8, 'パトリック・ベイリー', '捕'),
+          (9, 'ブラヤン・ロッキオ', '遊'),
+        ])
+          {
+            'id_game': 1,
+            'id_team': 202,
+            'name_full': entry.$2,
+            'int_batting_order': entry.$1,
+            'code_position_from': entry.$3,
+          },
+      ],
+    );
+    final names = [
+      for (var order = 1; order <= 9; order++) _playersOf(lineups, order).first['name'],
+    ];
+    expect(names, [
+      'スティーブン・クワン',
+      'ホセ・ラミレス',
+      'チェース・デローター',
+      'ジョ・アデル',
+      'ナサニエル・ロウ',
+      'アンヘル・マルティネス',
+      'トラビス・バザナ',
+      'パトリック・ベイリー',
+      'ブラヤン・ロッキオ',
+    ]);
+    expect(_playersOf(lineups, 4).single['pos'], '指');
+    expect(_playersOf(lineups, 1).single['plays'], '右安|single');
+    expect(_playersOf(lineups, 9).single['plays'], '');
+  });
 }

@@ -19,7 +19,7 @@ void main() {
     );
     expect(
       Postgres.isBrokenConnection(
-        SocketException('Failed host lookup: db.example'),
+        const SocketException('Failed host lookup: db.example'),
       ),
       isTrue,
     );

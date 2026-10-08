@@ -4,6 +4,7 @@ import '../AppSql.dart';
 import '../../tools/Postgres.dart';
 
 class m_user extends DBModel {
+  @override
   String tableName = 'm_user';
   String name_last = '';
   String name_first = '';
@@ -35,6 +36,7 @@ class m_user extends DBModel {
     return user;
   }
 
+  @override
   Map<String, dynamic> toMap() {
     return super.toMap()
       ..addAll({

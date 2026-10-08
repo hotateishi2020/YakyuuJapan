@@ -79,7 +79,7 @@ class AppSql {
     for (final player in players) {
       // 文字列補間を使用して値を直接埋め込み
       // null のときはクォートなしの NULL（'NULL'::date だと日付文字列として解釈され失敗する）
-      String date_birth = player.date_birth == null
+      String dateBirth = player.date_birth == null
           ? 'NULL'
           : "'${player.date_birth!.year.toString().padLeft(4, '0')}-"
               "${player.date_birth!.month.toString().padLeft(2, '0')}-"
@@ -95,7 +95,7 @@ class AppSql {
           ${player.pitching},
           ${player.batting},
           '${player.uniform_number}',
-          ${date_birth} ::timestamp
+          $dateBirth ::timestamp
         FROM m_player
         WHERE NOT EXISTS (
           SELECT 1
@@ -1291,7 +1291,7 @@ SELECT
         ) AS int_game_left,
         game_behind,
         to_char(int_win / (int_win + int_lose) ::NUMERIC * 100, 'FM990.0') || '%' AS pct_win,
-        regexp_replace(to_char(num_avg_batting, 'FM0.000'), '^0(?=\.)', '') AS num_avg_batting,
+        regexp_replace(to_char(num_avg_batting, 'FM0.000'), '^0(?=.)', '') AS num_avg_batting,
         int_homerun,
         int_rbi,
         int_sh,
@@ -1384,7 +1384,7 @@ ORDER BY mt.id_league, tpt.int_rank
         CASE WHEN m_stats.code_display = 'INTEGER' THEN TRUNC(stats)::int::text
              WHEN m_stats.code_display = 'INT_DEC_2' THEN to_char(stats, 'FM90.00')
              WHEN m_stats.code_display = 'INT_DEC_3' THEN to_char(stats, '0.000')
-             WHEN m_stats.code_display = 'NUM_NO_ZERO_3' THEN regexp_replace(to_char(stats, 'FM0.000'), '^0(?=\.)', '')
+             WHEN m_stats.code_display = 'NUM_NO_ZERO_3' THEN regexp_replace(to_char(stats, 'FM0.000'), '^0(?=.)', '')
              WHEN m_stats.code_display = 'DEC_1' THEN to_char(stats, 'FM990.0')
              WHEN m_stats.code_display = 'RATE_ATTEMPT' THEN to_char(stats, 'FM990.0') || ' (' || cnt_play::text || ')'
              ELSE to_char(stats, '')

@@ -15,7 +15,13 @@ For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
+
+
+
+
 ↓デプロイ記述↓
+
+
 
 cd /Users/standapp/StudioProjects/Koko 
 
@@ -27,10 +33,18 @@ cp -R build/web/* backend/public/
 
 git add . 
 
-git commit -m "個人成績読み込み修正" 
+git commit -m "試合情報の守備位置を表示するようにしました。" 
 
 git push 
 
 cd /Users/standapp/StudioProjects/Koko/backend
 
 dart run tool_sql.dart
+
+dart run tool_sql2.dart
+
+
+
+
+
+コピペ：：dart run index.dart 

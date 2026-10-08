@@ -330,7 +330,7 @@ String boxBadgePosition(String raw) => _badgePosition(raw);
 _BoxPlay? classifyBoxPlay(String raw) {
   final text = raw.replaceAll(RegExp(r'\s+'), '');
   if (text.isEmpty) return null;
-  final r = Value.CodeGameResult;
+  const r = Value.CodeGameResult;
   final direction = _boxDirection(text);
   if (text.contains('打妨') || text.contains('打撃妨害')) return _BoxPlay(r.INTERFERENCE_BATTING, '', 0);
   if (text.contains('野選')) return _BoxPlay(r.FIELDERS_CHOICE, direction, 0);
@@ -469,7 +469,7 @@ void applyBoxPlateScoring(List<BoxPlate> plates) {
   var bottom = false;
   var scoreHome = 0;
   var scoreAway = 0;
-  final r = Value.CodeGameResult;
+  const r = Value.CodeGameResult;
   for (final plate in ordered) {
     if (plate.inning != inning || plate.bottom != bottom) {
       first = false;
@@ -525,13 +525,7 @@ void applyBoxPlateScoring(List<BoxPlate> plates) {
       third = false;
     } else if (plate.result == r.SACRIFICE_FLY) {
       third = false;
-    } else if (plate.result == r.HIT_SINGLE ||
-        plate.result == r.WALK_BALL ||
-        plate.result == r.WALK_DEAD ||
-        plate.result == r.ERROR_FIELDING ||
-        plate.result == r.INTERFERENCE_BATTING ||
-        plate.result == r.FIELDERS_CHOICE ||
-        plate.result == r.DROPPED_THIRD) {
+    } else if (plate.result == r.HIT_SINGLE || plate.result == r.WALK_BALL || plate.result == r.WALK_DEAD || plate.result == r.ERROR_FIELDING || plate.result == r.INTERFERENCE_BATTING || plate.result == r.FIELDERS_CHOICE || plate.result == r.DROPPED_THIRD) {
       third = second;
       second = first;
       first = true;
@@ -544,8 +538,7 @@ bool _sameBatter(String boxName, String liveName) {
   final live = StringTool.noSpace(liveName);
   if (box.isEmpty || live.isEmpty) return false;
   if (box == live || box.startsWith(live) || live.startsWith(box)) return true;
-  return playerNameMatches(query: live, nameFull: box) ||
-      playerNameMatches(query: box, nameFull: live);
+  return playerNameMatches(query: live, nameFull: box) || playerNameMatches(query: box, nameFull: live);
 }
 
 const _positionMarks = {'投', '捕', '一', '二', '三', '遊', '左', '中', '右', '指'};
@@ -571,7 +564,7 @@ String _badgePosition(String raw) {
 String _boxDirection(String text) {
   if (text.isEmpty) return '';
   final head = text.substring(0, 1);
-  final p = Value.CodePosition;
+  const p = Value.CodePosition;
   return switch (head) {
     '左' => p.LF,
     '中' => p.CF,

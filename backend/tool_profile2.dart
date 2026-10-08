@@ -4,7 +4,11 @@ import 'dart:convert';
 import 'tools/Postgres.dart';
 
 String decode(http.Response res) {
-  try { return utf8.decode(res.bodyBytes, allowMalformed: true); } catch (_) { return res.body; }
+  try {
+    return utf8.decode(res.bodyBytes, allowMalformed: true);
+  } catch (_) {
+    return res.body;
+  }
 }
 
 Future<void> main() async {
@@ -19,11 +23,15 @@ Future<void> main() async {
 
   await Postgres.withConnection((conn) async {
     final teams = await conn.execute("SELECT id, name_shortest, url_npb_players FROM m_team WHERE id_league IN (3,4) AND COALESCE(url_npb_players,'')<>'' LIMIT 5");
-    for (final r in teams) print(r.toColumnMap());
+    for (final r in teams) {
+      print(r.toColumnMap());
+    }
     final p = await conn.execute('''
       SELECT id, name_full, url FROM m_player WHERE id_team BETWEEN 13 AND 42 AND COALESCE(url,'')<>'' LIMIT 5
     ''');
     print('mlb players with url:');
-    for (final r in p) print(r.toColumnMap());
+    for (final r in p) {
+      print(r.toColumnMap());
+    }
   });
 }

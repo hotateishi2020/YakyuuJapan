@@ -50,6 +50,7 @@ class m_player_career extends DBModel {
   int int_earned_runds = 0;
   double double_average_earned_runs = 0;
 
+  @override
   Map<String, dynamic> toMap() {
     return super.toMap()
       ..addAll({

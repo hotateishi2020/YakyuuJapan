@@ -1,6 +1,7 @@
 import '../../tools/DBModel.dart';
 
 class t_system_log extends DBModel {
+  @override
   String tableName = 't_system_log';
   String method = '';
   String category = '';
@@ -12,6 +13,7 @@ class t_system_log extends DBModel {
   int id_log_error = 0;
   bool flg_check = false;
 
+  @override
   Map<String, dynamic> toMap() {
     return super.toMap()
       ..addAll({

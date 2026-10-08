@@ -759,6 +759,7 @@ void _attachLiveBatters(List<Map<String, dynamic>> games, List<Map<String, dynam
     if (name.isEmpty) continue;
     game['name_batter'] = name;
     game['id_team_batter'] = teamId;
+    game['int_batter_order'] = nextOrder;
   }
 }
 

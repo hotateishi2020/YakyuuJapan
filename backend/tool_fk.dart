@@ -1,4 +1,5 @@
 import 'tools/Postgres.dart';
+
 Future<void> main() async {
   await Postgres.withConnection((conn) async {
     final fk = await conn.execute('''
@@ -8,7 +9,9 @@ Future<void> main() async {
       JOIN information_schema.constraint_column_usage ccu ON ccu.constraint_name = tc.constraint_name
       WHERE tc.table_name='m_player' AND tc.constraint_type='FOREIGN KEY'
     ''').timeout(const Duration(seconds: 15));
-    for (final r in fk) print(r.toColumnMap());
+    for (final r in fk) {
+      print(r.toColumnMap());
+    }
     // create place table
     await conn.execute('''
       CREATE TABLE IF NOT EXISTS m_place_birth (
@@ -33,7 +36,9 @@ Future<void> main() async {
       SELECT '日本', '🇯🇵', false, 0, 'BirthPlaceRegistry', 'BirthPlaceRegistry', 0, 'BirthPlaceRegistry', 'BirthPlaceRegistry'
       WHERE NOT EXISTS (SELECT 1 FROM m_country WHERE name = '日本' AND COALESCE(flg_delete,false)=false)
     ''').timeout(const Duration(seconds: 15));
-    final c = await conn.execute("SELECT id,name,emoji FROM m_country").timeout(const Duration(seconds:10));
-    for (final r in c) print(r.toColumnMap());
+    final c = await conn.execute("SELECT id,name,emoji FROM m_country").timeout(const Duration(seconds: 10));
+    for (final r in c) {
+      print(r.toColumnMap());
+    }
   });
 }

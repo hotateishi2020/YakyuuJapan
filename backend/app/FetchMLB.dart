@@ -27,7 +27,7 @@ import 'PlayerName.dart';
 
 /// MLB 用スクレイプ。Yahoo HTML の読み方は NPB と共通化しつつ、URL・地区構成だけ差し替える。
 class FetchMLB {
-  static final _org = OrgKind.mlb;
+  static const _org = OrgKind.mlb;
 
   /// 地区順位表（最大6表）を読み、ア／ナ各リーグ内の勝率順で総合順位を付ける。
   static Future<Response> fetchStatsTeam(Connection conn) async {
@@ -394,7 +394,7 @@ class FetchMLB {
       updated++;
       print('MLB日本人補完: $name @ $teamName');
     }
-    print('MLB日本人補完: ${updated}件 / 年度別成績新規: $careers行');
+    print('MLB日本人補完: $updated件 / 年度別成績新規: $careers行');
     return updated;
   }
 

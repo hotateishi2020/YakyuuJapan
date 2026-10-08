@@ -7,6 +7,10 @@ class BlinkBg extends StatefulWidget {
   final Color color;
   final double radius;
   final Duration duration;
+  final double fillMin;
+  final double fillMax;
+  final Color borderColor;
+  final double borderWidth;
 
   const BlinkBg({
     super.key,
@@ -15,6 +19,10 @@ class BlinkBg extends StatefulWidget {
     required this.color,
     this.radius = 4,
     this.duration = const Duration(milliseconds: 1000),
+    this.fillMin = 0,
+    this.fillMax = 0.85,
+    this.borderColor = Colors.orange,
+    this.borderWidth = 1,
   });
 
   @override
@@ -43,8 +51,9 @@ class _BlinkBgState extends State<BlinkBg> with SingleTickerProviderStateMixin {
     return AnimatedBuilder(
       animation: _t,
       builder: (context, child) {
-        final double backgroundAlpha = (0.85 * _t.value).clamp(0.0, 1.0);
-        final double borderAlpha = _t.value.clamp(0.0, 1.0);
+        final span = (widget.fillMax - widget.fillMin).clamp(0.0, 1.0);
+        final double backgroundAlpha = (widget.fillMin + span * _t.value).clamp(0.0, 1.0);
+        final double borderAlpha = (widget.fillMin + (1 - widget.fillMin) * _t.value).clamp(0.0, 1.0);
         return Stack(children: [
           Positioned.fill(child: Container(decoration: widget.base)),
           Positioned.fill(
@@ -53,8 +62,8 @@ class _BlinkBgState extends State<BlinkBg> with SingleTickerProviderStateMixin {
                 color: widget.color.withValues(alpha: backgroundAlpha),
                 borderRadius: BorderRadius.circular(widget.radius),
                 border: Border.all(
-                  color: Colors.orange.withValues(alpha: borderAlpha),
-                  width: 1,
+                  color: widget.borderColor.withValues(alpha: borderAlpha),
+                  width: widget.borderWidth,
                 ),
               ),
             ),

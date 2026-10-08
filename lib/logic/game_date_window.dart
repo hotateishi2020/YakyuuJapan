@@ -5,7 +5,7 @@ const kGamesSqlPastDays = 3;
 const kGamesSqlFutureDays = 10;
 
 DateTime? parseYmd(String? raw) {
-  final match = RegExp(r'(\d{4})-(\d{2})-(\d{2})').firstMatch('${raw ?? ''}');
+  final match = RegExp(r'(\d{4})-(\d{2})-(\d{2})').firstMatch(raw ?? '');
   if (match == null) return null;
   return DateTime(
     int.parse(match.group(1)!),

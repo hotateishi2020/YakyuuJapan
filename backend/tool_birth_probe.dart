@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'tools/Postgres.dart';
+
 Future<void> main() async {
   await Postgres.withConnection((conn) async {
     final a = await conn.execute('''
@@ -25,6 +26,8 @@ Future<void> main() async {
       ORDER BY (p.date_birth IS NULL) DESC, p.name_full
       LIMIT 15
     ''').timeout(const Duration(seconds: 20));
-    for (final r in b) stdout.writeln(r.toColumnMap());
+    for (final r in b) {
+      stdout.writeln(r.toColumnMap());
+    }
   });
 }

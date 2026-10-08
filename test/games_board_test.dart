@@ -71,7 +71,7 @@ void main() {
           child: SizedBox(
             width: 240,
             height: 90,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 game,
                 {
@@ -131,7 +131,7 @@ void main() {
           child: SizedBox(
             width: 320,
             height: 420,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   ...base,
@@ -368,7 +368,7 @@ void main() {
           child: SizedBox(
             width: 320,
             height: 160,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: nested,
               horizontal: true,
             ),
@@ -677,7 +677,7 @@ void main() {
           child: SizedBox(
             width: 400,
             height: 120,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [game('巨人'), game('阪神')],
               horizontal: true,
             ),
@@ -708,7 +708,7 @@ void main() {
           child: SizedBox(
             width: 420,
             height: 280,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-04',
@@ -762,7 +762,7 @@ void main() {
           child: SizedBox(
             width: 420,
             height: 280,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-02',
@@ -911,8 +911,8 @@ void main() {
     expect(find.text('114.2%'), findsOneWidget);
     expect(find.text('勝敗'), findsNWidgets(2));
     expect(find.text('防御率'), findsNWidgets(2));
-    expect(find.text('活躍選手のみ表示'), findsNothing);
-    expect(find.text('出場選手全表示'), findsNothing);
+    expect(find.text('詳細表示'), findsNothing);
+    expect(find.byType(Checkbox), findsNothing);
   });
 
   testWidgets('pregame score logos sit beside the 試合前 label at 80% cell height', (tester) async {
@@ -922,7 +922,7 @@ void main() {
           child: SizedBox(
             width: 420,
             height: 220,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -976,7 +976,7 @@ void main() {
           child: SizedBox(
             width: 520,
             height: 320,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -1024,7 +1024,7 @@ void main() {
           child: SizedBox(
             width: 520,
             height: 320,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               playerStats: [
                 stat('最多勝', '村上頌樹', 3),
                 stat('防御率', '村上頌樹', 2),
@@ -1077,7 +1077,7 @@ void main() {
           child: SizedBox(
             width: 520,
             height: 220,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-03',
@@ -1176,7 +1176,7 @@ void main() {
           child: SizedBox(
             width: 320,
             height: 220,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [game('DeNA', 5), game('阪神', 2)],
               horizontal: true,
             ),
@@ -1203,7 +1203,7 @@ void main() {
           child: SizedBox(
             width: 240,
             height: 180,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-09-28',
@@ -1304,7 +1304,7 @@ void main() {
           child: SizedBox(
             width: 520,
             height: 160,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-09-30',
@@ -1393,7 +1393,7 @@ void main() {
           child: SizedBox(
             width: 640,
             height: 420,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-03',
@@ -1482,23 +1482,20 @@ void main() {
     expect(find.text('2打点'), findsNothing);
     expect(find.byKey(const ValueKey('rbi-badge-1')), findsWidgets);
 
-    expect(find.text('活躍選手のみ表示'), findsOneWidget);
-    final pickerLabel = tester.getRect(find.text('活躍選手のみ表示'));
-    final picker = tester.getRect(find.ancestor(of: find.text('活躍選手のみ表示'), matching: find.byType(Material)).first);
+    expect(find.text('詳細表示'), findsOneWidget);
+    expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isFalse);
+    final roster = tester.getRect(find.text('詳細表示'));
+    final statsHeader = tester.getRect(find.text('選手成績'));
     final venue = tester.getRect(find.textContaining('ZOZOマリン'));
-    expect(picker.left, lessThan(venue.left - 4));
-    expect((picker.center.dy - venue.center.dy).abs(), lessThan(12));
-    expect(picker.width, greaterThan(pickerLabel.width + 8));
-    expect(picker.width, greaterThanOrEqualTo(118));
     final board = tester.getRect(find.byType(GamesBoardYahooStyle));
     final timeRect = tester.getRect(find.textContaining('🌙 18:00').first);
-    final headerMid = (timeRect.left + venue.right) / 2;
-    expect(headerMid, closeTo(board.center.dx, 36));
+    expect(timeRect.left, lessThan(venue.left));
+    expect(timeRect.left, closeTo(board.left + 4, 12));
+    expect(roster.top, greaterThan(statsHeader.bottom - 1));
+    expect(roster.top, lessThan(statsHeader.bottom + 24));
+    expect(roster.left, lessThan(board.center.dx));
 
-    await tester.tap(find.text('活躍選手のみ表示'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-    await tester.tap(find.text('出場選手全表示').last);
+    await tester.tap(find.text('詳細表示'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
@@ -1545,7 +1542,7 @@ void main() {
           child: SizedBox(
             width: 520,
             height: 220,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-02',
@@ -1591,7 +1588,7 @@ void main() {
           child: SizedBox(
             width: 640,
             height: 180,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-09-30',
@@ -1687,7 +1684,7 @@ void main() {
           child: SizedBox(
             width: 640,
             height: 160,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-09-30',
@@ -1776,7 +1773,7 @@ void main() {
           child: SizedBox(
             width: 640,
             height: 160,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-06',
@@ -1833,7 +1830,7 @@ void main() {
           child: SizedBox(
             width: 640,
             height: 160,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -1891,7 +1888,7 @@ void main() {
           child: SizedBox(
             width: 640,
             height: 240,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               horizontal: true,
               games: [
                 {
@@ -2033,7 +2030,7 @@ void main() {
           child: SizedBox(
             width: 360,
             height: 480,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-03',
@@ -2086,7 +2083,7 @@ void main() {
           child: SizedBox(
             width: 360,
             height: 220,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-06',
@@ -2132,7 +2129,7 @@ void main() {
           child: SizedBox(
             width: 360,
             height: 320,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-02',
@@ -2198,7 +2195,7 @@ void main() {
           child: SizedBox(
             width: 360,
             height: 520,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-08',
@@ -2256,7 +2253,7 @@ void main() {
           child: SizedBox(
             width: 520,
             height: 180,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-05',
@@ -2327,7 +2324,7 @@ void main() {
           child: SizedBox(
             width: 560,
             height: 180,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-06',
@@ -2390,7 +2387,7 @@ void main() {
           child: SizedBox(
             width: 420,
             height: 200,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-06',
@@ -2478,7 +2475,7 @@ void main() {
           child: SizedBox(
             width: 640,
             height: 220,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-06',
@@ -2552,7 +2549,7 @@ void main() {
           child: SizedBox(
             width: 640,
             height: 360,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-05',
@@ -2601,10 +2598,7 @@ void main() {
       ),
     );
     await tester.pump();
-    await tester.tap(find.text('活躍選手のみ表示'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-    await tester.tap(find.text('出場選手全表示').last);
+    await tester.tap(find.text('詳細表示'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
@@ -2621,7 +2615,7 @@ void main() {
           child: SizedBox(
             width: 420,
             height: 160,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-03-27',
@@ -2783,7 +2777,7 @@ void main() {
           child: SizedBox(
             width: 640,
             height: 360,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-06',
@@ -2829,10 +2823,7 @@ void main() {
       ),
     );
     await tester.pump();
-    await tester.tap(find.text('活躍選手のみ表示'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-    await tester.tap(find.text('出場選手全表示').last);
+    await tester.tap(find.text('詳細表示'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
@@ -2852,7 +2843,7 @@ void main() {
           child: SizedBox(
             width: 420,
             height: 220,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-08',
@@ -2907,7 +2898,7 @@ void main() {
           child: SizedBox(
             width: 420,
             height: 200,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-08',
@@ -2960,7 +2951,7 @@ void main() {
           child: SizedBox(
             width: 360,
             height: 180,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-08',
@@ -3011,7 +3002,7 @@ void main() {
           child: SizedBox(
             width: 560,
             height: 220,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -3087,7 +3078,7 @@ void main() {
           child: SizedBox(
             width: 640,
             height: 260,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -3180,7 +3171,7 @@ void main() {
     expect(find.text('佐藤輝明'), findsWidgets);
     expect(find.text('近本光司'), findsWidgets);
     expect(find.text('森下翔太'), findsWidgets);
-    expect(find.text('中野拓夢'), findsOneWidget);
+    expect(find.text('中野拓夢'), findsNothing);
     expect(find.text('HR'), findsOneWidget);
     expect(find.text('三'), findsOneWidget);
     expect(find.text('中'), findsOneWidget);
@@ -3197,7 +3188,7 @@ void main() {
           child: SizedBox(
             width: 560,
             height: 220,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -3273,7 +3264,7 @@ void main() {
           child: SizedBox(
             width: 560,
             height: 280,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-06',
@@ -3352,8 +3343,8 @@ void main() {
     expect(find.text('近本光司'), findsWidgets);
     expect(find.text('佐藤輝明'), findsWidgets);
     expect(find.text('坂倉将吾'), findsWidgets);
-    expect(find.text('髙寺望夢'), findsOneWidget);
-    expect(find.text('菊池涼介'), findsOneWidget);
+    expect(find.text('髙寺望夢'), findsNothing);
+    expect(find.text('菊池涼介'), findsNothing);
     expect(find.textContaining('タイムリー'), findsWidgets);
     expect(find.text('中安'), findsOneWidget);
   });
@@ -3365,7 +3356,7 @@ void main() {
           child: SizedBox(
             width: 640,
             height: 220,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -3434,7 +3425,7 @@ void main() {
           child: SizedBox(
             width: 560,
             height: 220,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -3508,7 +3499,7 @@ void main() {
           child: SizedBox(
             width: 560,
             height: 220,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -3575,7 +3566,7 @@ void main() {
           child: SizedBox(
             width: 420,
             height: 180,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -3618,7 +3609,7 @@ void main() {
           child: SizedBox(
             width: 640,
             height: 280,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-06',
@@ -3689,10 +3680,7 @@ void main() {
       ),
     );
     await tester.pump();
-    await tester.tap(find.text('活躍選手のみ表示'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-    await tester.tap(find.text('出場選手全表示').last);
+    await tester.tap(find.text('詳細表示'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
@@ -3725,7 +3713,7 @@ void main() {
           child: SizedBox(
             width: 640,
             height: 280,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-03',
@@ -3768,10 +3756,7 @@ void main() {
       ),
     );
     await tester.pump();
-    await tester.tap(find.text('活躍選手のみ表示'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-    await tester.tap(find.text('出場選手全表示').last);
+    await tester.tap(find.text('詳細表示'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
@@ -3792,7 +3777,7 @@ void main() {
             child: SizedBox(
               width: 520,
               height: 200,
-              child: GamesBoardYahooStyle(
+              child: GamesBoardYahooStyle(initialStatsExpanded: true, 
                 games: [
                   {
                     'date_game': '2026-10-07',
@@ -3852,7 +3837,7 @@ void main() {
           child: SizedBox(
             width: 520,
             height: 200,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -3897,14 +3882,14 @@ void main() {
     expect(tester.getTopLeft(find.text('100mph')).dx, greaterThan(tester.getTopLeft(find.text('99球')).dx));
   });
 
-  testWidgets('試合中の全員表示は未打席のスタメンも9人出す', (tester) async {
+  testWidgets('試合中の詳細表示は未打席のスタメンも9人出す', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 420,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -3954,7 +3939,8 @@ void main() {
       ),
     );
     await tester.pump();
-    expect(find.text('出場選手全表示'), findsOneWidget);
+    expect(find.text('詳細表示'), findsOneWidget);
+    expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isTrue);
 
     expect(find.text('大谷翔平'), findsWidgets);
     expect(find.text('ベッツ'), findsWidgets);
@@ -3967,14 +3953,14 @@ void main() {
     expect(find.text('ロハス'), findsWidgets);
   });
 
-  testWidgets('全員表示は打点のあるアウトにも打点バッジを付ける', (tester) async {
+  testWidgets('詳細表示は打点のあるアウトにも打点バッジを付ける', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 520,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -4021,10 +4007,7 @@ void main() {
       ),
     );
     await tester.pump();
-    await tester.tap(find.text('活躍選手のみ表示'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-    await tester.tap(find.text('出場選手全表示').last);
+    await tester.tap(find.text('詳細表示'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
     expect(find.byKey(const ValueKey('rbi-badge-1')), findsOneWidget);
@@ -4037,7 +4020,7 @@ void main() {
           child: SizedBox(
             width: 640,
             height: 520,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -4056,6 +4039,7 @@ void main() {
                   'id_league_away': 4,
                   'name_batter': 'オルソン',
                   'id_team_batter': 28,
+                  'int_batter_order': 3,
                   'color_back_home': '#CE1141',
                   'color_back_away': '#005A9C',
                   'color_font_home': '#FFFFFF',
@@ -4078,9 +4062,14 @@ void main() {
       ),
     );
     await tester.pump();
-    expect(find.text('出場選手全表示'), findsOneWidget);
+    expect(find.text('詳細表示'), findsOneWidget);
+    expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isTrue);
     expect(find.byKey(const ValueKey('live-batter-stats')), findsOneWidget);
     expect(find.text('Now'), findsOneWidget);
+    final nowBlink = tester.widget<BlinkBg>(find.byKey(const ValueKey('live-batter-stats')));
+    expect(nowBlink.duration, const Duration(milliseconds: 380));
+    expect(nowBlink.color, const Color(0xFFFF6D00));
+    expect(nowBlink.fillMax, 1);
     final now = tester.getRect(find.byKey(const ValueKey('now-play-chip')));
     final blink = tester.getRect(find.byKey(const ValueKey('live-batter-stats')));
     final hit = tester.getRect(find.text('右安'));
@@ -4097,7 +4086,7 @@ void main() {
           child: SizedBox(
             width: 640,
             height: 520,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -4114,8 +4103,10 @@ void main() {
                   'id_team_away': 40,
                   'id_league_home': 4,
                   'id_league_away': 4,
-                  'name_batter': '大谷',
-                  'id_team_batter': 40,
+                  'int_outs': 3,
+                  'name_batter': 'プロファー',
+                  'id_team_batter': 28,
+                  'int_batter_order': 1,
                   'color_back_home': '#CE1141',
                   'color_back_away': '#005A9C',
                   'color_font_home': '#FFFFFF',
@@ -4152,6 +4143,67 @@ void main() {
     expect((now - homeName).distance, lessThan((now - awayName).distance));
   });
 
+  testWidgets('Nowは次打者の打順だけに出し同姓の他打者には出さない', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 640,
+            height: 520,
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+              games: [
+                {
+                  'date_game': '2026-10-07',
+                  'time_game': '☀️ 07:00',
+                  'name_team_home': 'ロッテ',
+                  'name_team_away': '阪神',
+                  'name_stadium': 'ZOZOマリン',
+                  'name_pitcher_home': 'A',
+                  'name_pitcher_away': 'B',
+                  'score_home': 1,
+                  'score_away': 0,
+                  'state': '5回裏',
+                  'id_team_home': 12,
+                  'id_team_away': 2,
+                  'name_batter': '佐藤二郎',
+                  'id_team_batter': 12,
+                  'int_batter_order': 5,
+                  'color_back_home': '#000000',
+                  'color_back_away': '#FFD200',
+                  'color_font_home': '#FFFFFF',
+                  'color_font_away': '#000000',
+                  'lineup': [
+                    {
+                      'id_team': 12,
+                      'order': 1,
+                      'players': [
+                        {'name': '佐藤太郎', 'role': '', 'pos': '左', 'plays': '三振|out', 'rbi': 0},
+                      ],
+                    },
+                    {
+                      'id_team': 12,
+                      'order': 5,
+                      'players': [
+                        {'name': '佐藤二郎', 'role': '', 'pos': '遊', 'plays': '', 'rbi': 0},
+                      ],
+                    },
+                  ],
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('Now'), findsOneWidget);
+    final now = tester.getCenter(find.byKey(const ValueKey('now-play-chip')));
+    final due = tester.getCenter(find.text('佐藤二郎').first);
+    final other = tester.getCenter(find.text('佐藤太郎').first);
+    expect((now - due).distance, lessThan((now - other).distance));
+  });
+
   testWidgets('非打撃の得点は直後の打撃の左上に青バッジを付け打点にはしない', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -4159,7 +4211,7 @@ void main() {
           child: SizedBox(
             width: 640,
             height: 420,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -4199,14 +4251,14 @@ void main() {
     expect(find.text('中安'), findsOneWidget);
   });
 
-  testWidgets('全員表示のタイムリーとライナーは打球方向を残す', (tester) async {
+  testWidgets('詳細表示のタイムリーとライナーは打球方向を残す', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 420,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -4266,7 +4318,8 @@ void main() {
       ),
     );
     await tester.pump();
-    expect(find.text('出場選手全表示'), findsOneWidget);
+    expect(find.text('詳細表示'), findsOneWidget);
+    expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isTrue);
     expect(find.text('四球'), findsNWidgets(2));
     expect(find.text('左安'), findsOneWidget);
     expect(find.text('左直'), findsOneWidget);
@@ -4288,7 +4341,7 @@ void main() {
           child: SizedBox(
             width: 640,
             height: 280,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -4348,7 +4401,8 @@ void main() {
       ),
     );
     await tester.pump();
-    expect(find.text('活躍選手のみ表示'), findsOneWidget);
+    expect(find.text('詳細表示'), findsOneWidget);
+    expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isFalse);
     expect(find.text('タイムリー'), findsOneWidget);
     expect(find.text('ソロホームラン'), findsOneWidget);
     expect(find.text('遊安'), findsOneWidget);
@@ -4366,7 +4420,7 @@ void main() {
           child: SizedBox(
             width: 520,
             height: 320,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               playerStats: [
                 {
                   'title': 'WHIP',
@@ -4463,7 +4517,7 @@ void main() {
           child: SizedBox(
             width: 640,
             height: 420,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -4511,7 +4565,7 @@ void main() {
           child: SizedBox(
             width: 720,
             height: 420,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -4552,10 +4606,7 @@ void main() {
       ),
     );
     await tester.pump();
-    await tester.tap(find.text('活躍選手のみ表示'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-    await tester.tap(find.text('出場選手全表示').last);
+    await tester.tap(find.text('詳細表示'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
     expect(find.byKey(const ValueKey('rbi-badge-1')), findsOneWidget);
@@ -4604,7 +4655,7 @@ void main() {
           child: SizedBox(
             width: 720,
             height: 280,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-08',
@@ -4635,6 +4686,43 @@ void main() {
     expect(find.text('守備'), findsNothing);
   });
 
+  testWidgets('予告先発が無い試合前は投手欄を出さない', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 720,
+            height: 220,
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+              games: [
+                {
+                  'date_game': '2026-10-08',
+                  'time_game': '🌙 18:00',
+                  'name_team_home': '阪神',
+                  'name_team_away': '巨人',
+                  'name_stadium': '甲子園',
+                  'score_home': -1,
+                  'score_away': -1,
+                  'state': '試合前',
+                  'id_team_home': 2,
+                  'id_team_away': 1,
+                  'color_back_home': '#FFD200',
+                  'color_back_away': '#FF6600',
+                  'color_font_home': '#000000',
+                  'color_font_away': '#000000',
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('投手'), findsNothing);
+    expect(find.text('試合前'), findsOneWidget);
+  });
+
   testWidgets('守備図はスタメンと代守とE/FPを出す', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -4642,7 +4730,7 @@ void main() {
           child: SizedBox(
             width: 900,
             height: 520,
-            child: GamesBoardYahooStyle(
+            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
               games: [
                 {
                   'date_game': '2026-10-08',
@@ -4713,9 +4801,23 @@ void main() {
                     },
                     {
                       'id_team': 8,
+                      'order': 1,
+                      'players': [
+                        {'name': '児玉亮涼', 'pos': '二'},
+                      ],
+                    },
+                    {
+                      'id_team': 8,
                       'order': 7,
                       'players': [
                         {'name': '西川愛也', 'pos': '左'},
+                      ],
+                    },
+                    {
+                      'id_team': 8,
+                      'order': 8,
+                      'players': [
+                        {'name': '西川龍馬', 'pos': '中'},
                       ],
                     },
                     {
@@ -4765,5 +4867,91 @@ void main() {
     expect(catcher.dy, greaterThan(third.dy + 8));
     expect(dh.dy, greaterThan(third.dy + 8));
     expect(dh.dx, lessThan(catcher.dx - 4));
+    final second = tester.getCenter(find.byKey(const ValueKey('defense-name-児玉亮涼')));
+    final short = tester.getCenter(find.byKey(const ValueKey('defense-name-源田壮亮')));
+    final center = tester.getCenter(find.byKey(const ValueKey('defense-name-西川龍馬')));
+    final left = tester.getCenter(find.byKey(const ValueKey('defense-name-西川愛也')));
+    expect(second.dx, greaterThan(short.dx + 16));
+    expect(center.dy, lessThan(left.dy - 6));
+
+    await tester.tap(find.text('詳細表示'));
+    await tester.pump();
+    expect(find.text('守備'), findsNothing);
+    expect(find.byKey(const ValueKey('defense-name-平良海馬')), findsNothing);
+  });
+
+  testWidgets('選手成績は初期表示では畳まれていて開閉できる', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 640,
+            height: 520,
+            child: GamesBoardYahooStyle(
+              games: [
+                {
+                  'date_game': '2026-10-08',
+                  'time_game': '🌙 18:00',
+                  'name_team_home': '阪神',
+                  'name_team_away': '巨人',
+                  'name_stadium': '甲子園',
+                  'name_pitcher_home': '村上頌樹',
+                  'name_pitcher_away': '戸郷翔征',
+                  'score_home': 1,
+                  'score_away': 0,
+                  'state': '5回裏',
+                  'id_team_home': 2,
+                  'id_team_away': 1,
+                  'color_back_home': '#FFD200',
+                  'color_back_away': '#FF6600',
+                  'color_font_home': '#000000',
+                  'color_font_away': '#000000',
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('選手成績'), findsOneWidget);
+    expect(find.text('詳細表示'), findsNothing);
+    expect(find.text('投手'), findsNothing);
+    expect(find.text('村上頌樹'), findsNothing);
+    expect(find.text('5回裏'), findsOneWidget);
+
+    final shell = find.byKey(const ValueKey('game-card-shell-2026-10-08|阪神|巨人'));
+    final collapsedCard = tester.getSize(shell);
+    await tester.tap(find.text('選手成績'));
+    await tester.pump();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 120));
+    final openingCard = tester.getSize(shell);
+    expect(openingCard.height, greaterThan(collapsedCard.height + 8));
+    expect(openingCard.height, lessThan(collapsedCard.height + 420));
+
+    await tester.pump(const Duration(milliseconds: 320));
+    expect(find.text('投手'), findsOneWidget);
+    expect(find.text('村上頌樹'), findsWidgets);
+    final roster = tester.getRect(find.text('詳細表示'));
+    final statsHeader = tester.getRect(find.text('選手成績'));
+    expect(roster.top, greaterThan(statsHeader.bottom - 1));
+    expect(roster.top, lessThan(statsHeader.bottom + 24));
+    final openedCard = tester.getSize(shell);
+    expect(openedCard.height, greaterThan(openingCard.height));
+
+    await tester.tap(find.text('選手成績'));
+    await tester.pump();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 120));
+    final closingCard = tester.getSize(shell);
+    expect(closingCard.height, lessThan(openedCard.height));
+    expect(closingCard.height, greaterThan(120));
+
+    await tester.pump(const Duration(milliseconds: 320));
+    expect(find.text('投手'), findsNothing);
+    expect(find.text('村上頌樹'), findsNothing);
+    expect(find.text('詳細表示'), findsNothing);
   });
 }

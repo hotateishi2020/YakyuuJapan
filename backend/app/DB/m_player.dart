@@ -5,9 +5,10 @@ class m_player extends DBModel {
   String name_first = '';
   String name_full = '';
   String name_middle = '';
+
   /// MLB 略称（J.チョウリオ）照合用のファーストネーム頭文字（A–Z, 最大3文字）
   String name_first_initial = '';
-  DateTime? date_birth = null;
+  DateTime? date_birth;
   int id_team = 0;
   int id_position = 0;
   int height = 0;

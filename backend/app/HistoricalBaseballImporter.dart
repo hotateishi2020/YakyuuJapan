@@ -38,20 +38,7 @@ class HistoricalBaseballImporter {
   };
 
   static const _hittingStatIds = <int>[1, 2, 3, 4, 5, 6, 7, 8, 20, 22];
-  static const _pitchingStatIds = <int>[
-    9,
-    10,
-    11,
-    12,
-    13,
-    14,
-    15,
-    16,
-    17,
-    18,
-    19,
-    21
-  ];
+  static const _pitchingStatIds = <int>[9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21];
 
   static const _bulkHittingCareerSql = '''
     WITH data AS (
@@ -172,12 +159,10 @@ class HistoricalBaseballImporter {
     'not_applicable',
   };
 
-  static String checkpointKey(String org, int year, String dataset) =>
-      '$org|$year|$dataset';
+  static String checkpointKey(String org, int year, String dataset) => '$org|$year|$dataset';
 
   static Future<void> ensureYearRetire(Connection conn) async {
-    await conn.execute(
-        'ALTER TABLE m_player ADD COLUMN IF NOT EXISTS year_retire integer');
+    await conn.execute('ALTER TABLE m_player ADD COLUMN IF NOT EXISTS year_retire integer');
     await conn.execute('''
       WITH last_year AS (
         SELECT id_player, MAX(int_year) AS last_year
@@ -241,28 +226,17 @@ class HistoricalBaseballImporter {
       return;
     }
 
-    await conn
-        .execute('ALTER TABLE m_team ADD COLUMN IF NOT EXISTS source_key text');
-    await conn.execute(
-        'ALTER TABLE m_team ADD COLUMN IF NOT EXISTS external_id text');
-    await conn.execute(
-        'ALTER TABLE m_player ADD COLUMN IF NOT EXISTS source_key text');
-    await conn.execute(
-        'ALTER TABLE m_player ADD COLUMN IF NOT EXISTS external_id text');
-    await conn.execute(
-        'ALTER TABLE t_stats_player ADD COLUMN IF NOT EXISTS int_year integer');
-    await conn.execute(
-        'ALTER TABLE t_stats_team ADD COLUMN IF NOT EXISTS id_league integer');
-    await conn.execute(
-        'ALTER TABLE t_stats_team ADD COLUMN IF NOT EXISTS name_team text');
-    await conn.execute(
-        'ALTER TABLE t_stats_team ADD COLUMN IF NOT EXISTS name_shortest text');
-    await conn.execute(
-        'ALTER TABLE t_stats_team ADD COLUMN IF NOT EXISTS code_area text');
-    await conn
-        .execute('ALTER TABLE t_game ADD COLUMN IF NOT EXISTS source_key text');
-    await conn.execute(
-        'ALTER TABLE t_game ADD COLUMN IF NOT EXISTS external_id text');
+    await conn.execute('ALTER TABLE m_team ADD COLUMN IF NOT EXISTS source_key text');
+    await conn.execute('ALTER TABLE m_team ADD COLUMN IF NOT EXISTS external_id text');
+    await conn.execute('ALTER TABLE m_player ADD COLUMN IF NOT EXISTS source_key text');
+    await conn.execute('ALTER TABLE m_player ADD COLUMN IF NOT EXISTS external_id text');
+    await conn.execute('ALTER TABLE t_stats_player ADD COLUMN IF NOT EXISTS int_year integer');
+    await conn.execute('ALTER TABLE t_stats_team ADD COLUMN IF NOT EXISTS id_league integer');
+    await conn.execute('ALTER TABLE t_stats_team ADD COLUMN IF NOT EXISTS name_team text');
+    await conn.execute('ALTER TABLE t_stats_team ADD COLUMN IF NOT EXISTS name_shortest text');
+    await conn.execute('ALTER TABLE t_stats_team ADD COLUMN IF NOT EXISTS code_area text');
+    await conn.execute('ALTER TABLE t_game ADD COLUMN IF NOT EXISTS source_key text');
+    await conn.execute('ALTER TABLE t_game ADD COLUMN IF NOT EXISTS external_id text');
     await conn.execute('''
       CREATE TABLE IF NOT EXISTS historical_backfill_checkpoint (
         org text NOT NULL,
@@ -465,10 +439,8 @@ class HistoricalBaseballImporter {
       final id = row[0] as int;
       final sourceKey = '${row[1] ?? ''}';
       final fullName = repairUtf8Mojibake('${row[2] ?? ''}') ?? '${row[2] ?? ''}';
-      final shortName =
-          repairUtf8Mojibake('${row[3] ?? ''}') ?? '${row[3] ?? ''}';
-      final shortest =
-          repairUtf8Mojibake('${row[4] ?? ''}') ?? '${row[4] ?? ''}';
+      final shortName = repairUtf8Mojibake('${row[3] ?? ''}') ?? '${row[3] ?? ''}';
+      final shortest = repairUtf8Mojibake('${row[4] ?? ''}') ?? '${row[4] ?? ''}';
       final correctedKey = npbTeamSourceKey(fullName);
       if (fullName.isEmpty) continue;
       final existing = await conn.execute(
@@ -482,13 +454,10 @@ class HistoricalBaseballImporter {
         parameters: [correctedKey, id],
       );
       if (existing.isNotEmpty) {
-        await _repointTeam(
-            conn, keepId: existing.first[0] as int, dropId: id);
+        await _repointTeam(conn, keepId: existing.first[0] as int, dropId: id);
         continue;
       }
-      if (sourceKey != correctedKey ||
-          fullName != '${row[2] ?? ''}' ||
-          shortName != '${row[3] ?? ''}') {
+      if (sourceKey != correctedKey || fullName != '${row[2] ?? ''}' || shortName != '${row[3] ?? ''}') {
         await conn.execute(
           '''
             UPDATE m_team
@@ -616,8 +585,7 @@ class HistoricalBaseballImporter {
         return combined!;
       }
 
-      final sourceTag =
-          leagueSources.map((source) => source.checkpointTag).join('+');
+      final sourceTag = leagueSources.map((source) => source.checkpointTag).join('+');
       final sourceUrls = leagueSources.map((source) => source.uri).join(',');
       for (final dataset in const ['standings', 'hitting', 'pitching']) {
         await _runDataset(
@@ -641,8 +609,7 @@ class HistoricalBaseballImporter {
         final leagueId = leagueSources.first.leagueId;
         final suffix = leagueId == 1 ? 'c' : 'p';
         for (final category in npbDetailedCategories.entries) {
-          final uri = Uri.parse(
-              'https://npb.jp/bis/$year/stats/${category.key}_$suffix.html');
+          final uri = Uri.parse('https://npb.jp/bis/$year/stats/${category.key}_$suffix.html');
           await _runOptionalDataset(
             org: 'npb',
             year: year,
@@ -664,8 +631,7 @@ class HistoricalBaseballImporter {
                 throw StateError('Empty NPB ranking source: $uri');
               }
               final page = await getPage();
-              return _loadNpbDetailedRanking(
-                  page, rows, category.value, leagueId);
+              return _loadNpbDetailedRanking(page, rows, category.value, leagueId);
             },
           );
         }
@@ -684,7 +650,7 @@ class HistoricalBaseballImporter {
           NpbSourceSpec(
             leagueId: 1,
             checkpointTag: 'oneleague-${phase == 's' ? 'spring' : 'fall'}',
-            uri: 'https://npb.jp/bis/yearly/yakyuremmei_${year}$phase.html',
+            uri: 'https://npb.jp/bis/yearly/yakyuremmei_$year$phase.html',
             phase: phase == 's' ? 'spring' : 'fall',
           ),
       ];
@@ -705,12 +671,8 @@ class HistoricalBaseballImporter {
         NpbSourceSpec(
           leagueId: league.value,
           checkpointTag: league.key,
-          uri: year == DateTime.now().year
-              ? 'https://npb.jp/bis/$year/stats/std_${league.value == 1 ? 'c' : 'p'}.html'
-              : 'https://npb.jp/bis/yearly/${league.key}_$year.html',
-          activeStatsBase: year == DateTime.now().year
-              ? 'https://npb.jp/bis/$year/stats'
-              : null,
+          uri: year == DateTime.now().year ? 'https://npb.jp/bis/$year/stats/std_${league.value == 1 ? 'c' : 'p'}.html' : 'https://npb.jp/bis/yearly/${league.key}_$year.html',
+          activeStatsBase: year == DateTime.now().year ? 'https://npb.jp/bis/$year/stats' : null,
         ),
     ];
   }
@@ -742,11 +704,9 @@ class HistoricalBaseballImporter {
         },
       );
 
-  static String npbJapanSeriesUrl(int year) =>
-      'https://npb.jp/bis/scores/nipponseries/linescore$year.html';
+  static String npbJapanSeriesUrl(int year) => 'https://npb.jp/bis/scores/nipponseries/linescore$year.html';
 
-  static String npbClimaxCalendarUrl(int year) =>
-      'https://npb.jp/bis/$year/calendar/index_10.html';
+  static String npbClimaxCalendarUrl(int year) => 'https://npb.jp/bis/$year/calendar/index_10.html';
 
   static List<String> npbClimaxCalendarUrls(int year) => [
         npbClimaxCalendarUrl(year),
@@ -808,13 +768,11 @@ class HistoricalBaseballImporter {
         load: () async {
           try {
             final body = await _getHtml(Uri.parse(url));
-            final games =
-                parseNpbJapanSeries(body, expectedYear: year, sourceUrl: url);
+            final games = parseNpbJapanSeries(body, expectedYear: year, sourceUrl: url);
             if (games.isEmpty) {
               throw StateError('Empty NPB Japan Series source: $url');
             }
-            return PostseasonImportResult(
-                await _loadPostseasonGames(games), 'complete');
+            return PostseasonImportResult(await _loadPostseasonGames(games), 'complete');
           } on HistoricalHttpException catch (error) {
             if (error.statusCode != 404) rethrow;
             if (year == DateTime.now().year) {
@@ -852,8 +810,7 @@ class HistoricalBaseballImporter {
           for (final url in urls) {
             try {
               final body = await _getHtml(Uri.parse(url));
-              games.addAll(parseNpbClimaxCalendar(body,
-                  expectedYear: year, sourceUrl: url));
+              games.addAll(parseNpbClimaxCalendar(body, expectedYear: year, sourceUrl: url));
             } on HistoricalHttpException catch (error) {
               if (error.statusCode != 404) rethrow;
             }
@@ -864,8 +821,7 @@ class HistoricalBaseballImporter {
             }
             throw StateError('Empty NPB Climax source for $year');
           }
-          return PostseasonImportResult(
-              await _loadPostseasonGames(games), 'complete');
+          return PostseasonImportResult(await _loadPostseasonGames(games), 'complete');
         } on HistoricalHttpException {
           rethrow;
         }
@@ -888,15 +844,11 @@ class HistoricalBaseballImporter {
     }
     progress('start $org $year $dataset');
     try {
-      final result =
-          await _retryBrokenConnection(load, progress, '$org $year $dataset');
-      await _saveCheckpoint(
-          org, year, dataset, result.status, result.rowCount, sourceUrl, null);
-      progress(
-          'done  $org $year $dataset (${result.rowCount} rows, ${result.status})');
+      final result = await _retryBrokenConnection(load, progress, '$org $year $dataset');
+      await _saveCheckpoint(org, year, dataset, result.status, result.rowCount, sourceUrl, null);
+      progress('done  $org $year $dataset (${result.rowCount} rows, ${result.status})');
     } catch (error) {
-      await _saveCheckpoint(
-          org, year, dataset, 'failed', 0, sourceUrl, '$error');
+      await _saveCheckpoint(org, year, dataset, 'failed', 0, sourceUrl, '$error');
       progress('fail  $org $year $dataset: $error');
       _failedDatasets.add('$org $year $dataset');
     }
@@ -917,29 +869,23 @@ class HistoricalBaseballImporter {
     }
     progress('start $org $year $dataset');
     try {
-      final count =
-          await _retryBrokenConnection(load, progress, '$org $year $dataset');
-      await _saveCheckpoint(
-          org, year, dataset, 'complete', count, sourceUrl, null);
+      final count = await _retryBrokenConnection(load, progress, '$org $year $dataset');
+      await _saveCheckpoint(org, year, dataset, 'complete', count, sourceUrl, null);
       progress('done  $org $year $dataset ($count rows)');
     } on HistoricalNotYetAvailable {
-      await _saveCheckpoint(
-          org, year, dataset, 'not_yet_available', 0, sourceUrl, null);
+      await _saveCheckpoint(org, year, dataset, 'not_yet_available', 0, sourceUrl, null);
       progress('skip $org $year $dataset (not yet available)');
     } on HistoricalHttpException catch (error) {
       if (error.statusCode != 404) {
-        await _saveCheckpoint(
-            org, year, dataset, 'failed', 0, sourceUrl, '$error');
+        await _saveCheckpoint(org, year, dataset, 'failed', 0, sourceUrl, '$error');
         progress('fail  $org $year $dataset: $error');
         _failedDatasets.add('$org $year $dataset');
         return;
       }
-      await _saveCheckpoint(
-          org, year, dataset, 'unavailable', 0, sourceUrl, '$error');
+      await _saveCheckpoint(org, year, dataset, 'unavailable', 0, sourceUrl, '$error');
       progress('skip $org $year $dataset (official page unavailable)');
     } catch (error) {
-      await _saveCheckpoint(
-          org, year, dataset, 'failed', 0, sourceUrl, '$error');
+      await _saveCheckpoint(org, year, dataset, 'failed', 0, sourceUrl, '$error');
       progress('fail  $org $year $dataset: $error');
       _failedDatasets.add('$org $year $dataset');
     }
@@ -959,8 +905,7 @@ class HistoricalBaseballImporter {
         progress('skip npb $year $dataset (checkpoint complete)');
         continue;
       }
-      await _saveCheckpoint(
-          'npb', year, dataset, 'not_applicable', 0, '', null);
+      await _saveCheckpoint('npb', year, dataset, 'not_applicable', 0, '', null);
       progress('skip npb $year $dataset (season not played)');
     }
   }
@@ -1018,8 +963,7 @@ class HistoricalBaseballImporter {
       );
     } on HistoricalHttpException catch (error) {
       if (error.statusCode != 404) rethrow;
-      await _saveCheckpoint(
-          org, year, dataset, 'unavailable', 0, sourceUrl, error.toString());
+      await _saveCheckpoint(org, year, dataset, 'unavailable', 0, sourceUrl, error.toString());
       progress('skip $org $year $dataset (official page unavailable)');
     }
   }
@@ -1034,8 +978,7 @@ class HistoricalBaseballImporter {
         _completeCheckpoints.clear();
         for (final row in result) {
           if (doneCheckpointStatuses.contains(row[3])) {
-            _completeCheckpoints.add(
-                checkpointKey('${row[0]}', row[1] as int, '${row[2]}'));
+            _completeCheckpoints.add(checkpointKey('${row[0]}', row[1] as int, '${row[2]}'));
           }
         }
       });
@@ -1057,8 +1000,7 @@ class HistoricalBaseballImporter {
           ''',
           parameters: [org, year, dataset],
         );
-        final done = result.isNotEmpty &&
-            doneCheckpointStatuses.contains(result.first[0]);
+        final done = result.isNotEmpty && doneCheckpointStatuses.contains(result.first[0]);
         if (done) _completeCheckpoints.add(key);
         return done;
       });
@@ -1155,8 +1097,7 @@ class HistoricalBaseballImporter {
     Object? lastError;
     for (var attempt = 1; attempt <= maxHttpAttempts; attempt++) {
       try {
-        final response =
-            await _httpGet(uri).timeout(const Duration(seconds: 45));
+        final response = await _httpGet(uri).timeout(const Duration(seconds: 45));
         if (response.statusCode == 200) return response;
         if (response.statusCode == 404) {
           throw HistoricalHttpException(404, uri);
@@ -1166,8 +1107,7 @@ class HistoricalBaseballImporter {
         }
         lastError = HistoricalHttpException(response.statusCode, uri);
       } on HistoricalHttpException catch (error) {
-        if (error.statusCode == 404 ||
-            (error.statusCode != 429 && error.statusCode < 500)) {
+        if (error.statusCode == 404 || (error.statusCode != 429 && error.statusCode < 500)) {
           rethrow;
         }
         lastError = error;
@@ -1180,8 +1120,7 @@ class HistoricalBaseballImporter {
         await Future<void>.delayed(retryBaseDelay * (1 << (attempt - 1)));
       }
     }
-    throw StateError(
-        'HTTP failed after $maxHttpAttempts attempts for $uri: $lastError');
+    throw StateError('HTTP failed after $maxHttpAttempts attempts for $uri: $lastError');
   }
 
   /// Exposed for focused transport tests; import code uses the same bounded
@@ -1198,8 +1137,7 @@ class HistoricalBaseballImporter {
     return decodeOfficialHtml(await _get(uri));
   }
 
-  Future<NpbYearPage> _fetchNpbSource(
-      NpbSourceSpec source, int expectedYear) async {
+  Future<NpbYearPage> _fetchNpbSource(NpbSourceSpec source, int expectedYear) async {
     final body = await _getHtml(Uri.parse(source.uri));
     validateNpbSeason(body, expectedYear);
     var page = parseNpbYearPage(
@@ -1233,13 +1171,9 @@ class HistoricalBaseballImporter {
   }
 
   static void validateNpbSeason(String source, int expectedYear) {
-    final years = RegExp(r'(?:19|20)\d{2}')
-        .allMatches(source)
-        .map((match) => int.parse(match.group(0)!))
-        .toSet();
+    final years = RegExp(r'(?:19|20)\d{2}').allMatches(source).map((match) => int.parse(match.group(0)!)).toSet();
     if (!years.contains(expectedYear)) {
-      throw StateError(
-          'NPB season mismatch: expected $expectedYear, found ${years.take(5).join(',')}');
+      throw StateError('NPB season mismatch: expected $expectedYear, found ${years.take(5).join(',')}');
     }
   }
 
@@ -1252,8 +1186,7 @@ class HistoricalBaseballImporter {
     return value;
   }
 
-  Future<int> _loadMlbStandings(
-      int year, int mlbLeagueId, int appLeagueId) async {
+  Future<int> _loadMlbStandings(int year, int mlbLeagueId, int appLeagueId) async {
     final json = await _getJson(_mlbStandingsUri(year, mlbLeagueId));
     final rows = <Map<String, dynamic>>[];
     for (final record in _maps(json['records'])) {
@@ -1264,24 +1197,20 @@ class HistoricalBaseballImporter {
       }
     }
     if (rows.isEmpty) {
-      final fallback =
-          await _getJson(_mlbTeamPitchingStatsUri(year, mlbLeagueId));
+      final fallback = await _getJson(_mlbTeamPitchingStatsUri(year, mlbLeagueId));
       rows.addAll(standingsFromTeamPitching(fallback, year));
     }
     if (rows.isEmpty) {
-      throw StateError(
-          'MLB returned no standings for $year league $mlbLeagueId');
+      throw StateError('MLB returned no standings for $year league $mlbLeagueId');
     }
     return _transaction((conn) async {
       final teamIds = <int>[];
       var rank = 0;
-      rows.sort((a, b) => _number(b['winningPercentage'])
-          .compareTo(_number(a['winningPercentage'])));
+      rows.sort((a, b) => _number(b['winningPercentage']).compareTo(_number(a['winningPercentage'])));
       for (final row in rows) {
         final returnedSeason = _integer(row['season']);
         if (returnedSeason > 0 && returnedSeason != year) {
-          throw StateError(
-              'MLB standings season mismatch: expected $year, got $returnedSeason');
+          throw StateError('MLB standings season mismatch: expected $year, got $returnedSeason');
         }
         final team = _map(row['team']);
         final externalId = _integer(team['id']);
@@ -1293,8 +1222,7 @@ class HistoricalBaseballImporter {
           externalId: '$externalId',
           fullName: name,
           leagueId: appLeagueId,
-          shortName:
-              _text(team['teamName']).isEmpty ? name : _text(team['teamName']),
+          shortName: _text(team['teamName']).isEmpty ? name : _text(team['teamName']),
         );
         teamIds.add(teamId);
         rank++;
@@ -1322,9 +1250,7 @@ class HistoricalBaseballImporter {
             name,
             _text(team['teamName']).isEmpty ? name : _text(team['teamName']),
             area,
-            _integer(row['leagueRank']) > 0
-                ? _integer(row['leagueRank'])
-                : rank,
+            _integer(row['leagueRank']) > 0 ? _integer(row['leagueRank']) : rank,
             _integer(row['gamesPlayed']),
             _integer(row['wins']),
             _integer(row['losses']),
@@ -1349,28 +1275,21 @@ class HistoricalBaseballImporter {
       splits.addAll(_maps(stat['splits']));
     }
     if (splits.isEmpty) {
-      throw StateError(
-          'MLB returned no $group stats for $year league $mlbLeagueId');
+      throw StateError('MLB returned no $group stats for $year league $mlbLeagueId');
     }
     final rawLines = <MlbRawLine>[];
     for (final split in splits) {
       final returnedSeason = _integer(split['season']);
       if (returnedSeason > 0 && returnedSeason != year) {
-        throw StateError(
-            'MLB stats season mismatch: expected $year, got $returnedSeason');
+        throw StateError('MLB stats season mismatch: expected $year, got $returnedSeason');
       }
-      final person = _map(split['player']).isNotEmpty
-          ? _map(split['player'])
-          : _map(split['person']);
+      final person = _map(split['player']).isNotEmpty ? _map(split['player']) : _map(split['person']);
       final team = _map(split['team']);
       final playerExternalId = _integer(person['id']);
       final teamExternalId = _integer(team['id']);
       final fullName = _text(person['fullName']);
       final teamName = _text(team['name']);
-      if (playerExternalId <= 0 ||
-          teamExternalId <= 0 ||
-          fullName.isEmpty ||
-          teamName.isEmpty) {
+      if (playerExternalId <= 0 || teamExternalId <= 0 || fullName.isEmpty || teamName.isEmpty) {
         continue;
       }
       rawLines.add(MlbRawLine(
@@ -1378,20 +1297,16 @@ class HistoricalBaseballImporter {
         teamExternalId: '$teamExternalId',
         playerName: fullName,
         teamName: teamName,
-        teamShortName: _text(team['teamName']).isEmpty
-            ? teamName
-            : _text(team['teamName']),
+        teamShortName: _text(team['teamName']).isEmpty ? teamName : _text(team['teamName']),
         birthDate: _date(person['birthDate']),
         values: _map(split['stat']),
       ));
     }
     if (rawLines.isEmpty) {
-      throw StateError(
-          'MLB returned no usable $group rows for $year league $mlbLeagueId');
+      throw StateError('MLB returned no usable $group rows for $year league $mlbLeagueId');
     }
 
-    await _transaction(
-        (conn) => _bulkResolveMlbEntities(conn, rawLines, appLeagueId));
+    await _transaction((conn) => _bulkResolveMlbEntities(conn, rawLines, appLeagueId));
     final lines = [
       for (final raw in rawLines)
         SeasonLine(
@@ -1467,8 +1382,7 @@ class HistoricalBaseballImporter {
     for (final row in teamIds) {
       _teamIdCache['mlb|${row[0]}'] = row[1] as int;
     }
-    if (teamsByExternal.keys
-        .any((key) => !_teamIdCache.containsKey('mlb|$key'))) {
+    if (teamsByExternal.keys.any((key) => !_teamIdCache.containsKey('mlb|$key'))) {
       throw StateError('Failed to resolve all MLB teams in bulk');
     }
 
@@ -1544,8 +1458,7 @@ class HistoricalBaseballImporter {
     for (final row in playerIds) {
       _playerIdCache['mlb|${row[0]}'] = row[1] as int;
     }
-    if (playersByExternal.keys
-        .any((key) => !_playerIdCache.containsKey('mlb|$key'))) {
+    if (playersByExternal.keys.any((key) => !_playerIdCache.containsKey('mlb|$key'))) {
       throw StateError('Failed to resolve all MLB players in bulk');
     }
   }
@@ -1592,12 +1505,10 @@ class HistoricalBaseballImporter {
       for (final line in lines) {
         final value = statValue(statId, line.values);
         if (value == null) continue;
-        if (!qualifiesForMlbRate(
-            statId, line.values, teamGames[line.teamId] ?? 0)) {
+        if (!qualifiesForMlbRate(statId, line.values, teamGames[line.teamId] ?? 0)) {
           continue;
         }
-        candidates
-            .add(RankValue(line, value, countForStat(statId, line.values)));
+        candidates.add(RankValue(line, value, countForStat(statId, line.values)));
       }
       await _transaction((conn) async {
         await _deleteRankings(conn, year, leagueId, [statId]);
@@ -1670,8 +1581,7 @@ class HistoricalBaseballImporter {
   static List<List<T>> chunksOf<T>(List<T> values, int size) {
     if (size <= 0) throw ArgumentError.value(size, 'size');
     return [
-      for (var start = 0; start < values.length; start += size)
-        values.sublist(start, math.min(start + size, values.length)),
+      for (var start = 0; start < values.length; start += size) values.sublist(start, math.min(start + size, values.length)),
     ];
   }
 
@@ -1727,8 +1637,7 @@ class HistoricalBaseballImporter {
     });
   }
 
-  Future<int> _loadNpbPlayers(NpbYearPage page,
-      {required bool pitching}) async {
+  Future<int> _loadNpbPlayers(NpbYearPage page, {required bool pitching}) async {
     // Standings may have been checkpointed by an earlier run; reconstruct IDs.
     await Postgres.withConnection((conn) async {
       for (final row in page.standings) {
@@ -1749,8 +1658,9 @@ class HistoricalBaseballImporter {
           ''',
           parameters: [key, key, _normalizeTeam(row.teamName)],
         );
-        if (found.isNotEmpty)
+        if (found.isNotEmpty) {
           page.teamIdsByName[row.teamName] = found.first[0] as int;
+        }
       }
     });
     final sourceRows = pitching ? page.pitching : page.hitting;
@@ -1762,8 +1672,7 @@ class HistoricalBaseballImporter {
       final lines = <SeasonLine>[];
       final seen = <String>{};
       for (final row in [...sourceRows, ...leaderRows]) {
-        final canonicalTeam =
-            resolveNpbTeamAlias(row.teamAlias, page.teamIdsByName.keys);
+        final canonicalTeam = resolveNpbTeamAlias(row.teamAlias, page.teamIdsByName.keys);
         if (canonicalTeam == null) continue;
         final teamId = page.teamIdsByName[canonicalTeam];
         if (teamId == null) continue;
@@ -1771,13 +1680,7 @@ class HistoricalBaseballImporter {
         if (normalizedName.isEmpty) continue;
         final identity = '$normalizedName|$teamId';
         if (!seen.add(identity)) continue;
-        final ambiguousTeams = [...sourceRows, ...leaderRows]
-            .where((candidate) =>
-                normalizeJapaneseName(candidate.playerName) == normalizedName)
-            .map((candidate) => resolveNpbTeamAlias(
-                candidate.teamAlias, page.teamIdsByName.keys))
-            .whereType<String>()
-            .toSet();
+        final ambiguousTeams = [...sourceRows, ...leaderRows].where((candidate) => normalizeJapaneseName(candidate.playerName) == normalizedName).map((candidate) => resolveNpbTeamAlias(candidate.teamAlias, page.teamIdsByName.keys)).whereType<String>().toSet();
         if (ambiguousTeams.length > 1) {
           // The official yearly page has no person ID. Do not merge homonyms.
           continue;
@@ -1790,8 +1693,7 @@ class HistoricalBaseballImporter {
           teamId: teamId,
         );
         final values = <String, dynamic>{...row.values};
-        final matchingLeader = leaderRows.where((leader) =>
-            normalizeJapaneseName(leader.playerName) == normalizedName);
+        final matchingLeader = leaderRows.where((leader) => normalizeJapaneseName(leader.playerName) == normalizedName);
         for (final leader in matchingLeader) {
           values.addAll(leader.values);
         }
@@ -1807,8 +1709,7 @@ class HistoricalBaseballImporter {
         await _upsertCareer(conn, page.year, line, pitching: pitching);
       }
       final ids = pitching ? _pitchingStatIds : _hittingStatIds;
-      await _replaceNpbRankings(
-          conn, page.year, page.leagueId, ids, lines, pitching);
+      await _replaceNpbRankings(conn, page.year, page.leagueId, ids, lines, pitching);
       return lines.length;
     });
   }
@@ -1837,20 +1738,12 @@ class HistoricalBaseballImporter {
       await _deleteRankings(conn, page.year, leagueId, [statId]);
       final rankingRows = <Map<String, Object?>>[];
       for (final row in rows) {
-        final canonicalTeam =
-            resolveNpbTeamAlias(row.teamAlias, page.teamIdsByName.keys);
-        final teamId =
-            canonicalTeam == null ? null : page.teamIdsByName[canonicalTeam];
+        final canonicalTeam = resolveNpbTeamAlias(row.teamAlias, page.teamIdsByName.keys);
+        final teamId = canonicalTeam == null ? null : page.teamIdsByName[canonicalTeam];
         if (teamId == null) continue;
         final normalizedName = normalizeJapaneseName(row.playerName);
         if (normalizedName.isEmpty) continue;
-        final teamsForName = rows
-            .where((candidate) =>
-                normalizeJapaneseName(candidate.playerName) == normalizedName)
-            .map((candidate) => resolveNpbTeamAlias(
-                candidate.teamAlias, page.teamIdsByName.keys))
-            .whereType<String>()
-            .toSet();
+        final teamsForName = rows.where((candidate) => normalizeJapaneseName(candidate.playerName) == normalizedName).map((candidate) => resolveNpbTeamAlias(candidate.teamAlias, page.teamIdsByName.keys)).whereType<String>().toSet();
         if (teamsForName.length > 1) continue;
         final playerId = await _upsertPlayer(
           conn,
@@ -1868,11 +1761,9 @@ class HistoricalBaseballImporter {
         });
       }
       if (rankingRows.isEmpty) {
-        throw StateError(
-            'NPB ranking had no resolvable rows for ${page.year} stat $statId');
+        throw StateError('NPB ranking had no resolvable rows for ${page.year} stat $statId');
       }
-      await _insertPreparedRankingRows(
-          conn, page.year, leagueId, statId, rankingRows);
+      await _insertPreparedRankingRows(conn, page.year, leagueId, statId, rankingRows);
       return rankingRows.length;
     });
   }
@@ -1924,20 +1815,16 @@ class HistoricalBaseballImporter {
           homeId = await teamId(game.homeTeamKey);
           awayId = await teamId(game.awayTeamKey);
         } else {
-          homeId = resolveNpbPostseasonTeamId(
-              game.homeTeamKey, npbTeamsByName, npbTeamsByKey);
-          awayId = resolveNpbPostseasonTeamId(
-              game.awayTeamKey, npbTeamsByName, npbTeamsByKey);
+          homeId = resolveNpbPostseasonTeamId(game.homeTeamKey, npbTeamsByName, npbTeamsByKey);
+          awayId = resolveNpbPostseasonTeamId(game.awayTeamKey, npbTeamsByName, npbTeamsByKey);
         }
         if (homeId == null || awayId == null) {
           // Current-year MLB brackets include seed placeholders
           // (e.g. "NL Higher Seed") until the series is set.
-          if (game.sourceKey == 'mlb' &&
-              game.start.year == DateTime.now().year) {
+          if (game.sourceKey == 'mlb' && game.start.year == DateTime.now().year) {
             continue;
           }
-          throw StateError(
-              'Unresolved postseason teams: ${game.awayTeamKey} @ ${game.homeTeamKey}');
+          throw StateError('Unresolved postseason teams: ${game.awayTeamKey} @ ${game.homeTeamKey}');
         }
 
         final found = await conn.execute(
@@ -2035,8 +1922,7 @@ class HistoricalBaseballImporter {
       for (final game in _maps(date['games'])) {
         final season = _integer(game['season']);
         if (season > 0 && season != expectedYear) {
-          throw StateError(
-              'MLB postseason season mismatch: expected $expectedYear, got $season');
+          throw StateError('MLB postseason season mismatch: expected $expectedYear, got $season');
         }
         final code = codeByType[_text(game['gameType'])];
         final gamePk = _integer(game['gamePk']);
@@ -2048,21 +1934,14 @@ class HistoricalBaseballImporter {
         final homeKey = _integer(homeTeam['id']);
         final awayKey = _integer(awayTeam['id']);
         final start = DateTime.tryParse(_text(game['gameDate']));
-        if (code == null ||
-            gamePk <= 0 ||
-            homeKey <= 0 ||
-            awayKey <= 0 ||
-            start == null) {
+        if (code == null || gamePk <= 0 || homeKey <= 0 || awayKey <= 0 || start == null) {
           continue;
         }
-        final abstractState =
-            _text(_map(game['status'])['abstractGameState']).toLowerCase();
-        final detailedState =
-            _text(_map(game['status'])['detailedState']).toLowerCase();
+        final abstractState = _text(_map(game['status'])['abstractGameState']).toLowerCase();
+        final detailedState = _text(_map(game['status'])['detailedState']).toLowerCase();
         final state = abstractState == 'final'
             ? '試合終了'
-            : detailedState.contains('cancel') ||
-                    detailedState.contains('postpon')
+            : detailedState.contains('cancel') || detailedState.contains('postpon')
                 ? '試合中止'
                 : abstractState == 'live'
                     ? '試合中'
@@ -2098,8 +1977,7 @@ class HistoricalBaseballImporter {
       // Nested wrapper <tr>s also contain .scoreTeam descendants. Only the
       // inning table's direct team cells are the visitor/home line score.
       final teamRows = block.querySelectorAll('tr').where((row) {
-        return row.children.any((cell) => cell.classes.contains('scoreTeam')) &&
-            row.children.any((cell) => cell.classes.contains('scoreTotal'));
+        return row.children.any((cell) => cell.classes.contains('scoreTeam')) && row.children.any((cell) => cell.classes.contains('scoreTotal'));
       }).toList();
       if (dateMatch == null || teamRows.length != 2) continue;
       final info = block.querySelector('.scoreInfomation')?.text ?? '';
@@ -2116,10 +1994,8 @@ class HistoricalBaseballImporter {
       // Official line-score rows are visitor first, home second.
       final awayName = teamRows[0].querySelector('.scoreTeam')!.text.trim();
       final homeName = teamRows[1].querySelector('.scoreTeam')!.text.trim();
-      final awayScore =
-          int.tryParse(teamRows[0].querySelector('.scoreTotal')!.text.trim());
-      final homeScore =
-          int.tryParse(teamRows[1].querySelector('.scoreTotal')!.text.trim());
+      final awayScore = int.tryParse(teamRows[0].querySelector('.scoreTotal')!.text.trim());
+      final homeScore = int.tryParse(teamRows[1].querySelector('.scoreTotal')!.text.trim());
       games.add(HistoricalGame(
         sourceKey: 'npb',
         externalId: 'js:$expectedYear:${number.replaceAll(RegExp(r'\s+'), '')}',
@@ -2164,14 +2040,12 @@ class HistoricalBaseballImporter {
         final href = link?.attributes['href'] ?? '';
         final text = link?.text.replaceAll(RegExp(r'\s+'), ' ').trim() ?? '';
         final dateMatch = RegExp(r's((?:19|20)\d{6})').firstMatch(href);
-        final scoreMatch = RegExp(r'^(.+?)\s+(\d+|\*)\s*-\s*(\d+|\*)\s+(.+)$')
-            .firstMatch(text);
+        final scoreMatch = RegExp(r'^(.+?)\s+(\d+|\*)\s*-\s*(\d+|\*)\s+(.+)$').firstMatch(text);
         if (dateMatch == null || scoreMatch == null) continue;
         final ymd = dateMatch.group(1)!;
         final year = int.parse(ymd.substring(0, 4));
         if (year != expectedYear) {
-          throw StateError(
-              'NPB Climax season mismatch: expected $expectedYear, got $year');
+          throw StateError('NPB Climax season mismatch: expected $expectedYear, got $year');
         }
         final homeScore = int.tryParse(scoreMatch.group(2)!);
         final awayScore = int.tryParse(scoreMatch.group(3)!);
@@ -2277,14 +2151,7 @@ class HistoricalBaseballImporter {
         VALUES (\$1,\$2,\$3,\$4,'','',\$5,\$6,false,now(),now())
         RETURNING id
       ''',
-      parameters: [
-        shortName,
-        shortName,
-        fullName,
-        leagueId,
-        sourceKey,
-        externalId
-      ],
+      parameters: [shortName, shortName, fullName, leagueId, sourceKey, externalId],
     );
     final id = inserted.first[0] as int;
     _teamIdCache[cacheKey] = id;
@@ -2518,26 +2385,19 @@ class HistoricalBaseballImporter {
     // Qualified tables accurately rank average/ERA. Other counting rankings are
     // inserted only when the league-leaders table supplied that exact category.
     for (final statId in statIds) {
-      if (pitching &&
-          statId != 9 &&
-          !lines.any((l) => l.values.containsKey('leader:$statId'))) {
+      if (pitching && statId != 9 && !lines.any((l) => l.values.containsKey('leader:$statId'))) {
         continue;
       }
-      if (!pitching &&
-          statId != 1 &&
-          !lines.any((l) => l.values.containsKey('leader:$statId'))) {
+      if (!pitching && statId != 1 && !lines.any((l) => l.values.containsKey('leader:$statId'))) {
         continue;
       }
       final candidates = <RankValue>[];
       for (final line in lines) {
         final leaderValue = line.values['leader:$statId'];
-        final value = leaderValue == null
-            ? statValue(statId, line.values)
-            : _number(leaderValue);
+        final value = leaderValue == null ? statValue(statId, line.values) : _number(leaderValue);
         if (value == null) continue;
         if (statId != 1 && statId != 9 && leaderValue == null) continue;
-        candidates
-            .add(RankValue(line, value, countForStat(statId, line.values)));
+        candidates.add(RankValue(line, value, countForStat(statId, line.values)));
       }
       await _insertRankValues(conn, year, leagueId, statId, candidates);
     }
@@ -2600,9 +2460,7 @@ class HistoricalBaseballImporter {
     required bool lowerIsBetter,
   }) {
     candidates.sort((a, b) {
-      final compared = lowerIsBetter
-          ? a.value.compareTo(b.value)
-          : b.value.compareTo(a.value);
+      final compared = lowerIsBetter ? a.value.compareTo(b.value) : b.value.compareTo(a.value);
       return compared != 0 ? compared : b.count.compareTo(a.count);
     });
     num? previous;
@@ -2649,20 +2507,16 @@ class HistoricalBaseballImporter {
       case 11:
         return present('strikeOuts');
       case 12:
-        return present('strikeoutsPer9Inn') ??
-            _perNine(v['strikeOuts'], v['inningsPitched']);
+        return present('strikeoutsPer9Inn') ?? _perNine(v['strikeOuts'], v['inningsPitched']);
       case 13:
-        return present('walksPer9Inn') ??
-            _perNine(v['baseOnBalls'], v['inningsPitched']);
+        return present('walksPer9Inn') ?? _perNine(v['baseOnBalls'], v['inningsPitched']);
       case 14:
         return present('avg');
       case 15:
         return present('whip');
       case 16:
         final starts = _integer(v['gamesStarted']);
-        return starts > 0 && v.containsKey('qualityStarts')
-            ? _integer(v['qualityStarts']) * 100 / starts
-            : null;
+        return starts > 0 && v.containsKey('qualityStarts') ? _integer(v['qualityStarts']) * 100 / starts : null;
       case 17:
         return present('holds');
       case 18:
@@ -2672,23 +2526,17 @@ class HistoricalBaseballImporter {
       case 20:
         return present('plateAppearances');
       case 21:
-        return v.containsKey('inningsPitched')
-            ? baseballInnings(_text(v['inningsPitched']))
-            : null;
+        return v.containsKey('inningsPitched') ? baseballInnings(_text(v['inningsPitched'])) : null;
       case 22:
-        final attempts =
-            _integer(v['stolenBases']) + _integer(v['caughtStealing']);
-        return attempts > 0
-            ? _integer(v['stolenBases']) * 100 / attempts
-            : null;
+        final attempts = _integer(v['stolenBases']) + _integer(v['caughtStealing']);
+        return attempts > 0 ? _integer(v['stolenBases']) * 100 / attempts : null;
     }
     return null;
   }
 
   static int countForStat(int id, Map<String, dynamic> values) {
     if (id == 22) {
-      return _integer(values['stolenBases']) +
-          _integer(values['caughtStealing']);
+      return _integer(values['stolenBases']) + _integer(values['caughtStealing']);
     }
     if (id >= 9 && id <= 19 || id == 21) {
       return baseballInnings(_text(values['inningsPitched'])).truncate();
@@ -2706,8 +2554,7 @@ class HistoricalBaseballImporter {
     }
     if (teamGames <= 0) return false;
     if (statId == 22) {
-      final attempts =
-          _integer(values['stolenBases']) + _integer(values['caughtStealing']);
+      final attempts = _integer(values['stolenBases']) + _integer(values['caughtStealing']);
       return attempts >= teamGames * 0.1;
     }
     if (statId == 16) {
@@ -2742,14 +2589,9 @@ class HistoricalBaseballImporter {
     return (pieces.last, pieces.sublist(0, pieces.length - 1).join(' '));
   }
 
-  static bool _containsJapanese(String value) =>
-      RegExp(r'[\u3040-\u30ff\u3400-\u9fff]').hasMatch(value);
+  static bool _containsJapanese(String value) => RegExp(r'[\u3040-\u30ff\u3400-\u9fff]').hasMatch(value);
 
-  static String normalizeJapaneseName(String value) => value
-      .replaceAll(RegExp(r'[\s\u3000・･]'), '')
-      .replaceAll('髙', '高')
-      .replaceAll('﨑', '崎')
-      .trim();
+  static String normalizeJapaneseName(String value) => value.replaceAll(RegExp(r'[\s\u3000・･]'), '').replaceAll('髙', '高').replaceAll('﨑', '崎').trim();
 
   /// Dart http latin1-decoded UTF-8 leaves each source byte as a code unit.
   static String? repairUtf8Mojibake(String value) {
@@ -2767,15 +2609,9 @@ class HistoricalBaseballImporter {
     }
   }
 
-  static String _normalizeTeam(String value) => value
-      .replaceAll(RegExp(r'[\s\u3000・･]'), '')
-      .replaceAll(RegExp(r'[（）()]'), '')
-      .replaceAll('讀賣', '読売')
-      .trim();
+  static String _normalizeTeam(String value) => value.replaceAll(RegExp(r'[\s\u3000・･]'), '').replaceAll(RegExp(r'[（）()]'), '').replaceAll('讀賣', '読売').trim();
 
-  static String npbTeamSourceKey(String exactOfficialFullName) =>
-      npbFranchiseKey(exactOfficialFullName) ??
-      'npb:team:${_normalizeTeam(exactOfficialFullName)}';
+  static String npbTeamSourceKey(String exactOfficialFullName) => npbFranchiseKey(exactOfficialFullName) ?? 'npb:team:${_normalizeTeam(exactOfficialFullName)}';
 
   static String? npbFranchiseKey(String officialName) {
     final normalized = _normalizeTeam(officialName);
@@ -2879,9 +2715,7 @@ class HistoricalBaseballImporter {
     final normalizedAlias = _normalizeTeam(alias);
     if (normalizedAlias.isEmpty) return null;
     final names = fullNames.toList();
-    final exact = names
-        .where((full) => _normalizeTeam(full) == normalizedAlias)
-        .toList();
+    final exact = names.where((full) => _normalizeTeam(full) == normalizedAlias).toList();
     if (exact.length == 1) return exact.single;
     if (exact.length > 1) return null;
     const known = <String, String>{
@@ -2916,25 +2750,18 @@ class HistoricalBaseballImporter {
       'オ': 'オリックス・バファローズ',
       '西': '埼玉西武ライオンズ',
     };
-    final aliasKey = npbFranchiseKey(normalizedAlias) ??
-        npbFranchiseKey(known[normalizedAlias] ?? '');
+    final aliasKey = npbFranchiseKey(normalizedAlias) ?? npbFranchiseKey(known[normalizedAlias] ?? '');
     if (aliasKey != null && aliasKey.isNotEmpty) {
-      final byFranchise = names
-          .where((full) => npbFranchiseKey(full) == aliasKey)
-          .toList();
+      final byFranchise = names.where((full) => npbFranchiseKey(full) == aliasKey).toList();
       if (byFranchise.length == 1) return byFranchise.single;
     }
     final exactMapped = known[normalizedAlias];
     if (exactMapped != null) {
-      final mapped = names
-          .where((full) => _normalizeTeam(full) == _normalizeTeam(exactMapped))
-          .toList();
+      final mapped = names.where((full) => _normalizeTeam(full) == _normalizeTeam(exactMapped)).toList();
       if (mapped.length == 1) return mapped.single;
     }
     if (normalizedAlias.length < 2) return null;
-    final contains = names
-        .where((full) => _normalizeTeam(full).contains(normalizedAlias))
-        .toList();
+    final contains = names.where((full) => _normalizeTeam(full).contains(normalizedAlias)).toList();
     return contains.length == 1 ? contains.single : null;
   }
 
@@ -2989,8 +2816,7 @@ class HistoricalBaseballImporter {
       }
     }
     rows.sort((a, b) {
-      final byPct = _number(b['winningPercentage'])
-          .compareTo(_number(a['winningPercentage']));
+      final byPct = _number(b['winningPercentage']).compareTo(_number(a['winningPercentage']));
       if (byPct != 0) return byPct;
       return _integer(b['wins']).compareTo(_integer(a['wins']));
     });
@@ -3012,9 +2838,7 @@ class HistoricalBaseballImporter {
       final parsed = _rankingCells(tr);
       if (parsed == null) continue;
       final (rank, player, team, rawValue) = parsed;
-      final value = statId == 21
-          ? baseballInnings(rawValue)
-          : double.tryParse(rawValue.startsWith('.') ? '0$rawValue' : rawValue);
+      final value = statId == 21 ? baseballInnings(rawValue) : double.tryParse(rawValue.startsWith('.') ? '0$rawValue' : rawValue);
       if (rank <= 0 || player.isEmpty || team.isEmpty || value == null) {
         continue;
       }
@@ -3031,26 +2855,17 @@ class HistoricalBaseballImporter {
       final rank = int.tryParse(rankCell.text.trim());
       if (rank == null) return null;
       final player = tr.querySelector('.stplayer')?.text.trim() ?? '';
-      final team = tr
-              .querySelector('.stteam')
-              ?.text
-              .replaceAll(RegExp(r'[（）()]'), '')
-              .trim() ??
-          '';
-      final rawValue =
-          tr.querySelector('.ststats')?.text.replaceAll(' ', '').trim() ?? '';
+      final team = tr.querySelector('.stteam')?.text.replaceAll(RegExp(r'[（）()]'), '').trim() ?? '';
+      final rawValue = tr.querySelector('.ststats')?.text.replaceAll(' ', '').trim() ?? '';
       return (rank, player, team, rawValue);
     }
     if (!tr.classes.contains('ststats')) return null;
-    final cells = tr.children
-        .where((cell) => cell.localName == 'td')
-        .toList(growable: false);
+    final cells = tr.children.where((cell) => cell.localName == 'td').toList(growable: false);
     if (cells.length < 3) return null;
     final rank = int.tryParse(cells[0].text.trim());
     if (rank == null) return null;
     final nameTeam = cells[1].text.trim();
-    final match =
-        RegExp(r'^(.*)[（(]([^）)]+)[）)]$').firstMatch(nameTeam);
+    final match = RegExp(r'^(.*)[（(]([^）)]+)[）)]$').firstMatch(nameTeam);
     if (match == null) return null;
     return (
       rank,
@@ -3092,18 +2907,10 @@ class HistoricalBaseballImporter {
       final wins = b.wins.compareTo(a.wins);
       return wins != 0 ? wins : a.losses.compareTo(b.losses);
     });
-    combined.hitting.addAll(_combineNpbPlayerRows(
-        pages.expand((page) => page.hitting).toList(),
-        pitching: false));
-    combined.pitching.addAll(_combineNpbPlayerRows(
-        pages.expand((page) => page.pitching).toList(),
-        pitching: true));
-    combined.hittingLeaders.addAll(_combineNpbPlayerRows(
-        pages.expand((page) => page.hittingLeaders).toList(),
-        pitching: false));
-    combined.pitchingLeaders.addAll(_combineNpbPlayerRows(
-        pages.expand((page) => page.pitchingLeaders).toList(),
-        pitching: true));
+    combined.hitting.addAll(_combineNpbPlayerRows(pages.expand((page) => page.hitting).toList(), pitching: false));
+    combined.pitching.addAll(_combineNpbPlayerRows(pages.expand((page) => page.pitching).toList(), pitching: true));
+    combined.hittingLeaders.addAll(_combineNpbPlayerRows(pages.expand((page) => page.hittingLeaders).toList(), pitching: false));
+    combined.pitchingLeaders.addAll(_combineNpbPlayerRows(pages.expand((page) => page.pitchingLeaders).toList(), pitching: true));
     return combined;
   }
 
@@ -3113,8 +2920,7 @@ class HistoricalBaseballImporter {
   }) {
     final grouped = <String, List<NpbPlayerRow>>{};
     for (final row in rows) {
-      final key =
-          '${normalizeJapaneseName(row.playerName)}|${_normalizeTeam(row.teamAlias)}';
+      final key = '${normalizeJapaneseName(row.playerName)}|${_normalizeTeam(row.teamAlias)}';
       grouped.putIfAbsent(key, () => []).add(row);
     }
     return grouped.values.map((group) {
@@ -3152,14 +2958,10 @@ class HistoricalBaseballImporter {
       };
       for (final key in additive) {
         if (group.any((row) => row.values.containsKey(key))) {
-          values[key] =
-              group.fold<int>(0, (sum, row) => sum + _integer(row.values[key]));
+          values[key] = group.fold<int>(0, (sum, row) => sum + _integer(row.values[key]));
         }
       }
-      final innings = group.fold<double>(
-          0,
-          (sum, row) =>
-              sum + baseballInnings(_text(row.values['inningsPitched'])));
+      final innings = group.fold<double>(0, (sum, row) => sum + baseballInnings(_text(row.values['inningsPitched'])));
       if (innings > 0) values['inningsPitched'] = innings;
       final atBats = _integer(values['atBats']);
       if (atBats > 0) values['avg'] = _integer(values['hits']) / atBats;
@@ -3173,13 +2975,11 @@ class HistoricalBaseballImporter {
       for (final row in group) {
         for (final entry in row.values.entries) {
           if (entry.key.startsWith('leader:')) {
-            values[entry.key] =
-                _number(values[entry.key]) + _number(entry.value);
+            values[entry.key] = _number(values[entry.key]) + _number(entry.value);
           }
         }
       }
-      return NpbPlayerRow(group.first.playerName, group.first.teamAlias, values,
-          phase: 'combined');
+      return NpbPlayerRow(group.first.playerName, group.first.teamAlias, values, phase: 'combined');
     }).toList();
   }
 
@@ -3198,16 +2998,10 @@ class HistoricalBaseballImporter {
       final text = table.text.replaceAll(RegExp(r'\s+'), '');
       if (isNpbLeagueStandingsHeaders(headers)) {
         page.standings.addAll(_parseNpbStandings(table));
-      } else if (headers.contains('選手') &&
-          headers.any((h) => h.contains('打率'))) {
-        page.hitting.addAll(_parseNpbBatting(table).map((row) => NpbPlayerRow(
-            row.playerName, row.teamAlias, row.values,
-            phase: phase)));
-      } else if ((headers.contains('選手') || headers.contains('投手')) &&
-          headers.any((h) => h.contains('防御率'))) {
-        page.pitching.addAll(_parseNpbPitching(table).map((row) => NpbPlayerRow(
-            row.playerName, row.teamAlias, row.values,
-            phase: phase)));
+      } else if (headers.contains('選手') && headers.any((h) => h.contains('打率'))) {
+        page.hitting.addAll(_parseNpbBatting(table).map((row) => NpbPlayerRow(row.playerName, row.teamAlias, row.values, phase: phase)));
+      } else if ((headers.contains('選手') || headers.contains('投手')) && headers.any((h) => h.contains('防御率'))) {
+        page.pitching.addAll(_parseNpbPitching(table).map((row) => NpbPlayerRow(row.playerName, row.teamAlias, row.values, phase: phase)));
       } else if (text.contains('首位打者') || text.contains('最優秀防御率')) {
         _parseNpbLeaders(table, page);
       }
@@ -3219,10 +3013,7 @@ class HistoricalBaseballImporter {
       ..removeWhere((row) => !looksLikeTeamName(row.teamName))
       ..retainWhere((row) {
         final key = _normalizeTeam(row.teamName);
-        return page.standings
-                .where((other) => _normalizeTeam(other.teamName) == key)
-                .reduce((a, b) => a.games >= b.games ? a : b) ==
-            row;
+        return page.standings.where((other) => _normalizeTeam(other.teamName) == key).reduce((a, b) => a.games >= b.games ? a : b) == row;
       });
     return page;
   }
@@ -3262,10 +3053,8 @@ class HistoricalBaseballImporter {
           if (cells.length < 3) continue;
           final wins = cells.first == '-' ? 0 : _integer(cells.first);
           final losses = cells.last == '-' ? 0 : _integer(cells.last);
-          final drawsMatch = RegExp(r'\((\d+)\)')
-              .firstMatch(cells.sublist(1, cells.length - 1).join());
-          final draws =
-              drawsMatch == null ? 0 : int.parse(drawsMatch.group(1)!);
+          final drawsMatch = RegExp(r'\((\d+)\)').firstMatch(cells.sublist(1, cells.length - 1).join());
+          final draws = drawsMatch == null ? 0 : int.parse(drawsMatch.group(1)!);
           final total = totals.putIfAbsent(teams[teamIndex], () => [0, 0, 0]);
           total[0] += wins;
           total[1] += losses;
@@ -3286,34 +3075,23 @@ class HistoricalBaseballImporter {
       ..sort((a, b) => b.wins.compareTo(a.wins));
   }
 
-  static List<NpbStanding> _parseNpbNestedTournamentStandings(
-      Document document) {
+  static List<NpbStanding> _parseNpbNestedTournamentStandings(Document document) {
     final totals = <String, List<int>>{};
     for (final matrix in document.querySelectorAll('.contentsPadding')) {
-      final teams = matrix
-          .querySelectorAll('td.matchTeam')
-          .map((cell) => cell.text.replaceAll(RegExp(r'\s+'), ' ').trim())
-          .where((name) => name.isNotEmpty)
-          .toList();
+      final teams = matrix.querySelectorAll('td.matchTeam').map((cell) => cell.text.replaceAll(RegExp(r'\s+'), ' ').trim()).where((name) => name.isNotEmpty).toList();
       if (teams.isEmpty) continue;
 
       final competitionTables = matrix.querySelectorAll('table').where((table) {
         final win = table.querySelector('.matchHdWin');
         final draw = table.querySelector('.matchHdTai');
         final loss = table.querySelector('.matchHdLose');
-        return _nearestTable(win) == table &&
-            _nearestTable(draw) == table &&
-            _nearestTable(loss) == table;
+        return _nearestTable(win) == table && _nearestTable(draw) == table && _nearestTable(loss) == table;
       });
       for (final competition in competitionTables) {
         var teamIndex = 0;
         for (final row in competition.querySelectorAll('tr')) {
           if (teamIndex >= teams.length) break;
-          final cells = row
-              .querySelectorAll('td.matchStats,td.matchTop')
-              .map((cell) => cell.text.replaceAll(RegExp(r'\s+'), '').trim())
-              .where((text) => text.isNotEmpty)
-              .toList();
+          final cells = row.querySelectorAll('td.matchStats,td.matchTop').map((cell) => cell.text.replaceAll(RegExp(r'\s+'), '').trim()).where((text) => text.isNotEmpty).toList();
           if (cells.length < 3) continue;
           final wins = cells[0] == '-' ? 0 : _integer(cells[0]);
           final drawMatch = RegExp(r'\((\d+)\)').firstMatch(cells[1]);
@@ -3355,14 +3133,8 @@ class HistoricalBaseballImporter {
   static List<String> _tableHeaders(Element table) {
     final rows = table.querySelectorAll('tr');
     if (rows.isEmpty) return const [];
-    final headerRow = rows.reduce((a, b) =>
-        a.querySelectorAll('th').length >= b.querySelectorAll('th').length
-            ? a
-            : b);
-    return headerRow
-        .querySelectorAll('th')
-        .map((cell) => normalizeNpbHeader(cell.text))
-        .toList();
+    final headerRow = rows.reduce((a, b) => a.querySelectorAll('th').length >= b.querySelectorAll('th').length ? a : b);
+    return headerRow.querySelectorAll('th').map((cell) => normalizeNpbHeader(cell.text)).toList();
   }
 
   static bool isNpbLeagueStandingsHeaders(List<String> headers) {
@@ -3373,12 +3145,7 @@ class HistoricalBaseballImporter {
     if (!headers.any((header) => header.contains('引分') || header.contains('ゲーム差'))) {
       return false;
     }
-    return !headers.any((header) =>
-        header.contains('打率') ||
-        header.contains('防御率') ||
-        header.contains('選手') ||
-        header.contains('本塁打') ||
-        header.contains('奪三振'));
+    return !headers.any((header) => header.contains('打率') || header.contains('防御率') || header.contains('選手') || header.contains('本塁打') || header.contains('奪三振'));
   }
 
   static bool looksLikeTeamName(String name) {
@@ -3390,16 +3157,13 @@ class HistoricalBaseballImporter {
 
   static String normalizeNpbHeader(String text) {
     final compact = text.replaceAll(RegExp(r'[\s\u00a0\u3000・･]'), '');
-    return compact
-        .replaceAll(RegExp(r'選[^手]{0,3}手'), '選手')
-        .replaceAll(RegExp(r'[|｜]'), 'ー');
+    return compact.replaceAll(RegExp(r'選[^手]{0,3}手'), '選手').replaceAll(RegExp(r'[|｜]'), 'ー');
   }
 
   static List<NpbStanding> _parseNpbStandings(Element table) {
     final result = <NpbStanding>[];
     final headers = _tableHeaders(table);
-    int indexWhere(String text) =>
-        headers.indexWhere((header) => header.contains(text));
+    int indexWhere(String text) => headers.indexWhere((header) => header.contains(text));
     for (final row in table.querySelectorAll('tr')) {
       final cells = _cells(row);
       final teamIndex = indexWhere('チーム');
@@ -3409,14 +3173,10 @@ class HistoricalBaseballImporter {
       final drawsIndex = indexWhere('引分');
       var behindIndex = indexWhere('ゲーム差');
       if (behindIndex < 0) behindIndex = headers.indexOf('差');
-      if (teamIndex < 0 ||
-          gamesIndex < 0 ||
-          cells.length <= gamesIndex ||
-          int.tryParse(cells[gamesIndex]) == null) {
+      if (teamIndex < 0 || gamesIndex < 0 || cells.length <= gamesIndex || int.tryParse(cells[gamesIndex]) == null) {
         continue;
       }
-      String at(int index) =>
-          index >= 0 && index < cells.length ? cells[index] : '';
+      String at(int index) => index >= 0 && index < cells.length ? cells[index] : '';
       result.add(NpbStanding(
         teamName: at(teamIndex),
         games: _integer(at(gamesIndex)),
@@ -3451,8 +3211,7 @@ class HistoricalBaseballImporter {
           {
             'avg': _number(value(cells, '打率')),
             'gamesPlayed': _integer(value(cells, '試合')),
-            if (index('打席') >= 0)
-              'plateAppearances': _integer(value(cells, '打席')),
+            if (index('打席') >= 0) 'plateAppearances': _integer(value(cells, '打席')),
             'atBats': _integer(value(cells, '打数')),
             'runs': _integer(value(cells, '得点')),
             'hits': _integer(value(cells, '安打')),
@@ -3462,14 +3221,12 @@ class HistoricalBaseballImporter {
             if (index('塁打') >= 0) 'totalBases': _integer(value(cells, '塁打')),
             'rbi': _integer(value(cells, '打点')),
             'stolenBases': _integer(value(cells, '盗塁')),
-            if (index('盗塁刺') >= 0)
-              'caughtStealing': _integer(value(cells, '盗塁刺')),
+            if (index('盗塁刺') >= 0) 'caughtStealing': _integer(value(cells, '盗塁刺')),
             if (index('犠打') >= 0) 'sacBunts': _integer(value(cells, '犠打')),
             if (index('四球') >= 0) 'baseOnBalls': _integer(value(cells, '四球')),
             if (index('死球') >= 0) 'hitByPitch': _integer(value(cells, '死球')),
             if (index('三振') >= 0) 'strikeOuts': _integer(value(cells, '三振')),
-            if (index('併殺打') >= 0)
-              'groundIntoDoublePlay': _integer(value(cells, '併殺打')),
+            if (index('併殺打') >= 0) 'groundIntoDoublePlay': _integer(value(cells, '併殺打')),
             if (index('長打率') >= 0) 'slg': _number(value(cells, '長打率')),
             if (index('出塁率') >= 0) 'obp': _number(value(cells, '出塁率')),
           },
@@ -3491,11 +3248,8 @@ class HistoricalBaseballImporter {
       final cells = [..._cells(row)];
       if (cells.length < 4 || int.tryParse(cells[0]) == null) continue;
       final inningsIndex = index('投球回');
-      if (inningsIndex >= 0 &&
-          inningsIndex + 1 < cells.length &&
-          cells[inningsIndex + 1].startsWith('.')) {
-        cells[inningsIndex] =
-            '${cells[inningsIndex]}${cells[inningsIndex + 1]}';
+      if (inningsIndex >= 0 && inningsIndex + 1 < cells.length && cells[inningsIndex + 1].startsWith('.')) {
+        cells[inningsIndex] = '${cells[inningsIndex]}${cells[inningsIndex + 1]}';
         cells.removeAt(inningsIndex + 1);
       }
       var playerIndex = index('選手');
@@ -3508,9 +3262,7 @@ class HistoricalBaseballImporter {
           identity.$2,
           {
             'era': _number(value(cells, '防御率')),
-            'gamesPitched': _integer(value(cells, '登板').isNotEmpty
-                ? value(cells, '登板')
-                : value(cells, '試合')),
+            'gamesPitched': _integer(value(cells, '登板').isNotEmpty ? value(cells, '登板') : value(cells, '試合')),
             'wins': _integer(value(cells, '勝利')),
             'losses': _integer(value(cells, '敗北')),
             'saves': _integer(value(cells, 'セーブ')),
@@ -3520,9 +3272,7 @@ class HistoricalBaseballImporter {
             'shutouts': _integer(value(cells, '完封勝')),
             'inningsPitched': value(cells, '投球回').replaceAll(' ', ''),
             if (index('打者') >= 0) 'battersFaced': _integer(value(cells, '打者')),
-            'strikeOuts': _integer(value(cells, '奪三振').isNotEmpty
-                ? value(cells, '奪三振')
-                : value(cells, '三振')),
+            'strikeOuts': _integer(value(cells, '奪三振').isNotEmpty ? value(cells, '奪三振') : value(cells, '三振')),
             'runs': _integer(value(cells, '失点')),
             if (index('自責点') >= 0) 'earnedRuns': _integer(value(cells, '自責点')),
           },
@@ -3546,19 +3296,14 @@ class HistoricalBaseballImporter {
     for (final row in table.querySelectorAll('tr')) {
       final cells = _cells(row);
       if (cells.length < 2) continue;
-      final entry = categories.entries
-          .where((candidate) => cells[0].contains(candidate.key))
-          .firstOrNull;
+      final entry = categories.entries.where((candidate) => cells[0].contains(candidate.key)).firstOrNull;
       if (entry == null) continue;
       final joined = cells.sublist(1).join(' ');
       final identity = parseNpbPlayerCell(joined);
       if (identity == null) continue;
-      final number = RegExp(r'(?:^|\s)([.]?\d+(?:\.\d+)?)\s*$')
-          .firstMatch(joined)
-          ?.group(1);
+      final number = RegExp(r'(?:^|\s)([.]?\d+(?:\.\d+)?)\s*$').firstMatch(joined)?.group(1);
       if (number == null) continue;
-      final target =
-          entry.value >= 9 ? page.pitchingLeaders : page.hittingLeaders;
+      final target = entry.value >= 9 ? page.pitchingLeaders : page.hittingLeaders;
       target.add(NpbPlayerRow(
         identity.$1,
         identity.$2,
@@ -3567,8 +3312,7 @@ class HistoricalBaseballImporter {
     }
   }
 
-  static (String, String)? parseNpbPlayerIdentity(
-      List<String> cells, int playerIndex) {
+  static (String, String)? parseNpbPlayerIdentity(List<String> cells, int playerIndex) {
     if (playerIndex < 0 || playerIndex >= cells.length) return null;
     final current = parseNpbPlayerCell(cells[playerIndex]);
     if (current != null) return current;
@@ -3585,31 +3329,21 @@ class HistoricalBaseballImporter {
     return name.isEmpty || team.isEmpty ? null : (name, team);
   }
 
-  static List<String> _cells(Element row) => row
-      .querySelectorAll('th,td')
-      .map((cell) => cell.text.replaceAll(RegExp(r'\s+'), ' ').trim())
-      .where((text) => text.isNotEmpty)
-      .toList();
+  static List<String> _cells(Element row) => row.querySelectorAll('th,td').map((cell) => cell.text.replaceAll(RegExp(r'\s+'), ' ').trim()).where((text) => text.isNotEmpty).toList();
 
   static List<Map<String, dynamic>> _maps(dynamic value) {
     if (value is! List) return const [];
-    return value
-        .whereType<Map>()
-        .map((item) => item.cast<String, dynamic>())
-        .toList();
+    return value.whereType<Map>().map((item) => item.cast<String, dynamic>()).toList();
   }
 
-  static Map<String, dynamic> _map(dynamic value) =>
-      value is Map ? value.cast<String, dynamic>() : const {};
+  static Map<String, dynamic> _map(dynamic value) => value is Map ? value.cast<String, dynamic>() : const {};
 
   static String _text(dynamic value) => value?.toString().trim() ?? '';
 
   static int _integer(dynamic value) {
     if (value is int) return value;
     if (value is num) return value.toInt();
-    return int.tryParse(_text(value).replaceAll(',', '')) ??
-        double.tryParse(_text(value).replaceAll(',', ''))?.toInt() ??
-        0;
+    return int.tryParse(_text(value).replaceAll(',', '')) ?? double.tryParse(_text(value).replaceAll(',', ''))?.toInt() ?? 0;
   }
 
   static double _number(dynamic value) {
@@ -3697,8 +3431,7 @@ class NpbStanding {
 }
 
 class NpbPlayerRow {
-  const NpbPlayerRow(this.playerName, this.teamAlias, this.values,
-      {this.phase});
+  const NpbPlayerRow(this.playerName, this.teamAlias, this.values, {this.phase});
   final String playerName;
   final String teamAlias;
   final Map<String, dynamic> values;
@@ -3706,8 +3439,7 @@ class NpbPlayerRow {
 }
 
 class NpbDetailedRankRow {
-  const NpbDetailedRankRow(
-      this.rank, this.playerName, this.teamAlias, this.value);
+  const NpbDetailedRankRow(this.rank, this.playerName, this.teamAlias, this.value);
   final int rank;
   final String playerName;
   final String teamAlias;

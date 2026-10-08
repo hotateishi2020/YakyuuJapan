@@ -4,7 +4,11 @@ import 'dart:convert';
 import 'tools/Postgres.dart';
 
 String decode(http.Response res) {
-  try { return utf8.decode(res.bodyBytes, allowMalformed: true); } catch (_) { return res.body; }
+  try {
+    return utf8.decode(res.bodyBytes, allowMalformed: true);
+  } catch (_) {
+    return res.body;
+  }
 }
 
 Future<void> main() async {
@@ -14,7 +18,9 @@ Future<void> main() async {
       FROM m_team WHERE id_league IN (3,4) ORDER BY id
     ''').timeout(const Duration(seconds: 20));
     print('MLB teams ${teams.length}:');
-    for (final r in teams) print(r.toColumnMap());
+    for (final r in teams) {
+      print(r.toColumnMap());
+    }
 
     final career = await conn.execute('''
       SELECT COUNT(*) AS n,
@@ -37,7 +43,9 @@ Future<void> main() async {
       LIMIT 8
     ''').timeout(const Duration(seconds: 30));
     print('sample players:');
-    for (final r in sample) print(r.toColumnMap());
+    for (final r in sample) {
+      print(r.toColumnMap());
+    }
 
     final withUrl = sample.isNotEmpty ? '${sample.first.toColumnMap()['url']}' : '';
     if (withUrl.isNotEmpty) {

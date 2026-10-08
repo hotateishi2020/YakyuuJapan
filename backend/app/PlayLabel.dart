@@ -416,9 +416,9 @@ bool _isBattingResult(String result) {
       _ => 'ヒット',
     };
     final short = switch (result) {
-      'HIT2' => '${direction}２',
-      'HIT3' => '${direction}３',
-      _ => direction.isEmpty ? '安' : '${direction}安',
+      'HIT2' => '$direction２',
+      'HIT3' => '$direction３',
+      _ => direction.isEmpty ? '安' : '$direction安',
     };
     if (runs > 0) {
       final points = runs >= 2 ? '$runs点' : '';
@@ -463,8 +463,8 @@ bool _isBattingResult(String result) {
     'SQUEEZE' => 'スクイズ',
     'SACRIFICE_BUNT' => squeeze ? 'スクイズ' : '犠打',
     'SACRIFICE_FLY' => '犠飛',
-    'ERROR' || 'ERROR_FIELDING' => direction.isEmpty ? '失策' : '${direction}失',
-    'FIELDERS_CHOICE' => direction.isEmpty ? '野選' : '${direction}野選',
+    'ERROR' || 'ERROR_FIELDING' => direction.isEmpty ? '失策' : '$direction失',
+    'FIELDERS_CHOICE' => direction.isEmpty ? '野選' : '$direction野選',
     'INTERFERENCE_BATTING' => '打撃妨害',
     _ => '',
   };

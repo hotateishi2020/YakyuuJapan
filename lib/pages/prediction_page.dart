@@ -73,10 +73,7 @@ class _OrgBundle {
   bool partReady(_LoadPart part) => readyParts.contains(part);
 
   /// 画面に出せるコンテンツが1つでもあるか（空のプレースホルダキャッシュを除外）
-  bool get hasContent =>
-      readyParts.contains(_LoadPart.standings) ||
-      readyParts.contains(_LoadPart.players) ||
-      readyParts.contains(_LoadPart.games);
+  bool get hasContent => readyParts.contains(_LoadPart.standings) || readyParts.contains(_LoadPart.players) || readyParts.contains(_LoadPart.games);
 
   _OrgBundle copy() => _OrgBundle(
         predictions: List<Map<String, dynamic>>.from(predictions),
@@ -113,11 +110,14 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   Color? _infoColor2;
 
   bool isLoading = true;
+
   /// 初回表示後はヘッダー〜団体タブを残し、タブ下だけローディングする。
   bool _shellReady = false;
+
   /// 初期 SQL が終わるまで Login を出さず、認証リクエストで回線を奪わない。
   bool _authEntryReady = false;
   String? error;
+
   /// 団体ごとのセクション準備状況（準備できたものから描画）
   final Map<OrgKind, Set<_LoadPart>> _readyParts = {};
   final Map<String, Future<void>> _partLoadFutures = {};
@@ -186,11 +186,9 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
 
   bool get _showUserPredictions => AuthSession.instance.isLoggedIn;
 
-  bool _partReady(_LoadPart part, [OrgKind? kind]) =>
-      _readyParts[kind ?? _orgKind]?.contains(part) ?? false;
+  bool _partReady(_LoadPart part, [OrgKind? kind]) => _readyParts[kind ?? _orgKind]?.contains(part) ?? false;
 
-  bool get _boardContentReady =>
-      _partReady(_LoadPart.standings) || _partReady(_LoadPart.games) || _partReady(_LoadPart.players);
+  bool get _boardContentReady => _partReady(_LoadPart.standings) || _partReady(_LoadPart.games) || _partReady(_LoadPart.players);
 
   Future<void> _bootstrapWithAuth() async {
     try {
@@ -199,8 +197,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     if (!mounted) return;
     try {
       await Future.wait([
-        for (final part in _LoadPart.values)
-          _fetchPart(_orgKind, part, _seasonYear, background: true),
+        for (final part in _LoadPart.values) _fetchPart(_orgKind, part, _seasonYear, background: true),
       ]).timeout(const Duration(seconds: 20));
     } catch (_) {}
     if (!mounted) return;
@@ -225,8 +222,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     setState(() => _authEntryReady = false);
     try {
       await Future.wait([
-        for (final part in _LoadPart.values)
-          _fetchPart(_orgKind, part, _seasonYear, background: false, force: true),
+        for (final part in _LoadPart.values) _fetchPart(_orgKind, part, _seasonYear, background: false, force: true),
       ]).timeout(const Duration(seconds: 45));
     } catch (_) {}
     if (!mounted) return;
@@ -276,9 +272,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   bool _cacheUsable(OrgKind kind) {
     final cached = _orgCache[kind];
     if (cached == null || !cached.hasContent) return false;
-    return _partLoadedForYear(kind, _LoadPart.games) ||
-        _partLoadedForYear(kind, _LoadPart.standings) ||
-        _partLoadedForYear(kind, _LoadPart.players);
+    return _partLoadedForYear(kind, _LoadPart.games) || _partLoadedForYear(kind, _LoadPart.standings) || _partLoadedForYear(kind, _LoadPart.players);
   }
 
   /// キャッシュへ保存（リストはコピーして参照共有を避ける）
@@ -340,14 +334,14 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     _storeCache(_orgKind, _snapshotCurrent());
     final cached = _orgCache[kind];
     final usable = cached != null && cached.hasContent;
-        setState(() {
+    setState(() {
       _orgKind = kind;
       _portraitLeagueTab = 0;
       _itemTab = 0;
       error = null;
       if (usable) {
         _applyBundle(cached, kind: kind);
-          isLoading = false;
+        isLoading = false;
         _shellReady = true;
       } else {
         isLoading = true;
@@ -379,7 +373,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       unawaited(_ensureSeasonYearLoaded());
       await _startGamesWatch();
       unawaited(_prefetchOtherOrg());
-        return;
+      return;
     }
     await _loadThenWatchGames();
     unawaited(_ensureSeasonYearLoaded());
@@ -493,8 +487,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     return '${now.year}-$month-$day';
   }
 
-  String _predictionsPath([OrgKind? kind]) =>
-      '/predictions?org=${OrgConfig.of(kind ?? _orgKind).label.toLowerCase()}&year=$_seasonYear';
+  String _predictionsPath([OrgKind? kind]) => '/predictions?org=${OrgConfig.of(kind ?? _orgKind).label.toLowerCase()}&year=$_seasonYear';
 
   Future<void> _startGamesWatch() async {
     if (!mounted) return;
@@ -604,7 +597,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         cached.playerStatsActual = nextActual;
       }
       if (kind == _orgKind) {
-      setState(() {
+        setState(() {
           standings = nextStandings;
           npbPlayerStatsActual = nextActual;
         });
@@ -625,7 +618,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       if (cached != null && cached.hasContent && target == _orgKind) {
         setState(() {
           _applyBundle(cached, kind: target);
-        isLoading = false;
+          isLoading = false;
           _shellReady = true;
           error = null;
         });
@@ -684,8 +677,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   bool _partLoadedForYear(OrgKind kind, _LoadPart part) {
-    return (_orgCache[kind]?.partReady(part) ?? false) &&
-        _loadedPartYears['${kind.name}|${part.name}'] == _seasonYear;
+    return (_orgCache[kind]?.partReady(part) ?? false) && _loadedPartYears['${kind.name}|${part.name}'] == _seasonYear;
   }
 
   void _invalidateYearParts() {
@@ -941,9 +933,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     if (mounted) setState(() => _loadingGameDateByOrg[kind] = ymd);
     try {
       final org = OrgConfig.of(kind);
-      final res = await http
-          .get(Env.api(_partPath(kind, 'games', _seasonYear, date: ymd, fresh: true)))
-          .timeout(const Duration(seconds: 60));
+      final res = await http.get(Env.api(_partPath(kind, 'games', _seasonYear, date: ymd, fresh: true))).timeout(const Duration(seconds: 60));
       if (!mounted) return;
       if (res.statusCode != 200) {
         logger.w('past games $ymd HTTP ${res.statusCode}');
@@ -971,8 +961,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     }
   }
 
-  bool get _showPostseasonNow =>
-      showPostseasonBoard || postseasonBoardVisible(serverFlag: false, today: DateTime.now());
+  bool get _showPostseasonNow => showPostseasonBoard || postseasonBoardVisible(serverFlag: false, today: DateTime.now());
 
   void _scheduleTeamLogoPrecache(List<Map<String, dynamic>> rows) {
     if (rows.isEmpty) return;
@@ -1123,6 +1112,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       if (parsed == null) return;
       if (latest == null || parsed.isAfter(latest!)) latest = parsed;
     }
+
     for (final game in games) {
       consider(game['date_game']);
     }
@@ -1440,10 +1430,24 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   static const _mlbPostseasonCodes = {
-    'WC', 'DS', 'LCS', 'WS',
-    'ALWC', 'NLWC', 'ALWC36', 'ALWC45', 'NLWC36', 'NLWC45',
-    'ALDS', 'NLDS', 'ALDS1', 'ALDS2', 'NLDS1', 'NLDS2',
-    'ALCS', 'NLCS',
+    'WC',
+    'DS',
+    'LCS',
+    'WS',
+    'ALWC',
+    'NLWC',
+    'ALWC36',
+    'ALWC45',
+    'NLWC36',
+    'NLWC45',
+    'ALDS',
+    'NLDS',
+    'ALDS1',
+    'ALDS2',
+    'NLDS1',
+    'NLDS2',
+    'ALCS',
+    'NLCS',
   };
 
   /// postseason_games に加え、直近ゲームに付いた MLB ポストシーズン code も使う。
@@ -1520,15 +1524,15 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
-          decoration: BoxDecoration(
-            color: Colors.white,
+      decoration: BoxDecoration(
+        color: Colors.white,
         border: Border.all(color: Colors.black87, width: 1.5),
         borderRadius: BorderRadius.circular(10),
-          ),
+      ),
       clipBehavior: Clip.antiAlias,
       child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
           Material(
             color: Colors.black,
             child: InkWell(
@@ -1601,13 +1605,13 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     );
     final namesLoading = infoLoading && !_partReady(_LoadPart.standings);
 
-    Widget _miniSpinner({double size = 18}) => SizedBox(
+    Widget miniSpinner({double size = 18}) => SizedBox(
           width: size,
           height: size,
           child: const CircularProgressIndicator(strokeWidth: 2),
         );
 
-    Widget _scoreBox({bool hideHeader = false, bool portraitCompact = false}) {
+    Widget scoreBox({bool hideHeader = false, bool portraitCompact = false}) {
       // ログインユーザーを左、相手を右に並べる（id=1/2 の予想者）
       final loginId = AuthSession.instance.user?.id;
       final selfLeft = loginId == 2;
@@ -1622,18 +1626,18 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       const double vBorder = 1.0;
       const double cellPad = 6.0;
 
-      Widget _nameCell(String name, Color background, {bool leftBorder = false}) {
+      Widget nameCell(String name, Color background, {bool leftBorder = false}) {
         final showSpinner = namesLoading && name.trim().isEmpty;
         return Expanded(
-                child: Container(
+          child: Container(
             decoration: BoxDecoration(
               color: background,
               border: leftBorder ? const Border(left: BorderSide(color: Colors.black45, width: vBorder)) : null,
             ),
-                  alignment: Alignment.center,
+            alignment: Alignment.center,
             padding: const EdgeInsets.symmetric(horizontal: cellPad, vertical: 4),
             child: showSpinner
-                ? _miniSpinner(size: 16)
+                ? miniSpinner(size: 16)
                 : OneLineShrinkText(
                     name,
                     baseSize: 20,
@@ -1641,7 +1645,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                     weight: FontWeight.bold,
                     color: Colors.white,
                   ),
-                ),
+          ),
         );
       }
 
@@ -1652,28 +1656,28 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           borderRadius: BorderRadius.circular(10),
         ),
         clipBehavior: Clip.antiAlias,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: portraitCompact ? MainAxisSize.min : MainAxisSize.max,
-                  children: [
+          children: [
             if (!hideHeader)
-                    Container(
+              Container(
                 height: 30,
                 decoration: const BoxDecoration(
                   color: Colors.black,
                   border: Border(bottom: BorderSide(color: Colors.black45, width: vBorder)),
                 ),
-                      alignment: Alignment.center,
+                alignment: Alignment.center,
                 padding: const EdgeInsets.symmetric(horizontal: cellPad, vertical: 4),
                 child: const OneLineShrinkText(
                   'SCORE',
                   baseSize: 20,
-                        minSize: 10,
-                        weight: FontWeight.bold,
+                  minSize: 10,
+                  weight: FontWeight.bold,
                   align: TextAlign.center,
-                        color: Colors.white,
-                      ),
-                    ),
+                  color: Colors.white,
+                ),
+              ),
             // 2行目: 立石 | 江島
             Container(
               height: portraitCompact ? 26 : 32,
@@ -1683,8 +1687,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _nameCell(name1, color1),
-                  _nameCell(name2, color2, leftBorder: true),
+                  nameCell(name1, color1),
+                  nameCell(name2, color2, leftBorder: true),
                 ],
               ),
             ),
@@ -1700,25 +1704,25 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                         padding: const EdgeInsets.all(cellPad),
                         alignment: Alignment.center,
                         child: scoreLoading
-                            ? _miniSpinner(size: 20)
+                            ? miniSpinner(size: 20)
                             : FittedBox(
                                 fit: BoxFit.scaleDown,
                                 child: Text(
                                   score1,
                                   style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, height: 1.0),
-                        ),
+                                ),
+                              ),
                       ),
-                    ),
                     ),
                     Expanded(
                       child: Container(
-                decoration: const BoxDecoration(
-                  border: Border(left: BorderSide(color: Colors.black45, width: vBorder)),
-                ),
+                        decoration: const BoxDecoration(
+                          border: Border(left: BorderSide(color: Colors.black45, width: vBorder)),
+                        ),
                         padding: const EdgeInsets.all(cellPad),
-                      alignment: Alignment.center,
+                        alignment: Alignment.center,
                         child: scoreLoading
-                            ? _miniSpinner(size: 20)
+                            ? miniSpinner(size: 20)
                             : FittedBox(
                                 fit: BoxFit.scaleDown,
                                 child: Text(
@@ -1732,7 +1736,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                 ),
               )
             else
-                    Expanded(
+              Expanded(
                 child: LayoutBuilder(builder: (context, c) {
                   final double halfW = c.maxWidth / 2;
                   final double availW = (halfW - cellPad * 2).clamp(0.0, double.infinity);
@@ -1745,13 +1749,13 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                     return Expanded(
                       child: Container(
                         decoration: BoxDecoration(
-                        color: Colors.white,
+                          color: Colors.white,
                           border: leftBorder ? const Border(left: BorderSide(color: Colors.black45, width: vBorder)) : null,
                         ),
                         padding: const EdgeInsets.all(cellPad),
                         alignment: Alignment.center,
                         child: scoreLoading
-                            ? _miniSpinner(size: 22)
+                            ? miniSpinner(size: 22)
                             : Text(
                                 value,
                                 textAlign: TextAlign.center,
@@ -1759,9 +1763,9 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                                   fontSize: scoreSize,
                                   fontWeight: FontWeight.w800,
                                   height: 1.0,
-                        ),
+                                ),
+                              ),
                       ),
-                    ),
                     );
                   }
 
@@ -1779,7 +1783,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       );
     }
 
-    Widget _newsBox({bool hideHeader = false, double? boxHeight, bool fill = false}) {
+    Widget newsBox({bool hideHeader = false, double? boxHeight, bool fill = false}) {
       Color parse(String? name, Color fallback) {
         final n = (name ?? '').toLowerCase().trim();
         const m = {
@@ -1807,7 +1811,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       const double tagH = 20.0;
 
       Widget newsTag(String title, Color back, Color font) {
-      return Container(
+        return Container(
           constraints: const BoxConstraints(minWidth: tagW, minHeight: tagH),
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
@@ -1845,8 +1849,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                   borderRadius: BorderRadius.circular(3),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              child: Row(
-                children: [
+                    child: Row(
+                      children: [
                         const Text('News', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                         if (AuthSession.instance.showNewsNew) ...[
                           const SizedBox(width: 8),
@@ -1860,71 +1864,71 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                               fit: BoxFit.scaleDown,
                               alignment: Alignment.centerRight,
                               child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
-                    decoration: BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: const Text('未読メッセージを一覧表示', style: TextStyle(color: Colors.white, fontSize: 11)),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Text('未読メッセージを一覧表示', style: TextStyle(color: Colors.white, fontSize: 11)),
                               ),
                             ),
                           ),
-                  ),
-                ],
+                        ),
+                      ],
                     ),
                   ),
+                ),
               ),
-            ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(10, 4, 10, 6),
-                  child: Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const Divider(height: 1),
-                      const SizedBox(height: 4),
+                  children: [
+                    const Divider(height: 1),
+                    const SizedBox(height: 4),
                     Expanded(
                       child: infoLoading
-                          ? Center(child: _miniSpinner(size: 22))
+                          ? Center(child: miniSpinner(size: 22))
                           : ListView(
                               padding: EdgeInsets.zero,
                               primary: false,
                               children: [
-                      for (final n in notifications)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 2),
+                                for (final n in notifications)
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 2),
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       primary: false,
-                          child: Row(
+                                      child: Row(
                                         mainAxisSize: MainAxisSize.min,
-                            children: [
+                                        children: [
                                           newsTag(
-                                  (n['tag_main_title'] ?? '').toString(),
+                                            (n['tag_main_title'] ?? '').toString(),
                                             parse(n['tag_main_color_back'], Colors.grey.shade300),
                                             parse(n['tag_main_color_font'], Colors.white),
-                              ),
-                              const SizedBox(width: 6),
+                                          ),
+                                          const SizedBox(width: 6),
                                           newsTag(
-                                  (n['tag_sub_title'] ?? '').toString(),
+                                            (n['tag_sub_title'] ?? '').toString(),
                                             parse(n['tag_sub_color_back'], Colors.grey.shade300),
                                             parse(n['tag_sub_color_font'], Colors.white),
-                              ),
-                              const SizedBox(width: 6),
+                                          ),
+                                          const SizedBox(width: 6),
                                           Text(
-                                  (n['title'] ?? '').toString(),
+                                            (n['title'] ?? '').toString(),
                                             maxLines: 1,
                                             softWrap: false,
                                             style: const TextStyle(fontSize: 12, height: 1.1, color: Colors.black87),
                                           ),
                                         ],
                                       ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
+                                    ),
+                                  ),
+                              ],
+                            ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -1933,7 +1937,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       );
     }
 
-    Widget _eventsBox({bool hideHeader = false, double? boxHeight, bool fill = false}) {
+    Widget eventsBox({bool hideHeader = false, double? boxHeight, bool fill = false}) {
       final evs = [...events];
       evs.sort((a, b) => (a['date_from_temp'] ?? '').toString().compareTo((b['date_from_temp'] ?? '').toString()));
 
@@ -1980,8 +1984,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (!hideHeader)
-            SizedBox(
-              width: double.infinity,
+              SizedBox(
+                width: double.infinity,
                 child: Material(
                   color: const Color(0xFF757575),
                   borderRadius: BorderRadius.circular(3),
@@ -2001,144 +2005,144 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                       ),
                     ),
                   ),
+                ),
               ),
-            ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(10, 4, 10, 6),
                 child: infoLoading
-                    ? Center(child: _miniSpinner(size: 22))
+                    ? Center(child: miniSpinner(size: 22))
                     : LayoutBuilder(
-                  builder: (context, constraints) {
-                    double measureTextWidth(String text) {
-                      final painter = TextPainter(
-                        text: TextSpan(
-                            text: text,
-                            style: const TextStyle(
-                              fontSize: 12,
-                            )),
-                        maxLines: 1,
-                        textDirection: TextDirection.ltr,
-                      )..layout();
-                      return painter.width;
-                    }
+                        builder: (context, constraints) {
+                          double measureTextWidth(String text) {
+                            final painter = TextPainter(
+                              text: TextSpan(
+                                  text: text,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                  )),
+                              maxLines: 1,
+                              textDirection: TextDirection.ltr,
+                            )..layout();
+                            return painter.width;
+                          }
 
-                    double rawMaxTitleW = 0;
-                    for (final e in evs) {
-                      final t = (e['title_event'] ?? '').toString();
-                      final w = measureTextWidth(t);
-                      if (w > rawMaxTitleW) rawMaxTitleW = w;
-                    }
+                          double rawMaxTitleW = 0;
+                          for (final e in evs) {
+                            final t = (e['title_event'] ?? '').toString();
+                            final w = measureTextWidth(t);
+                            if (w > rawMaxTitleW) rawMaxTitleW = w;
+                          }
 
-                    // 狭い比率でも固定幅の合計が親幅を超えないよう、全列を利用可能幅から配分する。
-                    const double spacing = 14; // category間6 + title前6 + date前2
-                    final usableW = math.max(0.0, constraints.maxWidth - spacing);
-                    final catW = math.min(64.0, usableW * 0.20);
-                    final textW = math.max(0.0, usableW - catW * 2);
-                    final wantedTitleW = rawMaxTitleW.clamp(0.0, textW);
-                    final titleColW = math.min(wantedTitleW, textW * 0.62);
-                    final dateColW = math.max(0.0, textW - titleColW);
+                          // 狭い比率でも固定幅の合計が親幅を超えないよう、全列を利用可能幅から配分する。
+                          const double spacing = 14; // category間6 + title前6 + date前2
+                          final usableW = math.max(0.0, constraints.maxWidth - spacing);
+                          final catW = math.min(64.0, usableW * 0.20);
+                          final textW = math.max(0.0, usableW - catW * 2);
+                          final wantedTitleW = rawMaxTitleW.clamp(0.0, textW);
+                          final titleColW = math.min(wantedTitleW, textW * 0.62);
+                          final dateColW = math.max(0.0, textW - titleColW);
 
-                    return SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          const Divider(height: 1),
-                          const SizedBox(height: 4),
-                          for (final e in evs)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 2),
-                              child: Row(children: [
-                                // 主カテゴリ
-                                Container(
-                                  width: catW,
-                                  alignment: Alignment.center,
-                                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
-                                  decoration: BoxDecoration(
-                                    color: parse(e['event_category_color_back'], Colors.grey.shade300),
-                                    borderRadius: BorderRadius.circular(3),
-                                  ),
-                                  child: OneLineShrinkText(
-                                    (e['event_category'] ?? '').toString(),
-                                    baseSize: 12,
-                                    minSize: 8,
-                                    color: parse(e['event_category_color_font'], Colors.white),
-                                    align: TextAlign.center,
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                // サブカテゴリ
-                                Container(
-                                  width: catW,
-                                  alignment: Alignment.center,
-                                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
-                                  decoration: BoxDecoration(
-                                    color: parse(e['event_category_sub_color_back'], Colors.grey.shade300),
-                                    borderRadius: BorderRadius.circular(3),
-                                  ),
-                                  child: OneLineShrinkText(
-                                    (e['event_category_sub'] ?? '').toString(),
-                                    baseSize: 12,
-                                    minSize: 8,
-                                    color: parse(e['event_category_sub_color_font'], Colors.white),
-                                    align: TextAlign.center,
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                // タイトル（最長幅に固定）
-                                SizedBox(
-                                  width: titleColW,
-                                  child: Builder(builder: (context) {
-                                    final String title = (e['title_event'] ?? '').toString();
-                                    final bool isToday = e['flg_today'] == true;
-                                    final double tw = measureTextWidth(title);
-                                    final double frac = (tw / titleColW).clamp(0.0, 1.0);
-                                    final BoxDecoration? deco = isToday
-                                        ? BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                Colors.yellowAccent.withOpacity(1.0),
-                                                Colors.yellowAccent.withOpacity(1.0),
-                                                Colors.yellowAccent.withOpacity(0.0),
-                                              ],
-                                              stops: [0.0, frac, 1.0],
-                                              begin: Alignment.centerLeft,
-                                              end: Alignment.centerRight,
-                                            ),
-                                            borderRadius: BorderRadius.circular(3),
-                                          )
-                                        : null;
-                                    return Container(
-                                      decoration: deco,
-                                      child: OneLineShrinkText(
-                                        title,
-                                        baseSize: 12,
-                                        minSize: 8,
-                                        align: TextAlign.left,
+                          return SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                const Divider(height: 1),
+                                const SizedBox(height: 4),
+                                for (final e in evs)
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 2),
+                                    child: Row(children: [
+                                      // 主カテゴリ
+                                      Container(
+                                        width: catW,
+                                        alignment: Alignment.center,
+                                        padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+                                        decoration: BoxDecoration(
+                                          color: parse(e['event_category_color_back'], Colors.grey.shade300),
+                                          borderRadius: BorderRadius.circular(3),
+                                        ),
+                                        child: OneLineShrinkText(
+                                          (e['event_category'] ?? '').toString(),
+                                          baseSize: 12,
+                                          minSize: 8,
+                                          color: parse(e['event_category_color_font'], Colors.white),
+                                          align: TextAlign.center,
+                                        ),
                                       ),
-                                    );
-                                  }),
-                                ),
-                                const SizedBox(width: 2),
-                                // 日付（左詰め・最小/最大幅内で縮小）
-                                SizedBox(
-                                  width: dateColW,
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: OneLineShrinkText(
-                                      formatEventTiming(e['txt_timing']),
-                                      baseSize: 12,
-                                      minSize: 8,
-                                      align: TextAlign.left,
-                                    ),
+                                      const SizedBox(width: 6),
+                                      // サブカテゴリ
+                                      Container(
+                                        width: catW,
+                                        alignment: Alignment.center,
+                                        padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+                                        decoration: BoxDecoration(
+                                          color: parse(e['event_category_sub_color_back'], Colors.grey.shade300),
+                                          borderRadius: BorderRadius.circular(3),
+                                        ),
+                                        child: OneLineShrinkText(
+                                          (e['event_category_sub'] ?? '').toString(),
+                                          baseSize: 12,
+                                          minSize: 8,
+                                          color: parse(e['event_category_sub_color_font'], Colors.white),
+                                          align: TextAlign.center,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      // タイトル（最長幅に固定）
+                                      SizedBox(
+                                        width: titleColW,
+                                        child: Builder(builder: (context) {
+                                          final String title = (e['title_event'] ?? '').toString();
+                                          final bool isToday = e['flg_today'] == true;
+                                          final double tw = measureTextWidth(title);
+                                          final double frac = (tw / titleColW).clamp(0.0, 1.0);
+                                          final BoxDecoration? deco = isToday
+                                              ? BoxDecoration(
+                                                  gradient: LinearGradient(
+                                                    colors: [
+                                                      Colors.yellowAccent.withOpacity(1.0),
+                                                      Colors.yellowAccent.withOpacity(1.0),
+                                                      Colors.yellowAccent.withOpacity(0.0),
+                                                    ],
+                                                    stops: [0.0, frac, 1.0],
+                                                    begin: Alignment.centerLeft,
+                                                    end: Alignment.centerRight,
+                                                  ),
+                                                  borderRadius: BorderRadius.circular(3),
+                                                )
+                                              : null;
+                                          return Container(
+                                            decoration: deco,
+                                            child: OneLineShrinkText(
+                                              title,
+                                              baseSize: 12,
+                                              minSize: 8,
+                                              align: TextAlign.left,
+                                            ),
+                                          );
+                                        }),
+                                      ),
+                                      const SizedBox(width: 2),
+                                      // 日付（左詰め・最小/最大幅内で縮小）
+                                      SizedBox(
+                                        width: dateColW,
+                                        child: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: OneLineShrinkText(
+                                            formatEventTiming(e['txt_timing']),
+                                            baseSize: 12,
+                                            minSize: 8,
+                                            align: TextAlign.left,
+                                          ),
+                                        ),
+                                      ),
+                                    ]),
                                   ),
-                                ),
-                              ]),
+                              ],
                             ),
-                        ],
+                          );
+                        }, //builder
                       ),
-                    );
-                  }, //builder
-                ),
               ),
             ),
           ],
@@ -2158,16 +2162,16 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
             expanded: _newsExpanded,
             onToggle: _toggleNewsSection,
             showNew: AuthSession.instance.showNewsNew,
-            child: _newsBox(hideHeader: true, boxHeight: panelH),
+            child: newsBox(hideHeader: true, boxHeight: panelH),
           ),
           _portraitCollapsibleSection(
             title: 'イベント日程',
             expanded: _eventsExpanded,
             onToggle: _toggleEventsSection,
             showNew: AuthSession.instance.showEventNew,
-            child: _eventsBox(hideHeader: true, boxHeight: panelH),
+            child: eventsBox(hideHeader: true, boxHeight: panelH),
           ),
-          if (_showUserPredictions) _scoreBox(hideHeader: true, portraitCompact: true),
+          if (_showUserPredictions) scoreBox(hideHeader: true, portraitCompact: true),
         ],
       );
     }
@@ -2187,7 +2191,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // イベント120 + 間隔6 + スコア名26 + 得点46
-            SizedBox(width: standingsW, height: 198, child: _newsBox(fill: true)),
+            SizedBox(width: standingsW, height: 198, child: newsBox(fill: true)),
             const SizedBox(width: seasonGap),
             SizedBox(
               width: personalW,
@@ -2195,10 +2199,10 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _eventsBox(),
+                  eventsBox(),
                   if (_showUserPredictions) ...[
                     const SizedBox(height: 6),
-                    _scoreBox(hideHeader: true, portraitCompact: true),
+                    scoreBox(hideHeader: true, portraitCompact: true),
                   ],
                 ],
               ),
@@ -2221,7 +2225,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         // フル幅表示（スケーリングなし）
         final designWidth = constraints.maxWidth;
         const double scale = 1.0;
-        final compact = false;
+        const compact = false;
         // 1セクションも来ていなければタブ下にグルグル。来たものから描画する。
         final orgContentLoading = !_boardContentReady && error == null;
 
@@ -2268,12 +2272,10 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(height: ALL_SPACE_BLOCK),
+            const SizedBox(height: ALL_SPACE_BLOCK),
             _infoShell(
               expand: false,
-              child: isPortrait
-                  ? _scoreNewsEventsRow(portrait: true)
-                  : (_infoExpanded ? _scoreNewsEventsRow(portrait: false) : const SizedBox.shrink()),
+              child: isPortrait ? _scoreNewsEventsRow(portrait: true) : (_infoExpanded ? _scoreNewsEventsRow(portrait: false) : const SizedBox.shrink()),
             ),
             const SizedBox(height: 8),
             _orgTabBar(),
@@ -2296,7 +2298,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                   logoAsset: logoAsset,
                   leagueLabelPrefix: leagueLabelPrefix,
                 ),
-                SizedBox(height: ALL_SPACE_BLOCK),
+                const SizedBox(height: ALL_SPACE_BLOCK),
               ],
             ),
           );
@@ -2312,7 +2314,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                     children: [
                       const SizedBox(height: 8),
                       _boardTabBar(),
-                      SizedBox(height: ALL_SPACE_BLOCK),
+                      const SizedBox(height: ALL_SPACE_BLOCK),
                       Expanded(
                         flex: isPortrait ? 1 : ALL_RATIO_BLOCK_H[1] * 2,
                         child: _viewByItem
@@ -2342,7 +2344,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                                     },
                                   ),
                       ),
-                      if (isPortrait) SizedBox(height: ALL_SPACE_BLOCK),
+                      if (isPortrait) const SizedBox(height: ALL_SPACE_BLOCK),
                     ],
                   );
 
@@ -2358,12 +2360,12 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         return ShowUserPredictions(
           value: _showUserPredictions,
           child: Container(
-          alignment: Alignment.topCenter,
-          child: Transform.scale(
-            scale: scale,
             alignment: Alignment.topCenter,
-            child: ConstrainedBox(
-              constraints: BoxConstraints.tightFor(width: designWidth),
+            child: Transform.scale(
+              scale: scale,
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: BoxConstraints.tightFor(width: designWidth),
                 child: SizedBox(
                   height: constraints.maxHeight,
                   child: Column(
@@ -2387,7 +2389,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                       ),
                       Expanded(
                         child: Padding(
-                          padding: EdgeInsets.only(bottom: ALL_SPACE_BLOCK, left: ALL_MARGIN_LEFT, right: ALL_MARGIN_LEFT),
+                          padding: const EdgeInsets.only(bottom: ALL_SPACE_BLOCK, left: ALL_MARGIN_LEFT, right: ALL_MARGIN_LEFT),
                           child: bodyContent,
                         ),
                       ),

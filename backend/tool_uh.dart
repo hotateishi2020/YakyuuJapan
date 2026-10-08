@@ -1,4 +1,5 @@
 import 'tools/Postgres.dart';
+
 Future<void> main() async {
   await Postgres.withConnection((conn) async {
     final cols = await conn.execute('''
@@ -7,6 +8,8 @@ Future<void> main() async {
     ''');
     print(cols.map((r) => r[0]).join(', '));
     final rows = await conn.execute('SELECT id, name_last, mailaddress FROM m_user ORDER BY id LIMIT 5');
-    for (final r in rows) print(r.toColumnMap());
+    for (final r in rows) {
+      print(r.toColumnMap());
+    }
   });
 }

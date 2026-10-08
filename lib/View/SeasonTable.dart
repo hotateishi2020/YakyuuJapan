@@ -194,7 +194,7 @@ class SeasonTableBlock extends StatelessWidget {
           final losses = int.tryParse('${wild[i]['int_lose']}') ?? 0;
           final behind = ((leaderWins - wins) + (losses - leaderLosses)) / 2;
           wild[i]['int_rank'] = i + 1;
-          wild[i]['game_behind'] = i == 0 ? '0' : (behind == behind.roundToDouble() ? '${behind.round()}' : behind.toStringAsFixed(1));
+          wild[i]['game_behind'] = i == 0 ? '-' : (behind == behind.roundToDouble() ? '${behind.round()}' : behind.toStringAsFixed(1));
         }
         if (_showMlbWildcard) {
           sections.add((label: 'ワイルドカード順位', rows: wild));
@@ -211,9 +211,7 @@ class SeasonTableBlock extends StatelessWidget {
     return Container(
       height: 32,
       decoration: BoxDecoration(
-        gradient: gradient == null
-            ? null
-            : LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: gradient),
+        gradient: gradient == null ? null : LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: gradient),
         color: gradient == null ? color : null,
         borderRadius: BorderRadius.circular(4),
       ),
@@ -248,20 +246,20 @@ class SeasonTableBlock extends StatelessWidget {
 
     // 文字幅の目安（12pxフォントで約14px/字）
     // 文字幅の目安（12pxフォントで約14px/字）
-    const double _kChar = 14.0;
-    const double _wChar2 = _kChar * 2; // 2文字ぶん
-    const double _wChar1 = _kChar * 1.5; // 1文字ぶん
-    const double _wChar6 = _kChar * 6; // 6文字ぶん（順位表で使用中）
-    const double _wChar3 = _kChar * 3; // 3文字ぶん（順位表で使用中）
+    const double kChar = 14.0;
+    const double wChar2 = kChar * 2; // 2文字ぶん
+    const double wChar1 = kChar * 1.5; // 1文字ぶん
+    const double wChar6 = kChar * 6; // 6文字ぶん（順位表で使用中）
+    const double wChar3 = kChar * 3; // 3文字ぶん（順位表で使用中）
 
-    bool _isTrue(dynamic value) {
+    bool isTrue(dynamic value) {
       if (value == true) return true;
       if (value is num) return value != 0;
       final s = '$value'.trim().toLowerCase();
       return s == 'true' || s == 't' || s == '1';
     }
 
-    Widget _gridCell(String text, {double h = 15, Color? bg, Color? fg, FontWeight? weight, TextAlign align = TextAlign.center}) {
+    Widget gridCell(String text, {double h = 15, Color? bg, Color? fg, FontWeight? weight, TextAlign align = TextAlign.center}) {
       return Container(
         height: h,
         alignment: Alignment.center,
@@ -273,7 +271,7 @@ class SeasonTableBlock extends StatelessWidget {
       );
     }
 
-    Widget _teamNameCell(String text, {required double h, Color? bg, Color? fg, bool showJapan = false}) {
+    Widget teamNameCell(String text, {required double h, Color? bg, Color? fg, bool showJapan = false}) {
       return Container(
         height: h,
         alignment: Alignment.center,
@@ -300,7 +298,7 @@ class SeasonTableBlock extends StatelessWidget {
       );
     }
 
-    Widget _personalStatsSheet(List<Map<String, dynamic>> bat, List<Map<String, dynamic>> pit) {
+    Widget personalStatsSheet(List<Map<String, dynamic>> bat, List<Map<String, dynamic>> pit) {
       // 画素の多い横長画面は、打者上段・投手下段の全スタッツグリッド（元仕様）。
       if (!portraitLayout) {
         return DualBandLeaguePersonalStats(
@@ -330,19 +328,19 @@ class SeasonTableBlock extends StatelessWidget {
                     return (tateishi.isNotEmpty && tateishi != '—') || (ejima.isNotEmpty && ejima != '—');
                   }));
           // MLB は「ホワイトソックス」等が入るのでチーム名列を広めに取る。
-          final double minNameW = org.kind == OrgKind.mlb ? _kChar * 9 : _wChar6;
+          final double minNameW = org.kind == OrgKind.mlb ? kChar * 9 : wChar6;
           // スクロール側（試合〜防御率）の固定幅合計
-          final double scrollColsW = _wChar2 + // 試合
-              _wChar1 * 3 + // 勝・負・分
-              _wChar2 + // 勝差
-              _wChar3 + // 勝率
-              _wChar2 + // 打率
-              _wChar3 + // 本塁打
-              _wChar2 + // 打点
-              _wChar2 + // 盗塁
-              _wChar3 + // 失策率
-              _wChar2 * 3; // 防御率3列
-          final double pinnedBaseW = showPredictCols ? _wChar2 * 3 : _wChar2; // 順位(+立・江)
+          const double scrollColsW = wChar2 + // 試合
+              wChar1 * 3 + // 勝・負・分
+              wChar2 + // 勝差
+              wChar3 + // 勝率
+              wChar2 + // 打率
+              wChar3 + // 本塁打
+              wChar2 + // 打点
+              wChar2 + // 盗塁
+              wChar3 + // 失策率
+              wChar2 * 3; // 防御率3列
+          final double pinnedBaseW = showPredictCols ? wChar2 * 3 : wChar2; // 順位(+立・江)
           final double parentW = lb.maxWidth.isFinite ? lb.maxWidth : (pinnedBaseW + minNameW + scrollColsW);
           final double availForName = parentW - pinnedBaseW - scrollColsW;
           final double wName = availForName > minNameW ? availForName : minNameW;
@@ -351,36 +349,36 @@ class SeasonTableBlock extends StatelessWidget {
 
           Widget pinnedHeader() {
             return Row(children: [
-              SizedBox(width: _wChar2, child: _gridCell('順位', h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
+              SizedBox(width: wChar2, child: gridCell('順位', h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
               if (showPredictCols) ...[
-                SizedBox(width: _wChar2, child: _gridCell('立', h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
-                SizedBox(width: _wChar2, child: _gridCell('江', h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
+                SizedBox(width: wChar2, child: gridCell('立', h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
+                SizedBox(width: wChar2, child: gridCell('江', h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
               ],
-              SizedBox(width: wName, child: _gridCell('チーム', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: wName, child: gridCell('チーム', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
             ]);
           }
 
           Widget scrollHeader() {
             return Row(children: [
-              SizedBox(width: _wChar2, child: _gridCell('試合', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-              SizedBox(width: _wChar1, child: _gridCell('勝', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-              SizedBox(width: _wChar1, child: _gridCell('負', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-              SizedBox(width: _wChar1, child: _gridCell('分', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-              SizedBox(width: _wChar2, child: _gridCell('勝差', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-              SizedBox(width: _wChar3, child: _gridCell('勝率', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-              SizedBox(width: _wChar2, child: _gridCell('打率', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-              SizedBox(width: _wChar3, child: _gridCell('本塁打', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-              SizedBox(width: _wChar2, child: _gridCell('打点', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-              SizedBox(width: _wChar2, child: _gridCell('盗塁', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
-              SizedBox(width: _wChar3, child: _gridCell('失策率', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: wChar2, child: gridCell('試合', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: wChar1, child: gridCell('勝', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: wChar1, child: gridCell('負', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: wChar1, child: gridCell('分', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: wChar2, child: gridCell('勝差', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: wChar3, child: gridCell('勝率', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: wChar2, child: gridCell('打率', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: wChar3, child: gridCell('本塁打', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: wChar2, child: gridCell('打点', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: wChar2, child: gridCell('盗塁', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
+              SizedBox(width: wChar3, child: gridCell('失策率', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: Colors.white)),
               SizedBox(
-                width: _wChar2 * 3,
+                width: wChar2 * 3,
                 child: Column(children: [
-                  _gridCell('防御率', weight: FontWeight.bold, h: ALL_HEADER_H / 2, bg: leagueColor, fg: Colors.white),
+                  gridCell('防御率', weight: FontWeight.bold, h: ALL_HEADER_H / 2, bg: leagueColor, fg: Colors.white),
                   Row(children: [
-                    SizedBox(width: _wChar2, child: _gridCell('総合', weight: FontWeight.bold, h: ALL_HEADER_H / 2, bg: leagueColor, fg: Colors.white, align: TextAlign.center)),
-                    SizedBox(width: _wChar2, child: _gridCell('先発', weight: FontWeight.bold, h: ALL_HEADER_H / 2, bg: leagueColor, fg: Colors.white, align: TextAlign.center)),
-                    SizedBox(width: _wChar2, child: _gridCell('救援', weight: FontWeight.bold, h: ALL_HEADER_H / 2, bg: leagueColor, fg: Colors.white, align: TextAlign.center)),
+                    SizedBox(width: wChar2, child: gridCell('総合', weight: FontWeight.bold, h: ALL_HEADER_H / 2, bg: leagueColor, fg: Colors.white, align: TextAlign.center)),
+                    SizedBox(width: wChar2, child: gridCell('先発', weight: FontWeight.bold, h: ALL_HEADER_H / 2, bg: leagueColor, fg: Colors.white, align: TextAlign.center)),
+                    SizedBox(width: wChar2, child: gridCell('救援', weight: FontWeight.bold, h: ALL_HEADER_H / 2, bg: leagueColor, fg: Colors.white, align: TextAlign.center)),
                   ]),
                 ]),
               ),
@@ -396,11 +394,11 @@ class SeasonTableBlock extends StatelessWidget {
             final Color? teamBgEjima = _parseColorName(row['team_color_back_ejima']);
             final Color? teamFgEjima = _parseColorName(row['team_color_font_ejima']);
             return Row(children: [
-              SizedBox(width: _wChar2, child: _gridCell('$rk', h: gridBodyH, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
+              SizedBox(width: wChar2, child: gridCell('$rk', h: gridBodyH, bg: leagueColor, fg: Colors.white, weight: FontWeight.bold)),
               if (showPredictCols) ...[
                 SizedBox(
-                  width: _wChar2,
-                  child: _gridCell(
+                  width: wChar2,
+                  child: gridCell(
                     _num(row['team_name_tateishi']),
                     h: gridBodyH,
                     bg: row['flg_atari_tateishi'] == true ? Colors.yellowAccent : teamBgTateishi,
@@ -409,8 +407,8 @@ class SeasonTableBlock extends StatelessWidget {
                   ),
                 ),
                 SizedBox(
-                  width: _wChar2,
-                  child: _gridCell(
+                  width: wChar2,
+                  child: gridCell(
                     _num(row['team_name_ejima']),
                     h: gridBodyH,
                     bg: row['flg_atari_ejima'] == true ? Colors.yellowAccent : teamBgEjima,
@@ -421,12 +419,12 @@ class SeasonTableBlock extends StatelessWidget {
               ],
               SizedBox(
                 width: wName,
-                child: _teamNameCell(
+                child: teamNameCell(
                   _num(row['name_team']),
                   h: gridBodyH,
                   bg: teamBg,
                   fg: teamFg,
-                  showJapan: org.kind == OrgKind.mlb && _isTrue(row['flg_japan']),
+                  showJapan: org.kind == OrgKind.mlb && isTrue(row['flg_japan']),
                 ),
               ),
             ]);
@@ -491,20 +489,20 @@ class SeasonTableBlock extends StatelessWidget {
             final gbDisplay = isChampion && org.kind == OrgKind.mlb ? 'W' : _num(row['game_behind']);
 
             return Row(children: [
-              SizedBox(width: _wChar2, child: _gridCell(_num(row['int_game']), h: gridBodyH, bg: paleBg)),
-              SizedBox(width: _wChar1, child: _gridCell(_num(row['int_win']), h: gridBodyH, bg: paleBg)),
-              SizedBox(width: _wChar1, child: _gridCell(_num(row['int_lose']), h: gridBodyH, bg: paleBg)),
-              SizedBox(width: _wChar1, child: _gridCell(_num(row['int_draw']), h: gridBodyH, bg: paleBg)),
-              SizedBox(width: _wChar2, child: _gridCell(gbDisplay, h: gridBodyH, bg: bgGb, fg: fgGb, weight: wtGb)),
-              SizedBox(width: _wChar3, child: _gridCell(_num(row['pct_win']), h: gridBodyH, bg: paleBg)),
-              SizedBox(width: _wChar2, child: _gridCell(_num(row['num_avg_batting']), h: gridBodyH, bg: paleBg, fg: fgBat, weight: wtBat)),
-              SizedBox(width: _wChar3, child: _gridCell(_num(row['int_homerun']), h: gridBodyH, bg: paleBg, fg: fgHr, weight: wtHr)),
-              SizedBox(width: _wChar2, child: _gridCell(_num(row['int_rbi']), h: gridBodyH, bg: paleBg, fg: fgRbi, weight: wtRbi)),
-              SizedBox(width: _wChar2, child: _gridCell(_num(row['int_sh']), h: gridBodyH, bg: paleBg, fg: fgSb, weight: wtSb)),
-              SizedBox(width: _wChar3, child: _gridCell(_num(row['num_avg_fielding']), h: gridBodyH, bg: paleBg, fg: fgFld, weight: wtFld)),
-              SizedBox(width: _wChar2, child: _gridCell(_num(row['num_era_total']), h: gridBodyH, bg: paleBg, fg: fgEraT, weight: wtEraT)),
-              SizedBox(width: _wChar2, child: _gridCell(_num(row['num_era_starter']), h: gridBodyH, bg: paleBg, fg: fgEraS, weight: wtEraS)),
-              SizedBox(width: _wChar2, child: _gridCell(_num(row['num_era_relief']), h: gridBodyH, bg: paleBg, fg: fgEraR, weight: wtEraR)),
+              SizedBox(width: wChar2, child: gridCell(_num(row['int_game']), h: gridBodyH, bg: paleBg)),
+              SizedBox(width: wChar1, child: gridCell(_num(row['int_win']), h: gridBodyH, bg: paleBg)),
+              SizedBox(width: wChar1, child: gridCell(_num(row['int_lose']), h: gridBodyH, bg: paleBg)),
+              SizedBox(width: wChar1, child: gridCell(_num(row['int_draw']), h: gridBodyH, bg: paleBg)),
+              SizedBox(width: wChar2, child: gridCell(gbDisplay, h: gridBodyH, bg: bgGb, fg: fgGb, weight: wtGb)),
+              SizedBox(width: wChar3, child: gridCell(_num(row['pct_win']), h: gridBodyH, bg: paleBg)),
+              SizedBox(width: wChar2, child: gridCell(_num(row['num_avg_batting']), h: gridBodyH, bg: paleBg, fg: fgBat, weight: wtBat)),
+              SizedBox(width: wChar3, child: gridCell(_num(row['int_homerun']), h: gridBodyH, bg: paleBg, fg: fgHr, weight: wtHr)),
+              SizedBox(width: wChar2, child: gridCell(_num(row['int_rbi']), h: gridBodyH, bg: paleBg, fg: fgRbi, weight: wtRbi)),
+              SizedBox(width: wChar2, child: gridCell(_num(row['int_sh']), h: gridBodyH, bg: paleBg, fg: fgSb, weight: wtSb)),
+              SizedBox(width: wChar3, child: gridCell(_num(row['num_avg_fielding']), h: gridBodyH, bg: paleBg, fg: fgFld, weight: wtFld)),
+              SizedBox(width: wChar2, child: gridCell(_num(row['num_era_total']), h: gridBodyH, bg: paleBg, fg: fgEraT, weight: wtEraT)),
+              SizedBox(width: wChar2, child: gridCell(_num(row['num_era_starter']), h: gridBodyH, bg: paleBg, fg: fgEraS, weight: wtEraS)),
+              SizedBox(width: wChar2, child: gridCell(_num(row['num_era_relief']), h: gridBodyH, bg: paleBg, fg: fgEraR, weight: wtEraR)),
             ]);
           }
 
@@ -514,7 +512,7 @@ class SeasonTableBlock extends StatelessWidget {
           Widget divisionBanner(String label) {
             return SizedBox(
               width: double.infinity,
-              child: _gridCell(label, h: gridBodyH, bg: const Color(0xFF37474F), fg: Colors.white, weight: FontWeight.bold, align: TextAlign.left),
+              child: gridCell(label, h: gridBodyH, bg: const Color(0xFF37474F), fg: Colors.white, weight: FontWeight.bold, align: TextAlign.left),
             );
           }
 
@@ -603,7 +601,7 @@ class SeasonTableBlock extends StatelessWidget {
       final Widget gamesBlock = portraitLayout ? gamesSwitcher : Expanded(child: gamesSwitcher);
 
       final Widget standingsBody = loadingStandings ? _sectionLoading(height: 140) : standingsTable();
-      final Widget personalBody = loadingStats ? _sectionLoading(height: 180) : _personalStatsSheet(bat, pit);
+      final Widget personalBody = loadingStats ? _sectionLoading(height: 180) : personalStatsSheet(bat, pit);
 
       final Widget teamPanel = Column(
         mainAxisSize: portraitLayout ? MainAxisSize.min : MainAxisSize.max,
@@ -777,7 +775,7 @@ class PlayerStatCell extends StatelessWidget {
 
     BoxDecoration? nameBg() {
       final raw = showUserPredictions ? '${row['colors_user'] ?? ''}' : '';
-          final parts = raw.split('/').map((s) => s.trim().toLowerCase()).where((s) => s.isNotEmpty).toList();
+      final parts = raw.split('/').map((s) => s.trim().toLowerCase()).where((s) => s.isNotEmpty).toList();
       final cols = [
         for (final part in parts)
           if (parseColorNameOrNull(part) != null) parseColorNameOrNull(part)!
@@ -787,11 +785,11 @@ class PlayerStatCell extends StatelessWidget {
         return null;
       }
       if (cols.length == 1) return BoxDecoration(color: cols.first, borderRadius: BorderRadius.circular(4));
-            return BoxDecoration(
+      return BoxDecoration(
         gradient: LinearGradient(colors: cols, begin: Alignment.centerLeft, end: Alignment.centerRight),
-              borderRadius: BorderRadius.circular(4),
-            );
-          }
+        borderRadius: BorderRadius.circular(4),
+      );
+    }
 
     Widget cellBg({required Widget child, Color? overlay}) {
       return ColoredBox(
@@ -846,16 +844,16 @@ class PlayerStatCell extends StatelessWidget {
       );
     } else {
       nameWidget = cellBg(child: Align(alignment: Alignment.center, child: nameLine));
-        }
+    }
 
-        return SizedBox(
+    return SizedBox(
       width: width,
       height: _statRowH,
       child: ColoredBox(
         color: isNoRank ? noRankBg : (isJapan && !hasPredictColor ? japanBg : Colors.transparent),
-          child: Container(
+        child: Container(
           decoration: BoxDecoration(border: Border.all(color: Colors.black26, width: 1)),
-            child: Row(children: [
+          child: Row(children: [
             if (showRank)
               Expanded(
                 flex: 2,
@@ -866,7 +864,7 @@ class PlayerStatCell extends StatelessWidget {
                         ? const FittedBox(fit: BoxFit.contain, child: Text('👑', style: TextStyle(fontSize: 12, height: 1.0)))
                         : isNoRank
                             ? const FittedBox(
-                          fit: BoxFit.contain,
+                                fit: BoxFit.contain,
                                 child: Text('-', style: TextStyle(fontSize: 12, height: 1.0, color: Colors.white)),
                               )
                             : OneLineShrinkText(
@@ -924,9 +922,9 @@ const _statsPitchingFallback = Color(0xFF1A1AFF);
 
 /// 打撃：左の黄→橙→右の赤ピンク（横方向）
 const _statsBattingGradDecoration = BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
+  gradient: LinearGradient(
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
     colors: [
       Color(0xFFEBF100),
       Color(0xFFF8941D),
@@ -971,7 +969,7 @@ Widget _statsGradHeader({
   double height = 20,
   BorderRadius? borderRadius,
 }) {
-        return SizedBox(
+  return SizedBox(
     height: height,
     child: ClipRRect(
       borderRadius: borderRadius ?? BorderRadius.zero,
@@ -1069,7 +1067,7 @@ class StatsSegmentControl extends StatelessWidget {
             ? Image.asset(
                 backgroundAsset!,
                 fit: BoxFit.cover,
-                      alignment: Alignment.center,
+                alignment: Alignment.center,
                 errorBuilder: (_, __, ___) => const SizedBox.shrink(),
               )
             : const SizedBox.shrink();
@@ -1081,10 +1079,26 @@ class StatsSegmentControl extends StatelessWidget {
     const b = 0.0722 * inv;
     return ColorFiltered(
       colorFilter: const ColorFilter.matrix(<double>[
-        r + saturation, g, b, 0, 0,
-        r, g + saturation, b, 0, 0,
-        r, g, b + saturation, 0, 0,
-        0, 0, 0, 1, 0,
+        r + saturation,
+        g,
+        b,
+        0,
+        0,
+        r,
+        g + saturation,
+        b,
+        0,
+        0,
+        r,
+        g,
+        b + saturation,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
       ]),
       child: Opacity(opacity: 0.55, child: fill),
     );
@@ -1099,8 +1113,8 @@ class StatsSegmentControl extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
             for (var i = 0; i < labels.length; i++) ...[
               if (i > 0) Container(width: 1, color: foreground.withValues(alpha: 0.85)),
               Expanded(
@@ -1110,7 +1124,7 @@ class StatsSegmentControl extends StatelessWidget {
                     onTap: () => onSelected(i),
                     child: Stack(
                       fit: StackFit.expand,
-                            children: [
+                      children: [
                         ColoredBox(color: fallbackColor),
                         _backgroundFill(selected: selectedIndex == i),
                         if (selectedIndex == i)
@@ -1127,10 +1141,10 @@ class StatsSegmentControl extends StatelessWidget {
                             fontSize: labels.length > 9 ? 9 : 10,
                           ),
                         ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ],
           ],
@@ -1164,9 +1178,9 @@ class _DualStatsSegmentBars extends StatelessWidget {
       _statsSegmentHeightFor(pitchingTitles),
     ].fold<double>(0, (a, b) => a > b ? a : b);
 
-      return Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+      children: [
         if (battingTitles.isNotEmpty)
           StatsSegmentControl(
             labels: battingTitles,
@@ -1233,7 +1247,7 @@ class PersonalStatsLayoutPicker extends StatelessWidget {
           ],
           child: Stack(
             alignment: Alignment.center,
-                  children: [
+            children: [
               Text(label, maxLines: 1, softWrap: false, overflow: TextOverflow.clip, textAlign: TextAlign.center, style: style),
               const Positioned(
                 right: 2,
@@ -1427,8 +1441,8 @@ class ScrollLeaguePersonalStats extends StatelessWidget {
                       showJapanFlag: showJapanFlag,
                     ),
                 ],
-            );
-          }),
+              );
+            }),
             const SizedBox(height: 8),
           ],
         ],
@@ -1514,7 +1528,7 @@ class _FillScrollLeaguePersonalStats extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               for (final title in titles)
-          SizedBox(
+                SizedBox(
                   width: colW,
                   height: h,
                   child: Column(
@@ -1544,7 +1558,7 @@ class _FillScrollLeaguePersonalStats extends StatelessWidget {
                             final bodyH = bodyConstraints.maxHeight.isFinite ? bodyConstraints.maxHeight : 0.0;
                             final visibleSlots = bodyH > 0 ? (bodyH / _statRowH).floor().clamp(0, 1000) : 0;
                             if (matched.length > visibleSlots && visibleSlots > 0) {
-              return SingleChildScrollView(
+                              return SingleChildScrollView(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [
@@ -1569,7 +1583,7 @@ class _FillScrollLeaguePersonalStats extends StatelessWidget {
                                     showJapanFlag: showJapanFlag,
                                   ),
                                 for (var i = 0; i < emptyFixed; i++)
-          SizedBox(
+                                  SizedBox(
                                     width: colW,
                                     height: _statRowH,
                                     child: Container(
@@ -1594,9 +1608,9 @@ class _FillScrollLeaguePersonalStats extends StatelessWidget {
                               ],
                             );
                           });
-            }),
-          ),
-        ],
+                        }),
+                      ),
+                    ],
                   ),
                 ),
             ],
@@ -1736,8 +1750,8 @@ class ScrollBothLeaguePersonalStats extends StatelessWidget {
             final rowCount = left.length > right.length ? left.length : right.length;
             return SizedBox(
               height: _statsScrollBodyH,
-          child: SingleChildScrollView(
-            child: Column(
+              child: SingleChildScrollView(
+                child: Column(
                   children: [
                     for (var i = 0; i < rowCount; i++)
                       Row(
@@ -1926,7 +1940,7 @@ class _BothLeaguePersonalStatsState extends State<BothLeaguePersonalStats> {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+      children: [
         _DualStatsSegmentBars(
           battingTitles: batTitles,
           pitchingTitles: pitTitles,

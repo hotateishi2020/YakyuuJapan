@@ -47,7 +47,7 @@ String pitcherStatChips({
   final parts = <String>[
     '${_inningsLabel(innings)}$runsLabel|${runsTone == 'gray' ? 'dgray' : runsTone}',
     '被安打$hits|${_lowerTone(hits / ip, const [0, 0.3, 0.6, 0.9, 1.2, 1.5])}',
-    '${freePasses}四死|${_walksAllowedTone(freePasses / ip)}',
+    '$freePasses四死|${_walksAllowedTone(freePasses / ip)}',
     '${strikeouts}K|${starter ? _higherTone(strikeouts / ip, const [1, 0.85, 0.7, 0.55, 0.4, 0.25]) : _reliefStrikeoutTone(strikeouts / ip)}',
   ];
   if (pitches > 0) parts.add('$pitches球|');
@@ -197,17 +197,7 @@ bool _isReachedResult(String result) {
 }
 
 bool _isPlateResult(String result) {
-  return _isReachedResult(result) ||
-      result == 'OUT_FLY' ||
-      result == 'OUT_GROUND' ||
-      result == 'OUT_POP_UP' ||
-      result == 'OUT_DOUBLE_PLAY' ||
-      result == 'OUT_LINE_DRIVE' ||
-      result == 'STRIKE_OUT' ||
-      result == 'SACRIFICE_BUNT' ||
-      result == 'SACRIFICE_FLY' ||
-      result == 'SQUEEZE' ||
-      result == 'INTERFERENCE_FIELDING';
+  return _isReachedResult(result) || result == 'OUT_FLY' || result == 'OUT_GROUND' || result == 'OUT_POP_UP' || result == 'OUT_DOUBLE_PLAY' || result == 'OUT_LINE_DRIVE' || result == 'STRIKE_OUT' || result == 'SACRIFICE_BUNT' || result == 'SACRIFICE_FLY' || result == 'SQUEEZE' || result == 'INTERFERENCE_FIELDING';
 }
 
 /// テキスト速報の打席結果から、全打席安打・全打席出塁を選手ごとに作る。

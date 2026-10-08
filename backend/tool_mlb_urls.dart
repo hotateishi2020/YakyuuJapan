@@ -1,4 +1,5 @@
 import 'tools/Postgres.dart';
+
 Future<void> main() async {
   await Postgres.withConnection((conn) async {
     final a = await conn.execute('''
@@ -23,7 +24,9 @@ Future<void> main() async {
       GROUP BY p.id, p.name_full, p.url, t.name_short
       ORDER BY p.id LIMIT 20
     ''').timeout(const Duration(seconds: 20));
-    for (final r in b) print(r.toColumnMap());
+    for (final r in b) {
+      print(r.toColumnMap());
+    }
     final c = await conn.execute('''
       SELECT c.int_year, t.name_short, COUNT(*) n
       FROM m_player_career c
@@ -33,6 +36,8 @@ Future<void> main() async {
       ORDER BY c.int_year DESC, n DESC LIMIT 30
     ''').timeout(const Duration(seconds: 20));
     print('career by year:');
-    for (final r in c) print(r.toColumnMap());
+    for (final r in c) {
+      print(r.toColumnMap());
+    }
   });
 }

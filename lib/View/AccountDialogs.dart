@@ -172,9 +172,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
         TextButton(onPressed: _busy ? null : () => Navigator.pop(context), child: const Text('キャンセル')),
         FilledButton(
           onPressed: _busy ? null : _submit,
-          child: _busy
-              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-              : const Text('変更する'),
+          child: _busy ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('変更する'),
         ),
       ],
     );
@@ -251,9 +249,7 @@ class _NotificationSettingsDialogState extends State<_NotificationSettingsDialog
         TextButton(onPressed: _busy ? null : () => Navigator.pop(context), child: const Text('キャンセル')),
         FilledButton(
           onPressed: _busy ? null : _submit,
-          child: _busy
-              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-              : const Text('保存'),
+          child: _busy ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('保存'),
         ),
       ],
     );
@@ -395,7 +391,7 @@ class _BasicSettingsDialogState extends State<_BasicSettingsDialog> {
                     ),
                     const SizedBox(height: 10),
                     DropdownButtonFormField<int?>(
-                      value: _teams.any((t) => int.tryParse('${t['id']}') == _teamId) ? _teamId : null,
+                      initialValue: _teams.any((t) => int.tryParse('${t['id']}') == _teamId) ? _teamId : null,
                       isExpanded: true,
                       decoration: const InputDecoration(
                         labelText: '押しのチーム',
@@ -415,7 +411,7 @@ class _BasicSettingsDialogState extends State<_BasicSettingsDialog> {
                     ),
                     const SizedBox(height: 10),
                     DropdownButtonFormField<int?>(
-                      value: _players.any((p) => int.tryParse('${p['id']}') == _playerId) ? _playerId : null,
+                      initialValue: _players.any((p) => int.tryParse('${p['id']}') == _playerId) ? _playerId : null,
                       isExpanded: true,
                       decoration: const InputDecoration(
                         labelText: '押しの選手',
@@ -449,9 +445,7 @@ class _BasicSettingsDialogState extends State<_BasicSettingsDialog> {
         TextButton(onPressed: _busy ? null : () => Navigator.pop(context), child: const Text('キャンセル')),
         FilledButton(
           onPressed: _busy || _loading ? null : _submit,
-          child: _busy
-              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-              : const Text('保存'),
+          child: _busy ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('保存'),
         ),
       ],
     );

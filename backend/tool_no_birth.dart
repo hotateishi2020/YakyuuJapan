@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'tools/Postgres.dart';
+
 Future<void> main() async {
   await Postgres.withConnection((conn) async {
     final rows = await conn.execute('''
@@ -10,6 +11,8 @@ Future<void> main() async {
       WHERE tsp.id_league IN (3,4) AND p.date_birth IS NULL
       GROUP BY p.id, p.name_full, t.name_shortest, p.url, p.date_birth
     ''').timeout(const Duration(seconds: 20));
-    for (final r in rows) stdout.writeln(r.toColumnMap());
+    for (final r in rows) {
+      stdout.writeln(r.toColumnMap());
+    }
   });
 }

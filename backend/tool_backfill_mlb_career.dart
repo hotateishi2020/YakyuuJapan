@@ -39,7 +39,9 @@ Future<void> main() async {
       WHERE p.name_full IN ('吉田正尚','山本由伸','大谷翔平','岡本和真')
       ORDER BY p.name_full, c.int_year
     ''').timeout(const Duration(seconds: 30));
-    for (final r in sample) stdout.writeln('${r.toColumnMap()}');
+    for (final r in sample) {
+      stdout.writeln('${r.toColumnMap()}');
+    }
   });
   stdout.writeln('完了');
 }

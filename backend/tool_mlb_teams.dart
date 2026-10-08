@@ -1,4 +1,5 @@
 import 'tools/Postgres.dart';
+
 Future<void> main() async {
   print('start');
   await Postgres.withConnection((conn) async {
@@ -7,7 +8,9 @@ Future<void> main() async {
       SELECT id, id_league, name_short, name_shortest
       FROM m_team WHERE id_league IN (3,4) ORDER BY id
     ''').timeout(const Duration(seconds: 15));
-    for (final r in teams) print(r.toColumnMap());
+    for (final r in teams) {
+      print(r.toColumnMap());
+    }
     final c = await conn.execute('''
       SELECT COUNT(*) n FROM m_player_career c
       JOIN m_team t ON t.id=c.id_team AND t.id_league IN (3,4)

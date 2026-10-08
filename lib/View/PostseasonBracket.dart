@@ -30,6 +30,7 @@ class BracketGeom {
 class PostseasonBracket extends StatelessWidget {
   final List<Map<String, dynamic>> standings;
   final List<Map<String, dynamic>> games;
+
   /// 順位未取得中は「未確定」ではなくグルグルを出す
   final bool loadingTeams;
 
@@ -74,35 +75,35 @@ class PostseasonBracket extends StatelessWidget {
   Widget _bracket(PostseasonBoard board) {
     return Stack(
       children: [
-            CustomPaint(
-              size: const Size(BracketGeom.boardW, BracketGeom.h),
-              painter: _BracketLinePainter(board),
-            ),
-            _innerLogo(BracketGeom.xs[0] + 14, 'backend/assets/images/logo_cs_central.png'),
-            _innerLogo(BracketGeom.xs[5] - 14 - 96, 'backend/assets/images/logo_cs_pacific.png'),
-            _leagueLogo(central: true),
-            _leagueLogo(central: false),
-            _japanBox(BracketGeom.js),
-            _stars(BracketGeom.js.left + 10, _starTop(BracketGeom.js, board.japan.slots, insetTop: 28), board.japan.winsHigh, board.japan.slots),
-            _stars(BracketGeom.js.right - 26, _starTop(BracketGeom.js, board.japan.slots, insetTop: 28), board.japan.winsLow, board.japan.slots),
-            _stageBox(BracketGeom.finC, 'CS FINAL STAGE', background: _centralLeague),
-            _stageBox(BracketGeom.finP, 'CS FINAL STAGE', background: _pacificLeague),
-            _starsOnLine(BracketGeom.xs[0], BracketGeom.finC.center.dy, BracketGeom.cardTop, toLeft: true, wins: board.finalCentral.winsHigh, slots: board.finalCentral.slots),
-            _starsOnLine(BracketGeom.midC, BracketGeom.finC.center.dy, BracketGeom.cs1C.top, toLeft: false, wins: board.finalCentral.winsLow, slots: board.finalCentral.slots),
-            _starsOnLine(BracketGeom.midP, BracketGeom.finP.center.dy, BracketGeom.cs1P.top, toLeft: true, wins: board.finalPacific.winsLow, slots: board.finalPacific.slots),
-            _starsOnLine(BracketGeom.xs[5], BracketGeom.finP.center.dy, BracketGeom.cardTop, toLeft: false, wins: board.finalPacific.winsHigh, slots: board.finalPacific.slots),
-            _stageBox(BracketGeom.cs1C, 'CS 1st STAGE', fontSize: 10, background: _centralLeague),
-            _stageBox(BracketGeom.cs1P, 'CS 1st STAGE', fontSize: 10, background: _pacificLeague),
-            _starsOnLine(BracketGeom.xs[1], BracketGeom.cs1C.center.dy, BracketGeom.cardTop, toLeft: true, wins: board.cs1Central.winsHigh, slots: board.cs1Central.slots),
-            _starsOnLine(BracketGeom.xs[2], BracketGeom.cs1C.center.dy, BracketGeom.cardTop, toLeft: false, wins: board.cs1Central.winsLow, slots: board.cs1Central.slots),
-            _starsOnLine(BracketGeom.xs[3], BracketGeom.cs1P.center.dy, BracketGeom.cardTop, toLeft: true, wins: board.cs1Pacific.winsLow, slots: board.cs1Pacific.slots),
-            _starsOnLine(BracketGeom.xs[4], BracketGeom.cs1P.center.dy, BracketGeom.cardTop, toLeft: false, wins: board.cs1Pacific.winsHigh, slots: board.cs1Pacific.slots),
-            _team(0, board, board.central1, 'セ1位'),
-            _team(1, board, board.central2, 'セ2位'),
-            _team(2, board, board.central3, 'セ3位'),
-            _team(3, board, board.pacific3, 'パ3位'),
-            _team(4, board, board.pacific2, 'パ2位'),
-            _team(5, board, board.pacific1, 'パ1位'),
+        CustomPaint(
+          size: const Size(BracketGeom.boardW, BracketGeom.h),
+          painter: _BracketLinePainter(board),
+        ),
+        _innerLogo(BracketGeom.xs[0] + 14, 'backend/assets/images/logo_cs_central.png'),
+        _innerLogo(BracketGeom.xs[5] - 14 - 96, 'backend/assets/images/logo_cs_pacific.png'),
+        _leagueLogo(central: true),
+        _leagueLogo(central: false),
+        _japanBox(BracketGeom.js),
+        _stars(BracketGeom.js.left + 10, _starTop(BracketGeom.js, board.japan.slots, insetTop: 28), board.japan.winsHigh, board.japan.slots),
+        _stars(BracketGeom.js.right - 26, _starTop(BracketGeom.js, board.japan.slots, insetTop: 28), board.japan.winsLow, board.japan.slots),
+        _stageBox(BracketGeom.finC, 'CS FINAL STAGE', background: _centralLeague),
+        _stageBox(BracketGeom.finP, 'CS FINAL STAGE', background: _pacificLeague),
+        _starsOnLine(BracketGeom.xs[0], BracketGeom.finC.center.dy, BracketGeom.cardTop, toLeft: true, wins: board.finalCentral.winsHigh, slots: board.finalCentral.slots),
+        _starsOnLine(BracketGeom.midC, BracketGeom.finC.center.dy, BracketGeom.cs1C.top, toLeft: false, wins: board.finalCentral.winsLow, slots: board.finalCentral.slots),
+        _starsOnLine(BracketGeom.midP, BracketGeom.finP.center.dy, BracketGeom.cs1P.top, toLeft: true, wins: board.finalPacific.winsLow, slots: board.finalPacific.slots),
+        _starsOnLine(BracketGeom.xs[5], BracketGeom.finP.center.dy, BracketGeom.cardTop, toLeft: false, wins: board.finalPacific.winsHigh, slots: board.finalPacific.slots),
+        _stageBox(BracketGeom.cs1C, 'CS 1st STAGE', fontSize: 10, background: _centralLeague),
+        _stageBox(BracketGeom.cs1P, 'CS 1st STAGE', fontSize: 10, background: _pacificLeague),
+        _starsOnLine(BracketGeom.xs[1], BracketGeom.cs1C.center.dy, BracketGeom.cardTop, toLeft: true, wins: board.cs1Central.winsHigh, slots: board.cs1Central.slots),
+        _starsOnLine(BracketGeom.xs[2], BracketGeom.cs1C.center.dy, BracketGeom.cardTop, toLeft: false, wins: board.cs1Central.winsLow, slots: board.cs1Central.slots),
+        _starsOnLine(BracketGeom.xs[3], BracketGeom.cs1P.center.dy, BracketGeom.cardTop, toLeft: true, wins: board.cs1Pacific.winsLow, slots: board.cs1Pacific.slots),
+        _starsOnLine(BracketGeom.xs[4], BracketGeom.cs1P.center.dy, BracketGeom.cardTop, toLeft: false, wins: board.cs1Pacific.winsHigh, slots: board.cs1Pacific.slots),
+        _team(0, board, board.central1, 'セ1位'),
+        _team(1, board, board.central2, 'セ2位'),
+        _team(2, board, board.central3, 'セ3位'),
+        _team(3, board, board.pacific3, 'パ3位'),
+        _team(4, board, board.pacific2, 'パ2位'),
+        _team(5, board, board.pacific1, 'パ1位'),
       ],
     );
   }
@@ -115,7 +116,7 @@ class PostseasonBracket extends StatelessWidget {
     const gap = 22.0;
     // webp 全体のうちマーク部分のおおよそ上側（文字は下部）
     const markFraction = 0.62;
-    final center = BracketGeom.boardW / 2;
+    const center = BracketGeom.boardW / 2;
     final top = BracketGeom.js.bottom + 10;
     return Positioned(
       left: central ? center - gap - width : center + gap,
@@ -307,14 +308,14 @@ class PostseasonBracket extends StatelessWidget {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : unknown
-                      ? const Text(
-                          '未確定',
-                          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 13),
-                        )
-                      : Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                          child: teamLogoImage(asset: logoAsset, networkUrl: logoUrl),
-                        ),
+                          ? const Text(
+                              '未確定',
+                              style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 13),
+                            )
+                          : Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                              child: teamLogoImage(asset: logoAsset, networkUrl: logoUrl),
+                            ),
                 ),
               ),
               ColoredBox(
@@ -330,30 +331,30 @@ class PostseasonBracket extends StatelessWidget {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : unknown
-                        ? const SizedBox.shrink()
-                        : Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 2),
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    team.name,
-                                    textAlign: TextAlign.center,
-                                    maxLines: 1,
-                                    softWrap: false,
-                                    style: TextStyle(
-                                      color: nameFg,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: team.name.length >= 7 ? 9 : 11,
-                                      height: 1.15,
-                                    ),
+                            ? const SizedBox.shrink()
+                            : Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 2),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        team.name,
+                                        textAlign: TextAlign.center,
+                                        maxLines: 1,
+                                        softWrap: false,
+                                        style: TextStyle(
+                                          color: nameFg,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: team.name.length >= 7 ? 9 : 11,
+                                          height: 1.15,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
-                          ),
                   ),
                 ),
               ),
@@ -383,10 +384,14 @@ class _BracketLinePainter extends CustomPainter {
       );
     }
 
-    Path v(double x, double y1, double y2) => Path()..moveTo(x, y1)..lineTo(x, y2);
-    Path h(double x1, double x2, double y) => Path()..moveTo(x1, y)..lineTo(x2, y);
+    Path v(double x, double y1, double y2) => Path()
+      ..moveTo(x, y1)
+      ..lineTo(x, y2);
+    Path h(double x1, double x2, double y) => Path()
+      ..moveTo(x1, y)
+      ..lineTo(x2, y);
 
-    final cardY = BracketGeom.cardTop;
+    const cardY = BracketGeom.cardTop;
 
     final c2won = board.cs1Central.winnerId == board.central2.id && board.central2.id > 0;
     final c3won = board.cs1Central.winnerId == board.central3.id && board.central3.id > 0;

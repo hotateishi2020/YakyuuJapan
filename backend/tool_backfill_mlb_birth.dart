@@ -31,7 +31,9 @@ Future<void> main() async {
       LIMIT 20
     ''').timeout(const Duration(seconds: 30));
     stdout.writeln('🍁🌱対象サンプル:');
-    for (final r in b) stdout.writeln(r.toColumnMap());
+    for (final r in b) {
+      stdout.writeln(r.toColumnMap());
+    }
   });
   stdout.writeln('完了');
 }

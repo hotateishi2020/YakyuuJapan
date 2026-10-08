@@ -83,6 +83,7 @@ class MlbBracketGeom {
 class MlbPostseasonBracket extends StatelessWidget {
   final List<Map<String, dynamic>> standings;
   final List<Map<String, dynamic>> games;
+
   /// 順位未取得中は「未確定」ではなくグルグルを出す
   final bool loadingTeams;
 
@@ -167,7 +168,7 @@ class MlbPostseasonBracket extends StatelessWidget {
   }
 
   List<Widget> _stars(MlbPostseasonBoard board) {
-    final cardTop = MlbBracketGeom.cardTop;
+    const cardTop = MlbBracketGeom.cardTop;
     final alWc45 = MlbBracketGeom.alWc45Box;
     final alWc36 = MlbBracketGeom.alWc36Box;
     final nlWc45 = MlbBracketGeom.nlWc45Box;
@@ -388,32 +389,31 @@ class MlbPostseasonBracket extends StatelessWidget {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : unknown
-                        ? const SizedBox.shrink()
-                        : Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 2),
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    team.name,
-                                    textAlign: TextAlign.center,
-                                    maxLines: 1,
-                                    softWrap: false,
-                                    style: TextStyle(
-                                      color: nameFg,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: team.name.length >= 7 ? 8 : 9,
-                                      height: 1.1,
-                                    ),
+                            ? const SizedBox.shrink()
+                            : Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 2),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        team.name,
+                                        textAlign: TextAlign.center,
+                                        maxLines: 1,
+                                        softWrap: false,
+                                        style: TextStyle(
+                                          color: nameFg,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: team.name.length >= 7 ? 8 : 9,
+                                          height: 1.1,
+                                        ),
+                                      ),
+                                      if (team.hasJapanPlayer) const Text(' 🇯🇵', style: TextStyle(fontSize: 10, height: 1)),
+                                    ],
                                   ),
-                                  if (team.hasJapanPlayer)
-                                    const Text(' 🇯🇵', style: TextStyle(fontSize: 10, height: 1)),
-                                ],
+                                ),
                               ),
-                            ),
-                          ),
                   ),
                 ),
               ),
@@ -471,7 +471,7 @@ class _MlbBracketLinePainter extends CustomPainter {
       stroke(h(railX, sideX, midY), win: win);
     }
 
-    final cardTop = MlbBracketGeom.cardTop;
+    const cardTop = MlbBracketGeom.cardTop;
     final al = board.american;
     final nl = board.national;
 

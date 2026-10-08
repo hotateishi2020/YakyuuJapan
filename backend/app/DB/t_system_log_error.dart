@@ -1,12 +1,14 @@
 import '../../tools/DBModel.dart';
 
 class t_system_log_error extends DBModel {
+  @override
   String tableName = 't_system_log_error';
   String message_error = '';
   String stacktrace = '';
   bool flg_check = false;
   String code_log_system = '';
 
+  @override
   Map<String, dynamic> toMap() {
     return super.toMap()
       ..addAll({

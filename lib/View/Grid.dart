@@ -107,7 +107,7 @@ class UnifiedGrid extends StatelessWidget {
   }
 
   List<Widget> _buildLeagueColumn(int leagueId, {required double rowHeight}) {
-    Color? _parseColorNameLocal(String? name) => parseColorNameOrNull(name);
+    Color? parseColorNameLocal(String? name) => parseColorNameOrNull(name);
 
     // リーグ色（予想ブロック内サイドヘッダー用）
     final Color leagueColor = leagueId == 1 ? const Color(0xFF0E8E2D) : const Color(0xFF01B1EA);
@@ -129,10 +129,10 @@ class UnifiedGrid extends StatelessWidget {
     final rankRows = <Widget>[];
 
     // サイドヘッダー(26) + ギャップ(6) + 順位セル(56) と見かけ幅を揃える
-    const double _sideHeaderW = 23;
-    const double _sideGap = 0; // サイドヘッダーと右列の余白なし
-    const double _rankCellW = 56;
-    final double _rankHeaderW = _sideHeaderW + _sideGap + _rankCellW;
+    const double sideHeaderW = 23;
+    const double sideGap = 0; // サイドヘッダーと右列の余白なし
+    const double rankCellW = 56;
+    const double rankHeaderW = sideHeaderW + sideGap + rankCellW;
 
     rankHeader.add(Row(children: [
       Expanded(
@@ -156,7 +156,7 @@ class UnifiedGrid extends StatelessWidget {
     ]));
     // 余白や区切り線を入れず、直後のチーム順位ブロックに密着させる
 
-    bool _isHit(Map<String, dynamic>? pred, List<Map<String, dynamic>> curGroup) {
+    bool isHit(Map<String, dynamic>? pred, List<Map<String, dynamic>> curGroup) {
       if (pred == null || curGroup.isEmpty) return false;
 
       // 予想側の id_team / name
@@ -187,11 +187,11 @@ class UnifiedGrid extends StatelessWidget {
       final txt2 = p2.isNotEmpty ? (p2['name_team_short']?.toString() ?? '—') : '—';
 
       final String name = (row['name_team']?.toString() ?? '').trim();
-      final Color? curBg = _parseColorNameLocal('${row['color_back']}');
-      final Color? curFont = _parseColorNameLocal('${row['color_font']}');
+      final Color? curBg = parseColorNameLocal('${row['color_back']}');
+      final Color? curFont = parseColorNameLocal('${row['color_font']}');
 
-      final bool hi1 = _isHit(p1.isNotEmpty ? p1 : null, row.isNotEmpty ? [row] : const []);
-      final bool hi2 = _isHit(p2.isNotEmpty ? p2 : null, row.isNotEmpty ? [row] : const []);
+      final bool hi1 = isHit(p1.isNotEmpty ? p1 : null, row.isNotEmpty ? [row] : const []);
+      final bool hi2 = isHit(p2.isNotEmpty ? p2 : null, row.isNotEmpty ? [row] : const []);
 
       rankRows.add(SizedBox(
           height: rowHeight,
@@ -199,7 +199,7 @@ class UnifiedGrid extends StatelessWidget {
               child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(width: _rankCellW, child: rankCell('$rk', bgColor: leagueColor, fgColor: Colors.white)),
+              SizedBox(width: rankCellW, child: rankCell('$rk', bgColor: leagueColor, fgColor: Colors.white)),
               SizedBox(
                 width: w_col_predictor!,
                 child: Container(
@@ -249,11 +249,11 @@ class UnifiedGrid extends StatelessWidget {
                 color: leagueColor,
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: Center(
+              child: const Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Text('チ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                     Text('|', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                     Text('ム', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -294,17 +294,17 @@ class UnifiedGrid extends StatelessWidget {
     // スタッツのヘッダー行（「スタッツ 現在 立石 江島」）は非表示のまま
     final statsSection = <Widget>[];
 
-    int _idxOf(Map<String, dynamic> r) {
+    int idxOf(Map<String, dynamic> r) {
       final v = r['int_index'] ?? r['id_stats']; // 保険で id_stats も参照
       return int.tryParse('$v') ?? 1 << 30;
     }
 
-    int _minIdx(List<Map<String, dynamic>> rows) => rows.isEmpty ? (1 << 30) : rows.map(_idxOf).reduce((a, b) => a < b ? a : b);
+    int minIdx(List<Map<String, dynamic>> rows) => rows.isEmpty ? (1 << 30) : rows.map(idxOf).reduce((a, b) => a < b ? a : b);
 
     final statEntries = statMap.entries.toList()
       ..sort((a, b) {
-        final ia = _minIdx(a.value);
-        final ib = _minIdx(b.value);
+        final ia = minIdx(a.value);
+        final ib = minIdx(b.value);
         if (ia != ib) return ia.compareTo(ib);
         return a.key.split('|').last.compareTo(b.key.split('|').last); // 同順位は名称で
       });
@@ -332,17 +332,17 @@ class UnifiedGrid extends StatelessWidget {
       final titleBg = isPitcher ? const Color(0xFF1E88E5) : const Color(0xFFDC143C);
 
       // 点滅枠色（color_today）
-      Color? c0 = _parseColorNameLocal(user0Rows.map((e) => '${e['color_today'] ?? ''}').firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
-      Color? c1 = _parseColorNameLocal(user1Rows.map((e) => '${e['color_today'] ?? ''}').firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
-      Color? c2 = _parseColorNameLocal(user2Rows.map((e) => '${e['color_today'] ?? ''}').firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
+      Color? c0 = parseColorNameLocal(user0Rows.map((e) => '${e['color_today'] ?? ''}').firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
+      Color? c1 = parseColorNameLocal(user1Rows.map((e) => '${e['color_today'] ?? ''}').firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
+      Color? c2 = parseColorNameLocal(user2Rows.map((e) => '${e['color_today'] ?? ''}').firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
 
-      final Color _baseBg0 = const Color(0xFFF0E68C);
+      const Color baseBg0 = Color(0xFFF0E68C);
       // 現在列の背景を、同セル内の選手色でグラデーション（なければ既定色）
-      final colors0 = user0Rows.map((e) => _parseColorNameLocal('${e['color_back']}')).whereType<Color>().toList();
+      final colors0 = user0Rows.map((e) => parseColorNameLocal('${e['color_back']}')).whereType<Color>().toList();
       BoxDecoration deco0;
       if (colors0.isEmpty) {
         deco0 = BoxDecoration(
-          color: _baseBg0,
+          color: baseBg0,
           border: Border.all(color: Colors.grey.shade300),
           borderRadius: BorderRadius.circular(3),
         );
@@ -398,7 +398,7 @@ class UnifiedGrid extends StatelessWidget {
         final name = (r['player_name'] ?? '').toString().trim();
         if (name.isEmpty) continue;
         if (parts0.isNotEmpty) parts0.add(const TextSpan(text: ', '));
-        final col = _parseColorNameLocal('${r['color_font']}');
+        final col = parseColorNameLocal('${r['color_font']}');
         parts0.add(TextSpan(text: name, style: TextStyle(color: col, fontWeight: FontWeight.bold)));
       }
 
@@ -410,7 +410,7 @@ class UnifiedGrid extends StatelessWidget {
         child: SizedBox(
           width: double.infinity,
           child: parts0.isEmpty
-              ? OneLineShrinkText('—', baseSize: 12, minSize: 5, verticalPadding: 0, fast: true, weight: FontWeight.bold)
+              ? const OneLineShrinkText('—', baseSize: 12, minSize: 5, verticalPadding: 0, fast: true, weight: FontWeight.bold)
               : FittedBox(
                   fit: BoxFit.scaleDown,
                   alignment: Alignment.center,
@@ -419,8 +419,8 @@ class UnifiedGrid extends StatelessWidget {
         ),
       );
       // 予想選手はユーザーカラー背景。的中時は黄色（従来どおり）。
-      final code1 = _parseColorNameLocal(user1Rows.map((e) => '${e['code_color'] ?? ''}').firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
-      final code2 = _parseColorNameLocal(user2Rows.map((e) => '${e['code_color'] ?? ''}').firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
+      final code1 = parseColorNameLocal(user1Rows.map((e) => '${e['code_color'] ?? ''}').firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
+      final code2 = parseColorNameLocal(user2Rows.map((e) => '${e['code_color'] ?? ''}').firstWhere((s) => s.trim().isNotEmpty, orElse: () => ''));
       final w1 = cell(
         txt1,
         highlight: hi1,
@@ -450,7 +450,7 @@ class UnifiedGrid extends StatelessWidget {
               ),
               SizedBox(
                 width: w_col_predictor!,
-                child: c0 != null ? BlinkBorder(color: c0, radius: 3, width: 2, duration: const Duration(milliseconds: 1000), baseBgColor: _baseBg0, fillUseColor: true, child: w0) : w0,
+                child: c0 != null ? BlinkBorder(color: c0, radius: 3, width: 2, duration: const Duration(milliseconds: 1000), baseBgColor: baseBg0, fillUseColor: true, child: w0) : w0,
               ),
               SizedBox(
                 width: w_col_predictor!,
@@ -477,11 +477,11 @@ class UnifiedGrid extends StatelessWidget {
                 color: leagueColor,
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: Center(
+              child: const Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Text('個', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                     Text('人', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                     Text('タ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),

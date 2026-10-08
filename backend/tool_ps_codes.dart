@@ -1,4 +1,5 @@
 import 'tools/Postgres.dart';
+
 Future<void> main() async {
   await Postgres.withConnection((conn) async {
     final rows = await conn.execute('''
@@ -13,7 +14,9 @@ Future<void> main() async {
       GROUP BY code_game
       ORDER BY n DESC
     ''').timeout(const Duration(seconds: 20));
-    for (final r in rows) print(r.toColumnMap());
+    for (final r in rows) {
+      print(r.toColumnMap());
+    }
 
     final sample = await conn.execute('''
       SELECT g.id, g.code_game, g.state, g.score_home, g.score_away,
@@ -28,6 +31,8 @@ Future<void> main() async {
       LIMIT 40
     ''').timeout(const Duration(seconds: 20));
     print('--- recent MLB ---');
-    for (final r in sample) print(r.toColumnMap());
+    for (final r in sample) {
+      print(r.toColumnMap());
+    }
   });
 }

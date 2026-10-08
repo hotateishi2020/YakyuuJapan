@@ -1,6 +1,7 @@
 import '../../tools/DBModel.dart';
 
 class m_team extends DBModel {
+  @override
   String tableName = 'm_team';
   String name_shortest = '';
   String name_short = '';
@@ -11,6 +12,7 @@ class m_team extends DBModel {
   String path_img_logo = '';
   String url_npb_players = '';
 
+  @override
   Map<String, dynamic> toMap() {
     return super.toMap()
       ..addAll({

@@ -71,7 +71,7 @@ void main() {
     expect(players[2]['role'], '代守');
   });
 
-  List<Map<String, dynamic>> _playersOf(Map<int, List<Map<String, dynamic>>> lineups, int order) {
+  List<Map<String, dynamic>> playersOf(Map<int, List<Map<String, dynamic>>> lineups, int order) {
     final slot = lineups[1]!.firstWhere((row) => row['order'] == order);
     return (slot['players'] as List).cast<Map<String, dynamic>>();
   }
@@ -108,7 +108,7 @@ void main() {
       plays: const {},
       pitchers: const {},
     );
-    final players = _playersOf(lineups, 2);
+    final players = playersOf(lineups, 2);
     expect(players.map((player) => player['name']).toList(), ['ダスティン・ハリス']);
     expect(players.single['role'], '');
   });
@@ -136,7 +136,7 @@ void main() {
       plays: const {},
       pitchers: const {},
     );
-    final players = _playersOf(lineups, 2);
+    final players = playersOf(lineups, 2);
     expect(players.map((player) => player['name']).toList(), ['ダスティン・ハリス']);
     expect(players.single['role'], '');
   });
@@ -157,7 +157,7 @@ void main() {
       plays: const {},
       pitchers: const {},
     );
-    final players = _playersOf(lineups, 2);
+    final players = playersOf(lineups, 2);
     expect(players.map((player) => player['name']).toList(), ['ダスティン・ハリス']);
     expect(players.single['role'], '');
   });
@@ -192,7 +192,7 @@ void main() {
       plays: const {},
       pitchers: const {},
     );
-    final players = _playersOf(lineups, 5);
+    final players = playersOf(lineups, 5);
     expect(players.map((player) => player['name']).toList(), ['ジャクソン・メリル']);
     expect(players.single['role'], '');
   });
@@ -210,8 +210,8 @@ void main() {
       },
       pitchers: const {},
     );
-    final seventh = _playersOf(lineups, 7);
-    final ninth = _playersOf(lineups, 9);
+    final seventh = playersOf(lineups, 7);
+    final ninth = playersOf(lineups, 9);
     expect(seventh.single['name'], 'ブレーデン・モンゴメリー');
     expect(seventh.single['plays'], '空三振|out');
     expect(ninth.single['name'], 'コルソン・モンゴメリー');
@@ -250,7 +250,7 @@ void main() {
       ],
     );
     final names = [
-      for (var order = 1; order <= 9; order++) _playersOf(lineups, order).first['name'],
+      for (var order = 1; order <= 9; order++) playersOf(lineups, order).first['name'],
     ];
     expect(names, [
       'スティーブン・クワン',
@@ -263,9 +263,9 @@ void main() {
       'パトリック・ベイリー',
       'ブラヤン・ロッキオ',
     ]);
-    expect(_playersOf(lineups, 4).single['pos'], '指');
-    expect(_playersOf(lineups, 1).single['plays'], '右安|single');
-    expect(_playersOf(lineups, 9).single['plays'], '');
+    expect(playersOf(lineups, 4).single['pos'], '指');
+    expect(playersOf(lineups, 1).single['plays'], '右安|single');
+    expect(playersOf(lineups, 9).single['plays'], '');
   });
 
   test('守備変更の代守は投手の9番でなく外れた野手の打順に載せる', () {
@@ -421,7 +421,7 @@ void main() {
       plays: const {},
       pitchers: const {},
     );
-    final players = _playersOf(lineups, 2);
+    final players = playersOf(lineups, 2);
     expect(players.first['pos'], '遊');
     expect(players.first['field_marks'], 'E');
     expect(players.last['name'], '外崎修汰');

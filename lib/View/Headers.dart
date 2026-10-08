@@ -10,8 +10,8 @@ class Headers {
     double h,
     Color color,
     String title,
-    double padding_vertical,
-    double padding_horizontal, {
+    double paddingVertical,
+    double paddingHorizontal, {
     VoidCallback? onAuthChanged,
     List<Widget> actions = const [],
     bool authReady = true,
@@ -27,7 +27,7 @@ class Headers {
           colors: [Color(0xFFE10600), Color(0xFFFF9800)],
         ),
       ),
-      padding: EdgeInsets.symmetric(horizontal: padding_horizontal, vertical: padding_vertical),
+      padding: EdgeInsets.symmetric(horizontal: paddingHorizontal, vertical: paddingVertical),
       child: Row(
         children: [
           Expanded(

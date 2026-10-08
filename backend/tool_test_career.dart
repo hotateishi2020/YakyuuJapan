@@ -25,8 +25,8 @@ Future<void> main() async {
       print('match $name -> $id ${c.isEmpty ? "" : "${c.first.shortName} L${c.first.league}"}');
     }
 
-    final playerId = 5142; // 吉田
-    final url = 'https://baseball.yahoo.co.jp/mlb/player/202100515/';
+    const playerId = 5142; // 吉田
+    const url = 'https://baseball.yahoo.co.jp/mlb/player/202100515/';
     final doc = await YahooHtml.fetchDocument(Uri.parse(url));
     print('year_b ${doc.querySelector('#year_b') != null} year_p ${doc.querySelector('#year_p') != null}');
     final table = doc.querySelector('#year_b');
@@ -36,7 +36,7 @@ Future<void> main() async {
       final yearText = tr.querySelector('.bb-playerStatsTable__dataLabel')?.text.trim();
       final teamRaw = tr.querySelector('.bb-playerStatsTable__data--team')?.text.trim();
       final cells = tr.querySelectorAll('td.bb-playerStatsTable__data');
-      print('row year=$yearText team="$teamRaw" cells=${cells.length} c2=${cells.length>2?cells[2].text:""} c5=${cells.length>5?cells[5].text:""}');
+      print('row year=$yearText team="$teamRaw" cells=${cells.length} c2=${cells.length > 2 ? cells[2].text : ""} c5=${cells.length > 5 ? cells[5].text : ""}');
     }
     final n = await FetchMLB.upsertYahooMlbYearCareers(conn, playerId, doc, clubs);
     print('upserted $n');
@@ -46,6 +46,8 @@ Future<void> main() async {
       WHERE c.id_player=\$1 AND COALESCE(c.flg_delete,FALSE)=FALSE
       ORDER BY c.int_year, t.id_league
     ''', parameters: [playerId]);
-    for (final r in rows) print(r.toColumnMap());
+    for (final r in rows) {
+      print(r.toColumnMap());
+    }
   });
 }

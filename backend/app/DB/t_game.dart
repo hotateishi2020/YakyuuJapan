@@ -1,6 +1,7 @@
 import '../../tools/DBModel.dart';
 
 class t_game extends DBModel {
+  @override
   String tableName = 't_game';
   int id_pitcher_home = 0;
   int id_pitcher_away = 0;
@@ -14,10 +15,11 @@ class t_game extends DBModel {
   int score_away = 0;
   String state = '';
   String code_game = '';
-  DateTime? datetime_start = null;
+  DateTime? datetime_start;
   /// 終了試合の選手成績を取り終えたか。toMap には入れず、GameStatsLoad が単独で更新する。
   bool flg_stats_loaded = false;
 
+  @override
   Map<String, dynamic> toMap() {
     return super.toMap()
       ..addAll({

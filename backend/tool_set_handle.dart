@@ -1,4 +1,5 @@
 import 'tools/Postgres.dart';
+
 Future<void> main() async {
   await Postgres.withConnection((conn) async {
     await conn.execute("ALTER TABLE m_user ADD COLUMN IF NOT EXISTS name_handle VARCHAR(100) DEFAULT ''");
@@ -8,6 +9,8 @@ Future<void> main() async {
       WHERE COALESCE(name_handle, '') = '' AND COALESCE(mailaddress, '') <> ''
     ''');
     final rows = await conn.execute('SELECT id, name_last, name_handle, mailaddress FROM m_user ORDER BY id');
-    for (final r in rows) print(r.toColumnMap());
+    for (final r in rows) {
+      print(r.toColumnMap());
+    }
   });
 }

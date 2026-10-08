@@ -82,7 +82,9 @@ Future<void> main() async {
       ORDER BY name_full, id
       LIMIT 20
     ''').timeout(const Duration(seconds: 20));
-    for (final row in sample) print(row.toColumnMap());
+    for (final row in sample) {
+      print(row.toColumnMap());
+    }
   }).timeout(const Duration(seconds: 90));
   print('done');
   exit(0);

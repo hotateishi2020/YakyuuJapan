@@ -1,6 +1,7 @@
 import '../../tools/DBModel.dart';
 
 class t_stats_team extends DBModel {
+  @override
   String tableName = 't_stats_team';
   int year = 0;
   int id_team = 0;
@@ -20,6 +21,7 @@ class t_stats_team extends DBModel {
   double num_era_relief = 0;
   double num_avg_fielding = 0;
 
+  @override
   Map<String, dynamic> toMap() {
     return super.toMap()
       ..addAll({

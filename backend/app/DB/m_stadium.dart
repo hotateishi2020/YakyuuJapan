@@ -1,6 +1,7 @@
 import '../../tools/DBModel.dart';
 
 class m_stadium extends DBModel {
+  @override
   String tableName = 'm_stadium';
   String name_short = '';
   String name_full = '';
@@ -9,6 +10,7 @@ class m_stadium extends DBModel {
   String path_image_inside = '';
   String path_image_outside = '';
 
+  @override
   Map<String, dynamic> toMap() {
     return super.toMap()
       ..addAll({

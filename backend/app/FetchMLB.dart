@@ -119,6 +119,7 @@ class FetchMLB {
     await RegisteredPosition.syncMlb(conn);
     await syncJapanesePlayers(conn);
     final res = await FetchURL.fetchStatsPlayerForLeagues(conn, _org.leagueIds);
+    await RegisteredPosition.markMlbPitchersFromStats(conn);
     await enrichMlbPlayersForMarks(conn);
     await DisplaySnapshot.refreshPlayers(conn, DateTimeTool.getThisYear());
     return res;

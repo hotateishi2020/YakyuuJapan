@@ -1258,6 +1258,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       standings: standings,
       stats: npbPlayerStatsActual,
       games: gamesForLeague,
+      seriesGames: postseasonGames,
       onlyLeagueId: leagueId,
       gamesDateFilter: _gamesInitialDate(),
       portraitLayout: portraitLayout,
@@ -1304,6 +1305,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       return BothLeagueGameDay(
         key: ValueKey('both-${_orgKind.name}-$_seasonYear-${_gamesInitialDate()}'),
         games: games,
+        seriesGames: postseasonGames,
         playerStats: npbPlayerStatsActual,
         standings: standings,
         initialDate: _gamesInitialDate(),
@@ -2151,6 +2153,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
             npbPlayerStats: npbPlayerStats,
             npbPlayerStatsActual: npbPlayerStatsActual,
             games: games,
+            seriesGames: postseasonGames,
             usernameForId: _usernameForId,
             userNameFromPredictions: _userNameFromPredictions,
             compact: compact,

@@ -154,6 +154,30 @@ class RegisteredPosition {
     return updated;
   }
 
+  /// 投手の個人成績に出ている MLB 選手は、名簿で結びつかなくても投手として登録する。
+  static Future<int> markMlbPitchersFromStats(Connection conn) async {
+    await ensureSchema(conn);
+    final result = await conn.execute('''
+      UPDATE m_player AS p
+      SET txt_position = '投手',
+          updat = NOW()
+      FROM m_team AS t
+      WHERE t.id = p.id_team
+        AND t.id_league IN (3, 4)
+        AND COALESCE(p.flg_delete, FALSE) = FALSE
+        AND p.txt_position IS DISTINCT FROM '投手'
+        AND EXISTS (
+          SELECT 1
+          FROM t_stats_player_latest AS tsp
+          JOIN m_stats AS s ON s.id = tsp.id_stats AND s.flg_pitcher = TRUE
+          WHERE tsp.id_player = p.id
+            AND tsp.id_league IN (3, 4)
+        )
+    ''');
+    print('MLB投手成績から登録ポジション 更新${result.affectedRows}');
+    return result.affectedRows;
+  }
+
   static String lastToken(String name) {
     final parts = name.split(RegExp(r'[・．.]')).where((part) => part.isNotEmpty).toList();
     if (parts.isEmpty) return name;

@@ -24,7 +24,7 @@ INSERT INTO t_nortification (
     updpgm,
     updenv
 ) VALUES 
-('試合情報の守備位置を表示するようにしました。', '試合情報の守備位置を表示するようにしました。', 1, false, 'SYS', 'UPD', '', 0, 'SQLCreator', 'SQLCreator', 0, 'SQLCreator', 'SQLCreator') 
+('個人成績にパワプロカラーを適用しました。初期表示の高速化をしました。', '個人成績にパワプロカラーを適用しました。初期表示の高速化をしました。', 1, false, 'SYS', 'UPD', '', 0, 'SQLCreator', 'SQLCreator', 0, 'SQLCreator', 'SQLCreator') 
 RETURNING id;
 ''';
 

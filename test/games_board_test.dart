@@ -4737,6 +4737,40 @@ void main() {
     expect(find.text('試合前'), findsOneWidget);
   });
 
+  testWidgets('予告先発が無い試合前はカード下部を余白で伸ばさない', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(400, 900));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            height: 800,
+            child: GamesBoardYahooStyle(
+              games: [
+                {
+                  'date_game': '2026-10-10',
+                  'time_game': '14:00',
+                  'name_team_home': 'DeNA',
+                  'name_team_away': '巨人',
+                  'name_stadium': '東京ドーム',
+                  'state': '試合前',
+                  'score_home': -1,
+                  'score_away': -1,
+                  'id_team_home': 3,
+                  'id_team_away': 1,
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    final height = tester.getSize(find.byKey(const ValueKey('game-card-shell-2026-10-10|DeNA|巨人'))).height;
+    expect(height, lessThan(160));
+  });
+
   testWidgets('守備図はスタメンと代守とE/FPを出す', (tester) async {
     await tester.pumpWidget(
       MaterialApp(

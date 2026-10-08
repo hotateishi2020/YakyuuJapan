@@ -27,15 +27,11 @@ cp -R build/web/* backend/public/
 
 git add . 
 
-git commit -m "試合情報を初期表示の時は格納状態にするようにしました。" 
+git commit -m "個人成績にパワプロカラーを適用しました。初期表示の高速化をしました。" 
 
 git push 
 
 cd /Users/standapp/StudioProjects/Koko/backend
-
-
-
-
 
 dart run tool_sql.dart
 

@@ -23,41 +23,6 @@ String compactPersonalStatName(String name) {
   return name.replaceAll(RegExp(r'[\s\u3000]+'), '');
 }
 
-String _stealStatsWithRate(String steals, String rate) {
-  final count = steals.trim();
-  var shown = rate.trim();
-  if (shown.isEmpty) return count;
-  if (!shown.contains('%') && !shown.contains('％')) shown = '$shown%';
-  if (count.contains('（') || count.contains('(')) return count;
-  return '$count（$shown）';
-}
-
-List<Map<String, dynamic>> _mergeStealSuccessRate(List<Map<String, dynamic>> rows) {
-  String playerKey(Map<String, dynamic> row) {
-    final id = '${row['id_player'] ?? ''}'.trim();
-    if (id.isNotEmpty && id != 'null' && id != '0') return 'id:$id';
-    return 'name:${row['player_name'] ?? row['name_player'] ?? ''}';
-  }
-
-  final rates = <String, String>{};
-  for (final row in rows) {
-    if ('${row['title'] ?? ''}'.trim() != '盗塁成功率') continue;
-    final value = '${row['stats'] ?? ''}'.trim();
-    if (value.isNotEmpty && value != 'null' && value != '—') rates[playerKey(row)] = value;
-  }
-  return [
-    for (final row in rows)
-      if ('${row['title'] ?? ''}'.trim() != '盗塁成功率')
-        if ('${row['title'] ?? ''}'.trim() == '盗塁' && rates[playerKey(row)]?.isNotEmpty == true)
-          {
-            ...row,
-            'stats': _stealStatsWithRate('${row['stats'] ?? '—'}', rates[playerKey(row)]!),
-          }
-        else
-          row,
-  ];
-}
-
 PersonalStatsLayout readPersonalStatsLayout() {
   final raw = readBrowserCookie(personalStatsLayoutCookie);
   if (raw == 'scroll') return PersonalStatsLayout.scroll;
@@ -68,140 +33,322 @@ void writePersonalStatsLayout(PersonalStatsLayout layout) {
   writeBrowserCookie(personalStatsLayoutCookie, layout == PersonalStatsLayout.scroll ? 'scroll' : 'segment');
 }
 
-/// 勝差の数値。首位・「-」・優勝は 0。読めない値も 0 として左端に置く。
-({String name, String label, double gb}) gamesBehindEntry(String name, String raw) {
+/// 勝差の数値。首位・「-」・優勝・0 は間隔なし。値はすぐ上のチームとの差。
+({String name, String abbrev, String label, double gb}) gamesBehindEntry(String name, String raw, {String abbrev = ''}) {
   final text = raw.trim();
   if (text.isEmpty || text == 'null' || text == '-' || text == '—' || text == '－' || text == '優勝' || text.toUpperCase() == 'W') {
     final label = (text == '優勝' || text.toUpperCase() == 'W') ? text : '-';
-    return (name: name.trim(), label: label, gb: 0);
+    return (name: name.trim(), abbrev: abbrev.trim(), label: label, gb: 0);
   }
   final parsed = double.tryParse(text);
   if (parsed != null) {
-    return (name: name.trim(), label: text, gb: parsed < 0 ? 0 : parsed);
+    return (name: name.trim(), abbrev: abbrev.trim(), label: text, gb: parsed < 0 ? 0 : parsed);
   }
   final match = RegExp(r'([0-9]+(?:\.[0-9]+)?)').firstMatch(text);
   if (match != null) {
-    return (name: name.trim(), label: text, gb: double.parse(match.group(1)!));
+    return (name: name.trim(), abbrev: abbrev.trim(), label: text, gb: double.parse(match.group(1)!));
   }
-  return (name: name.trim(), label: text, gb: 0);
+  return (name: name.trim(), abbrev: abbrev.trim(), label: text, gb: 0);
 }
 
-/// 勝差の割合に対応するロゴ左端。首位が左、最大の勝差が右端。
-double gbMarkLeft(double gb, double maxGb, double width, double markW) {
-  final span = math.max(0.0, width - markW);
-  if (maxGb <= 0 || gb <= 0) return 0;
-  return (gb / maxGb) * span;
+const double gbChartLogoSize = 56;
+const double gbChartPxPerGame = 18;
+const double gbChartInlineMin = 22;
+const double gbChartLabelH = 16;
+
+String formatGamesBehindGap(double diff) {
+  final rounded = (math.max(0, diff) * 10).round() / 10;
+  if ((rounded - rounded.roundToDouble()).abs() < 0.001) return '${rounded.round()}';
+  return rounded.toStringAsFixed(1);
+}
+
+class GamesBehindLogo {
+  final String name;
+  final String abbrev;
+  final double left;
+  final double top;
+
+  const GamesBehindLogo({required this.name, required this.abbrev, required this.left, required this.top});
+}
+
+class GamesBehindLink {
+  final String upper;
+  final String lower;
+  final String label;
+  final bool side;
+  final bool sideRight;
+  final double labelLeft;
+  final double labelTop;
+
+  const GamesBehindLink({
+    required this.upper,
+    required this.lower,
+    required this.label,
+    required this.side,
+    required this.sideRight,
+    required this.labelLeft,
+    required this.labelTop,
+  });
+}
+
+class GamesBehindLayout {
+  final List<GamesBehindLogo> logos;
+  final List<GamesBehindLink> links;
+  final double logoSize;
+  final double height;
+  final double width;
+
+  const GamesBehindLayout({
+    required this.logos,
+    required this.links,
+    required this.logoSize,
+    required this.height,
+    required this.width,
+  });
+}
+
+/// 各チームの勝差は直上との差。0 は横に並べ、狭い差が続くときは左右交互に迂回する。
+GamesBehindLayout layoutGamesBehindChart(
+  List<({String name, String abbrev, String label, double gb})> entries, {
+  double? targetHeight,
+}) {
+  final gaps = <double>[];
+  for (var i = 0; i < entries.length - 1; i++) {
+    gaps.add(entries[i + 1].gb);
+  }
+  var rows = entries.isEmpty ? 0 : 1;
+  var games = 0.0;
+  for (final gap in gaps) {
+    if (gap <= 0) continue;
+    rows++;
+    games += gap;
+  }
+  var logo = gbChartLogoSize;
+  var px = gbChartPxPerGame;
+  if (targetHeight != null && targetHeight > 0 && rows > 0 && games > 0) {
+    final logoBudget = targetHeight * 0.45;
+    logo = (logoBudget / rows).clamp(18.0, gbChartLogoSize);
+    px = math.max(0.0, targetHeight - logo * rows) / games;
+  }
+  final logos = <GamesBehindLogo>[];
+  final links = <GamesBehindLink>[];
+  var left = 0.0;
+  var top = 0.0;
+  var previousWasSide = false;
+  var lastSideRight = true;
+  for (var i = 0; i < entries.length; i++) {
+    logos.add(GamesBehindLogo(name: entries[i].name, abbrev: entries[i].abbrev, left: left, top: top));
+    if (i == entries.length - 1) break;
+    final gap = gaps[i];
+    if (gap <= 0) {
+      left += logo + 6;
+      previousWasSide = false;
+      continue;
+    }
+    final gapPx = gap * px;
+    final side = gapPx < gbChartInlineMin;
+    final sideRight = !side
+        ? true
+        : previousWasSide
+            ? !lastSideRight
+            : true;
+    if (side) {
+      previousWasSide = true;
+      lastSideRight = sideRight;
+    } else {
+      previousWasSide = false;
+    }
+    final lowerTop = top + logo + gapPx;
+    final label = formatGamesBehindGap(gap);
+    final textW = label.length * 8.0 + 4;
+    final lineX = side ? (sideRight ? left + logo + 12 : left - 12) : left + logo / 2;
+    final labelLeft = side ? (sideRight ? lineX + 4 : lineX - 4 - textW) : lineX + 4;
+    final y1 = side ? top + logo / 2 : top + logo;
+    final y2 = side ? lowerTop + logo / 2 : lowerTop;
+    links.add(GamesBehindLink(
+      upper: entries[i].name,
+      lower: entries[i + 1].name,
+      label: label,
+      side: side,
+      sideRight: sideRight,
+      labelLeft: labelLeft,
+      labelTop: (y1 + y2) / 2 - gbChartLabelH / 2,
+    ));
+    top = lowerTop;
+  }
+  var minX = 0.0;
+  var maxX = logo;
+  for (final logoMark in logos) {
+    minX = math.min(minX, logoMark.left);
+    maxX = math.max(maxX, logoMark.left + logo);
+  }
+  for (final link in links) {
+    minX = math.min(minX, link.labelLeft);
+    maxX = math.max(maxX, link.labelLeft + link.label.length * 8 + 4);
+  }
+  final shift = -minX;
+  return GamesBehindLayout(
+    logos: [
+      for (final logoMark in logos) GamesBehindLogo(name: logoMark.name, abbrev: logoMark.abbrev, left: logoMark.left + shift, top: logoMark.top),
+    ],
+    links: [
+      for (final link in links)
+        GamesBehindLink(
+          upper: link.upper,
+          lower: link.lower,
+          label: link.label,
+          side: link.side,
+          sideRight: link.sideRight,
+          labelLeft: link.labelLeft + shift,
+          labelTop: link.labelTop,
+        ),
+    ],
+    logoSize: logo,
+    height: entries.isEmpty ? 0 : top + logo,
+    width: maxX - minX,
+  );
 }
 
 class GamesBehindChart extends StatelessWidget {
   final List<Map<String, dynamic>> rows;
+  final double? height;
 
-  const GamesBehindChart({super.key, required this.rows});
+  const GamesBehindChart({super.key, required this.rows, this.height});
 
   @override
   Widget build(BuildContext context) {
+    final ordered = [...rows];
+    final hasRank = ordered.any((row) => int.tryParse('${row['int_rank']}') != null);
+    if (hasRank) {
+      ordered.sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 999).compareTo(int.tryParse('${b['int_rank']}') ?? 999));
+    }
     final entries = [
-      for (final row in rows)
-        gamesBehindEntry('${row['name_team'] ?? ''}', '${row['game_behind'] ?? ''}'),
+      for (final row in ordered)
+        gamesBehindEntry(
+          '${row['name_team'] ?? ''}',
+          '${row['game_behind'] ?? ''}',
+          abbrev: '${row['name_shortest'] ?? ''}',
+        ),
     ].where((entry) => entry.name.isNotEmpty).toList();
     if (entries.isEmpty) return const SizedBox.shrink();
-    final maxGb = entries.map((entry) => entry.gb).reduce(math.max);
-    final tieCount = <String, int>{};
-    var maxTie = 1;
-    for (final entry in entries) {
-      final key = entry.gb.toStringAsFixed(2);
-      final next = (tieCount[key] ?? 0) + 1;
-      tieCount[key] = next;
-      if (next > maxTie) maxTie = next;
-    }
-    tieCount.clear();
-    const markW = 40.0;
-    final height = 48.0 + (maxTie - 1) * 16.0;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const Padding(
-          padding: EdgeInsets.only(left: 2, bottom: 4),
-          child: Text('ゲーム差', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, height: 1)),
-        ),
-        SizedBox(
-          height: height,
-          child: LayoutBuilder(builder: (context, constraints) {
-            final width = constraints.maxWidth.isFinite ? constraints.maxWidth : markW;
-            return Stack(
-              children: [
-                Positioned(
-                  left: markW / 2,
-                  right: markW / 2,
-                  top: 16,
-                  child: const ColoredBox(color: Color(0xFFB0BEC5), child: SizedBox(height: 2)),
+    final layout = layoutGamesBehindChart(entries, targetHeight: height);
+    return SizedBox(
+      height: layout.height,
+      child: LayoutBuilder(builder: (context, constraints) {
+        final maxW = constraints.maxWidth.isFinite ? constraints.maxWidth : layout.width;
+        final origin = math.max(0.0, (maxW - layout.width) / 2);
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned.fill(child: CustomPaint(painter: _GbDashPainter(layout, origin))),
+            for (final logo in layout.logos)
+              Positioned(
+                left: origin + logo.left,
+                top: logo.top,
+                child: _GbLogo(name: logo.name, abbrev: logo.abbrev, size: layout.logoSize),
+              ),
+            for (final link in layout.links)
+              Positioned(
+                left: origin + link.labelLeft,
+                top: link.labelTop,
+                child: Text(
+                  link.label,
+                  key: ValueKey('gb-gap-${link.upper}-${link.lower}'),
+                  style: const TextStyle(color: Colors.black, fontSize: 13, fontWeight: FontWeight.bold, height: 1),
                 ),
-                for (final entry in entries)
-                  Positioned(
-                    left: gbMarkLeft(entry.gb, maxGb, width, markW),
-                    top: () {
-                      final key = entry.gb.toStringAsFixed(2);
-                      final index = tieCount[key] ?? 0;
-                      tieCount[key] = index + 1;
-                      return index * 16.0;
-                    }(),
-                    child: _GbMark(entry: entry, width: markW),
-                  ),
-              ],
-            );
-          }),
-        ),
-      ],
+              ),
+          ],
+        );
+      }),
     );
   }
 }
 
-class _GbMark extends StatelessWidget {
-  final ({String name, String label, double gb}) entry;
-  final double width;
+class _GbDashPainter extends CustomPainter {
+  final GamesBehindLayout layout;
+  final double origin;
 
-  const _GbMark({required this.entry, required this.width});
+  _GbDashPainter(this.layout, this.origin);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFF212121)
+      ..strokeWidth = 1.4
+      ..style = PaintingStyle.stroke;
+    final byName = {for (final logo in layout.logos) logo.name: logo};
+    final logo = layout.logoSize;
+    for (final link in layout.links) {
+      final upper = byName[link.upper];
+      final lower = byName[link.lower];
+      if (upper == null || lower == null) continue;
+      if (!link.side) {
+        _dash(
+          canvas,
+          Offset(origin + upper.left + logo / 2, upper.top + logo),
+          Offset(origin + lower.left + logo / 2, lower.top),
+          paint,
+        );
+        continue;
+      }
+      final upperEdge = origin + (link.sideRight ? upper.left + logo : upper.left);
+      final lowerEdge = origin + (link.sideRight ? lower.left + logo : lower.left);
+      final lineX = link.sideRight ? math.max(upperEdge, lowerEdge) + 12 : math.min(upperEdge, lowerEdge) - 12;
+      final y1 = upper.top + logo / 2;
+      final y2 = lower.top + logo / 2;
+      _dash(canvas, Offset(lineX, y1), Offset(lineX, y2), paint);
+      _dash(canvas, Offset(upperEdge, y1), Offset(lineX, y1), paint);
+      _dash(canvas, Offset(lowerEdge, y2), Offset(lineX, y2), paint);
+    }
+  }
+
+  void _dash(Canvas canvas, Offset a, Offset b, Paint paint) {
+    const dash = 4.0;
+    const hole = 3.0;
+    final delta = b - a;
+    final length = delta.distance;
+    if (length <= 0) return;
+    final step = delta / length;
+    var drawn = 0.0;
+    while (drawn < length) {
+      final end = math.min(drawn + dash, length);
+      canvas.drawLine(a + step * drawn, a + step * end, paint);
+      drawn = end + hole;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _GbDashPainter oldDelegate) => oldDelegate.layout != layout || oldDelegate.origin != origin;
+}
+
+class _GbLogo extends StatelessWidget {
+  final String name;
+  final String abbrev;
+  final double size;
+
+  const _GbLogo({required this.name, required this.abbrev, required this.size});
 
   @override
   Widget build(BuildContext context) {
-    final asset = teamLogoAsset(entry.name);
-    final abbrev = mlbTeamAbbrev(entry.name);
+    final visual = teamLogoVisual(name, abbrev: abbrev);
+    final image = teamLogoImage(asset: visual.asset, networkUrl: visual.networkUrl);
     return SizedBox(
-      key: ValueKey('gb-mark-${entry.name}'),
-      width: width,
-      height: 44,
-      child: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          if (asset != null)
-            Image.asset(asset, height: 40, width: width, fit: BoxFit.contain)
-          else
-            Container(
-              height: 40,
-              width: width,
+      key: ValueKey('gb-mark-$name'),
+      width: size,
+      height: size,
+      child: visual.asset != null || visual.networkUrl != null
+          ? image
+          : Container(
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: const Color(0xFF37474F),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
-                abbrev ?? entry.name.characters.take(2).toString(),
-                style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                abbrev.isNotEmpty ? abbrev : name.characters.take(2).toString(),
+                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
               ),
             ),
-          Container(
-            width: width,
-            color: const Color(0xCC000000),
-            alignment: Alignment.center,
-            child: Text(
-              entry.label,
-              key: ValueKey('gb-label-${entry.name}'),
-              maxLines: 1,
-              style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold, height: 1.2),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -220,6 +367,7 @@ class SeasonTableBlock extends StatelessWidget {
   final List<Map<String, dynamic>> standings;
   final List<Map<String, dynamic>> stats;
   final List<Map<String, dynamic>> games;
+  final List<Map<String, dynamic>> seriesGames;
   final int? onlyLeagueId; // 団体内リーグ ID。null: 両方
   final String? gamesDateFilter; // "YYYY-MM-DD"（nullなら今日）
   final bool portraitLayout;
@@ -242,6 +390,7 @@ class SeasonTableBlock extends StatelessWidget {
     required this.standings,
     required this.stats,
     this.games = const [],
+    this.seriesGames = const [],
     this.onlyLeagueId,
     this.gamesDateFilter,
     this.portraitLayout = false,
@@ -379,9 +528,7 @@ class SeasonTableBlock extends StatelessWidget {
     const battingTitles = ['打率', '本塁打', '打点', '盗塁', '出塁率', '最多安打', '長打率', 'OPS'];
     const pitchingTitles = ['防御率', '最多勝', '奪三振', 'HP', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'K/BB', 'QS率'];
     final leagueStats = stats.where((e) => int.tryParse('${e['id_league']}') == leagueId).toList();
-    final bat = _mergeStealSuccessRate(
-      leagueStats.where((e) => battingTitles.contains(((e['title'] ?? '').toString())) || '${e['title'] ?? ''}' == '盗塁成功率').toList(),
-    );
+    final bat = leagueStats.where((e) => battingTitles.contains(((e['title'] ?? '').toString()))).toList();
     final pit = leagueStats.where((e) => pitchingTitles.contains(((e['title'] ?? '').toString()))).toList();
 
     // 文字幅の目安（12pxフォントで約14px/字）
@@ -702,14 +849,20 @@ class SeasonTableBlock extends StatelessWidget {
           }
 
           Widget sectionBlock(({String label, List<Map<String, dynamic>> rows}) section) {
+            final showGamesBehind = section.label != 'ワイルドカード順位';
             return Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 if (headerPerSection && section.label.isNotEmpty) divisionBanner(section.label),
                 sectionTable(section),
-                const SizedBox(height: 8),
-                GamesBehindChart(rows: section.rows),
+                if (showGamesBehind) ...[
+                  const SizedBox(height: 4),
+                  GamesBehindChart(
+                    rows: section.rows,
+                    height: (ALL_HEADER_H + section.rows.length * gridBodyH) * 1.25,
+                  ),
+                ],
               ],
             );
           }
@@ -736,6 +889,7 @@ class SeasonTableBlock extends StatelessWidget {
           : GameDateSwitcher(
               key: ValueKey('gds-${org.kind.name}-$onlyLeagueId-$gamesDateFilter'),
               games: games,
+              seriesGames: seriesGames,
               playerStats: stats,
               standings: standings,
               initialDate: gamesDateFilter,
@@ -809,7 +963,7 @@ class SeasonTableBlock extends StatelessWidget {
       if (portraitLayout) {
         // 縦スクロール時は、見出しと上位10名が見える高さに抑える。
         // Picker +（Segment二段 or 打者投手タブ）+ 上位10名。
-        const double personalSectionHeight = 32.0 + 130.0 + 20.8 * 10;
+        const double personalSectionHeight = 32.0 + 141.0 + 20.8 * 10;
         final Widget personalSection = personalStatsLayout == PersonalStatsLayout.scroll
             ? personalBody
             : SizedBox(
@@ -866,6 +1020,9 @@ class SeasonTableBlock extends StatelessWidget {
   }
 }
 
+/// 個人成績の「セ」「パ」「ア」「ナ」見出し。
+const double _personalLeagueHeaderH = 33;
+
 const double _statRowH = 20.8;
 const int _statsScrollVisibleRows = 10;
 const double _statsScrollBodyH = _statRowH * _statsScrollVisibleRows;
@@ -879,7 +1036,7 @@ Color? personalStatPositionColor(String raw) {
   if (text.isEmpty) return null;
   if (text.contains('投')) return const Color(0xFFFFCDD2);
   if (text.contains('捕')) return const Color(0xFFB3E5FC);
-  if (text.contains('外') || text == '左' || text == '中' || text == '右') return const Color(0xFFE6EE9C);
+  if (text.contains('外') || text == '左' || text == '中' || text == '右') return const Color(0xFFA5D6A7);
   if (text.contains('内') || text == '一' || text == '二' || text == '三' || text == '遊') return const Color(0xFFFFF59D);
   return null;
 }
@@ -1176,7 +1333,8 @@ List<String> _titlesInOrder(List<Map<String, dynamic>> rows, List<String> prefer
   final present = <String>{};
   for (final row in rows) {
     final title = _normalizePersonalTitle('${row['title'] ?? ''}'.trim());
-    if (title.isNotEmpty) present.add(title);
+    if (title.isEmpty || title == '盗塁成功率') continue;
+    present.add(title);
   }
   final ordered = <String>[];
   for (final title in preferred) {
@@ -1818,7 +1976,7 @@ class DualBandBothLeaguePersonalStats extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(
-            height: 22,
+            height: _personalLeagueHeaderH,
             child: ColoredBox(
               color: color,
               child: Center(
@@ -1892,7 +2050,7 @@ class ScrollBothLeaguePersonalStats extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           SizedBox(
-            height: 22,
+            height: _personalLeagueHeaderH,
             child: Row(
               children: [
                 Expanded(
@@ -2129,7 +2287,7 @@ class _BothLeaguePersonalStatsState extends State<BothLeaguePersonalStats> {
         ),
         const SizedBox(height: 6),
         SizedBox(
-          height: 22,
+          height: _personalLeagueHeaderH,
           child: Row(
             children: [
               Expanded(

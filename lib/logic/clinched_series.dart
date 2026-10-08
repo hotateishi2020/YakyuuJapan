@@ -38,16 +38,19 @@ int seriesWinsNeeded(String code, {required int advantage}) {
 }
 
 /// 規定勝数に達したあとの、行われない試合を除く。
+/// [seriesGames] は表示期間の外にある同シリーズの試合。勝数の判定にだけ使う。
 List<Map<String, dynamic>> dropUnplayedClinchedGames(
   List<Map<String, dynamic>> games, {
   List<Map<String, dynamic>> standings = const [],
+  List<Map<String, dynamic>> seriesGames = const [],
 }) {
+  final pool = seriesGames.isEmpty ? games : _seriesPool(seriesGames, games);
   final groups = <String, List<int>>{};
-  for (var i = 0; i < games.length; i++) {
-    final code = _code(games[i]);
+  for (var i = 0; i < pool.length; i++) {
+    final code = _code(pool[i]);
     if (seriesWinsNeeded(code, advantage: 0) <= 0) continue;
-    final home = _asInt(games[i]['id_team_home']);
-    final away = _asInt(games[i]['id_team_away']);
+    final home = _asInt(pool[i]['id_team_home']);
+    final away = _asInt(pool[i]['id_team_away']);
     if (home <= 0 || away <= 0) continue;
     final low = home < away ? home : away;
     final high = home < away ? away : home;
@@ -55,8 +58,8 @@ List<Map<String, dynamic>> dropUnplayedClinchedGames(
   }
   final drop = <int>{};
   for (final indexes in groups.values) {
-    final ordered = [...indexes]..sort((a, b) => _byStart(games[a], games[b]));
-    final sample = games[ordered.first];
+    final ordered = [...indexes]..sort((a, b) => _byStart(pool[a], pool[b]));
+    final sample = pool[ordered.first];
     final code = _code(sample);
     final home = _asInt(sample['id_team_home']);
     final away = _asInt(sample['id_team_away']);
@@ -67,7 +70,7 @@ List<Map<String, dynamic>> dropUnplayedClinchedGames(
     final wins = <int, int>{home: advHome, away: advAway};
     var decided = (wins[home] ?? 0) >= needed || (wins[away] ?? 0) >= needed;
     for (final index in ordered) {
-      final game = games[index];
+      final game = pool[index];
       if (decided && _unplayed(game)) {
         drop.add(index);
         continue;
@@ -82,10 +85,47 @@ List<Map<String, dynamic>> dropUnplayedClinchedGames(
     }
   }
   if (drop.isEmpty) return games;
+  if (identical(pool, games)) {
+    return [
+      for (var i = 0; i < games.length; i++)
+        if (!drop.contains(i)) games[i],
+    ];
+  }
+  final droppedIds = <int>{
+    for (final index in drop) _asInt(pool[index]['id_game'] ?? pool[index]['id']),
+  }..remove(0);
+  final droppedRows = <Map<String, dynamic>>{
+    for (final index in drop) pool[index],
+  };
   return [
-    for (var i = 0; i < games.length; i++)
-      if (!drop.contains(i)) games[i],
+    for (final game in games)
+      if (!droppedIds.contains(_asInt(game['id_game'] ?? game['id'])) && !droppedRows.contains(game)) game,
   ];
+}
+
+/// 表示中の試合を優先し、同じ id の履歴は勝数判定に一度だけ入れる。
+List<Map<String, dynamic>> _seriesPool(
+  List<Map<String, dynamic>> history,
+  List<Map<String, dynamic>> visible,
+) {
+  final byId = <int, Map<String, dynamic>>{};
+  final extras = <Map<String, dynamic>>[];
+  void put(Map<String, dynamic> row, {required bool prefer}) {
+    final id = _asInt(row['id_game'] ?? row['id']);
+    if (id <= 0) {
+      extras.add(row);
+      return;
+    }
+    if (!byId.containsKey(id) || prefer) byId[id] = row;
+  }
+
+  for (final row in history) {
+    put(row, prefer: false);
+  }
+  for (final row in visible) {
+    put(row, prefer: true);
+  }
+  return [...byId.values, ...extras];
 }
 
 int _csfAdvantage(String code, int teamId, int otherId, List<Map<String, dynamic>> standings) {

@@ -71,6 +71,33 @@ void main() {
     expect(shown.map((row) => row['id_game']), [1, 2, 3]);
   });
 
+  test('表示期間の外で3勝していればその日の未実施を出さない', () {
+    final history = [
+      game(id: 1, date: '2026-10-03', code: 'DS', home: 2, away: 1, state: '試合終了', scoreHome: 1, scoreAway: 0),
+      game(id: 2, date: '2026-10-04', code: 'DS', home: 2, away: 1, state: '試合終了', scoreHome: 5, scoreAway: 2),
+      game(id: 3, date: '2026-10-06', code: 'DS', home: 1, away: 2, state: '試合終了', scoreHome: 3, scoreAway: 4),
+    ];
+    final today = [
+      game(id: 4, date: '2026-10-09', code: 'DS', home: 1, away: 2, state: '予想先発'),
+      game(id: 5, date: '2026-10-09', code: 'DS', home: 3, away: 4, state: '試合前'),
+    ];
+    final shown = dropUnplayedClinchedGames(today, seriesGames: history);
+    expect(shown.map((row) => row['id_game']), [5]);
+  });
+
+  test('3勝で勝ち上がったチームの翌日の未実施を出さない', () {
+    final history = [
+      game(id: 1, date: '2026-10-03', code: 'DS', home: 10, away: 11, state: '試合終了', scoreHome: 5, scoreAway: 3),
+      game(id: 2, date: '2026-10-05', code: 'DS', home: 11, away: 10, state: '試合終了', scoreHome: 2, scoreAway: 3),
+      game(id: 3, date: '2026-10-07', code: 'DS', home: 11, away: 10, state: '試合終了', scoreHome: 1, scoreAway: 3),
+      game(id: 4, date: '2026-10-08', code: 'DS', home: 10, away: 11, state: '試合終了', scoreHome: 1, scoreAway: 4),
+    ];
+    final tomorrow = [
+      game(id: 5, date: '2026-10-10', code: 'DS', home: 10, away: 11, state: '試合前'),
+    ];
+    expect(dropUnplayedClinchedGames(tomorrow, seriesGames: history), isEmpty);
+  });
+
   test('進行中の試合は決着後でも残す', () {
     final games = [
       for (var i = 0; i < 4; i++)

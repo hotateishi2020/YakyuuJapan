@@ -12,6 +12,7 @@ class LeagueBoardRow extends StatelessWidget {
   final List<Map<String, dynamic>> npbPlayerStats;
   final List<Map<String, dynamic>> npbPlayerStatsActual;
   final List<Map<String, dynamic>> games;
+  final List<Map<String, dynamic>> seriesGames;
   final String Function(String idUser) usernameForId;
   final String Function(String idUser) userNameFromPredictions;
   final bool compact;
@@ -43,6 +44,7 @@ class LeagueBoardRow extends StatelessWidget {
     required this.npbPlayerStats,
     required this.npbPlayerStatsActual,
     required this.games,
+    this.seriesGames = const [],
     required this.usernameForId,
     required this.userNameFromPredictions,
     required this.compact,
@@ -70,6 +72,7 @@ class LeagueBoardRow extends StatelessWidget {
       standings: standings,
       stats: npbPlayerStatsActual,
       games: _leagueGames,
+      seriesGames: seriesGames,
       onlyLeagueId: leagueId,
       gamesDateFilter: gamesDateFilter ?? DateFormatUtil.ymdWithOffset(0),
       portraitLayout: portraitLayout,

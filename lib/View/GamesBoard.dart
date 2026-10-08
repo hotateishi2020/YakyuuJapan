@@ -24,6 +24,17 @@ String gameDateOnly(dynamic value) {
   return match?.group(0) ?? '${value ?? ''}'.trim();
 }
 
+/// シリーズ全体で決着したあとの未実施を除いてから、その日の試合だけにする。
+List<Map<String, dynamic>> gamesOnDate(
+  List<Map<String, dynamic>> games,
+  String date, {
+  List<Map<String, dynamic>> standings = const [],
+  List<Map<String, dynamic>> seriesGames = const [],
+}) {
+  final kept = dropUnplayedClinchedGames(games, standings: standings, seriesGames: seriesGames);
+  return normalizeGames(kept.where((game) => gameDateOnly(game['date_game']) == date).toList());
+}
+
 const _csCentralGradient = [Color(0xFF8CFAF7), Color(0xFF2BCFAD), Color(0xFF14C4C0)];
 const _csPacificGradient = [Color(0xFF5AD8EA), Color(0xFF1E6FE0), Color(0xFF1F52EB)];
 
@@ -593,6 +604,7 @@ Widget rosterAllBattersCheckbox({
 
 class GameDateSwitcher extends StatefulWidget {
   final List<Map<String, dynamic>> games;
+  final List<Map<String, dynamic>> seriesGames;
   final List<Map<String, dynamic>> playerStats;
   final List<Map<String, dynamic>> standings;
   final Color headerColor;
@@ -609,6 +621,7 @@ class GameDateSwitcher extends StatefulWidget {
   const GameDateSwitcher({
     super.key,
     required this.games,
+    this.seriesGames = const [],
     this.playerStats = const [],
     this.standings = const [],
     required this.headerColor,
@@ -713,12 +726,7 @@ class _GameDateSwitcherState extends State<GameDateSwitcher> {
   Widget build(BuildContext context) {
     final selectedDate = _selectedDate;
     final date = DateFormatUtil.ymd(selectedDate);
-    final dayGames = normalizeGames(
-      dropUnplayedClinchedGames(
-        widget.games.where((game) => gameDateOnly(game['date_game']) == date).toList(),
-        standings: widget.standings,
-      ),
-    );
+    final dayGames = gamesOnDate(widget.games, date, standings: widget.standings, seriesGames: widget.seriesGames);
     final climax = npbClimaxHeader(
       leagueId: widget.leagueId,
       fallbackLabel: widget.leagueLabel ?? '',
@@ -824,6 +832,7 @@ class _GameDateSwitcherState extends State<GameDateSwitcher> {
 /// 項目ごとの試合情報。日付ヘッダーは一つで、団体内の2リーグを縦に並べる。
 class BothLeagueGameDay extends StatefulWidget {
   final List<Map<String, dynamic>> games;
+  final List<Map<String, dynamic>> seriesGames;
   final List<Map<String, dynamic>> playerStats;
   final List<Map<String, dynamic>> standings;
   final String? initialDate;
@@ -839,6 +848,7 @@ class BothLeagueGameDay extends StatefulWidget {
   const BothLeagueGameDay({
     super.key,
     required this.games,
+    this.seriesGames = const [],
     this.playerStats = const [],
     this.standings = const [],
     this.initialDate,
@@ -921,12 +931,7 @@ class _BothLeagueGameDayState extends State<BothLeagueGameDay> {
   Widget build(BuildContext context) {
     final selectedDate = _selectedDate;
     final date = DateFormatUtil.ymd(selectedDate);
-    final dayGames = normalizeGames(
-      dropUnplayedClinchedGames(
-        widget.games.where((game) => gameDateOnly(game['date_game']) == date).toList(),
-        standings: widget.standings,
-      ),
-    );
+    final dayGames = gamesOnDate(widget.games, date, standings: widget.standings, seriesGames: widget.seriesGames);
     Widget dateButton(String label, int by) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 7),
@@ -1245,6 +1250,10 @@ class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> {
     );
   }
 
+  bool _cardCanGrow(List<Map<String, dynamic>> rows) {
+    return _measureCard(rows, expanded: true)._hasCollapsibleStats;
+  }
+
   double _collapsedHeight(List<Map<String, dynamic>> rows, {required bool stacked}) {
     return _measureCard(rows, expanded: false).intrinsicHeight(stackedTeams: stacked);
   }
@@ -1303,7 +1312,7 @@ class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> {
         bool stackedOf(List<Map<String, dynamic>> rows) => narrow && gameHasStarted(rows.first);
         final collapsed = [for (final rows in grouped) _collapsedHeight(rows, stacked: stackedOf(rows))];
         final expanded = [for (final rows in grouped) _expandedHeight(rows, stacked: stackedOf(rows))];
-        final open = [for (final rows in grouped) _statsOpen(rows.first)];
+        final open = [for (final rows in grouped) _statsOpen(rows.first) && _cardCanGrow(rows)];
         if (started || narrow) {
           final gaps = gameBlockGap * math.max(0, grouped.length - 1);
           var restSum = gaps;
@@ -1316,10 +1325,7 @@ class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> {
           final extra = canFit ? math.max(0.0, constraints.maxHeight - restSum) : 0.0;
           final targets = [
             for (var i = 0; i < grouped.length; i++)
-              if (!open[i] || !canFit || openWeight <= 0)
-                open[i] ? expanded[i] : collapsed[i]
-              else
-                expanded[i] + extra * expanded[i] / openWeight,
+              if (!open[i] || !canFit || openWeight <= 0) open[i] ? expanded[i] : collapsed[i] else expanded[i] + extra * expanded[i] / openWeight,
           ];
           final column = Column(
             mainAxisSize: MainAxisSize.min,
@@ -1691,8 +1697,7 @@ class _TableGameCard extends StatelessWidget {
                 _seasonNameChip(lines[i].label, fontSize, labelW, lines[i].leader ? const [_goldLeader] : colors[i]),
                 const SizedBox(width: 3),
                 valueText(i),
-                if (lines[i].leader || _seasonRank(lines[i].label, lines, pitcherName) == 1)
-                  Text('👑', style: TextStyle(fontSize: fontSize, height: 1)),
+                if (lines[i].leader || _seasonRank(lines[i].label, lines, pitcherName) == 1) Text('👑', style: TextStyle(fontSize: fontSize, height: 1)),
               ],
             ),
           ),
@@ -3033,8 +3038,7 @@ class _TableGameCard extends StatelessWidget {
                                 alignment: Alignment.centerLeft,
                                 child: _blinkLiveBatterStats(
                                   _lineupSlotStatLine(slot, statSize),
-                                  live: slot.players.isNotEmpty &&
-                                      _isLiveBatter(slot.players.last.name, home: home, order: slot.order),
+                                  live: slot.players.isNotEmpty && _isLiveBatter(slot.players.last.name, home: home, order: slot.order),
                                   statSize: statSize,
                                 ),
                               ),
@@ -5060,54 +5064,54 @@ class _TableGameCard extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerLeft,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (_text('time_game').isNotEmpty)
-                                OneLineShrinkText(
-                                  _text('time_game'),
-                                  baseSize: headerSize,
-                                  minSize: 9,
-                                  color: homeFg,
-                                  weight: FontWeight.bold,
-                                  align: TextAlign.left,
-                                ),
-                              if (_text('path_image_outside').isNotEmpty) ...[
-                                const SizedBox(width: 4),
-                                Image.asset(
-                                  _text('path_image_outside'),
-                                  height: _gameHeaderH - 6,
-                                  width: _gameHeaderH + 4,
-                                  fit: BoxFit.contain,
-                                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                                ),
-                              ],
-                              if (_text('name_stadium').isNotEmpty) ...[
-                                const SizedBox(width: 3),
-                                OneLineShrinkText(
-                                  _text('name_stadium'),
-                                  baseSize: headerSize,
-                                  minSize: 9,
-                                  color: homeFg,
-                                  weight: FontWeight.bold,
-                                  align: TextAlign.left,
-                                ),
-                              ],
-                              if (header.isEmpty)
-                                OneLineShrinkText(
-                                  '　',
-                                  baseSize: headerSize,
-                                  minSize: 9,
-                                  color: homeFg,
-                                  weight: FontWeight.bold,
-                                  align: TextAlign.left,
-                                ),
-                            ],
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_text('time_game').isNotEmpty)
+                          OneLineShrinkText(
+                            _text('time_game'),
+                            baseSize: headerSize,
+                            minSize: 9,
+                            color: homeFg,
+                            weight: FontWeight.bold,
+                            align: TextAlign.left,
                           ),
-                        ),
-                      ),
+                        if (_text('path_image_outside').isNotEmpty) ...[
+                          const SizedBox(width: 4),
+                          Image.asset(
+                            _text('path_image_outside'),
+                            height: _gameHeaderH - 6,
+                            width: _gameHeaderH + 4,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                          ),
+                        ],
+                        if (_text('name_stadium').isNotEmpty) ...[
+                          const SizedBox(width: 3),
+                          OneLineShrinkText(
+                            _text('name_stadium'),
+                            baseSize: headerSize,
+                            minSize: 9,
+                            color: homeFg,
+                            weight: FontWeight.bold,
+                            align: TextAlign.left,
+                          ),
+                        ],
+                        if (header.isEmpty)
+                          OneLineShrinkText(
+                            '　',
+                            baseSize: headerSize,
+                            minSize: 9,
+                            color: homeFg,
+                            weight: FontWeight.bold,
+                            align: TextAlign.left,
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
             SizedBox(

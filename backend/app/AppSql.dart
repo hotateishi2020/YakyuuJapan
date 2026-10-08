@@ -21,7 +21,7 @@ class AppSql {
           d.flg_predict = TRUE
           OR s.title IN (
              '最多安打', '長打率', 'OPS', '盗塁成功率',
-             '奪三振率', '与四球率', '被打率', 'WHIP', 'QS率'
+             '奪三振率', '与四球率', 'K/BB', '被打率', 'WHIP', 'QS率'
            )
          )
     ''';
@@ -1386,6 +1386,7 @@ ORDER BY mt.id_league, tpt.int_rank
              WHEN m_stats.code_display = 'INT_DEC_3' THEN to_char(stats, '0.000')
              WHEN m_stats.code_display = 'NUM_NO_ZERO_3' THEN regexp_replace(to_char(stats, 'FM0.000'), '^0(?=.)', '')
              WHEN m_stats.code_display = 'DEC_1' THEN to_char(stats, 'FM990.0')
+             WHEN m_stats.code_display = 'DEC_2' THEN to_char(stats, 'FM990.00')
              WHEN m_stats.code_display = 'RATE_ATTEMPT' THEN to_char(stats, 'FM990.0') || ' (' || cnt_play::text || ')'
              ELSE to_char(stats, '')
         END AS stats,
@@ -1429,6 +1430,10 @@ ORDER BY mt.id_league, tpt.int_rank
         COALESCE(BOOL_OR(m_player.year_retire = \$1), FALSE) AS flg_retired,
         COALESCE(BOOL_OR(m_country.name = '日本'), FALSE) AS flg_japan,
         COALESCE(MAX(m_country.emoji), '') AS emoji_country,
+        COALESCE(BOOL_OR(COALESCE(m_place_birth.name, '') LIKE '%佐賀%'), FALSE) AS flg_saga,
+        COALESCE(BOOL_OR(m_player.flg_injury), FALSE) AS flg_injury,
+        COALESCE(MAX(m_player.txt_injury), '') AS txt_injury,
+        COALESCE(NULLIF(MAX(m_player.txt_position), ''), '') AS txt_position,
         tsp.id_league,
         tsp.cnt_play,
         m_stats.int_index,
@@ -1446,6 +1451,8 @@ ORDER BY mt.id_league, tpt.int_rank
         LEFT JOIN m_player  ON m_player.id  = tsp.id_player
         LEFT JOIN m_country ON m_country.id = m_player.id_country
           AND COALESCE(m_country.flg_delete, FALSE) = FALSE
+        LEFT JOIN m_place_birth ON m_place_birth.id = m_player.id_place_birth
+          AND COALESCE(m_place_birth.flg_delete, FALSE) = FALSE
         LEFT JOIN (
           SELECT
             c.id_player,

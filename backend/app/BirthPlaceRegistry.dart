@@ -262,14 +262,58 @@ class BirthPlaceRegistry {
     return t;
   }
 
+  static const _japanPrefShort = {
+    '北海道',
+    '青森',
+    '岩手',
+    '宮城',
+    '秋田',
+    '山形',
+    '福島',
+    '茨城',
+    '栃木',
+    '群馬',
+    '埼玉',
+    '千葉',
+    '東京',
+    '神奈川',
+    '新潟',
+    '富山',
+    '石川',
+    '福井',
+    '山梨',
+    '長野',
+    '岐阜',
+    '静岡',
+    '愛知',
+    '三重',
+    '滋賀',
+    '京都',
+    '大阪',
+    '兵庫',
+    '奈良',
+    '和歌山',
+    '鳥取',
+    '島根',
+    '岡山',
+    '広島',
+    '山口',
+    '徳島',
+    '香川',
+    '愛媛',
+    '高知',
+    '福岡',
+    '佐賀',
+    '長崎',
+    '熊本',
+    '大分',
+    '宮崎',
+    '鹿児島',
+    '沖縄',
+  };
+
   static bool _looksLikeJapanPref(String text) {
-    return RegExp(r'(都|道|府|県)$').hasMatch(text) ||
-        const {
-          '北海道',
-          '東京',
-          '大阪',
-          '京都',
-        }.contains(text);
+    return RegExp(r'(都|道|府|県)$').hasMatch(text) || _japanPrefShort.contains(text);
   }
 
   static bool _looksLikePlace(String text) {
@@ -282,7 +326,7 @@ class BirthPlaceRegistry {
 
   static String _stripPlaceSuffix(String text) {
     final t = text.trim();
-    if (t == '北海道') return t;
+    if (t == '北海道' || _japanPrefShort.contains(t)) return t;
     return t.replaceFirst(RegExp(r'(都|道|府|県|州)$'), '');
   }
 }

@@ -9,7 +9,7 @@ services:
     name: koko-ping-stats-team
     runtime: docker
     dockerfilePath: ./backend/Dockerfile.cron
-    dockerContext: ./backend
+    dockerContext: .
     schedule: "2 7-15 * * *"
     plan: 0.5c-512mb
     envVars:
@@ -23,7 +23,7 @@ services:
     name: koko-ping-stats-player
     runtime: docker
     dockerfilePath: ./backend/Dockerfile.cron
-    dockerContext: ./backend
+    dockerContext: .
     schedule: "13,43 7-15 * * *"
     plan: 0.5c-512mb
     envVars:
@@ -37,7 +37,7 @@ services:
     name: koko-ping-games-day
     runtime: docker
     dockerfilePath: ./backend/Dockerfile.cron
-    dockerContext: ./backend
+    dockerContext: .
     schedule: "9,19,29,39,49,59 4-15 * * *"
     plan: 0.5c-512mb
     envVars:
@@ -51,7 +51,7 @@ services:
     name: koko-ping-games-night
     runtime: docker
     dockerfilePath: ./backend/Dockerfile.cron
-    dockerContext: ./backend
+    dockerContext: .
     schedule: "15 15-21 * * *"
     plan: 0.5c-512mb
     envVars:
@@ -65,7 +65,7 @@ services:
     name: koko-ping-stats-team-mlb
     runtime: docker
     dockerfilePath: ./backend/Dockerfile.cron
-    dockerContext: ./backend
+    dockerContext: .
     schedule: "5 4,8,10 * * *"
     plan: 0.5c-512mb
     envVars:
@@ -79,7 +79,7 @@ services:
     name: koko-ping-stats-player-mlb
     runtime: docker
     dockerfilePath: ./backend/Dockerfile.cron
-    dockerContext: ./backend
+    dockerContext: .
     schedule: "10 23,3,6 * * *"
     plan: 0.5c-512mb
     envVars:
@@ -93,7 +93,7 @@ services:
     name: koko-ping-games-mlb-day
     runtime: docker
     dockerfilePath: ./backend/Dockerfile.cron
-    dockerContext: ./backend
+    dockerContext: .
     schedule: "4,14,24,34,44,54 4-15 * * *"
     plan: 0.5c-512mb
     envVars:

@@ -15,7 +15,9 @@ import 'DB/t_game.dart';
 import 'DB/t_game_summary.dart';
 import 'DB/t_stats_team.dart';
 import 'BoxScore.dart';
+import 'DisplaySnapshot.dart';
 import 'FetchURL.dart';
+import 'RegisteredPosition.dart';
 import 'StadiumImages.dart';
 import 'GameFetchSchedule.dart';
 import 'GameStatsLoad.dart';
@@ -107,15 +109,18 @@ class FetchMLB {
       throw Exception('MLB順位を1件も取得できませんでした');
     }
     await Postgres.insertMulti(conn, teams);
+    await DisplaySnapshot.refreshTeams(conn, DateTimeTool.getThisYear());
     return Response.ok('ok');
   }
 
   /// m_stats_details の MLB URL（リーグ 3/4）を巡回して個人成績を登録。
   static Future<Response> fetchStatsPlayer(Connection conn) async {
     await ensureMlbStatsDetails(conn);
+    await RegisteredPosition.syncMlb(conn);
     await syncJapanesePlayers(conn);
     final res = await FetchURL.fetchStatsPlayerForLeagues(conn, _org.leagueIds);
     await enrichMlbPlayersForMarks(conn);
+    await DisplaySnapshot.refreshPlayers(conn, DateTimeTool.getThisYear());
     return res;
   }
 

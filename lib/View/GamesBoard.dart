@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import '../config/app_design.dart';
+import '../logic/clinched_series.dart';
 import '../logic/show_user_predictions.dart';
 import '../logic/game_dedupe.dart';
 import '../tools/color_parse.dart';
@@ -14,6 +15,9 @@ import 'BlinkBg.dart';
 /// Phone portrait and other narrow windows stack in-progress team stats,
 /// and always put match cards in a single column.
 const stackedTeamsMaxWidth = 600.0;
+
+/// 試合カード同士の間隔。
+const gameBlockGap = 8.0;
 
 String gameDateOnly(dynamic value) {
   final match = RegExp(r'\d{4}-\d{2}-\d{2}').firstMatch('${value ?? ''}');
@@ -355,6 +359,17 @@ String displayBoardState(String state) {
   return state.trim();
 }
 
+/// 6回を超えて2点差以内。8回と9回だけは1点差以内。
+bool isHeatedGame(String state, int scoreHome, int scoreAway) {
+  if (scoreHome < 0 || scoreAway < 0) return false;
+  if (state.contains('試合終了') || state.contains('コールド') || state.contains('中止') || state.contains('延期')) return false;
+  final live = liveAtBatHalf(state);
+  if (live == null || live.inning <= 6) return false;
+  final diff = (scoreHome - scoreAway).abs();
+  if (live.inning == 8 || live.inning == 9) return diff <= 1;
+  return diff <= 2;
+}
+
 /// 進行中の「5回裏」などから、攻撃中イニングと表裏を取る。
 ({int inning, bool bottom})? liveAtBatHalf(String state) {
   final match = RegExp(r'(\d+)\s*回\s*(表|裏)').firstMatch(state);
@@ -579,6 +594,7 @@ Widget rosterAllBattersCheckbox({
 class GameDateSwitcher extends StatefulWidget {
   final List<Map<String, dynamic>> games;
   final List<Map<String, dynamic>> playerStats;
+  final List<Map<String, dynamic>> standings;
   final Color headerColor;
   final int leagueId;
   final String? leagueLabel;
@@ -594,6 +610,7 @@ class GameDateSwitcher extends StatefulWidget {
     super.key,
     required this.games,
     this.playerStats = const [],
+    this.standings = const [],
     required this.headerColor,
     this.leagueId = 0,
     this.leagueLabel,
@@ -697,7 +714,10 @@ class _GameDateSwitcherState extends State<GameDateSwitcher> {
     final selectedDate = _selectedDate;
     final date = DateFormatUtil.ymd(selectedDate);
     final dayGames = normalizeGames(
-      widget.games.where((game) => gameDateOnly(game['date_game']) == date).toList(),
+      dropUnplayedClinchedGames(
+        widget.games.where((game) => gameDateOnly(game['date_game']) == date).toList(),
+        standings: widget.standings,
+      ),
     );
     final climax = npbClimaxHeader(
       leagueId: widget.leagueId,
@@ -773,6 +793,7 @@ class _GameDateSwitcherState extends State<GameDateSwitcher> {
             key: ValueKey('games-$date-${dayGames.map(gameMatchupKey).join('|')}'),
             games: dayGames,
             playerStats: widget.playerStats,
+            standings: widget.standings,
             dateFilter: date,
             horizontal: widget.horizontal,
           );
@@ -804,6 +825,7 @@ class _GameDateSwitcherState extends State<GameDateSwitcher> {
 class BothLeagueGameDay extends StatefulWidget {
   final List<Map<String, dynamic>> games;
   final List<Map<String, dynamic>> playerStats;
+  final List<Map<String, dynamic>> standings;
   final String? initialDate;
   final List<Widget> leading;
   final List<({int id, String name, Color color})> leagues;
@@ -818,6 +840,7 @@ class BothLeagueGameDay extends StatefulWidget {
     super.key,
     required this.games,
     this.playerStats = const [],
+    this.standings = const [],
     this.initialDate,
     this.leading = const [],
     this.leagues = const [
@@ -899,7 +922,10 @@ class _BothLeagueGameDayState extends State<BothLeagueGameDay> {
     final selectedDate = _selectedDate;
     final date = DateFormatUtil.ymd(selectedDate);
     final dayGames = normalizeGames(
-      widget.games.where((game) => gameDateOnly(game['date_game']) == date).toList(),
+      dropUnplayedClinchedGames(
+        widget.games.where((game) => gameDateOnly(game['date_game']) == date).toList(),
+        standings: widget.standings,
+      ),
     );
     Widget dateButton(String label, int by) {
       return Padding(
@@ -984,6 +1010,7 @@ class _BothLeagueGameDayState extends State<BothLeagueGameDay> {
             key: ValueKey('both-$leagueId-$date-${leagueGames.map(gameMatchupKey).join('|')}'),
             games: leagueGames,
             playerStats: widget.playerStats,
+            standings: widget.standings,
             dateFilter: date,
             horizontal: true,
           ),
@@ -1041,6 +1068,7 @@ class _BothLeagueGameDayState extends State<BothLeagueGameDay> {
 class GamesBoardYahooStyle extends StatefulWidget {
   final List<Map<String, dynamic>> games;
   final List<Map<String, dynamic>> playerStats;
+  final List<Map<String, dynamic>> standings;
   final String? dateFilter; // "YYYY-MM-DD"
   /// true のとき試合カードを横並び表示（リーグ内の1日分向け）
   final bool horizontal;
@@ -1052,6 +1080,7 @@ class GamesBoardYahooStyle extends StatefulWidget {
     super.key,
     required this.games,
     this.playerStats = const [],
+    this.standings = const [],
     this.dateFilter,
     this.horizontal = false,
     this.initialStatsExpanded = false,
@@ -1162,7 +1191,7 @@ class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> {
   final Map<String, bool> _allBattersByGame = {};
   final Map<String, bool> _statsExpandedByGame = {};
 
-  List<Map<String, dynamic>> get games => widget.games;
+  List<Map<String, dynamic>> get games => dropUnplayedClinchedGames(widget.games, standings: widget.standings);
   String? get dateFilter => widget.dateFilter;
   bool get horizontal => widget.horizontal;
 
@@ -1276,7 +1305,7 @@ class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> {
         final expanded = [for (final rows in grouped) _expandedHeight(rows, stacked: stackedOf(rows))];
         final open = [for (final rows in grouped) _statsOpen(rows.first)];
         if (started || narrow) {
-          final gaps = 2.0 * math.max(0, grouped.length - 1);
+          final gaps = gameBlockGap * math.max(0, grouped.length - 1);
           var restSum = gaps;
           var openWeight = 0.0;
           for (var i = 0; i < grouped.length; i++) {
@@ -1297,7 +1326,7 @@ class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               for (int i = 0; i < grouped.length; i++) ...[
-                if (i > 0) const SizedBox(height: 2),
+                if (i > 0) const SizedBox(height: gameBlockGap),
                 _sizedCard(grouped[i], target: targets[i], collapsed: collapsed[i]),
               ],
             ],
@@ -1314,7 +1343,7 @@ class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             for (int i = 0; i < grouped.length; i++) ...[
-              if (i > 0) const SizedBox(width: 2),
+              if (i > 0) const SizedBox(width: gameBlockGap),
               Expanded(
                 child: Align(
                   alignment: Alignment.topCenter,
@@ -1378,9 +1407,9 @@ class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> {
         return Column(
           children: [
             Expanded(child: slot(g0)),
-            const SizedBox(height: 2),
+            const SizedBox(height: gameBlockGap),
             Expanded(child: slot(g1)),
-            const SizedBox(height: 2),
+            const SizedBox(height: gameBlockGap),
             Expanded(child: slot(g2)),
           ],
         );
@@ -1530,18 +1559,18 @@ class _TableGameCard extends StatelessWidget {
     return null;
   }
 
-  String _seasonRankNote(String label, List<({String label, String value, bool leader})> lines, String pitcherName) {
-    if (label == '規定到達率' || label.isEmpty) return '';
+  int? _seasonRank(String label, List<({String label, String value, bool leader})> lines, String pitcherName) {
+    if (label == '規定到達率' || label.isEmpty) return null;
     final titles = switch (label) {
       '勝敗' => const ['最多勝', '勝利'],
       '防御率' => const ['防御率'],
       '奪三振' => const ['奪三振'],
       _ => const <String>[],
     };
-    if (titles.isEmpty) return '';
+    if (titles.isEmpty) return null;
     if (label == '防御率') {
       final rate = _qualifyingPercent(lines);
-      if (rate == null || rate < 100) return '';
+      if (rate == null || rate < 100) return null;
     }
     final compact = _compactPlayerName(pitcherName);
     final home = _compactPlayerName(_text('name_pitcher_home'));
@@ -1551,8 +1580,12 @@ class _TableGameCard extends StatelessWidget {
         : compact == away
             ? (int.tryParse('${game['id_league_away']}') ?? 0)
             : 0;
-    final rank = pitcherLeagueRank(stats: playerStats, name: pitcherName, leagueId: leagueId, titles: titles);
-    if (rank == null) return '';
+    return pitcherLeagueRank(stats: playerStats, name: pitcherName, leagueId: leagueId, titles: titles);
+  }
+
+  String _seasonRankNote(String label, List<({String label, String value, bool leader})> lines, String pitcherName) {
+    final rank = _seasonRank(label, lines, pitcherName);
+    if (rank == null || rank <= 1) return '';
     return '（リーグ$rank位）';
   }
 
@@ -1585,6 +1618,7 @@ class _TableGameCard extends StatelessWidget {
       '被打率',
       '奪三振率',
       '与四球率',
+      'K/BB',
       'QS率',
     };
     final found = <String, String>{};
@@ -1657,7 +1691,8 @@ class _TableGameCard extends StatelessWidget {
                 _seasonNameChip(lines[i].label, fontSize, labelW, lines[i].leader ? const [_goldLeader] : colors[i]),
                 const SizedBox(width: 3),
                 valueText(i),
-                if (lines[i].leader) Text('👑', style: TextStyle(fontSize: fontSize, height: 1)),
+                if (lines[i].leader || _seasonRank(lines[i].label, lines, pitcherName) == 1)
+                  Text('👑', style: TextStyle(fontSize: fontSize, height: 1)),
               ],
             ),
           ),
@@ -3477,6 +3512,7 @@ class _TableGameCard extends StatelessWidget {
   Widget _scoreBoardCenter({
     required String score,
     required String state,
+    required bool heated,
     required double scoreSize,
     required double stateSize,
     required Color? homeBg,
@@ -3498,6 +3534,7 @@ class _TableGameCard extends StatelessWidget {
               height: _scoreOnBoardH,
               state: shownState,
               score: score,
+              heated: heated,
               stateSize: stateSize,
               scoreSize: scoreSize,
               homeName: homeName,
@@ -3523,6 +3560,7 @@ class _TableGameCard extends StatelessWidget {
     required double height,
     required String state,
     required String score,
+    required bool heated,
     required double stateSize,
     required double scoreSize,
     required String homeName,
@@ -3557,6 +3595,31 @@ class _TableGameCard extends StatelessWidget {
             height: 1.0,
           ),
         ),
+        if (heated)
+          BlinkBg(
+            key: const ValueKey('heated-game'),
+            base: BoxDecoration(borderRadius: BorderRadius.circular(3), color: const Color(0xFFFFF3E0)),
+            color: const Color(0xFFFF7043),
+            radius: 3,
+            duration: const Duration(milliseconds: 700),
+            fillMin: 0.15,
+            fillMax: 0.95,
+            borderColor: const Color(0xFFD84315),
+            borderWidth: 1,
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+              child: Text(
+                '白熱試合',
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: 9,
+                  height: 1.0,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFFB71C1C),
+                ),
+              ),
+            ),
+          ),
       ],
     );
     return Padding(
@@ -3620,6 +3683,7 @@ class _TableGameCard extends StatelessWidget {
   Widget _matchScoreCell({
     required String state,
     required String score,
+    required bool heated,
     required double stateSize,
     required double scoreSize,
     required String homeName,
@@ -3640,6 +3704,7 @@ class _TableGameCard extends StatelessWidget {
           height: maxH,
           state: displayBoardState(state),
           score: score,
+          heated: heated,
           stateSize: stateSize,
           scoreSize: scoreSize,
           homeName: homeName,
@@ -4797,6 +4862,7 @@ class _TableGameCard extends StatelessWidget {
       final scoreHome = _int('score_home');
       final scoreAway = _int('score_away');
       final score = scoreHome >= 0 && scoreAway >= 0 ? '$scoreHome - $scoreAway' : 'vs';
+      final heated = isHeatedGame(state, scoreHome, scoreAway);
       final header = [
         if (_text('time_game').isNotEmpty) _text('time_game'),
         if (_text('name_stadium').isNotEmpty) _text('name_stadium'),
@@ -5069,6 +5135,7 @@ class _TableGameCard extends StatelessWidget {
                           ? _scoreBoardCenter(
                               score: score,
                               state: state,
+                              heated: heated,
                               scoreSize: scoreSize,
                               stateSize: stateSize,
                               homeBg: homeBg,
@@ -5081,6 +5148,7 @@ class _TableGameCard extends StatelessWidget {
                           : _matchScoreCell(
                               state: state,
                               score: score,
+                              heated: heated,
                               stateSize: stateSize,
                               scoreSize: scoreSize,
                               homeName: _text('name_team_home'),

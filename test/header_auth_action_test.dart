@@ -60,4 +60,17 @@ void main() {
     expect(find.text('Login'), findsNothing);
     expect(find.byIcon(Icons.account_circle), findsOneWidget);
   });
+
+  testWidgets('account menu offers password change', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: HeaderAuthAction(loggedIn: true, boardReady: true),
+        ),
+      ),
+    );
+    await tester.tap(find.byIcon(Icons.account_circle));
+    await tester.pumpAndSettle();
+    expect(find.text('パスワード変更'), findsOneWidget);
+  });
 }

@@ -16,6 +16,8 @@ class m_player extends DBModel {
   int pitching = 0;
   int batting = 0;
   bool flg_injury = false;
+  String txt_injury = '';
+  String txt_position = '';
   String path_img_face = '';
   String uniform_number = '';
   bool flg_rookie = false;
@@ -43,6 +45,8 @@ class m_player extends DBModel {
       "pitching": pitching,
       "batting": batting,
       "flg_injury": flg_injury,
+      "txt_injury": txt_injury,
+      "txt_position": txt_position,
       "path_img_face": path_img_face,
       "uniform_number": uniform_number,
       "flg_rookie": flg_rookie,

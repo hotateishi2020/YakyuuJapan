@@ -2,22 +2,22 @@ name: Ping APIs (multi-cron)
 
 on:
   schedule:
-    - cron: "2 7-15 * * *" # 毎日16時から24時の時間帯に毎時0分
-    - cron: "13,43 7-15 * * *" # 毎日16時から24時の時間帯に30分間隔
-    - cron: "9/10 4-15 * * *" # 毎日13時から24時の時間帯に10分間隔
-    - cron: "15 15-21 * * *" # 毎日0時から6時の時間帯に毎時0分
+    # JST 16:00–24:00 の毎時2分。NPB・MLB のチーム成績だけ。
+    - cron: "2 7-15 * * *"
+    # JST 16:00–24:00 の 30 分間隔。NPB・MLB の選手成績だけ。
+    - cron: "13,43 7-15 * * *"
   workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Call /fetchStatsTeamNPB (A)
-        if: ${{ github.event.schedule == '2 7-15 * * *' }}
+      - name: Call /fetchStatsTeamNPB
+        if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '2 7-15 * * *' }}
         run: curl -fsS "https://yakyuujapan.onrender.com/fetchStatsTeamNPB"
-        
-      - name: Call /fetchStatsPlayerNPB (B)
-        if: ${{ github.event.schedule == '13,43 7-15 * * *' }}
+
+      - name: Call /fetchStatsPlayerNPB
+        if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '13,43 7-15 * * *' }}
         run: |
           curl --silent --show-error \
             --fail-with-body \
@@ -30,20 +30,12 @@ jobs:
             --write-out "\nHTTP status: %{http_code}\n" \
             "https://yakyuujapan.onrender.com/fetchStatsPlayerNPB"
 
-      - name: Call /fetchGamesNPB (C)
-        if: ${{ github.event.schedule == '9/10 4-15 * * *' }}
-        run: curl -fsS "https://yakyuujapan.onrender.com/fetchGamesNPB"
-
-      - name: Call /fetchGamesNPB (D)
-        if: ${{ github.event.schedule == '15 15-21 * * *' }}
-        run: curl -fsS "https://yakyuujapan.onrender.com/fetchGamesNPB"
-
       - name: Call /fetchStatsTeamMLB
-        if: ${{ github.event.schedule == '2 7-15 * * *' }}
+        if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '2 7-15 * * *' }}
         run: curl -fsS "https://yakyuujapan.onrender.com/fetchStatsTeamMLB" || true
 
       - name: Call /fetchStatsPlayerMLB
-        if: ${{ github.event.schedule == '13,43 7-15 * * *' }}
+        if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '13,43 7-15 * * *' }}
         run: |
           curl --silent --show-error \
             --fail-with-body \
@@ -54,7 +46,3 @@ jobs:
             --connect-timeout 30 \
             --max-time 1800 \
             "https://yakyuujapan.onrender.com/fetchStatsPlayerMLB" || true
-
-      - name: Call /fetchGamesMLB
-        if: ${{ github.event.schedule == '9/10 4-15 * * *' || github.event.schedule == '15 15-21 * * *' }}
-        run: curl -fsS "https://yakyuujapan.onrender.com/fetchGamesMLB" || true

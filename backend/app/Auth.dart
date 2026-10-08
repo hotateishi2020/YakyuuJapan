@@ -7,6 +7,7 @@ import 'package:postgres/postgres.dart';
 import 'package:shelf/shelf.dart';
 
 import '../tools/Postgres.dart';
+import 'OutboundMail.dart';
 
 /// メール＋パスワードのログイン / 新規登録 / セッショントークン / プロフィール。
 class Auth {
@@ -42,6 +43,16 @@ class Auth {
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS id_player_fav INTEGER');
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS flg_notify_news BOOLEAN DEFAULT TRUE');
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS flg_notify_event BOOLEAN DEFAULT TRUE');
+      await conn.execute('''
+        CREATE TABLE IF NOT EXISTS t_auth_code (
+          purpose VARCHAR(20) NOT NULL,
+          mailaddress VARCHAR(200) NOT NULL,
+          code VARCHAR(10) NOT NULL,
+          payload TEXT NOT NULL,
+          expire_at TIMESTAMPTZ NOT NULL,
+          PRIMARY KEY (purpose, mailaddress)
+        )
+      ''');
       _schemaReady = true;
       done.complete();
     } catch (e, st) {
@@ -196,6 +207,82 @@ class Auth {
     return rows.first.toColumnMap()['id_user'] as int;
   }
 
+  static const _codeTtl = Duration(minutes: 15);
+
+  static String _newCode() {
+    final n = Random.secure().nextInt(1000000);
+    return n.toString().padLeft(6, '0');
+  }
+
+  static DateTime _asUtc(dynamic value) {
+    if (value is DateTime) return value.toUtc();
+    return DateTime.parse('$value').toUtc();
+  }
+
+  static Future<void> _saveCode(
+    Connection conn, {
+    required String purpose,
+    required String mail,
+    required String code,
+    required String payload,
+  }) async {
+    final expire = DateTime.now().toUtc().add(_codeTtl).toIso8601String();
+    await conn.execute(
+      '''
+        INSERT INTO t_auth_code (purpose, mailaddress, code, payload, expire_at)
+        VALUES (\$1::text, \$2::text, \$3::text, \$4::text, \$5::timestamptz)
+        ON CONFLICT (purpose, mailaddress) DO UPDATE SET
+          code = EXCLUDED.code,
+          payload = EXCLUDED.payload,
+          expire_at = EXCLUDED.expire_at
+      ''',
+      parameters: [purpose, mail, code, payload, expire],
+    );
+  }
+
+  static Future<Map<String, dynamic>?> _loadCode(Connection conn, String purpose, String mail) async {
+    final rows = await conn.execute(
+      '''
+        SELECT code, payload, expire_at
+        FROM t_auth_code
+        WHERE purpose = \$1::text AND lower(mailaddress) = lower(\$2::text)
+        LIMIT 1
+      ''',
+      parameters: [purpose, mail],
+    );
+    if (rows.isEmpty) return null;
+    return rows.first.toColumnMap();
+  }
+
+  static Future<void> _deleteCode(Connection conn, String purpose, String mail) async {
+    await conn.execute(
+      'DELETE FROM t_auth_code WHERE purpose = \$1::text AND lower(mailaddress) = lower(\$2::text)',
+      parameters: [purpose, mail],
+    );
+  }
+
+  static Future<String?> _sendCode(String mail, String subject, String lead, String code) async {
+    try {
+      await sendOutboundMail(
+        to: mail,
+        subject: subject,
+        text: '$lead\n\n認証コード: $code\n\nこのコードは15分間有効です。',
+      );
+      return null;
+    } catch (_) {
+      return '認証メールを送れませんでした。しばらくしてから再度お試しください';
+    }
+  }
+
+  static String? _codeError(Map<String, dynamic>? row, String input) {
+    if (row == null) return '認証コードを送ってから入力してください';
+    if (!_asUtc(row['expire_at']).isAfter(DateTime.now().toUtc())) {
+      return '認証コードの期限が切れています。もう一度送ってください';
+    }
+    if ('${row['code']}'.trim() != input.trim()) return '認証コードが違います';
+    return null;
+  }
+
   static Future<Response> register(Request request) async {
     return _withAuthDb((conn) async {
       await ensureSchema(conn);
@@ -243,14 +330,43 @@ class Auth {
       final hashed = _encodePassword(password);
       final color = _colors[Random().nextInt(_colors.length)];
       final display = nameLast.isNotEmpty ? nameLast : handle;
+      final code = '${body['code'] ?? ''}'.trim();
+      if (code.isEmpty) {
+        final sent = _newCode();
+        await _saveCode(
+          conn,
+          purpose: 'register',
+          mail: mail,
+          code: sent,
+          payload: jsonEncode({'handle': handle, 'display': display, 'password': hashed, 'color': color}),
+        );
+        final mailErr = await _sendCode(mail, 'YakyuuJapan ユーザー登録の認証コード', 'ユーザー登録の認証コードです。', sent);
+        if (mailErr != null) {
+          await _deleteCode(conn, 'register', mail);
+          return _json(503, {'ok': false, 'error': mailErr});
+        }
+        return _json(200, {'ok': true, 'need_code': true});
+      }
+      final pending = await _loadCode(conn, 'register', mail);
+      final codeErr = _codeError(pending, code);
+      if (codeErr != null) return _json(400, {'ok': false, 'error': codeErr});
+      final saved = jsonDecode('${pending!['payload']}') as Map<String, dynamic>;
+      final savedHandle = '${saved['handle'] ?? ''}';
+      final savedDisplay = '${saved['display'] ?? savedHandle}';
+      final savedPassword = '${saved['password'] ?? ''}';
+      final savedColor = '${saved['color'] ?? _colors.first}';
+      if (savedHandle != handle) {
+        return _json(400, {'ok': false, 'error': '認証コードを送った内容と違います。もう一度送ってください'});
+      }
       final inserted = await conn.execute(
         '''
           INSERT INTO m_user (name_last, name_first, name_handle, nickname, mailaddress, password, code_color, flg_delete, crtat, updat)
           VALUES (\$1::text, ''::text, \$2::text, \$1::text, \$3::text, \$4::text, \$5::text, FALSE, NOW(), NOW())
           RETURNING id
         ''',
-        parameters: [display, handle, mail, hashed, color],
+        parameters: [savedDisplay, savedHandle, mail, savedPassword, savedColor],
       );
+      await _deleteCode(conn, 'register', mail);
       final id = inserted.first.toColumnMap()['id'] as int;
       final user = await _userById(conn, id);
       final token = await _createSession(conn, id);
@@ -342,19 +458,49 @@ class Auth {
         return _json(400, {'ok': false, 'error': '新しいパスワードは4文字以上にしてください'});
       }
       final rows = await conn.execute(
-        'SELECT password FROM m_user WHERE id = \$1::int LIMIT 1',
+        'SELECT password, mailaddress FROM m_user WHERE id = \$1::int LIMIT 1',
         parameters: [userId],
       );
       if (rows.isEmpty) return _json(404, {'ok': false, 'error': 'ユーザーが見つかりません'});
-      final stored = '${rows.first.toColumnMap()['password'] ?? ''}';
-      final ok = await _passwordMatches(conn, userId, stored, current);
-      if (!ok) {
-        return _json(401, {'ok': false, 'error': '現在のパスワードが違います'});
+      final storedRow = rows.first.toColumnMap();
+      final mail = '${storedRow['mailaddress'] ?? ''}'.trim().toLowerCase();
+      if (!mail.contains('@')) {
+        return _json(400, {'ok': false, 'error': 'メールアドレスが登録されていないため認証できません'});
+      }
+      final code = '${body['code'] ?? ''}'.trim();
+      if (code.isEmpty) {
+        final stored = '${storedRow['password'] ?? ''}';
+        final ok = await _passwordMatches(conn, userId, stored, current);
+        if (!ok) {
+          return _json(401, {'ok': false, 'error': '現在のパスワードが違います'});
+        }
+        final sent = _newCode();
+        await _saveCode(
+          conn,
+          purpose: 'password',
+          mail: mail,
+          code: sent,
+          payload: jsonEncode({'user_id': userId, 'password': _encodePassword(next)}),
+        );
+        final mailErr = await _sendCode(mail, 'YakyuuJapan パスワード変更の認証コード', 'パスワード変更の認証コードです。', sent);
+        if (mailErr != null) {
+          await _deleteCode(conn, 'password', mail);
+          return _json(503, {'ok': false, 'error': mailErr});
+        }
+        return _json(200, {'ok': true, 'need_code': true});
+      }
+      final pending = await _loadCode(conn, 'password', mail);
+      final codeErr = _codeError(pending, code);
+      if (codeErr != null) return _json(400, {'ok': false, 'error': codeErr});
+      final saved = jsonDecode('${pending!['payload']}') as Map<String, dynamic>;
+      if ('${saved['user_id']}' != '$userId') {
+        return _json(400, {'ok': false, 'error': '認証コードが無効です。もう一度送ってください'});
       }
       await conn.execute(
         'UPDATE m_user SET password = \$1::text, updat = NOW() WHERE id = \$2::int',
-        parameters: [_encodePassword(next), userId],
+        parameters: ['${saved['password'] ?? ''}', userId],
       );
+      await _deleteCode(conn, 'password', mail);
       return _json(200, {'ok': true});
     });
   }

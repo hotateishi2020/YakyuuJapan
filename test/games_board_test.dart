@@ -22,6 +22,18 @@ void main() {
     expect(gameIsInProgress({'state': '試合前'}), isFalse);
   });
 
+  test('isHeatedGame marks late close games', () {
+    expect(isHeatedGame('6回裏', 3, 2), isFalse);
+    expect(isHeatedGame('7回表', 4, 2), isTrue);
+    expect(isHeatedGame('7回裏', 5, 2), isFalse);
+    expect(isHeatedGame('8回表', 3, 1), isFalse);
+    expect(isHeatedGame('8回裏', 2, 1), isTrue);
+    expect(isHeatedGame('9回表', 0, 0), isTrue);
+    expect(isHeatedGame('10回裏', 4, 2), isTrue);
+    expect(isHeatedGame('試合終了', 1, 1), isFalse);
+    expect(isHeatedGame('試合前', -1, -1), isFalse);
+  });
+
   test('liveAtBatHalf reads the batting inning from game state', () {
     expect(liveAtBatHalf('4回裏'), (inning: 4, bottom: true));
     expect(liveAtBatHalf('12回表'), (inning: 12, bottom: false));
@@ -1066,7 +1078,9 @@ void main() {
     expect(find.textContaining('98.2%（リーグ'), findsNothing);
     expect(find.textContaining('8勝7敗（リーグ8位）'), findsOneWidget);
     expect(find.textContaining('2.41（リーグ4位）'), findsOneWidget);
-    expect(find.textContaining('128（リーグ1位）'), findsOneWidget);
+    expect(find.textContaining('128（リーグ'), findsNothing);
+    expect(find.textContaining('128'), findsOneWidget);
+    expect(find.text('👑'), findsOneWidget);
     expect(find.textContaining('123.4%（リーグ'), findsNothing);
   });
 

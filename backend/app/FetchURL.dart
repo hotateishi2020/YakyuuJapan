@@ -8,6 +8,8 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 import 'AppSql.dart';
+import 'InjuryList.dart';
+import 'RegisteredPosition.dart';
 import '../tools/Postgres.dart';
 import '../tools/StringTool.dart';
 import '../tools/DateTimeTool.dart';
@@ -27,6 +29,7 @@ import 'package:intl/intl.dart';
 import 'package:postgres/postgres.dart';
 import 'package:shelf/shelf.dart';
 import 'BirthPlaceRegistry.dart';
+import 'DisplaySnapshot.dart';
 import 'GameFetchSchedule.dart';
 import 'StadiumImages.dart';
 import 'GameStatsLoad.dart';
@@ -501,6 +504,7 @@ class FetchURL {
     }
 
     await Postgres.insertMulti(conn, teams);
+    await DisplaySnapshot.refreshTeams(conn, DateTimeTool.getThisYear());
     return Response.ok('ok');
   }
 
@@ -2544,6 +2548,12 @@ class FetchURL {
     return whole + thirds / 3.0;
   }
 
+  /// 奪三振と与四球から K/BB。与四球が無い選手は順位に載せない。
+  static double? strikeoutsPerWalk(int strikeouts, int walks) {
+    if (strikeouts < 0 || walks <= 0) return null;
+    return (strikeouts * 100 / walks).round() / 100;
+  }
+
   /// 与四球と投球回から BB/9。表示は小数2桁。
   static double? walksPerNine(int walks, String innings) {
     final ip = baseballInnings(innings);
@@ -2570,11 +2580,115 @@ class FetchURL {
   }
 
   static Future<Response> fetchStatsPlayerNPB(Connection conn) async {
-    return fetchStatsPlayerForLeagues(conn, const [1, 2]);
+    await InjuryList.sync(conn);
+    await RegisteredPosition.syncNpb(conn);
+    final response = await fetchStatsPlayerForLeagues(conn, const [1, 2]);
+    await backfillRankingBirthplaces(conn);
+    await DisplaySnapshot.refreshPlayers(conn, DateTimeTool.getThisYear());
+    return response;
+  }
+
+  /// 個人成績表の選手ページから、未登録の出身地を埋める。佐賀出身の「佐」に使う。
+  static Future<int> backfillRankingBirthplaces(Connection conn) async {
+    final pages = Postgres.toMap(await conn.execute(AppSql.selectStatsDetails(leagueIds: const [1, 2])));
+    final profiles = <String, ({String name, String team})>{};
+    for (final stat in pages) {
+      final url = '${stat['url'] ?? ''}'.trim();
+      if (url.isEmpty || url.contains('/mlb/')) continue;
+      http.Response res;
+      try {
+        res = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 30));
+      } catch (e) {
+        print('出身地ランキング取得失敗: $e');
+        continue;
+      }
+      if (res.statusCode != 200) continue;
+      final doc = parse(_decodeHtml(res));
+      for (final tr in doc.querySelectorAll('#js-playerTable tr')) {
+        final tds = tr.querySelectorAll('td');
+        if (tds.length < 2) continue;
+        final parsed = _parseYahooRankingPlayerCell(tds[1].text);
+        if (parsed.player.isEmpty || parsed.team.isEmpty) continue;
+        final href = tds[1].querySelector('a')?.attributes['href']?.trim() ?? '';
+        if (href.isEmpty) continue;
+        final profileUrl = href.startsWith('http') ? href : 'https://baseball.yahoo.co.jp$href';
+        profiles.putIfAbsent(profileUrl, () => (name: StringTool.noSpace(parsed.player), team: parsed.team));
+      }
+    }
+
+    var updated = 0;
+    for (final entry in profiles.entries) {
+      final found = await conn.execute(
+        '''
+          SELECT p.id
+          FROM m_player p
+          JOIN m_team t ON t.id = p.id_team
+          WHERE regexp_replace(COALESCE(p.name_full, ''), '[[:space:]]', '', 'g') LIKE '%' || \$1 || '%'
+            AND t.name_shortest = \$2
+            AND COALESCE(p.id_place_birth, 0) = 0
+            AND COALESCE(p.flg_delete, FALSE) = FALSE
+        ''',
+        parameters: [entry.value.name, entry.value.team],
+      );
+      if (found.length != 1) continue;
+      final playerId = found.first.toColumnMap()['id'] as int;
+      try {
+        final res = await http.get(Uri.parse(entry.key)).timeout(const Duration(seconds: 20));
+        if (res.statusCode != 200) continue;
+        final doc = parse(_decodeHtml(res));
+        await BirthPlaceRegistry.applyFromProfile(conn, playerId, doc);
+        await BirthPlaceRegistry.applyBirthDate(conn, playerId, BirthPlaceRegistry.extractBirthDate(doc));
+        updated++;
+      } catch (e) {
+        print('出身地取得スキップ (${entry.value.name}): $e');
+      }
+    }
+    print('出身地の補完数$updated');
+    return updated;
+  }
+
+  /// 与四球率と同じ投手ランキング URL で K/BB を計算できるよう、指標と URL を足す。
+  static Future<void> ensureKbbStat(Connection conn) async {
+    await conn.execute('''
+      INSERT INTO m_stats (
+        title, flg_pitcher, flg_positive, flg_delete, int_index, code_display, title_shortest,
+        crtpgm, updpgm, crtat, updat
+      )
+      SELECT
+        'K/BB', TRUE, TRUE, FALSE,
+        COALESCE((SELECT MAX(int_index) FROM m_stats), 0) + 1,
+        'DEC_2', 'KBB',
+        'K/BB', 'K/BB', NOW(), NOW()
+      WHERE NOT EXISTS (
+        SELECT 1 FROM m_stats WHERE title = 'K/BB' AND COALESCE(flg_delete, FALSE) = FALSE
+      )
+    ''');
+    await conn.execute('''
+      INSERT INTO m_stats_details (
+        id_stats, id_league, flg_predict, url, int_idx_col, id_website, flg_delete,
+        int_idx_col_details, int_idx_row_details, crtpgm, updpgm, crtat, updat
+      )
+      SELECT
+        k.id, d.id_league, FALSE, d.url, d.int_idx_col, d.id_website, FALSE,
+        d.int_idx_col_details, d.int_idx_row_details, 'K/BB', 'K/BB', NOW(), NOW()
+      FROM m_stats k
+      JOIN m_stats src ON src.title = '与四球率' AND COALESCE(src.flg_delete, FALSE) = FALSE
+      JOIN m_stats_details d
+        ON d.id_stats = src.id
+       AND COALESCE(d.flg_delete, FALSE) = FALSE
+       AND COALESCE(d.url, '') <> ''
+      WHERE k.title = 'K/BB'
+        AND COALESCE(k.flg_delete, FALSE) = FALSE
+        AND NOT EXISTS (
+          SELECT 1 FROM m_stats_details x
+          WHERE x.id_stats = k.id AND x.id_league = d.id_league
+        )
+    ''');
   }
 
   /// NPB / MLB 共通。指定リーグの m_stats_details URL を巡回して個人成績を登録する。
-  static Future<Response> fetchStatsPlayerForLeagues(Connection conn, List<int> leagueIds) async {
+  static Future<Response> fetchStatsPlayerForLeagues(Connection conn, List<int> leagueIds, {String? onlyTitle}) async {
+    await ensureKbbStat(conn);
     // t_stats_player は履歴用に削除せず INSERT のみ。
     // t_stats_player_latest のみ同内容で deleteInsert する。
     final results = await conn.execute(AppSql.selectStatsDetails(leagueIds: leagueIds));
@@ -2582,6 +2696,7 @@ class FetchURL {
 
     for (final stat in stats) {
       final title = '${stat['title'] ?? ''}'.trim();
+      if (onlyTitle != null && title != onlyTitle) continue;
       print('statsID:${stat['id_stats']} $title');
       var url = '${stat['url'] ?? ''}'.trim();
       if (url.isEmpty) continue;
@@ -2680,6 +2795,17 @@ class FetchURL {
             appearances = int.tryParse(cols.elementAtOrNull(3) ?? '') ?? 0;
             playCount = innings > 0 ? innings.truncate() : 0;
             rank = null;
+          } else if (title == 'K/BB') {
+            final kCount = int.tryParse(cols.elementAtOrNull(17) ?? '') ?? -1;
+            final walkCount = int.tryParse(cols.elementAtOrNull(19) ?? '') ?? -1;
+            final rawIp = cols.elementAtOrNull(14) ?? '';
+            value = strikeoutsPerWalk(kCount, walkCount);
+            innings = double.tryParse(rawIp) ?? 0;
+            if (innings <= 0) value = null;
+            appearances = int.tryParse(cols.elementAtOrNull(3) ?? '') ?? 0;
+            strikeouts = kCount > 0 ? kCount : 0;
+            playCount = walkCount > 0 ? walkCount : 0;
+            rank = null;
           } else if (colIdx >= 0 && colIdx < cols.length) {
             value = double.tryParse(cols[colIdx]);
             if (isPitcherTable) {
@@ -2724,6 +2850,8 @@ class FetchURL {
         assignCompetitionRanks(listStats, higherIsBetter: true);
       } else if (title == '与四球率') {
         assignCompetitionRanks(listStats, higherIsBetter: false);
+      } else if (title == 'K/BB') {
+        assignCompetitionRanks(listStats, higherIsBetter: true);
       }
       if (listStats.isEmpty) continue;
 
@@ -2774,6 +2902,8 @@ class FetchURL {
       );
       print("個人成績latestの登録数" + cntLatest.affectedRows.toString());
     } //for stat
+
+    if (onlyTitle != null) return Response.ok('ok');
 
     //予想者が予想した選手がランク外だった場合は選手個人のサイトをスクレイピングして個人成績を取得する
     List<DBModel> listStatsPlayerNoRank = [];

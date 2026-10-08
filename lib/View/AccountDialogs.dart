@@ -78,7 +78,9 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
   final _currentCtrl = TextEditingController();
   final _newCtrl = TextEditingController();
   final _confirmCtrl = TextEditingController();
+  final _codeCtrl = TextEditingController();
   var _busy = false;
+  var _codeSent = false;
   String? _error;
 
   @override
@@ -86,6 +88,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
     _currentCtrl.dispose();
     _newCtrl.dispose();
     _confirmCtrl.dispose();
+    _codeCtrl.dispose();
     super.dispose();
   }
 
@@ -99,19 +102,27 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
       _busy = true;
       _error = null;
     });
-    final err = await AuthSession.instance.changePassword(
+    final result = await AuthSession.instance.changePassword(
       currentPassword: _currentCtrl.text,
       newPassword: _newCtrl.text,
+      code: _codeSent ? _codeCtrl.text : '',
     );
     if (!mounted) return;
-    if (err == null) {
+    if (result.codeSent) {
+      setState(() {
+        _busy = false;
+        _codeSent = true;
+      });
+      return;
+    }
+    if (result.error == null) {
       TextInput.finishAutofillContext(shouldSave: true);
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('パスワードを変更しました')));
     } else {
       setState(() {
         _busy = false;
-        _error = err;
+        _error = result.error;
       });
     }
   }
@@ -160,6 +171,24 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
                 ),
                 onSubmitted: (_) => _submit(),
               ),
+              if (_codeSent) ...[
+                const SizedBox(height: 10),
+                const Text(
+                  '登録メールアドレスに届いた認証コードを入力してください。',
+                  style: TextStyle(fontSize: 12),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _codeCtrl,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: '認証コード',
+                    border: OutlineInputBorder(),
+                    isDense: true,
+                  ),
+                  onSubmitted: (_) => _submit(),
+                ),
+              ],
               if (_error != null) ...[
                 const SizedBox(height: 8),
                 Text(_error!, style: const TextStyle(color: Colors.red, fontSize: 12)),
@@ -172,7 +201,9 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
         TextButton(onPressed: _busy ? null : () => Navigator.pop(context), child: const Text('キャンセル')),
         FilledButton(
           onPressed: _busy ? null : _submit,
-          child: _busy ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('変更する'),
+          child: _busy
+              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+              : Text(_codeSent ? '認証して変更' : '認証コードを送る'),
         ),
       ],
     );

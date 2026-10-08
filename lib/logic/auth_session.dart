@@ -199,11 +199,12 @@ class AuthSession {
     }
   }
 
-  Future<String?> register({
+  Future<({String? error, bool codeSent})> register({
     required String mailaddress,
     required String nameHandle,
     required String password,
     String nameLast = '',
+    String code = '',
   }) async {
     try {
       final res = await http
@@ -215,17 +216,19 @@ class AuthSession {
               'name_handle': nameHandle,
               'password': password,
               'name_last': nameLast,
+              'code': code,
             }),
           )
           .timeout(const Duration(seconds: 20));
       final map = jsonDecode(res.body) as Map<String, dynamic>;
       if (res.statusCode != 200 || map['ok'] != true) {
-        return '${map['error'] ?? '登録に失敗しました'}';
+        return (error: '${map['error'] ?? '登録に失敗しました'}', codeSent: false);
       }
+      if (map['need_code'] == true) return (error: null, codeSent: true);
       _applyAuthResponse(map);
-      return null;
+      return (error: null, codeSent: false);
     } catch (e) {
-      return authNetworkError(e, '登録');
+      return (error: authNetworkError(e, '登録'), codeSent: false);
     }
   }
 
@@ -244,7 +247,11 @@ class AuthSession {
     } catch (_) {}
   }
 
-  Future<String?> changePassword({required String currentPassword, required String newPassword}) async {
+  Future<({String? error, bool codeSent})> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    String code = '',
+  }) async {
     try {
       final res = await http
           .post(
@@ -253,16 +260,18 @@ class AuthSession {
             body: jsonEncode({
               'current_password': currentPassword,
               'new_password': newPassword,
+              'code': code,
             }),
           )
           .timeout(const Duration(seconds: 20));
       final map = jsonDecode(res.body) as Map<String, dynamic>;
       if (res.statusCode != 200 || map['ok'] != true) {
-        return '${map['error'] ?? 'パスワード変更に失敗しました'}';
+        return (error: '${map['error'] ?? 'パスワード変更に失敗しました'}', codeSent: false);
       }
-      return null;
+      if (map['need_code'] == true) return (error: null, codeSent: true);
+      return (error: null, codeSent: false);
     } catch (e) {
-      return '通信エラー: $e';
+      return (error: '通信エラー: $e', codeSent: false);
     }
   }
 

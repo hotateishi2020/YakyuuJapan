@@ -10,6 +10,13 @@ void main() {
     expect(parsed.placeName, 'サンペドロ・デ・マコリス');
   });
 
+  test('Yahooの都道府県名は日本の出身地になる', () {
+    expect(BirthPlaceRegistry.parse('佐賀'), (countryName: '日本', placeName: '佐賀'));
+    expect(BirthPlaceRegistry.parse('兵庫'), (countryName: '日本', placeName: '兵庫'));
+    expect(BirthPlaceRegistry.parse('佐賀県'), (countryName: '日本', placeName: '佐賀'));
+    expect(BirthPlaceRegistry.parse('京都'), (countryName: '日本', placeName: '京都'));
+  });
+
   test('known long country names exceed the old varchar(5) limit', () {
     expect(BirthPlaceRegistry.parse('プエルトリコ').countryName, 'プエルトリコ');
     expect(BirthPlaceRegistry.parse('オーストラリア').countryName, 'オーストラリア');

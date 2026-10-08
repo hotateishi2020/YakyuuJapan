@@ -138,14 +138,11 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   int _seasonYear = DateTime.now().year;
   final Map<String, int> _loadedPartYears = {};
   PersonalStatsLayout _personalStatsLayout = PersonalStatsLayout.segment;
-  Timer? _gamesRefreshTimer;
   Timer? _gamesPollTimer;
-  bool _gamesRefreshRunning = false;
   bool _gamesPollRunning = false;
   final Map<OrgKind, int> _gameDayOffset = {};
   final Map<OrgKind, String?> _loadingGameDateByOrg = {};
   final Set<String> _pastDateInflight = {};
-  final Set<OrgKind> _seasonStatsRefreshStarted = {};
 
   int get _gameDateOffset => _gameDayOffset[_orgKind] ?? 0;
 
@@ -359,7 +356,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         _readyParts[kind] = <_LoadPart>{};
       }
     });
-    _gamesRefreshTimer?.cancel();
     _gamesPollTimer?.cancel();
     if (usable) {
       // 足りないパートだけ補完。取得済みは再取得しない
@@ -465,7 +461,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _gamesRefreshTimer?.cancel();
     _gamesPollTimer?.cancel();
     super.dispose();
   }
@@ -480,30 +475,14 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     unawaited(_pollDisplayedGames());
   }
 
-  String _todayKey() {
-    final now = DateTime.now();
-    final month = now.month.toString().padLeft(2, '0');
-    final day = now.day.toString().padLeft(2, '0');
-    return '${now.year}-$month-$day';
-  }
-
-  String _predictionsPath([OrgKind? kind]) => '/predictions?org=${OrgConfig.of(kind ?? _orgKind).label.toLowerCase()}&year=$_seasonYear';
-
   Future<void> _startGamesWatch() async {
     if (!mounted) return;
-    // 一部パート失敗の error があっても、取れたデータがあれば監視は続ける
+    // 一部パート失敗の error があっても、取れたデータがあれば監視は続ける。
+    // 再取得は登録済みの集計テーブルを読むだけで、スクレイピングは呼ばない。
     if (error != null && !_boardContentReady) return;
-    if (orgGamesAllFinished(games, _todayKey(), _org.leagueIds)) {
-      _refreshSeasonStatsOnce();
-    }
-    _gamesRefreshTimer?.cancel();
     _gamesPollTimer?.cancel();
     _gamesPollTimer = Timer.periodic(const Duration(seconds: 10), (_) {
       unawaited(_pollDisplayedGames());
-    });
-    // 初期表示は SQL のみ。スクレイピングは描画後に始める。
-    _gamesRefreshTimer = Timer(const Duration(seconds: 5), () {
-      unawaited(_refreshGames());
     });
   }
 
@@ -530,82 +509,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     if (error != null && !_boardContentReady) return;
     await _startGamesWatch();
     unawaited(_prefetchOtherOrg());
-  }
-
-  Future<void> _refreshGames() async {
-    if (!mounted || _gamesRefreshRunning || isLoading) return;
-    if (_seasonYear != DateTime.now().year) return;
-    final today = _todayKey();
-    if (orgGamesAreSettled(games, today, _org.leagueIds)) {
-      if (orgGamesAllFinished(games, today, _org.leagueIds)) {
-        await _refreshSeasonStatsOnce();
-      }
-      return;
-    }
-    _gamesRefreshRunning = true;
-    var refreshStats = false;
-    try {
-      // 初回だけ全日程。今日の続きは backend が 10 秒後に今日だけ取りに行く。
-      final scrape = await http.get(Env.api(_org.gamesFetchPath)).timeout(const Duration(minutes: 10));
-      if (!mounted) return;
-      if (scrape.statusCode != 200) {
-        logger.w('試合スクレイピング失敗: ${scrape.statusCode}');
-      } else if (scrape.body.contains('offseason')) {
-        _gamesRefreshTimer?.cancel();
-        _gamesPollTimer?.cancel();
-        return;
-      }
-      await _pollDisplayedGames();
-      refreshStats = orgGamesAllFinished(games, today, _org.leagueIds);
-    } catch (e, st) {
-      logger.w('試合情報の定期更新に失敗: $e\n$st');
-    } finally {
-      _gamesRefreshRunning = false;
-    }
-    if (refreshStats) await _refreshSeasonStatsOnce();
-  }
-
-  Future<void> _refreshSeasonStatsOnce() async {
-    final kind = _orgKind;
-    if (!mounted || _seasonStatsRefreshStarted.contains(kind)) return;
-    if (!orgGamesAllFinished(games, _todayKey(), _org.leagueIds)) return;
-    _seasonStatsRefreshStarted.add(kind);
-    try {
-      final team = await http.get(Env.api(_org.teamStatsFetchPath)).timeout(const Duration(minutes: 5));
-      if (!mounted || team.statusCode != 200) {
-        logger.w('チーム成績スクレイピング失敗: ${team.statusCode}');
-        _seasonStatsRefreshStarted.remove(kind);
-        return;
-      }
-      if (team.body.contains('offseason')) {
-        _gamesRefreshTimer?.cancel();
-        _gamesPollTimer?.cancel();
-        return;
-      }
-      final res = await http.get(Env.api(_predictionsPath(kind))).timeout(const Duration(seconds: 30));
-      if (!mounted || res.statusCode != 200) {
-        _seasonStatsRefreshStarted.remove(kind);
-        return;
-      }
-      final map = jsonDecode(res.body) as Map<String, dynamic>;
-      final org = OrgConfig.of(kind);
-      final nextStandings = listMapFromJson(map['stats_team']).where(org.rowBelongs).toList();
-      final nextActual = listMapFromJson(map['stats_player']).where(org.rowBelongs).toList();
-      final cached = _orgCache[kind];
-      if (cached != null) {
-        cached.standings = nextStandings;
-        cached.playerStatsActual = nextActual;
-      }
-      if (kind == _orgKind) {
-        setState(() {
-          standings = nextStandings;
-          npbPlayerStatsActual = nextActual;
-        });
-      }
-    } catch (e, st) {
-      _seasonStatsRefreshStarted.remove(kind);
-      logger.w('チーム・個人成績の更新に失敗: $e\n$st');
-    }
   }
 
   Future<void> fetchData({OrgKind? kind, bool background = false}) async {
@@ -734,7 +637,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     if (year == DateTime.now().year) {
       unawaited(_startGamesWatch());
     } else {
-      _gamesRefreshTimer?.cancel();
       _gamesPollTimer?.cancel();
     }
     unawaited(_prefetchOtherOrg());
@@ -1403,6 +1305,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         key: ValueKey('both-${_orgKind.name}-$_seasonYear-${_gamesInitialDate()}'),
         games: games,
         playerStats: npbPlayerStatsActual,
+        standings: standings,
         initialDate: _gamesInitialDate(),
         leading: showBracket ? [_postseasonBracket(), const SizedBox(height: 6)] : const [],
         leagues: [

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import '../config/app_design.dart';
 import '../config/org_config.dart';
@@ -64,6 +66,144 @@ PersonalStatsLayout readPersonalStatsLayout() {
 
 void writePersonalStatsLayout(PersonalStatsLayout layout) {
   writeBrowserCookie(personalStatsLayoutCookie, layout == PersonalStatsLayout.scroll ? 'scroll' : 'segment');
+}
+
+/// 勝差の数値。首位・「-」・優勝は 0。読めない値も 0 として左端に置く。
+({String name, String label, double gb}) gamesBehindEntry(String name, String raw) {
+  final text = raw.trim();
+  if (text.isEmpty || text == 'null' || text == '-' || text == '—' || text == '－' || text == '優勝' || text.toUpperCase() == 'W') {
+    final label = (text == '優勝' || text.toUpperCase() == 'W') ? text : '-';
+    return (name: name.trim(), label: label, gb: 0);
+  }
+  final parsed = double.tryParse(text);
+  if (parsed != null) {
+    return (name: name.trim(), label: text, gb: parsed < 0 ? 0 : parsed);
+  }
+  final match = RegExp(r'([0-9]+(?:\.[0-9]+)?)').firstMatch(text);
+  if (match != null) {
+    return (name: name.trim(), label: text, gb: double.parse(match.group(1)!));
+  }
+  return (name: name.trim(), label: text, gb: 0);
+}
+
+/// 勝差の割合に対応するロゴ左端。首位が左、最大の勝差が右端。
+double gbMarkLeft(double gb, double maxGb, double width, double markW) {
+  final span = math.max(0.0, width - markW);
+  if (maxGb <= 0 || gb <= 0) return 0;
+  return (gb / maxGb) * span;
+}
+
+class GamesBehindChart extends StatelessWidget {
+  final List<Map<String, dynamic>> rows;
+
+  const GamesBehindChart({super.key, required this.rows});
+
+  @override
+  Widget build(BuildContext context) {
+    final entries = [
+      for (final row in rows)
+        gamesBehindEntry('${row['name_team'] ?? ''}', '${row['game_behind'] ?? ''}'),
+    ].where((entry) => entry.name.isNotEmpty).toList();
+    if (entries.isEmpty) return const SizedBox.shrink();
+    final maxGb = entries.map((entry) => entry.gb).reduce(math.max);
+    final tieCount = <String, int>{};
+    var maxTie = 1;
+    for (final entry in entries) {
+      final key = entry.gb.toStringAsFixed(2);
+      final next = (tieCount[key] ?? 0) + 1;
+      tieCount[key] = next;
+      if (next > maxTie) maxTie = next;
+    }
+    tieCount.clear();
+    const markW = 40.0;
+    final height = 48.0 + (maxTie - 1) * 16.0;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(left: 2, bottom: 4),
+          child: Text('ゲーム差', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, height: 1)),
+        ),
+        SizedBox(
+          height: height,
+          child: LayoutBuilder(builder: (context, constraints) {
+            final width = constraints.maxWidth.isFinite ? constraints.maxWidth : markW;
+            return Stack(
+              children: [
+                Positioned(
+                  left: markW / 2,
+                  right: markW / 2,
+                  top: 16,
+                  child: const ColoredBox(color: Color(0xFFB0BEC5), child: SizedBox(height: 2)),
+                ),
+                for (final entry in entries)
+                  Positioned(
+                    left: gbMarkLeft(entry.gb, maxGb, width, markW),
+                    top: () {
+                      final key = entry.gb.toStringAsFixed(2);
+                      final index = tieCount[key] ?? 0;
+                      tieCount[key] = index + 1;
+                      return index * 16.0;
+                    }(),
+                    child: _GbMark(entry: entry, width: markW),
+                  ),
+              ],
+            );
+          }),
+        ),
+      ],
+    );
+  }
+}
+
+class _GbMark extends StatelessWidget {
+  final ({String name, String label, double gb}) entry;
+  final double width;
+
+  const _GbMark({required this.entry, required this.width});
+
+  @override
+  Widget build(BuildContext context) {
+    final asset = teamLogoAsset(entry.name);
+    final abbrev = mlbTeamAbbrev(entry.name);
+    return SizedBox(
+      key: ValueKey('gb-mark-${entry.name}'),
+      width: width,
+      height: 44,
+      child: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          if (asset != null)
+            Image.asset(asset, height: 40, width: width, fit: BoxFit.contain)
+          else
+            Container(
+              height: 40,
+              width: width,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: const Color(0xFF37474F),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                abbrev ?? entry.name.characters.take(2).toString(),
+                style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+              ),
+            ),
+          Container(
+            width: width,
+            color: const Color(0xCC000000),
+            alignment: Alignment.center,
+            child: Text(
+              entry.label,
+              key: ValueKey('gb-label-${entry.name}'),
+              maxLines: 1,
+              style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold, height: 1.2),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 /// MLB ワイルドカード表は 9/1〜翌開幕までに出す。過去年は常に出す。
@@ -237,7 +377,7 @@ class SeasonTableBlock extends StatelessWidget {
 
     // 打撃/投手タイトル（画像に近い簡易版）: stats_player の形に合わせて抽出
     const battingTitles = ['打率', '本塁打', '打点', '盗塁', '出塁率', '最多安打', '長打率', 'OPS'];
-    const pitchingTitles = ['防御率', '最多勝', '奪三振', 'HP', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'QS率'];
+    const pitchingTitles = ['防御率', '最多勝', '奪三振', 'HP', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'K/BB', 'QS率'];
     final leagueStats = stats.where((e) => int.tryParse('${e['id_league']}') == leagueId).toList();
     final bat = _mergeStealSuccessRate(
       leagueStats.where((e) => battingTitles.contains(((e['title'] ?? '').toString())) || '${e['title'] ?? ''}' == '盗塁成功率').toList(),
@@ -561,8 +701,21 @@ class SeasonTableBlock extends StatelessWidget {
             );
           }
 
+          Widget sectionBlock(({String label, List<Map<String, dynamic>> rows}) section) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (headerPerSection && section.label.isNotEmpty) divisionBanner(section.label),
+                sectionTable(section),
+                const SizedBox(height: 8),
+                GamesBehindChart(rows: section.rows),
+              ],
+            );
+          }
+
           if (!headerPerSection) {
-            return sections.isEmpty ? const SizedBox.shrink() : sectionTable(sections.first);
+            return sections.isEmpty ? const SizedBox.shrink() : sectionBlock(sections.first);
           }
 
           return Column(
@@ -571,8 +724,7 @@ class SeasonTableBlock extends StatelessWidget {
             children: [
               for (var i = 0; i < sections.length; i++) ...[
                 if (i > 0) SizedBox(height: sections[i].label == 'ワイルドカード順位' ? 20 : 12),
-                if (sections[i].label.isNotEmpty) divisionBanner(sections[i].label),
-                sectionTable(sections[i]),
+                sectionBlock(sections[i]),
               ],
             ],
           );
@@ -585,6 +737,7 @@ class SeasonTableBlock extends StatelessWidget {
               key: ValueKey('gds-${org.kind.name}-$onlyLeagueId-$gamesDateFilter'),
               games: games,
               playerStats: stats,
+              standings: standings,
               initialDate: gamesDateFilter,
               headerColor: leagueColor,
               leagueId: leagueId,
@@ -720,6 +873,17 @@ const double _statsScrollBodyH = _statRowH * _statsScrollVisibleRows;
 /// MLB 個人成績の短縮チーム名列（半角3文字 + 余白）
 const double _mlbTeamAbbrevColW = 34.0;
 
+/// パワプロのポジション色を薄くした個人成績の地色。
+Color? personalStatPositionColor(String raw) {
+  final text = raw.trim();
+  if (text.isEmpty) return null;
+  if (text.contains('投')) return const Color(0xFFFFCDD2);
+  if (text.contains('捕')) return const Color(0xFFB3E5FC);
+  if (text.contains('外') || text == '左' || text == '中' || text == '右') return const Color(0xFFE6EE9C);
+  if (text.contains('内') || text == '一' || text == '二' || text == '三' || text == '遊') return const Color(0xFFFFF59D);
+  return null;
+}
+
 class PlayerStatCell extends StatelessWidget {
   final Map<String, dynamic> row;
   final double? width;
@@ -762,12 +926,15 @@ class PlayerStatCell extends StatelessWidget {
     final countryEmoji = '${row['emoji_country'] ?? ''}'.trim();
     final marks = [
       if (isJapan) (countryEmoji.isNotEmpty ? countryEmoji : '🇯🇵'),
+      if (isTrue(row['flg_saga'])) '佐',
       if (isTrue(row['flg_rookie'])) '🔰',
       if (isTrue(row['flg_career_this_year'])) '✨',
       if (isTrue(row['flg_under21'])) '🌱',
       if (isTrue(row['flg_age35'])) '🍁',
       if (isTrue(row['flg_retired'])) '💐',
+      if (isTrue(row['flg_injury'])) '🤕',
     ];
+    final positionBg = personalStatPositionColor('${row['txt_position'] ?? ''}');
     final compacted = compactPersonalStatName(name);
     final paren = compacted.indexOf('(');
     final label = paren >= 0 ? compacted.substring(0, paren) : compacted;
@@ -810,7 +977,15 @@ class PlayerStatCell extends StatelessWidget {
           fit: FlexFit.loose,
           child: OneLineShrinkText(label.isEmpty ? '—' : label, baseSize: 10, minSize: 1, fast: true, color: nameColor, weight: nameWeight, align: TextAlign.center),
         ),
-        for (final mark in marks) Text(mark, style: TextStyle(fontSize: 10, height: 1.0, color: nameColor)),
+        for (final mark in marks)
+          mark == '佐'
+              ? Container(
+                  margin: const EdgeInsets.only(left: 1),
+                  padding: const EdgeInsets.symmetric(horizontal: 1),
+                  decoration: BoxDecoration(color: const Color(0xFF0D47A1), borderRadius: BorderRadius.circular(2)),
+                  child: const Text('佐', style: TextStyle(fontSize: 9, height: 1.0, color: Colors.white, fontWeight: FontWeight.bold)),
+                )
+              : Text(mark, style: TextStyle(fontSize: 10, height: 1.0, color: nameColor)),
         if (suffix.isNotEmpty)
           Flexible(
             fit: FlexFit.loose,
@@ -850,7 +1025,8 @@ class PlayerStatCell extends StatelessWidget {
       width: width,
       height: _statRowH,
       child: ColoredBox(
-        color: isNoRank ? noRankBg : (isJapan && !hasPredictColor ? japanBg : Colors.transparent),
+        key: const ValueKey('player-stat-bg'),
+        color: isNoRank ? noRankBg : (positionBg ?? (isJapan && !hasPredictColor ? japanBg : Colors.transparent)),
         child: Container(
           decoration: BoxDecoration(border: Border.all(color: Colors.black26, width: 1)),
           child: Row(children: [
@@ -987,7 +1163,7 @@ Widget _statsGradHeader({
 String _normalizePersonalTitle(String t) => t == 'ホールド' ? 'HP' : t;
 
 bool _personalRowIsPitcher(Map<String, dynamic> row) {
-  const pitchingTitles = {'防御率', '最多勝', '奪三振', 'HP', 'ホールド', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'QS率'};
+  const pitchingTitles = {'防御率', '最多勝', '奪三振', 'HP', 'ホールド', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'K/BB', 'QS率'};
   final value = row['flg_pitcher'];
   if (value is bool) return value;
   final text = '$value'.trim().toLowerCase();
@@ -1394,7 +1570,7 @@ class ScrollLeaguePersonalStats extends StatelessWidget {
   });
 
   static const _battingCols = ['打率', '本塁打', '打点', '盗塁', '出塁率', '最多安打', '長打率', 'OPS'];
-  static const _pitchingCols = ['防御率', '最多勝', '奪三振', 'ホールド', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'QS率'];
+  static const _pitchingCols = ['防御率', '最多勝', '奪三振', 'ホールド', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'K/BB', 'QS率'];
 
   @override
   Widget build(BuildContext context) {
@@ -1507,7 +1683,7 @@ class _FillScrollLeaguePersonalStats extends StatelessWidget {
   });
 
   static const _battingCols = ['打率', '本塁打', '打点', '盗塁', '出塁率', '最多安打', '長打率', 'OPS'];
-  static const _pitchingCols = ['防御率', '最多勝', '奪三振', 'ホールド', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'QS率'];
+  static const _pitchingCols = ['防御率', '最多勝', '奪三振', 'ホールド', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'K/BB', 'QS率'];
 
   @override
   Widget build(BuildContext context) {
@@ -1692,7 +1868,7 @@ class ScrollBothLeaguePersonalStats extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final rows = stats.where((row) => _personalRowIsPitcher(row) == pitcher).toList();
-    final preferred = pitcher ? const ['防御率', '最多勝', '奪三振', 'ホールド', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'QS率'] : const ['打率', '本塁打', '打点', '盗塁', '出塁率', '最多安打', '長打率', 'OPS'];
+    final preferred = pitcher ? const ['防御率', '最多勝', '奪三振', 'ホールド', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'K/BB', 'QS率'] : const ['打率', '本塁打', '打点', '盗塁', '出塁率', '最多安打', '長打率', 'OPS'];
     final titles = _titlesInOrder(rows, preferred);
     if (titles.isEmpty) {
       return const Center(child: Text('成績はありません', style: TextStyle(fontSize: 12)));
@@ -1809,7 +1985,7 @@ class SegmentedLeaguePersonalStats extends StatefulWidget {
 
 class _SegmentedLeaguePersonalStatsState extends State<SegmentedLeaguePersonalStats> {
   static const _battingCols = ['打率', '本塁打', '打点', '盗塁', '出塁率', '最多安打', '長打率', 'OPS'];
-  static const _pitchingCols = ['防御率', '最多勝', '奪三振', 'ホールド', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'QS率'];
+  static const _pitchingCols = ['防御率', '最多勝', '奪三振', 'ホールド', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'K/BB', 'QS率'];
 
   bool _battingSelected = true;
   int _titleIndex = 0;
@@ -1890,7 +2066,7 @@ class BothLeaguePersonalStats extends StatefulWidget {
 
 class _BothLeaguePersonalStatsState extends State<BothLeaguePersonalStats> {
   static const _battingCols = ['打率', '本塁打', '打点', '盗塁', '出塁率', '最多安打', '長打率', 'OPS'];
-  static const _pitchingCols = ['防御率', '最多勝', '奪三振', 'ホールド', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'QS率'];
+  static const _pitchingCols = ['防御率', '最多勝', '奪三振', 'ホールド', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'K/BB', 'QS率'];
 
   bool _battingSelected = true;
   int _titleIndex = 0;

@@ -6,7 +6,8 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY scripts/cron_ping.sh /app/cron_ping.sh
+# ビルドの起点はリポジトリ直下。スクリプトは backend/scripts にある。
+COPY backend/scripts/cron_ping.sh /app/cron_ping.sh
 RUN chmod +x /app/cron_ping.sh
 
 ENTRYPOINT ["/app/cron_ping.sh"]

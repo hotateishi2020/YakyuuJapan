@@ -61,8 +61,49 @@ void main() {
     await tester.pump();
 
     expect(find.text('ワイルドカード順位'), findsOneWidget);
-    expect(find.text('-'), findsOneWidget);
+    expect(find.text('-'), findsNWidgets(2));
+    expect(find.text('ゲーム差'), findsWidgets);
     expect(find.text('1'), findsWidgets);
+  });
+
+  test('games behind places the leader at zero', () {
+    expect(gamesBehindEntry('阪神', '-'), (name: '阪神', label: '-', gb: 0));
+    expect(gamesBehindEntry('巨人', '2.5').gb, 2.5);
+    expect(gbMarkLeft(0, 4, 340, 40), 0);
+    expect(gbMarkLeft(2, 4, 340, 40), 150);
+    expect(gbMarkLeft(4, 4, 340, 40), 300);
+  });
+
+  testWidgets('ゲーム差の割合だけロゴを離し、画像の中に勝差を出す', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 340,
+            child: GamesBehindChart(rows: [
+              {'name_team': '阪神', 'game_behind': '-'},
+              {'name_team': '巨人', 'game_behind': '2'},
+              {'name_team': '中日', 'game_behind': '4'},
+            ]),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    final lead = tester.getTopLeft(find.byKey(const ValueKey('gb-mark-阪神')));
+    final mid = tester.getTopLeft(find.byKey(const ValueKey('gb-mark-巨人')));
+    final last = tester.getTopLeft(find.byKey(const ValueKey('gb-mark-中日')));
+    expect(lead.dx, lessThan(mid.dx));
+    expect(mid.dx, lessThan(last.dx));
+    expect(((mid.dx - lead.dx) - (last.dx - mid.dx)).abs(), lessThan(1));
+    expect(find.text('-'), findsOneWidget);
+    expect(find.text('2'), findsOneWidget);
+    expect(find.text('4'), findsOneWidget);
+    final label = tester.getRect(find.byKey(const ValueKey('gb-label-阪神')));
+    final mark = tester.getRect(find.byKey(const ValueKey('gb-mark-阪神')));
+    expect(label.center.dx, closeTo(mark.center.dx, 1));
+    expect(label.bottom, lessThanOrEqualTo(mark.bottom + 1));
+    expect(label.top, greaterThan(mark.top));
   });
 
   test('個人成績の選手名から姓名の空白を除く', () {
@@ -109,6 +150,39 @@ void main() {
       ),
     );
     expect(find.text('💐'), findsOneWidget);
+  });
+
+  test('個人成績の地色はポジションで分かれる', () {
+    expect(personalStatPositionColor('捕手'), const Color(0xFFB3E5FC));
+    expect(personalStatPositionColor('外野手'), const Color(0xFFE6EE9C));
+    expect(personalStatPositionColor('内野手'), const Color(0xFFFFF59D));
+    expect(personalStatPositionColor('投手'), const Color(0xFFFFCDD2));
+    expect(personalStatPositionColor('左'), const Color(0xFFE6EE9C));
+    expect(personalStatPositionColor(''), isNull);
+  });
+
+  testWidgets('佐賀出身と故障者にはマークを付ける', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: PlayerStatCell(
+            row: {
+              'int_rank': 3,
+              'name_team': 'ソ',
+              'name_player': '甲斐野央',
+              'stats': '1.80',
+              'flg_saga': true,
+              'flg_injury': true,
+              'txt_position': '投手',
+            },
+          ),
+        ),
+      ),
+    );
+    expect(find.text('佐'), findsOneWidget);
+    expect(find.text('🤕'), findsOneWidget);
+    final bg = tester.widget<ColoredBox>(find.byKey(const ValueKey('player-stat-bg')));
+    expect(bg.color, personalStatPositionColor('投手'));
   });
 }
 

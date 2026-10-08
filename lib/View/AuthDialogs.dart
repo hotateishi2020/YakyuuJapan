@@ -151,7 +151,9 @@ class _RegisterDialogState extends State<_RegisterDialog> {
   final _mailCtrl = TextEditingController();
   final _handleCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
+  final _codeCtrl = TextEditingController();
   var _busy = false;
+  var _codeSent = false;
   String? _error;
 
   @override
@@ -159,6 +161,7 @@ class _RegisterDialogState extends State<_RegisterDialog> {
     _mailCtrl.dispose();
     _handleCtrl.dispose();
     _passCtrl.dispose();
+    _codeCtrl.dispose();
     super.dispose();
   }
 
@@ -168,19 +171,27 @@ class _RegisterDialogState extends State<_RegisterDialog> {
       _busy = true;
       _error = null;
     });
-    final err = await AuthSession.instance.register(
+    final result = await AuthSession.instance.register(
       mailaddress: _mailCtrl.text,
       nameHandle: _handleCtrl.text,
       password: _passCtrl.text,
+      code: _codeSent ? _codeCtrl.text : '',
     );
     if (!mounted) return;
-    if (err == null) {
+    if (result.codeSent) {
+      setState(() {
+        _busy = false;
+        _codeSent = true;
+      });
+      return;
+    }
+    if (result.error == null) {
       TextInput.finishAutofillContext(shouldSave: true);
       Navigator.of(context).pop(true);
     } else {
       setState(() {
         _busy = false;
-        _error = err;
+        _error = result.error;
       });
     }
   }
@@ -233,6 +244,25 @@ class _RegisterDialogState extends State<_RegisterDialog> {
                   ),
                   onSubmitted: (_) => _submit(),
                 ),
+                if (_codeSent) ...[
+                  const SizedBox(height: 10),
+                  const Text(
+                    'メールに届いた認証コードを入力してください。',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _codeCtrl,
+                    keyboardType: TextInputType.number,
+                    textInputAction: TextInputAction.done,
+                    decoration: const InputDecoration(
+                      labelText: '認証コード',
+                      border: OutlineInputBorder(),
+                      isDense: true,
+                    ),
+                    onSubmitted: (_) => _submit(),
+                  ),
+                ],
                 if (_error != null) ...[
                   const SizedBox(height: 8),
                   Text(_error!, style: const TextStyle(color: Colors.red, fontSize: 12)),
@@ -251,7 +281,7 @@ class _RegisterDialogState extends State<_RegisterDialog> {
           onPressed: _busy ? null : _submit,
           child: _busy
               ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-              : const Text('登録する'),
+              : Text(_codeSent ? '認証して登録' : '認証コードを送る'),
         ),
       ],
     );

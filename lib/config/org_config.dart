@@ -24,9 +24,6 @@ class OrgConfig {
   final Color tabColor;
   final Color tabForeground;
   final List<OrgLeague> leagues;
-  final String gamesFetchPath;
-  final String teamStatsFetchPath;
-  final String playerStatsFetchPath;
 
   const OrgConfig({
     required this.kind,
@@ -35,9 +32,6 @@ class OrgConfig {
     required this.tabColor,
     required this.tabForeground,
     required this.leagues,
-    required this.gamesFetchPath,
-    required this.teamStatsFetchPath,
-    required this.playerStatsFetchPath,
   });
 
   Set<int> get leagueIds => {for (final league in leagues) league.id};
@@ -84,9 +78,6 @@ class OrgConfig {
       OrgLeague(id: 1, name: 'セ・リーグ', color: Color(0xFF0E8E2D), logoAsset: 'backend/assets/images/k-central.webp'),
       OrgLeague(id: 2, name: 'パ・リーグ', color: Color(0xFF01B1EA), logoAsset: 'backend/assets/images/k-pacific.webp'),
     ],
-    gamesFetchPath: '/fetchGamesNPB',
-    teamStatsFetchPath: '/fetchStatsTeamNPB',
-    playerStatsFetchPath: '/fetchStatsPlayerNPB',
   );
 
   static const mlb = OrgConfig(
@@ -99,9 +90,6 @@ class OrgConfig {
       OrgLeague(id: 3, name: 'ア・リーグ', color: Color(0xFFC8102E)),
       OrgLeague(id: 4, name: 'ナ・リーグ', color: Color(0xFF002D72)),
     ],
-    gamesFetchPath: '/fetchGamesMLB',
-    teamStatsFetchPath: '/fetchStatsTeamMLB',
-    playerStatsFetchPath: '/fetchStatsPlayerMLB',
   );
 
   static OrgConfig of(OrgKind kind) => kind == OrgKind.mlb ? mlb : npb;

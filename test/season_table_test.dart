@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/View/BlinkBg.dart';
@@ -67,6 +69,63 @@ void main() {
     expect(find.text('1'), findsWidgets);
   });
 
+  testWidgets('横長で3地区の順位表が画面に収まりきらなくても溢れない', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(1100, 640));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    Map<String, dynamic> team({
+      required int id,
+      required String name,
+      required String area,
+      required String behind,
+    }) {
+      return {
+        'id_league': 3,
+        'id_team': id,
+        'name_team': name,
+        'code_area': area,
+        'int_rank': 1,
+        'int_win': 10,
+        'int_lose': 5,
+        'int_draw': 0,
+        'int_game': 15,
+        'game_behind': behind,
+        'pct_win': '.500',
+      };
+    }
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SeasonTableBlock(
+          org: OrgConfig.mlb,
+          onlyLeagueId: 3,
+          seasonYear: 2026,
+          standings: [
+            team(id: 1, name: 'ヤンキース', area: 'EAST', behind: '-'),
+            team(id: 2, name: 'レッドソックス', area: 'EAST', behind: '4.5'),
+            team(id: 3, name: 'オリオールズ', area: 'EAST', behind: '6.5'),
+            team(id: 4, name: 'レイズ', area: 'EAST', behind: '7.5'),
+            team(id: 5, name: 'ブルージェイズ', area: 'EAST', behind: '8'),
+            team(id: 6, name: 'ガーディアンズ', area: 'CENTER', behind: '-'),
+            team(id: 7, name: 'タイガース', area: 'CENTER', behind: '2'),
+            team(id: 8, name: 'ロイヤルズ', area: 'CENTER', behind: '4'),
+            team(id: 9, name: 'ツインズ', area: 'CENTER', behind: '6'),
+            team(id: 10, name: 'ホワイトソックス', area: 'CENTER', behind: '10'),
+            team(id: 11, name: 'アストロズ', area: 'WEST', behind: '-'),
+            team(id: 12, name: 'マリナーズ', area: 'WEST', behind: '3'),
+            team(id: 13, name: 'レンジャーズ', area: 'WEST', behind: '5'),
+            team(id: 14, name: 'アスレチックス', area: 'WEST', behind: '8'),
+            team(id: 15, name: 'エンゼルス', area: 'WEST', behind: '12'),
+          ],
+          stats: const [],
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    expect(find.text('東地区'), findsOneWidget);
+    expect(find.text('西地区'), findsOneWidget);
+  });
+
   test('games behind places the leader at zero', () {
     expect(gamesBehindEntry('阪神', '-'), (name: '阪神', abbrev: '', label: '-', gb: 0));
     expect(gamesBehindEntry('巨人', '2.5').gb, 2.5);
@@ -79,34 +138,53 @@ void main() {
     expect(layout.logos[0].left, greaterThan(layout.logos[1].left));
     expect(layout.logos[1].left, greaterThan(layout.logos[2].left));
     expect(layout.logos[0].left - layout.logos[1].left, greaterThan(layout.logos[1].left - layout.logos[2].left));
-    expect(layout.logos[0].top, layout.logos[2].top);
+    expect(layout.logos[0].top, lessThan(layout.logos[1].top));
+    expect(layout.logos[1].top, lessThan(layout.logos[2].top));
   });
 
-  test('ゲーム差0は縦に重ね、線も数字も出さない', () {
+  test('ゲーム差0は横に並べ、線も数字も出さない', () {
     final layout = layoutGamesBehindChart([
       gamesBehindEntry('1位', '-'),
       gamesBehindEntry('2位', '0'),
       gamesBehindEntry('3位', '0'),
     ]);
     expect(layout.links, isEmpty);
-    expect(layout.logos[0].left, layout.logos[1].left);
-    expect(layout.logos[1].left, layout.logos[2].left);
-    expect(layout.logos[1].top, greaterThan(layout.logos[0].top));
-    expect(layout.logos[2].top, greaterThan(layout.logos[1].top));
+    expect(layout.logos[0].top, closeTo(layout.logos[1].top, 0.01));
+    expect(layout.logos[1].top, closeTo(layout.logos[2].top, 0.01));
+    expect(layout.logos[0].left, greaterThan(layout.logos[1].left));
+    expect(layout.logos[1].left, greaterThan(layout.logos[2].left));
   });
 
-  test('狭いゲーム差が続くときは上下交互に迂回する', () {
+  test('斜線は一直線で、数字は点線に重ならない', () {
     final layout = layoutGamesBehindChart([
       gamesBehindEntry('1位', '-'),
       gamesBehindEntry('2位', '0.5'),
       gamesBehindEntry('3位', '0.5'),
       gamesBehindEntry('4位', '0.5'),
     ]);
-    expect(layout.links.every((link) => link.side), isTrue);
-    expect(layout.links[0].sideBelow, isFalse);
-    expect(layout.links[1].sideBelow, isTrue);
-    expect(layout.links[2].sideBelow, isFalse);
+    expect(layout.links.length, 3);
     expect(layout.logos.first.left, greaterThan(layout.logos.last.left));
+    final size = layout.logoSize;
+    final centers = [
+      for (final logo in layout.logos) Offset(logo.left + size / 2, logo.top + size / 2),
+    ];
+    final abx = centers[1].dx - centers[0].dx;
+    final aby = centers[1].dy - centers[0].dy;
+    for (var i = 2; i < centers.length; i++) {
+      final acx = centers[i].dx - centers[0].dx;
+      final acy = centers[i].dy - centers[0].dy;
+      expect((abx * acy - aby * acx).abs(), lessThan(0.6));
+    }
+    double yAt(double x) {
+      final t = (x - centers.last.dx) / (centers.first.dx - centers.last.dx);
+      return centers.last.dy + t * (centers.first.dy - centers.last.dy);
+    }
+
+    for (final link in layout.links) {
+      final textW = gbChartLabelWidth(link.label);
+      final lineHigh = math.min(yAt(link.labelLeft), yAt(link.labelLeft + textW));
+      expect(link.labelTop + gbChartLabelH, lessThan(lineHigh - 1));
+    }
     var logoTop = layout.logos.first.top;
     var logoBottom = layout.logos.first.top + layout.logoSize;
     for (final logo in layout.logos) {
@@ -150,17 +228,30 @@ void main() {
     final last = tester.getRect(find.byKey(const ValueKey('gb-mark-中日')));
     expect(last.right, lessThan(mid.left));
     expect(mid.right, lessThan(lead.left));
-    expect(lead.top, closeTo(mid.top, 0.5));
-    expect(mid.top, closeTo(last.top, 0.5));
+    expect(lead.top, lessThan(mid.top));
+    expect(mid.top, lessThan(last.top));
     final tight = lead.left - mid.right;
     final wide = mid.left - last.right;
-    expect(wide, greaterThan(tight * 3));
+    expect(wide, greaterThan(tight));
     final small = tester.getRect(find.byKey(const ValueKey('gb-gap-阪神-巨人')));
     final big = tester.getRect(find.byKey(const ValueKey('gb-gap-巨人-中日')));
-    expect(small.bottom, lessThan(lead.top + 1));
-    expect(big.left, greaterThan(last.left));
-    expect(big.right, lessThan(mid.right));
-    expect(big.top, greaterThan(mid.center.dy - 1));
+    expect(small.overlaps(lead), isFalse);
+    expect(small.overlaps(mid), isFalse);
+    expect(big.overlaps(mid), isFalse);
+    expect(big.overlaps(last), isFalse);
+    double yAt(double x) {
+      final t = (x - last.center.dx) / (lead.center.dx - last.center.dx);
+      return last.center.dy + t * (lead.center.dy - last.center.dy);
+    }
+
+    double lineHigh(Rect label) {
+      final left = yAt(label.left);
+      final right = yAt(label.right);
+      return left < right ? left : right;
+    }
+
+    expect(small.bottom, lessThan(lineHigh(small)));
+    expect(big.bottom, lessThan(lineHigh(big)));
   });
 
   testWidgets('ゲーム差の図は1位を右、最下位を左に並べる', (tester) async {
@@ -185,6 +276,8 @@ void main() {
     final sixth = tester.getTopLeft(find.byKey(const ValueKey('gb-mark-6位')));
     expect(first.dx, greaterThan(second.dx));
     expect(second.dx, greaterThan(sixth.dx));
+    expect(first.dy, lessThan(second.dy));
+    expect(second.dy, lessThan(sixth.dy));
   });
 
   testWidgets('MLBのゲーム差は略称に対応するロゴを出す', (tester) async {

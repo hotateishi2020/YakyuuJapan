@@ -34,6 +34,18 @@ void main() {
     expect(isHeatedGame('試合前', -1, -1), isFalse);
   });
 
+  test('finishedGameOutcome is win, lose, or draw only after the game ends', () {
+    expect(finishedGameOutcome('試合終了', 3, 1), FinishedGameOutcome.homeWin);
+    expect(finishedGameOutcome('コールド', 1, 4), FinishedGameOutcome.awayWin);
+    expect(finishedGameOutcome('試合終了', 2, 2), FinishedGameOutcome.draw);
+    expect(finishedGameOutcome('9回裏', 3, 1), isNull);
+    expect(finishedGameOutcome('試合終了', -1, 2), isNull);
+    expect(teamResultBadge(FinishedGameOutcome.homeWin, home: true), resultBadgeWin);
+    expect(teamResultBadge(FinishedGameOutcome.homeWin, home: false), resultBadgeLose);
+    expect(teamResultBadge(FinishedGameOutcome.awayWin, home: true), resultBadgeLose);
+    expect(teamResultBadge(FinishedGameOutcome.draw, home: true), isNull);
+  });
+
   test('liveAtBatHalf reads the batting inning from game state', () {
     expect(liveAtBatHalf('4回裏'), (inning: 4, bottom: true));
     expect(liveAtBatHalf('12回表'), (inning: 12, bottom: false));
@@ -1023,6 +1035,82 @@ void main() {
       return provider is AssetImage && provider.assetName == 'backend/assets/images/team_s.png';
     }).first);
     expect(homeLogo.height, closeTo(44 * 0.8, 6));
+  });
+
+  Finder _resultBadge(String asset) {
+    return find.byWidgetPredicate((widget) {
+      if (widget is! Image) return false;
+      final provider = widget.image;
+      return provider is AssetImage && provider.assetName == asset;
+    });
+  }
+
+  Future<void> _pumpFinishedGame(
+    WidgetTester tester, {
+    required int scoreHome,
+    required int scoreAway,
+  }) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 520,
+            height: 320,
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
+              games: [
+                {
+                  'date_game': '2026-10-07',
+                  'time_game': '18:00',
+                  'name_team_home': 'ヤクルト',
+                  'name_team_away': '巨人',
+                  'name_stadium': '神宮',
+                  'score_home': scoreHome,
+                  'score_away': scoreAway,
+                  'state': '試合終了',
+                  'id_team_home': 4,
+                  'id_team_away': 1,
+                  'color_back_home': '#1D4E89',
+                  'color_back_away': '#F15A22',
+                  'color_font_home': 'white',
+                  'color_font_away': 'black',
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+  }
+
+  testWidgets('finished games show win and lose above the team names', (tester) async {
+    await _pumpFinishedGame(tester, scoreHome: 3, scoreAway: 1);
+    expect(_resultBadge(resultBadgeWin), findsOneWidget);
+    expect(_resultBadge(resultBadgeLose), findsOneWidget);
+    expect(_resultBadge(resultBadgeDraw), findsNothing);
+    final win = tester.getRect(_resultBadge(resultBadgeWin));
+    final lose = tester.getRect(_resultBadge(resultBadgeLose));
+    final homeName = tester.getRect(find.text('ヤクルト'));
+    final awayName = tester.getRect(find.text('巨人'));
+    expect(win.bottom, lessThanOrEqualTo(homeName.top + 1));
+    expect(lose.bottom, lessThanOrEqualTo(awayName.top + 1));
+    expect(win.center.dx, closeTo(homeName.center.dx, 12));
+    expect(lose.center.dx, closeTo(awayName.center.dx, 12));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a draw shows DRAW under the score and not on the team names', (tester) async {
+    await _pumpFinishedGame(tester, scoreHome: 2, scoreAway: 2);
+    expect(_resultBadge(resultBadgeDraw), findsOneWidget);
+    expect(_resultBadge(resultBadgeWin), findsNothing);
+    expect(_resultBadge(resultBadgeLose), findsNothing);
+    final draw = tester.getRect(_resultBadge(resultBadgeDraw));
+    final score = tester.getRect(find.text('2 - 2'));
+    expect(draw.top, greaterThanOrEqualTo(score.bottom - 1));
+    expect(draw.center.dx, closeTo(score.center.dx, 16));
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('starter season ranks show beside wins era and strikeouts when qualified', (tester) async {

@@ -27,7 +27,7 @@ cp -R build/web/* backend/public/
 
 git add . 
 
-git commit -m "個人成績にパワプロカラーを適用しました。初期表示の高速化をしました。" 
+git commit -m "ゲーム差を視覚的に表現する図を表示するようにしました。" 
 
 git push 
 

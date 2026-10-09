@@ -16,6 +16,7 @@ import 'app/AppSql.dart';
 import 'app/Achieve.dart';
 import 'app/AceEvaluator.dart';
 import 'app/DisplaySnapshot.dart';
+import 'app/GamesReadGate.dart';
 import 'app/FetchURL.dart';
 import 'app/GamesFetch.dart';
 import 'app/FetchMLB.dart';
@@ -35,6 +36,9 @@ final Map<String, DateTime> _predictionsCacheAt = {};
 /// /predictions/part 用（org|part）
 final Map<String, String> _predictionsPartCacheBody = {};
 final Map<String, DateTime> _predictionsPartCacheAt = {};
+/// 試合パートで前回読んだ t_game の更新日時。同じなら集計SQLを出さない。
+final Map<String, String> _predictionsGamesRevision = {};
+final Map<String, String> _pendingGamesRevision = {};
 const Duration _predictionsCacheTtl = Duration(seconds: 45);
 
 void _clearPredictionsCache() {
@@ -42,6 +46,72 @@ void _clearPredictionsCache() {
   _predictionsCacheAt.clear();
   _predictionsPartCacheBody.clear();
   _predictionsPartCacheAt.clear();
+  _predictionsGamesRevision.clear();
+  _pendingGamesRevision.clear();
+}
+
+/// 該当 t_game の更新日時が前回と同じなら、試合集計のSQLを出さずに前回分を使う。
+Future<Response?> _unchangedGamesResponse(
+  OrgKind org,
+  int year,
+  String cacheKey,
+  String? from,
+  String? to, {
+  required bool clientHasGames,
+}) async {
+  String revision;
+  try {
+    revision = await Postgres.withConnection(
+      (conn) => GamesReadGate.revision(
+        conn,
+        leagueIds: org.leagueIds,
+        year: year,
+        from: from,
+        to: to,
+      ),
+    );
+  } catch (e, st) {
+    print('t_game 更新日時の確認に失敗: $e');
+    print(st);
+    _pendingGamesRevision.remove(cacheKey);
+    return null;
+  }
+  final cachedBody = _predictionsPartCacheBody[cacheKey];
+  if (!GamesReadGate.reuse(
+    cachedBody: cachedBody,
+    previousRevision: _predictionsGamesRevision[cacheKey],
+    revision: revision,
+  )) {
+    _pendingGamesRevision[cacheKey] = revision;
+    return null;
+  }
+  // 画面がまだ試合を持っていないときは、集計SQLを出さずに前回の本文を返す。
+  if (!clientHasGames && cachedBody != null) {
+    return Response.ok(
+      cachedBody,
+      headers: {
+        'content-type': 'application/json; charset=utf-8',
+        'x-cache': 'UNCHANGED',
+        'x-org': org.code,
+        'x-part': 'games',
+      },
+    );
+  }
+  return Response.ok(
+    jsonEncode({
+      'ok': true,
+      'unchanged': true,
+      'part': 'games',
+      'org': org.code,
+      'year': year,
+    }),
+    headers: {
+      'content-type': 'application/json; charset=utf-8',
+      'x-cache': 'UNCHANGED',
+      'x-org': org.code,
+      'x-part': 'games',
+    },
+  );
 }
 
 Future<Map<String, dynamic>> _buildPredictionsPartInfo(OrgKind org) async {
@@ -1056,8 +1126,19 @@ void main() async {
         }
         final window = part == 'games' ? _gamesQueryWindow(request, year) : (from: null, to: null);
         final cacheKey = window.from != null ? '${org.code}|$part|$year|${window.from}|${window.to}' : '${org.code}|$part|$year';
+        if (part == 'games') {
+          final unchanged = await _unchangedGamesResponse(
+            org,
+            year,
+            cacheKey,
+            window.from,
+            window.to,
+            clientHasGames: request.url.queryParameters['have'] == '1',
+          );
+          if (unchanged != null) return unchanged;
+        }
         final now = DateTime.now();
-        if (request.url.queryParameters['fresh'] != '1') {
+        if (part != 'games' && request.url.queryParameters['fresh'] != '1') {
           final cachedBody = _predictionsPartCacheBody[cacheKey];
           final cachedAt = _predictionsPartCacheAt[cacheKey];
           if (cachedBody != null && cachedAt != null && now.difference(cachedAt) < _predictionsCacheTtl) {
@@ -1076,6 +1157,10 @@ void main() async {
         final body = jsonEncode(payload);
         _predictionsPartCacheBody[cacheKey] = body;
         _predictionsPartCacheAt[cacheKey] = DateTime.now();
+        if (part == 'games') {
+          final revision = _pendingGamesRevision.remove(cacheKey);
+          if (revision != null) _predictionsGamesRevision[cacheKey] = revision;
+        }
         return Response.ok(
           body,
           headers: {

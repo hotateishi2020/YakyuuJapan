@@ -573,6 +573,33 @@ bool gameHasStarted(Map<String, dynamic> game) {
   return home >= 0 && away >= 0;
 }
 
+const resultBadgeWin = 'backend/assets/images/result_win.png';
+const resultBadgeLose = 'backend/assets/images/result_lose.png';
+const resultBadgeDraw = 'backend/assets/images/result_draw.png';
+
+enum FinishedGameOutcome { homeWin, awayWin, draw }
+
+/// 試合終了・コールドでスコアが揃っているときだけ勝敗を返す。
+FinishedGameOutcome? finishedGameOutcome(String state, int scoreHome, int scoreAway) {
+  if (!state.contains('試合終了') && !state.contains('コールド')) return null;
+  if (scoreHome < 0 || scoreAway < 0) return null;
+  if (scoreHome == scoreAway) return FinishedGameOutcome.draw;
+  if (scoreHome > scoreAway) return FinishedGameOutcome.homeWin;
+  return FinishedGameOutcome.awayWin;
+}
+
+String? teamResultBadge(FinishedGameOutcome? outcome, {required bool home}) {
+  switch (outcome) {
+    case FinishedGameOutcome.homeWin:
+      return home ? resultBadgeWin : resultBadgeLose;
+    case FinishedGameOutcome.awayWin:
+      return home ? resultBadgeLose : resultBadgeWin;
+    case FinishedGameOutcome.draw:
+    case null:
+      return null;
+  }
+}
+
 bool gameIsInProgress(Map<String, dynamic> game) {
   final state = '${game['state'] ?? ''}'.trim();
   if (gameIsPregameState(state)) return false;
@@ -2768,7 +2795,7 @@ class _TableGameCard extends StatelessWidget {
   /// 表示枠の縦横比が変わっても、BoxFit.cover と同じ切り抜きに載せる。
   static const _defensePosOnImage = <String, Offset>{
     '投': Offset(0.50, 0.57),
-    '捕': Offset(0.50, 0.78),
+    '捕': Offset(0.50, 0.72),
     '一': Offset(0.63, 0.62),
     '二': Offset(0.56, 0.49),
     '三': Offset(0.37, 0.62),
@@ -2776,10 +2803,10 @@ class _TableGameCard extends StatelessWidget {
     '左': Offset(0.30, 0.38),
     '中': Offset(0.50, 0.30),
     '右': Offset(0.70, 0.38),
-    '指': Offset(0.18, 0.88),
+    '指': Offset(0.18, 0.80),
   };
 
-  /// 中堅（上）から捕手（下）までが枠に入る切り抜き。入りきらない縦横比では全体を収める。
+  /// セル全体を覆う切り抜き。縦が足りるときは中堅から捕手が見える位置に寄せる。
   static ({BoxFit fit, Alignment alignment, Offset origin, double drawn}) defenseImageFrame(Size box) {
     const image = 1024.0;
     const bandTop = 0.22;
@@ -2790,24 +2817,90 @@ class _TableGameCard extends StatelessWidget {
     final coverScale = math.max(box.width / image, box.height / image);
     final coverDrawn = image * coverScale;
     final visibleH = box.height / coverDrawn;
-    if (visibleH + 0.001 >= bandBottom - bandTop) {
-      final imageTop = ((bandTop + bandBottom) / 2 - visibleH / 2).clamp(0.0, math.max(0.0, 1 - visibleH));
-      final dy = -imageTop * coverDrawn;
-      final dx = (box.width - coverDrawn) / 2;
-      final denom = box.height - coverDrawn;
-      final ay = denom.abs() < 0.5 ? 0.0 : ((dy * 2 / denom) - 1).clamp(-1.0, 1.0);
-      return (fit: BoxFit.cover, alignment: Alignment(0, ay), origin: Offset(dx, dy), drawn: coverDrawn);
-    }
-    final containScale = math.min(box.width / image, box.height / image);
-    final drawn = image * containScale;
-    final origin = Offset((box.width - drawn) / 2, (box.height - drawn) / 2);
-    return (fit: BoxFit.contain, alignment: Alignment.center, origin: origin, drawn: drawn);
+    final imageTop = visibleH >= 1 ? 0.0 : ((bandTop + bandBottom) / 2 - visibleH / 2).clamp(0.0, math.max(0.0, 1 - visibleH));
+    final dy = -imageTop * coverDrawn;
+    final dx = (box.width - coverDrawn) / 2;
+    final denom = box.height - coverDrawn;
+    final ay = denom.abs() < 0.5 ? 0.0 : ((dy * 2 / denom) - 1).clamp(-1.0, 1.0);
+    return (fit: BoxFit.cover, alignment: Alignment(0, ay), origin: Offset(dx, dy), drawn: coverDrawn);
   }
 
   /// 1024×1024 の球場画像を [box] に合わせたときの、画像上の点。
   static Offset defenseImagePoint(Offset fraction, Size box) {
     final frame = defenseImageFrame(box);
     return frame.origin + Offset(fraction.dx * frame.drawn, fraction.dy * frame.drawn);
+  }
+
+  /// 名札の中心を、枠の中で重ならない位置へずらす。
+  static List<Offset> separateDefenseNameCenters(List<Offset> centers, List<Size> sizes, Size box) {
+    if (centers.isEmpty) return const [];
+    final placed = [...centers];
+    const gap = 2.0;
+    for (var iter = 0; iter < 16; iter++) {
+      var moved = false;
+      for (var i = 0; i < placed.length; i++) {
+        for (var j = i + 1; j < placed.length; j++) {
+          final overlapX = (sizes[i].width + sizes[j].width) / 2 + gap - (placed[j].dx - placed[i].dx).abs();
+          final overlapY = (sizes[i].height + sizes[j].height) / 2 + gap - (placed[j].dy - placed[i].dy).abs();
+          if (overlapX <= 0 || overlapY <= 0) continue;
+          if (overlapX < overlapY) {
+            final sign = placed[j].dx >= placed[i].dx ? 1.0 : -1.0;
+            final push = overlapX / 2;
+            placed[i] = Offset(placed[i].dx - sign * push, placed[i].dy);
+            placed[j] = Offset(placed[j].dx + sign * push, placed[j].dy);
+          } else {
+            final sign = placed[j].dy >= placed[i].dy ? 1.0 : -1.0;
+            final push = overlapY / 2;
+            placed[i] = Offset(placed[i].dx, placed[i].dy - sign * push);
+            placed[j] = Offset(placed[j].dx, placed[j].dy + sign * push);
+          }
+          moved = true;
+        }
+      }
+      if (!moved) break;
+    }
+    double clampCenter(double value, double half, double extent) {
+      if (half * 2 >= extent) return extent / 2;
+      return value.clamp(half, extent - half);
+    }
+
+    for (var i = 0; i < placed.length; i++) {
+      placed[i] = Offset(
+        clampCenter(placed[i].dx, sizes[i].width / 2, box.width),
+        clampCenter(placed[i].dy, sizes[i].height / 2, box.height),
+      );
+    }
+    return placed;
+  }
+
+  Size _defenseSpotSize(
+    ({String pos, String starter, List<String> pinches, String starterMarks, List<String> pinchMarks}) spot,
+    TextScaler scaler,
+  ) {
+    Size labelSize(String name, String marks, {required bool pinch}) {
+      final fontSize = pinch ? 8.0 : 9.0;
+      final painter = TextPainter(
+        text: TextSpan(
+          text: pinch ? '(${_diagramName(name)})' : _diagramName(name),
+          style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w700, height: 1.05),
+        ),
+        textDirection: TextDirection.ltr,
+        textScaler: scaler,
+        maxLines: 1,
+      )..layout();
+      final badges = marks.split(RegExp(r'\s+')).where((part) => part == 'E' || part == 'FP').length;
+      return Size(painter.width + 6 + badges * 18, painter.height + 2);
+    }
+
+    final starter = labelSize(spot.starter, spot.starterMarks, pinch: false);
+    var width = starter.width;
+    var height = starter.height;
+    for (var i = 0; i < spot.pinches.length; i++) {
+      final pinch = labelSize(spot.pinches[i], i < spot.pinchMarks.length ? spot.pinchMarks[i] : '', pinch: true);
+      width = math.max(width, pinch.width);
+      height += pinch.height;
+    }
+    return Size(width, height);
   }
 
   String _currentPitcherName({required bool home}) {
@@ -2955,7 +3048,16 @@ class _TableGameCard extends StatelessWidget {
       child: LayoutBuilder(builder: (context, constraints) {
         final w = constraints.maxWidth.isFinite ? constraints.maxWidth : 120.0;
         final h = constraints.maxHeight.isFinite ? constraints.maxHeight : _defenseRowH;
-        final frame = defenseImageFrame(Size(w, h));
+        final box = Size(w, h);
+        final frame = defenseImageFrame(box);
+        final scaler = MediaQuery.textScalerOf(context);
+        final centers = separateDefenseNameCenters(
+          [
+            for (final spot in spots) defenseImagePoint(_defensePosOnImage[spot.pos] ?? const Offset(0.5, 0.5), box),
+          ],
+          [for (final spot in spots) _defenseSpotSize(spot, scaler)],
+          box,
+        );
         return SizedBox(
           width: w,
           height: h,
@@ -2973,9 +3075,10 @@ class _TableGameCard extends StatelessWidget {
                   )
                 else
                   const ColoredBox(color: Color(0xFF1B5E20)),
-                for (final spot in spots)
+                for (var i = 0; i < spots.length; i++)
                   () {
-                    final at = defenseImagePoint(_defensePosOnImage[spot.pos] ?? const Offset(0.5, 0.5), Size(w, h));
+                    final spot = spots[i];
+                    final at = centers[i];
                     return Positioned(
                       left: at.dx,
                       top: at.dy,
@@ -3702,6 +3805,7 @@ class _TableGameCard extends StatelessWidget {
     required String awayName,
     String? homeAbbrev,
     String? awayAbbrev,
+    bool draw = false,
   }) {
     final shownState = displayBoardState(state);
     return _cell(
@@ -3722,6 +3826,7 @@ class _TableGameCard extends StatelessWidget {
               awayName: awayName,
               homeAbbrev: homeAbbrev,
               awayAbbrev: awayAbbrev,
+              draw: draw,
             ),
           ),
           Expanded(
@@ -3748,6 +3853,7 @@ class _TableGameCard extends StatelessWidget {
     required String awayName,
     String? homeAbbrev,
     String? awayAbbrev,
+    bool draw = false,
   }) {
     final logoSide = height * 0.8;
     const sidePad = 4.0;
@@ -3776,6 +3882,16 @@ class _TableGameCard extends StatelessWidget {
             height: 1.0,
           ),
         ),
+        if (draw)
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Image.asset(
+              resultBadgeDraw,
+              height: 14,
+              fit: BoxFit.contain,
+              filterQuality: FilterQuality.medium,
+            ),
+          ),
         if (heated)
           BlinkBg(
             key: const ValueKey('heated-game'),
@@ -3871,6 +3987,7 @@ class _TableGameCard extends StatelessWidget {
     required String awayName,
     String? homeAbbrev,
     String? awayAbbrev,
+    bool draw = false,
     Color? homeBg,
     Color? awayBg,
     Color? homeFg,
@@ -3892,6 +4009,7 @@ class _TableGameCard extends StatelessWidget {
           awayName: awayName,
           homeAbbrev: homeAbbrev,
           awayAbbrev: awayAbbrev,
+          draw: draw,
         );
       }),
     );
@@ -3952,6 +4070,7 @@ class _TableGameCard extends StatelessWidget {
     required double size,
     required Color? color,
     required Color textColor,
+    String? resultBadge,
     bool right = true,
   }) {
     return _cell(
@@ -3962,6 +4081,18 @@ class _TableGameCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (resultBadge != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 2),
+              child: SizedBox(
+                height: 22,
+                child: Image.asset(
+                  resultBadge,
+                  fit: BoxFit.contain,
+                  filterQuality: FilterQuality.medium,
+                ),
+              ),
+            ),
           Flexible(
             child: OneLineShrinkText(
               name,
@@ -5044,6 +5175,7 @@ class _TableGameCard extends StatelessWidget {
       final scoreAway = _int('score_away');
       final score = scoreHome >= 0 && scoreAway >= 0 ? '$scoreHome - $scoreAway' : 'vs';
       final heated = isHeatedGame(state, scoreHome, scoreAway);
+      final outcome = finishedGameOutcome(state, scoreHome, scoreAway);
       final header = [
         if (_text('time_game').isNotEmpty) _text('time_game'),
         if (_text('name_stadium').isNotEmpty) _text('name_stadium'),
@@ -5308,6 +5440,7 @@ class _TableGameCard extends StatelessWidget {
                         size: teamSize,
                         color: homeBg,
                         textColor: homeFg,
+                        resultBadge: teamResultBadge(outcome, home: true),
                       ),
                     ),
                     SizedBox(
@@ -5325,6 +5458,7 @@ class _TableGameCard extends StatelessWidget {
                               awayName: _text('name_team_away'),
                               homeAbbrev: _text('name_shortest_home'),
                               awayAbbrev: _text('name_shortest_away'),
+                              draw: outcome == FinishedGameOutcome.draw,
                             )
                           : _matchScoreCell(
                               state: state,
@@ -5336,6 +5470,7 @@ class _TableGameCard extends StatelessWidget {
                               awayName: _text('name_team_away'),
                               homeAbbrev: _text('name_shortest_home'),
                               awayAbbrev: _text('name_shortest_away'),
+                              draw: outcome == FinishedGameOutcome.draw,
                               homeBg: homeBg,
                               awayBg: awayBg,
                               homeFg: homeFg,
@@ -5349,6 +5484,7 @@ class _TableGameCard extends StatelessWidget {
                         size: teamSize,
                         color: awayBg,
                         textColor: awayFg,
+                        resultBadge: teamResultBadge(outcome, home: false),
                         right: false,
                       ),
                     ),

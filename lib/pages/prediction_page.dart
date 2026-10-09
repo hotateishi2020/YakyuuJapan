@@ -479,9 +479,10 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     if (!mounted) return;
     // 一部パート失敗の error があっても、取れたデータがあれば監視は続ける。
     // 再取得は登録済みの集計テーブルを読むだけで、スクレイピングは呼ばない。
+    // t_game の更新日時が前回と同じときはサーバが集計SQLを出さない。
     if (error != null && !_boardContentReady) return;
     _gamesPollTimer?.cancel();
-    _gamesPollTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+    _gamesPollTimer = Timer.periodic(const Duration(minutes: 1), (_) {
       unawaited(_pollDisplayedGames());
     });
   }
@@ -559,6 +560,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     String part,
     int year, {
     bool fresh = false,
+    bool haveGames = false,
     String? date,
     String? from,
     String? to,
@@ -567,6 +569,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       '/predictions/part?org=${OrgConfig.of(kind).label.toLowerCase()}&part=$part&year=$year',
     );
     if (fresh) path.write('&fresh=1');
+    if (haveGames) path.write('&have=1');
     if (date != null && date.isNotEmpty) path.write('&date=$date');
     if (from != null && from.isNotEmpty) path.write('&from=$from');
     if (to != null && to.isNotEmpty) path.write('&to=$to');
@@ -710,13 +713,15 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         from = ymdOf(window.from);
         to = ymdOf(window.to);
       }
-      final res = await http.get(Env.api(_partPath(target, part.name, year, fresh: fresh, from: from, to: to))).timeout(const Duration(seconds: 60));
+      final haveGames = part == _LoadPart.games && _partLoadedForYear(target, part);
+      final res = await http.get(Env.api(_partPath(target, part.name, year, fresh: fresh, haveGames: haveGames, from: from, to: to))).timeout(const Duration(seconds: 60));
       if (res.statusCode != 200) {
         logger.w('part ${part.name} HTTP ${res.statusCode}');
         _maybeSetPartError(target, background, 'HTTPエラー: ${res.statusCode}');
         return;
       }
       final map = jsonDecode(res.body) as Map<String, dynamic>;
+      if (part == _LoadPart.games && map['unchanged'] == true && _partLoadedForYear(target, part)) return;
       if (part != _LoadPart.info && year != _seasonYear) {
         return;
       }
@@ -842,6 +847,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         return;
       }
       final map = jsonDecode(res.body) as Map<String, dynamic>;
+      if (map['unchanged'] == true) return;
       final bundle = _ensureCache(kind);
       _applyGamesPayload(bundle, map, org, _seasonYear);
       bundle.extraGameDates.add(ymd);

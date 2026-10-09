@@ -34,12 +34,7 @@ class Headers {
           Expanded(
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Image.asset(
-                'backend/assets/images/logo_yakyuu_japan.png',
-                fit: BoxFit.contain,
-                alignment: Alignment.centerLeft,
-                semanticLabel: title,
-              ),
+              child: _titleLogo(h, title),
             ),
           ),
           ...actions,
@@ -52,6 +47,44 @@ class Headers {
       ),
     );
   }
+}
+
+/// logo_yakyuu_japan.png は 1024×341 で、白い文字は余白の中にある。
+/// 文字の高さがヘッダーの約7割になるよう、文字の範囲だけを切り出す。
+const _logoTextLeft = 61.0;
+const _logoTextTop = 82.0;
+const _logoTextW = 942.0;
+const _logoTextH = 162.0;
+const _logoImgW = 1024.0;
+const _logoImgH = 341.0;
+
+Widget _titleLogo(double headerH, String title) {
+  final textH = headerH * 0.7;
+  final scale = textH / _logoTextH;
+  return SizedBox(
+    width: _logoTextW * scale,
+    height: textH,
+    child: ClipRect(
+      child: OverflowBox(
+        alignment: Alignment.topLeft,
+        minWidth: 0,
+        maxWidth: _logoImgW * scale,
+        minHeight: 0,
+        maxHeight: _logoImgH * scale,
+        child: Transform.translate(
+          offset: Offset(-_logoTextLeft * scale, -_logoTextTop * scale),
+          child: Image.asset(
+            'backend/assets/images/logo_yakyuu_japan.png',
+            width: _logoImgW * scale,
+            height: _logoImgH * scale,
+            fit: BoxFit.fill,
+            alignment: Alignment.topLeft,
+            semanticLabel: title,
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 /// 初期の試合・順位・成績の読み込みが終わるまで Login を出さない。

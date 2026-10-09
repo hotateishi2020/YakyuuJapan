@@ -27,7 +27,7 @@ cp -R build/web/* backend/public/
 
 git add . 
 
-git commit -m "ゲーム差の表示を調整。" 
+git commit -m "年度変更時のエラーを修正。" 
 
 git push 
 

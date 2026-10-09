@@ -4,6 +4,29 @@ import 'package:Yakyuu_Japan/View/Headers.dart';
 import 'package:Yakyuu_Japan/config/app_design.dart';
 
 void main() {
+  testWidgets('title logo letters are about 70% of the header height', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) => Headers.globalHeader(
+            context,
+            HEADER_GLOBAL_H,
+            ALL_COLOR_APP,
+            HEADER_TITLE,
+            HEADER_PAD_VERTICAL,
+            8,
+            authReady: true,
+          ),
+        ),
+      ),
+    );
+    final logo = find.bySemanticsLabel(HEADER_TITLE);
+    expect(logo, findsOneWidget);
+    final clip = find.ancestor(of: logo, matching: find.byType(ClipRect)).first;
+    expect(tester.getSize(clip).height, closeTo(HEADER_GLOBAL_H * 0.7, 0.5));
+    expect(tester.getSize(logo).height, greaterThan(tester.getSize(clip).height));
+  });
+
   testWidgets('board load shows a spinner instead of Login', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(

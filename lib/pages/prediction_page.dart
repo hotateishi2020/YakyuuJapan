@@ -17,8 +17,8 @@ import '../logic/auth_session.dart';
 import '../logic/show_user_predictions.dart';
 import '../View/Headers.dart';
 import '../View/Text.dart';
-import '../View/LeagueBoardRow.dart';
 import '../View/GamesBoard.dart';
+import '../View/LeagueLogo.dart';
 import '../View/SeasonTable.dart';
 import '../View/MlbPostseasonBracket.dart';
 import '../View/PostseasonBracket.dart';
@@ -126,14 +126,10 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   bool _eventsExpanded = false;
   bool _infoExpanded = true;
   static const _infoCookie = 'koko_info_open';
-  static const _viewCookie = 'koko_view_by_item';
   static const _orgCookie = 'koko_org';
   OrgKind _orgKind = OrgKind.npb;
   final Map<OrgKind, _OrgBundle> _orgCache = {};
   final Map<OrgKind, Future<void>> _orgLoadFutures = {};
-  // 縦型: 0=第1リーグ, 1=第2リーグ
-  int _portraitLeagueTab = 0;
-  bool _viewByItem = false;
   int _itemTab = 0;
   int _seasonYear = DateTime.now().year;
   final Map<String, int> _loadedPartYears = {};
@@ -155,11 +151,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
 
   OrgConfig get _org => OrgConfig.of(_orgKind);
 
-  // 個人成績の id_user → 表示名
-  String _usernameForId(String idUser) => lookupField(npbPlayerStats, 'id_user', idUser, 'username');
-
-  String _userNameFromPredictions(String idUserStr) => lookupField(predictions, 'id_user', idUserStr, 'name_user_last');
-
   @override
   void initState() {
     super.initState();
@@ -168,7 +159,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     final saved = readBrowserCookie(_infoCookie);
     if (saved == '0') _infoExpanded = false;
     if (saved == '1') _infoExpanded = true;
-    if (readBrowserCookie(_viewCookie) == '1') _viewByItem = true;
     // cookie の団体をそのまま初回表示（npb / mlb）
     if (readBrowserCookie(_orgCookie) == 'mlb') {
       _orgKind = OrgKind.mlb;
@@ -193,12 +183,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     } catch (_) {}
     if (!mounted) return;
     try {
-      await Future.wait([
-        for (final part in _LoadPart.values) _fetchPart(_orgKind, part, _seasonYear, background: true),
-      ]).timeout(const Duration(seconds: 20));
-    } catch (_) {}
-    if (!mounted) return;
-    try {
       await AuthSession.instance.restore().timeout(const Duration(seconds: 15));
     } catch (_) {}
     if (!mounted) return;
@@ -219,7 +203,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     setState(() => _authEntryReady = false);
     try {
       await Future.wait([
-        for (final part in _LoadPart.values) _fetchPart(_orgKind, part, _seasonYear, background: false, force: true),
+        for (final part in {_LoadPart.games, _LoadPart.info, _partForItem(_itemTab)})
+          _fetchPart(_orgKind, part, _seasonYear, background: false, force: true),
       ]).timeout(const Duration(seconds: 45));
     } catch (_) {}
     if (!mounted) return;
@@ -333,7 +318,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     final usable = cached != null && cached.hasContent;
     setState(() {
       _orgKind = kind;
-      _portraitLeagueTab = 0;
       _itemTab = 0;
       error = null;
       if (usable) {
@@ -364,15 +348,13 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           if (!cached.partReady(part)) part,
       ];
       if (missing.isNotEmpty) {
-        unawaited(_fetchOrgParts(kind, background: false, only: missing));
+        unawaited(_fetchOrgParts(kind, background: true, only: _partsForItemView(missing)));
       }
-      unawaited(_ensureSeasonYearLoaded());
       await _startGamesWatch();
       unawaited(_prefetchOtherOrg());
       return;
     }
     await _loadThenWatchGames();
-    unawaited(_ensureSeasonYearLoaded());
   }
 
   Future<void> _prefetchOtherOrg() async {
@@ -636,7 +618,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       _seasonYear = year;
       _invalidateYearParts();
     });
-    await _ensureSeasonYearLoaded();
+    await _ensureItemYearLoaded(_itemTab);
     if (year == DateTime.now().year) {
       unawaited(_startGamesWatch());
     } else {
@@ -645,35 +627,29 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     unawaited(_prefetchOtherOrg());
   }
 
-  Future<void> _restoreCurrentBoardParts() async {
-    await _ensureSeasonYearLoaded();
-  }
-
   Future<void> _fetchOrgParts(
     OrgKind target, {
     required bool background,
     List<_LoadPart>? only,
   }) async {
     _ensureCache(target);
-    final parts = only ?? _LoadPart.values;
+    // 初期表示は試合情報。順位・個人成績を先に待たない。個人成績はタブを開くまで取らない。
+    final parts = only ?? _partsForItemView(null);
     final pending = [
       for (final part in parts)
         if (!_partLoadedForYear(target, part)) part,
     ];
-    if (pending.isEmpty) return;
-    // 順位表→試合を先に出し、個人成績と Info は接続を奪わないよう後追いする。
-    if (pending.contains(_LoadPart.standings)) {
-      await _fetchPart(target, _LoadPart.standings, _seasonYear, background: background);
-    }
     if (pending.contains(_LoadPart.games)) {
       await _fetchPart(target, _LoadPart.games, _seasonYear, background: background);
     }
+    _warmStandingsForGames(target);
+    if (pending.isEmpty) return;
     final rest = [
       for (final part in pending)
-        if (part != _LoadPart.standings && part != _LoadPart.games) part,
+        if (part != _LoadPart.games) part,
     ];
     if (rest.isEmpty) return;
-    final awaitRest = only != null && !pending.contains(_LoadPart.games) && !pending.contains(_LoadPart.standings);
+    final awaitRest = only != null && !pending.contains(_LoadPart.games);
     if (awaitRest) {
       await Future.wait([
         for (final part in rest) _fetchPart(target, part, _seasonYear, background: background),
@@ -683,6 +659,20 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     for (final part in rest) {
       unawaited(_fetchPart(target, part, _seasonYear, background: true));
     }
+  }
+
+  /// 試合情報のクライマックス消化判定に使う。表示は待たない。
+  void _warmStandingsForGames(OrgKind target) {
+    if (target != _orgKind || _itemTab != 0) return;
+    if (_partLoadedForYear(target, _LoadPart.standings)) return;
+    unawaited(_fetchPart(target, _LoadPart.standings, _seasonYear, background: true));
+  }
+
+  /// 項目ごと表示で今いるタブと、ヘッダーの Info。個人成績はタブを開くまで取らない。
+  List<_LoadPart> _partsForItemView(List<_LoadPart>? requested) {
+    final visible = {_LoadPart.games, _LoadPart.info, _partForItem(_itemTab)};
+    if (requested == null) return visible.toList();
+    return [for (final part in requested) if (visible.contains(part)) part];
   }
 
   Future<void> _fetchPart(OrgKind target, _LoadPart part, int year, {required bool background, bool force = false}) async {
@@ -900,12 +890,13 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     Color? selectedColor,
     Color? selectedForeground,
     Map<int, String>? leadingAssets,
+    double height = TAB_BAR_H,
   }) {
     final assets = leadingAssets ?? const <int, String>{};
     final Color active = selectedColor ?? ALL_COLOR_APP;
     final Color activeFg = selectedForeground ?? TAB_COLOR_FONT;
     return SizedBox(
-      height: TAB_BAR_H,
+      height: height,
       child: Row(
         children: [
           for (int i = 0; i < tabs.length; i++) ...[
@@ -924,52 +915,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         if (assets[tabs[i].$2] case final asset?) ...[
-                          SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: ClipRect(
-                              child: OverflowBox(
-                                alignment: Alignment.topCenter,
-                                maxWidth: 56,
-                                maxHeight: 31.5,
-                                child: Transform.translate(
-                                  offset: const Offset(0, -2),
-                                  child: ColorFiltered(
-                                    colorFilter: const ColorFilter.matrix([
-                                      1,
-                                      0,
-                                      0,
-                                      0,
-                                      0,
-                                      0,
-                                      1,
-                                      0,
-                                      0,
-                                      0,
-                                      0,
-                                      0,
-                                      1,
-                                      0,
-                                      0,
-                                      2.2,
-                                      0,
-                                      0,
-                                      0,
-                                      -45,
-                                    ]),
-                                    child: Image.asset(
-                                      asset,
-                                      width: 56,
-                                      height: 31.5,
-                                      fit: BoxFit.fill,
-                                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 4),
+                          LeagueLogo(asset: asset, height: height * 0.72),
+                          const SizedBox(width: 6),
                         ],
                         Text(
                           tabs[i].$1,
@@ -992,22 +939,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         ],
       ),
     );
-  }
-
-  double _leaguePickerWidth(BuildContext context) {
-    const style = TextStyle(fontSize: 11, height: 1.0, color: Colors.white, fontWeight: FontWeight.bold);
-    final scaler = MediaQuery.textScalerOf(context);
-    final painter = TextPainter(
-      text: const TextSpan(text: 'リーグごとに表示', style: style),
-      textDirection: TextDirection.ltr,
-      textScaler: scaler,
-      maxLines: 1,
-    )..layout();
-    // フォント未読込の初回は漢字が狭く測られることがある。
-    final floor = 11.0 * scaler.scale(1) * 7;
-    final textW = painter.width > floor ? painter.width : floor;
-    // 矢印分だけ足す（横余白は最小）。
-    return textW + 18;
   }
 
   String _gamesInitialDate() {
@@ -1058,77 +989,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
               ),
               const Icon(Icons.arrow_drop_down, color: Colors.white, size: 15),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _viewModePicker() {
-    return SizedBox(
-      width: _leaguePickerWidth(context),
-      height: TAB_BAR_H,
-      child: Material(
-        color: Colors.black,
-        shape: RoundedRectangleBorder(
-          side: const BorderSide(color: Colors.black),
-          borderRadius: BorderRadius.circular(TAB_RADIUS),
-        ),
-        child: PopupMenuButton<bool>(
-          padding: EdgeInsets.zero,
-          tooltip: '',
-          color: Colors.black,
-          initialValue: _viewByItem,
-          position: PopupMenuPosition.under,
-          onSelected: (value) {
-            if (value == _viewByItem) return;
-            setState(() => _viewByItem = value);
-            writeBrowserCookie(_viewCookie, value ? '1' : '0');
-            if (value) {
-              unawaited(_ensureItemYearLoaded(_itemTab));
-            } else {
-              unawaited(_restoreCurrentBoardParts());
-            }
-          },
-          itemBuilder: (context) => const [
-            PopupMenuItem(
-              value: false,
-              height: 36,
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Center(child: Text('リーグごとに表示', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, height: 1.0, color: Colors.white, fontWeight: FontWeight.bold))),
-            ),
-            PopupMenuItem(
-              value: true,
-              height: 36,
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Center(child: Text('項目ごとに表示', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, height: 1.0, color: Colors.white, fontWeight: FontWeight.bold))),
-            ),
-          ],
-          child: Padding(
-            padding: const EdgeInsets.only(left: 4, right: 14),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Text(
-                  _viewByItem ? '項目ごとに表示' : 'リーグごとに表示',
-                  maxLines: 1,
-                  softWrap: false,
-                  overflow: TextOverflow.clip,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    height: 1.0,
-                    leadingDistribution: TextLeadingDistribution.even,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Positioned(
-                  right: 0,
-                  child: Icon(Icons.arrow_drop_down, size: 16, color: Colors.white),
-                ),
-              ],
-            ),
           ),
         ),
       ),
@@ -1215,27 +1075,24 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   Widget _boardTabBar() {
-    final byLeague = !_viewByItem;
     return Row(
       children: [
         Expanded(
-          child: byLeague
-              ? _portraitLeagueTabBar()
-              : _portraitTabBar(
-                  tabs: const [
-                    ('試合情報', 0),
-                    ('チーム順位', 1),
-                    ('個人成績', 2),
-                  ],
-                  selectedIndex: _itemTab,
-                  onSelected: (i) {
-                    if (i == _itemTab) return;
-                    setState(() => _itemTab = i);
-                    unawaited(_ensureItemYearLoaded(i));
-                  },
-                  selectedColor: _org.tabColor,
-                  selectedForeground: _org.tabForeground,
-                ),
+          child: _portraitTabBar(
+            tabs: const [
+              ('試合情報', 0),
+              ('チーム順位', 1),
+              ('個人成績', 2),
+            ],
+            selectedIndex: _itemTab,
+            onSelected: (i) {
+              if (i == _itemTab) return;
+              setState(() => _itemTab = i);
+              unawaited(_ensureItemYearLoaded(i));
+            },
+            selectedColor: _org.tabColor,
+            selectedForeground: _org.tabForeground,
+          ),
         ),
       ],
     );
@@ -1391,25 +1248,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                 ),
         );
       },
-    );
-  }
-
-  Widget _portraitLeagueTabBar() {
-    final assets = <int, String>{
-      for (var i = 0; i < _org.leagues.length; i++)
-        if (_org.leagues[i].logoAsset != null) i: _org.leagues[i].logoAsset!,
-    };
-    return _portraitTabBar(
-      tabs: [
-        for (var i = 0; i < _org.leagues.length; i++) (_org.leagues[i].name, i),
-      ],
-      selectedIndex: _portraitLeagueTab,
-      onSelected: (i) {
-        if (i == _portraitLeagueTab) return;
-        setState(() => _portraitLeagueTab = i);
-      },
-      selectedColor: _org.leagueAt(_portraitLeagueTab).color,
-      leadingAssets: assets.isEmpty ? null : assets,
     );
   }
 
@@ -2123,49 +1961,11 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         // フル幅表示（スケーリングなし）
         final designWidth = constraints.maxWidth;
         const double scale = 1.0;
-        const compact = false;
         // 1セクションも来ていなければタブ下にグルグル。来たものから描画する。
         final orgContentLoading = !_boardContentReady && error == null;
 
         final shortestSide = constraints.maxWidth < constraints.maxHeight ? constraints.maxWidth : constraints.maxHeight;
         final isPortrait = constraints.maxHeight / constraints.maxWidth >= PORTRAIT_ASPECT_RATIO || shortestSide < COMPACT_LAYOUT_PX;
-
-        Widget centralLeagueBoard({
-          required int leagueId,
-          required Color leagueColor,
-          required String logoAsset,
-          required String leagueLabelPrefix,
-        }) {
-          return LeagueBoardRow(
-            leagueId: leagueId,
-            leagueColor: leagueColor,
-            logoAsset: logoAsset,
-            leagueLabelPrefix: leagueLabelPrefix,
-            predictions: predictions,
-            standings: standings,
-            npbPlayerStats: npbPlayerStats,
-            npbPlayerStatsActual: npbPlayerStatsActual,
-            games: games,
-            seriesGames: postseasonGames,
-            usernameForId: _usernameForId,
-            userNameFromPredictions: _userNameFromPredictions,
-            compact: compact,
-            portraitLayout: isPortrait,
-            org: _org,
-            personalStatsLayout: _personalStatsLayout,
-            onPersonalStatsLayoutChanged: _setPersonalStatsLayout,
-            loadingStandings: !_partReady(_LoadPart.standings),
-            loadingStats: !_partReady(_LoadPart.players),
-            loadingGames: !_partReady(_LoadPart.games),
-            seasonYear: _seasonYear,
-            gamesDateFilter: _gamesInitialDate(),
-            onNeedGameDate: _loadGameDate,
-            shouldLoadGameDate: _shouldLoadGameDate,
-            loadingGameDate: _loadingGameDate,
-            gameDateOffset: _gameDateOffset,
-            onGameDateOffsetChanged: _setGameDateOffset,
-          );
-        }
 
         final Widget chrome = Column(
           mainAxisSize: MainAxisSize.min,
@@ -2181,28 +1981,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           ],
         );
 
-        Widget portraitLeaguePage({
-          required int leagueId,
-          required Color leagueColor,
-          required String logoAsset,
-          required String leagueLabelPrefix,
-        }) {
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                centralLeagueBoard(
-                  leagueId: leagueId,
-                  leagueColor: leagueColor,
-                  logoAsset: logoAsset,
-                  leagueLabelPrefix: leagueLabelPrefix,
-                ),
-                const SizedBox(height: ALL_SPACE_BLOCK),
-              ],
-            ),
-          );
-        }
-
         // 取れたデータがあるときはエラー表示で消さない
         final Widget orgBody = orgContentLoading
             ? const Center(child: CircularProgressIndicator())
@@ -2216,32 +1994,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                       const SizedBox(height: ALL_SPACE_BLOCK),
                       Expanded(
                         flex: isPortrait ? 1 : ALL_RATIO_BLOCK_H[1] * 2,
-                        child: _viewByItem
-                            ? _itemBoard(wideLayout: !isPortrait)
-                            : isPortrait
-                                ? IndexedStack(
-                                    index: _portraitLeagueTab,
-                                    children: [
-                                      for (final league in _org.leagues)
-                                        portraitLeaguePage(
-                                          leagueId: league.id,
-                                          leagueColor: league.color,
-                                          logoAsset: league.logoAsset ?? '',
-                                          leagueLabelPrefix: league.name.replaceAll('・リーグ', ''),
-                                        ),
-                                    ],
-                                  )
-                                : Builder(
-                                    builder: (context) {
-                                      final league = _org.leagueAt(_portraitLeagueTab);
-                                      return centralLeagueBoard(
-                                        leagueId: league.id,
-                                        leagueColor: league.color,
-                                        logoAsset: league.logoAsset ?? '',
-                                        leagueLabelPrefix: league.name.replaceAll('・リーグ', ''),
-                                      );
-                                    },
-                                  ),
+                        child: _itemBoard(wideLayout: !isPortrait),
                       ),
                       if (isPortrait) const SizedBox(height: ALL_SPACE_BLOCK),
                     ],
@@ -2281,8 +2034,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                         authReady: _authEntryReady,
                         actions: [
                           _yearPicker(),
-                          const SizedBox(width: 6),
-                          _viewModePicker(),
                           const SizedBox(width: 4),
                         ],
                       ),

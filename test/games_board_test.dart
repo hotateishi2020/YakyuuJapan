@@ -549,6 +549,47 @@ void main() {
     expect(find.text('この日の試合はありません'), findsNothing);
   });
 
+  testWidgets('試合情報のリーグ見出しは1.5倍の高さで名前の横にロゴを出す', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SizedBox(
+          width: 480,
+          height: 420,
+          child: BothLeagueGameDay(
+            initialDate: '2026-10-09',
+            leagues: const [
+              (id: 1, name: 'セ・リーグ', color: Color(0xFF0E8E2D)),
+            ],
+            games: const [
+              {
+                'date_game': '2026-10-09',
+                'time_game': '18:00',
+                'name_team_home': '阪神',
+                'name_team_away': '巨人',
+                'state': '試合終了',
+                'score_home': 1,
+                'score_away': 0,
+                'id_team_home': 2,
+                'id_team_away': 1,
+                'id_league_home': 1,
+                'id_league_away': 1,
+              },
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final header = find.ancestor(of: find.text('セ・リーグ'), matching: find.byType(Container)).first;
+    expect(tester.getSize(header).height, 48);
+    final logo = find.byWidgetPredicate(
+      (widget) => widget is Image && widget.image is AssetImage && (widget.image as AssetImage).assetName.contains('k-central'),
+    );
+    expect(logo, findsOneWidget);
+    expect(tester.getTopLeft(logo).dx, lessThan(tester.getTopLeft(find.text('セ・リーグ')).dx));
+  });
+
   testWidgets('previous day shows loaded games instead of the empty label', (tester) async {
     var games = <Map<String, dynamic>>[
       {

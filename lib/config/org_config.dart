@@ -87,8 +87,8 @@ class OrgConfig {
     tabColor: Color(0xFF002D72),
     tabForeground: Colors.white,
     leagues: [
-      OrgLeague(id: 3, name: 'ア・リーグ', color: Color(0xFFC8102E)),
-      OrgLeague(id: 4, name: 'ナ・リーグ', color: Color(0xFF002D72)),
+      OrgLeague(id: 3, name: 'ア・リーグ', color: Color(0xFFC8102E), logoAsset: 'backend/assets/images/logo_al.png'),
+      OrgLeague(id: 4, name: 'ナ・リーグ', color: Color(0xFF002D72), logoAsset: 'backend/assets/images/logo_nl.png'),
     ],
   );
 

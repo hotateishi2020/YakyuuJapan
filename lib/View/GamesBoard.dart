@@ -3,6 +3,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import '../config/app_design.dart';
+import '../config/org_config.dart';
+import 'LeagueLogo.dart';
 import '../logic/clinched_series.dart';
 import '../logic/show_user_predictions.dart';
 import '../logic/game_dedupe.dart';
@@ -72,6 +74,10 @@ const _csPacificGradient = [Color(0xFF5AD8EA), Color(0xFF1E6FE0), Color(0xFF1F52
             ? _csPacificGradient
             : null,
   );
+}
+
+String? _leagueLogoAsset(int leagueId) {
+  return OrgConfig.npb.leagueById(leagueId)?.logoAsset ?? OrgConfig.mlb.leagueById(leagueId)?.logoAsset;
 }
 
 int _gameInt(dynamic value) {
@@ -1150,11 +1156,12 @@ class _BothLeagueGameDayState extends State<BothLeagueGameDay> {
 
     Widget leagueBlock(String label, Color color, int leagueId, List<Map<String, dynamic>> leagueGames) {
       final climax = npbClimaxHeader(leagueId: leagueId, fallbackLabel: label, games: leagueGames);
+      final logo = climax.logoAsset ?? _leagueLogoAsset(leagueId);
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
-            height: 32,
+            height: 48,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               gradient: climax.gradient == null ? null : LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: climax.gradient!),
@@ -1163,8 +1170,8 @@ class _BothLeagueGameDayState extends State<BothLeagueGameDay> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (climax.logoAsset != null) ...[
-                  Image.asset(climax.logoAsset!, height: 22, fit: BoxFit.contain),
+                if (logo != null) ...[
+                  LeagueLogo(asset: logo, height: 32),
                   const SizedBox(width: 8),
                 ],
                 Text(climax.label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),

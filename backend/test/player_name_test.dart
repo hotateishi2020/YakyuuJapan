@@ -84,5 +84,49 @@ void main() {
       playerNameMatches(query: 'コルソン・モンゴメリー', nameFull: 'ブレーデン・モンゴメリー'),
       isFalse,
     );
+    expect(
+      playerNameMatches(query: 'ヘーゲン・スミス', nameFull: 'C.スミス', storedInitial: 'C'),
+      isFalse,
+    );
+    expect(
+      playerNameMatches(query: 'C.スミス', nameFull: 'ヘーゲン・スミス', nameLast: 'ヘーゲン・スミス', storedInitial: 'H'),
+      isFalse,
+    );
+    expect(
+      playerNameMatches(query: 'C.スミス', nameFull: 'ケード・スミス', nameLast: 'ケード・スミス', storedInitial: 'C'),
+      isTrue,
+    );
+    expect(
+      playerNameMatches(query: 'H.スミス', nameFull: 'ヘーゲン・スミス', nameLast: 'ヘーゲン・スミス', storedInitial: 'H'),
+      isTrue,
+    );
+    expect(
+      playerNameMatches(
+        query: 'C.モンゴメリー',
+        nameFull: 'ブレーデン・モンゴメリー',
+        nameLast: 'ブレーデン・モンゴメリー',
+        storedInitial: 'C',
+      ),
+      isFalse,
+    );
+  });
+
+  test('同姓のモンゴメリーはフルネームの行を選ぶ', () {
+    final candidates = [
+      (id: 5710, nameFull: 'C.モンゴメリー', nameLast: 'C.モンゴメリー', initial: 'C'),
+      (id: 5983, nameFull: 'ブレーデン・モンゴメリー', nameLast: 'ブレーデン・モンゴメリー', initial: 'C'),
+      (id: 5984, nameFull: 'コルソン・モンゴメリー', nameLast: 'コルソン・モンゴメリー', initial: 'C'),
+    ];
+    List<({int id, String nameFull, String nameLast, String initial})> matching(String query) {
+      return [
+        for (final c in candidates)
+          if (playerNameMatches(query: query, nameFull: c.nameFull, nameLast: c.nameLast, storedInitial: c.initial)) c,
+      ];
+    }
+
+    expect(pickBestPlayerId(query: 'ブレーデン・モンゴメリー', candidates: matching('ブレーデン・モンゴメリー')), 5983);
+    expect(pickBestPlayerId(query: 'コルソン・モンゴメリー', candidates: matching('コルソン・モンゴメリー')), 5984);
+    expect(correctedNameInitial('ブレーデン・モンゴメリー', 'C'), 'B');
+    expect(correctedNameInitial('コルソン・モンゴメリー', 'C'), isNull);
   });
 }

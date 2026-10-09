@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/View/Headers.dart';
+import 'package:Yakyuu_Japan/config/app_design.dart';
 
 void main() {
   testWidgets('board load shows a spinner instead of Login', (tester) async {
@@ -47,6 +48,7 @@ void main() {
     );
     expect(find.text('Login'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(tester.getSize(find.widgetWithText(TextButton, 'Login')).height, TAB_BAR_H);
   });
 
   testWidgets('logged-in users see the account icon even while the board loads', (tester) async {

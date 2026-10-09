@@ -6,6 +6,7 @@ import 'package:postgres/postgres.dart';
 
 import '../tools/Postgres.dart';
 import 'AppSql.dart';
+import 'ClinchedGames.dart';
 import 'DB/m_stadium.dart';
 import 'DB/t_game.dart';
 import 'Value.dart';
@@ -133,6 +134,7 @@ class Postseason {
     for (final day in dates) {
       await _syncDate(conn, day, fetchDetail: fullDue);
     }
+    await dropUnplayedClinchedGames(conn);
   }
 
   static String _ymd(DateTime day) {

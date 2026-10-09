@@ -299,10 +299,144 @@ String? _givenNamePart(String name) {
   return parts.first.replaceAll(RegExp(r'[\s\u3000]+'), '');
 }
 
+final _latinInitialRe = RegExp(r'^([A-Za-zＡ-Ｚ]{1,3})[\.．]');
+
+String? _latinInitial(String name) {
+  final match = _latinInitialRe.firstMatch(_compactPlayerName(name));
+  if (match == null) return null;
+  return _asciiUpper(match.group(1)!);
+}
+
+String _asciiUpper(String raw) {
+  const wide = 'ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ';
+  const ascii = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  final out = StringBuffer();
+  for (final char in raw.split('')) {
+    final index = wide.indexOf(char);
+    out.write(index >= 0 ? ascii[index] : char.toUpperCase());
+  }
+  return out.toString();
+}
+
+/// カタカナの名が、そのラテンイニシャルであり得るか。
+/// ヘーゲンは H、ケードは C/K。C.スミスをヘーゲン・スミスとはみなさない。
+bool _givenMatchesInitial(String given, String initial) {
+  final letter = _asciiUpper(initial);
+  if (letter.isEmpty) return false;
+  final name = _asciiUpper(given);
+  if (RegExp(r'^[A-Z]+$').hasMatch(name)) return name == letter;
+  final possible = _kanaInitials(given);
+  if (possible.isEmpty) return true;
+  return possible.contains(letter[0]);
+}
+
+String _kanaInitials(String given) {
+  const digraphs = {
+    'ウィ': 'W',
+    'ウェ': 'W',
+    'ウォ': 'W',
+    'ヴァ': 'V',
+    'ヴィ': 'V',
+    'ヴェ': 'V',
+    'ヴォ': 'V',
+    'チェ': 'C',
+    'シェ': 'S',
+    'ジェ': 'J',
+    'ティ': 'T',
+    'ディ': 'D',
+    'ファ': 'F',
+    'フィ': 'F',
+    'フェ': 'F',
+    'フォ': 'F',
+  };
+  const kana = {
+    'ア': 'A',
+    'イ': 'IY',
+    'ウ': 'U',
+    'エ': 'E',
+    'オ': 'O',
+    'カ': 'KC',
+    'キ': 'KC',
+    'ク': 'KCQ',
+    'ケ': 'KC',
+    'コ': 'KC',
+    'サ': 'S',
+    'シ': 'S',
+    'ス': 'S',
+    'セ': 'SC',
+    'ソ': 'S',
+    'タ': 'T',
+    'チ': 'CT',
+    'ツ': 'TS',
+    'テ': 'T',
+    'ト': 'T',
+    'ナ': 'N',
+    'ニ': 'N',
+    'ヌ': 'N',
+    'ネ': 'N',
+    'ノ': 'N',
+    'ハ': 'H',
+    'ヒ': 'H',
+    'フ': 'FH',
+    'ヘ': 'H',
+    'ホ': 'H',
+    'マ': 'M',
+    'ミ': 'M',
+    'ム': 'M',
+    'メ': 'M',
+    'モ': 'M',
+    'ヤ': 'Y',
+    'ユ': 'YU',
+    'ヨ': 'Y',
+    'ラ': 'RL',
+    'リ': 'RL',
+    'ル': 'RL',
+    'レ': 'RL',
+    'ロ': 'RL',
+    'ワ': 'W',
+    'ヲ': 'O',
+    'ン': 'N',
+    'ガ': 'G',
+    'ギ': 'G',
+    'グ': 'G',
+    'ゲ': 'G',
+    'ゴ': 'G',
+    'ザ': 'ZJ',
+    'ジ': 'JG',
+    'ズ': 'Z',
+    'ゼ': 'ZJ',
+    'ゾ': 'Z',
+    'ダ': 'D',
+    'デ': 'D',
+    'ド': 'D',
+    'バ': 'BV',
+    'ビ': 'BV',
+    'ブ': 'BV',
+    'ベ': 'BV',
+    'ボ': 'BV',
+    'パ': 'P',
+    'ピ': 'P',
+    'プ': 'P',
+    'ペ': 'P',
+    'ポ': 'P',
+  };
+  if (given.length >= 2) {
+    final two = digraphs[given.substring(0, 2)];
+    if (two != null) return two;
+  }
+  if (given.isEmpty) return '';
+  return kana[given.substring(0, 1)] ?? '';
+}
+
 bool samePlayerStatName(String left, String right) {
   final leftGiven = _givenNamePart(left);
   final rightGiven = _givenNamePart(right);
   if (leftGiven != null && rightGiven != null && leftGiven != rightGiven) return false;
+  final leftInitial = _latinInitial(left);
+  final rightInitial = _latinInitial(right);
+  if (leftInitial != null && rightInitial != null && leftInitial != rightInitial) return false;
+  if (leftGiven != null && rightInitial != null && !_givenMatchesInitial(leftGiven, rightInitial)) return false;
+  if (rightGiven != null && leftInitial != null && !_givenMatchesInitial(rightGiven, leftInitial)) return false;
   final a = _playerNameKey(left);
   final b = _playerNameKey(right);
   if (a.isEmpty || b.isEmpty) return false;
@@ -2629,18 +2763,52 @@ class _TableGameCard extends StatelessWidget {
   }
 
   static const _defensePosOrder = ['投', '捕', '一', '二', '三', '遊', '左', '中', '右', '指'];
-  static const _defensePosAlign = <String, Alignment>{
-    '投': Alignment(0.0, 0.28),
-    '捕': Alignment(0.0, 0.80),
-    '一': Alignment(0.46, 0.42),
-    '二': Alignment(0.34, -0.08),
-    '三': Alignment(-0.46, 0.42),
-    '遊': Alignment(-0.34, -0.08),
-    '左': Alignment(-0.55, -0.48),
-    '中': Alignment(0.0, -0.80),
-    '右': Alignment(0.55, -0.48),
-    '指': Alignment(-0.50, 0.82),
+
+  /// 正方形の球場画像に対する位置（左上 0,0、右下 1,1）。
+  /// 表示枠の縦横比が変わっても、BoxFit.cover と同じ切り抜きに載せる。
+  static const _defensePosOnImage = <String, Offset>{
+    '投': Offset(0.50, 0.57),
+    '捕': Offset(0.50, 0.78),
+    '一': Offset(0.63, 0.62),
+    '二': Offset(0.56, 0.49),
+    '三': Offset(0.37, 0.62),
+    '遊': Offset(0.44, 0.49),
+    '左': Offset(0.30, 0.38),
+    '中': Offset(0.50, 0.30),
+    '右': Offset(0.70, 0.38),
+    '指': Offset(0.18, 0.88),
   };
+
+  /// 中堅（上）から捕手（下）までが枠に入る切り抜き。入りきらない縦横比では全体を収める。
+  static ({BoxFit fit, Alignment alignment, Offset origin, double drawn}) defenseImageFrame(Size box) {
+    const image = 1024.0;
+    const bandTop = 0.22;
+    const bandBottom = 0.88;
+    if (box.width <= 0 || box.height <= 0) {
+      return (fit: BoxFit.cover, alignment: Alignment.center, origin: Offset.zero, drawn: 0);
+    }
+    final coverScale = math.max(box.width / image, box.height / image);
+    final coverDrawn = image * coverScale;
+    final visibleH = box.height / coverDrawn;
+    if (visibleH + 0.001 >= bandBottom - bandTop) {
+      final imageTop = ((bandTop + bandBottom) / 2 - visibleH / 2).clamp(0.0, math.max(0.0, 1 - visibleH));
+      final dy = -imageTop * coverDrawn;
+      final dx = (box.width - coverDrawn) / 2;
+      final denom = box.height - coverDrawn;
+      final ay = denom.abs() < 0.5 ? 0.0 : ((dy * 2 / denom) - 1).clamp(-1.0, 1.0);
+      return (fit: BoxFit.cover, alignment: Alignment(0, ay), origin: Offset(dx, dy), drawn: coverDrawn);
+    }
+    final containScale = math.min(box.width / image, box.height / image);
+    final drawn = image * containScale;
+    final origin = Offset((box.width - drawn) / 2, (box.height - drawn) / 2);
+    return (fit: BoxFit.contain, alignment: Alignment.center, origin: origin, drawn: drawn);
+  }
+
+  /// 1024×1024 の球場画像を [box] に合わせたときの、画像上の点。
+  static Offset defenseImagePoint(Offset fraction, Size box) {
+    final frame = defenseImageFrame(box);
+    return frame.origin + Offset(fraction.dx * frame.drawn, fraction.dy * frame.drawn);
+  }
 
   String _currentPitcherName({required bool home}) {
     final teamId = _int(home ? 'id_team_home' : 'id_team_away');
@@ -2787,6 +2955,7 @@ class _TableGameCard extends StatelessWidget {
       child: LayoutBuilder(builder: (context, constraints) {
         final w = constraints.maxWidth.isFinite ? constraints.maxWidth : 120.0;
         final h = constraints.maxHeight.isFinite ? constraints.maxHeight : _defenseRowH;
+        final frame = defenseImageFrame(Size(w, h));
         return SizedBox(
           width: w,
           height: h,
@@ -2798,28 +2967,36 @@ class _TableGameCard extends StatelessWidget {
                 if (inside.isNotEmpty)
                   Image.asset(
                     inside,
-                    fit: BoxFit.cover,
+                    fit: frame.fit,
+                    alignment: frame.alignment,
                     errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF1B5E20)),
                   )
                 else
                   const ColoredBox(color: Color(0xFF1B5E20)),
                 for (final spot in spots)
-                  Align(
-                    alignment: _defensePosAlign[spot.pos] ?? Alignment.center,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _defenseNameColumn(spot.starter, spot.starterMarks, pos: spot.pos),
-                        for (var i = 0; i < spot.pinches.length; i++)
-                          _defenseNameColumn(
-                            spot.pinches[i],
-                            i < spot.pinchMarks.length ? spot.pinchMarks[i] : '',
-                            pos: spot.pos,
-                            pinch: true,
-                          ),
-                      ],
-                    ),
-                  ),
+                  () {
+                    final at = defenseImagePoint(_defensePosOnImage[spot.pos] ?? const Offset(0.5, 0.5), Size(w, h));
+                    return Positioned(
+                      left: at.dx,
+                      top: at.dy,
+                      child: FractionalTranslation(
+                        translation: const Offset(-0.5, -0.5),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _defenseNameColumn(spot.starter, spot.starterMarks, pos: spot.pos),
+                            for (var i = 0; i < spot.pinches.length; i++)
+                              _defenseNameColumn(
+                                spot.pinches[i],
+                                i < spot.pinchMarks.length ? spot.pinchMarks[i] : '',
+                                pos: spot.pos,
+                                pinch: true,
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }(),
               ],
             ),
           ),

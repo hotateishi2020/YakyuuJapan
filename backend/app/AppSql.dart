@@ -761,7 +761,8 @@ class AppSql {
             int_pitch, int_four, int_dead_pitching, int_strike_out, code_result_pitcher, int_hit, int_runs_earned, int_balk, t_game_summary.id, t_game_summary.id_player, t_game_summary.txt_homerun_total
           ORDER BY t_game_summary.id_game, m_player.id_team, flg_pitcher DESC, point_total DESC, t_game_summary.id 
         ) AS v_game_summary ON v_game_summary.id_game = t_game.id 
-      WHERE ${gameDateWindow(alias: 't_game', ranged: ranged)}
+      WHERE COALESCE(t_game.flg_delete, FALSE) = FALSE
+        AND ${gameDateWindow(alias: 't_game', ranged: ranged)}
       GROUP BY t_game.id, t_game.datetime_start, team_home.name_short, team_away.name_short, team_home.name_shortest, team_away.name_shortest, pitcher_home.id, pitcher_home.name_full, pitcher_home.flg_ace, pitcher_away.id, pitcher_away.name_full, pitcher_away.flg_ace,
                pitcher_win.name_full, pitcher_lose.name_full, m_stadium.name_short, m_stadium.path_image_inside, m_stadium.path_image_outside, t_game.score_home, t_game.score_away,
                team_home.id_league, team_away.id_league, team_home.color_font, team_home.color_back, team_away.color_font,

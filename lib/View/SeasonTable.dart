@@ -76,7 +76,7 @@ class GamesBehindLink {
   final String lower;
   final String label;
   final bool side;
-  final bool sideRight;
+  final bool sideBelow;
   final double labelLeft;
   final double labelTop;
 
@@ -85,7 +85,7 @@ class GamesBehindLink {
     required this.lower,
     required this.label,
     required this.side,
-    required this.sideRight,
+    required this.sideBelow,
     required this.labelLeft,
     required this.labelTop,
   });
@@ -107,113 +107,166 @@ class GamesBehindLayout {
   });
 }
 
-/// 各チームの勝差は直上との差。0 は横に並べ、狭い差が続くときは左右交互に迂回する。
+/// 首位を右、最下位を左に横へ並べる。差 0 は縦に重ね、狭い差が続くときは上下交互に迂回する。
 GamesBehindLayout layoutGamesBehindChart(
   List<({String name, String abbrev, String label, double gb})> entries, {
-  double? targetHeight,
+  double? targetWidth,
 }) {
+  if (entries.isEmpty) {
+    return const GamesBehindLayout(logos: [], links: [], logoSize: gbChartLogoSize, height: 0, width: 0);
+  }
   final gaps = <double>[];
   for (var i = 0; i < entries.length - 1; i++) {
     gaps.add(entries[i + 1].gb);
   }
-  var rows = entries.isEmpty ? 0 : 1;
+  var slots = 1;
   var games = 0.0;
   for (final gap in gaps) {
     if (gap <= 0) continue;
-    rows++;
+    slots++;
     games += gap;
   }
   var logo = gbChartLogoSize;
   var px = gbChartPxPerGame;
-  if (targetHeight != null && targetHeight > 0 && rows > 0 && games > 0) {
-    final logoBudget = targetHeight * 0.45;
-    logo = (logoBudget / rows).clamp(18.0, gbChartLogoSize);
-    px = math.max(0.0, targetHeight - logo * rows) / games;
+  if (targetWidth != null && targetWidth > 0 && games > 0) {
+    final logoBudget = targetWidth * 0.45;
+    logo = (logoBudget / slots).clamp(18.0, gbChartLogoSize);
+    px = math.max(0.0, targetWidth - logo * slots) / games;
   }
-  final logos = <GamesBehindLogo>[];
-  final links = <GamesBehindLink>[];
-  var left = 0.0;
-  var top = 0.0;
+
+  // いったん首位を左に置き、あとで左右を反転して首位を右端にする。
+  final preLogos = <({String name, String abbrev, double x, double y})>[];
+  final preLinks = <({String upper, String lower, String label, bool side, bool sideBelow, double labelX, double labelY, double textW})>[];
+  var x = 0.0;
+  var y = 0.0;
   var previousWasSide = false;
-  var lastSideRight = true;
+  var lastSideBelow = false;
   for (var i = 0; i < entries.length; i++) {
-    logos.add(GamesBehindLogo(name: entries[i].name, abbrev: entries[i].abbrev, left: left, top: top));
+    preLogos.add((name: entries[i].name, abbrev: entries[i].abbrev, x: x, y: y));
     if (i == entries.length - 1) break;
     final gap = gaps[i];
     if (gap <= 0) {
-      left += logo + 6;
+      y += logo + 6;
       previousWasSide = false;
       continue;
     }
     final gapPx = gap * px;
     final side = gapPx < gbChartInlineMin;
-    final sideRight = !side
+    final sideBelow = !side
         ? true
         : previousWasSide
-            ? !lastSideRight
-            : true;
+            ? !lastSideBelow
+            : false;
     if (side) {
       previousWasSide = true;
-      lastSideRight = sideRight;
+      lastSideBelow = sideBelow;
     } else {
       previousWasSide = false;
     }
-    final lowerTop = top + logo + gapPx;
+    final nextX = x + logo + gapPx;
     final label = formatGamesBehindGap(gap);
     final textW = label.length * 8.0 + 4;
-    final lineX = side ? (sideRight ? left + logo + 12 : left - 12) : left + logo / 2;
-    final labelLeft = side ? (sideRight ? lineX + 4 : lineX - 4 - textW) : lineX + 4;
-    final y1 = side ? top + logo / 2 : top + logo;
-    final y2 = side ? lowerTop + logo / 2 : lowerTop;
-    links.add(GamesBehindLink(
+    final midX = (x + nextX) / 2 + logo / 2;
+    final double labelX;
+    final double labelY;
+    if (!side) {
+      labelX = midX - textW / 2;
+      labelY = y + logo / 2 + 2;
+    } else {
+      final lineY = sideBelow ? y + logo + 12 : y - 12;
+      labelX = midX - textW / 2;
+      labelY = sideBelow ? lineY + 2 : lineY - 2 - gbChartLabelH;
+    }
+    preLinks.add((
       upper: entries[i].name,
       lower: entries[i + 1].name,
       label: label,
       side: side,
-      sideRight: sideRight,
-      labelLeft: labelLeft,
-      labelTop: (y1 + y2) / 2 - gbChartLabelH / 2,
+      sideBelow: sideBelow,
+      labelX: labelX,
+      labelY: labelY,
+      textW: textW,
     ));
-    top = lowerTop;
+    x = nextX;
   }
-  var minX = 0.0;
-  var maxX = logo;
-  for (final logoMark in logos) {
-    minX = math.min(minX, logoMark.left);
-    maxX = math.max(maxX, logoMark.left + logo);
+
+  final mainExtent = x + logo;
+  var minX = double.infinity;
+  var maxX = double.negativeInfinity;
+  var minY = double.infinity;
+  var maxY = double.negativeInfinity;
+  void include(double left, double top, double right, double bottom) {
+    minX = math.min(minX, left);
+    maxX = math.max(maxX, right);
+    minY = math.min(minY, top);
+    maxY = math.max(maxY, bottom);
   }
-  for (final link in links) {
-    minX = math.min(minX, link.labelLeft);
-    maxX = math.max(maxX, link.labelLeft + link.label.length * 8 + 4);
+
+  final mirroredLogos = <({String name, String abbrev, double x, double y})>[];
+  for (final mark in preLogos) {
+    final sx = mainExtent - (mark.x + logo);
+    mirroredLogos.add((name: mark.name, abbrev: mark.abbrev, x: sx, y: mark.y));
+    include(sx, mark.y, sx + logo, mark.y + logo);
   }
-  final shift = -minX;
+  final mirroredLinks = <({String upper, String lower, String label, bool side, bool sideBelow, double x, double y})>[];
+  for (final link in preLinks) {
+    final sx = mainExtent - (link.labelX + link.textW);
+    mirroredLinks.add((
+      upper: link.upper,
+      lower: link.lower,
+      label: link.label,
+      side: link.side,
+      sideBelow: link.sideBelow,
+      x: sx,
+      y: link.labelY,
+    ));
+    include(sx, link.labelY, sx + link.textW, link.labelY + gbChartLabelH);
+  }
+  if (mirroredLogos.isNotEmpty) {
+    var logoTop = double.infinity;
+    var logoBottom = double.negativeInfinity;
+    for (final mark in mirroredLogos) {
+      logoTop = math.min(logoTop, mark.y);
+      logoBottom = math.max(logoBottom, mark.y + logo);
+    }
+    final mid = (logoTop + logoBottom) / 2;
+    final above = mid - minY;
+    final below = maxY - mid;
+    if (below > above) {
+      minY -= below - above;
+    } else if (above > below) {
+      maxY += above - below;
+    }
+  }
+  final shiftX = -minX;
+  final shiftY = -minY;
   return GamesBehindLayout(
     logos: [
-      for (final logoMark in logos) GamesBehindLogo(name: logoMark.name, abbrev: logoMark.abbrev, left: logoMark.left + shift, top: logoMark.top),
+      for (final mark in mirroredLogos)
+        GamesBehindLogo(name: mark.name, abbrev: mark.abbrev, left: mark.x + shiftX, top: mark.y + shiftY),
     ],
     links: [
-      for (final link in links)
+      for (final link in mirroredLinks)
         GamesBehindLink(
           upper: link.upper,
           lower: link.lower,
           label: link.label,
           side: link.side,
-          sideRight: link.sideRight,
-          labelLeft: link.labelLeft + shift,
-          labelTop: link.labelTop,
+          sideBelow: link.sideBelow,
+          labelLeft: link.x + shiftX,
+          labelTop: link.y + shiftY,
         ),
     ],
     logoSize: logo,
-    height: entries.isEmpty ? 0 : top + logo,
+    height: maxY - minY,
     width: maxX - minX,
   );
 }
 
 class GamesBehindChart extends StatelessWidget {
   final List<Map<String, dynamic>> rows;
-  final double? height;
 
-  const GamesBehindChart({super.key, required this.rows, this.height});
+  const GamesBehindChart({super.key, required this.rows});
 
   @override
   Widget build(BuildContext context) {
@@ -231,13 +284,13 @@ class GamesBehindChart extends StatelessWidget {
         ),
     ].where((entry) => entry.name.isNotEmpty).toList();
     if (entries.isEmpty) return const SizedBox.shrink();
-    final layout = layoutGamesBehindChart(entries, targetHeight: height);
-    return SizedBox(
-      height: layout.height,
-      child: LayoutBuilder(builder: (context, constraints) {
-        final maxW = constraints.maxWidth.isFinite ? constraints.maxWidth : layout.width;
-        final origin = math.max(0.0, (maxW - layout.width) / 2);
-        return Stack(
+    return LayoutBuilder(builder: (context, constraints) {
+      final maxW = constraints.maxWidth.isFinite ? constraints.maxWidth : null;
+      final layout = layoutGamesBehindChart(entries, targetWidth: maxW);
+      final origin = math.max(0.0, ((maxW ?? layout.width) - layout.width) / 2);
+      return SizedBox(
+        height: layout.height,
+        child: Stack(
           clipBehavior: Clip.none,
           children: [
             Positioned.fill(child: CustomPaint(painter: _GbDashPainter(layout, origin))),
@@ -258,9 +311,9 @@ class GamesBehindChart extends StatelessWidget {
                 ),
               ),
           ],
-        );
-      }),
-    );
+        ),
+      );
+    });
   }
 }
 
@@ -285,20 +338,20 @@ class _GbDashPainter extends CustomPainter {
       if (!link.side) {
         _dash(
           canvas,
-          Offset(origin + upper.left + logo / 2, upper.top + logo),
-          Offset(origin + lower.left + logo / 2, lower.top),
+          Offset(origin + lower.left + logo, lower.top + logo / 2),
+          Offset(origin + upper.left, upper.top + logo / 2),
           paint,
         );
         continue;
       }
-      final upperEdge = origin + (link.sideRight ? upper.left + logo : upper.left);
-      final lowerEdge = origin + (link.sideRight ? lower.left + logo : lower.left);
-      final lineX = link.sideRight ? math.max(upperEdge, lowerEdge) + 12 : math.min(upperEdge, lowerEdge) - 12;
-      final y1 = upper.top + logo / 2;
-      final y2 = lower.top + logo / 2;
-      _dash(canvas, Offset(lineX, y1), Offset(lineX, y2), paint);
-      _dash(canvas, Offset(upperEdge, y1), Offset(lineX, y1), paint);
-      _dash(canvas, Offset(lowerEdge, y2), Offset(lineX, y2), paint);
+      final upperX = origin + upper.left + logo / 2;
+      final lowerX = origin + lower.left + logo / 2;
+      final upperEdge = link.sideBelow ? upper.top + logo : upper.top;
+      final lowerEdge = link.sideBelow ? lower.top + logo : lower.top;
+      final lineY = link.sideBelow ? math.max(upperEdge, lowerEdge) + 12 : math.min(upperEdge, lowerEdge) - 12;
+      _dash(canvas, Offset(lowerX, lineY), Offset(upperX, lineY), paint);
+      _dash(canvas, Offset(upperX, upperEdge), Offset(upperX, lineY), paint);
+      _dash(canvas, Offset(lowerX, lowerEdge), Offset(lowerX, lineY), paint);
     }
   }
 
@@ -858,10 +911,7 @@ class SeasonTableBlock extends StatelessWidget {
                 sectionTable(section),
                 if (showGamesBehind) ...[
                   const SizedBox(height: 4),
-                  GamesBehindChart(
-                    rows: section.rows,
-                    height: (ALL_HEADER_H + section.rows.length * gridBodyH) * 1.25,
-                  ),
+                  GamesBehindChart(rows: section.rows),
                 ],
               ],
             );
@@ -963,7 +1013,7 @@ class SeasonTableBlock extends StatelessWidget {
       if (portraitLayout) {
         // 縦スクロール時は、見出しと上位10名が見える高さに抑える。
         // Picker +（Segment二段 or 打者投手タブ）+ 上位10名。
-        const double personalSectionHeight = 32.0 + 141.0 + 20.8 * 10;
+        const double personalSectionHeight = 32.0 + 141.0 + _statRowH * 10;
         final Widget personalSection = personalStatsLayout == PersonalStatsLayout.scroll
             ? personalBody
             : SizedBox(
@@ -1023,7 +1073,7 @@ class SeasonTableBlock extends StatelessWidget {
 /// 個人成績の「セ」「パ」「ア」「ナ」見出し。
 const double _personalLeagueHeaderH = 33;
 
-const double _statRowH = 20.8;
+const double _statRowH = 20.8 * 1.5;
 const int _statsScrollVisibleRows = 10;
 const double _statsScrollBodyH = _statRowH * _statsScrollVisibleRows;
 

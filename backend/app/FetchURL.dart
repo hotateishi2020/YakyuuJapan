@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 import 'AppSql.dart';
+import 'ClinchedGames.dart';
 import 'InjuryList.dart';
 import 'RegisteredPosition.dart';
 import '../tools/Postgres.dart';
@@ -1174,6 +1175,7 @@ class FetchURL {
         }
       }
     } //for 今日から10日後
+    await dropUnplayedClinchedGames(conn);
     return Response.ok('ok');
   }
 

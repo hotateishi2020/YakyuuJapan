@@ -1,44 +1,14 @@
-# Render Blueprint: ping.yml と同じ4本の定期実行。
-# Web サービス (yakyuujapan) は既存のまま使い、Cron Job だけ追加する。
-# Dashboard → Blueprints → New Blueprint Instance でこのファイルを適用する。
-#
+# Render Blueprint: 試合情報の定期取得だけを載せる。
+# サービス名はダッシュボードの Cron Job と一致させる。
 # 時刻はすべて UTC（JST = UTC+9）
 services:
-  # A: 毎日 16:02–24:02 JST に毎時、チーム成績を取得
+  # 毎日 13:00–24:59 JST に3分間隔で NPB の試合を取得
   - type: cron
-    name: koko-ping-stats-team
+    name: koko-fetch-games-day
     runtime: docker
     dockerfilePath: ./backend/Dockerfile.cron
     dockerContext: .
-    schedule: "2 7-15 * * *"
-    plan: 0.5c-512mb
-    envVars:
-      - key: CRON_JOB
-        value: stats-team
-      - key: PING_BASE_URL
-        value: https://yakyuujapan.onrender.com
-
-  # B: 毎日 16:13/16:43–24:13/24:43 JST に選手成績を取得
-  - type: cron
-    name: koko-ping-stats-player
-    runtime: docker
-    dockerfilePath: ./backend/Dockerfile.cron
-    dockerContext: .
-    schedule: "13,43 7-15 * * *"
-    plan: 0.5c-512mb
-    envVars:
-      - key: CRON_JOB
-        value: stats-player
-      - key: PING_BASE_URL
-        value: https://yakyuujapan.onrender.com
-
-  # C: 毎日 13:09–24:59 JST に10分間隔で試合を取得
-  - type: cron
-    name: koko-ping-games-day
-    runtime: docker
-    dockerfilePath: ./backend/Dockerfile.cron
-    dockerContext: .
-    schedule: "9,19,29,39,49,59 4-15 * * *"
+    schedule: "*/3 4-15 * * *"
     plan: 0.5c-512mb
     envVars:
       - key: CRON_JOB
@@ -46,55 +16,27 @@ services:
       - key: PING_BASE_URL
         value: https://yakyuujapan.onrender.com
 
-  # D: 毎日 0:15–6:15 JST に毎時、試合を取得
+  # 毎日 13:00–24:59 JST に3分間隔で MLB の試合を取得（NPB の1分後）
   - type: cron
-    name: koko-ping-games-night
+    name: koko-fetch-games-mlb-day
     runtime: docker
     dockerfilePath: ./backend/Dockerfile.cron
     dockerContext: .
-    schedule: "15 15-21 * * *"
+    schedule: "1-58/3 4-15 * * *"
     plan: 0.5c-512mb
     envVars:
       - key: CRON_JOB
-        value: games
+        value: games-mlb
       - key: PING_BASE_URL
         value: https://yakyuujapan.onrender.com
 
-  # E: MLB チーム成績（JST 17/13/19 相当）
+  # 毎日 1:00–12:59 JST に3分間隔で MLB の試合を取得
   - type: cron
-    name: koko-ping-stats-team-mlb
+    name: koko-fetch-games-mlb-early
     runtime: docker
     dockerfilePath: ./backend/Dockerfile.cron
     dockerContext: .
-    schedule: "5 4,8,10 * * *"
-    plan: 0.5c-512mb
-    envVars:
-      - key: CRON_JOB
-        value: stats-team-mlb
-      - key: PING_BASE_URL
-        value: https://yakyuujapan.onrender.com
-
-  # F: MLB 個人成績（JST 8/12/15 相当）
-  - type: cron
-    name: koko-ping-stats-player-mlb
-    runtime: docker
-    dockerfilePath: ./backend/Dockerfile.cron
-    dockerContext: .
-    schedule: "10 23,3,6 * * *"
-    plan: 0.5c-512mb
-    envVars:
-      - key: CRON_JOB
-        value: stats-player-mlb
-      - key: PING_BASE_URL
-        value: https://yakyuujapan.onrender.com
-
-  # G: MLB 試合（日中10分間隔）
-  - type: cron
-    name: koko-ping-games-mlb-day
-    runtime: docker
-    dockerfilePath: ./backend/Dockerfile.cron
-    dockerContext: .
-    schedule: "4,14,24,34,44,54 4-15 * * *"
+    schedule: "*/3 0-3,16-23 * * *"
     plan: 0.5c-512mb
     envVars:
       - key: CRON_JOB

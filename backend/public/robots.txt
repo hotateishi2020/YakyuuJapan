@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /auth
+Disallow: /fetch
+Disallow: /predictions
+Disallow: /refresh
+
+Sitemap: https://yakyuujapan.onrender.com/sitemap.xml

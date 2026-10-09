@@ -2782,6 +2782,11 @@ void main() {
     expect(samePlayerStatName('W.コントレラス', 'ウィリアム・コントレラス'), isTrue);
     expect(samePlayerStatName('東克樹', '村上頌樹'), isFalse);
     expect(samePlayerStatName('ブレーデン・モンゴメリー', 'コルソン・モンゴメリー'), isFalse);
+    expect(samePlayerStatName('ヘーゲン・スミス', 'C.スミス'), isFalse);
+    expect(samePlayerStatName('C.スミス', 'ヘーゲン・スミス'), isFalse);
+    expect(samePlayerStatName('ヘーゲン・スミス', 'H.スミス'), isTrue);
+    expect(samePlayerStatName('ケード・スミス', 'C.スミス'), isTrue);
+    expect(samePlayerStatName('B.モンゴメリー', 'ブレーデン・モンゴメリー'), isTrue);
   });
 
   testWidgets('White Sox 9th Montgomery keeps his own batting chips', (tester) async {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../config/app_design.dart';
 import '../logic/auth_session.dart';
 import 'AccountDialogs.dart';
 import 'AuthDialogs.dart';
@@ -102,9 +103,12 @@ class HeaderAuthAction extends StatelessWidget {
       style: TextButton.styleFrom(
         foregroundColor: Colors.white,
         backgroundColor: Colors.black38,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        minimumSize: Size.zero,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        minimumSize: const Size(0, TAB_BAR_H),
+        maximumSize: const Size(double.infinity, TAB_BAR_H),
+        fixedSize: const Size.fromHeight(TAB_BAR_H),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(TAB_RADIUS)),
       ),
       child: const Text('Login', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
     );

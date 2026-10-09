@@ -8,6 +8,7 @@ import '../tools/Postgres.dart';
 import '../tools/StringTool.dart';
 import 'AppSql.dart';
 import 'BirthPlaceRegistry.dart';
+import 'ClinchedGames.dart';
 import 'DB/m_player.dart';
 import 'DB/m_player_career.dart';
 import 'DB/m_stadium.dart';
@@ -975,6 +976,7 @@ class FetchMLB {
         }
       }
     }
+    await dropUnplayedClinchedGames(conn);
     return Response.ok('ok');
   }
 
@@ -1255,16 +1257,24 @@ class FetchMLB {
       }
       final picked = pickBestPlayerId(query: name, candidates: candidates);
       if (picked != null) {
-        if (parsed.hasInitial) {
+        final chosen = candidates.firstWhere((c) => c.id == picked);
+        final corrected = correctedNameInitial(chosen.nameFull, chosen.initial);
+        if (corrected != null) {
           await conn.execute(
             '''
               UPDATE m_player
-              SET name_first_initial = CASE
-                    WHEN COALESCE(BTRIM(name_first_initial), '') = '' THEN \$1::text
-                    ELSE name_first_initial
-                  END,
-                  updat = NOW()
+              SET name_first_initial = \$1::text, updat = NOW()
               WHERE id = \$2::int
+            ''',
+            parameters: [corrected, picked],
+          );
+        } else if (parsed.hasInitial && chosen.initial.trim().isEmpty) {
+          await conn.execute(
+            '''
+              UPDATE m_player
+              SET name_first_initial = \$1::text, updat = NOW()
+              WHERE id = \$2::int
+                AND COALESCE(BTRIM(name_first_initial), '') = ''
             ''',
             parameters: [parsed.initial, picked],
           );

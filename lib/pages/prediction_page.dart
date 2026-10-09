@@ -506,18 +506,55 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     );
   }
 
-  Widget _headerScore() {
+  static const _scoreNameStyle = TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w900, height: 1);
+  static const _scoreValueStyle = TextStyle(color: Colors.black, fontSize: 13, fontWeight: FontWeight.w900, height: 1);
+
+  ({String name1, String name2, String score1, String score2, Color color1, Color color2}) _headerScoreParts() {
     final counts = _infoAtariCounts();
     final loginId = AuthSession.instance.user?.id;
     final selfLeft = loginId == 2;
     final leftKey = selfLeft ? '2' : '1';
     final rightKey = selfLeft ? '1' : '2';
-    final name1 = selfLeft ? _infoName2 : _infoName1;
-    final name2 = selfLeft ? _infoName1 : _infoName2;
-    final score1 = '${counts[leftKey] ?? 0}';
-    final score2 = '${counts[rightKey] ?? 0}';
-    final color1 = (selfLeft ? _infoColor2 : _infoColor1) ?? const Color(0xFF0000FF);
-    final color2 = (selfLeft ? _infoColor1 : _infoColor2) ?? const Color(0xFFF44336);
+    return (
+      name1: selfLeft ? _infoName2 : _infoName1,
+      name2: selfLeft ? _infoName1 : _infoName2,
+      score1: '${counts[leftKey] ?? 0}',
+      score2: '${counts[rightKey] ?? 0}',
+      color1: (selfLeft ? _infoColor2 : _infoColor1) ?? const Color(0xFF0000FF),
+      color2: (selfLeft ? _infoColor1 : _infoColor2) ?? const Color(0xFFF44336),
+    );
+  }
+
+  double _textWidth(String text, TextStyle style) {
+    final painter = TextPainter(
+      text: TextSpan(text: text, style: style),
+      maxLines: 1,
+      textDirection: TextDirection.ltr,
+    )..layout();
+    return painter.width;
+  }
+
+  /// 名前と点数の文字が収まる幅。狭い画面ではここまで縮めてよい。
+  double _headerScorePreferredWidth() {
+    final parts = _headerScoreParts();
+    double col(String name, String score) {
+      final nameW = name.trim().isEmpty ? 22.0 : _textWidth(name.trim(), _scoreNameStyle);
+      final scoreW = _textWidth(score, _scoreValueStyle);
+      return math.max(nameW, math.max(scoreW, 14)) + 8;
+    }
+
+    final cell = math.max(col(parts.name1, parts.score1), col(parts.name2, parts.score2));
+    return cell * 2 + 3;
+  }
+
+  Widget _headerScore() {
+    final parts = _headerScoreParts();
+    final name1 = parts.name1;
+    final name2 = parts.name2;
+    final score1 = parts.score1;
+    final score2 = parts.score2;
+    final color1 = parts.color1;
+    final color2 = parts.color2;
     final pending = !_scoreReady;
     const tableH = HEADER_GLOBAL_H * 0.8;
 
@@ -534,7 +571,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                     child: Text(
                       name.trim(),
                       maxLines: 1,
-                      style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w900, height: 1),
+                      style: _scoreNameStyle,
                     ),
                   ),
           ),
@@ -557,17 +594,16 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                   child: Text(
                     score,
                     maxLines: 1,
-                    style: const TextStyle(color: Colors.black, fontSize: 13, fontWeight: FontWeight.w900, height: 1),
+                    style: _scoreValueStyle,
                   ),
                 ),
         ),
       );
     }
 
-    const width = 148.0;
     return SizedBox(
       height: tableH,
-      width: width,
+      width: double.infinity,
       child: DecoratedBox(
           decoration: BoxDecoration(
             border: Border.all(color: Colors.black, width: 1),
@@ -2229,8 +2265,9 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                         ALL_MARGIN_LEFT,
                         onAuthChanged: _onAuthChanged,
                         authReady: _authEntryReady,
+                        titleTrailing: _headerScore(),
+                        titleTrailingWidth: _headerScorePreferredWidth(),
                         actions: [
-                          _headerScore(),
                           const SizedBox(width: 4),
                           _yearPicker(),
                           const SizedBox(width: 4),

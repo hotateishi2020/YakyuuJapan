@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../config/app_design.dart';
@@ -17,6 +19,7 @@ class Headers {
     List<Widget> actions = const [],
     bool authReady = true,
     Widget? titleTrailing,
+    double? titleTrailingWidth,
   }) {
     final loggedIn = AuthSession.instance.isLoggedIn;
 
@@ -33,18 +36,41 @@ class Headers {
       child: Row(
         children: [
           Expanded(
-            child: Row(
-              children: [
-                // 文字の見た目が上に寄るので、ヘッダー中央よりほんの少し下へ。
-                Transform.translate(
-                  offset: Offset(0, paddingVertical * 0.3),
-                  child: _titleLogo(h, title),
-                ),
-                if (titleTrailing != null) ...[
-                  const SizedBox(width: 8),
-                  Flexible(child: titleTrailing),
-                ],
-              ],
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final logoNat = _logoNaturalWidth(h);
+                final scoreNat = titleTrailing == null ? 0.0 : (titleTrailingWidth ?? logoNat);
+                const gap = 8.0;
+                final room = math.max(0.0, constraints.maxWidth - (titleTrailing == null ? 0.0 : gap));
+                var logoW = logoNat;
+                var scoreW = scoreNat;
+                if (titleTrailing != null && logoNat + scoreNat > room) {
+                  var overflow = logoNat + scoreNat - room;
+                  final logoMin = logoNat * 0.5;
+                  final logoCut = math.min(overflow, math.max(0.0, logoNat - logoMin));
+                  logoW = logoNat - logoCut;
+                  overflow -= logoCut;
+                  scoreW = math.max(0.0, scoreNat - overflow);
+                  if (logoW + scoreW > room && room > 0) {
+                    final scale = room / (logoW + scoreW);
+                    logoW *= scale;
+                    scoreW *= scale;
+                  }
+                }
+                return Row(
+                  children: [
+                    Transform.translate(
+                      offset: Offset(0, paddingVertical * 0.3),
+                      child: _titleLogo(h, title, maxWidth: logoW),
+                    ),
+                    if (titleTrailing != null) ...[
+                      const Spacer(),
+                      const SizedBox(width: gap),
+                      SizedBox(width: scoreW, child: titleTrailing),
+                    ],
+                  ],
+                );
+              },
             ),
           ),
           ...actions,
@@ -68,12 +94,20 @@ const _logoTextH = 162.0;
 const _logoImgW = 1024.0;
 const _logoImgH = 341.0;
 
-Widget _titleLogo(double headerH, String title) {
+double _logoNaturalWidth(double headerH) {
+  return _logoTextW * (headerH * 0.7) / _logoTextH;
+}
+
+Widget _titleLogo(double headerH, String title, {double? maxWidth}) {
   final textH = headerH * 0.7;
-  final scale = textH / _logoTextH;
+  var scale = textH / _logoTextH;
+  if (maxWidth != null && maxWidth > 0) {
+    final naturalW = _logoTextW * scale;
+    if (naturalW > maxWidth) scale *= maxWidth / naturalW;
+  }
   return SizedBox(
     width: _logoTextW * scale,
-    height: textH,
+    height: _logoTextH * scale,
     child: ClipRect(
       child: OverflowBox(
         alignment: Alignment.topLeft,

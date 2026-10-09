@@ -2943,6 +2943,85 @@ void main() {
     expect(tester.getTopLeft(find.text('四球')).dy, greaterThan(tester.getTopLeft(find.text('右２')).dy - 2));
   });
 
+  testWidgets('死球は赤地に黒文字、5打席凡退は右端に5タコ', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 860,
+            height: 520,
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
+              games: [
+                {
+                  'date_game': '2026-10-09',
+                  'time_game': '🌙 18:00',
+                  'name_team_home': '阪神',
+                  'name_team_away': '巨人',
+                  'name_stadium': '甲子園',
+                  'name_pitcher_home': '先発甲',
+                  'name_pitcher_away': '先発乙',
+                  'score_home': 2,
+                  'score_away': 1,
+                  'state': '試合終了',
+                  'id_team_home': 2,
+                  'id_team_away': 1,
+                  'id_league_home': 1,
+                  'id_league_away': 1,
+                  'color_back_home': 'yellow',
+                  'color_back_away': 'orange',
+                  'color_font_home': 'black',
+                  'color_font_away': 'black',
+                  'lineup': [
+                    {
+                      'id_team': 2,
+                      'order': 1,
+                      'players': [
+                        {'name': '死球選手', 'pos': '中', 'plays': '死球|dead'},
+                      ],
+                    },
+                    {
+                      'id_team': 2,
+                      'order': 2,
+                      'players': [
+                        {'name': '五凡退', 'pos': '右', 'plays': '一ゴ|out 二ゴ|out 三ゴ|out 遊ゴ|out 中飛|out'},
+                      ],
+                    },
+                    {
+                      'id_team': 2,
+                      'order': 3,
+                      'players': [
+                        {'name': '四球あり', 'pos': '左', 'plays': '一ゴ|out 二ゴ|out 三ゴ|out 遊ゴ|out 四球|walk'},
+                      ],
+                    },
+                  ],
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.tap(find.text('詳細表示'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    final hbp = tester.widget<Text>(find.text('死球'));
+    expect(hbp.style?.color, Colors.black);
+    final hbpBox = tester.widget<Container>(find.ancestor(of: find.text('死球'), matching: find.byType(Container)).first);
+    expect((hbpBox.decoration as BoxDecoration).color, const Color(0xFFE53935));
+
+    expect(find.text('5タコ'), findsOneWidget);
+    final tako = tester.widget<Text>(find.text('5タコ'));
+    expect(tako.style?.color, const Color(0xFFE53935));
+    final takoBox = tester.widget<Container>(find.ancestor(of: find.text('5タコ'), matching: find.byType(Container)).first);
+    expect((takoBox.decoration as BoxDecoration).color, Colors.black);
+    expect(tester.getTopLeft(find.text('5タコ')).dx, greaterThan(tester.getTopLeft(find.text('中飛')).dx));
+    expect(find.text('四球'), findsOneWidget);
+  });
+
   testWidgets('MLB game cards put Japan flag to the right of Japanese names', (tester) async {
     await tester.pumpWidget(
       MaterialApp(

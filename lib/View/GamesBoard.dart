@@ -3164,6 +3164,7 @@ class _TableGameCard extends StatelessWidget {
       predict: predicts.join(','),
       statSize: statSize,
       includeOuts: true,
+      showFiveTako: slot.players.any((player) => _isFivePlateOuts(player.plays)),
     );
   }
 
@@ -3175,6 +3176,7 @@ class _TableGameCard extends StatelessWidget {
     required String predict,
     required double statSize,
     required bool includeOuts,
+    bool showFiveTako = false,
   }) {
     final parts = _orderedPlays(plays, includeOuts: includeOuts, rbi: rbi);
     final extraAt = _extraRbiIndex(parts, rbi);
@@ -3193,6 +3195,7 @@ class _TableGameCard extends StatelessWidget {
                 child: _predictBadge(part, statSize),
               ),
         ],
+        if (showFiveTako) _fiveTakoChip(statSize),
       ],
     );
   }
@@ -4415,6 +4418,7 @@ class _TableGameCard extends StatelessWidget {
                           ),
                         ],
                     ],
+                    if (notableBatting && _isFivePlateOuts(pitcher.plays)) _fiveTakoChip(statSize),
                   ],
                 );
                 return _blinkLiveBatterStats(
@@ -4569,7 +4573,8 @@ class _TableGameCard extends StatelessWidget {
       'triple' || 'double' || 'extra' || 'qs' => const Color(0xFFFFB300),
       'single' => const Color(0xFFFFEB3B),
       'walk' => const Color(0xFF43A047),
-      'dead' || 'error' => const Color(0xFF78909C),
+      'dead' => label.contains('死球') ? const Color(0xFFE53935) : const Color(0xFF78909C),
+      'error' => const Color(0xFF78909C),
       'sac' || 'sacfly' || 'squeeze' || 'sacbunt' => const Color(0xFF8E24AA),
       'k10' => const Color(0xFFDC143C),
       'steal' => const Color(0xFFC6FF00),
@@ -4612,6 +4617,50 @@ class _TableGameCard extends StatelessWidget {
     final bar = encoded.lastIndexOf('|');
     if (bar < 0) return '$encoded|$flag';
     return '$encoded/$flag';
+  }
+
+  /// 打席が5つで、すべて凡退（振逃を除くアウト）のとき true。
+  bool _isFivePlateOuts(String plays) {
+    final appearances = <String>[];
+    for (final part in plays.split(' ')) {
+      if (part.isEmpty) continue;
+      final kind = _playKind(part);
+      if (kind == 'steal' || kind == 'stealout') continue;
+      appearances.add(part);
+    }
+    if (appearances.length != 5) return false;
+    return appearances.every((part) {
+      if (_playKind(part) != 'out') return false;
+      return !_playText(part).contains('振逃');
+    });
+  }
+
+  Widget _fiveTakoChip(double fontSize) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 3),
+      child: Container(
+        key: const ValueKey('five-tako'),
+        height: _playChipH,
+        padding: const EdgeInsets.fromLTRB(3, 0, 3, 0),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(2),
+        ),
+        child: Text(
+          '5タコ',
+          maxLines: 1,
+          softWrap: false,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: const Color(0xFFE53935),
+            fontSize: _playChipSize(fontSize),
+            fontWeight: FontWeight.w600,
+            height: 1.0,
+          ),
+        ),
+      ),
+    );
   }
 
   int _playRank(String encoded) {
@@ -4984,8 +5033,9 @@ class _TableGameCard extends StatelessWidget {
                 : _compactPlay(parsed.body, kind, parsed.direction)
             : _insertDirection(strippedBody, parsed.direction, kind);
     shown = _fullwidthHitDigits(shown).replaceAll(RegExp(r'(?<!\d)1点'), '');
+    final hbp = kind == 'dead' && parsed.body.contains('死球');
     final bg = _playColor(kind, parsed.body);
-    final ink = parsed.body.contains('併殺') ? const Color(0xFFE53935) : _inkOn(bg);
+    final ink = hbp ? Colors.black : (parsed.body.contains('併殺') ? const Color(0xFFE53935) : _inkOn(bg));
     final chipSize = _playChipSize(fontSize);
     final rbi = kind == 'error' ? 0 : (rbiOverride >= 0 ? rbiOverride : _rbiOfEncoded(encoded));
     final steal = flags.contains('steal');

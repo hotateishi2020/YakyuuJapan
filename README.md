@@ -27,7 +27,7 @@ cp -R build/web/* backend/public/
 
 git add . 
 
-git commit -m "ゲーム差を視覚的に表現する図を表示するようにしました。" 
+git commit -m "ゲーム差の表示を調整。" 
 
 git push 
 

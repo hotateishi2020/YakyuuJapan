@@ -1013,22 +1013,13 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   String _gamesInitialDate() {
     final now = DateTime.now();
     if (_seasonYear == now.year) return DateFormatUtil.ymdWithOffset(0);
-    DateTime? latest;
-    void consider(dynamic raw) {
-      final text = gameDateOnly(raw);
-      final parsed = DateTime.tryParse(text);
-      if (parsed == null) return;
-      if (latest == null || parsed.isAfter(latest!)) latest = parsed;
-    }
-
-    for (final game in games) {
-      consider(game['date_game']);
-    }
-    for (final game in postseasonGames) {
-      consider(game['date_game']);
-    }
-    latest ??= DateTime(_seasonYear, 10, 15);
-    return DateFormatUtil.ymd(latest!);
+    final latest = latestOrgGameDate(
+      year: _seasonYear,
+      mlb: _orgKind == OrgKind.mlb,
+      games: games,
+      postseasonGames: postseasonGames,
+    );
+    return DateFormatUtil.ymd(latest ?? DateTime(_seasonYear, 10, 15));
   }
 
   Widget _yearPicker() {
@@ -1255,11 +1246,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     required SeasonPane pane,
     bool portraitLayout = false,
   }) {
-    final gamesForLeague = games.where((game) {
-      final home = int.tryParse('${game['id_league_home']}') ?? 0;
-      final away = int.tryParse('${game['id_league_away']}') ?? 0;
-      return home == leagueId && away == leagueId;
-    }).toList();
+    final gamesForLeague = games.where((game) => gameVisibleInLeague(game, leagueId)).toList();
     return SeasonTableBlock(
       standings: standings,
       stats: npbPlayerStatsActual,

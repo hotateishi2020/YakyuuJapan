@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../config/org_config.dart';
+import '../logic/game_date_window.dart';
 import '../tools/date_format.dart';
 import 'SeasonTable.dart';
 
@@ -64,7 +65,7 @@ class LeagueBoardRow extends StatelessWidget {
     this.onGameDateOffsetChanged,
   });
 
-  List<Map<String, dynamic>> get _leagueGames => games.where((g) => (int.tryParse('${g['id_league_home']}') ?? 0) == leagueId && (int.tryParse('${g['id_league_away']}') ?? 0) == leagueId).toList();
+  List<Map<String, dynamic>> get _leagueGames => games.where((game) => gameVisibleInLeague(game, leagueId)).toList();
 
   @override
   Widget build(BuildContext context) {

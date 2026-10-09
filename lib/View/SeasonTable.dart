@@ -357,6 +357,11 @@ class GamesBehindChart extends StatelessWidget {
     if (hasRank) {
       ordered.sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 999).compareTo(int.tryParse('${b['int_rank']}') ?? 999));
     }
+    final knownBehind = ordered.any((row) {
+      final text = '${row['game_behind'] ?? ''}'.trim();
+      return text.isNotEmpty && text != 'null' && text != '-' && text != '—' && text != '－';
+    });
+    if (!knownBehind) return const SizedBox.shrink();
     final entries = [
       for (final row in ordered)
         gamesBehindEntry(

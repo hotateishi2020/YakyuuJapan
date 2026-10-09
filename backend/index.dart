@@ -264,7 +264,7 @@ Future<Map<String, dynamic>> _buildPredictionsPartGames(
     game['lineup'] = lineups[_asInt(game['id_game'])] ?? const <Map<String, dynamic>>[];
   }
   _attachLiveBatters(games, playRows);
-  final postseason = snap.postseason;
+  final postseason = _postseasonForOrg(snap.postseason, org);
   return {
     'org': org.code,
     'year': year,
@@ -314,6 +314,24 @@ bool _rowInLeagues(Map<String, dynamic> row, List<int> leagueIds, {List<String> 
     if (leagueIds.contains(id)) return true;
   }
   return false;
+}
+
+const _npbPostseasonCodes = {'CS1', 'CSF', 'JS'};
+
+/// ポストシーズンは団体ごとに分ける。NPB の応答に MLB のワールドシリーズを混ぜない。
+List<Map<String, dynamic>> _postseasonForOrg(List<Map<String, dynamic>> rows, OrgKind org) {
+  return [
+    for (final row in rows)
+      if (_postseasonRowForOrg(row, org)) row,
+  ];
+}
+
+bool _postseasonRowForOrg(Map<String, dynamic> row, OrgKind org) {
+  final code = '${row['code_game'] ?? ''}'.trim().toUpperCase();
+  if (code.isEmpty) return false;
+  final npb = _npbPostseasonCodes.contains(code);
+  if (org == OrgKind.npb) return npb;
+  return !npb;
 }
 
 List<Map<String, dynamic>> _filterByLeagues(List<Map<String, dynamic>> rows, List<int> leagueIds, {List<String> keys = const ['id_league']}) {
@@ -1246,6 +1264,7 @@ void main() async {
         // print(games);
         final leagueIds = org.leagueIds;
         final filteredGames = _filterByLeagues(games, leagueIds, keys: const ['id_league_home', 'id_league_away']);
+        final postseason = _postseasonForOrg(snap.postseason, org);
         final payload = <String, dynamic>{
           'org': org.code,
           'year': current_year,
@@ -1256,8 +1275,8 @@ void main() async {
           'games': filteredGames,
           'events': org.code == 'npb' ? Postgres.toJson(results[5] as Result) : const <Map<String, dynamic>>[],
           'notification': org.code == 'npb' ? Postgres.toJson(results[6] as Result) : const <Map<String, dynamic>>[],
-          'postseason_games': _dedupeSameDayMatchups(snap.postseason),
-          'show_postseason_board': snap.postseason.isNotEmpty || _showPostseasonBoard(snap.board),
+          'postseason_games': _dedupeSameDayMatchups(postseason),
+          'show_postseason_board': postseason.isNotEmpty || _showPostseasonBoard(snap.board),
         };
         final body = jsonEncode(payload);
         _predictionsCacheBody[cacheKey] = body;

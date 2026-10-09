@@ -1291,7 +1291,7 @@ SELECT
           END
         ) AS int_game_left,
         game_behind,
-        to_char(int_win / (int_win + int_lose) ::NUMERIC * 100, 'FM990.0') || '%' AS pct_win,
+        to_char(int_win / NULLIF(int_win + int_lose, 0) ::NUMERIC * 100, 'FM990.0') || '%' AS pct_win,
         regexp_replace(to_char(num_avg_batting, 'FM0.000'), '^0(?=.)', '') AS num_avg_batting,
         int_homerun,
         int_rbi,
@@ -1377,8 +1377,8 @@ ORDER BY mt.id_league, tpt.int_rank
         m_team.color_back,
         CASE WHEN tsp.int_rank < 1000 THEN regexp_replace(COALESCE(m_player.name_full, ''), E'[\\s　]+', '', 'g')
              ELSE
-               CASE WHEN m_stats.flg_pitcher = TRUE THEN regexp_replace(COALESCE(m_player.name_full, ''), E'[\\s　]+', '', 'g') || '(' || ROUND(LEAST(cnt_play::numeric / int_game * 100, 100), 1) || '%)' 
-                    ELSE regexp_replace(COALESCE(m_player.name_full, ''), E'[\\s　]+', '', 'g') || '(' || ROUND(LEAST(cnt_play::numeric / (int_game * 3.1) * 100, 100), 1) || '%)'
+               CASE WHEN m_stats.flg_pitcher = TRUE THEN regexp_replace(COALESCE(m_player.name_full, ''), E'[\\s　]+', '', 'g') || '(' || ROUND(LEAST(cnt_play::numeric / NULLIF(int_game, 0) * 100, 100), 1) || '%)'
+                    ELSE regexp_replace(COALESCE(m_player.name_full, ''), E'[\\s　]+', '', 'g') || '(' || ROUND(LEAST(cnt_play::numeric / NULLIF(int_game * 3.1, 0) * 100, 100), 1) || '%)'
                END
         END AS name_player,
         COALESCE(m_player.name_last, '') AS name_last,

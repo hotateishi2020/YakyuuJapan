@@ -75,4 +75,34 @@ void main() {
     );
     expect(merged.map((game) => game['id_game']).toList(), [1, 652]);
   });
+
+  test('past year opens on that org last game, not the other org series', () {
+    final date = latestOrgGameDate(
+      year: 2025,
+      mlb: false,
+      games: [
+        {'date_game': '2025-10-29', 'code_game': 'JS', 'id_league_home': 1, 'id_league_away': 2},
+      ],
+      postseasonGames: [
+        {'date_game': '2025-10-29', 'code_game': 'JS'},
+        {'date_game': '2025-11-02', 'code_game': 'WS'},
+        {'date_game': '2026-10-09', 'code_game': 'JS'},
+      ],
+    );
+    expect(ymdOf(date!), '2025-10-29');
+    expect(
+      gameVisibleInLeague(
+        {'code_game': 'JS', 'id_league_home': 1, 'id_league_away': 2},
+        1,
+      ),
+      isTrue,
+    );
+    expect(
+      gameVisibleInLeague(
+        {'code_game': '', 'id_league_home': 1, 'id_league_away': 2},
+        1,
+      ),
+      isFalse,
+    );
+  });
 }

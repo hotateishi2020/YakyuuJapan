@@ -257,7 +257,11 @@ class AppSql {
           SELECT
             c0.id_player,
             c0.int_year,
-            COALESCE(c0.int_appearance, 0) AS pa,
+            CASE
+              WHEN COALESCE(c0.int_appearance, 0) > 0 THEN c0.int_appearance
+              WHEN COALESCE(c0.double_inning, 0) = 0 AND COALESCE(c0.int_games, 0) > 60 THEN c0.int_games
+              ELSE 0
+            END AS pa,
             (
               trunc(COALESCE(c0.double_inning, 0))::int * 3
               + LEAST(2, GREATEST(0, round((COALESCE(c0.double_inning, 0) - trunc(COALESCE(c0.double_inning, 0))) * 10)::int))
@@ -1499,7 +1503,13 @@ ORDER BY mt.id_league, tpt.int_rank
             SELECT
               c.id_player,
               MIN(c.int_year) FILTER (WHERE COALESCE(t.id_league, 0) NOT IN (3, 4)) AS first_year,
-              COALESCE(SUM(COALESCE(c.int_appearance, 0)) FILTER (
+              COALESCE(SUM(
+                CASE
+                  WHEN COALESCE(c.int_appearance, 0) > 0 THEN c.int_appearance
+                  WHEN COALESCE(c.double_inning, 0) = 0 AND COALESCE(c.int_games, 0) > 60 THEN c.int_games
+                  ELSE 0
+                END
+              ) FILTER (
                 WHERE COALESCE(t.id_league, 0) NOT IN (3, 4) AND c.int_year < \$1
               ), 0) AS prior_pa,
               COALESCE(SUM(

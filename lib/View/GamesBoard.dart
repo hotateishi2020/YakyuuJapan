@@ -4087,13 +4087,20 @@ class _TableGameCard extends StatelessWidget {
       color: color,
       right: right,
       padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Stack(
+        alignment: Alignment.center,
         children: [
+          OneLineShrinkText(
+            name,
+            baseSize: size,
+            minSize: 9,
+            color: textColor,
+            weight: FontWeight.bold,
+            align: TextAlign.center,
+          ),
           if (resultBadge != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 2),
+            Align(
+              alignment: Alignment.topCenter,
               child: SizedBox(
                 height: 22,
                 child: Image.asset(
@@ -4103,18 +4110,9 @@ class _TableGameCard extends StatelessWidget {
                 ),
               ),
             ),
-          Flexible(
-            child: OneLineShrinkText(
-              name,
-              baseSize: size,
-              minSize: 9,
-              color: textColor,
-              weight: FontWeight.bold,
-              align: TextAlign.center,
-            ),
-          ),
           if (milestone.isNotEmpty)
-            Center(
+            Align(
+              alignment: Alignment.bottomCenter,
               child: IntrinsicWidth(
                 child: BlinkBg(
                   base: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(2)),

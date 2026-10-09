@@ -16,6 +16,7 @@ class Headers {
     VoidCallback? onAuthChanged,
     List<Widget> actions = const [],
     bool authReady = true,
+    Widget? titleTrailing,
   }) {
     final loggedIn = AuthSession.instance.isLoggedIn;
 
@@ -28,13 +29,22 @@ class Headers {
           colors: [Color(0xFFE10600), Color(0xFFFF9800)],
         ),
       ),
-      padding: EdgeInsets.symmetric(horizontal: paddingHorizontal, vertical: paddingVertical),
+      padding: EdgeInsets.symmetric(horizontal: paddingHorizontal),
       child: Row(
         children: [
           Expanded(
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: _titleLogo(h, title),
+            child: Row(
+              children: [
+                // 文字の見た目が上に寄るので、ヘッダー中央よりほんの少し下へ。
+                Transform.translate(
+                  offset: Offset(0, paddingVertical * 0.3),
+                  child: _titleLogo(h, title),
+                ),
+                if (titleTrailing != null) ...[
+                  const SizedBox(width: 8),
+                  Flexible(child: titleTrailing),
+                ],
+              ],
             ),
           ),
           ...actions,

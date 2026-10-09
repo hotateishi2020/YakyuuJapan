@@ -27,7 +27,7 @@ cp -R build/web/* backend/public/
 
 git add . 
 
-git commit -m "年度変更時のエラーを修正。" 
+git commit -m "初期表示の不具合を修正。" 
 
 git push 
 

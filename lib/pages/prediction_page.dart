@@ -103,6 +103,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   bool showPostseasonBoard = false;
   List<Map<String, dynamic>> events = [];
   List<Map<String, dynamic>> notifications = [];
+  bool _sharedInfoReady = false;
+  final List<VoidCallback> _infoDialogListeners = [];
   // Info / SCORE 専用（団体タブの predictions とは独立）
   String _infoName1 = '';
   String _infoName2 = '';
@@ -124,9 +126,9 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
 
   bool _newsExpanded = false;
   bool _eventsExpanded = false;
-  bool _infoExpanded = true;
-  static const _infoCookie = 'koko_info_open';
   static const _orgCookie = 'koko_org';
+  bool _scoreLoading = false;
+  int _scoreGen = 0;
   OrgKind _orgKind = OrgKind.npb;
   final Map<OrgKind, _OrgBundle> _orgCache = {};
   final Map<OrgKind, Future<void>> _orgLoadFutures = {};
@@ -156,9 +158,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     bindPageVisibility(_onPageBecameVisible);
-    final saved = readBrowserCookie(_infoCookie);
-    if (saved == '0') _infoExpanded = false;
-    if (saved == '1') _infoExpanded = true;
     // cookie の団体をそのまま初回表示（npb / mlb）
     if (readBrowserCookie(_orgCookie) == 'mlb') {
       _orgKind = OrgKind.mlb;
@@ -203,7 +202,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     setState(() => _authEntryReady = false);
     try {
       await Future.wait([
-        for (final part in {_LoadPart.games, _LoadPart.info, _partForItem(_itemTab)})
+        for (final part in _partsForItemView(null))
           _fetchPart(_orgKind, part, _seasonYear, background: false, force: true),
       ]).timeout(const Duration(seconds: 45));
     } catch (_) {}
@@ -264,11 +263,12 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   /// Info（ニュース・イベント・予想者名）は NPB/MLB 共通。空応答で消さない。
-  void _applySharedInfo(Map<String, dynamic> map) {
+  void _applySharedInfo(Map<String, dynamic> map, {required bool settles}) {
     final evts = listMapFromJson(map['events']);
     final notifs = listMapFromJson(map['notification']);
     if (evts.isNotEmpty) events = evts;
     if (notifs.isNotEmpty) notifications = notifs;
+    if (settles) _sharedInfoReady = true;
     _captureInfoUsers(listMapFromJson(map['predict_team']));
   }
 
@@ -277,8 +277,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     List<Map<String, dynamic>> playerStats = const [],
   ]) {
     for (final id in const ['1', '2']) {
-      final name = lookupField(preds, 'id_user', id, 'name_user_last', fallback: '').trim();
-      if (name.isNotEmpty && name != '—') {
+      final name = _lookupUserName(preds, playerStats, id);
+      if (name.isNotEmpty) {
         if (id == '1') {
           _infoName1 = name;
         } else {
@@ -295,6 +295,37 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           _infoColor2 = parsed;
         }
       }
+    }
+  }
+
+  String _lookupUserName(
+    List<Map<String, dynamic>> preds,
+    List<Map<String, dynamic>> playerStats,
+    String id,
+  ) {
+    for (final rows in [preds, playerStats]) {
+      for (final key in const ['name_user_last', 'username', 'name_last']) {
+        final name = lookupField(rows, 'id_user', id, key, fallback: '').trim();
+        if (name.isNotEmpty && name != '—' && name != '現在') return name;
+      }
+    }
+    return '';
+  }
+
+  void addInfoDialogListener(VoidCallback listener) {
+    _infoDialogListeners.add(listener);
+  }
+
+  void removeInfoDialogListener(VoidCallback listener) {
+    _infoDialogListeners.remove(listener);
+  }
+
+  @override
+  void setState(VoidCallback fn) {
+    super.setState(fn);
+    if (_infoDialogListeners.isEmpty) return;
+    for (final listener in List<VoidCallback>.of(_infoDialogListeners)) {
+      listener();
     }
   }
 
@@ -365,78 +396,211 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     await fetchData(kind: other, background: true);
   }
 
-  void _toggleInfo() {
-    setState(() => _infoExpanded = !_infoExpanded);
-    writeBrowserCookie(_infoCookie, _infoExpanded ? '1' : '0');
+  bool get _scoreReady => OrgKind.values.every(
+        (kind) => _partReady(_LoadPart.standings, kind) && _partReady(_LoadPart.players, kind),
+      );
+
+  /// スコアは NPB と MLB の順位・個人成績が揃ったときに確定する。揃うまで表示は出さない。
+  Future<void> _loadScoreOnce() async {
+    final year = _seasonYear;
+    final gen = ++_scoreGen;
+    if (_scoreReady) {
+      if (_scoreLoading && gen == _scoreGen) {
+        _scoreLoading = false;
+        if (mounted) setState(() {});
+      }
+      return;
+    }
+    _scoreLoading = true;
+    if (mounted) setState(() {});
+    try {
+      await Future.wait([
+        for (final kind in OrgKind.values) ...[
+          _ensureScorePart(kind, _LoadPart.standings, year),
+          _ensureScorePart(kind, _LoadPart.players, year),
+        ],
+      ]).timeout(const Duration(seconds: 45));
+    } catch (_) {
+    } finally {
+      if (gen == _scoreGen) {
+        _scoreLoading = false;
+        if (mounted) setState(() {});
+        if (!_scoreReady && mounted && _seasonYear == year) {
+          Future<void>.delayed(const Duration(seconds: 3), () {
+            if (!mounted || _scoreReady || _seasonYear != year || gen != _scoreGen) return;
+            unawaited(_loadScoreOnce());
+          });
+        }
+      }
+    }
   }
 
-  Widget _infoShell({required Widget child, required bool expand}) {
-    final showInfoNew = !_infoExpanded && AuthSession.instance.showInfoNew;
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.black87, width: 1.5),
-        borderRadius: BorderRadius.circular(10),
+  Future<void> _ensureScorePart(OrgKind kind, _LoadPart part, int year) {
+    if (_partLoadedForYear(kind, part)) return Future<void>.value();
+    return _fetchPart(kind, part, year, background: true);
+  }
+
+  Future<void> _ensureSharedInfo() {
+    if (_sharedInfoReady) return Future<void>.value();
+    return _fetchPart(OrgKind.npb, _LoadPart.info, _seasonYear, background: true);
+  }
+
+  void _openInfoPopup() {
+    if (AuthSession.instance.showNewsNew) unawaited(_markRead('news'));
+    if (AuthSession.instance.showEventNew) unawaited(_markRead('event'));
+    if (!_sharedInfoReady) unawaited(_ensureSharedInfo());
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => _LiveInfoDialog(host: this),
+    );
+  }
+
+  Widget _infoPopup(BuildContext dialogContext) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(8, 4, 4, 0),
+          child: Row(
+            children: [
+              const Text('News・イベント', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              const Spacer(),
+              IconButton(
+                tooltip: '閉じる',
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                icon: const Icon(Icons.close),
+              ),
+            ],
+          ),
+        ),
+        Expanded(child: _scoreNewsEventsRow(portrait: false, popup: true)),
+      ],
+    );
+  }
+
+  Widget _infoButton() {
+    final unread = AuthSession.instance.showNewsNew || AuthSession.instance.showEventNew || AuthSession.instance.showInfoNew;
+    return SizedBox(
+      width: TAB_BAR_H,
+      height: TAB_BAR_H,
+      child: Material(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(TAB_RADIUS),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: _openInfoPopup,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              const Icon(Icons.newspaper, color: Colors.white, size: 16),
+              if (unread)
+                const Positioned(
+                  top: 3,
+                  right: 3,
+                  child: BlinkNewMark(fontSize: 8),
+                ),
+            ],
+          ),
+        ),
       ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        mainAxisSize: expand && _infoExpanded ? MainAxisSize.max : MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Material(
-            color: Colors.black,
-            child: InkWell(
-              onTap: _toggleInfo,
-              child: SizedBox(
-                height: 28,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+    );
+  }
+
+  Widget _headerScore() {
+    final counts = _infoAtariCounts();
+    final loginId = AuthSession.instance.user?.id;
+    final selfLeft = loginId == 2;
+    final leftKey = selfLeft ? '2' : '1';
+    final rightKey = selfLeft ? '1' : '2';
+    final name1 = selfLeft ? _infoName2 : _infoName1;
+    final name2 = selfLeft ? _infoName1 : _infoName2;
+    final score1 = '${counts[leftKey] ?? 0}';
+    final score2 = '${counts[rightKey] ?? 0}';
+    final color1 = (selfLeft ? _infoColor2 : _infoColor1) ?? const Color(0xFF0000FF);
+    final color2 = (selfLeft ? _infoColor1 : _infoColor2) ?? const Color(0xFFF44336);
+    final pending = !_scoreReady;
+    const tableH = HEADER_GLOBAL_H * 0.8;
+
+    Widget nameCell(String name, Color color) {
+      return ColoredBox(
+        color: color,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Center(
+            child: name.trim().isEmpty
+                ? const SizedBox.shrink()
+                : FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      name.trim(),
+                      maxLines: 1,
+                      style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w900, height: 1),
+                    ),
+                  ),
+          ),
+        ),
+      );
+    }
+
+    Widget scoreCell(String score) {
+      return ColoredBox(
+        color: Colors.white,
+        child: Center(
+          child: pending
+              ? const SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black),
+                )
+              : FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    score,
+                    maxLines: 1,
+                    style: const TextStyle(color: Colors.black, fontSize: 13, fontWeight: FontWeight.w900, height: 1),
+                  ),
+                ),
+        ),
+      );
+    }
+
+    const width = 148.0;
+    return SizedBox(
+      height: tableH,
+      width: width,
+      child: DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black, width: 1),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          position: DecorationPosition.foreground,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(3),
+            child: Column(
+              children: [
+                Expanded(
                   child: Row(
                     children: [
-                      Icon(
-                        _infoExpanded ? Icons.expand_less : Icons.expand_more,
-                        size: 18,
-                        color: Colors.white,
-                      ),
-                      const SizedBox(width: 4),
-                      const Text(
-                        'Info',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if (showInfoNew) ...[
-                        const SizedBox(width: 8),
-                        const BlinkNewMark(fontSize: 10),
-                      ],
+                      Expanded(child: nameCell(name1, color1)),
+                      Container(width: 1, color: Colors.black),
+                      Expanded(child: nameCell(name2, color2)),
                     ],
                   ),
                 ),
-              ),
+                Container(height: 1, color: Colors.black),
+                Expanded(
+                  child: Row(
+                    children: [
+                      Expanded(child: scoreCell(score1)),
+                      Container(width: 1, color: Colors.black),
+                      Expanded(child: scoreCell(score2)),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          if (_infoExpanded)
-            expand
-                ? Expanded(
-                    child: ColoredBox(
-                      color: const Color(0xFFF5F0DC),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
-                        child: child,
-                      ),
-                    ),
-                  )
-                : ColoredBox(
-                    color: const Color(0xFFF5F0DC),
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
-                      child: child,
-                    ),
-                  ),
-        ],
-      ),
+        ),
     );
   }
 
@@ -482,6 +646,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
 
   Future<void> _loadThenWatchGames() async {
     await fetchData();
+    unawaited(_ensureSharedInfo());
+    unawaited(_loadScoreOnce());
     if (!mounted) return;
     if (!_shellReady || isLoading) {
       setState(() {
@@ -618,7 +784,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       _seasonYear = year;
       _invalidateYearParts();
     });
-    await _ensureItemYearLoaded(_itemTab);
+    await _ensureSeasonYearLoaded();
+    unawaited(_loadScoreOnce());
     if (year == DateTime.now().year) {
       unawaited(_startGamesWatch());
     } else {
@@ -633,7 +800,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     List<_LoadPart>? only,
   }) async {
     _ensureCache(target);
-    // 初期表示は試合情報。順位・個人成績を先に待たない。個人成績はタブを開くまで取らない。
+    // タブを開いていなくても試合・順位・個人成績は取る。画面に出すのは試合を先に待つ。
     final parts = only ?? _partsForItemView(null);
     final pending = [
       for (final part in parts)
@@ -668,10 +835,10 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     unawaited(_fetchPart(target, _LoadPart.standings, _seasonYear, background: true));
   }
 
-  /// 項目ごと表示で今いるタブと、ヘッダーの Info。個人成績はタブを開くまで取らない。
+  /// 項目ごと表示。開いているタブに関係なく、試合・順位・個人成績と Info を取る。
   List<_LoadPart> _partsForItemView(List<_LoadPart>? requested) {
-    final visible = {_LoadPart.games, _LoadPart.info, _partForItem(_itemTab)};
-    if (requested == null) return visible.toList();
+    const visible = [_LoadPart.games, _LoadPart.info, _LoadPart.standings, _LoadPart.players];
+    if (requested == null) return visible;
     return [for (final part in requested) if (visible.contains(part)) part];
   }
 
@@ -739,8 +906,10 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       if (!mounted) return;
       setState(() {
         if (part == _LoadPart.info) {
-          _applySharedInfo(map);
-          _captureInfoUsers(listMapFromJson(map['predict_team']));
+          _applySharedInfo(map, settles: target == OrgKind.npb);
+        }
+        if (part == _LoadPart.standings || part == _LoadPart.players) {
+          _captureInfoUsers(bundle.predictions, bundle.playerStats);
         }
         if (target == _orgKind) {
           switch (part) {
@@ -1331,14 +1500,11 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     return totals;
   }
 
-  // 上部: Score + News + イベント日程（NPB/MLB 共通。団体タブでは内容を切り替えない）
-  Widget _scoreNewsEventsRow({required bool portrait}) {
+  // 上部: News + イベント日程（NPB/MLB 共通。団体タブでは内容を切り替えない）
+  Widget _scoreNewsEventsRow({required bool portrait, bool popup = false}) {
     final counts = _infoAtariCounts();
-    final infoLoading = !_partReady(_LoadPart.info);
-    // SCORE は NPB / MLB の合算値。片方だけの途中値を確定値のように見せない。
-    final scoreLoading = OrgKind.values.any(
-      (kind) => !_partReady(_LoadPart.standings, kind) || !_partReady(_LoadPart.players, kind),
-    );
+    final infoLoading = !_sharedInfoReady;
+    final scoreLoading = _scoreLoading;
     final namesLoading = infoLoading && !_partReady(_LoadPart.standings);
 
     Widget miniSpinner({double size = 18}) => SizedBox(
@@ -1546,21 +1712,32 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       const double tagW = 64.0;
       const double tagH = 20.0;
 
-      Widget newsTag(String title, Color back, Color font) {
+      Widget newsTag(String title, Color back, Color font, {double? width}) {
         return Container(
-          constraints: const BoxConstraints(minWidth: tagW, minHeight: tagH),
+          width: width,
+          constraints: BoxConstraints(minWidth: width ?? tagW, minHeight: tagH),
           alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
+          padding: EdgeInsets.symmetric(vertical: 2, horizontal: width == null ? 6 : 3),
           decoration: BoxDecoration(
             color: back,
             borderRadius: BorderRadius.circular(3),
           ),
-          child: Text(
-            title,
-            maxLines: 1,
-            softWrap: false,
-            style: TextStyle(fontSize: 12, color: font, height: 1.1),
-          ),
+          child: width == null
+              ? Text(
+                  title,
+                  maxLines: 1,
+                  softWrap: false,
+                  style: TextStyle(fontSize: 12, color: font, height: 1.1),
+                )
+              : FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    softWrap: false,
+                    style: TextStyle(fontSize: 12, color: font, height: 1.1),
+                  ),
+                ),
         );
       }
 
@@ -1643,6 +1820,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                                             (n['tag_main_title'] ?? '').toString(),
                                             parse(n['tag_main_color_back'], Colors.grey.shade300),
                                             parse(n['tag_main_color_font'], Colors.white),
+                                            width: tagW * 2 / 3,
                                           ),
                                           const SizedBox(width: 6),
                                           newsTag(
@@ -1710,10 +1888,18 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       final h = boxHeight ?? 120.0;
       final content = Container(
         height: fill ? null : h,
+        clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(color: Colors.black45),
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: popup
+              ? const BorderRadius.only(
+                  topLeft: Radius.circular(4),
+                  topRight: Radius.circular(4),
+                  bottomLeft: Radius.circular(28),
+                  bottomRight: Radius.circular(28),
+                )
+              : BorderRadius.circular(4),
         ),
         padding: EdgeInsets.zero,
         child: Column(
@@ -1745,7 +1931,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
               ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(10, 4, 10, 6),
+                padding: EdgeInsets.fromLTRB(10, 4, 10, popup ? 22 : 6),
                 child: infoLoading
                     ? Center(child: miniSpinner(size: 22))
                     : LayoutBuilder(
@@ -1888,6 +2074,22 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       return content;
     }
 
+    if (popup) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+              child: newsBox(fill: true),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Expanded(child: eventsBox(fill: true)),
+        ],
+      );
+    }
+
     if (portrait) {
       const double panelH = 160.0;
       return Column(
@@ -1972,11 +2174,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: ALL_SPACE_BLOCK),
-            _infoShell(
-              expand: false,
-              child: isPortrait ? _scoreNewsEventsRow(portrait: true) : (_infoExpanded ? _scoreNewsEventsRow(portrait: false) : const SizedBox.shrink()),
-            ),
-            const SizedBox(height: 8),
             _orgTabBar(),
           ],
         );
@@ -2033,7 +2230,11 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                         onAuthChanged: _onAuthChanged,
                         authReady: _authEntryReady,
                         actions: [
+                          _headerScore(),
+                          const SizedBox(width: 4),
                           _yearPicker(),
+                          const SizedBox(width: 4),
+                          _infoButton(),
                           const SizedBox(width: 4),
                         ],
                       ),
@@ -2051,6 +2252,49 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           ),
         );
       },
+    );
+  }
+}
+
+/// ページの setState に合わせて News・イベントを描き直す。
+class _LiveInfoDialog extends StatefulWidget {
+  const _LiveInfoDialog({required this.host});
+
+  final _PredictionPageState host;
+
+  @override
+  State<_LiveInfoDialog> createState() => _LiveInfoDialogState();
+}
+
+class _LiveInfoDialogState extends State<_LiveInfoDialog> {
+  void _refresh() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.host.addInfoDialogListener(_refresh);
+  }
+
+  @override
+  void dispose() {
+    widget.host.removeInfoDialogListener(_refresh);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    return Dialog(
+      insetPadding: EdgeInsets.symmetric(horizontal: size.width * 0.025, vertical: size.height * 0.025),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+      clipBehavior: Clip.antiAlias,
+      child: SizedBox(
+        width: size.width * 0.95,
+        height: size.height * 0.95,
+        child: widget.host._infoPopup(context),
+      ),
     );
   }
 }

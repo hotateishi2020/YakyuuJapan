@@ -1,0 +1,1480 @@
+2026-10-10
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _buildPredictionsPartGames (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:210:31)
+#14     _buildPredictionsPart (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:296:14)
+#15     main.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1275:31)
+<asynchronous suspension>
+#16     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1559:16)
+<asynchronous suspension>
+#17     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#18     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#19     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#20     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#21     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#22     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#23     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#24     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1497:31)
+#14     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1562:22)
+<asynchronous suspension>
+#15     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#16     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#17     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#18     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#19     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#20     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#21     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#22     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-10
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _buildPredictionsPartGames (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:210:31)
+#14     _buildPredictionsPart (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:296:14)
+#15     main.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1275:31)
+<asynchronous suspension>
+#16     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1559:16)
+<asynchronous suspension>
+#17     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#18     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#19     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#20     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#21     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#22     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#23     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#24     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1497:31)
+#14     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1562:22)
+<asynchronous suspension>
+#15     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#16     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#17     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#18     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#19     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#20     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#21     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#22     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-10
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _buildPredictionsPartGames (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:210:31)
+#14     _buildPredictionsPart (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:296:14)
+#15     main.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1275:31)
+<asynchronous suspension>
+#16     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1559:16)
+<asynchronous suspension>
+#17     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#18     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#19     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#20     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#21     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#22     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#23     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#24     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1497:31)
+#14     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1562:22)
+<asynchronous suspension>
+#15     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#16     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#17     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#18     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#19     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#20     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#21     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#22     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-10
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _buildPredictionsPartGames (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:210:31)
+#14     _buildPredictionsPart (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:296:14)
+#15     main.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1275:31)
+<asynchronous suspension>
+#16     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1559:16)
+<asynchronous suspension>
+#17     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#18     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#19     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#20     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#21     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#22     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#23     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#24     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1497:31)
+#14     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1562:22)
+<asynchronous suspension>
+#15     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#16     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#17     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#18     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#19     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#20     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#21     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#22     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-10
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _buildPredictionsPartGames (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:210:31)
+#14     _buildPredictionsPart (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:296:14)
+#15     main.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1275:31)
+<asynchronous suspension>
+#16     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1559:16)
+<asynchronous suspension>
+#17     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#18     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#19     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#20     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#21     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#22     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#23     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#24     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1497:31)
+#14     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1562:22)
+<asynchronous suspension>
+#15     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#16     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#17     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#18     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#19     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#20     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#21     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#22     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-10
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _buildPredictionsPartGames (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:210:31)
+#14     _buildPredictionsPart (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:296:14)
+#15     main.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1275:31)
+<asynchronous suspension>
+#16     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1559:16)
+<asynchronous suspension>
+#17     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#18     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#19     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#20     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#21     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#22     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#23     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#24     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1497:31)
+#14     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1562:22)
+<asynchronous suspension>
+#15     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#16     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#17     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#18     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#19     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#20     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#21     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#22     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-10
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _buildPredictionsPartGames (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:210:31)
+#14     _buildPredictionsPart (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:296:14)
+#15     main.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1275:31)
+<asynchronous suspension>
+#16     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1559:16)
+<asynchronous suspension>
+#17     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#18     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#19     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#20     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#21     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#22     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#23     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#24     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1497:31)
+#14     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1562:22)
+<asynchronous suspension>
+#15     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#16     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#17     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#18     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#19     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#20     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#21     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#22     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-10
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _buildPredictionsPartGames (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:210:31)
+#14     _buildPredictionsPart (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:296:14)
+#15     main.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1275:31)
+<asynchronous suspension>
+#16     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1559:16)
+<asynchronous suspension>
+#17     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#18     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#19     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#20     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#21     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#22     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#23     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#24     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1497:31)
+#14     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1562:22)
+<asynchronous suspension>
+#15     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#16     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#17     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#18     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#19     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#20     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#21     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#22     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-10
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _buildPredictionsPartGames (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:210:31)
+#14     _buildPredictionsPart (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:296:14)
+#15     main.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1275:31)
+<asynchronous suspension>
+#16     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1559:16)
+<asynchronous suspension>
+#17     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#18     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#19     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#20     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#21     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#22     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#23     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#24     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1497:31)
+#14     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1562:22)
+<asynchronous suspension>
+#15     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#16     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#17     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#18     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#19     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#20     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#21     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#22     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-10
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _buildPredictionsPartGames (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:210:31)
+#14     _buildPredictionsPart (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:296:14)
+#15     main.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1275:31)
+<asynchronous suspension>
+#16     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1559:16)
+<asynchronous suspension>
+#17     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#18     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#19     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#20     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#21     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#22     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#23     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#24     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1497:31)
+#14     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1562:22)
+<asynchronous suspension>
+#15     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#16     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#17     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#18     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#19     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#20     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#21     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#22     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-10
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _buildPredictionsPartGames (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:210:31)
+#14     _buildPredictionsPart (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:296:14)
+#15     main.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1275:31)
+<asynchronous suspension>
+#16     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1559:16)
+<asynchronous suspension>
+#17     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#18     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#19     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#20     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#21     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#22     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#23     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#24     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1497:31)
+#14     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1562:22)
+<asynchronous suspension>
+#15     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#16     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#17     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#18     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#19     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#20     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#21     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#22     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-10
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _buildPredictionsPartGames (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:210:31)
+#14     _buildPredictionsPart (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:296:14)
+#15     main.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1275:31)
+<asynchronous suspension>
+#16     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1559:16)
+<asynchronous suspension>
+#17     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#18     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#19     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#20     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#21     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#22     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#23     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#24     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1497:31)
+#14     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1562:22)
+<asynchronous suspension>
+#15     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#16     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#17     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#18     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#19     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#20     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#21     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#22     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-10
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _buildPredictionsPartGames (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:210:31)
+#14     _buildPredictionsPart (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:296:14)
+#15     main.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1275:31)
+<asynchronous suspension>
+#16     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1559:16)
+<asynchronous suspension>
+#17     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#18     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#19     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#20     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#21     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#22     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#23     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#24     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1497:31)
+#14     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1562:22)
+<asynchronous suspension>
+#15     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#16     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#17     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#18     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#19     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#20     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#21     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#22     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-10
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _buildPredictionsPartGames (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:210:31)
+#14     _buildPredictionsPart (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:296:14)
+#15     main.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1275:31)
+<asynchronous suspension>
+#16     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1559:16)
+<asynchronous suspension>
+#17     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#18     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#19     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#20     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#21     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#22     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#23     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#24     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1497:31)
+#14     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1562:22)
+<asynchronous suspension>
+#15     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#16     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#17     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#18     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#19     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#20     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#21     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#22     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-10
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _buildPredictionsPartGames (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:210:31)
+#14     _buildPredictionsPart (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:296:14)
+#15     main.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1275:31)
+<asynchronous suspension>
+#16     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1559:16)
+<asynchronous suspension>
+#17     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#18     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#19     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#20     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#21     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#22     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#23     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#24     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1497:31)
+#14     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1562:22)
+<asynchronous suspension>
+#15     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#16     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#17     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#18     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#19     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#20     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#21     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#22     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-10
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _buildPredictionsPartGames (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:210:31)
+#14     _buildPredictionsPart (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:296:14)
+#15     main.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1275:31)
+<asynchronous suspension>
+#16     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1559:16)
+<asynchronous suspension>
+#17     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#18     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#19     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#20     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#21     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#22     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#23     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#24     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1497:31)
+#14     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1562:22)
+<asynchronous suspension>
+#15     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#16     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#17     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#18     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#19     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#20     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#21     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#22     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-10
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _buildPredictionsPartGames (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:210:31)
+#14     _buildPredictionsPart (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:296:14)
+#15     main.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1275:31)
+<asynchronous suspension>
+#16     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1559:16)
+<asynchronous suspension>
+#17     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#18     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#19     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#20     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#21     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#22     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#23     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#24     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1497:31)
+#14     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1562:22)
+<asynchronous suspension>
+#15     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#16     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#17     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#18     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#19     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#20     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#21     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#22     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-10
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _buildPredictionsPartGames (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:210:31)
+#14     _buildPredictionsPart (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:296:14)
+#15     main.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1275:31)
+<asynchronous suspension>
+#16     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1559:16)
+<asynchronous suspension>
+#17     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#18     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#19     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#20     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#21     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#22     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#23     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#24     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1497:31)
+#14     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1562:22)
+<asynchronous suspension>
+#15     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#16     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#17     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#18     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#19     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#20     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#21     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#22     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-10
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _buildPredictionsPartGames (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:210:31)
+#14     _buildPredictionsPart (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:296:14)
+#15     main.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1275:31)
+<asynchronous suspension>
+#16     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1559:16)
+<asynchronous suspension>
+#17     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#18     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#19     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#20     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#21     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#22     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#23     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#24     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1497:31)
+#14     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1562:22)
+<asynchronous suspension>
+#15     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#16     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#17     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#18     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#19     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#20     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#21     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#22     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-10
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _buildPredictionsPartGames (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:210:31)
+#14     _buildPredictionsPart (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:296:14)
+#15     main.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1275:31)
+<asynchronous suspension>
+#16     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1559:16)
+<asynchronous suspension>
+#17     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#18     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#19     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#20     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#21     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#22     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#23     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#24     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+SocketException: Failed host lookup: 'ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech' (OS Error: nodename nor servname provided, or not known, errno = 8)
+#0      _NativeSocket.startConnect (dart:io-patch/socket_patch.dart:821:35)
+#1      _NativeSocket.connect (dart:io-patch/socket_patch.dart:1146:12)
+#2      _RawSocket.connect (dart:io-patch/socket_patch.dart:2275:26)
+#3      RawSocket.connect (dart:io-patch/socket_patch.dart:31:23)
+#4      Socket._connect (dart:io-patch/socket_patch.dart:2564:22)
+#5      Socket.connect (dart:io/socket.dart:869:21)
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:31)
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:35)
+#8      Connection.open (package:postgres/postgres.dart:229:39)
+#9      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:40:35)
+#10     Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:49:20)
+#11     Postgres.acquire (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:104:14)
+#12     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:174:26)
+#13     _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1497:31)
+#14     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1562:22)
+<asynchronous suspension>
+#15     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1234:14)
+<asynchronous suspension>
+#16     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#17     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#18     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#19     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#20     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#21     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#22     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+

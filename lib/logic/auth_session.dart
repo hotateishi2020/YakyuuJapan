@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -11,9 +12,15 @@ const authUserCookie = 'koko_auth_user';
 const authManualLogoutCookie = 'koko_manual_logout';
 const _sessionMaxAge = 30 * 24 * 60 * 60; // 30日
 
+bool isClientTimeout(Object error) {
+  if (error is TimeoutException) return true;
+  final text = error.toString().toLowerCase();
+  return text.contains('timeoutexception') || text.contains('timed out');
+}
+
 String authNetworkError(Object e, String action) {
-  final text = e.toString().toLowerCase();
-  if (text.contains('timeoutexception') || text.contains('timed out')) {
+  if (isClientTimeout(e)) {
+    unawaited(AuthSession.instance.reportTimeout(e, StackTrace.current));
     return '$actionがタイムアウトしました。少し待って再度お試しください';
   }
   return '通信エラー: $e';
@@ -41,6 +48,7 @@ class AuthUser {
   final bool readNews;
   /// false のときイベント日程に New を出す
   final bool readEvent;
+  final bool admin;
 
   const AuthUser({
     required this.id,
@@ -58,6 +66,7 @@ class AuthUser {
     this.notifyEvent = true,
     this.readNews = true,
     this.readEvent = true,
+    this.admin = false,
   });
 
   /// ヘッダー等の表示名は name_last（ニックネーム）のみ
@@ -95,6 +104,7 @@ class AuthUser {
         notifyEvent: _asBool(json['flg_notify_event']),
         readNews: _asBool(json['flg_read_news']),
         readEvent: _asBool(json['flg_read_event']),
+        admin: _asBool(json['flg_admin'], fallback: false),
       );
 
   Map<String, dynamic> toJson() => {
@@ -113,6 +123,7 @@ class AuthUser {
         'flg_notify_event': notifyEvent,
         'flg_read_news': readNews,
         'flg_read_event': readEvent,
+        'flg_admin': admin,
       };
 }
 
@@ -124,6 +135,55 @@ class AuthSession {
   String? token;
 
   bool get isLoggedIn => user != null && (token?.isNotEmpty ?? false);
+
+  bool _reportingTimeout = false;
+  String? _lastTimeoutMessage;
+  DateTime? _lastTimeoutAt;
+
+  /// ブラウザの TimeoutException をエラーログへ残す。記録そのものの失敗は画面に出さない。
+  Future<void> reportTimeout(Object error, [StackTrace? stack]) async {
+    if (!isClientTimeout(error) || _reportingTimeout) return;
+    final message = error.toString();
+    final now = DateTime.now();
+    if (_lastTimeoutMessage == message && _lastTimeoutAt != null && now.difference(_lastTimeoutAt!) < const Duration(seconds: 5)) {
+      return;
+    }
+    _reportingTimeout = true;
+    _lastTimeoutMessage = message;
+    _lastTimeoutAt = now;
+    try {
+      await http
+          .post(
+            Env.api('/client/error'),
+            headers: _authHeaders,
+            body: jsonEncode({
+              'message': message,
+              'stack': '${stack ?? ''}',
+            }),
+          )
+          .timeout(const Duration(seconds: 8));
+    } catch (_) {}
+    _reportingTimeout = false;
+  }
+
+  /// 画面操作を操作ログへ残す。記録の失敗は画面に出さない。
+  Future<void> reportAction(String action, {int? year}) async {
+    if (const bool.fromEnvironment('FLUTTER_TEST')) return;
+    try {
+      await http
+          .post(
+            Env.api('/client/action'),
+            headers: _authHeaders,
+            body: jsonEncode({
+              'action': action,
+              if (year != null) 'year': year,
+            }),
+          )
+          .timeout(const Duration(seconds: 8));
+    } catch (e, st) {
+      if (isClientTimeout(e)) unawaited(reportTimeout(e, st));
+    }
+  }
 
   bool get showNewsNew => isLoggedIn && !(user?.readNews ?? true);
   bool get showEventNew => isLoggedIn && !(user?.readEvent ?? true);
@@ -166,7 +226,8 @@ class AuthSession {
       }
       user = AuthUser.fromJson(Map<String, dynamic>.from(map['user'] as Map));
       _persistSession();
-    } catch (_) {
+    } catch (e, st) {
+      unawaited(reportTimeout(e, st));
       await _debugAutoLoginIfNeeded();
     }
   }
@@ -244,7 +305,9 @@ class AuthSession {
             headers: {'Authorization': 'Bearer $t'},
           )
           .timeout(const Duration(seconds: 10));
-    } catch (_) {}
+    } catch (e, st) {
+      unawaited(reportTimeout(e, st));
+    }
   }
 
   Future<({String? error, bool codeSent})> changePassword({

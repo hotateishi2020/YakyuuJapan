@@ -7,6 +7,19 @@ import 'GamesBoard.dart';
 const _eliminatedBg = Color(0xFFBDBDBD);
 const _centralLeague = Color(0xFF0E8E2D);
 const _pacificLeague = Color(0xFF01B1EA);
+const npbAdvanceLine = Color(0xFFFFD600);
+
+Color npbBracketLineColor(bool advanced) => advanced ? npbAdvanceLine : Colors.black87;
+
+double npbBracketLineWidth(bool advanced) => advanced ? 5.0 : 1.3;
+
+/// 1st勝者の黄線をファイナルまで延ばすか。ファイナル敗退なら1stで止める。
+bool npbLineReachesFinal(StageResult first, StageResult finalStage) {
+  final winner = first.winnerId ?? 0;
+  if (!first.decided || winner <= 0) return false;
+  if (!finalStage.decided) return true;
+  return finalStage.winnerId == winner;
+}
 
 class BracketGeom {
   static const boardW = 844.0;
@@ -83,9 +96,7 @@ class PostseasonBracket extends StatelessWidget {
         _innerLogo(BracketGeom.xs[5] - 14 - 96, 'backend/assets/images/logo_cs_pacific.png'),
         _leagueLogo(central: true),
         _leagueLogo(central: false),
-        _japanBox(BracketGeom.js),
-        _stars(BracketGeom.js.left + 10, _starTop(BracketGeom.js, board.japan.slots, insetTop: 28), board.japan.winsHigh, board.japan.slots),
-        _stars(BracketGeom.js.right - 26, _starTop(BracketGeom.js, board.japan.slots, insetTop: 28), board.japan.winsLow, board.japan.slots),
+        _japanBox(BracketGeom.js, board),
         _stageBox(BracketGeom.finC, 'CS FINAL STAGE', background: _centralLeague),
         _stageBox(BracketGeom.finP, 'CS FINAL STAGE', background: _pacificLeague),
         _starsOnLine(BracketGeom.xs[0], BracketGeom.finC.center.dy, BracketGeom.cardTop, toLeft: true, wins: board.finalCentral.winsHigh, slots: board.finalCentral.slots),
@@ -149,7 +160,17 @@ class PostseasonBracket extends StatelessWidget {
     );
   }
 
-  Widget _japanBox(Rect rect) {
+  BracketTeam? _finalist(StageResult stage, List<BracketTeam> teams) {
+    if (!stage.decided || stage.winnerId == null) return null;
+    for (final team in teams) {
+      if (team.id > 0 && team.id == stage.winnerId) return team;
+    }
+    return null;
+  }
+
+  Widget _japanBox(Rect rect, PostseasonBoard board) {
+    final central = _finalist(board.finalCentral, [board.central1, board.central2, board.central3]);
+    final pacific = _finalist(board.finalPacific, [board.pacific1, board.pacific2, board.pacific3]);
     return Positioned(
       left: rect.left,
       top: rect.top,
@@ -160,11 +181,11 @@ class PostseasonBracket extends StatelessWidget {
           color: Colors.white,
           border: Border.all(color: Colors.black, width: 2),
         ),
-        child: const Padding(
-          padding: EdgeInsets.all(2),
+        child: Padding(
+          padding: const EdgeInsets.all(2),
           child: Column(
             children: [
-              ColoredBox(
+              const ColoredBox(
                 color: Color(0xFF004832),
                 child: SizedBox(
                   height: 22,
@@ -175,15 +196,86 @@ class PostseasonBracket extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(36, 2, 36, 2),
-                  child: Image(image: AssetImage('backend/assets/images/logo_japan_series.png'), fit: BoxFit.contain),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    const Positioned.fill(
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(40, 2, 40, 2),
+                        child: Image(image: AssetImage('backend/assets/images/logo_japan_series.png'), fit: BoxFit.contain),
+                      ),
+                    ),
+                    if (central != null && pacific != null)
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Text(
+                          '${board.japan.winsHigh} - ${board.japan.winsLow}',
+                          key: const Key('postseason-js-score'),
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, height: 1, color: Colors.black87),
+                        ),
+                      ),
+                    if (central != null)
+                      Positioned(
+                        left: -46,
+                        top: 0,
+                        bottom: 0,
+                        child: _japanFinalist(central, wins: board.japan.winsHigh, slots: board.japan.slots, alignLeft: true),
+                      ),
+                    if (pacific != null)
+                      Positioned(
+                        right: -46,
+                        top: 0,
+                        bottom: 0,
+                        child: _japanFinalist(pacific, wins: board.japan.winsLow, slots: board.japan.slots, alignLeft: false),
+                      ),
+                  ],
                 ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _japanFinalist(BracketTeam? team, {required int wins, required int slots, required bool alignLeft}) {
+    if (team == null || team.id <= 0 || team.name.isEmpty) return const SizedBox(width: 8);
+    final visual = teamLogoVisual(team.name, abbrev: team.nameShortest);
+    final logo = SizedBox(
+      key: Key('postseason-js-team-${team.id}'),
+      width: 52,
+      height: 52,
+      child: teamLogoImage(asset: visual.asset, networkUrl: visual.networkUrl),
+    );
+    final stars = Column(
+      key: Key('postseason-js-stars-${team.id}'),
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var i = 0; i < slots; i++)
+          Text(
+            i < wins ? '★' : '☆',
+            style: TextStyle(
+              fontSize: 11,
+              height: 1,
+              color: i < wins ? npbAdvanceLine : Colors.black87,
+              shadows: i < wins
+                  ? const [
+                      Shadow(offset: Offset(-0.6, 0), color: Colors.black87),
+                      Shadow(offset: Offset(0.6, 0), color: Colors.black87),
+                      Shadow(offset: Offset(0, -0.6), color: Colors.black87),
+                      Shadow(offset: Offset(0, 0.6), color: Colors.black87),
+                    ]
+                  : null,
+            ),
+          ),
+      ],
+    );
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (alignLeft) ...[SizedBox(width: 16, child: stars), const SizedBox(width: 4), logo],
+        if (!alignLeft) ...[logo, const SizedBox(width: 4), SizedBox(width: 16, child: stars)],
+      ],
     );
   }
 
@@ -373,13 +465,13 @@ class _BracketLinePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    void stroke(Path path, bool thick) {
+    void stroke(Path path, bool advanced) {
       canvas.drawPath(
         path,
         Paint()
-          ..color = Colors.black87
+          ..color = npbBracketLineColor(advanced)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = thick ? 4.5 : 1.3
+          ..strokeWidth = npbBracketLineWidth(advanced)
           ..strokeCap = StrokeCap.square,
       );
     }
@@ -408,8 +500,9 @@ class _BracketLinePainter extends CustomPainter {
     stroke(h(BracketGeom.xs[1], BracketGeom.cs1C.left, BracketGeom.cs1C.center.dy), c2thick);
     stroke(v(BracketGeom.xs[2], cardY, BracketGeom.cs1C.center.dy), c3thick);
     stroke(h(BracketGeom.cs1C.right, BracketGeom.xs[2], BracketGeom.cs1C.center.dy), c3thick);
-    stroke(v(BracketGeom.midC, BracketGeom.cs1C.top, BracketGeom.finC.center.dy), board.cs1Central.decided);
-    stroke(h(BracketGeom.finC.right, BracketGeom.midC, BracketGeom.finC.center.dy), board.cs1Central.decided);
+    final centralToFinal = npbLineReachesFinal(board.cs1Central, board.finalCentral);
+    stroke(v(BracketGeom.midC, BracketGeom.cs1C.top, BracketGeom.finC.center.dy), centralToFinal);
+    stroke(h(BracketGeom.finC.right, BracketGeom.midC, BracketGeom.finC.center.dy), centralToFinal);
 
     stroke(v(BracketGeom.xs[0], cardY, BracketGeom.finC.center.dy), c1final);
     stroke(h(BracketGeom.xs[0], BracketGeom.finC.left, BracketGeom.finC.center.dy), c1final);
@@ -421,8 +514,9 @@ class _BracketLinePainter extends CustomPainter {
     stroke(h(BracketGeom.xs[3], BracketGeom.cs1P.left, BracketGeom.cs1P.center.dy), p3thick);
     stroke(v(BracketGeom.xs[4], cardY, BracketGeom.cs1P.center.dy), p2thick);
     stroke(h(BracketGeom.cs1P.right, BracketGeom.xs[4], BracketGeom.cs1P.center.dy), p2thick);
-    stroke(v(BracketGeom.midP, BracketGeom.cs1P.top, BracketGeom.finP.center.dy), board.cs1Pacific.decided);
-    stroke(h(BracketGeom.midP, BracketGeom.finP.left, BracketGeom.finP.center.dy), board.cs1Pacific.decided);
+    final pacificToFinal = npbLineReachesFinal(board.cs1Pacific, board.finalPacific);
+    stroke(v(BracketGeom.midP, BracketGeom.cs1P.top, BracketGeom.finP.center.dy), pacificToFinal);
+    stroke(h(BracketGeom.midP, BracketGeom.finP.left, BracketGeom.finP.center.dy), pacificToFinal);
 
     stroke(v(BracketGeom.xs[5], cardY, BracketGeom.finP.center.dy), p1final);
     stroke(h(BracketGeom.finP.right, BracketGeom.xs[5], BracketGeom.finP.center.dy), p1final);

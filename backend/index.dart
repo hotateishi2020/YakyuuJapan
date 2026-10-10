@@ -262,6 +262,7 @@ Future<Map<String, dynamic>> _buildPredictionsPartGames(
   );
   for (final game in games) {
     game['lineup'] = lineups[_asInt(game['id_game'])] ?? const <Map<String, dynamic>>[];
+    _useAnnouncedLineup(game);
   }
   _attachLiveBatters(games, playRows);
   final postseason = _postseasonForOrg(snap.postseason, org);
@@ -508,7 +509,11 @@ List<Map<String, dynamic>> _mergeAdjacentScoreDupes(List<Map<String, dynamic>> g
       if (used[j] || _matchupCodeKey(games[j]) != key) continue;
       final other = games[j];
       if (!_nearSameGameDay(best, other)) continue;
-      final finishedPair = _rowFinished(best) && _rowFinished(other) && '${best['score_home']}|${best['score_away']}' == '${other['score_home']}|${other['score_away']}';
+      // 同スコアの連日は、Yahoo と歴史取り込みの二重、または同じ夜の日付ずれだけを1件にする。
+      // 日本シリーズのように翌日も同じ点差で終わった別試合は残す。
+      final sameNight = _gameNightDate(best) == _gameNightDate(other);
+      final sameScore = '${best['score_home']}|${best['score_away']}' == '${other['score_home']}|${other['score_away']}';
+      final finishedPair = _rowFinished(best) && _rowFinished(other) && sameScore && (_yahooHistoricalMix(best, other) || sameNight);
       if (!finishedPair && !_importDuplicateOf(best, other)) continue;
       used[j] = true;
       if (_gameRowQuality(other) > _gameRowQuality(best)) best = other;
@@ -540,6 +545,27 @@ bool _isStarter(Map<String, dynamic> row) {
   final name = '${row['name_full_summary'] ?? ''}'.trim();
   if (name.isEmpty) return false;
   return name == '${row['name_pitcher_home'] ?? ''}'.trim() || name == '${row['name_pitcher_away'] ?? ''}'.trim();
+}
+
+/// 打席記録がまだ無い試合前は、発表済みスタメンを詳細欄に出す。
+void _useAnnouncedLineup(Map<String, dynamic> game) {
+  final current = game['lineup'];
+  if (current is List && current.isNotEmpty) {
+    game.remove('txt_lineup_announced');
+    return;
+  }
+  final raw = '${game['txt_lineup_announced'] ?? ''}'.trim();
+  game.remove('txt_lineup_announced');
+  if (raw.isEmpty) return;
+  try {
+    final decoded = jsonDecode(raw);
+    if (decoded is List && decoded.isNotEmpty) {
+      game['lineup'] = [
+        for (final row in decoded)
+          if (row is Map) Map<String, dynamic>.from(row),
+      ];
+    }
+  } catch (_) {}
 }
 
 List<Map<String, dynamic>> _lineupStartersOf(Map<String, Map<String, dynamic>> lines) {
@@ -884,6 +910,7 @@ List<Map<String, dynamic>> _summariesOf(
           'txt_pitch_tone': _summaryPitchTone(row),
           'txt_pitch_chips': _summaryPitchChips(row),
           'int_velo_max': row['int_velo_max'],
+          'int_balk': row['int_balk'],
         },
   ];
   final gameId = rows.isEmpty ? 0 : _asInt(rows.first['id_game']);
@@ -1014,6 +1041,155 @@ void main() async {
       final response = await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.GAMES, GamesFetch.mlb);
       if (response.statusCode == 200) _clearPredictionsCache();
       return response;
+    });
+
+    app.post('/client/action', (Request request) async {
+      return tryCatchAPI(request, 'CLIENT', 'ACTION', (conn) async {
+        Map<String, dynamic> body = {};
+        try {
+          final decoded = jsonDecode(await request.readAsString());
+          if (decoded is Map) body = Map<String, dynamic>.from(decoded);
+        } catch (_) {}
+        final action = '${body['action'] ?? ''}'.trim();
+        const allowed = {
+          '初期表示を読み込んだ',
+          'npbタブを開いた',
+          'mlbタブを開いた',
+          '試合情報タブを開いた',
+          'チーム順位タブを開いた',
+          '個人成績タブを開いた',
+          'news・イベント日程ポップアップを開いた',
+          '年度を変更した',
+          'アカウント設定のプルダウンを開いた',
+        };
+        if (!allowed.contains(action)) {
+          return Response(400, body: 'unknown action');
+        }
+        final reporter = m_user();
+        await _attachRequestUser(conn, request, reporter);
+        final year = int.tryParse('${body['year'] ?? ''}');
+        final log = t_system_log();
+        log.method = 'VIEW';
+        log.category = 'CLIENT';
+        log.code = 'ACTION';
+        log.memo = action;
+        log.flg_user = reporter.id > 0;
+        log.url = action == '年度を変更した' && year != null && year >= 1800 && year <= 2200 ? '$year年' : '';
+        log.url_pre = '';
+        log.id_log_error = 0;
+        log.flg_check = false;
+        log.crtby = reporter.id;
+        log.crtpgm = 'CLIENT';
+        log.updby = reporter.id;
+        log.updpgm = 'CLIENT';
+        await Postgres.insert(conn, log);
+        return Response.ok('ok');
+      });
+    });
+
+    app.post('/client/error', (Request request) async {
+      return tryCatchAPI(request, 'CLIENT', 'TIMEOUT', (conn) async {
+        Map<String, dynamic> body = {};
+        try {
+          final decoded = jsonDecode(await request.readAsString());
+          if (decoded is Map) body = Map<String, dynamic>.from(decoded);
+        } catch (_) {}
+        final message = '${body['message'] ?? ''}'.trim();
+        if (!message.toLowerCase().contains('timeout')) {
+          return Response(400, body: 'timeout only');
+        }
+        final reporter = m_user();
+        await _attachRequestUser(conn, request, reporter);
+        reporter.category_system = 'CLIENT';
+        reporter.code_system = 'TIMEOUT';
+        final stack = '${body['stack'] ?? ''}';
+        await insertLogError(
+          conn,
+          message.length > 2000 ? message.substring(0, 2000) : message,
+          stack.length > 4000 ? stack.substring(0, 4000) : stack,
+          reporter,
+        );
+        return Response.ok('ok');
+      });
+    });
+
+    app.get('/admin/logs', (Request request) async {
+      return tryCatchAPI(request, 'ADMIN', 'LOGS', (conn) async {
+        final adminId = await Auth.adminUserId(conn, request);
+        if (adminId == null) return Response(403, body: 'forbidden');
+        final q = (request.url.queryParameters['q'] ?? '').trim();
+        final access = await conn.execute(
+          '''
+            SELECT l.crtat, l.crtby, COALESCE(u.name_last, '') AS name_user,
+                   l.method, l.category, l.code, l.memo, l.url
+            FROM t_system_log l
+            LEFT JOIN m_user u ON u.id = l.crtby
+            WHERE \$1::text = ''
+               OR CAST(l.crtby AS text) = \$1::text
+               OR COALESCE(u.name_last, '') ILIKE '%' || \$1::text || '%'
+               OR COALESCE(u.name_first, '') ILIKE '%' || \$1::text || '%'
+            ORDER BY l.crtat DESC
+            LIMIT 200
+          ''',
+          parameters: [q],
+        );
+        final errors = await conn.execute(
+          '''
+            SELECT e.crtat, e.crtby, COALESCE(u.name_last, '') AS name_user,
+                   e.message_error, e.stacktrace, COALESCE(l.url, '') AS url
+            FROM t_system_log_error e
+            LEFT JOIN t_system_log l ON l.id_log_error = e.id
+            LEFT JOIN m_user u ON u.id = e.crtby
+            WHERE \$1::text = ''
+               OR CAST(COALESCE(e.crtby, 0) AS text) = \$1::text
+               OR COALESCE(u.name_last, '') ILIKE '%' || \$1::text || '%'
+               OR COALESCE(u.name_first, '') ILIKE '%' || \$1::text || '%'
+            ORDER BY e.crtat DESC
+            LIMIT 200
+          ''',
+          parameters: [q],
+        );
+        String stamp(dynamic value) {
+          if (value == null) return '';
+          if (value is DateTime) return value.toIso8601String();
+          return '$value';
+        }
+
+        Map<String, dynamic> accessRow(dynamic row) {
+          final map = row.toColumnMap();
+          return {
+            'crtat': stamp(map['crtat']),
+            'id_user': map['crtby'] ?? 0,
+            'name_user': map['name_user'] ?? '',
+            'method': map['method'] ?? '',
+            'category': map['category'] ?? '',
+            'code': map['code'] ?? '',
+            'memo': map['memo'] ?? '',
+            'url': map['url'] ?? '',
+          };
+        }
+
+        Map<String, dynamic> errorRow(dynamic row) {
+          final map = row.toColumnMap();
+          return {
+            'crtat': stamp(map['crtat']),
+            'id_user': map['crtby'] ?? 0,
+            'name_user': map['name_user'] ?? '',
+            'message': map['message_error'] ?? '',
+            'stacktrace': map['stacktrace'] ?? '',
+            'url': map['url'] ?? '',
+          };
+        }
+
+        return Response.ok(
+          jsonEncode({
+            'ok': true,
+            'access': [for (final row in access) accessRow(row)],
+            'errors': [for (final row in errors) errorRow(row)],
+          }),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      });
     });
 
     app.post('/auth/register', (Request request) async {
@@ -1259,6 +1435,7 @@ void main() async {
         );
         for (final game in games) {
           game['lineup'] = lineups[_asInt(game['id_game'])] ?? const <Map<String, dynamic>>[];
+          _useAnnouncedLineup(game);
         }
         _attachLiveBatters(games, playRows);
         // print(games);
@@ -1411,6 +1588,13 @@ Future<int> _saveErrorLog(Object e, String stacktrace, m_user user) async {
   }
 }
 
+Future<void> _attachRequestUser(Connection conn, Request request, m_user user) async {
+  final id = await Auth.userIdOf(conn, request);
+  if (id == null || id <= 0) return;
+  user.id = id;
+  user.flg_user = true;
+}
+
 Future<void> _saveAccessLog(Request request, m_user user, int idError) async {
   try {
     await Postgres.withConnection((conn) async {
@@ -1451,6 +1635,7 @@ Future<Response> tryCatchAPIReadonly(
   user.code_system = code_system;
   user.flg_user = false;
   try {
+    await Postgres.withConnection((conn) => _attachRequestUser(conn, request, user));
     print("🌐Routing...【" + request.requestedUri.toString() + "】");
     // DDL は待たない。列確認・seed は裏で進め、試合 SELECT を先に返す。
     FetchURL.kickSchemaEnsures();
@@ -1485,7 +1670,7 @@ Future<Response> tryCatchAPI(Request request, String category_system, String cod
       await Postgres.transactionCommit(conn, () async {
         print("🌐Routing...【" + request.requestedUri.toString() + "】");
         print("");
-        await user.loadProperty(conn, 0);
+        await _attachRequestUser(conn, request, user);
         user.category_system = category_system;
         user.code_system = code_system;
         user.flg_user = false;
@@ -1498,7 +1683,9 @@ Future<Response> tryCatchAPI(Request request, String category_system, String cod
     _notifyProgramError(e);
     response = Response.internalServerError(body: 'データベースエラー: $e');
   } finally {
-    unawaited(_saveAccessLog(request, user, id_error));
+    if (request.requestedUri.path != '/client/action') {
+      unawaited(_saveAccessLog(request, user, id_error));
+    }
     print("🌐Responsed Successfully‼️【" + request.requestedUri.toString() + "】");
   }
   print('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');

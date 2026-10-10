@@ -151,7 +151,10 @@ List<Map<String, dynamic>> _mergeAdjacentScoreDupes(List<Map<String, dynamic>> g
       if (used[j] || _matchupCodeKey(games[j]) != key) continue;
       final other = games[j];
       if (!_nearSameDay(best, other)) continue;
-      final finishedPair = _finished(best) && _finished(other) && _scoreKey(best) == _scoreKey(other);
+      // 同スコアの連日は、Yahoo と歴史取り込みの二重、または同じ夜の日付ずれだけを1件にする。
+      // 日本シリーズのように翌日も同じ点差で終わった別試合は残す。
+      final sameNight = gameNightDate(best) == gameNightDate(other);
+      final finishedPair = _finished(best) && _finished(other) && _scoreKey(best) == _scoreKey(other) && (_importSourceMix(best, other) || sameNight);
       if (!finishedPair && !_importDuplicateOf(best, other)) continue;
       used[j] = true;
       if (_quality(other) > _quality(best)) best = other;

@@ -27,7 +27,7 @@ cp -R build/web/* backend/public/
 
 git add . 
 
-git commit -m "初期表示の不具合を修正。" 
+git commit -m "infoの情報をポップアップで出すように修正しました。" 
 
 git push 
 

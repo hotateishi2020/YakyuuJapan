@@ -118,7 +118,71 @@ class RegisteredPosition {
       }
       updated += await _write(conn, teamId, positions);
     }
+    updated += await fillBlankFromSameName(conn);
     print('NPB登録ポジション 更新$updated');
+    return updated;
+  }
+
+  /// 移籍で成績行と名簿行が別の m_player に分かれると、成績側の登録ポジションが空のままになる。
+  /// 同じ氏名でポジションが一つに定まっているときだけ、空欄へコピーする。
+  static Future<int> fillBlankFromSameName(Connection conn) async {
+    final targets = await conn.execute('''
+      SELECT p.id, regexp_replace(p.name_full, '[[:space:]　]+', '', 'g') AS name
+      FROM m_player AS p
+      WHERE COALESCE(p.txt_position, '') = ''
+        AND COALESCE(p.flg_delete, FALSE) = FALSE
+        AND p.id IN (
+          SELECT id_player FROM t_stats_player
+          UNION
+          SELECT id_player FROM t_stats_player_latest
+        )
+    ''');
+    if (targets.isEmpty) return 0;
+    final names = <String>{};
+    final idsByName = <String, List<int>>{};
+    for (final row in targets) {
+      final id = row[0] as int;
+      final name = '${row[1]}';
+      if (name.isEmpty) continue;
+      names.add(name);
+      idsByName.putIfAbsent(name, () => []).add(id);
+    }
+    final donors = await conn.execute(
+      '''
+        SELECT regexp_replace(name_full, '[[:space:]　]+', '', 'g') AS name,
+               txt_position
+        FROM m_player
+        WHERE COALESCE(txt_position, '') <> ''
+          AND COALESCE(flg_delete, FALSE) = FALSE
+          AND regexp_replace(name_full, '[[:space:]　]+', '', 'g') = ANY(\$1::text[])
+      ''',
+      parameters: [names.toList()],
+    );
+    final positions = <String, Set<String>>{};
+    for (final row in donors) {
+      positions.putIfAbsent('${row[0]}', () => {}).add('${row[1]}');
+    }
+    final idsByPosition = <String, List<int>>{};
+    for (final entry in positions.entries) {
+      if (entry.value.length != 1) continue;
+      final ids = idsByName[entry.key];
+      if (ids == null) continue;
+      idsByPosition.putIfAbsent(entry.value.single, () => []).addAll(ids);
+    }
+    var updated = 0;
+    for (final entry in idsByPosition.entries) {
+      final result = await conn.execute(
+        '''
+          UPDATE m_player
+          SET txt_position = \$1::varchar,
+              updat = NOW()
+          WHERE id = ANY(\$2::int[])
+            AND COALESCE(txt_position, '') = ''
+        ''',
+        parameters: [entry.key, entry.value],
+      );
+      updated += result.affectedRows;
+    }
     return updated;
   }
 

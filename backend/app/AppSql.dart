@@ -228,8 +228,8 @@ class AppSql {
     ''';
   }
 
-  /// 数字の条件を外れた選手と、年度別成績の所属がメジャーの選手だけ flg_rookie を false にする。
-  /// true にはしない。経歴のメジャー在籍は選手詳細を見て別途判定する。
+  /// 数字の条件を外れた選手と、年度別成績にNPB以外（MLB・CPBLなど）の所属がある選手だけ flg_rookie を false にする。
+  /// true にはしない。経歴の他リーグ在籍は選手詳細を見て別途判定する。
   static String updateRookieFlagsFromCareer() {
     return '''
       UPDATE m_player AS p
@@ -251,7 +251,7 @@ class AppSql {
                 AND int_year <= first_year + 4
                 AND int_year < this_year
             ), 0) <= 90
-            AND NOT COALESCE(BOOL_OR(id_league IN (3, 4)), FALSE)
+            AND NOT COALESCE(BOOL_OR(COALESCE(id_league, 0) >= 3), FALSE)
           ) AS is_rookie
         FROM (
           SELECT
@@ -529,6 +529,7 @@ class AppSql {
         team_away.color_font AS color_font_away,
         team_away.color_back AS color_back_away,
         t_game.code_game,
+        COALESCE(t_game.txt_lineup_announced, '') AS txt_lineup_announced,
         CONCAT_WS('・',
           CASE WHEN t_game.code_game = 'NM' AND EXTRACT(MONTH FROM t_game.datetime_start) <= 4 AND t_game.id = boundary_home.first_id THEN 'シーズン開幕戦' END,
           CASE WHEN t_game.code_game = 'NM' AND EXTRACT(MONTH FROM t_game.datetime_start) >= 9 AND t_game.id = boundary_home.last_id THEN 'シーズン最終戦' END,
@@ -856,6 +857,89 @@ class AppSql {
       FROM t_game
       WHERE datetime_start::date = \$1::date
         AND COALESCE(code_game, '') NOT IN ('CS1', 'CSF', 'JS')
+    ''';
+  }
+
+  /// 名前はフルネーム、姓、または部分一致。フルネーム一致を優先する。
+  static String selectPlayerIdByNameOnTeam() {
+    return '''
+      SELECT id
+      FROM m_player
+      WHERE id_team = \$2
+        AND COALESCE(flg_delete, FALSE) = FALSE
+        AND (
+          regexp_replace(name_full, '[[:space:]]', '', 'g') = regexp_replace(\$1, '[[:space:]]', '', 'g')
+          OR name_last = \$1
+          OR regexp_replace(name_full, '[[:space:]]', '', 'g') LIKE '%' || regexp_replace(\$1, '[[:space:]]', '', 'g') || '%'
+        )
+      ORDER BY
+        CASE
+          WHEN regexp_replace(name_full, '[[:space:]]', '', 'g') = regexp_replace(\$1, '[[:space:]]', '', 'g') THEN 0
+          WHEN name_last = \$1 THEN 1
+          ELSE 2
+        END,
+        id
+      LIMIT 1
+    ''';
+  }
+
+  /// カードの状態・得点と、取れた先発・責任投手だけを書く。空の値では消さない。
+  static String updateGameCardPitchers() {
+    return '''
+      UPDATE t_game
+      SET state = CASE WHEN BTRIM(\$1) <> '' THEN \$1 ELSE state END,
+          score_home = CASE WHEN \$2::int >= 0 THEN \$2::int ELSE score_home END,
+          score_away = CASE WHEN \$3::int >= 0 THEN \$3::int ELSE score_away END,
+          id_pitcher_home = CASE WHEN \$4::int > 0 THEN \$4::int ELSE id_pitcher_home END,
+          id_pitcher_away = CASE WHEN \$5::int > 0 THEN \$5::int ELSE id_pitcher_away END,
+          id_pitcher_win = CASE WHEN \$6::int > 0 THEN \$6::int ELSE id_pitcher_win END,
+          id_pitcher_lose = CASE WHEN \$7::int > 0 THEN \$7::int ELSE id_pitcher_lose END,
+          id_pitcher_save = CASE WHEN \$8::int > 0 THEN \$8::int ELSE id_pitcher_save END,
+          updat = NOW()
+      WHERE id = \$9
+        AND (
+          (BTRIM(\$1) <> '' AND state IS DISTINCT FROM \$1)
+          OR (\$2::int >= 0 AND score_home IS DISTINCT FROM \$2::int)
+          OR (\$3::int >= 0 AND score_away IS DISTINCT FROM \$3::int)
+          OR (\$4::int > 0 AND id_pitcher_home IS DISTINCT FROM \$4::int)
+          OR (\$5::int > 0 AND id_pitcher_away IS DISTINCT FROM \$5::int)
+          OR (\$6::int > 0 AND id_pitcher_win IS DISTINCT FROM \$6::int)
+          OR (\$7::int > 0 AND id_pitcher_lose IS DISTINCT FROM \$7::int)
+          OR (\$8::int > 0 AND id_pitcher_save IS DISTINCT FROM \$8::int)
+        )
+    ''';
+  }
+
+  static String selectGamePitcherPresence() {
+    return '''
+      SELECT
+        COALESCE(id_pitcher_home, 0) AS id_pitcher_home,
+        COALESCE(id_pitcher_away, 0) AS id_pitcher_away,
+        COALESCE(txt_lineup_announced, '') AS txt_lineup_announced,
+        EXISTS (
+          SELECT 1
+          FROM t_game_summary s
+          WHERE s.id_game = t_game.id
+            AND (
+              COALESCE(s.double_inning_pitch, 0) > 0
+              OR COALESCE(s.int_pitch, 0) > 0
+              OR BTRIM(COALESCE(s.code_result_pitcher, '')) <> ''
+            )
+        ) AS has_pitching
+      FROM t_game
+      WHERE id = \$1
+    ''';
+  }
+
+  static String deletePitcherSummaries() {
+    return '''
+      DELETE FROM t_game_summary
+      WHERE id_game = \$1
+        AND (
+          COALESCE(double_inning_pitch, 0) > 0
+          OR COALESCE(int_pitch, 0) > 0
+          OR BTRIM(COALESCE(code_result_pitcher, '')) <> ''
+        )
     ''';
   }
 
@@ -1242,8 +1326,8 @@ class AppSql {
 SELECT
         t_stats_team.int_rank,
         m_team.id AS id_team,
-        COALESCE(NULLIF(t_stats_team.name_team, ''), m_team.name_short) AS name_team,
-        COALESCE(NULLIF(t_stats_team.name_team, ''), m_team.name_full) AS name_team_full,
+        COALESCE(NULLIF(m_team.name_short, ''), NULLIF(t_stats_team.name_team, '')) AS name_team,
+        COALESCE(NULLIF(m_team.name_full, ''), NULLIF(t_stats_team.name_team, '')) AS name_team_full,
         v_predict_team.team_name_tateishi,
         CASE WHEN m_team.id = v_predict_team.team_id_tateishi THEN true ELSE false END AS flg_atari_tateishi,
         v_predict_team.team_color_back_tateishi,
@@ -1406,6 +1490,7 @@ ORDER BY mt.id_league, tpt.int_rank
              WHEN t_game_away.id_pitcher_away > 0 THEN TRUE
              ELSE FALSE END AS flg_today,
         -- NPB: 表示年時点の新人（初年度から5年・前年までの打席≦60・投球回≦30）。経歴が無い今季は flg_rookie。
+        -- 表示年より前にNPB以外の所属（MLB・CPBLなど）があれば新人にしない。
         -- MLB: 表示年より前のメジャー打数≦130 かつ投球回≦50（新人王有資格）。
         -- 前年未登録（新加入含む）は 0 打数・0 投球回として有資格扱い。
         CASE
@@ -1461,14 +1546,14 @@ ORDER BY mt.id_league, tpt.int_rank
         LEFT JOIN (
           SELECT
             c.id_player,
-            CASE WHEN t.id_league IN (3, 4) THEN 'mlb' ELSE 'npb' END AS org_key,
+            CASE WHEN COALESCE(t.id_league, 0) >= 3 THEN 'mlb' ELSE 'npb' END AS org_key,
             MIN(c.int_year) AS min_year
           FROM m_player_career c
           JOIN m_team t ON t.id = c.id_team
           WHERE COALESCE(c.flg_delete, FALSE) = FALSE
           GROUP BY
             c.id_player,
-            CASE WHEN t.id_league IN (3, 4) THEN 'mlb' ELSE 'npb' END
+            CASE WHEN COALESCE(t.id_league, 0) >= 3 THEN 'mlb' ELSE 'npb' END
         ) career_org
           ON career_org.id_player = tsp.id_player
          AND career_org.org_key = CASE WHEN tsp.id_league IN (3, 4) THEN 'mlb' ELSE 'npb' END
@@ -1502,7 +1587,7 @@ ORDER BY mt.id_league, tpt.int_rank
           FROM (
             SELECT
               c.id_player,
-              MIN(c.int_year) FILTER (WHERE COALESCE(t.id_league, 0) NOT IN (3, 4)) AS first_year,
+              MIN(c.int_year) FILTER (WHERE COALESCE(t.id_league, 0) < 3) AS first_year,
               COALESCE(SUM(
                 CASE
                   WHEN COALESCE(c.int_appearance, 0) > 0 THEN c.int_appearance
@@ -1510,15 +1595,15 @@ ORDER BY mt.id_league, tpt.int_rank
                   ELSE 0
                 END
               ) FILTER (
-                WHERE COALESCE(t.id_league, 0) NOT IN (3, 4) AND c.int_year < \$1
+                WHERE COALESCE(t.id_league, 0) < 3 AND c.int_year < \$1
               ), 0) AS prior_pa,
               COALESCE(SUM(
                 trunc(COALESCE(c.double_inning, 0))::int * 3
                 + LEAST(2, GREATEST(0, round((COALESCE(c.double_inning, 0) - trunc(COALESCE(c.double_inning, 0))) * 10)::int))
               ) FILTER (
-                WHERE COALESCE(t.id_league, 0) NOT IN (3, 4) AND c.int_year < \$1
+                WHERE COALESCE(t.id_league, 0) < 3 AND c.int_year < \$1
               ), 0) AS prior_thirds,
-              COALESCE(BOOL_OR(t.id_league IN (3, 4) AND c.int_year < \$1), FALSE) AS prior_mlb
+              COALESCE(BOOL_OR(COALESCE(t.id_league, 0) >= 3 AND c.int_year < \$1), FALSE) AS prior_mlb
             FROM m_player_career c
             LEFT JOIN m_team t ON t.id = c.id_team
             WHERE COALESCE(c.flg_delete, FALSE) = FALSE

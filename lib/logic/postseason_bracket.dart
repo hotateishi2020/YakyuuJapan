@@ -532,3 +532,84 @@ PostseasonBoard buildPostseasonBoard({
     eliminatedIds: eliminated,
   );
 }
+
+class SeriesStarCount {
+  final int wins;
+  final int slots;
+
+  const SeriesStarCount({required this.wins, required this.slots});
+}
+
+bool _postseasonCardCode(String code) {
+  const npb = {'CS1', 'CS', 'CS2', 'CSF', 'JS'};
+  if (npb.contains(code)) return true;
+  if (code == 'WC' || code == 'DS' || code == 'LCS' || code == 'WS') return true;
+  return code.startsWith('AL') || code.startsWith('NL');
+}
+
+String _seriesFamily(String code) {
+  if (code == 'CS2') return 'CSF';
+  if (code == 'CS') return 'CS1';
+  return code;
+}
+
+int _starSlots(String code, int advantage) {
+  if (code == 'CS1' || code.contains('WC')) return 2;
+  if (code.contains('DS') && !code.contains('LCS')) return 3;
+  if (code == 'CSF') return advantage >= 2 ? 5 : 4;
+  return 4;
+}
+
+/// トーナメント表と同じ勝ち星。ポストシーズン以外は null。
+SeriesStarCount? seriesStarsForSide({
+  required Map<String, dynamic> game,
+  required bool home,
+  required List<Map<String, dynamic>> seriesGames,
+  required List<Map<String, dynamic>> standings,
+}) {
+  final code = _seriesFamily('${game['code_game'] ?? ''}'.trim().toUpperCase());
+  if (!_postseasonCardCode(code) && !_postseasonCardCode('${game['code_game'] ?? ''}'.trim().toUpperCase())) return null;
+  final homeId = _asInt(game['id_team_home']);
+  final awayId = _asInt(game['id_team_away']);
+  final teamId = home ? homeId : awayId;
+  if (teamId <= 0 || homeId <= 0 || awayId <= 0) return null;
+
+  BracketTeam? listed(int id) {
+    for (final row in standings) {
+      if (_asInt(row['id_team']) == id) return _teamFromRow(row);
+    }
+    return null;
+  }
+
+  var advantage = 0;
+  var seedId = 0;
+  if (code == 'CSF') {
+    final homeTeam = listed(homeId);
+    final awayTeam = listed(awayId);
+    final leader = homeTeam?.rank == 1 ? homeTeam : awayTeam?.rank == 1 ? awayTeam : null;
+    final rival = leader == null ? null : leader.id == homeId ? awayTeam : homeTeam;
+    if (leader != null && leader.id > 0) {
+      seedId = leader.id;
+      advantage = 1;
+      if (rival != null && rival.id > 0 && finalistTakesExtraAdvantage(rival, leader: leader)) advantage = 2;
+    }
+  }
+
+  var wins = teamId == seedId ? advantage : 0;
+  for (final row in seriesGames) {
+    final rowCode = _seriesFamily('${row['code_game'] ?? ''}'.trim().toUpperCase());
+    if (rowCode != code) continue;
+    final rowHome = _asInt(row['id_team_home']);
+    final rowAway = _asInt(row['id_team_away']);
+    final pair = (rowHome == homeId && rowAway == awayId) || (rowHome == awayId && rowAway == homeId);
+    if (!pair) continue;
+    final state = '${row['state'] ?? ''}'.trim();
+    if (state != '試合終了' && !state.contains('コールド')) continue;
+    final scoreHome = _asInt(row['score_home']);
+    final scoreAway = _asInt(row['score_away']);
+    if (scoreHome < 0 || scoreAway < 0 || scoreHome == scoreAway) continue;
+    final winner = scoreHome > scoreAway ? rowHome : rowAway;
+    if (winner == teamId) wins += 1;
+  }
+  return SeriesStarCount(wins: wins, slots: _starSlots(code, advantage));
+}

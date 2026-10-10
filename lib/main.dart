@@ -1,8 +1,22 @@
+import 'dart:async';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'config/app_design.dart';
+import 'logic/auth_session.dart';
 import 'pages/prediction_page.dart';
 
 void main() {
+  final previousFlutter = FlutterError.onError;
+  FlutterError.onError = (details) {
+    unawaited(AuthSession.instance.reportTimeout(details.exception, details.stack));
+    previousFlutter?.call(details);
+  };
+  final previousPlatform = PlatformDispatcher.instance.onError;
+  PlatformDispatcher.instance.onError = (error, stack) {
+    unawaited(AuthSession.instance.reportTimeout(error, stack));
+    return previousPlatform?.call(error, stack) ?? false;
+  };
   runApp(const MyApp());
 }
 

@@ -277,6 +277,67 @@ void main() {
       ),
     );
     expect(gray.color, const Color(0xFFBDBDBD));
+    expect(npbBracketLineColor(true), npbAdvanceLine);
+    expect(npbBracketLineColor(false), Colors.black87);
+    expect(npbBracketLineWidth(true), 5);
+    expect(find.byKey(const Key('postseason-js-score')), findsNothing);
+    expect(npbLineReachesFinal(StageResult.empty, StageResult.empty), isFalse);
+  });
+
+  testWidgets('日本シリーズ欄に決勝進出チームのロゴと星取と勝敗差を出す', (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: SizedBox(
+          width: 900,
+          height: 420,
+          child: PostseasonBracket(
+            standings: [
+              standing(id: 1, league: 1, rank: 1, name: '阪神タイガース'),
+              standing(id: 2, league: 1, rank: 2, name: '読売ジャイアンツ', behind: '3'),
+              standing(id: 3, league: 1, rank: 3, name: '横浜DeNAベイスターズ', behind: '6', wins: 72, losses: 68),
+              standing(id: 9, league: 2, rank: 3, name: '北海道日本ハムファイターズ', behind: '8'),
+              standing(id: 8, league: 2, rank: 2, name: '埼玉西武ライオンズ', behind: '4'),
+              standing(id: 7, league: 2, rank: 1, name: '福岡ソフトバンクホークス'),
+            ],
+            games: [
+              game(code: 'CS1', home: 2, away: 3, scoreHome: 3, scoreAway: 1),
+              game(code: 'CS1', home: 2, away: 3, scoreHome: 2, scoreAway: 1),
+              game(code: 'CSF', home: 1, away: 2, scoreHome: 5, scoreAway: 1),
+              game(code: 'CSF', home: 1, away: 2, scoreHome: 4, scoreAway: 2),
+              game(code: 'CSF', home: 1, away: 2, scoreHome: 6, scoreAway: 0),
+              game(code: 'CS1', home: 8, away: 9, scoreHome: 4, scoreAway: 1),
+              game(code: 'CS1', home: 8, away: 9, scoreHome: 3, scoreAway: 2),
+              game(code: 'CSF', home: 7, away: 8, scoreHome: 2, scoreAway: 0),
+              game(code: 'CSF', home: 7, away: 8, scoreHome: 5, scoreAway: 1),
+              game(code: 'CSF', home: 7, away: 8, scoreHome: 3, scoreAway: 1),
+              game(code: 'JS', home: 7, away: 1, scoreHome: 2, scoreAway: 1),
+              game(code: 'JS', home: 1, away: 7, scoreHome: 5, scoreAway: 3),
+              game(code: 'JS', home: 7, away: 1, scoreHome: 4, scoreAway: 0),
+              game(code: 'JS', home: 1, away: 7, scoreHome: 1, scoreAway: 6),
+              game(code: 'JS', home: 7, away: 1, scoreHome: 3, scoreAway: 2),
+            ],
+          ),
+        ),
+      ),
+    ));
+    await tester.pump();
+
+    expect(find.byKey(const Key('postseason-js-team-1')), findsOneWidget);
+    expect(find.byKey(const Key('postseason-js-team-7')), findsOneWidget);
+    expect(find.text('1勝'), findsNothing);
+    expect(find.text('3差'), findsNothing);
+    expect(tester.widget<Text>(find.byKey(const Key('postseason-js-score'))).data, '1 - 4');
+    final japan = tester.getRect(find.byKey(const Key('postseason-js-score')));
+    final central = tester.getRect(find.byKey(const Key('postseason-js-team-1')));
+    final pacific = tester.getRect(find.byKey(const Key('postseason-js-team-7')));
+    expect(central.center.dx, lessThan(japan.center.dx));
+    expect(pacific.center.dx, greaterThan(japan.center.dx));
+    final centralStars = tester.getRect(find.byKey(const Key('postseason-js-stars-1')));
+    final pacificStars = tester.getRect(find.byKey(const Key('postseason-js-stars-7')));
+    expect(centralStars.right, lessThanOrEqualTo(central.left + 1));
+    expect(pacificStars.left, greaterThanOrEqualTo(pacific.right - 1));
+    expect(centralStars.height, greaterThan(centralStars.width));
+    expect(pacificStars.height, greaterThan(pacificStars.width));
   });
 
   test('残り試合で追い抜ける順位は空欄、確定した順位だけ球団名を出す', () {
@@ -450,16 +511,17 @@ void main() {
     expect(result.decided, isFalse);
   });
 
-  test('前後日の同スコア重複は地区シリーズの3勝に数えない', () {
+  test('連日同じ点差の日本シリーズは両方数えて4勝1敗になる', () {
     final rows = dedupeSameDayMatchupRows([
-      game(code: 'DS', home: 16, away: 15, scoreHome: 1, scoreAway: 0, date: '2026-10-03'),
-      game(code: 'DS', home: 16, away: 15, scoreHome: 1, scoreAway: 0, date: '2026-10-04'),
-      game(code: 'DS', home: 16, away: 15, scoreHome: 5, scoreAway: 2, date: '2026-10-06', time: '☀️ 09:00'),
-      game(code: 'DS', home: 16, away: 15, scoreHome: 5, scoreAway: 2, date: '2026-10-06', time: '🌙 00:00'),
+      game(code: 'JS', home: 7, away: 1, scoreHome: 1, scoreAway: 2, date: '2025-10-25'),
+      game(code: 'JS', home: 7, away: 1, scoreHome: 10, scoreAway: 1, date: '2025-10-26'),
+      game(code: 'JS', home: 1, away: 7, scoreHome: 1, scoreAway: 2, date: '2025-10-28'),
+      game(code: 'JS', home: 1, away: 7, scoreHome: 2, scoreAway: 3, date: '2025-10-29'),
+      game(code: 'JS', home: 1, away: 7, scoreHome: 2, scoreAway: 3, date: '2025-10-30'),
     ]);
     final result = scoreSeries(
-      high: team(id: 16, league: 3, rank: 1),
-      low: team(id: 15, league: 3, rank: 4),
+      high: team(id: 1, league: 1, rank: 1),
+      low: team(id: 7, league: 2, rank: 1),
       games: [
         for (final row in rows)
           BracketGame(
@@ -472,14 +534,23 @@ void main() {
           ),
       ],
       advantageHigh: 0,
-      winsNeeded: 3,
-      maxGames: 5,
-      tieGoesToHigh: true,
+      winsNeeded: 4,
+      maxGames: 7,
+      tieGoesToHigh: false,
     );
-    expect(rows, hasLength(2));
-    expect(result.winsHigh, 2);
-    expect(result.winsLow, 0);
-    expect(result.decided, isFalse);
+    expect(rows, hasLength(5));
+    expect(result.winsHigh, 1);
+    expect(result.winsLow, 4);
+  });
+
+  test('ファイナル敗退の黄線は1stで止まり、勝ち上がりはファイナルまで伸びる', () {
+    const wonFirst = StageResult(slots: 2, advantage: 0, winsHigh: 2, winsLow: 0, decided: true, winnerId: 2, loserId: 3);
+    const lostFinal = StageResult(slots: 4, advantage: 1, winsHigh: 4, winsLow: 2, decided: true, winnerId: 1, loserId: 2);
+    const wonFinal = StageResult(slots: 4, advantage: 1, winsHigh: 1, winsLow: 4, decided: true, winnerId: 2, loserId: 1);
+    const openFinal = StageResult(slots: 4, advantage: 1, winsHigh: 2, winsLow: 1, decided: false, winnerId: null, loserId: null);
+    expect(npbLineReachesFinal(wonFirst, lostFinal), isFalse);
+    expect(npbLineReachesFinal(wonFirst, wonFinal), isTrue);
+    expect(npbLineReachesFinal(wonFirst, openFinal), isTrue);
   });
 
   test('ブルワーズのパドレス戦2勝はDSの星に残る', () {

@@ -15,6 +15,7 @@ import '../tools/date_format.dart';
 import '../logic/atari_counts.dart';
 import '../logic/auth_session.dart';
 import '../logic/show_user_predictions.dart';
+import '../View/EventCalendar.dart';
 import '../View/Headers.dart';
 import '../View/Text.dart';
 import '../View/GamesBoard.dart';
@@ -126,6 +127,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
 
   bool _newsExpanded = false;
   bool _eventsExpanded = false;
+  static const _bracketCookie = 'koko_bracket_open';
+  bool _bracketOpen = true;
   static const _orgCookie = 'koko_org';
   bool _scoreLoading = false;
   int _scoreGen = 0;
@@ -165,6 +168,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       _orgKind = OrgKind.npb;
     }
     _personalStatsLayout = readPersonalStatsLayout();
+    if (readBrowserCookie(_bracketCookie) == '0') _bracketOpen = false;
     // ヘッダー〜団体タブはデータ待ちせず先に出す
     _shellReady = true;
     _bootstrapWithAuth();
@@ -179,13 +183,20 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   Future<void> _bootstrapWithAuth() async {
     try {
       await _loadThenWatchGames().timeout(const Duration(seconds: 45));
-    } catch (_) {}
+    } catch (e, st) {
+      unawaited(AuthSession.instance.reportTimeout(e, st));
+    }
     if (!mounted) return;
     try {
       await AuthSession.instance.restore().timeout(const Duration(seconds: 15));
-    } catch (_) {}
+    } catch (e, st) {
+      unawaited(AuthSession.instance.reportTimeout(e, st));
+    }
     if (!mounted) return;
     setState(() => _authEntryReady = true);
+    if (_boardContentReady) {
+      unawaited(AuthSession.instance.reportAction('初期表示を読み込んだ'));
+    }
   }
 
   void _onAuthChanged() {
@@ -205,7 +216,9 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         for (final part in _partsForItemView(null))
           _fetchPart(_orgKind, part, _seasonYear, background: false, force: true),
       ]).timeout(const Duration(seconds: 45));
-    } catch (_) {}
+    } catch (e, st) {
+      unawaited(AuthSession.instance.reportTimeout(e, st));
+    }
     if (!mounted) return;
     setState(() => _authEntryReady = true);
   }
@@ -342,6 +355,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
 
   Future<void> _changeOrg(OrgKind kind) async {
     if (kind == _orgKind) return;
+    unawaited(AuthSession.instance.reportAction(kind == OrgKind.npb ? 'npbタブを開いた' : 'mlbタブを開いた'));
     writeBrowserCookie(_orgCookie, OrgConfig.of(kind).label.toLowerCase());
     // 離れる団体の表示内容を必ず保持
     _storeCache(_orgKind, _snapshotCurrent());
@@ -420,7 +434,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           _ensureScorePart(kind, _LoadPart.players, year),
         ],
       ]).timeout(const Duration(seconds: 45));
-    } catch (_) {
+    } catch (e, st) {
+      unawaited(AuthSession.instance.reportTimeout(e, st));
     } finally {
       if (gen == _scoreGen) {
         _scoreLoading = false;
@@ -446,6 +461,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   void _openInfoPopup() {
+    unawaited(AuthSession.instance.reportAction('news・イベント日程ポップアップを開いた'));
     if (AuthSession.instance.showNewsNew) unawaited(_markRead('news'));
     if (AuthSession.instance.showEventNew) unawaited(_markRead('event'));
     if (!_sharedInfoReady) unawaited(_ensureSharedInfo());
@@ -816,6 +832,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
 
   Future<void> _selectItemYear(int year) async {
     if (_seasonYear == year) return;
+    unawaited(AuthSession.instance.reportAction('年度を変更した', year: year));
     setState(() {
       _seasonYear = year;
       _invalidateYearParts();
@@ -974,8 +991,32 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         }
       });
     } catch (e, st) {
+      unawaited(AuthSession.instance.reportTimeout(e, st));
       logger.e('part ${part.name} 通信/解析エラー: $e\n$st');
       _maybeSetPartError(target, background, '通信エラー: $e');
+    }
+  }
+
+  /// 同じイニングの再取得で打者が一瞬欠けると Now が消える。直前の打者を残す。
+  void _keepLiveBatters(List<Map<String, dynamic>> previous, List<Map<String, dynamic>> incoming) {
+    final prevById = <String, Map<String, dynamic>>{};
+    for (final game in previous) {
+      final id = '${game['id_game'] ?? game['id'] ?? ''}'.trim();
+      if (id.isNotEmpty && id != '0') prevById[id] = game;
+    }
+    for (final game in incoming) {
+      if ('${game['name_batter'] ?? ''}'.trim().isNotEmpty) continue;
+      final state = '${game['state'] ?? ''}';
+      if (!state.contains('回') || state.contains('試合終了') || state.contains('コールド')) continue;
+      final id = '${game['id_game'] ?? game['id'] ?? ''}'.trim();
+      final old = prevById[id];
+      if (old == null || '${old['state'] ?? ''}' != state) continue;
+      final oldName = '${old['name_batter'] ?? ''}'.trim();
+      if (oldName.isEmpty) continue;
+      game['name_batter'] = oldName;
+      game['id_team_batter'] = old['id_team_batter'];
+      if (old['int_batter_order'] != null) game['int_batter_order'] = old['int_batter_order'];
+      if (game['int_outs'] == null && old['int_outs'] != null) game['int_outs'] = old['int_outs'];
     }
   }
 
@@ -986,6 +1027,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     int year,
   ) {
     final incoming = normalizeGames(listMapFromJson(map['games'])).where(org.gameBelongs).toList();
+    _keepLiveBatters(bundle.games, incoming);
     final window = resolveGamesWindow(
       fromText: '${map['from'] ?? ''}',
       toText: '${map['to'] ?? ''}',
@@ -1053,6 +1095,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         showPostseasonBoard = bundle.showPostseasonBoard;
       });
     } catch (e, st) {
+      unawaited(AuthSession.instance.reportTimeout(e, st));
       logger.w('past games $ymd 失敗: $e\n$st');
     } finally {
       _pastDateInflight.remove(inflightKey);
@@ -1292,6 +1335,10 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
             selectedIndex: _itemTab,
             onSelected: (i) {
               if (i == _itemTab) return;
+              const actions = ['試合情報タブを開いた', 'チーム順位タブを開いた', '個人成績タブを開いた'];
+              if (i >= 0 && i < actions.length) {
+                unawaited(AuthSession.instance.reportAction(actions[i]));
+              }
               setState(() => _itemTab = i);
               unawaited(_ensureItemYearLoaded(i));
             },
@@ -1437,20 +1484,47 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         final boardH = isMlb ? MlbBracketGeom.h : BracketGeom.h;
         final width = constraints.maxWidth.isFinite ? constraints.maxWidth : boardW;
         final loadingTeams = !_partReady(_LoadPart.standings);
-        return SizedBox(
-          width: width,
-          height: width * boardH / boardW,
-          child: isMlb
-              ? MlbPostseasonBracket(
-                  standings: standings,
-                  games: _mlbBracketGames(),
-                  loadingTeams: loadingTeams,
-                )
-              : PostseasonBracket(
-                  standings: standings,
-                  games: postseasonGames,
-                  loadingTeams: loadingTeams,
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Material(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(4),
+              child: InkWell(
+                onTap: () {
+                  setState(() => _bracketOpen = !_bracketOpen);
+                  writeBrowserCookie(_bracketCookie, _bracketOpen ? '1' : '0');
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: Row(
+                    children: [
+                      Icon(_bracketOpen ? Icons.expand_less : Icons.expand_more, color: Colors.white, size: 18),
+                      const SizedBox(width: 4),
+                      const Text('トーナメント', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                    ],
+                  ),
                 ),
+              ),
+            ),
+            if (_bracketOpen)
+              SizedBox(
+                width: width,
+                height: width * boardH / boardW,
+                child: isMlb
+                    ? MlbPostseasonBracket(
+                        standings: standings,
+                        games: _mlbBracketGames(),
+                        loadingTeams: loadingTeams,
+                      )
+                    : PostseasonBracket(
+                        standings: standings,
+                        games: postseasonGames,
+                        loadingTeams: loadingTeams,
+                      ),
+              ),
+          ],
         );
       },
     );
@@ -1751,7 +1825,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       Widget newsTag(String title, Color back, Color font, {double? width}) {
         return Container(
           width: width,
-          constraints: BoxConstraints(minWidth: width ?? tagW, minHeight: tagH),
+          height: tagH,
+          constraints: BoxConstraints(minWidth: width ?? tagW, maxHeight: tagH),
           alignment: Alignment.center,
           padding: EdgeInsets.symmetric(vertical: 2, horizontal: width == null ? 6 : 3),
           decoration: BoxDecoration(
@@ -1791,7 +1866,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           children: [
             if (!hideHeader)
               Material(
-                color: const Color(0xFF757575),
+                color: Colors.black,
                 borderRadius: BorderRadius.circular(3),
                 child: InkWell(
                   onTap: AuthSession.instance.showNewsNew ? () => unawaited(_markRead('news')) : null,
@@ -1805,24 +1880,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                           const SizedBox(width: 8),
                           const BlinkNewMark(fontSize: 10),
                         ],
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              alignment: Alignment.centerRight,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: const Text('未読メッセージを一覧表示', style: TextStyle(color: Colors.white, fontSize: 11)),
-                              ),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),
@@ -1839,43 +1896,53 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                     Expanded(
                       child: infoLoading
                           ? Center(child: miniSpinner(size: 22))
-                          : ListView(
-                              padding: EdgeInsets.zero,
-                              primary: false,
-                              children: [
-                                for (final n in notifications)
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 2),
+                          : LayoutBuilder(
+                              builder: (context, constraints) {
+                                return SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  primary: false,
+                                  child: SizedBox(
+                                    height: constraints.maxHeight,
                                     child: SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
                                       primary: false,
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          newsTag(
-                                            (n['tag_main_title'] ?? '').toString(),
-                                            parse(n['tag_main_color_back'], Colors.grey.shade300),
-                                            parse(n['tag_main_color_font'], Colors.white),
-                                            width: tagW * 2 / 3,
-                                          ),
-                                          const SizedBox(width: 6),
-                                          newsTag(
-                                            (n['tag_sub_title'] ?? '').toString(),
-                                            parse(n['tag_sub_color_back'], Colors.grey.shade300),
-                                            parse(n['tag_sub_color_font'], Colors.white),
-                                          ),
-                                          const SizedBox(width: 6),
-                                          Text(
-                                            (n['title'] ?? '').toString(),
-                                            maxLines: 1,
-                                            softWrap: false,
-                                            style: const TextStyle(fontSize: 12, height: 1.1, color: Colors.black87),
-                                          ),
+                                          for (final n in notifications)
+                                            Padding(
+                                              padding: const EdgeInsets.only(bottom: 2),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  newsTag(
+                                                    (n['tag_main_title'] ?? '').toString(),
+                                                    parse(n['tag_main_color_back'], Colors.grey.shade300),
+                                                    parse(n['tag_main_color_font'], Colors.white),
+                                                    width: tagW * 2 / 3,
+                                                  ),
+                                                  const SizedBox(width: 6),
+                                                  newsTag(
+                                                    (n['tag_sub_title'] ?? '').toString(),
+                                                    parse(n['tag_sub_color_back'], Colors.grey.shade300),
+                                                    parse(n['tag_sub_color_font'], Colors.white),
+                                                    width: tagW * 2 / 3,
+                                                  ),
+                                                  const SizedBox(width: 6),
+                                                  Text(
+                                                    (n['title'] ?? '').toString(),
+                                                    maxLines: 1,
+                                                    softWrap: false,
+                                                    style: const TextStyle(fontSize: 12, height: 1.1, color: Colors.black87),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
                                         ],
                                       ),
                                     ),
                                   ),
-                              ],
+                                );
+                              },
                             ),
                     ),
                   ],
@@ -1890,36 +1957,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     Widget eventsBox({bool hideHeader = false, double? boxHeight, bool fill = false}) {
       final evs = [...events];
       evs.sort((a, b) => (a['date_from_temp'] ?? '').toString().compareTo((b['date_from_temp'] ?? '').toString()));
-
-      Color parse(String? name, Color fallback) {
-        final n = (name ?? '').toLowerCase().trim();
-        const m = {
-          'red': 0xFFF44336,
-          'green': 0xFF4CAF50,
-          'blue': 0xFF0000FF,
-          'navy': 0xFF001F3F,
-          'royalblue': 0xFF4169E1,
-          'orange': 0xFFFF9800,
-          'yellow': 0xFFFFEB3B,
-          'gold': 0xFFFFD700,
-          'lime': 0xFFCDDC39,
-          'black': 0xFF000000,
-          'gray': 0xFF9E9E9E,
-          'grey': 0xFF9E9E9E,
-          'crimson': 0xFFDC143C,
-          'lightgreen': 0xFF8BC34A,
-          'white': 0xFFFFFFFF,
-        };
-        if (m.containsKey(n)) return Color(m[n]!);
-        return fallback;
-      }
-
-      String formatEventTiming(dynamic value) {
-        return (value ?? '').toString().replaceAllMapped(
-              RegExp(r'(?:\d{4}年)?(\d{1,2})月(\d{1,2})日'),
-              (m) => '${m[1]!.padLeft(2, '0')}/${m[2]!.padLeft(2, '0')}',
-            );
-      }
 
       final h = boxHeight ?? 120.0;
       final content = Container(
@@ -1945,7 +1982,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
               SizedBox(
                 width: double.infinity,
                 child: Material(
-                  color: const Color(0xFF757575),
+                  color: Colors.black,
                   borderRadius: BorderRadius.circular(3),
                   child: InkWell(
                     onTap: AuthSession.instance.showEventNew ? () => unawaited(_markRead('event')) : null,
@@ -1967,140 +2004,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
               ),
             Expanded(
               child: Padding(
-                padding: EdgeInsets.fromLTRB(10, 4, 10, popup ? 22 : 6),
-                child: infoLoading
-                    ? Center(child: miniSpinner(size: 22))
-                    : LayoutBuilder(
-                        builder: (context, constraints) {
-                          double measureTextWidth(String text) {
-                            final painter = TextPainter(
-                              text: TextSpan(
-                                  text: text,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                  )),
-                              maxLines: 1,
-                              textDirection: TextDirection.ltr,
-                            )..layout();
-                            return painter.width;
-                          }
-
-                          double rawMaxTitleW = 0;
-                          for (final e in evs) {
-                            final t = (e['title_event'] ?? '').toString();
-                            final w = measureTextWidth(t);
-                            if (w > rawMaxTitleW) rawMaxTitleW = w;
-                          }
-
-                          // 狭い比率でも固定幅の合計が親幅を超えないよう、全列を利用可能幅から配分する。
-                          const double spacing = 14; // category間6 + title前6 + date前2
-                          final usableW = math.max(0.0, constraints.maxWidth - spacing);
-                          final catW = math.min(64.0, usableW * 0.20);
-                          final textW = math.max(0.0, usableW - catW * 2);
-                          final wantedTitleW = rawMaxTitleW.clamp(0.0, textW);
-                          final titleColW = math.min(wantedTitleW, textW * 0.62);
-                          final dateColW = math.max(0.0, textW - titleColW);
-
-                          return SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                const Divider(height: 1),
-                                const SizedBox(height: 4),
-                                for (final e in evs)
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 2),
-                                    child: Row(children: [
-                                      // 主カテゴリ
-                                      Container(
-                                        width: catW,
-                                        alignment: Alignment.center,
-                                        padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
-                                        decoration: BoxDecoration(
-                                          color: parse(e['event_category_color_back'], Colors.grey.shade300),
-                                          borderRadius: BorderRadius.circular(3),
-                                        ),
-                                        child: OneLineShrinkText(
-                                          (e['event_category'] ?? '').toString(),
-                                          baseSize: 12,
-                                          minSize: 8,
-                                          color: parse(e['event_category_color_font'], Colors.white),
-                                          align: TextAlign.center,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 6),
-                                      // サブカテゴリ
-                                      Container(
-                                        width: catW,
-                                        alignment: Alignment.center,
-                                        padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
-                                        decoration: BoxDecoration(
-                                          color: parse(e['event_category_sub_color_back'], Colors.grey.shade300),
-                                          borderRadius: BorderRadius.circular(3),
-                                        ),
-                                        child: OneLineShrinkText(
-                                          (e['event_category_sub'] ?? '').toString(),
-                                          baseSize: 12,
-                                          minSize: 8,
-                                          color: parse(e['event_category_sub_color_font'], Colors.white),
-                                          align: TextAlign.center,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 6),
-                                      // タイトル（最長幅に固定）
-                                      SizedBox(
-                                        width: titleColW,
-                                        child: Builder(builder: (context) {
-                                          final String title = (e['title_event'] ?? '').toString();
-                                          final bool isToday = e['flg_today'] == true;
-                                          final double tw = measureTextWidth(title);
-                                          final double frac = (tw / titleColW).clamp(0.0, 1.0);
-                                          final BoxDecoration? deco = isToday
-                                              ? BoxDecoration(
-                                                  gradient: LinearGradient(
-                                                    colors: [
-                                                      Colors.yellowAccent.withOpacity(1.0),
-                                                      Colors.yellowAccent.withOpacity(1.0),
-                                                      Colors.yellowAccent.withOpacity(0.0),
-                                                    ],
-                                                    stops: [0.0, frac, 1.0],
-                                                    begin: Alignment.centerLeft,
-                                                    end: Alignment.centerRight,
-                                                  ),
-                                                  borderRadius: BorderRadius.circular(3),
-                                                )
-                                              : null;
-                                          return Container(
-                                            decoration: deco,
-                                            child: OneLineShrinkText(
-                                              title,
-                                              baseSize: 12,
-                                              minSize: 8,
-                                              align: TextAlign.left,
-                                            ),
-                                          );
-                                        }),
-                                      ),
-                                      const SizedBox(width: 2),
-                                      // 日付（左詰め・最小/最大幅内で縮小）
-                                      SizedBox(
-                                        width: dateColW,
-                                        child: Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: OneLineShrinkText(
-                                            formatEventTiming(e['txt_timing']),
-                                            baseSize: 12,
-                                            minSize: 8,
-                                            align: TextAlign.left,
-                                          ),
-                                        ),
-                                      ),
-                                    ]),
-                                  ),
-                              ],
-                            ),
-                          );
-                        }, //builder
-                      ),
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 6),
+                child: infoLoading ? Center(child: miniSpinner(size: 22)) : EventCalendar(events: evs),
               ),
             ),
           ],
@@ -2169,11 +2074,11 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
             const SizedBox(width: seasonGap),
             SizedBox(
               width: personalW,
+              height: 198,
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  eventsBox(),
+                  Expanded(child: eventsBox(fill: true)),
                   if (_showUserPredictions) ...[
                     const SizedBox(height: 6),
                     scoreBox(hideHeader: true, portraitCompact: true),

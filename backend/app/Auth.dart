@@ -13,7 +13,15 @@ import 'OutboundMail.dart';
 class Auth {
   static const sessionDays = 30;
   static const _colors = [
-    'red', 'blue', 'green', 'orange', 'purple', 'teal', 'crimson', 'navy', 'gold',
+    'red',
+    'blue',
+    'green',
+    'orange',
+    'purple',
+    'teal',
+    'crimson',
+    'navy',
+    'gold',
   ];
 
   static bool _schemaReady = false;
@@ -43,6 +51,8 @@ class Auth {
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS id_player_fav INTEGER');
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS flg_notify_news BOOLEAN DEFAULT TRUE');
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS flg_notify_event BOOLEAN DEFAULT TRUE');
+      await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS flg_admin BOOLEAN NOT NULL DEFAULT FALSE');
+      await conn.execute('UPDATE m_user SET flg_admin = TRUE WHERE id = 1 AND COALESCE(flg_admin, FALSE) = FALSE');
       await conn.execute('''
         CREATE TABLE IF NOT EXISTS t_auth_code (
           purpose VARCHAR(20) NOT NULL,
@@ -104,8 +114,7 @@ class Auth {
     return base64Url.encode(bytes).replaceAll('=', '');
   }
 
-  static bool _looksHashed(String stored) =>
-      stored.length == 64 && RegExp(r'^[0-9a-f]+$').hasMatch(stored);
+  static bool _looksHashed(String stored) => stored.length == 64 && RegExp(r'^[0-9a-f]+$').hasMatch(stored);
 
   static String _encodePassword(String password) {
     final salt = _newSalt();
@@ -146,6 +155,7 @@ class Auth {
         'flg_notify_event': row['flg_notify_event'] ?? true,
         'flg_read_news': row['flg_read_news'] ?? true,
         'flg_read_event': row['flg_read_event'] ?? true,
+        'flg_admin': row['flg_admin'] ?? false,
       };
 
   static const _userSelect = '''
@@ -156,6 +166,7 @@ class Auth {
            COALESCE(u.flg_read_news, TRUE) AS flg_read_news,
            COALESCE(u.flg_read_event, TRUE) AS flg_read_event,
            COALESCE(t.name_short, t.name_shortest, '') AS name_team_fav,
+           COALESCE(u.flg_admin, FALSE) AS flg_admin,
            CASE
              WHEN p.id IS NULL THEN ''
              ELSE COALESCE(p.name_full, COALESCE(p.name_last, '') || COALESCE(p.name_first, ''))
@@ -206,6 +217,23 @@ class Auth {
     if (rows.isEmpty) return null;
     return rows.first.toColumnMap()['id_user'] as int;
   }
+
+  /// 管理者だけ通す。フラグが無い、または false なら null。
+  static Future<int?> adminUserId(Connection conn, Request request) async {
+    final userId = await _requireUserId(conn, request);
+    if (userId == null) return null;
+    await ensureSchema(conn);
+    final rows = await conn.execute(
+      'SELECT COALESCE(flg_admin, FALSE) AS flg_admin FROM m_user WHERE id = \$1::int',
+      parameters: [userId],
+    );
+    if (rows.isEmpty) return null;
+    final flag = rows.first.toColumnMap()['flg_admin'];
+    final ok = flag == true || '$flag'.trim().toLowerCase() == 'true' || '$flag' == 't';
+    return ok ? userId : null;
+  }
+
+  static Future<int?> userIdOf(Connection conn, Request request) => _requireUserId(conn, request);
 
   static const _codeTtl = Duration(minutes: 15);
 

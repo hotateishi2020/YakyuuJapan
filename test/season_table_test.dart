@@ -348,7 +348,7 @@ void main() {
       'flg_pitcher': false,
     };
     await expectHeader(
-      BothLeaguePersonalStats(
+      const BothLeaguePersonalStats(
         stats: [
           {...row, 'id_league': 1},
           {...row, 'id_league': 2, 'name_player': '柳田'},
@@ -357,7 +357,7 @@ void main() {
       'セ',
     );
     await expectHeader(
-      BothLeaguePersonalStats(
+      const BothLeaguePersonalStats(
         layout: PersonalStatsLayout.scroll,
         stats: [
           {...row, 'id_league': 1},
@@ -367,7 +367,7 @@ void main() {
       'パ',
     );
     await expectHeader(
-      DualBandBothLeaguePersonalStats(
+      const DualBandBothLeaguePersonalStats(
         org: OrgConfig.mlb,
         stats: [
           {...row, 'id_league': 3},
@@ -458,4 +458,3 @@ void main() {
     expect(bg.color, personalStatPositionColor('投手'));
   });
 }
-

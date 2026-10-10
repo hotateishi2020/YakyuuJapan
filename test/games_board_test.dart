@@ -9,11 +9,14 @@ void main() {
     expect(gameIsPregameState('試合前'), isTrue);
     expect(gameIsPregameState('予想先発'), isTrue);
     expect(gameIsPregameState('スタメン'), isTrue);
+    expect(gameIsPregameState('予告先発'), isTrue);
+    expect(gameIsPregameState('見どころ'), isTrue);
     expect(gameIsPregameState('4回裏'), isFalse);
     expect(gameIsPregameState('試合終了'), isFalse);
     expect(gameHasStarted({'state': 'スタメン', 'score_home': -1, 'score_away': -1}), isFalse);
     expect(displayBoardState('予想先発'), '試合前');
     expect(displayBoardState('スタメン'), '試合前');
+    expect(displayBoardState('予告先発'), '試合前');
     expect(displayBoardState(''), '試合前');
     expect(displayBoardState('8回表'), '8回表');
     expect(displayBoardState('試合終了'), '試合終了');
@@ -32,6 +35,57 @@ void main() {
     expect(isHeatedGame('10回裏', 4, 2), isTrue);
     expect(isHeatedGame('試合終了', 1, 1), isFalse);
     expect(isHeatedGame('試合前', -1, -1), isFalse);
+  });
+
+  test('fifth inning must finish before a no-hit label', () {
+    expect(fifthInningComplete('5回裏'), isFalse);
+    expect(fifthInningComplete('5回裏 2アウト'), isFalse);
+    expect(fifthInningComplete('5回裏 3アウト'), isTrue);
+    expect(fifthInningComplete('6回表'), isTrue);
+    expect(fifthInningComplete('試合終了'), isFalse);
+  });
+
+  test('live pitching feat prefers a perfect game in progress', () {
+    expect(
+      livePitchingFeatLabel(state: '6回表', starterStillIn: true, hits: 0, freePasses: 0),
+      'パーフェクトピッチング中',
+    );
+    expect(
+      livePitchingFeatLabel(state: '6回表', starterStillIn: true, hits: 0, freePasses: 1),
+      'ノーヒットピッチング中',
+    );
+    expect(
+      livePitchingFeatLabel(state: '6回表', starterStillIn: true, hits: 0, freePasses: 0, playRunner: true),
+      'ノーヒットピッチング中',
+    );
+    expect(
+      livePitchingFeatLabel(state: '6回表', starterStillIn: true, hits: 0, freePasses: 0, balks: 1),
+      'ノーヒットピッチング中',
+    );
+    expect(
+      livePitchingFeatLabel(state: '6回表', starterStillIn: true, hits: 0, freePasses: 0, playHit: true),
+      '',
+    );
+    expect(livePitchingFeatLabel(state: '5回表', starterStillIn: true, hits: 0, freePasses: 0), '');
+    expect(livePitchingFeatLabel(state: '7回裏', starterStillIn: false, hits: 0, freePasses: 0), '');
+    expect(livePitchingFeatLabel(state: '8回表', starterStillIn: true, hits: 1, freePasses: 0), '');
+    expect(livePitchingFeatLabel(state: '6回表', starterStillIn: true, hits: null, freePasses: 0), '');
+  });
+
+  test('pitcher allowance reads hits and free passes', () {
+    expect(
+      pitcherAllowance('6回無失点|dgray 被安打0|crimson 0四死|crimson 8K|crimson', ''),
+      (hits: 0, freePasses: 0),
+    );
+    expect(pitcherAllowance('', '6回無失点(被安打0無四球8奪三振)'), (hits: 0, freePasses: 0));
+    expect(pitcherAllowance('', '6回1失点(被安打0 2四球1死球5奪三振)'), (hits: 0, freePasses: 3));
+    expect(pitcherAllowance('7.2回3失点|yellow 9奪三振|crimson', ''), isNull);
+  });
+
+  test('finished pitching feat prefers a perfect game', () {
+    expect(finishedPitchingFeat('完全試合|perfect ノーヒットノーラン|nohit 完封|shutout'), '完全試合');
+    expect(finishedPitchingFeat('ノーヒットノーラン|nohit 完投|cg'), 'ノーヒットノーラン');
+    expect(finishedPitchingFeat('完封|shutout'), '');
   });
 
   test('finishedGameOutcome is win, lose, or draw only after the game ends', () {
@@ -1723,6 +1777,211 @@ void main() {
     expect(tester.getTopLeft(find.text('２ケタ奪三振')).dx, greaterThan(tester.getTopRight(find.text('9K')).dx - 0.5));
   });
 
+  Map<String, dynamic> noHitGame({
+    required String state,
+    required String chips,
+    String achieve = '',
+    int balks = 0,
+    List<Map<String, dynamic>> lineup = const [],
+  }) {
+    return {
+      'date_game': '2026-10-11',
+      'time_game': '14:00',
+      'name_team_home': '阪神',
+      'name_team_away': 'ヤクルト',
+      'name_stadium': '甲子園',
+      'name_pitcher_home': '髙橋遥人',
+      'name_pitcher_away': '奥川恭伸',
+      'score_home': 1,
+      'score_away': 0,
+      'state': state,
+      'id_team_home': 2,
+      'id_team_away': 4,
+      'id_team_summary': 2,
+      'name_full_summary': '髙橋遥人',
+      'flg_pitcher': true,
+      'txt_pitch_chips': chips,
+      'txt_achieve': achieve,
+      'int_balk': balks,
+      'lineup': lineup,
+      'color_back_home': '#FFD200',
+      'color_back_away': '#003366',
+      'color_font_home': '#000000',
+      'color_font_away': '#FFFFFF',
+    };
+  }
+
+  Future<void> pumpNoHit(WidgetTester tester, Map<String, dynamic> game) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 720,
+            height: 240,
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
+              games: [game],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+  }
+
+  testWidgets('heated games say 白熱展開', (tester) async {
+    await pumpNoHit(
+      tester,
+      noHitGame(state: '7回表', chips: '6回2失点|yellow 被安打5|green 2四死|green 4K|green'),
+    );
+    expect(find.text('白熱展開'), findsOneWidget);
+    expect(find.text('白熱試合'), findsNothing);
+  });
+
+  testWidgets('a perfect game in progress sits to the right of the pitching line', (tester) async {
+    await pumpNoHit(
+      tester,
+      noHitGame(state: '6回表', chips: '5回無失点|dgray 被安打0|crimson 0四死|crimson 6K|crimson'),
+    );
+    expect(find.text('パーフェクトピッチング中'), findsOneWidget);
+    expect(find.text('ノーヒットピッチング中'), findsNothing);
+    expect(
+      tester.getTopLeft(find.text('パーフェクトピッチング中')).dx,
+      greaterThan(tester.getTopRight(find.text('6K')).dx - 0.5),
+    );
+  });
+
+  testWidgets('a no-hitter in progress is labeled when a runner has reached', (tester) async {
+    await pumpNoHit(
+      tester,
+      noHitGame(
+        state: '6回裏',
+        chips: '5.1回無失点|dgray 被安打0|crimson 1四死|green 7K|crimson',
+        lineup: [
+          {
+            'id_team': 4,
+            'order': 1,
+            'players': [
+              {'name': '山田哲人', 'pos': '二', 'plays': '四球|walk'},
+            ],
+          },
+        ],
+      ),
+    );
+    expect(find.text('ノーヒットピッチング中'), findsOneWidget);
+    expect(find.text('パーフェクトピッチング中'), findsNothing);
+    expect(
+      tester.getTopLeft(find.text('ノーヒットピッチング中')).dx,
+      greaterThan(tester.getTopRight(find.text('被安打0')).dx - 0.5),
+    );
+  });
+
+  testWidgets('an error keeps a no-hitter from being called perfect', (tester) async {
+    await pumpNoHit(
+      tester,
+      noHitGame(
+        state: '7回表',
+        chips: '6回無失点|dgray 被安打0|crimson 0四死|crimson 8K|crimson',
+        lineup: [
+          {
+            'id_team': 4,
+            'order': 1,
+            'players': [
+              {'name': '山田哲人', 'pos': '二', 'plays': '遊失|error'},
+            ],
+          },
+        ],
+      ),
+    );
+    expect(find.text('ノーヒットピッチング中'), findsOneWidget);
+    expect(find.text('パーフェクトピッチング中'), findsNothing);
+  });
+
+  testWidgets('the no-hit label waits until the fifth inning is over', (tester) async {
+    await pumpNoHit(
+      tester,
+      noHitGame(state: '5回裏', chips: '4.2回無失点|dgray 被安打0|crimson 0四死|crimson 5K|crimson'),
+    );
+    expect(find.text('パーフェクトピッチング中'), findsNothing);
+    expect(find.text('ノーヒットピッチング中'), findsNothing);
+  });
+
+  testWidgets('a finished no-hitter is labeled beside the pitching line', (tester) async {
+    await pumpNoHit(
+      tester,
+      noHitGame(
+        state: '試合終了',
+        chips: '9回無失点|dgray 被安打0|crimson 1四死|green 10K|crimson',
+        achieve: 'ノーヒットノーラン|nohit 完投|cg',
+      ),
+    );
+    expect(find.text('ノーヒットノーラン'), findsOneWidget);
+    expect(find.text('ノーヒットピッチング中'), findsNothing);
+    expect(find.text('完投'), findsOneWidget);
+    expect(
+      tester.getTopLeft(find.text('ノーヒットノーラン')).dx,
+      greaterThan(tester.getTopRight(find.text('10K')).dx - 0.5),
+    );
+    expect(
+      tester.getTopLeft(find.text('完投')).dx,
+      greaterThan(tester.getTopRight(find.text('ノーヒットノーラン')).dx - 0.5),
+    );
+  });
+
+  testWidgets('a finished perfect game is labeled 完全試合', (tester) async {
+    await pumpNoHit(
+      tester,
+      noHitGame(
+        state: '試合終了',
+        chips: '9回無失点|dgray 被安打0|crimson 0四死|crimson 11K|crimson',
+        achieve: '完全試合|perfect ノーヒットノーラン|nohit 完封|shutout',
+      ),
+    );
+    expect(find.text('完全試合'), findsOneWidget);
+    expect(find.text('ノーヒットノーラン'), findsNothing);
+    expect(find.text('パーフェクトピッチング中'), findsNothing);
+    expect(find.text('完封'), findsOneWidget);
+  });
+
+  testWidgets('a balk keeps a no-hitter from being called perfect', (tester) async {
+    await pumpNoHit(
+      tester,
+      noHitGame(
+        state: '6回表',
+        chips: '5回無失点|dgray 被安打0|crimson 0四死|crimson 6K|crimson',
+        balks: 1,
+      ),
+    );
+    expect(find.text('ノーヒットピッチング中'), findsOneWidget);
+    expect(find.text('パーフェクトピッチング中'), findsNothing);
+  });
+
+  testWidgets('a relieved starter does not keep the no-hit label', (tester) async {
+    final game = noHitGame(
+      state: '7回表',
+      chips: '5回無失点|dgray 被安打0|crimson 0四死|crimson 6K|crimson',
+    );
+    game['summaries'] = [
+      {
+        'id_team_summary': 2,
+        'name_full_summary': '髙橋遥人',
+        'flg_pitcher': true,
+        'txt_pitch_chips': '5回無失点|dgray 被安打0|crimson 0四死|crimson 6K|crimson',
+      },
+      {
+        'id_team_summary': 2,
+        'name_full_summary': '岩崎優',
+        'flg_pitcher': true,
+        'txt_pitch_chips': '1回無失点|dgray 被安打1|green 0四死|crimson 1K|green',
+      },
+    ];
+    await pumpNoHit(tester, game);
+    expect(find.text('髙橋遥人'), findsOneWidget);
+    expect(find.text('パーフェクトピッチング中'), findsNothing);
+    expect(find.text('ノーヒットピッチング中'), findsNothing);
+  });
+
   testWidgets('cycle and pitching feats use their colors', (tester) async {
     const pitching = '9回無失点(無安打無四球11奪三振)';
     await tester.pumpWidget(
@@ -2523,7 +2782,7 @@ void main() {
     expect(find.text('三振'), findsNothing);
   });
 
-  testWidgets('活躍表示は打順枠の打席を並べ代の二ゴを左飛の右隣に出す', (tester) async {
+  testWidgets('活躍表示は本人の打席だけ並べ他人の代打は出さない', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Center(
@@ -2592,26 +2851,18 @@ void main() {
     expect(find.text('左飛'), findsNothing);
     expect(find.text('二ゴ'), findsNothing);
     expect(find.text('タイムリー'), findsOneWidget);
-    expect(find.text('代打：M.バルガス'), findsOneWidget);
+    expect(find.text('代打：M.バルガス'), findsNothing);
     expect(find.text('M.バルガス'), findsNothing);
     expect(find.byKey(const ValueKey('pinch-badge')), findsNothing);
-    expect(
-      (tester.widget<Container>(find.byKey(const ValueKey('pinch-caption-0'))).decoration as BoxDecoration).color,
-      const Color(0xFF5C6BC0),
-    );
+    expect(find.byKey(const ValueKey('pinch-caption-0')), findsNothing);
     expect(tester.getTopLeft(find.text('中安')).dx, lessThan(tester.getTopLeft(find.text('タイムリー')).dx));
-    expect(
-      tester.getTopLeft(find.text('代打：M.バルガス')).dx,
-      greaterThan(tester.getTopRight(find.text('タイムリー')).dx - 1),
-    );
     final boardRight = tester.getRect(find.byType(GamesBoardYahooStyle)).right;
     for (final label in ['中安', 'タイムリー']) {
       expect(tester.getRect(find.text(label)).right, lessThanOrEqualTo(boardRight + 0.5));
     }
-    expect(tester.getRect(find.text('代打：M.バルガス')).right, lessThanOrEqualTo(boardRight + 0.5));
   });
 
-  testWidgets('代守の打席は代マークと代守：名前を出す', (tester) async {
+  testWidgets('活躍表示の代打は本人の代打だけ出し他人の代守は出さない', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Center(
@@ -2672,7 +2923,8 @@ void main() {
     expect(find.text('二ゴ'), findsNothing);
     expect(find.text('左飛'), findsNothing);
     expect(find.text('代打同点タイムリー'), findsOneWidget);
-    expect(find.text('代守：ブレンドン・ドイル'), findsOneWidget);
+    expect(find.text('代打：トミー・ファム'), findsOneWidget);
+    expect(find.text('代守：ブレンドン・ドイル'), findsNothing);
     expect(find.text('ブレンドン・ドイル'), findsNothing);
     expect(find.byKey(const ValueKey('pinch-badge')), findsNothing);
     expect(
@@ -2680,7 +2932,7 @@ void main() {
       const Color(0xFF5C6BC0),
     );
     expect(
-      tester.getTopLeft(find.text('代守：ブレンドン・ドイル')).dx,
+      tester.getTopLeft(find.text('代打：トミー・ファム')).dx,
       greaterThan(tester.getTopRight(find.text('代打同点タイムリー')).dx - 1),
     );
   });
@@ -2902,6 +3154,15 @@ void main() {
     expect(nested, hasLength(1));
     expect(nested.single['id_game'], 652);
     expect(nested.single['state'], '試合終了');
+  });
+
+  test('season leader crown matches the full name, not the family name', () {
+    expect(seasonLeaderNameMatches('髙橋光成', '髙橋'), isFalse);
+    expect(seasonLeaderNameMatches('髙橋光成', '髙橋奎二'), isFalse);
+    expect(seasonLeaderNameMatches('髙橋光成', '髙橋光成'), isTrue);
+    expect(seasonLeaderNameMatches('髙橋 光成', '髙橋光成'), isTrue);
+    expect(seasonLeaderNameMatches('山本由伸', '山本由伸'), isTrue);
+    expect(seasonLeaderNameMatches('S.大谷', '大谷翔平'), isTrue);
   });
 
   test('samePlayerStatName matches initials and full names', () {
@@ -3169,6 +3430,67 @@ void main() {
     expect(find.textContaining('🇯🇵'), findsOneWidget);
     expect(tester.getTopLeft(find.textContaining('🇯🇵')).dx, greaterThan(tester.getTopLeft(find.textContaining('山本由伸')).dx));
     expect(tester.getTopLeft(find.textContaining('👑')).dx, greaterThan(tester.getTopLeft(find.textContaining('🇯🇵')).dx));
+  });
+
+  testWidgets('a shared family name does not crown another announced starter', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 420,
+            height: 200,
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
+              games: [
+                {
+                  'date_game': '2026-10-11',
+                  'time_game': '🌙 18:00',
+                  'name_team_home': '西武',
+                  'name_team_away': 'ソフトバンク',
+                  'name_stadium': 'ベルーナドーム',
+                  'name_pitcher_home': '髙橋光成',
+                  'name_pitcher_away': '先発相手',
+                  'score_home': -1,
+                  'score_away': -1,
+                  'state': '予告先発',
+                  'code_game': 'CS',
+                  'id_team_home': 11,
+                  'id_team_away': 12,
+                  'id_league_home': 2,
+                  'id_league_away': 2,
+                  'color_back_home': '#004EA2',
+                  'color_back_away': '#FFD700',
+                  'color_font_home': 'white',
+                  'color_font_away': 'black',
+                },
+              ],
+              playerStats: const [
+                {
+                  'title': '防御率',
+                  'name_player': '髙橋奎二',
+                  'name_last': '髙橋',
+                  'int_rank': 1,
+                  'id_league': 1,
+                  'stats': '1.80',
+                },
+                {
+                  'title': '防御率',
+                  'name_player': '髙橋光成',
+                  'name_last': '髙橋',
+                  'int_rank': 8,
+                  'id_league': 2,
+                  'stats': '3.12',
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.textContaining('髙橋光成'), findsOneWidget);
+    expect(find.textContaining('👑'), findsNothing);
   });
 
   testWidgets('NPB regular season cards do not show Japan flag or crown', (tester) async {

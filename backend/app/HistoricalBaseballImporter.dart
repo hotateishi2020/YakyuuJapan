@@ -706,6 +706,22 @@ class HistoricalBaseballImporter {
 
   static String npbJapanSeriesUrl(int year) => 'https://npb.jp/bis/scores/nipponseries/linescore$year.html';
 
+  /// 公式の日本シリーズ日程だけを取り、既存の試合は external_id で更新する。
+  Future<PostseasonImportResult> importNpbJapanSeries(int year) async {
+    final url = npbJapanSeriesUrl(year);
+    try {
+      final body = await _getHtml(Uri.parse(url));
+      final games = parseNpbJapanSeries(body, expectedYear: year, sourceUrl: url);
+      if (games.isEmpty) return const PostseasonImportResult(0, 'no_data');
+      final count = await _loadPostseasonGames(games);
+      await _saveCheckpoint('npb', year, 'postseason-japan-series', 'complete', count, url, null);
+      return PostseasonImportResult(count, 'complete');
+    } on HistoricalHttpException catch (error) {
+      if (error.statusCode == 404) return const PostseasonImportResult(0, 'not_yet_available');
+      rethrow;
+    }
+  }
+
   static String npbClimaxCalendarUrl(int year) => 'https://npb.jp/bis/$year/calendar/index_10.html';
 
   static List<String> npbClimaxCalendarUrls(int year) => [

@@ -7,10 +7,24 @@ import 'package:http/http.dart' as http;
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
 
+/// Yahoo が 500 番台を返してページを読めない。試合取得はこの時点で打ち切る。
+class YahooPageUnavailable implements Exception {
+  final int statusCode;
+  final Uri url;
+
+  YahooPageUnavailable(this.statusCode, this.url);
+
+  @override
+  String toString() => 'HTTP $statusCode for $url';
+}
+
 /// Yahoo 野球ページ共通の HTML 取得・デコード。
 class YahooHtml {
   static Future<Document> fetchDocument(Uri url) async {
     final res = await http.get(url, headers: {'User-Agent': 'Mozilla/5.0'}).timeout(const Duration(seconds: 12));
+    if (res.statusCode >= 500) {
+      throw YahooPageUnavailable(res.statusCode, url);
+    }
     if (res.statusCode != 200) {
       throw Exception('HTTP ${res.statusCode} for $url');
     }

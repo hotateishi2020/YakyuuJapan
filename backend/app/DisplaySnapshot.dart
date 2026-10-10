@@ -52,6 +52,7 @@ class DisplaySnapshot {
       CREATE INDEX IF NOT EXISTS v_games_details_date
       ON v_games_details (int_year, code, date_game)
     ''');
+    await conn.execute("ALTER TABLE t_game ADD COLUMN IF NOT EXISTS txt_lineup_announced TEXT NOT NULL DEFAULT ''");
     _ensured = true;
   }
 

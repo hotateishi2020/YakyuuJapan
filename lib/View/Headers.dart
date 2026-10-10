@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../config/app_design.dart';
 import '../logic/auth_session.dart';
+import '../pages/admin_logs_page.dart';
 import 'AccountDialogs.dart';
 import 'AuthDialogs.dart';
 
@@ -147,14 +148,32 @@ class HeaderAuthAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (loggedIn) {
+      final admin = AuthSession.instance.user?.admin == true;
       return Builder(
         builder: (iconContext) {
-          return IconButton(
-            tooltip: 'アカウント',
-            onPressed: () => showAccountMenu(iconContext, onChanged: onAuthChanged),
-            icon: const Icon(Icons.account_circle, color: Colors.white, size: 28),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (admin)
+                IconButton(
+                  tooltip: 'ログ管理',
+                  onPressed: () {
+                    Navigator.of(iconContext).push(
+                      MaterialPageRoute<void>(builder: (_) => const AdminLogsPage()),
+                    );
+                  },
+                  icon: const Icon(Icons.admin_panel_settings, color: Colors.white, size: 26),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                ),
+              IconButton(
+                tooltip: 'アカウント',
+                onPressed: () => showAccountMenu(iconContext, onChanged: onAuthChanged),
+                icon: const Icon(Icons.account_circle, color: Colors.white, size: 28),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+              ),
+            ],
           );
         },
       );

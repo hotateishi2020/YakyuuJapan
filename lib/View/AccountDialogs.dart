@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -16,6 +18,7 @@ Future<void> showAccountMenu(BuildContext context, {VoidCallback? onChanged}) as
     Offset.zero & overlay.size,
   );
 
+  unawaited(AuthSession.instance.reportAction('アカウント設定のプルダウンを開いた'));
   final action = await showMenu<String>(
     context: context,
     position: position,

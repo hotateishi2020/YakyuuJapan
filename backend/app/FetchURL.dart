@@ -902,7 +902,7 @@ class FetchURL {
         summary.id_player = playerId;
         if (mark.contains('勝')) {
           summary.code_result_pitcher = Value.CodeGameResultPitcher.WIN;
-        } else if (mark.contains('敗')) {
+        } else if (mark.contains('敗') || mark.contains('負')) {
           summary.code_result_pitcher = Value.CodeGameResultPitcher.LOSE;
         } else if (mark.contains('Ｓ') || mark.contains('セーブ')) {
           summary.code_result_pitcher = Value.CodeGameResultPitcher.SAVE;
@@ -1429,7 +1429,7 @@ class FetchURL {
 
                       if (codeResultPitcher.contains('勝')) {
                         gameSummaryPitcher.code_result_pitcher = Value.CodeGameResultPitcher.WIN;
-                      } else if (codeResultPitcher.contains('敗')) {
+                      } else if (codeResultPitcher.contains('敗') || codeResultPitcher.contains('負')) {
                         gameSummaryPitcher.code_result_pitcher = Value.CodeGameResultPitcher.LOSE;
                       } else if (codeResultPitcher.contains('Ｓ') || codeResultPitcher.contains('セーブ')) {
                         gameSummaryPitcher.code_result_pitcher = Value.CodeGameResultPitcher.SAVE;

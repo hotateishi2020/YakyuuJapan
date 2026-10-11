@@ -911,6 +911,7 @@ class GameDateSwitcher extends StatefulWidget {
 class _GameDateSwitcherState extends State<GameDateSwitcher> {
   late DateTime _baseDate;
   int _offset = 0;
+  final Map<String, bool> _statsExpandedByGame = {};
 
   @override
   void initState() {
@@ -1066,13 +1067,14 @@ class _GameDateSwitcherState extends State<GameDateSwitcher> {
             child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
           )
         : GamesBoardYahooStyle(
-            key: ValueKey('games-$date-${dayGames.map(gameMatchupKey).join('|')}'),
+            key: ValueKey('games-$date'),
             games: dayGames,
             seriesGames: widget.seriesGames,
             playerStats: widget.playerStats,
             standings: widget.standings,
             dateFilter: date,
             horizontal: widget.horizontal,
+            statsExpandedByGame: _statsExpandedByGame,
           );
     return LayoutBuilder(builder: (context, constraints) {
       if (constraints.maxHeight.isFinite) {
@@ -1141,6 +1143,7 @@ class BothLeagueGameDay extends StatefulWidget {
 class _BothLeagueGameDayState extends State<BothLeagueGameDay> {
   late DateTime _baseDate;
   int _offset = 0;
+  final Map<String, bool> _statsExpandedByGame = {};
 
   @override
   void initState() {
@@ -1282,13 +1285,14 @@ class _BothLeagueGameDayState extends State<BothLeagueGameDay> {
           ),
           const SizedBox(height: 4),
           GamesBoardYahooStyle(
-            key: ValueKey('both-$leagueId-$date-${leagueGames.map(gameMatchupKey).join('|')}'),
+            key: ValueKey('both-$leagueId-$date'),
             games: leagueGames,
             seriesGames: widget.seriesGames,
             playerStats: widget.playerStats,
             standings: widget.standings,
             dateFilter: date,
             horizontal: true,
+            statsExpandedByGame: _statsExpandedByGame,
           ),
         ],
       );
@@ -1341,6 +1345,63 @@ class _BothLeagueGameDayState extends State<BothLeagueGameDay> {
   }
 }
 
+/// 画面上の移動が大きい操作はスクロールなので、選手成績を開閉しない。
+class _ScrollSafeTap extends StatefulWidget {
+  final VoidCallback onTap;
+  final Widget child;
+
+  const _ScrollSafeTap({required this.onTap, required this.child});
+
+  @override
+  State<_ScrollSafeTap> createState() => _ScrollSafeTapState();
+}
+
+class _ScrollSafeTapState extends State<_ScrollSafeTap> {
+  static const _slop = 18.0;
+  Offset? _down;
+  bool _dragged = false;
+  DateTime? _ignoreUntil;
+
+  void _rememberScroll() {
+    _down = null;
+    _dragged = true;
+    _ignoreUntil = DateTime.now().add(const Duration(milliseconds: 400));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Listener(
+      behavior: HitTestBehavior.opaque,
+      onPointerDown: (event) {
+        _down = event.position;
+        _dragged = false;
+      },
+      onPointerMove: (event) {
+        final down = _down;
+        if (down == null) return;
+        if ((event.position - down).distance > _slop) _dragged = true;
+      },
+      onPointerSignal: (_) => _rememberScroll(),
+      onPointerUp: (event) {
+        final down = _down;
+        final dragged = _dragged;
+        final ignoreUntil = _ignoreUntil;
+        _down = null;
+        _dragged = false;
+        if (down == null || dragged) return;
+        if (ignoreUntil != null && DateTime.now().isBefore(ignoreUntil)) return;
+        if ((event.position - down).distance > _slop) return;
+        widget.onTap();
+      },
+      onPointerCancel: (_) {
+        _down = null;
+        _dragged = false;
+      },
+      child: widget.child,
+    );
+  }
+}
+
 class GamesBoardYahooStyle extends StatefulWidget {
   final List<Map<String, dynamic>> games;
   final List<Map<String, dynamic>> seriesGames;
@@ -1353,6 +1414,9 @@ class GamesBoardYahooStyle extends StatefulWidget {
   /// 選手成績を最初から開いておく。試合開始後の初期表示は畳む。試合前は開く。
   final bool initialStatsExpanded;
 
+  /// 親が持つ開閉。リストの外に出して作り直しても、スクロールで閉じない。
+  final Map<String, bool>? statsExpandedByGame;
+
   const GamesBoardYahooStyle({
     super.key,
     required this.games,
@@ -1362,6 +1426,7 @@ class GamesBoardYahooStyle extends StatefulWidget {
     this.dateFilter,
     this.horizontal = false,
     this.initialStatsExpanded = false,
+    this.statsExpandedByGame,
   });
 
   @override
@@ -1473,16 +1538,21 @@ class _AnimatedGameSlotState extends State<_AnimatedGameSlot> with SingleTickerP
   }
 }
 
-class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> {
+class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> with AutomaticKeepAliveClientMixin {
   final Map<String, bool> _allBattersByGame = {};
   final Map<String, bool> _statsExpandedByGame = {};
+
+  Map<String, bool> get _statsStore => widget.statsExpandedByGame ?? _statsExpandedByGame;
+
+  @override
+  bool get wantKeepAlive => true;
 
   List<Map<String, dynamic>> get games => dropUnplayedClinchedGames(widget.games, standings: widget.standings);
   String? get dateFilter => widget.dateFilter;
   bool get horizontal => widget.horizontal;
 
   bool _statsOpen(Map<String, dynamic> game) {
-    final stored = _statsExpandedByGame[gameMatchupKey(game)];
+    final stored = _statsStore[gameMatchupKey(game)];
     if (stored != null) return stored;
     if (widget.initialStatsExpanded) return true;
     return gameIsPregameState('${game['state'] ?? ''}');
@@ -1518,7 +1588,7 @@ class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> {
       statsLayoutHeight: layoutHeight,
       onStatsExpandedChanged: (value) {
         if (value == statsExpanded) return;
-        setState(() => _statsExpandedByGame[key] = value);
+        setState(() => _statsStore[key] = value);
       },
     );
   }
@@ -1582,6 +1652,7 @@ class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final src = (dateFilter == null || dateFilter!.isEmpty) ? games : games.where((g) => gameDateOnly(g['date_game']) == dateFilter).toList();
     final grouped = _groupGames(normalizeGames(src));
 
@@ -1820,31 +1891,41 @@ class _TableGameCard extends StatelessWidget {
     }
     final strikeouts = RegExp(r'^(\d+)奪三振$').firstMatch(part);
     if (strikeouts != null) return (label: '奪三振', value: strikeouts.group(1)!);
-    if (RegExp(r'^\d+勝\d+敗$').hasMatch(part)) return (label: '勝敗', value: part);
+    if (RegExp(r'^\d+勝\d+[敗負]$').hasMatch(part)) return (label: '勝敗', value: part);
+    final hold = RegExp(r'^(\d+)H$').firstMatch(part);
+    if (hold != null) return (label: 'H', value: hold.group(1)!);
+    final save = RegExp(r'^(\d+)S$').firstMatch(part);
+    if (save != null) return (label: 'S', value: save.group(1)!);
     if (RegExp(r'^\d+(?:\.\d+)?$').hasMatch(part)) return (label: '防御率', value: part);
     return (label: part, value: '');
   }
 
-  int _seasonMarkRow(String label, int rows) {
-    if (rows <= 0) return 0;
+  int _seasonMarkRow(String label, List<String> lineLabels) {
+    if (lineLabels.isEmpty) return 0;
     final t = label.replaceAll(RegExp(r'\s+'), '');
-    if (t.contains('規定')) return rows - 1;
-    // titles_pitcher は短縮名（防/勝/奪）で来ることもある
-    if (t.contains('奪三振') || t == '奪') return math.min(2, rows - 1);
-    if (t.contains('防御') || t == '防') return math.min(1, rows - 1);
-    return 0;
+    int find(bool Function(String line) test) {
+      final index = lineLabels.indexWhere(test);
+      return index < 0 ? 0 : index;
+    }
+
+    if (t.contains('規定')) return find((line) => line.contains('規定'));
+    if (t.contains('奪三振') || t == '奪') return find((line) => line.contains('奪三振') || line == '奪');
+    if (t.contains('防御') || t == '防') return find((line) => line.contains('防御') || line == '防');
+    if (t == 'H' || t == 'HP' || t.contains('ホールド')) return find((line) => line == 'H' || line == 'HP' || line.contains('ホールド'));
+    if (t == 'S' || t == 'SV' || t.contains('セーブ')) return find((line) => line == 'S' || line.contains('セーブ'));
+    return find((line) => line == '勝敗' || line.contains('勝'));
   }
 
-  List<List<Color>> _seasonChipColors(String predict, int rows) {
-    final colors = List.generate(rows, (_) => <Color>[]);
-    if (rows <= 0) return colors;
+  List<List<Color>> _seasonChipColors(String predict, List<String> lineLabels) {
+    final colors = List.generate(lineLabels.length, (_) => <Color>[]);
+    if (lineLabels.isEmpty) return colors;
     for (final part in predict.split(',')) {
       if (part.isEmpty) continue;
       final bar = part.indexOf('|');
       final label = (bar < 0 ? part : part.substring(0, bar)).trim();
       final color = parseColorNameOrNull(bar < 0 ? '' : part.substring(bar + 1));
       if (color == null) continue;
-      final row = colors[_seasonMarkRow(label, rows)];
+      final row = colors[_seasonMarkRow(label, lineLabels)];
       if (!row.contains(color)) row.add(color);
     }
     return colors;
@@ -1920,8 +2001,33 @@ class _TableGameCard extends StatelessWidget {
 
   String _seasonTitleKey(String label) {
     if (label == '勝敗') return '最多勝';
-    if (label == 'ホールド') return 'HP';
+    if (label == 'ホールド' || label == 'H') return 'HP';
+    if (label == 'セーブ' || label == 'S') return 'セーブ';
     return label;
+  }
+
+  /// 今季の勝・負・H・S。試合が始まったあとの投手成績にも出す。
+  String _decisionRecordText(String raw) {
+    final parts = raw
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((part) => part.isNotEmpty)
+        .where((part) => RegExp(r'^\d+勝\d+[敗負]$').hasMatch(part) || RegExp(r'^\d+H$').hasMatch(part) || RegExp(r'^\d+S$').hasMatch(part))
+        .map((part) => part.replaceFirst(RegExp(r'敗$'), '負'))
+        .toList();
+    if (parts.isEmpty) return '';
+    return parts.join(' ');
+  }
+
+  String _seasonDecision(String name, bool home, Map<String, dynamic> row) {
+    final direct = _decisionRecordText('${row['txt_decision_season'] ?? ''}');
+    if (direct.isNotEmpty) return direct;
+    final starter = _compactPlayerName(_text(home ? 'name_pitcher_home' : 'name_pitcher_away'));
+    if (starter.isEmpty || _compactPlayerName(name) != starter) return '';
+    final key = home ? 'txt_season_pitcher_home' : 'txt_season_pitcher_away';
+    final onRow = _decisionRecordText('${row[key] ?? ''}');
+    if (onRow.isNotEmpty) return onRow;
+    return _decisionRecordText(_text(key));
   }
 
   Map<String, String> _pitcherNumberOneStats(String pitcherName) {
@@ -1983,7 +2089,7 @@ class _TableGameCard extends StatelessWidget {
   Widget _seasonStatTable(String stat, String predict, double fontSize, {required String pitcherName}) {
     final lines = _seasonDisplayLines(stat, pitcherName);
     if (lines.isEmpty) return const SizedBox.shrink();
-    final colors = _seasonChipColors(predict, lines.length);
+    final colors = _seasonChipColors(predict, [for (final line in lines) line.label]);
     var labelW = 0.0;
     for (final line in lines) {
       final w = _textWidth(line.label, fontSize, weight: FontWeight.bold) + 8;
@@ -2266,6 +2372,9 @@ class _TableGameCard extends StatelessWidget {
   bool _isSeasonStatLeader(String name) {
     if (!_isPostseasonGame || name.trim().isEmpty) return false;
     for (final row in playerStats) {
+      final title = '${row['title'] ?? ''}'.trim();
+      // 個人成績表に出さない盗塁成功率は、成功100%が同率1位になり王冠が付く。
+      if (title.isEmpty || title == '盗塁成功率') continue;
       final rank = int.tryParse('${row['int_rank']}') ?? 0;
       if (rank != 1) continue;
       if (seasonLeaderNameMatches(name, '${row['name_player'] ?? ''}')) return true;
@@ -2676,6 +2785,7 @@ class _TableGameCard extends StatelessWidget {
       final colors = '${row['colors_summary'] ?? ''}'.trim();
       final mark = pitcher ? _resultMark(row['code_result_pitcher']) : _batterMark(row);
       final chips = pitcher ? _chipsOf(row, starter: name == starterName) : '';
+      final decision = pitcher && chips.isNotEmpty ? _seasonDecision(name, home, row) : '';
       final role = pitcher ? _pitcherRoleMark(name, starterName, row['code_result_pitcher']) : '';
       final batting = pitcher ? '' : '${row['txt_batting'] ?? ''}';
       final plays = pitcher
@@ -2689,7 +2799,7 @@ class _TableGameCard extends StatelessWidget {
         name,
         colors.isNotEmpty ? colors : (name == starterName ? starterColors : ''),
         mark,
-        chips.isNotEmpty ? '' : _statOf(row, pitcher: pitcher),
+        chips.isNotEmpty ? decision : _statOf(row, pitcher: pitcher),
         '',
         '${row['titles_predict'] ?? ''}',
         plays,
@@ -3846,12 +3956,12 @@ class _TableGameCard extends StatelessWidget {
   bool get _hasCollapsibleStats => _showPitcherStats || _showBatterStats;
 
   Widget _playerStatsToggle() {
-    return SizedBox(
-      height: _statsToggleH,
-      child: Material(
-        color: _labelColor,
-        child: InkWell(
-          onTap: () => onStatsExpandedChanged(!statsExpanded),
+    return _ScrollSafeTap(
+      onTap: () => onStatsExpandedChanged(!statsExpanded),
+      child: SizedBox(
+        height: _statsToggleH,
+        child: Material(
+          color: _labelColor,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6),
             child: Row(
@@ -4665,6 +4775,8 @@ class _TableGameCard extends StatelessWidget {
                 final liveFeat = notableBatting || doneFeat.isNotEmpty ? '' : _livePitchingLabel(pitcher, home: home);
                 final feat = doneFeat.isNotEmpty ? doneFeat : liveFeat;
                 final featKind = feat == '完全試合' || feat == 'パーフェクトピッチング中' ? 'perfect' : 'nohit';
+                final decision = _decisionRecordText(pitcher.stat);
+                final statBody = decision.isNotEmpty ? '' : pitcher.stat;
                 final chipParts = pitcher.chips.split(' ').where((part) => part.isNotEmpty);
                 final metrics = chipParts.where((part) => !_isPitchCount(part) && !_isVeloChip(part));
                 final pitchCounts = chipParts.where(_isPitchCount);
@@ -4674,6 +4786,16 @@ class _TableGameCard extends StatelessWidget {
                 final row = Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    if (decision.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 4),
+                        child: Text(
+                          decision,
+                          maxLines: 1,
+                          softWrap: false,
+                          style: TextStyle(fontSize: statSize, fontWeight: FontWeight.w600, height: 1, color: Colors.black87),
+                        ),
+                      ),
                     for (final part in metrics)
                       Padding(
                         padding: const EdgeInsets.only(right: 3),
@@ -4689,9 +4811,9 @@ class _TableGameCard extends StatelessWidget {
                       ),
                     if (notableBatting && pitcher.pinchNames.isNotEmpty) _pinchCaptionsRow(pitcher.pinchNames, statSize),
                     if (!notableBatting && _isPinchRole(pitcher.role)) _pinchCaption(pitcher, statSize),
-                    if (pitcher.stat.isNotEmpty) ...[
+                    if (statBody.isNotEmpty) ...[
                       if (pitcher.plays.isNotEmpty || pitcher.chips.isNotEmpty) const SizedBox(width: 4),
-                      _pitchStat(pitcher.stat, statSize, pitcher.tone, textScaler: scaler),
+                      _pitchStat(statBody, statSize, pitcher.tone, textScaler: scaler),
                     ],
                     for (final part in pitchCounts)
                       Padding(

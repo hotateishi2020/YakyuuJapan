@@ -3493,6 +3493,143 @@ void main() {
     expect(find.textContaining('👑'), findsNothing);
   });
 
+  testWidgets('stolen base percentage leaders do not get a crown', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 520,
+            height: 280,
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
+              games: [
+                {
+                  'date_game': '2026-10-11',
+                  'time_game': '☀️ 14:00',
+                  'name_team_home': '巨人',
+                  'name_team_away': 'DeNA',
+                  'name_stadium': '東京ドーム',
+                  'name_pitcher_home': '竹丸和幸',
+                  'name_pitcher_away': '石田裕太郎',
+                  'score_home': 1,
+                  'score_away': 0,
+                  'state': '4回裏',
+                  'code_game': 'CS1',
+                  'id_team_home': 1,
+                  'id_team_away': 5,
+                  'id_league_home': 1,
+                  'id_league_away': 1,
+                  'color_back_home': '#FF6600',
+                  'color_back_away': '#0066FF',
+                  'color_font_home': '#000000',
+                  'color_font_away': '#FFFFFF',
+                  'id_team_summary': 1,
+                  'name_full_summary': '奈良間大己',
+                  'flg_pitcher': false,
+                  'txt_batting': '2打数1安打(1打点)',
+                },
+              ],
+              playerStats: const [
+                {
+                  'title': '盗塁成功率',
+                  'name_player': '奈良間大己',
+                  'int_rank': 1,
+                  'id_league': 1,
+                  'stats': '100.0',
+                },
+                {
+                  'title': '盗塁成功率',
+                  'name_player': '吉川尚輝',
+                  'int_rank': 1,
+                  'id_league': 1,
+                  'stats': '100.0',
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.textContaining('奈良間大己'), findsOneWidget);
+    expect(find.textContaining('👑'), findsNothing);
+  });
+
+  testWidgets('started games keep season wins losses holds and saves on the pitching line', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 640,
+            height: 280,
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
+              games: [
+                {
+                  'date_game': '2026-10-11',
+                  'time_game': '☀️ 14:00',
+                  'name_team_home': '西武',
+                  'name_team_away': '日本ハム',
+                  'name_stadium': 'ベルーナドーム',
+                  'name_pitcher_home': '髙橋光成',
+                  'name_pitcher_away': '達孝太',
+                  'txt_season_pitcher_home': '9勝6敗 0H 0S 2.54 114奪三振 規定到達率90.0%',
+                  'score_home': 2,
+                  'score_away': 1,
+                  'state': '5回表',
+                  'code_game': 'CS1',
+                  'id_team_home': 11,
+                  'id_team_away': 12,
+                  'id_league_home': 2,
+                  'id_league_away': 2,
+                  'color_back_home': '#004EA2',
+                  'color_back_away': '#FFD700',
+                  'color_font_home': 'white',
+                  'color_font_away': 'black',
+                  'id_team_summary': 11,
+                  'name_full_summary': '髙橋光成',
+                  'flg_pitcher': true,
+                  'txt_pitching': '5回2失点(被安打4無四球3奪三振)',
+                },
+                {
+                  'date_game': '2026-10-11',
+                  'time_game': '☀️ 14:00',
+                  'name_team_home': '西武',
+                  'name_team_away': '日本ハム',
+                  'name_stadium': 'ベルーナドーム',
+                  'name_pitcher_home': '髙橋光成',
+                  'name_pitcher_away': '達孝太',
+                  'score_home': 2,
+                  'score_away': 1,
+                  'state': '5回表',
+                  'code_game': 'CS1',
+                  'id_team_home': 11,
+                  'id_team_away': 12,
+                  'id_league_home': 2,
+                  'id_league_away': 2,
+                  'color_back_home': '#004EA2',
+                  'color_back_away': '#FFD700',
+                  'color_font_home': 'white',
+                  'color_font_away': 'black',
+                  'id_team_summary': 12,
+                  'name_full_summary': '達孝太',
+                  'flg_pitcher': true,
+                  'txt_pitching': '4回1失点(被安打3無四球4奪三振)',
+                  'txt_decision_season': '5勝8負 5H 2S',
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('9勝6負 0H 0S'), findsOneWidget);
+    expect(find.text('5勝8負 5H 2S'), findsOneWidget);
+  });
+
   testWidgets('NPB regular season cards do not show Japan flag or crown', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -5601,5 +5738,111 @@ void main() {
     expect(find.text('投手'), findsNothing);
     expect(find.text('村上頌樹'), findsNothing);
     expect(find.text('詳細表示'), findsNothing);
+  });
+
+  testWidgets('選手成績はスクロールでは閉じない', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SizedBox(
+          width: 640,
+          height: 280,
+          child: ListView(
+            children: [
+              GamesBoardYahooStyle(
+                games: [
+                  {
+                    'date_game': '2026-10-08',
+                    'time_game': '🌙 18:00',
+                    'name_team_home': '阪神',
+                    'name_team_away': '巨人',
+                    'name_stadium': '甲子園',
+                    'name_pitcher_home': '村上頌樹',
+                    'name_pitcher_away': '戸郷翔征',
+                    'score_home': 1,
+                    'score_away': 0,
+                    'state': '5回裏',
+                    'id_team_home': 2,
+                    'id_team_away': 1,
+                    'color_back_home': '#FFD200',
+                    'color_back_away': '#FF6600',
+                    'color_font_home': '#000000',
+                    'color_font_away': '#000000',
+                  },
+                ],
+                horizontal: true,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.tap(find.text('選手成績'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text('投手'), findsOneWidget);
+
+    final gesture = await tester.startGesture(tester.getCenter(find.text('選手成績')));
+    await gesture.moveBy(const Offset(0, -160));
+    await gesture.up();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text('投手'), findsOneWidget);
+    expect(find.text('選手成績'), findsOneWidget);
+  });
+
+  testWidgets('選手成績はリストから外れても戻すと開いたまま', (tester) async {
+    const game = {
+      'date_game': '2026-10-08',
+      'time_game': '🌙 18:00',
+      'name_team_home': '阪神',
+      'name_team_away': '巨人',
+      'name_stadium': '甲子園',
+      'name_pitcher_home': '村上頌樹',
+      'name_pitcher_away': '戸郷翔征',
+      'score_home': 1,
+      'score_away': 0,
+      'state': '5回裏',
+      'id_team_home': 2,
+      'id_team_away': 1,
+      'id_league_home': 1,
+      'id_league_away': 1,
+      'color_back_home': '#FFD200',
+      'color_back_away': '#FF6600',
+      'color_font_home': '#000000',
+      'color_font_away': '#000000',
+    };
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SizedBox(
+          width: 640,
+          height: 320,
+          child: BothLeagueGameDay(
+            games: [game],
+            initialDate: '2026-10-08',
+            leading: const [SizedBox(height: 2400)],
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.scrollUntilVisible(find.text('選手成績'), 500);
+    await tester.pump();
+    await tester.tap(find.text('選手成績'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text('投手'), findsOneWidget);
+    final opened = tester.getSize(find.byKey(const ValueKey('game-card-shell-2026-10-08|阪神|巨人'))).height;
+
+    final scrollable = tester.state<ScrollableState>(find.byType(Scrollable).first);
+    scrollable.position.jumpTo(0);
+    await tester.pump();
+    await tester.scrollUntilVisible(find.text('選手成績'), 500);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.text('投手'), findsOneWidget);
+    final back = tester.getSize(find.byKey(const ValueKey('game-card-shell-2026-10-08|阪神|巨人'))).height;
+    expect(back, greaterThan(opened - 8));
   });
 }

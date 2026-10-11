@@ -898,6 +898,7 @@ List<Map<String, dynamic>> _summariesOf(
           'flg_pitcher': row['flg_pitcher'],
           'flg_japan': row['flg_japan'],
           'code_result_pitcher': row['code_result_pitcher'],
+          'txt_decision_season': row['txt_decision_season'],
           'colors_summary': row['colors_summary'],
           'titles_predict': row['titles_predict'],
           'txt_plays': _summaryIsPitcher(row['flg_pitcher'])

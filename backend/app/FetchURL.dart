@@ -50,6 +50,15 @@ DateTime? gameStartOn(String date, String raw) {
   return DateTime.tryParse('$date $hour:$minute:00');
 }
 
+/// 出場成績の投手表、先頭列の勝・敗・H・S。
+String pitcherDecisionCode(String mark) {
+  if (mark.contains('勝')) return Value.CodeGameResultPitcher.WIN;
+  if (mark.contains('敗') || mark.contains('負')) return Value.CodeGameResultPitcher.LOSE;
+  if (mark.contains('Ｓ') || mark.contains('セーブ') || mark.contains('S')) return Value.CodeGameResultPitcher.SAVE;
+  if (mark.contains('H') || mark.contains('ホールド')) return Value.CodeGameResultPitcher.HOLD;
+  return '';
+}
+
 class FetchURL {
   static String decodeHtmlResponse(http.Response res) => _decodeHtml(res);
 
@@ -586,7 +595,8 @@ class FetchURL {
       final gameId = existing.first.toColumnMap()['id'] as int;
       final live = state.contains('回');
       final loaded = await GameStatsLoad.isLoaded(conn, gameId);
-      final refreshDetails = started && GameStatsLoad.needsRefresh(live: live, loaded: loaded);
+      final decisionsMissing = await GameStatsLoad.pitcherDecisionsMissing(conn, gameId);
+      final refreshDetails = started && (GameStatsLoad.needsRefresh(live: live, loaded: loaded) || decisionsMissing);
       try {
         await _syncPostseasonPitchers(
           conn,
@@ -900,15 +910,7 @@ class FetchURL {
         final summary = t_game_summary();
         summary.id_game = gameId;
         summary.id_player = playerId;
-        if (mark.contains('勝')) {
-          summary.code_result_pitcher = Value.CodeGameResultPitcher.WIN;
-        } else if (mark.contains('敗') || mark.contains('負')) {
-          summary.code_result_pitcher = Value.CodeGameResultPitcher.LOSE;
-        } else if (mark.contains('Ｓ') || mark.contains('セーブ')) {
-          summary.code_result_pitcher = Value.CodeGameResultPitcher.SAVE;
-        } else if (mark.contains('H') || mark.contains('ホールド')) {
-          summary.code_result_pitcher = Value.CodeGameResultPitcher.HOLD;
-        }
+        summary.code_result_pitcher = pitcherDecisionCode(mark);
         summary.double_inning_pitch = double.tryParse(cellOf(row, '投球回')) ?? 0.0;
         summary.int_pitch = int.tryParse(cellOf(row, '投球数')) ?? 0;
         summary.int_hit = int.tryParse(cellOf(row, '被安打')) ?? 0;
@@ -1427,15 +1429,7 @@ class FetchURL {
                         }
                       }
 
-                      if (codeResultPitcher.contains('勝')) {
-                        gameSummaryPitcher.code_result_pitcher = Value.CodeGameResultPitcher.WIN;
-                      } else if (codeResultPitcher.contains('敗') || codeResultPitcher.contains('負')) {
-                        gameSummaryPitcher.code_result_pitcher = Value.CodeGameResultPitcher.LOSE;
-                      } else if (codeResultPitcher.contains('Ｓ') || codeResultPitcher.contains('セーブ')) {
-                        gameSummaryPitcher.code_result_pitcher = Value.CodeGameResultPitcher.SAVE;
-                      } else if (codeResultPitcher.contains('H') || codeResultPitcher.contains('ホールド')) {
-                        gameSummaryPitcher.code_result_pitcher = Value.CodeGameResultPitcher.HOLD;
-                      }
+                      gameSummaryPitcher.code_result_pitcher = pitcherDecisionCode(codeResultPitcher);
 
                       gameSummaryPitcher.id_game = game.id;
                       gameSummaryPitcher.id_player = idPlayerResult;

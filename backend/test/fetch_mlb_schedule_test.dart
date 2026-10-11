@@ -1,10 +1,39 @@
 import 'package:test/test.dart';
 
 import '../app/FetchMLB.dart';
+import '../app/FetchURL.dart';
 import '../app/GameFetchSchedule.dart';
 import '../app/GameStatsLoad.dart';
+import '../app/Value.dart';
 
 void main() {
+  test('終了試合で勝利投手がいるのに勝敗マークが無いときは出場成績を取り直す', () {
+    expect(
+      GameStatsLoad.needsDecisionRefresh(finished: true, hasWinner: true, hasDecisionCode: false),
+      isTrue,
+    );
+    expect(
+      GameStatsLoad.needsDecisionRefresh(finished: true, hasWinner: true, hasDecisionCode: true),
+      isFalse,
+    );
+    expect(
+      GameStatsLoad.needsDecisionRefresh(finished: false, hasWinner: true, hasDecisionCode: false),
+      isFalse,
+    );
+    expect(
+      GameStatsLoad.needsDecisionRefresh(finished: true, hasWinner: false, hasDecisionCode: false),
+      isFalse,
+    );
+  });
+
+  test('出場成績の投手表の先頭列を勝敗HSにする', () {
+    expect(pitcherDecisionCode('勝'), Value.CodeGameResultPitcher.WIN);
+    expect(pitcherDecisionCode('敗'), Value.CodeGameResultPitcher.LOSE);
+    expect(pitcherDecisionCode('H'), Value.CodeGameResultPitcher.HOLD);
+    expect(pitcherDecisionCode('Ｓ'), Value.CodeGameResultPitcher.SAVE);
+    expect(pitcherDecisionCode(''), '');
+  });
+
   test('完了済みの終了試合は選手成績を取り直さない', () {
     expect(GameStatsLoad.needsRefresh(live: false, loaded: true), isFalse);
     expect(GameStatsLoad.needsRefresh(live: false, loaded: false), isTrue);

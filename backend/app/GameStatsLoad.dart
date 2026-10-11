@@ -11,6 +11,15 @@ class GameStatsLoad {
     return !loaded;
   }
 
+  /// 試合終了で勝利投手がいるのに、出場成績の勝・負・H・Sが一人も無い。
+  static bool needsDecisionRefresh({
+    required bool finished,
+    required bool hasWinner,
+    required bool hasDecisionCode,
+  }) {
+    return finished && hasWinner && !hasDecisionCode;
+  }
+
   /// その日の Yahoo 試合が1件以上あり、未完了・試合中が残っていない。
   static bool dateFullyLoaded({required bool hasYahooGames, required bool hasPending}) {
     return hasYahooGames && !hasPending;
@@ -121,6 +130,36 @@ class GameStatsLoad {
     return rows.first.toColumnMap()['loaded'] == true;
   }
 
+  /// 終了試合なのに投手の勝・負・H・Sが未保存なら、出場成績を取り直す。
+  static Future<bool> pitcherDecisionsMissing(Connection conn, int gameId) async {
+    if (gameId <= 0) return false;
+    final rows = await conn.execute(
+      '''
+        SELECT
+          g.state LIKE '%試合終了%' AS finished,
+          COALESCE(g.id_pitcher_win, 0) > 0 AS has_winner,
+          EXISTS (
+            SELECT 1
+            FROM t_game_summary s
+            WHERE s.id_game = g.id
+              AND BTRIM(COALESCE(s.code_result_pitcher, '')) <> ''
+          ) AS has_decision
+        FROM t_game g
+        WHERE g.id = \$1::int
+        LIMIT 1
+      ''',
+      parameters: [gameId],
+    );
+    if (rows.isEmpty) return false;
+    final map = rows.first.toColumnMap();
+    bool flag(dynamic value) => value == true || '$value'.trim().toLowerCase() == 'true';
+    return needsDecisionRefresh(
+      finished: flag(map['finished']),
+      hasWinner: flag(map['has_winner']),
+      hasDecisionCode: flag(map['has_decision']),
+    );
+  }
+
   /// 終了試合に出場成績と打席があれば完了にする。
   static Future<void> markIfComplete(Connection conn, int gameId, {required bool finished}) async {
     if (gameId <= 0 || !finished) return;
@@ -138,6 +177,15 @@ class GameStatsLoad {
             SELECT 1 FROM t_game_details d
             WHERE d.id_game = g.id
               AND COALESCE(BTRIM(d.code_result), '') <> ''
+          )
+          AND (
+            COALESCE(g.id_pitcher_win, 0) = 0
+            OR EXISTS (
+              SELECT 1
+              FROM t_game_summary s
+              WHERE s.id_game = g.id
+                AND BTRIM(COALESCE(s.code_result_pitcher, '')) <> ''
+            )
           )
       ''',
       parameters: [gameId],

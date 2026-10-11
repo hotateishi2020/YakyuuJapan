@@ -797,11 +797,11 @@ void _attachLiveBatters(List<Map<String, dynamic>> games, List<Map<String, dynam
     final stated = _statedHalf(state);
     var playOuts = 0;
     if (stated != null) {
-      final statedRows = [
-        for (final row in all)
-          if (_asInt(row['int_inning']) == stated.inning && _asBool(row['flg_bottom']) == stated.bottom && _isLiveBattingResult('${row['code_result'] ?? ''}')) row,
-      ]..sort((a, b) => _asInt(a['id']).compareTo(_asInt(b['id'])));
-      if (statedRows.isNotEmpty) playOuts = _asInt(statedRows.last['cnt_out']);
+      for (final row in all) {
+        if (_asInt(row['int_inning']) != stated.inning || _asBool(row['flg_bottom']) != stated.bottom) continue;
+        final after = outsAfterPlate(_asInt(row['cnt_out']), '${row['code_result'] ?? ''}');
+        if (after > playOuts) playOuts = after;
+      }
     }
     if (playOuts > 0) game['int_outs'] = playOuts;
     final half = _liveHalf(state, playOuts: playOuts);

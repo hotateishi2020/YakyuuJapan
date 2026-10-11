@@ -4628,6 +4628,71 @@ void main() {
     expect(blink.width, closeTo(now.width, 2));
   });
 
+  testWidgets('打席前が二死でもint_outsが3ならNowは相手の次打者へ移る', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 640,
+            height: 520,
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
+              games: [
+                {
+                  'date_game': '2026-10-07',
+                  'time_game': '☀️ 07:00',
+                  'name_team_home': 'ブレーブス',
+                  'name_team_away': 'ドジャース',
+                  'name_stadium': 'トゥルイストパーク',
+                  'name_pitcher_home': 'A',
+                  'name_pitcher_away': 'B',
+                  'score_home': 0,
+                  'score_away': 1,
+                  'state': '5回表',
+                  'id_team_home': 28,
+                  'id_team_away': 40,
+                  'id_league_home': 4,
+                  'id_league_away': 4,
+                  'int_outs': 3,
+                  'name_batter': 'プロファー',
+                  'id_team_batter': 28,
+                  'int_batter_order': 1,
+                  'color_back_home': '#CE1141',
+                  'color_back_away': '#005A9C',
+                  'color_font_home': '#FFFFFF',
+                  'color_font_away': '#FFFFFF',
+                  'lineup': [
+                    {
+                      'id_team': 40,
+                      'order': 2,
+                      'players': [
+                        {'name': '大谷', 'role': '', 'pos': '指', 'plays': '', 'rbi': 0},
+                      ],
+                    },
+                    {
+                      'id_team': 28,
+                      'order': 1,
+                      'players': [
+                        {'name': 'プロファー', 'role': '', 'pos': '左', 'plays': '', 'rbi': 0},
+                      ],
+                    },
+                  ],
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('Now'), findsOneWidget);
+    final now = tester.getCenter(find.byKey(const ValueKey('now-play-chip')));
+    final homeName = tester.getCenter(find.text('プロファー').first);
+    final awayName = tester.getCenter(find.text('大谷').first);
+    expect((now - homeName).distance, lessThan((now - awayName).distance));
+  });
+
   testWidgets('3アウトでNowは次に攻撃するチームへ移る', (tester) async {
     await tester.pumpWidget(
       MaterialApp(

@@ -175,6 +175,15 @@ void main() {
     );
   });
 
+  test('二死からのアウトは3アウトになり、安打のままなら2アウト', () {
+    expect(outsAfterPlate(2, Value.CodeGameResult.OUT_FLY), 3);
+    expect(outsAfterPlate(2, Value.CodeGameResult.STRIKE_OUT), 3);
+    expect(outsAfterPlate(1, Value.CodeGameResult.OUT_DOUBLE_PLAY), 3);
+    expect(outsAfterPlate(2, Value.CodeGameResult.HIT_SINGLE), 2);
+    expect(outsAfterPlate(0, Value.CodeGameResult.STRIKE_OUT), 1);
+    expect(outsAfterPlate(2, Value.CodeGameResult.STEAL_BASE_OUT), 3);
+  });
+
   test('playPlayerKey ignores spaces in NPB names', () {
     expect(playPlayerKey(1, 2, '成瀬　脩人'), playPlayerKey(1, 2, '成瀬脩人'));
     expect(playPlayerKey(1, 2, '佐藤 輝明'), playPlayerKey(1, 2, '佐藤輝明'));

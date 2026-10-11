@@ -1,6 +1,20 @@
 import '../tools/StringTool.dart';
 import 'Value.dart';
 
+/// 打席前のアウト数に、その結果で増えるアウトを足す。3で頭打ち。
+/// 速報の「二死」は打席前なので、フライで攻撃終了ならここが 3 になる。
+int outsAfterPlate(int outsBefore, String result) {
+  final added = switch (result) {
+    'OUT_DOUBLE_PLAY' => 2,
+    'OUT_FLY' || 'OUT_GROUND' || 'OUT_POP_UP' || 'OUT_LINE_DRIVE' || 'SACRIFICE_BUNT' || 'SACRIFICE_FLY' || 'SQUEEZE' || 'STRIKE_OUT' || 'STEAL_BASE_OUT' || 'RUN_DEAD' || 'PICKOFF' || 'FIELDERS_CHOICE' => 1,
+    _ => 0,
+  };
+  final after = outsBefore + added;
+  if (after >= 3) return 3;
+  if (after < 0) return 0;
+  return after;
+}
+
 /// 試合とチームと選手名から、打席結果の表示文を引くキー。
 String playPlayerKey(dynamic idGame, dynamic idTeam, dynamic name) {
   return '${_asInt(idGame)}|${_asInt(idTeam)}|${StringTool.noSpace('$name')}';

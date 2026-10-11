@@ -21,6 +21,21 @@ bool npbLineReachesFinal(StageResult first, StageResult finalStage) {
   return finalStage.winnerId == winner;
 }
 
+/// 1位シードはファーストを挟まず、球団が決まっていればファイナルまでの線を勝ち上がりにする。
+bool npbSeedReachesFinal(BracketTeam seed) => seed.id > 0;
+
+const _monoLogo = ColorFilter.matrix(<double>[
+  0.2126, 0.7152, 0.0722, 0, 0,
+  0.2126, 0.7152, 0.0722, 0, 0,
+  0.2126, 0.7152, 0.0722, 0, 0,
+  0, 0, 0, 1, 0,
+]);
+
+Widget _grayIfEliminated(Widget child, {required bool eliminated}) {
+  if (!eliminated) return child;
+  return ColorFiltered(colorFilter: _monoLogo, child: child);
+}
+
 class BracketGeom {
   static const boardW = 844.0;
   static const w = boardW;
@@ -219,14 +234,14 @@ class PostseasonBracket extends StatelessWidget {
                         left: -46,
                         top: 0,
                         bottom: 0,
-                        child: _japanFinalist(central, wins: board.japan.winsHigh, slots: board.japan.slots, alignLeft: true),
+                        child: _japanFinalist(central, wins: board.japan.winsHigh, slots: board.japan.slots, alignLeft: true, eliminated: board.eliminated(central.id)),
                       ),
                     if (pacific != null)
                       Positioned(
                         right: -46,
                         top: 0,
                         bottom: 0,
-                        child: _japanFinalist(pacific, wins: board.japan.winsLow, slots: board.japan.slots, alignLeft: false),
+                        child: _japanFinalist(pacific, wins: board.japan.winsLow, slots: board.japan.slots, alignLeft: false, eliminated: board.eliminated(pacific.id)),
                       ),
                   ],
                 ),
@@ -238,14 +253,14 @@ class PostseasonBracket extends StatelessWidget {
     );
   }
 
-  Widget _japanFinalist(BracketTeam? team, {required int wins, required int slots, required bool alignLeft}) {
+  Widget _japanFinalist(BracketTeam? team, {required int wins, required int slots, required bool alignLeft, required bool eliminated}) {
     if (team == null || team.id <= 0 || team.name.isEmpty) return const SizedBox(width: 8);
     final visual = teamLogoVisual(team.name, abbrev: team.nameShortest);
     final logo = SizedBox(
       key: Key('postseason-js-team-${team.id}'),
       width: 52,
       height: 52,
-      child: teamLogoImage(asset: visual.asset, networkUrl: visual.networkUrl),
+      child: _grayIfEliminated(teamLogoImage(asset: visual.asset, networkUrl: visual.networkUrl), eliminated: eliminated),
     );
     final stars = Column(
       key: Key('postseason-js-stars-${team.id}'),
@@ -406,7 +421,7 @@ class PostseasonBracket extends StatelessWidget {
                             )
                           : Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                              child: teamLogoImage(asset: logoAsset, networkUrl: logoUrl),
+                              child: _grayIfEliminated(teamLogoImage(asset: logoAsset, networkUrl: logoUrl), eliminated: out),
                             ),
                 ),
               ),
@@ -487,11 +502,11 @@ class _BracketLinePainter extends CustomPainter {
 
     final c2won = board.cs1Central.winnerId == board.central2.id && board.central2.id > 0;
     final c3won = board.cs1Central.winnerId == board.central3.id && board.central3.id > 0;
-    final c1final = board.finalCentral.winnerId == board.central1.id && board.central1.id > 0;
+    final c1seeded = npbSeedReachesFinal(board.central1);
     final cFinalFromCs = board.finalCentral.decided && board.finalCentral.winnerId != board.central1.id && (board.finalCentral.winnerId ?? 0) > 0;
     final p3won = board.cs1Pacific.winnerId == board.pacific3.id && board.pacific3.id > 0;
     final p2won = board.cs1Pacific.winnerId == board.pacific2.id && board.pacific2.id > 0;
-    final p1final = board.finalPacific.winnerId == board.pacific1.id && board.pacific1.id > 0;
+    final p1seeded = npbSeedReachesFinal(board.pacific1);
     final pFinalFromCs = board.finalPacific.decided && board.finalPacific.winnerId != board.pacific1.id && (board.finalPacific.winnerId ?? 0) > 0;
 
     final c2thick = c2won || cFinalFromCs && board.finalCentral.winnerId == board.central2.id;
@@ -504,8 +519,8 @@ class _BracketLinePainter extends CustomPainter {
     stroke(v(BracketGeom.midC, BracketGeom.cs1C.top, BracketGeom.finC.center.dy), centralToFinal);
     stroke(h(BracketGeom.finC.right, BracketGeom.midC, BracketGeom.finC.center.dy), centralToFinal);
 
-    stroke(v(BracketGeom.xs[0], cardY, BracketGeom.finC.center.dy), c1final);
-    stroke(h(BracketGeom.xs[0], BracketGeom.finC.left, BracketGeom.finC.center.dy), c1final);
+    stroke(v(BracketGeom.xs[0], cardY, BracketGeom.finC.center.dy), c1seeded);
+    stroke(h(BracketGeom.xs[0], BracketGeom.finC.left, BracketGeom.finC.center.dy), c1seeded);
     stroke(v(BracketGeom.finC.center.dx, BracketGeom.js.bottom, BracketGeom.finC.top), board.finalCentral.decided);
 
     final p3thick = p3won || pFinalFromCs && board.finalPacific.winnerId == board.pacific3.id;
@@ -518,8 +533,8 @@ class _BracketLinePainter extends CustomPainter {
     stroke(v(BracketGeom.midP, BracketGeom.cs1P.top, BracketGeom.finP.center.dy), pacificToFinal);
     stroke(h(BracketGeom.midP, BracketGeom.finP.left, BracketGeom.finP.center.dy), pacificToFinal);
 
-    stroke(v(BracketGeom.xs[5], cardY, BracketGeom.finP.center.dy), p1final);
-    stroke(h(BracketGeom.finP.right, BracketGeom.xs[5], BracketGeom.finP.center.dy), p1final);
+    stroke(v(BracketGeom.xs[5], cardY, BracketGeom.finP.center.dy), p1seeded);
+    stroke(h(BracketGeom.finP.right, BracketGeom.xs[5], BracketGeom.finP.center.dy), p1seeded);
     stroke(v(BracketGeom.finP.center.dx, BracketGeom.js.bottom, BracketGeom.finP.top), board.finalPacific.decided);
   }
 

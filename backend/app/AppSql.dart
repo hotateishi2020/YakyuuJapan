@@ -384,9 +384,7 @@ class AppSql {
     return '''
       (
         SELECT TRIM(
-          c.int_win::text || '勝' || c.int_lose::text || '負 ' ||
-          COALESCE(c.int_hold, 0)::text || 'H ' ||
-          COALESCE(c.int_save, 0)::text || 'S ' ||
+          c.int_win::text || '勝' || c.int_lose::text || '敗 ' ||
           to_char(COALESCE(c.double_average_earned_runs, 0), 'FM990.00') || ' ' ||
           COALESCE(c.int_strike_out_pitcher, 0)::text || '奪三振' ||
           CASE
@@ -588,7 +586,6 @@ class AppSql {
         ) AS titles_pitcher_away,
         ${_seasonPitcherLine('pitcher_home')} AS txt_season_pitcher_home,
         ${_seasonPitcherLine('pitcher_away')} AS txt_season_pitcher_away,
-        decision.txt_decision_season,
         id_game_summary,
         id_team_summary,
         name_full_summary,
@@ -668,7 +665,6 @@ class AppSql {
             t_game_summary.id AS id_game_summary,
             t_game_summary.id_game AS id_game,
             m_player.id_team AS id_team_summary,
-            t_game_summary.id_player AS id_player_summary,
             name_full AS name_full_summary,
             int_batting::text || '打数' || CASE WHEN int_hit1 = 0 THEN '無' ELSE int_hit1::text END || '安打' || 
             CASE WHEN (int_homerun = 0 AND int_rbi = 0 AND int_fourball = 0 AND int_steal_base = 0 AND int_sacrifice = 0) THEN '' ELSE '(' ||
@@ -769,30 +765,7 @@ class AppSql {
             int_rbi, int_steal_base, int_dead_batting, int_sacrifice, double_inning_pitch, int_runs,
             int_pitch, int_four, int_dead_pitching, int_strike_out, code_result_pitcher, int_hit, int_runs_earned, int_balk, t_game_summary.id, t_game_summary.id_player, t_game_summary.txt_homerun_total
           ORDER BY t_game_summary.id_game, m_player.id_team, flg_pitcher DESC, point_total DESC, t_game_summary.id 
-        ) AS v_game_summary ON v_game_summary.id_game = t_game.id
-        LEFT JOIN LATERAL (
-          SELECT TRIM(
-            c.int_win::text || '勝' || c.int_lose::text || '負 ' ||
-            COALESCE(c.int_hold, 0)::text || 'H ' ||
-            COALESCE(c.int_save, 0)::text || 'S'
-          ) AS txt_decision_season
-          FROM m_player_career c
-          JOIN m_player rp ON rp.id = c.id_player
-          WHERE c.int_year = \$1
-            AND COALESCE(c.flg_delete, FALSE) = FALSE
-            AND (
-              c.id_player = v_game_summary.id_player_summary
-              OR (
-                COALESCE(rp.flg_delete, FALSE) = FALSE
-                AND rp.id_team = v_game_summary.id_team_summary
-                AND regexp_replace(rp.name_full, '[[:space:]]', '', 'g')
-                  = regexp_replace(COALESCE(v_game_summary.name_full_summary, ''), '[[:space:]]', '', 'g')
-              )
-            )
-          ORDER BY CASE WHEN c.id_player = v_game_summary.id_player_summary THEN 0 ELSE 1 END,
-                   c.double_inning DESC NULLS LAST
-          LIMIT 1
-        ) decision ON TRUE 
+        ) AS v_game_summary ON v_game_summary.id_game = t_game.id 
       WHERE COALESCE(t_game.flg_delete, FALSE) = FALSE
         AND ${gameDateWindow(alias: 't_game', ranged: ranged)}
       GROUP BY t_game.id, t_game.datetime_start, team_home.name_short, team_away.name_short, team_home.name_shortest, team_away.name_shortest, pitcher_home.id, pitcher_home.name_full, pitcher_home.flg_ace, pitcher_away.id, pitcher_away.name_full, pitcher_away.flg_ace,
@@ -800,11 +773,10 @@ class AppSql {
                team_home.id_league, team_away.id_league, team_home.color_font, team_home.color_back, team_away.color_font,
                team_away.color_back, team_home.id, team_away.id, pitcher_win.id_team, pitcher_lose.id_team, pitcher_save.name_full, 
                pitcher_save.id_team, t_game.state, t_game.code_game, boundary_home.first_id, boundary_home.last_id,
-               boundary_away.first_id, boundary_away.last_id, v_game_summary.id_game_summary, id_team_summary, id_player_summary, name_full_summary,
+               boundary_away.first_id, boundary_away.last_id, v_game_summary.id_game_summary, id_team_summary, name_full_summary,
                txt_batting, txt_pitching, txt_homerun_total, code_result_pitcher, colors_summary, titles_predict, flg_pitcher, v_game_summary.flg_ace, v_game_summary.flg_japan, point_total,
                double_inning_pitch, int_pitch, int_hit_allowed, int_strike_out, int_walk_pitch, int_hbp_pitch, int_runs_pitch, int_runs_earned, int_balk, int_hit_batting,
-               txt_scores_home, txt_scores_away, int_runs_home, int_runs_away, int_error_home, int_error_away, int_hit_home, int_hit_away, int_velo_max,
-               decision.txt_decision_season
+               txt_scores_home, txt_scores_away, int_runs_home, int_runs_away, int_error_home, int_error_away, int_hit_home, int_hit_away, int_velo_max
       ORDER BY to_char(t_game.datetime_start, 'YYYY-MM-DD'), t_game.id, id_team_summary, CASE WHEN flg_pitcher = TRUE THEN v_game_summary.id_game_summary END ASC, CASE WHEN flg_pitcher = FALSE THEN v_game_summary.point_total END DESC;
 
     ''';

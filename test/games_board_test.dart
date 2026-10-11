@@ -3556,7 +3556,42 @@ void main() {
     expect(find.textContaining('👑'), findsNothing);
   });
 
-  testWidgets('started games keep season wins losses holds and saves on the pitching line', (tester) async {
+  testWidgets('decision marks sit left of the pitcher name without season records', (tester) async {
+    Map<String, dynamic> row({
+      required int teamId,
+      required String name,
+      required String code,
+      required String pitching,
+    }) =>
+        {
+          'date_game': '2026-10-10',
+          'time_game': '🌙 18:00',
+          'name_team_home': '西武',
+          'name_team_away': '日本ハム',
+          'name_stadium': 'ベルーナドーム',
+          'name_pitcher_home': '髙橋光成',
+          'name_pitcher_away': '達孝太',
+          'txt_season_pitcher_home': '9勝6敗 0H 0S 2.54 114奪三振 規定到達率90.0%',
+          'txt_season_pitcher_away': '5勝8敗 5H 2S 3.21 98奪三振 規定到達率80.0%',
+          'score_home': 2,
+          'score_away': 3,
+          'state': '試合終了',
+          'code_game': 'CS1',
+          'id_team_home': 11,
+          'id_team_away': 12,
+          'id_league_home': 2,
+          'id_league_away': 2,
+          'color_back_home': '#004EA2',
+          'color_back_away': '#FFD700',
+          'color_font_home': 'white',
+          'color_font_away': 'black',
+          'id_team_summary': teamId,
+          'name_full_summary': name,
+          'flg_pitcher': true,
+          'code_result_pitcher': code,
+          'txt_pitching': pitching,
+        };
+
     await tester.pumpWidget(
       MaterialApp(
         home: Center(
@@ -3566,58 +3601,10 @@ void main() {
             child: GamesBoardYahooStyle(
               initialStatsExpanded: true,
               games: [
-                {
-                  'date_game': '2026-10-11',
-                  'time_game': '☀️ 14:00',
-                  'name_team_home': '西武',
-                  'name_team_away': '日本ハム',
-                  'name_stadium': 'ベルーナドーム',
-                  'name_pitcher_home': '髙橋光成',
-                  'name_pitcher_away': '達孝太',
-                  'txt_season_pitcher_home': '9勝6敗 0H 0S 2.54 114奪三振 規定到達率90.0%',
-                  'score_home': 2,
-                  'score_away': 1,
-                  'state': '5回表',
-                  'code_game': 'CS1',
-                  'id_team_home': 11,
-                  'id_team_away': 12,
-                  'id_league_home': 2,
-                  'id_league_away': 2,
-                  'color_back_home': '#004EA2',
-                  'color_back_away': '#FFD700',
-                  'color_font_home': 'white',
-                  'color_font_away': 'black',
-                  'id_team_summary': 11,
-                  'name_full_summary': '髙橋光成',
-                  'flg_pitcher': true,
-                  'txt_pitching': '5回2失点(被安打4無四球3奪三振)',
-                },
-                {
-                  'date_game': '2026-10-11',
-                  'time_game': '☀️ 14:00',
-                  'name_team_home': '西武',
-                  'name_team_away': '日本ハム',
-                  'name_stadium': 'ベルーナドーム',
-                  'name_pitcher_home': '髙橋光成',
-                  'name_pitcher_away': '達孝太',
-                  'score_home': 2,
-                  'score_away': 1,
-                  'state': '5回表',
-                  'code_game': 'CS1',
-                  'id_team_home': 11,
-                  'id_team_away': 12,
-                  'id_league_home': 2,
-                  'id_league_away': 2,
-                  'color_back_home': '#004EA2',
-                  'color_back_away': '#FFD700',
-                  'color_font_home': 'white',
-                  'color_font_away': 'black',
-                  'id_team_summary': 12,
-                  'name_full_summary': '達孝太',
-                  'flg_pitcher': true,
-                  'txt_pitching': '4回1失点(被安打3無四球4奪三振)',
-                  'txt_decision_season': '5勝8負 5H 2S',
-                },
+                row(teamId: 11, name: '髙橋光成', code: 'LOSE', pitching: '5回2失点(被安打4無四球3奪三振)'),
+                row(teamId: 12, name: '達孝太', code: 'WIN', pitching: '6回1失点(被安打3無四球4奪三振)'),
+                row(teamId: 12, name: '田中正義', code: 'HOLD', pitching: '1回無失点(被安打0無四球1奪三振)'),
+                row(teamId: 12, name: '宮西尚生', code: 'SAVE', pitching: '1回無失点(被安打0無四球1奪三振)'),
               ],
               horizontal: true,
             ),
@@ -3626,8 +3613,100 @@ void main() {
       ),
     );
     await tester.pump();
-    expect(find.text('9勝6負 0H 0S'), findsOneWidget);
-    expect(find.text('5勝8負 5H 2S'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    expect(find.textContaining('9勝6負'), findsNothing);
+    expect(find.textContaining('5勝8負'), findsNothing);
+    expect(find.textContaining('0H'), findsNothing);
+    expect(find.textContaining('5H'), findsNothing);
+    Finder badge(String mark) {
+      return find.byWidgetPredicate((widget) {
+        if (widget is! Text || widget.data != mark) return false;
+        return widget.style?.fontSize == 9;
+      });
+    }
+
+    void leftOf(String mark, String name) {
+      final badgeBox = tester.getCenter(badge(mark));
+      final player = tester.getCenter(find.text(name));
+      expect(badgeBox.dx, lessThan(player.dx));
+      expect(badgeBox.dy, closeTo(player.dy, 2));
+    }
+
+    leftOf('負', '髙橋光成');
+    leftOf('勝', '達孝太');
+    leftOf('H', '田中正義');
+    leftOf('S', '宮西尚生');
+  });
+
+  testWidgets('header win lose and save marks sit left of the name when the pitching code is empty', (tester) async {
+    Map<String, dynamic> row(int teamId, String name, String pitching) => {
+          'date_game': '2026-10-11',
+          'time_game': '🌙 18:00',
+          'name_team_home': '巨人',
+          'name_team_away': 'DeNA',
+          'name_stadium': '東京ドーム',
+          'name_pitcher_home': '竹丸和幸',
+          'name_pitcher_away': '石田裕太郎',
+          'name_pitcher_win': '石田　裕太郎',
+          'name_pitcher_lose': '竹丸和幸',
+          'name_pitcher_save': 'レイノルズ',
+          'id_team_pitcher_win': 5,
+          'id_team_pitcher_lose': 1,
+          'id_team_pitcher_save': 5,
+          'score_home': 1,
+          'score_away': 4,
+          'state': '試合終了',
+          'id_team_home': 1,
+          'id_team_away': 5,
+          'color_back_home': '#FF6600',
+          'color_back_away': '#0066FF',
+          'color_font_home': 'black',
+          'color_font_away': 'white',
+          'id_team_summary': teamId,
+          'name_full_summary': name,
+          'flg_pitcher': true,
+          'code_result_pitcher': '',
+          'txt_pitching': pitching,
+        };
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 640,
+            height: 280,
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
+              games: [
+                row(1, '竹丸和幸', '6回4失点(被安打8無四球4奪三振)'),
+                row(5, '石田裕太郎', '7回1失点(被安打5無四球6奪三振)'),
+                row(5, 'レイノルズ', '1回無失点(被安打0無四球1奪三振)'),
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    Finder badge(String mark) {
+      return find.byWidgetPredicate((widget) {
+        if (widget is! Text || widget.data != mark) return false;
+        return widget.style?.fontSize == 9;
+      });
+    }
+
+    void leftOf(String mark, String name) {
+      final badgeBox = tester.getCenter(badge(mark));
+      final player = tester.getCenter(find.text(name));
+      expect(badgeBox.dx, lessThan(player.dx));
+      expect(badgeBox.dy, closeTo(player.dy, 2));
+    }
+
+    leftOf('負', '竹丸和幸');
+    leftOf('勝', '石田裕太郎');
+    leftOf('S', 'レイノルズ');
   });
 
   testWidgets('NPB regular season cards do not show Japan flag or crown', (tester) async {

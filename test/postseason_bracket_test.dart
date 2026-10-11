@@ -277,6 +277,18 @@ void main() {
       ),
     );
     expect(gray.color, const Color(0xFFBDBDBD));
+    expect(
+      find.descendant(of: find.byKey(const Key('postseason-team-3-セ3位')), matching: find.byType(ColorFiltered)),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: find.byKey(const Key('postseason-team-1-セ1位')), matching: find.byType(ColorFiltered)),
+      findsNothing,
+    );
+    expect(
+      find.descendant(of: find.byKey(const Key('postseason-team-7-パ1位')), matching: find.byType(ColorFiltered)),
+      findsNothing,
+    );
     expect(npbBracketLineColor(true), npbAdvanceLine);
     expect(npbBracketLineColor(false), Colors.black87);
     expect(npbBracketLineWidth(true), 5);
@@ -338,6 +350,14 @@ void main() {
     expect(pacificStars.left, greaterThanOrEqualTo(pacific.right - 1));
     expect(centralStars.height, greaterThan(centralStars.width));
     expect(pacificStars.height, greaterThan(pacificStars.width));
+    expect(
+      find.descendant(of: find.byKey(const Key('postseason-js-team-1')), matching: find.byType(ColorFiltered)),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: find.byKey(const Key('postseason-js-team-7')), matching: find.byType(ColorFiltered)),
+      findsNothing,
+    );
   });
 
   test('残り試合で追い抜ける順位は空欄、確定した順位だけ球団名を出す', () {
@@ -551,6 +571,9 @@ void main() {
     expect(npbLineReachesFinal(wonFirst, lostFinal), isFalse);
     expect(npbLineReachesFinal(wonFirst, wonFinal), isTrue);
     expect(npbLineReachesFinal(wonFirst, openFinal), isTrue);
+    expect(npbSeedReachesFinal(team(id: 1, league: 1, rank: 1)), isTrue);
+    expect(npbSeedReachesFinal(team(id: 7, league: 2, rank: 1)), isTrue);
+    expect(npbSeedReachesFinal(const BracketTeam(id: 0, leagueId: 1, rank: 1, name: '', colorBack: '', colorFont: '', wins: 0, losses: 0, gamesBehind: null)), isFalse);
   });
 
   test('ブルワーズのパドレス戦2勝はDSの星に残る', () {

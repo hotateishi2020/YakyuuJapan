@@ -1892,10 +1892,7 @@ class _TableGameCard extends StatelessWidget {
     final strikeouts = RegExp(r'^(\d+)奪三振$').firstMatch(part);
     if (strikeouts != null) return (label: '奪三振', value: strikeouts.group(1)!);
     if (RegExp(r'^\d+勝\d+[敗負]$').hasMatch(part)) return (label: '勝敗', value: part);
-    final hold = RegExp(r'^(\d+)H$').firstMatch(part);
-    if (hold != null) return (label: 'H', value: hold.group(1)!);
-    final save = RegExp(r'^(\d+)S$').firstMatch(part);
-    if (save != null) return (label: 'S', value: save.group(1)!);
+    if (RegExp(r'^\d+[HS]$').hasMatch(part)) return (label: '', value: '');
     if (RegExp(r'^\d+(?:\.\d+)?$').hasMatch(part)) return (label: '防御率', value: part);
     return (label: part, value: '');
   }
@@ -2006,30 +2003,6 @@ class _TableGameCard extends StatelessWidget {
     return label;
   }
 
-  /// 今季の勝・負・H・S。試合が始まったあとの投手成績にも出す。
-  String _decisionRecordText(String raw) {
-    final parts = raw
-        .trim()
-        .split(RegExp(r'\s+'))
-        .where((part) => part.isNotEmpty)
-        .where((part) => RegExp(r'^\d+勝\d+[敗負]$').hasMatch(part) || RegExp(r'^\d+H$').hasMatch(part) || RegExp(r'^\d+S$').hasMatch(part))
-        .map((part) => part.replaceFirst(RegExp(r'敗$'), '負'))
-        .toList();
-    if (parts.isEmpty) return '';
-    return parts.join(' ');
-  }
-
-  String _seasonDecision(String name, bool home, Map<String, dynamic> row) {
-    final direct = _decisionRecordText('${row['txt_decision_season'] ?? ''}');
-    if (direct.isNotEmpty) return direct;
-    final starter = _compactPlayerName(_text(home ? 'name_pitcher_home' : 'name_pitcher_away'));
-    if (starter.isEmpty || _compactPlayerName(name) != starter) return '';
-    final key = home ? 'txt_season_pitcher_home' : 'txt_season_pitcher_away';
-    final onRow = _decisionRecordText('${row[key] ?? ''}');
-    if (onRow.isNotEmpty) return onRow;
-    return _decisionRecordText(_text(key));
-  }
-
   Map<String, String> _pitcherNumberOneStats(String pitcherName) {
     if (pitcherName.trim().isEmpty) return const {};
     final compact = _compactPlayerName(pitcherName);
@@ -2072,7 +2045,7 @@ class _TableGameCard extends StatelessWidget {
   }
 
   List<({String label, String value, bool leader})> _seasonDisplayLines(String stat, String pitcherName) {
-    final base = stat.split(RegExp(r'\s+')).where((part) => part.isNotEmpty).map(_seasonStat).toList();
+    final base = stat.split(RegExp(r'\s+')).where((part) => part.isNotEmpty).map(_seasonStat).where((line) => line.label.isNotEmpty).toList();
     final leaders = _pitcherNumberOneStats(pitcherName);
     final shown = {for (final line in base) _seasonTitleKey(line.label)};
     final out = [
@@ -2182,11 +2155,22 @@ class _TableGameCard extends StatelessWidget {
     final text = '${code ?? ''}'.trim().toUpperCase();
     return switch (text) {
       'WIN' || '勝' => '勝',
-      'LOSE' || '負' => '負',
+      'LOSE' || 'LOSS' || '負' || '敗' => '負',
       'SAVE' || 'S' => 'S',
       'HOLD' || 'H' => 'H',
       _ => '',
     };
+  }
+
+  /// 投手行に勝敗コードが無くても、試合の勝利・敗戦・セーブ投手なら左のマークを付ける。
+  ({String mark, String code})? _headerDecision(String name, int teamId) {
+    final compact = _compactPlayerName(name);
+    if (compact.isEmpty) return null;
+    bool same(String key) => _compactPlayerName(_text(key)) == compact;
+    if (_int('id_team_pitcher_win') == teamId && same('name_pitcher_win')) return (mark: '勝', code: 'WIN');
+    if (_int('id_team_pitcher_lose') == teamId && same('name_pitcher_lose')) return (mark: '負', code: 'LOSE');
+    if (_int('id_team_pitcher_save') == teamId && same('name_pitcher_save')) return (mark: 'S', code: 'SAVE');
+    return null;
   }
 
   /// 投手の役割マーク。先発=先、抑え(セーブ)=抑、それ以外の救援=中。
@@ -2783,10 +2767,17 @@ class _TableGameCard extends StatelessWidget {
       if (summaryTeam != teamId) continue;
       if (_isPitcher(row) != pitcher) continue;
       final colors = '${row['colors_summary'] ?? ''}'.trim();
-      final mark = pitcher ? _resultMark(row['code_result_pitcher']) : _batterMark(row);
+      var resultCode = '${row['code_result_pitcher'] ?? ''}';
+      var mark = pitcher ? _resultMark(resultCode) : _batterMark(row);
+      if (pitcher && mark.isEmpty) {
+        final stamped = _headerDecision(name, teamId);
+        if (stamped != null) {
+          mark = stamped.mark;
+          resultCode = stamped.code;
+        }
+      }
       final chips = pitcher ? _chipsOf(row, starter: name == starterName) : '';
-      final decision = pitcher && chips.isNotEmpty ? _seasonDecision(name, home, row) : '';
-      final role = pitcher ? _pitcherRoleMark(name, starterName, row['code_result_pitcher']) : '';
+      final role = pitcher ? _pitcherRoleMark(name, starterName, resultCode) : '';
       final batting = pitcher ? '' : '${row['txt_batting'] ?? ''}';
       final plays = pitcher
           ? ''
@@ -2799,7 +2790,7 @@ class _TableGameCard extends StatelessWidget {
         name,
         colors.isNotEmpty ? colors : (name == starterName ? starterColors : ''),
         mark,
-        chips.isNotEmpty ? decision : _statOf(row, pitcher: pitcher),
+        chips.isNotEmpty ? '' : _statOf(row, pitcher: pitcher),
         '',
         '${row['titles_predict'] ?? ''}',
         plays,
@@ -4775,8 +4766,6 @@ class _TableGameCard extends StatelessWidget {
                 final liveFeat = notableBatting || doneFeat.isNotEmpty ? '' : _livePitchingLabel(pitcher, home: home);
                 final feat = doneFeat.isNotEmpty ? doneFeat : liveFeat;
                 final featKind = feat == '完全試合' || feat == 'パーフェクトピッチング中' ? 'perfect' : 'nohit';
-                final decision = _decisionRecordText(pitcher.stat);
-                final statBody = decision.isNotEmpty ? '' : pitcher.stat;
                 final chipParts = pitcher.chips.split(' ').where((part) => part.isNotEmpty);
                 final metrics = chipParts.where((part) => !_isPitchCount(part) && !_isVeloChip(part));
                 final pitchCounts = chipParts.where(_isPitchCount);
@@ -4786,16 +4775,6 @@ class _TableGameCard extends StatelessWidget {
                 final row = Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (decision.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 4),
-                        child: Text(
-                          decision,
-                          maxLines: 1,
-                          softWrap: false,
-                          style: TextStyle(fontSize: statSize, fontWeight: FontWeight.w600, height: 1, color: Colors.black87),
-                        ),
-                      ),
                     for (final part in metrics)
                       Padding(
                         padding: const EdgeInsets.only(right: 3),
@@ -4811,9 +4790,9 @@ class _TableGameCard extends StatelessWidget {
                       ),
                     if (notableBatting && pitcher.pinchNames.isNotEmpty) _pinchCaptionsRow(pitcher.pinchNames, statSize),
                     if (!notableBatting && _isPinchRole(pitcher.role)) _pinchCaption(pitcher, statSize),
-                    if (statBody.isNotEmpty) ...[
+                    if (pitcher.stat.isNotEmpty) ...[
                       if (pitcher.plays.isNotEmpty || pitcher.chips.isNotEmpty) const SizedBox(width: 4),
-                      _pitchStat(statBody, statSize, pitcher.tone, textScaler: scaler),
+                      _pitchStat(pitcher.stat, statSize, pitcher.tone, textScaler: scaler),
                     ],
                     for (final part in pitchCounts)
                       Padding(

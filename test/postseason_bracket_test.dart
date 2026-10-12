@@ -635,4 +635,51 @@ void main() {
     expect(board.nlDs1.winsLow, 0);
     expect(board.nlDs1.decided, isFalse);
   });
+
+  test('NLCSの終了試合はナ・リーグ優勝決定の星になる', () {
+    Map<String, dynamic> nl({
+      required int id,
+      required int rank,
+      required String name,
+      required String area,
+    }) {
+      return {
+        'id_team': id,
+        'id_league': 4,
+        'int_rank': rank,
+        'name_team': name,
+        'code_area': area,
+        'int_win': 100 - rank,
+        'int_lose': 60 + rank,
+        'game_behind': '0',
+        'color_back': 'navy',
+        'color_font': 'white',
+      };
+    }
+
+    final board = buildMlbPostseasonBoard(
+      standings: [
+        nl(id: 35, rank: 1, name: 'ブルワーズ', area: 'CENTER'),
+        nl(id: 40, rank: 2, name: 'ドジャース', area: 'WEST'),
+        nl(id: 28, rank: 3, name: 'ブレーブス', area: 'EAST'),
+        nl(id: 41, rank: 4, name: 'パドレス', area: 'WEST'),
+        nl(id: 33, rank: 5, name: 'カブス', area: 'CENTER'),
+        nl(id: 31, rank: 6, name: 'フィリーズ', area: 'EAST'),
+      ],
+      games: [
+        for (final date in ['2026-10-04', '2026-10-05', '2026-10-06'])
+          game(code: 'DS', home: 35, away: 41, scoreHome: 3, scoreAway: 1, date: date),
+        for (final date in ['2026-10-07', '2026-10-08', '2026-10-09'])
+          game(code: 'DS', home: 40, away: 28, scoreHome: 4, scoreAway: 2, date: date),
+        game(code: 'NLCS', home: 35, away: 40, scoreHome: 2, scoreAway: 1, date: '2026-10-12'),
+        game(code: 'NM', home: 35, away: 40, scoreHome: 9, scoreAway: 0, date: '2026-10-13'),
+      ],
+    );
+    expect(board.nlDs1.decided, isTrue);
+    expect(board.nlDs1.winnerId, 35);
+    expect(board.nlDs2.decided, isTrue);
+    expect(board.nlDs2.winnerId, 40);
+    expect(board.nlCs.winsHigh, 1);
+    expect(board.nlCs.winsLow, 0);
+  });
 }

@@ -7,6 +7,7 @@ class t_system_log_error extends DBModel {
   String stacktrace = '';
   bool flg_check = false;
   String code_log_system = '';
+  String txt_detail = '';
 
   @override
   Map<String, dynamic> toMap() {
@@ -16,6 +17,7 @@ class t_system_log_error extends DBModel {
         "stacktrace": stacktrace,
         "flg_check": flg_check,
         "code_log_system": code_log_system,
+        "txt_detail": txt_detail,
       });
   }
 }

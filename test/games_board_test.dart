@@ -5802,6 +5802,10 @@ void main() {
     final statsHeader = tester.getRect(find.text('選手成績'));
     expect(roster.top, greaterThan(statsHeader.bottom - 1));
     expect(roster.top, lessThan(statsHeader.bottom + 24));
+    final toggle = tester.widget<SizedBox>(
+      find.ancestor(of: find.text('選手成績'), matching: find.byWidgetPredicate((widget) => widget is SizedBox && widget.height == 32)).first,
+    );
+    expect(toggle.height, 32);
     final openedCard = tester.getSize(shell);
     expect(openedCard.height, greaterThan(openingCard.height));
 

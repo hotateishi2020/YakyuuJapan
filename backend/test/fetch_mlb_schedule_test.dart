@@ -34,6 +34,22 @@ void main() {
     expect(pitcherDecisionCode(''), '');
   });
 
+  test('優勝決定シリーズはリーグ別のLCSコードになる', () {
+    expect(FetchMLB.mlbGameCode('NL優勝決定シリーズ', 4, 4), 'NLCS');
+    expect(FetchMLB.mlbGameCode('AL優勝決定シリーズ', 3, 3), 'ALCS');
+    expect(FetchMLB.mlbGameCode('リーグチャンピオンシップ', 4, 4), 'LCS');
+    expect(FetchMLB.mlbGameCode('地区シリーズ', 4, 4), 'DS');
+    expect(FetchMLB.mlbGameCode('交流戦', 3, 4), 'EX');
+  });
+
+  test('優勝決定シリーズはリーグ別のLCSになる', () {
+    expect(FetchMLB.mlbGameCode('NL優勝決定シリーズ', 4, 4), 'NLCS');
+    expect(FetchMLB.mlbGameCode('AL優勝決定シリーズ', 3, 3), 'ALCS');
+    expect(FetchMLB.mlbGameCode('リーグチャンピオンシップ', 4, 4), 'LCS');
+    expect(FetchMLB.mlbGameCode('地区シリーズ', 4, 4), 'DS');
+    expect(FetchMLB.mlbGameCode('ワールドシリーズ', 3, 4), 'WS');
+  });
+
   test('完了済みの終了試合は選手成績を取り直さない', () {
     expect(GameStatsLoad.needsRefresh(live: false, loaded: true), isFalse);
     expect(GameStatsLoad.needsRefresh(live: false, loaded: false), isTrue);

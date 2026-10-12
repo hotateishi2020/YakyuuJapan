@@ -911,7 +911,7 @@ class FetchMLB {
             ..id_pitcher_win = idPitcherWin
             ..id_pitcher_lose = idPitcherLose
             ..id_pitcher_save = idPitcherSave
-            ..code_game = _mlbGameCode(sectionTitle, homeLeague, awayLeague);
+            ..code_game = mlbGameCode(sectionTitle, homeLeague, awayLeague);
 
           if (exists.isNotEmpty) {
             game.id = exists.first.toColumnMap()['id'] as int;
@@ -1094,10 +1094,14 @@ class FetchMLB {
     print('MLB出場成績を登録: game=$gameId (${list.length}人)');
   }
 
-  static String _mlbGameCode(String sectionTitle, int homeLeague, int awayLeague) {
+  static String mlbGameCode(String sectionTitle, int homeLeague, int awayLeague) {
     final title = sectionTitle.replaceAll(RegExp(r'\s+'), '');
     if (title.contains('ワールドシリーズ') || title.contains('WS')) return 'WS';
-    if (title.contains('リーグチャンピオン') || title.contains('LCS')) return 'LCS';
+    if (title.contains('優勝決定') || title.contains('リーグチャンピオン') || title.contains('LCS')) {
+      if (title.contains('ナショナル') || title.contains('ナ・') || title.contains('NL')) return 'NLCS';
+      if (title.contains('アメリカン') || title.contains('ア・') || title.contains('AL')) return 'ALCS';
+      return 'LCS';
+    }
     if (title.contains('地区シリーズ') || title.contains('DS')) return 'DS';
     if (title.contains('ワイルドカード') || title.contains('WC')) return 'WC';
     if (homeLeague != 0 && homeLeague == awayLeague) return 'NM';

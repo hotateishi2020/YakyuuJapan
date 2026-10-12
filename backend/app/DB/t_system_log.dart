@@ -12,6 +12,7 @@ class t_system_log extends DBModel {
   String url_pre = '';
   int id_log_error = 0;
   bool flg_check = false;
+  String txt_detail = '';
 
   @override
   Map<String, dynamic> toMap() {
@@ -26,6 +27,7 @@ class t_system_log extends DBModel {
         "url_pre": url_pre,
         "id_log_error": id_log_error,
         "flg_check": flg_check,
+        "txt_detail": txt_detail,
       });
   }
 }

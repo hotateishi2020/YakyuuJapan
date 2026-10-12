@@ -2170,8 +2170,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                         ALL_MARGIN_LEFT,
                         onAuthChanged: _onAuthChanged,
                         authReady: _authEntryReady,
-                        titleTrailing: _headerScore(),
-                        titleTrailingWidth: _headerScorePreferredWidth(),
+                        titleTrailing: _showUserPredictions ? _headerScore() : null,
+                        titleTrailingWidth: _showUserPredictions ? _headerScorePreferredWidth() : null,
                         actions: [
                           const SizedBox(width: 4),
                           _yearPicker(),

@@ -18,6 +18,7 @@ import 'app/AceEvaluator.dart';
 import 'app/DisplaySnapshot.dart';
 import 'app/GamesReadGate.dart';
 import 'app/FetchURL.dart';
+import 'app/LogDetail.dart';
 import 'app/GamesFetch.dart';
 import 'app/FetchMLB.dart';
 import 'app/Lineup.dart';
@@ -1068,6 +1069,7 @@ void main() async {
         final reporter = m_user();
         await _attachRequestUser(conn, request, reporter);
         final year = int.tryParse('${body['year'] ?? ''}');
+        final screen = '${body['screen_name'] ?? ''}'.trim();
         final log = t_system_log();
         log.method = 'VIEW';
         log.category = 'CLIENT';
@@ -1082,6 +1084,26 @@ void main() async {
         log.crtpgm = 'CLIENT';
         log.updby = reporter.id;
         log.updpgm = 'CLIENT';
+        log.crtenv = LogDetail.clip('${body['environment'] ?? 'web'}', 20);
+        log.txt_detail = LogDetail.encode({
+          'log_type': '操作',
+          'level': 'INFO',
+          'user_id': reporter.id,
+          'session_id': LogDetail.clip('${body['session_id'] ?? ''}', 80),
+          'request_id': LogDetail.clip('${body['request_id'] ?? _requestId(request)}', 64),
+          'screen_name': screen.isEmpty ? LogDetail.screenOf(action) : LogDetail.clip(screen, 40),
+          'action': action,
+          'status': LogDetail.clip('${body['status'] ?? '成功'}', 20),
+          'details': LogDetail.clip(year == null ? '${body['details'] ?? ''}' : '$year年', 500),
+          'app_version': LogDetail.clip('${body['app_version'] ?? ''}', 20),
+          'environment': log.crtenv,
+          'source': 'client',
+          'function_name': 'reportAction',
+          'file_name': 'auth_session.dart',
+          'api_path': '/client/action',
+          'http_status': 200,
+          'context': '',
+        });
         await Postgres.insert(conn, log);
         return Response.ok('ok');
       });
@@ -1102,12 +1124,38 @@ void main() async {
         await _attachRequestUser(conn, request, reporter);
         reporter.category_system = 'CLIENT';
         reporter.code_system = 'TIMEOUT';
-        final stack = '${body['stack'] ?? ''}';
+        final stack = LogDetail.clip('${body['stack'] ?? ''}', 4000);
+        final frame = LogDetail.stackFrame(stack);
         await insertLogError(
           conn,
           message.length > 2000 ? message.substring(0, 2000) : message,
-          stack.length > 4000 ? stack.substring(0, 4000) : stack,
+          stack,
           reporter,
+          detail: {
+            'log_type': 'エラー',
+            'level': 'ERROR',
+            'user_id': reporter.id,
+            'session_id': LogDetail.clip('${body['session_id'] ?? ''}', 80),
+            'request_id': LogDetail.clip('${body['request_id'] ?? _requestId(request)}', 64),
+            'screen_name': LogDetail.clip('${body['screen_name'] ?? ''}', 40),
+            'action': LogDetail.clip('${body['action'] ?? '通信タイムアウト'}', 80),
+            'status': '失敗',
+            'details': LogDetail.clip('${body['details'] ?? ''}', 500),
+            'app_version': LogDetail.clip('${body['app_version'] ?? ''}', 20),
+            'environment': LogDetail.clip('${body['environment'] ?? 'web'}', 20),
+            'error_type': LogDetail.clip('${body['error_type'] ?? 'TimeoutException'}', 80),
+            'error_code': LogDetail.clip('${body['error_code'] ?? ''}', 40),
+            'error_message': message.length > 2000 ? message.substring(0, 2000) : message,
+            'source': LogDetail.clip('${body['source'] ?? 'client'}', 40),
+            'function_name': LogDetail.clip('${body['function_name'] ?? frame['function_name'] ?? ''}', 80),
+            'file_name': LogDetail.clip('${body['file_name'] ?? frame['file_name'] ?? ''}', 80),
+            'line_number': LogDetail.clip('${body['line_number'] ?? frame['line_number'] ?? ''}', 10),
+            'stack_trace': stack,
+            'api_path': LogDetail.clip('${body['api_path'] ?? ''}', 120),
+            'http_status': body['http_status'] ?? '',
+            'duration_ms': body['duration_ms'] ?? '',
+            'context': LogDetail.clip('${body['context'] ?? ''}', 1000),
+          },
         );
         return Response.ok('ok');
       });
@@ -1120,8 +1168,8 @@ void main() async {
         final q = (request.url.queryParameters['q'] ?? '').trim();
         final access = await conn.execute(
           '''
-            SELECT l.crtat, l.crtby, COALESCE(u.name_last, '') AS name_user,
-                   l.method, l.category, l.code, l.memo, l.url
+            SELECT l.id, l.crtat, l.crtby, COALESCE(u.name_last, '') AS name_user,
+                   l.method, l.category, l.code, l.memo, l.url, l.txt_detail
             FROM t_system_log l
             LEFT JOIN m_user u ON u.id = l.crtby
             WHERE \$1::text = ''
@@ -1135,8 +1183,8 @@ void main() async {
         );
         final errors = await conn.execute(
           '''
-            SELECT e.crtat, e.crtby, COALESCE(u.name_last, '') AS name_user,
-                   e.message_error, e.stacktrace, COALESCE(l.url, '') AS url
+            SELECT e.id, e.crtat, e.crtby, COALESCE(u.name_last, '') AS name_user,
+                   e.message_error, e.stacktrace, COALESCE(l.url, '') AS url, e.txt_detail
             FROM t_system_log_error e
             LEFT JOIN t_system_log l ON l.id_log_error = e.id
             LEFT JOIN m_user u ON u.id = e.crtby
@@ -1155,9 +1203,50 @@ void main() async {
           return '$value';
         }
 
-        Map<String, dynamic> accessRow(dynamic row) {
-          final map = row.toColumnMap();
+        String textOf(Map<String, dynamic> detail, Map<String, dynamic> map, String key, String fallbackKey) {
+          final fromDetail = '${detail[key] ?? ''}'.trim();
+          if (fromDetail.isNotEmpty) return fromDetail;
+          return '${map[fallbackKey] ?? ''}'.trim();
+        }
+
+        Map<String, dynamic> present(dynamic row, {required String fallbackType}) {
+          final map = Map<String, dynamic>.from(row.toColumnMap());
+          final detail = LogDetail.decode(map['txt_detail']);
+          final isError = fallbackType == 'エラー';
+          final logType = textOf(detail, map, 'log_type', '');
+          final level = textOf(detail, map, 'level', '');
+          final status = textOf(detail, map, 'status', '');
+          var action = textOf(detail, map, 'action', isError ? 'message_error' : 'memo');
+          if (action.isEmpty && !isError) {
+            action = '${map['method'] ?? ''} ${map['url'] ?? ''}'.trim();
+          }
           return {
+            'log_id': '${map['id'] ?? ''}',
+            'timestamp': stamp(map['crtat']),
+            'log_type': logType.isEmpty ? fallbackType : logType,
+            'level': level.isEmpty ? (isError ? 'ERROR' : 'INFO') : level,
+            'user_id': map['crtby'] ?? detail['user_id'] ?? 0,
+            'user_name': '${map['name_user'] ?? ''}',
+            'session_id': '${detail['session_id'] ?? ''}',
+            'request_id': '${detail['request_id'] ?? ''}',
+            'screen_name': '${detail['screen_name'] ?? ''}',
+            'action': action,
+            'status': status.isEmpty ? (isError ? '失敗' : '成功') : status,
+            'details': '${detail['details'] ?? ''}',
+            'app_version': '${detail['app_version'] ?? ''}',
+            'environment': '${detail['environment'] ?? ''}',
+            'error_type': '${detail['error_type'] ?? ''}',
+            'error_code': '${detail['error_code'] ?? ''}',
+            'error_message': textOf(detail, map, 'error_message', 'message_error'),
+            'source': textOf(detail, map, 'source', 'category'),
+            'function_name': '${detail['function_name'] ?? ''}',
+            'file_name': '${detail['file_name'] ?? ''}',
+            'line_number': '${detail['line_number'] ?? ''}',
+            'stack_trace': textOf(detail, map, 'stack_trace', 'stacktrace'),
+            'api_path': textOf(detail, map, 'api_path', 'url'),
+            'http_status': '${detail['http_status'] ?? ''}',
+            'duration_ms': '${detail['duration_ms'] ?? ''}',
+            'context': '${detail['context'] ?? ''}',
             'crtat': stamp(map['crtat']),
             'id_user': map['crtby'] ?? 0,
             'name_user': map['name_user'] ?? '',
@@ -1166,26 +1255,21 @@ void main() async {
             'code': map['code'] ?? '',
             'memo': map['memo'] ?? '',
             'url': map['url'] ?? '',
+            'message': map['message_error'] ?? detail['error_message'] ?? '',
           };
         }
 
-        Map<String, dynamic> errorRow(dynamic row) {
-          final map = row.toColumnMap();
-          return {
-            'crtat': stamp(map['crtat']),
-            'id_user': map['crtby'] ?? 0,
-            'name_user': map['name_user'] ?? '',
-            'message': map['message_error'] ?? '',
-            'stacktrace': map['stacktrace'] ?? '',
-            'url': map['url'] ?? '',
-          };
-        }
+        final logs = <Map<String, dynamic>>[
+          for (final row in access) present(row, fallbackType: '操作'),
+          for (final row in errors) present(row, fallbackType: 'エラー'),
+        ]..sort((a, b) => '${b['timestamp']}'.compareTo('${a['timestamp']}'));
 
         return Response.ok(
           jsonEncode({
             'ok': true,
-            'access': [for (final row in access) accessRow(row)],
-            'errors': [for (final row in errors) errorRow(row)],
+            'logs': logs,
+            'access': [for (final row in logs) if (row['log_type'] != 'エラー') row],
+            'errors': [for (final row in logs) if (row['log_type'] == 'エラー') row],
           }),
           headers: {'content-type': 'application/json; charset=utf-8'},
         );
@@ -1567,10 +1651,34 @@ void _notifyProgramError(Object e) {
   unawaited(sendProgramErrorMail(e).catchError((_) {}));
 }
 
-Future<int> _saveErrorLog(Object e, String stacktrace, m_user user) async {
+Future<int> _saveErrorLog(
+  Object e,
+  String stacktrace,
+  m_user user, {
+  required Request request,
+  required int durationMs,
+  required String requestId,
+}) async {
   try {
     final id = await Postgres.withConnection((conn) async {
-      return insertLogError(conn, e, stacktrace, user);
+      return insertLogError(
+        conn,
+        e,
+        stacktrace,
+        user,
+        detail: {
+          'api_path': request.requestedUri.path,
+          'http_status': 500,
+          'duration_ms': durationMs,
+          'request_id': requestId,
+          'source': user.category_system,
+          'environment': 'server',
+          'context': jsonEncode({
+            'method': request.method,
+            'path': request.requestedUri.path,
+          }),
+        },
+      );
     });
     print("エラーログのDBに登録しました。");
     return id;
@@ -1595,16 +1703,30 @@ Future<void> _attachRequestUser(Connection conn, Request request, m_user user) a
   user.flg_user = true;
 }
 
-Future<void> _saveAccessLog(Request request, m_user user, int idError) async {
+String _requestId(Request request) {
+  final header = (request.headers['x-request-id'] ?? '').trim();
+  if (header.isNotEmpty) return _clipDb(header, 64);
+  return 'req_${DateTime.now().microsecondsSinceEpoch.toRadixString(16)}';
+}
+
+Future<void> _saveAccessLog(
+  Request request,
+  m_user user,
+  int idError, {
+  required int durationMs,
+  required int httpStatus,
+  required String requestId,
+}) async {
   try {
     await Postgres.withConnection((conn) async {
+      final failed = idError > 0 || httpStatus >= 400;
       final log = t_system_log();
       log.method = _clipDb(request.method, 20);
       log.category = _clipDb(user.category_system, 20);
       log.code = _clipDb(user.code_system, 20);
       log.memo = '';
       log.flg_user = user.flg_user;
-      log.url = request.requestedUri.toString();
+      log.url = request.requestedUri.path;
       log.url_pre = "";
       log.id_log_error = idError;
       log.flg_check = false;
@@ -1612,12 +1734,37 @@ Future<void> _saveAccessLog(Request request, m_user user, int idError) async {
       log.crtpgm = _clipDb(user.code_system, 30);
       log.updby = user.id;
       log.updpgm = _clipDb(user.code_system, 30);
+      log.crtenv = 'server';
+      log.txt_detail = LogDetail.encode({
+        'log_type': '操作',
+        'level': httpStatus >= 500 ? 'ERROR' : (httpStatus >= 400 ? 'WARN' : 'INFO'),
+        'user_id': user.id,
+        'session_id': '',
+        'request_id': requestId,
+        'screen_name': '',
+        'action': '${request.method} ${request.requestedUri.path}',
+        'status': failed ? '失敗' : '成功',
+        'details': user.code_system,
+        'app_version': '',
+        'environment': 'server',
+        'source': user.category_system,
+        'function_name': user.code_system,
+        'api_path': request.requestedUri.path,
+        'http_status': httpStatus,
+        'duration_ms': durationMs,
+        'context': jsonEncode({'method': request.method, 'path': request.requestedUri.path}),
+      });
       await Postgres.insert(conn, log);
     });
     print("操作ログを登録しました。【${user.code_system}】");
   } catch (e, st) {
     print('操作ログ登録失敗: $e\n$st');
   }
+}
+
+bool _skipAccessLog(String path, {required bool readonly}) {
+  if (readonly) return path == '/predictions/part';
+  return path == '/client/action' || path == '/client/error';
 }
 
 /// 読み取り専用API: トランザクションなし。ログINSERTのみ別接続で行う。
@@ -1628,6 +1775,8 @@ Future<Response> tryCatchAPIReadonly(
   Future<Response> Function() callback,
 ) async {
   print('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
+  final started = DateTime.now();
+  final requestId = _requestId(request);
   var id_error = 0;
   final user = m_user();
   var response = Response.ok('ok');
@@ -1642,12 +1791,26 @@ Future<Response> tryCatchAPIReadonly(
     response = await callback();
   } catch (e, st) {
     _printRequestError(request, e, st);
-    id_error = await _saveErrorLog(e, st.toString(), user);
+    id_error = await _saveErrorLog(
+      e,
+      st.toString(),
+      user,
+      request: request,
+      durationMs: DateTime.now().difference(started).inMilliseconds,
+      requestId: requestId,
+    );
     _notifyProgramError(e);
     response = Response.internalServerError(body: 'データベースエラー: $e');
   } finally {
-    if (request.requestedUri.path != '/predictions/part') {
-      unawaited(_saveAccessLog(request, user, id_error));
+    if (!_skipAccessLog(request.requestedUri.path, readonly: true)) {
+      unawaited(_saveAccessLog(
+        request,
+        user,
+        id_error,
+        durationMs: DateTime.now().difference(started).inMilliseconds,
+        httpStatus: response.statusCode,
+        requestId: requestId,
+      ));
     }
     print("🌐Responsed Successfully‼️【" + request.requestedUri.toString() + "】");
   }
@@ -1657,6 +1820,8 @@ Future<Response> tryCatchAPIReadonly(
 
 Future<Response> tryCatchAPI(Request request, String category_system, String code_system, Future<Response> callback(Connection conn)) async {
   print('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
+  final started = DateTime.now();
+  final requestId = _requestId(request);
   var id_error = 0;
   final user = m_user();
   var response = Response.ok('ok');
@@ -1679,12 +1844,26 @@ Future<Response> tryCatchAPI(Request request, String category_system, String cod
     });
   } catch (e, st) {
     _printRequestError(request, e, st);
-    id_error = await _saveErrorLog(e, st.toString(), user);
+    id_error = await _saveErrorLog(
+      e,
+      st.toString(),
+      user,
+      request: request,
+      durationMs: DateTime.now().difference(started).inMilliseconds,
+      requestId: requestId,
+    );
     _notifyProgramError(e);
     response = Response.internalServerError(body: 'データベースエラー: $e');
   } finally {
-    if (request.requestedUri.path != '/client/action') {
-      unawaited(_saveAccessLog(request, user, id_error));
+    if (!_skipAccessLog(request.requestedUri.path, readonly: false)) {
+      unawaited(_saveAccessLog(
+        request,
+        user,
+        id_error,
+        durationMs: DateTime.now().difference(started).inMilliseconds,
+        httpStatus: response.statusCode,
+        requestId: requestId,
+      ));
     }
     print("🌐Responsed Successfully‼️【" + request.requestedUri.toString() + "】");
   }
@@ -1692,15 +1871,42 @@ Future<Response> tryCatchAPI(Request request, String category_system, String cod
   return response;
 }
 
-Future<int> insertLogError(Connection conn, Object e, String stacktrace, m_user user) async {
+Future<int> insertLogError(
+  Connection conn,
+  Object e,
+  String stacktrace,
+  m_user user, {
+  Map<String, dynamic>? detail,
+}) async {
+  final message = LogDetail.clip(e.toString(), 2000);
+  final stack = LogDetail.clip(stacktrace, 4000);
+  final frame = LogDetail.stackFrame(stack);
   final log_error = t_system_log_error();
-  log_error.message_error = e.toString();
-  log_error.stacktrace = stacktrace;
+  log_error.message_error = message;
+  log_error.stacktrace = stack;
   log_error.flg_check = false;
   log_error.code_log_system = _clipDb(user.code_system, 20);
   log_error.crtby = user.id;
   log_error.crtpgm = _clipDb(user.code_system, 30);
   log_error.updby = user.id;
   log_error.updpgm = _clipDb(user.code_system, 30);
+  log_error.crtenv = LogDetail.clip('${detail?['environment'] ?? 'server'}', 20);
+  log_error.txt_detail = LogDetail.encode({
+    'log_type': 'エラー',
+    'level': 'ERROR',
+    'user_id': user.id,
+    'error_type': e.runtimeType.toString(),
+    'error_code': LogDetail.errorCode(e),
+    'error_message': message,
+    'source': user.category_system,
+    'function_name': frame['function_name'] ?? '',
+    'file_name': frame['file_name'] ?? '',
+    'line_number': frame['line_number'] ?? '',
+    'stack_trace': stack,
+    'action': user.code_system,
+    'status': '失敗',
+    'environment': 'server',
+    ...?detail,
+  });
   return await Postgres.insert(conn, log_error);
 }

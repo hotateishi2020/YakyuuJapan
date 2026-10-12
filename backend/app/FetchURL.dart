@@ -243,6 +243,18 @@ class FetchURL {
           'txt_lineup_announced',
           "ALTER TABLE t_game ADD COLUMN IF NOT EXISTS txt_lineup_announced TEXT NOT NULL DEFAULT ''",
         );
+        await _addColumnIfMissing(
+          c,
+          't_system_log',
+          'txt_detail',
+          "ALTER TABLE t_system_log ADD COLUMN IF NOT EXISTS txt_detail TEXT NOT NULL DEFAULT ''",
+        );
+        await _addColumnIfMissing(
+          c,
+          't_system_log_error',
+          'txt_detail',
+          "ALTER TABLE t_system_log_error ADD COLUMN IF NOT EXISTS txt_detail TEXT NOT NULL DEFAULT ''",
+        );
         await StadiumImages.ensureColumns(c);
         _appColumnsReady = true;
       },

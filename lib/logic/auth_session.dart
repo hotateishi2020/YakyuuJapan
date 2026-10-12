@@ -10,7 +10,60 @@ import '../tools/browser_cookie.dart';
 const authTokenCookie = 'koko_auth_token';
 const authUserCookie = 'koko_auth_user';
 const authManualLogoutCookie = 'koko_manual_logout';
+const _sessionCookie = 'koko_sid';
 const _sessionMaxAge = 30 * 24 * 60 * 60; // 30日
+
+String _clientSessionId() {
+  final saved = readBrowserCookie(_sessionCookie);
+  if (saved != null && saved.isNotEmpty) return saved;
+  final id = 'ses_${DateTime.now().microsecondsSinceEpoch.toRadixString(16)}';
+  writeBrowserCookie(_sessionCookie, id, maxAgeSeconds: _sessionMaxAge);
+  return id;
+}
+
+String _clientRequestId() => 'req_${DateTime.now().microsecondsSinceEpoch.toRadixString(16)}';
+
+String _screenOf(String action) {
+  if (action.contains('npb')) return 'NPB';
+  if (action.contains('mlb')) return 'MLB';
+  if (action.contains('試合情報')) return '試合情報';
+  if (action.contains('チーム順位')) return 'チーム順位';
+  if (action.contains('個人成績')) return '個人成績';
+  if (action.contains('news') || action.contains('イベント')) return 'NEWS・イベント';
+  if (action.contains('年度')) return '年度';
+  if (action.contains('アカウント')) return 'アカウント';
+  if (action.contains('初期表示')) return '初期表示';
+  return '';
+}
+
+Map<String, dynamic> _clientLogBody({
+  required String action,
+  String status = '成功',
+  String? details,
+  int? year,
+  Object? error,
+  String? stack,
+  String? apiPath,
+  String? requestId,
+}) {
+  final frame = stack ?? '';
+  return {
+    'action': action,
+    'status': status,
+    'screen_name': _screenOf(action),
+    'session_id': _clientSessionId(),
+    'request_id': requestId ?? _clientRequestId(),
+    'app_version': Env.appVersion,
+    'environment': kIsWeb ? 'web' : 'app',
+    if (year != null) 'year': year,
+    if (details != null && details.isNotEmpty) 'details': details,
+    if (error != null) 'error_type': error.runtimeType.toString(),
+    if (error != null) 'message': error.toString(),
+    if (frame.isNotEmpty) 'stack': frame.length > 4000 ? frame.substring(0, 4000) : frame,
+    if (apiPath != null && apiPath.isNotEmpty) 'api_path': apiPath,
+    'source': 'client',
+  };
+}
 
 bool isClientTimeout(Object error) {
   if (error is TimeoutException) return true;
@@ -151,15 +204,22 @@ class AuthSession {
     _reportingTimeout = true;
     _lastTimeoutMessage = message;
     _lastTimeoutAt = now;
+    final requestId = _clientRequestId();
     try {
       await http
           .post(
             Env.api('/client/error'),
-            headers: _authHeaders,
-            body: jsonEncode({
-              'message': message,
-              'stack': '${stack ?? ''}',
-            }),
+            headers: {
+              ..._authHeaders,
+              'x-request-id': requestId,
+            },
+            body: jsonEncode(_clientLogBody(
+              action: '通信タイムアウト',
+              status: '失敗',
+              error: error,
+              stack: '${stack ?? ''}',
+              requestId: requestId,
+            )),
           )
           .timeout(const Duration(seconds: 8));
     } catch (_) {}
@@ -169,15 +229,16 @@ class AuthSession {
   /// 画面操作を操作ログへ残す。記録の失敗は画面に出さない。
   Future<void> reportAction(String action, {int? year}) async {
     if (const bool.fromEnvironment('FLUTTER_TEST')) return;
+    final requestId = _clientRequestId();
     try {
       await http
           .post(
             Env.api('/client/action'),
-            headers: _authHeaders,
-            body: jsonEncode({
-              'action': action,
-              if (year != null) 'year': year,
-            }),
+            headers: {
+              ..._authHeaders,
+              'x-request-id': requestId,
+            },
+            body: jsonEncode(_clientLogBody(action: action, year: year, requestId: requestId)),
           )
           .timeout(const Duration(seconds: 8));
     } catch (e, st) {

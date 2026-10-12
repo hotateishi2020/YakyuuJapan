@@ -25,4 +25,6 @@ class Env {
     final base = baseUrl();
     return base.isEmpty ? Uri.parse(path) : Uri.parse('$base$path');
   }
+
+  static const appVersion = '1.0.0';
 }

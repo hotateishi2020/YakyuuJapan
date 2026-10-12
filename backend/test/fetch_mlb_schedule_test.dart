@@ -1,6 +1,7 @@
 import 'package:test/test.dart';
 
 import '../app/FetchMLB.dart';
+import '../app/JapanClock.dart';
 import '../app/FetchURL.dart';
 import '../app/GameFetchSchedule.dart';
 import '../app/GameStatsLoad.dart';
@@ -88,6 +89,32 @@ void main() {
     expect(GameFetchSchedule.isTodayQueued('mlb'), isTrue);
     GameFetchSchedule.scheduleTodayAgain('mlb', () async => false);
     expect(GameFetchSchedule.isTodayQueued('mlb'), isTrue);
+  });
+
+  test('日本時間の朝はUTCの前日でも今日の試合日になる', () {
+    final morning = JapanClock.fromUtc(DateTime.utc(2026, 10, 12, 22, 48));
+    expect(morning.year, 2026);
+    expect(morning.month, 10);
+    expect(morning.day, 13);
+    expect(morning.hour, 7);
+  });
+
+  test('未来の日程カードは同じ内容なら取り直さず変わったら取り直す', () {
+    GameFetchSchedule.resetForTest();
+    const key = 'mlb|2026-10-15|/mlb/game/1/index';
+    final first = GameFetchSchedule.normalizeCard(key, 'ドジャース 予想先発');
+    expect(GameFetchSchedule.futureCardUnchanged(key, first), isFalse);
+    GameFetchSchedule.rememberFutureCard(key, first);
+    expect(GameFetchSchedule.futureCardUnchanged(key, GameFetchSchedule.normalizeCard(key, 'ドジャース   予想先発')), isTrue);
+    expect(GameFetchSchedule.futureCardUnchanged(key, GameFetchSchedule.normalizeCard(key, 'ドジャース 3回裏 1-2')), isFalse);
+    expect(GameFetchSchedule.futureCardUnchanged(key, ''), isFalse);
+    final now = DateTime(2026, 10, 13, 7, 0);
+    expect(GameFetchSchedule.isFutureDay(DateTime(2026, 10, 14), now), isTrue);
+    expect(GameFetchSchedule.isFutureDay(DateTime(2026, 10, 13), now), isFalse);
+    GameFetchSchedule.armFutureWatch('mlb', () async {});
+    expect(GameFetchSchedule.isFutureQueued('mlb'), isTrue);
+    GameFetchSchedule.armFutureWatch('mlb', () async {});
+    expect(GameFetchSchedule.isFutureQueued('mlb'), isTrue);
   });
 
   test('昨日以前は全部読み込み済みなら再取得しない', () {

@@ -10,6 +10,12 @@ class GameFetchSchedule {
   static final _todayQueued = <String, bool>{};
   static final _todayFetch = <String, Future<bool> Function()>{};
   static int _todayEpoch = 0;
+  static final _futureArmed = <String>{};
+  static final _futureBusy = <String, bool>{};
+  static final _futureQueued = <String, bool>{};
+  static final _futureFetch = <String, Future<void> Function()>{};
+  static final _cardPrint = <String, String>{};
+  static int _futureEpoch = 0;
 
   static bool takeFuture(String org, DateTime now) {
     final last = _lastFuture[org];
@@ -71,12 +77,72 @@ class GameFetchSchedule {
     });
   }
 
+  static bool isFutureBusy(String org) => _futureBusy[org] == true;
+
+  static bool isFutureQueued(String org) => _futureQueued[org] == true;
+
+  /// 起動後と、その後は [futureInterval] ごとに、明日以降の日程カードを見に行く。
+  static void armFutureWatch(String org, Future<void> Function() fetchFuture) {
+    _futureFetch[org] = fetchFuture;
+    if (_futureArmed.contains(org)) return;
+    _futureArmed.add(org);
+    _queueFuture(org, initial: true);
+  }
+
+  static void _queueFuture(String org, {bool initial = false}) {
+    if (_futureQueued[org] == true) return;
+    _futureQueued[org] = true;
+    final token = _futureEpoch;
+    Future<void>.delayed(initial ? const Duration(seconds: 20) : futureInterval, () async {
+      _futureQueued[org] = false;
+      if (token != _futureEpoch) return;
+      final fetch = _futureFetch[org];
+      if (fetch == null) return;
+      if (_futureBusy[org] == true) {
+        _queueFuture(org);
+        return;
+      }
+      _futureBusy[org] = true;
+      try {
+        await fetch();
+      } catch (e, st) {
+        print('未来の試合確認に失敗しました ($org): $e');
+        print(st);
+      } finally {
+        if (token == _futureEpoch) _futureBusy[org] = false;
+      }
+      if (token == _futureEpoch) _queueFuture(org);
+    });
+  }
+
+  /// 日程カードの見た目。空白の差では変わったことにしない。
+  static String normalizeCard(String href, String text) {
+    return '$href|${text.replaceAll(RegExp(r'\s+'), '')}';
+  }
+
+  /// 前回と同じカードなら詳細は取り直さない。空のカードは毎回見る。
+  static bool futureCardUnchanged(String key, String fingerprint) {
+    if (fingerprint.replaceAll(RegExp(r'\s+'), '').isEmpty) return false;
+    return _cardPrint[key] == fingerprint;
+  }
+
+  static void rememberFutureCard(String key, String fingerprint) {
+    if (fingerprint.isEmpty) return;
+    _cardPrint[key] = fingerprint;
+  }
+
   static void resetForTest() {
     _todayEpoch++;
+    _futureEpoch++;
     _lastFuture.clear();
     _pastDone.clear();
     _todayBusy.clear();
     _todayQueued.clear();
     _todayFetch.clear();
+    _futureArmed.clear();
+    _futureBusy.clear();
+    _futureQueued.clear();
+    _futureFetch.clear();
+    _cardPrint.clear();
   }
 }

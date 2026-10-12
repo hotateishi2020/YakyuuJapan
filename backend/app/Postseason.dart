@@ -1,10 +1,12 @@
 import 'dart:convert';
 
+import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 
 import '../tools/Postgres.dart';
+import 'GameFetchSchedule.dart';
 import 'AppSql.dart';
 import 'ClinchedGames.dart';
 import 'DB/m_stadium.dart';
@@ -153,38 +155,57 @@ class Postseason {
     if (root == null) return;
 
     for (final section in root.querySelectorAll('section.bb-score')) {
-      final title = section.querySelector('.bb-score__title')?.text.trim() ?? '';
-      final code = codeFromScheduleTitle(title);
-      if (code == null || (code != 'CS1' && code != 'CSF' && code != 'JS')) continue;
-      for (final card in section.querySelectorAll('li.bb-score__item')) {
-        final homeName = card.querySelector('.bb-score__homeLogo')?.text.trim() ?? '';
-        final awayName = card.querySelector('.bb-score__awayLogo')?.text.trim() ?? '';
-        if (homeName.isEmpty || awayName.isEmpty || homeName == '未定' || awayName == '未定') continue;
-        final state = card.querySelector('.bb-score__link')?.text.trim() ?? '試合前';
-        final venue = card.querySelector('.bb-score__venue')?.text.trim() ?? '';
-        final scoreLeft = int.tryParse(card.querySelector('.bb-score__score--left')?.text.trim() ?? '');
-        final scoreRight = int.tryParse(card.querySelector('.bb-score__score--right')?.text.trim() ?? '');
-        final href = card.querySelector('a')?.attributes['href'] ?? '';
-        var start = _startOn(date, '18:00');
-        if (fetchDetail && href.isNotEmpty) {
-          final detail = await _detail(href, date);
-          if (detail != null && detail.start != null) start = detail.start;
-        }
-        if (start == null) continue;
-        await _upsert(
-          conn,
-          code: code,
-          date: date,
-          homeName: homeName,
-          awayName: awayName,
-          state: state,
-          venue: venue,
-          scoreHome: scoreLeft ?? -1,
-          scoreAway: scoreRight ?? -1,
-          start: start,
-        );
-      }
+      await syncSection(conn, date, section, fetchDetail: fetchDetail);
     }
+  }
+
+  /// 取得済みの日程ページから CS・日本シリーズを反映する。
+  /// [onlyIfChanged] のときは、前回と同じカードは詳細を取りに行かない。
+  static Future<bool> syncSection(
+    Connection conn,
+    String date,
+    Element section, {
+    bool fetchDetail = false,
+    bool onlyIfChanged = false,
+  }) async {
+    final title = section.querySelector('.bb-score__title')?.text.trim() ?? '';
+    final code = codeFromScheduleTitle(title);
+    if (code == null || (code != 'CS1' && code != 'CSF' && code != 'JS')) return false;
+    var wrote = false;
+    for (final card in section.querySelectorAll('li.bb-score__item')) {
+      final homeName = card.querySelector('.bb-score__homeLogo')?.text.trim() ?? '';
+      final awayName = card.querySelector('.bb-score__awayLogo')?.text.trim() ?? '';
+      if (homeName.isEmpty || awayName.isEmpty || homeName == '未定' || awayName == '未定') continue;
+      final href = card.querySelector('a')?.attributes['href']?.trim() ?? '';
+      final fingerprint = GameFetchSchedule.normalizeCard(href, card.text);
+      final cardKey = 'npb-ps|$date|$homeName|$awayName|$href';
+      if (onlyIfChanged && GameFetchSchedule.futureCardUnchanged(cardKey, fingerprint)) continue;
+      final state = card.querySelector('.bb-score__link')?.text.trim() ?? '試合前';
+      final venue = card.querySelector('.bb-score__venue')?.text.trim() ?? '';
+      final scoreLeft = int.tryParse(card.querySelector('.bb-score__score--left')?.text.trim() ?? '');
+      final scoreRight = int.tryParse(card.querySelector('.bb-score__score--right')?.text.trim() ?? '');
+      var start = _startOn(date, '18:00');
+      if ((fetchDetail || onlyIfChanged) && href.isNotEmpty) {
+        final detail = await _detail(href, date);
+        if (detail != null && detail.start != null) start = detail.start;
+      }
+      if (start == null) continue;
+      await _upsert(
+        conn,
+        code: code,
+        date: date,
+        homeName: homeName,
+        awayName: awayName,
+        state: state,
+        venue: venue,
+        scoreHome: scoreLeft ?? -1,
+        scoreAway: scoreRight ?? -1,
+        start: start,
+      );
+      if (onlyIfChanged) GameFetchSchedule.rememberFutureCard(cardKey, fingerprint);
+      wrote = true;
+    }
+    return wrote;
   }
 
   static Future<({DateTime? start})?> _detail(String href, String date) async {

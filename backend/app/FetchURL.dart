@@ -32,6 +32,7 @@ import 'package:shelf/shelf.dart';
 import 'BirthPlaceRegistry.dart';
 import 'DisplaySnapshot.dart';
 import 'GameFetchSchedule.dart';
+import 'JapanClock.dart';
 import 'StadiumImages.dart';
 import 'GameStatsLoad.dart';
 import 'OrgLeague.dart';
@@ -547,7 +548,7 @@ class FetchURL {
   /// CS・日本シリーズなど、日程カードから既存試合の打席・球速を取り直す。
   static Future<void> refreshRecentPostseasonDetails(Connection conn) async {
     await ensureGameDetailsVelo(conn);
-    final now = DateTime.now();
+    final now = JapanClock.now();
     final formatter = DateFormat('yyyy-MM-dd');
     for (var i = -2; i <= 5; i++) {
       final date = now.add(Duration(days: i));
@@ -955,29 +956,61 @@ class FetchURL {
         await Postgres.commit(conn);
       } catch (_) {}
       try {
-        final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-        await DisplaySnapshot.refreshGames(conn, DateTime.now().year, from: today, to: today);
+        final today = DateFormat('yyyy-MM-dd').format(JapanClock.now());
+        await DisplaySnapshot.refreshGames(conn, JapanClock.now().year, from: today, to: today);
       } catch (e) {
         print('今日の試合スナップショットを更新できませんでした: $e');
       }
-      final key = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final key = DateFormat('yyyy-MM-dd').format(JapanClock.now());
       keep = !await GameStatsLoad.isDateFullyLoaded(conn, key, OrgKind.npb.leagueIds);
     });
     return keep;
   }
 
-  static Future<Response> fetchGamesNPB(Connection conn, {bool todayOnly = false}) async {
+  /// 明日以降の日程カードを見て、表示が変わった試合だけ取り直す。
+  static Future<void> refreshFutureIfChanged() async {
+    final changed = <String>{};
+    await Postgres.withConnection((conn) async {
+      try {
+        await Postgres.begin(conn);
+      } catch (_) {}
+      await fetchGamesNPB(conn, futureOnly: true, reloadedDates: changed);
+      try {
+        await Postgres.commit(conn);
+      } catch (_) {}
+      if (changed.isEmpty) return;
+      final days = changed.toList()..sort();
+      try {
+        await DisplaySnapshot.refreshGames(conn, JapanClock.now().year, from: days.first, to: days.last);
+      } catch (e) {
+        print('未来の試合スナップショットを更新できませんでした: $e');
+      }
+    });
+  }
+
+  static Future<Response> fetchGamesNPB(
+    Connection conn, {
+    bool todayOnly = false,
+    bool futureOnly = false,
+    Set<String>? reloadedDates,
+  }) async {
+    GameFetchSchedule.armFutureWatch('npb', refreshFutureIfChanged);
     await ensureGameDetailsVelo(conn);
-    final now = DateTime.now();
-    final includeFuture = !todayOnly && GameFetchSchedule.takeFuture('npb', now);
-    if (!todayOnly && !includeFuture) print('NPB明日以降は${GameFetchSchedule.futureInterval.inMinutes}分以内のためスキップ');
-    final listDate = todayOnly
-        ? [DateTime(now.year, now.month, now.day)]
-        : [
-            now,
-            for (var i = -2; i <= 10; i++)
-              if (i != 0 && (includeFuture || i <= 0)) now.add(Duration(days: i)),
-          ];
+    final now = JapanClock.now();
+    final includeFuture = futureOnly || (!todayOnly && GameFetchSchedule.takeFuture('npb', now));
+    if (!futureOnly && !todayOnly && !includeFuture) {
+      print('NPB明日以降は${GameFetchSchedule.futureInterval.inMinutes}分以内のためスキップ');
+    }
+    final today = DateTime(now.year, now.month, now.day);
+    final listDate = futureOnly
+        ? [for (var i = 1; i <= 10; i++) today.add(Duration(days: i))]
+        : todayOnly
+            ? [today]
+            : [
+                now,
+                for (var i = -2; i <= 10; i++)
+                  if (i != 0 && (includeFuture || i <= 0)) now.add(Duration(days: i)),
+              ];
 
     for (var date in listDate) {
       final formatter = DateFormat('yyyy-MM-dd');
@@ -1038,6 +1071,10 @@ class FetchURL {
             final sectionTitle = league.querySelector('.bb-score__title')?.text.trim() ?? '';
             if (isPostseasonHeading(sectionTitle)) {
               await _refreshStartedCards(conn, url, league, formatted);
+              if (GameFetchSchedule.isFutureDay(date, now)) {
+                final wrote = await Postseason.syncSection(conn, formatted, league, onlyIfChanged: true);
+                if (wrote) reloadedDates?.add(formatted);
+              }
               continue;
             }
             DateTime datetimeGamestart = DateTime.now();
@@ -1070,6 +1107,12 @@ class FetchURL {
                 continue;
               }
               var urlHref = card.querySelectorAll('a')[0].attributes['href']?.trim() ?? '';
+              final futureDay = GameFetchSchedule.isFutureDay(date, now);
+              final cardKey = 'npb|$formatted|$urlHref';
+              final fingerprint = GameFetchSchedule.normalizeCard(urlHref, card.text);
+              if (futureDay && GameFetchSchedule.futureCardUnchanged(cardKey, fingerprint)) {
+                continue;
+              }
 
               try {
                 var urlDetail = url.resolve(urlHref.replaceFirst('index', 'top'));
@@ -1325,10 +1368,18 @@ class FetchURL {
               if (resultGame.isEmpty) {
                 //DBに同じ日付、同じ組み合わせの試合が登録されていない場合、新規登録する
                 game.id = await Postgres.insert(conn, game);
+                if (futureDay) {
+                  GameFetchSchedule.rememberFutureCard(cardKey, fingerprint);
+                  reloadedDates?.add(formatted);
+                }
               } else {
                 //DBに同じ日付、同じ組み合わせの試合が登録されている場合は更新する
                 game.id = resultGame.first.toColumnMap()['id'];
                 await Postgres.update(conn, game);
+                if (futureDay) {
+                  GameFetchSchedule.rememberFutureCard(cardKey, fingerprint);
+                  reloadedDates?.add(formatted);
+                }
                 final live = matchState.contains('回');
                 final loaded = await GameStatsLoad.isLoaded(conn, game.id);
                 if (!GameStatsLoad.needsRefresh(live: live, loaded: loaded)) {

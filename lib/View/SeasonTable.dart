@@ -1049,7 +1049,7 @@ class SeasonTableBlock extends StatelessWidget {
                       : const BoxDecoration(),
                   child: pinned,
                 ),
-                Expanded(
+              Expanded(
                   child: cols.scrollStats
                       ? SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
@@ -1173,7 +1173,7 @@ class SeasonTableBlock extends StatelessWidget {
             const SizedBox(height: 12),
             gamesBlock,
           ] else
-            Expanded(
+              Expanded(
               child: CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(child: standingsBody),
@@ -1389,13 +1389,13 @@ class PlayerStatCell extends StatelessWidget {
         for (final part in parts)
           if (parseColorNameOrNull(part) != null) parseColorNameOrNull(part)!
       ];
-      if (cols.isEmpty) return null;
+          if (cols.isEmpty) return null;
       if (cols.length == 1) return BoxDecoration(color: cols.first, borderRadius: BorderRadius.circular(4));
-      return BoxDecoration(
+            return BoxDecoration(
         gradient: LinearGradient(colors: cols, begin: Alignment.centerLeft, end: Alignment.centerRight),
-        borderRadius: BorderRadius.circular(4),
-      );
-    }
+              borderRadius: BorderRadius.circular(4),
+            );
+          }
 
     Widget cellBg({required Widget child, Color? overlay}) {
       return ColoredBox(
@@ -1445,12 +1445,12 @@ class PlayerStatCell extends StatelessWidget {
       child: ColoredBox(
         key: const ValueKey('player-stat-bg'),
         color: isNoRank ? noRankBg : (positionBg ?? Colors.transparent),
-        child: Container(
+          child: Container(
           decoration: BoxDecoration(border: Border.all(color: Colors.black26, width: 1)),
-          child: Row(children: [
+            child: Row(children: [
             if (showRank)
               Expanded(
-                flex: 2,
+                  flex: 2,
                 child: ColoredBox(
                   color: const Color(0xFF424242),
                   child: Center(
@@ -1458,7 +1458,7 @@ class PlayerStatCell extends StatelessWidget {
                         ? const FittedBox(fit: BoxFit.contain, child: Text('👑', style: TextStyle(fontSize: 12, height: 1.0)))
                         : isNoRank
                             ? const FittedBox(
-                                fit: BoxFit.contain,
+                          fit: BoxFit.contain,
                                 child: Text('-', style: TextStyle(fontSize: 12, height: 1.0, color: Colors.white)),
                               )
                             : OneLineShrinkText(
@@ -1485,7 +1485,7 @@ class PlayerStatCell extends StatelessWidget {
               )
             else
               Expanded(
-                flex: 2,
+                  flex: 2,
                 child: cellBg(
                   overlay: parseColorNameOrNull('${row['color_back'] ?? ''}') ?? (isNoRank ? noRankBg : Colors.transparent),
                   child: Align(
@@ -1495,7 +1495,7 @@ class PlayerStatCell extends StatelessWidget {
                 ),
               ),
             Expanded(flex: 10, child: nameWidget),
-            Expanded(
+              Expanded(
               flex: 4,
               child: cellBg(
                 child: Align(
@@ -1573,9 +1573,9 @@ Widget _statsGradHeader({
         children: [
           _statsGradBackground(batting: batting),
           Center(child: child),
-        ],
-      ),
-    ),
+                            ],
+                          ),
+                        ),
   );
 }
 
@@ -1645,7 +1645,7 @@ Widget _horizontalTitleLabel(String title, {required bool starred, required Widg
   return Column(
     mainAxisSize: MainAxisSize.min,
     mainAxisAlignment: MainAxisAlignment.center,
-    children: [
+                            children: [
       child,
       const Text('⭐️', style: TextStyle(fontSize: 11, height: 1, color: Colors.white)),
     ],
@@ -1805,9 +1805,9 @@ class _DualStatsSegmentBars extends StatelessWidget {
       _statsSegmentHeightFor(pitchingTitles),
     ].fold<double>(0, (a, b) => a > b ? a : b) + (starredTitles.isEmpty ? 0 : 12);
 
-    return Column(
+      return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
+        children: [
         if (battingTitles.isNotEmpty)
           StatsSegmentControl(
             labels: battingTitles,
@@ -1876,7 +1876,7 @@ class PersonalStatsLayoutPicker extends StatelessWidget {
           ],
           child: Stack(
             alignment: Alignment.center,
-            children: [
+                  children: [
               Text(label, maxLines: 1, softWrap: false, overflow: TextOverflow.clip, textAlign: TextAlign.center, style: style),
               const Positioned(
                 right: 2,
@@ -2074,8 +2074,8 @@ class ScrollLeaguePersonalStats extends StatelessWidget {
                       showJapanFlag: showJapanFlag,
                     ),
                 ],
-              );
-            }),
+            );
+          }),
             const SizedBox(height: 8),
           ],
         ],
@@ -2161,7 +2161,7 @@ class _FillScrollLeaguePersonalStats extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               for (final title in titles)
-                SizedBox(
+          SizedBox(
                   width: colW,
                   height: h,
                   child: Column(
@@ -2195,7 +2195,7 @@ class _FillScrollLeaguePersonalStats extends StatelessWidget {
                             final bodyH = bodyConstraints.maxHeight.isFinite ? bodyConstraints.maxHeight : 0.0;
                             final visibleSlots = bodyH > 0 ? (bodyH / _statRowH).floor().clamp(0, 1000) : 0;
                             if (matched.length > visibleSlots && visibleSlots > 0) {
-                              return SingleChildScrollView(
+              return SingleChildScrollView(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [
@@ -2220,7 +2220,7 @@ class _FillScrollLeaguePersonalStats extends StatelessWidget {
                                     showJapanFlag: showJapanFlag,
                                   ),
                                 for (var i = 0; i < emptyFixed; i++)
-                                  SizedBox(
+          SizedBox(
                                     width: colW,
                                     height: _statRowH,
                                     child: Container(
@@ -2245,9 +2245,9 @@ class _FillScrollLeaguePersonalStats extends StatelessWidget {
                               ],
                             );
                           });
-                        }),
-                      ),
-                    ],
+            }),
+          ),
+        ],
                   ),
                 ),
             ],
@@ -2391,8 +2391,8 @@ class ScrollBothLeaguePersonalStats extends StatelessWidget {
             final rowCount = left.length > right.length ? left.length : right.length;
             return SizedBox(
               height: _statsScrollBodyH,
-              child: SingleChildScrollView(
-                child: Column(
+          child: SingleChildScrollView(
+            child: Column(
                   children: [
                     for (var i = 0; i < rowCount; i++)
                       Row(
@@ -2590,7 +2590,7 @@ class _BothLeaguePersonalStatsState extends State<BothLeaguePersonalStats> {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
+        children: [
         _DualStatsSegmentBars(
           battingTitles: batTitles,
           pitchingTitles: pitTitles,

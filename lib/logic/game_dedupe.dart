@@ -107,14 +107,35 @@ List<Map<String, dynamic>> _pickDayMatchup(List<Map<String, dynamic>> group) {
       final prev = best[key];
       if (prev == null || _quality(game) > _quality(prev)) best[key] = game;
     }
-    return best.values.toList();
+    return _separateSeriesGames(group, best.values.toList());
   }
-  final hasYahoo = group.any(_yahooSource);
-  final hasHistorical = group.any((game) => !_yahooSource(game) && _asInt(game['id_game'] ?? game['id']) >= 2000);
-  if (hasYahoo && hasHistorical) {
-    return [group.first];
+  return _separateSeriesGames(group, [group.first]);
+}
+
+/// 1〜7時台は前日夜に寄せるが、暦日が違う進行中・未開始は次のカードなので残す。
+/// Yahoo と歴史インポートの組は取り込み重複のまま1件にする。
+List<Map<String, dynamic>> _separateSeriesGames(
+  List<Map<String, dynamic>> group,
+  List<Map<String, dynamic>> kept,
+) {
+  final keptIds = <int>{};
+  for (final game in kept) {
+    final id = _asInt(game['id_game'] ?? game['id']);
+    if (id > 0) keptIds.add(id);
   }
-  return [group.first];
+  final extras = <Map<String, dynamic>>[];
+  for (final game in group) {
+    final id = _asInt(game['id_game'] ?? game['id']);
+    if (id > 0 && keptIds.contains(id)) continue;
+    if (_finished(game)) continue;
+    final day = _dateOnly(game['date_game']);
+    if (kept.any((other) => _dateOnly(other['date_game']) == day)) continue;
+    if (kept.any((other) => _importSourceMix(game, other))) continue;
+    extras.add(game);
+    if (id > 0) keptIds.add(id);
+  }
+  if (extras.isEmpty) return kept;
+  return [...kept, ...extras];
 }
 
 bool _importSourceMix(Map<String, dynamic> a, Map<String, dynamic> b) {

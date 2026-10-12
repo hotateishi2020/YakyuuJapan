@@ -365,8 +365,6 @@ class AppSql {
           LEFT OUTER JOIN m_system_code AS event_category_sub ON event_category_sub.key = m_event.code_category_sub AND event_category_sub.code = 'EVENT_SUB'
           ORDER BY events.date_from
         ) AS t
-      WHERE date_from_temp > CURRENT_DATE 
-        OR (date_to IS NOT NULL AND date_to > CURRENT_DATE AND date_from_temp > (CURRENT_DATE - INTERVAL '10 day'))
       ORDER BY date_from_temp, txt_timing;
     ''';
   }

@@ -707,6 +707,22 @@ class Auth {
     }
     final q = request.url.queryParameters['token']?.trim();
     if (q != null && q.isNotEmpty) return q;
+    // ログイン中のブラウザが /fetchGamesNPB などを開いたときは Cookie にトークンがある。
+    final cookie = _cookie(request, 'koko_auth_token');
+    if (cookie != null && cookie.isNotEmpty) return cookie;
+    return null;
+  }
+
+  static String? _cookie(Request request, String name) {
+    final raw = request.headers['cookie'] ?? request.headers['Cookie'] ?? '';
+    for (final part in raw.split(';')) {
+      final item = part.trim();
+      final eq = item.indexOf('=');
+      if (eq <= 0) continue;
+      if (item.substring(0, eq) != name) continue;
+      final value = Uri.decodeComponent(item.substring(eq + 1)).trim();
+      if (value.isNotEmpty) return value;
+    }
     return null;
   }
 

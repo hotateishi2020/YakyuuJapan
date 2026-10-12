@@ -145,6 +145,23 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
     return merged;
   }
 
+  /// API が UTC のまま返しても、表では日本時間にする。
+  String _japanTime(String raw) {
+    final text = raw.trim();
+    if (text.isEmpty) return '';
+    final hasZone = text.endsWith('Z') || RegExp(r'[+-]\d{2}:?\d{2}$').hasMatch(text);
+    if (!hasZone) {
+      final shown = text.replaceFirst('T', ' ');
+      final dot = shown.indexOf('.');
+      return dot < 0 ? shown : shown.substring(0, dot);
+    }
+    final parsed = DateTime.tryParse(text);
+    if (parsed == null) return text;
+    final jst = parsed.toUtc().add(const Duration(hours: 9));
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${jst.year}-${two(jst.month)}-${two(jst.day)} ${two(jst.hour)}:${two(jst.minute)}:${two(jst.second)}';
+  }
+
   String _cell(Map<String, dynamic> row, String key) {
     if (key == 'user_id') {
       final name = '${row['user_name'] ?? ''}'.trim();
@@ -153,11 +170,7 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
       if (name.isEmpty) return id;
       return '$name ($id)';
     }
-    if (key == 'timestamp') {
-      final text = '${row['timestamp'] ?? ''}'.replaceFirst('T', ' ');
-      final dot = text.indexOf('.');
-      return dot < 0 ? text : text.substring(0, dot);
-    }
+    if (key == 'timestamp') return _japanTime('${row['timestamp'] ?? ''}');
     if (key == 'duration_ms') {
       final text = '${row['duration_ms'] ?? ''}'.trim();
       if (text.isEmpty || text == 'null') return '';

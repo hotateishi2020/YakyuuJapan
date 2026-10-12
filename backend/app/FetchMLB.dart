@@ -21,6 +21,7 @@ import 'FetchURL.dart';
 import 'RegisteredPosition.dart';
 import 'StadiumImages.dart';
 import 'GameFetchSchedule.dart';
+import 'JapanClock.dart';
 import 'GameStatsLoad.dart';
 import 'OrgLeague.dart';
 import 'Value.dart';
@@ -670,24 +671,64 @@ class FetchMLB {
       try {
         await Postgres.begin(conn);
       } catch (_) {}
-      await fetchGames(conn, todayOnly: true);
+      final changed = <String>{};
+      await fetchGames(conn, todayOnly: true, reloadedDates: changed);
       try {
         await Postgres.commit(conn);
       } catch (_) {}
-      final key = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final key = DateFormat('yyyy-MM-dd').format(JapanClock.now());
+      if (changed.contains(key)) {
+        try {
+          await DisplaySnapshot.refreshGames(conn, JapanClock.now().year, from: key, to: key);
+        } catch (e) {
+          print('今日の試合スナップショットを更新できませんでした: $e');
+        }
+      }
       keep = !await GameStatsLoad.isDateFullyLoaded(conn, key, _org.leagueIds);
     });
     return keep;
   }
 
+  /// 明日以降の日程カードを見て、表示が変わった試合だけ取り直す。
+  static Future<void> refreshFutureIfChanged() async {
+    final changed = <String>{};
+    await Postgres.withConnection((conn) async {
+      try {
+        await Postgres.begin(conn);
+      } catch (_) {}
+      await fetchGames(conn, futureOnly: true, reloadedDates: changed);
+      try {
+        await Postgres.commit(conn);
+      } catch (_) {}
+      if (changed.isEmpty) return;
+      final days = changed.toList()..sort();
+      try {
+        await DisplaySnapshot.refreshGames(conn, JapanClock.now().year, from: days.first, to: days.last);
+      } catch (e) {
+        print('未来の試合スナップショットを更新できませんでした: $e');
+      }
+    });
+  }
+
   /// 日程カード＋試合トップから試合情報を登録。ポストシーズンも含める。
-  static Future<Response> fetchGames(Connection conn, {bool todayOnly = false}) async {
+  static Future<Response> fetchGames(
+    Connection conn, {
+    bool todayOnly = false,
+    bool futureOnly = false,
+    Set<String>? reloadedDates,
+  }) async {
+    GameFetchSchedule.armFutureWatch('mlb', refreshFutureIfChanged);
     await FetchURL.ensureGameDetailsVelo(conn);
     await FetchURL.ensureAppColumns(conn);
-    final now = DateTime.now();
-    final includeFuture = !todayOnly && GameFetchSchedule.takeFuture('mlb', now);
-    if (!todayOnly && !includeFuture) print('MLB明日以降は${GameFetchSchedule.futureInterval.inMinutes}分以内のためスキップ');
-    final dates = scheduleDates(now, includeFuture: includeFuture, todayOnly: todayOnly);
+    final now = JapanClock.now();
+    final includeFuture = futureOnly || (!todayOnly && GameFetchSchedule.takeFuture('mlb', now));
+    if (!futureOnly && !todayOnly && !includeFuture) {
+      print('MLB明日以降は${GameFetchSchedule.futureInterval.inMinutes}分以内のためスキップ');
+    }
+    final today = DateTime(now.year, now.month, now.day);
+    final dates = futureOnly
+        ? [for (var i = 1; i <= 10; i++) today.add(Duration(days: i))]
+        : scheduleDates(now, includeFuture: includeFuture, todayOnly: todayOnly);
     final formatter = DateFormat('yyyy-MM-dd');
     final todayKey = formatter.format(now);
     final clubs = await _careerClubs(conn);
@@ -747,6 +788,13 @@ class FetchMLB {
           final href = link?.attributes['href']?.trim() ?? '';
           if (href.isEmpty) continue;
 
+          final linkText = card.querySelector('.bb-score__link')?.text.trim() ?? '';
+          final statusText = card.querySelector('.bb-score__status')?.text.trim() ?? '';
+          final fingerprint = GameFetchSchedule.normalizeCard(href, card.text);
+          final cardKey = 'mlb|$formatted|$href';
+          final futureDay = GameFetchSchedule.isFutureDay(date, now);
+          if (futureDay && GameFetchSchedule.futureCardUnchanged(cardKey, fingerprint)) continue;
+
           final homeRaw = card.querySelector('.bb-score__homeLogo')?.text.trim() ?? '';
           final awayRaw = card.querySelector('.bb-score__awayLogo')?.text.trim() ?? '';
           final homeName = YahooTeamNames.normalize(homeRaw);
@@ -771,16 +819,20 @@ class FetchMLB {
             scoreHome = int.tryParse(scores[0].text.trim()) ?? -1;
             scoreAway = int.tryParse(scores[2].text.trim()) ?? -1;
           }
-          final status = card.querySelector('.bb-score__status')?.text.trim() ?? '';
+          final status = linkText.isNotEmpty ? linkText : statusText;
           final venue = card.querySelector('.bb-score__venue')?.text.trim() ?? '';
 
-          var start = gameStartOn(formatted, status);
+          var start = gameStartOn(formatted, statusText);
+          start ??= gameStartOn(formatted, linkText);
           start ??= DateTime.tryParse('$formatted 00:00:00');
           if (start == null) continue;
 
-          final cardLive = status.contains('試合中') || RegExp(r'\d+\s*回').hasMatch(status);
+          final cardLive = status.contains('試合中') ||
+              statusText.contains('試合中') ||
+              RegExp(r'\d+\s*回').hasMatch(status) ||
+              RegExp(r'\d+\s*回').hasMatch(statusText);
           final known = await _gameOnDate(conn, idTeamHome, idTeamAway, formatted);
-          if (!GameStatsLoad.needsRefresh(live: cardLive, loaded: known?.loaded == true)) {
+          if (!futureDay && !GameStatsLoad.needsRefresh(live: cardLive, loaded: known?.loaded == true)) {
             print('MLB試合スキップ(成績済): $homeName vs $awayName');
             continue;
           }
@@ -925,12 +977,14 @@ class FetchMLB {
             game.id = await Postgres.insert(conn, game);
             print('MLB試合新規: $homeName vs $awayName');
           }
+          reloadedDates?.add(formatted);
+          if (futureDay) GameFetchSchedule.rememberFutureCard(cardKey, fingerprint);
 
           final live = matchState.contains('試合中') || RegExp(r'\d+\s*回').hasMatch(matchState);
           final finished = matchState.contains('試合終了');
           final started = live || finished || matchState.contains('終了');
-          final scrapeStats = started && formatted.compareTo(todayKey) <= 0;
-          if (scrapeStats && href.isNotEmpty && game.id > 0) {
+          // 日本時間の朝は UTC では前日なので、日付が「明日」でも開始済みなら出場成績を取る。
+          if (started && href.isNotEmpty && game.id > 0) {
             try {
               final statsUrl = url.resolve(FetchURL.gamePageHref(href, 'stats'));
               await _saveGameBoxSummary(conn, statsUrl, game.id, idTeamHome, idTeamAway);

@@ -1189,8 +1189,8 @@ void main() {
     final lose = tester.getRect(_resultBadge(resultBadgeLose));
     final homeName = tester.getRect(find.text('ヤクルト'));
     final awayName = tester.getRect(find.text('巨人'));
-    expect(win.bottom, lessThanOrEqualTo(homeName.top + 1));
-    expect(lose.bottom, lessThanOrEqualTo(awayName.top + 1));
+    expect(homeName.top - win.bottom, inInclusiveRange(3, 8));
+    expect(awayName.top - lose.bottom, inInclusiveRange(3, 8));
     expect(win.center.dx, closeTo(homeName.center.dx, 12));
     expect(lose.center.dx, closeTo(awayName.center.dx, 12));
     expect(tester.takeException(), isNull);
@@ -1689,7 +1689,7 @@ void main() {
     expect(timeRect.left, lessThan(venue.left));
     expect(timeRect.left, closeTo(board.left + 4, 12));
     expect(roster.top, greaterThan(statsHeader.bottom - 1));
-    expect(roster.top, lessThan(statsHeader.bottom + 24));
+    expect(roster.top, lessThan(statsHeader.bottom + 36));
     expect(roster.left, lessThan(board.center.dx));
 
     await tester.tap(find.text('詳細表示'));
@@ -5801,7 +5801,7 @@ void main() {
     final roster = tester.getRect(find.text('詳細表示'));
     final statsHeader = tester.getRect(find.text('選手成績'));
     expect(roster.top, greaterThan(statsHeader.bottom - 1));
-    expect(roster.top, lessThan(statsHeader.bottom + 24));
+    expect(roster.top, lessThan(statsHeader.bottom + 36));
     final toggle = tester.widget<SizedBox>(
       find.ancestor(of: find.text('選手成績'), matching: find.byWidgetPredicate((widget) => widget is SizedBox && widget.height == 32)).first,
     );

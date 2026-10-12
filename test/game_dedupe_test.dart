@@ -213,6 +213,64 @@ void main() {
     expect(rows.single['state'], '試合終了');
   });
 
+  test('前日の終了試合と翌朝の進行中は別カードとして残す', () {
+    final rows = dedupeSameDayMatchupRows([
+      {
+        'code_game': 'NLCS',
+        'id_team_home': 35,
+        'id_team_away': 40,
+        'score_home': 2,
+        'score_away': 1,
+        'state': '試合終了',
+        'date_game': '2026-10-12',
+        'time_game': '☀️ 09:00',
+        'id_game': 3348,
+      },
+      {
+        'code_game': 'NLCS',
+        'id_team_home': 35,
+        'id_team_away': 40,
+        'score_home': 1,
+        'score_away': 1,
+        'state': '3回裏',
+        'date_game': '2026-10-13',
+        'time_game': '☀️ 06:00',
+        'id_game': 3349,
+      },
+    ]);
+    expect(rows, hasLength(2));
+    expect(rows.map((row) => row['id_game']).toSet(), {3348, 3349});
+  });
+
+  test('翌朝の未開始カードは前日の終了試合と分ける', () {
+    final rows = dedupeSameDayMatchupRows([
+      {
+        'code_game': 'NLCS',
+        'id_team_home': 35,
+        'id_team_away': 40,
+        'score_home': 2,
+        'score_away': 1,
+        'state': '試合終了',
+        'date_game': '2026-10-12',
+        'time_game': '☀️ 09:00',
+        'id_game': 3348,
+      },
+      {
+        'code_game': 'NLCS',
+        'id_team_home': 35,
+        'id_team_away': 40,
+        'score_home': -1,
+        'score_away': -1,
+        'state': '予想先発',
+        'date_game': '2026-10-13',
+        'time_game': '☀️ 06:00',
+        'id_game': 3350,
+      },
+    ]);
+    expect(rows, hasLength(2));
+    expect(rows.map((row) => row['date_game']).toSet(), {'2026-10-12', '2026-10-13'});
+  });
+
   test('進行中のYahoo試合は歴史の試合前より優先する', () {
     final rows = dedupeSameDayMatchupRows([
       {

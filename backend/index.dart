@@ -29,6 +29,7 @@ import 'app/Value.dart';
 import 'app/Auth.dart';
 import 'app/EventReadReset.dart';
 import 'app/PlayerStatsSchedule.dart';
+import 'app/GameFetchSchedule.dart';
 
 /// /predictions 用の短TTLキャッシュ（同一プロセス内・団体別）
 final Map<String, String> _predictionsCacheBody = {};
@@ -414,6 +415,31 @@ int _gameRowQuality(Map<String, dynamic> game) {
   return score;
 }
 
+/// 1〜7時台は前日夜に寄せるが、暦日が違う進行中・未開始は次のカードなので残す。
+List<Map<String, dynamic>> _separateSeriesGames(
+  List<Map<String, dynamic>> group,
+  List<Map<String, dynamic>> kept,
+) {
+  final keptIds = <int>{};
+  for (final game in kept) {
+    final id = _asInt(game['id_game'] ?? game['id']);
+    if (id > 0) keptIds.add(id);
+  }
+  final extras = <Map<String, dynamic>>[];
+  for (final game in group) {
+    final id = _asInt(game['id_game'] ?? game['id']);
+    if (id > 0 && keptIds.contains(id)) continue;
+    if (_rowFinished(game)) continue;
+    final day = _dateOnly(game['date_game']);
+    if (kept.any((other) => _dateOnly(other['date_game']) == day)) continue;
+    if (kept.any((other) => _yahooHistoricalMix(game, other))) continue;
+    extras.add(game);
+    if (id > 0) keptIds.add(id);
+  }
+  if (extras.isEmpty) return kept;
+  return [...kept, ...extras];
+}
+
 List<Map<String, dynamic>> _dedupeSameDayMatchups(List<Map<String, dynamic>> games) {
   if (games.length <= 1) return games;
   final buckets = <String, List<Map<String, dynamic>>>{};
@@ -443,16 +469,10 @@ List<Map<String, dynamic>> _dedupeSameDayMatchups(List<Map<String, dynamic>> gam
         final prev = best[scoreKey];
         if (prev == null || _gameRowQuality(game) > _gameRowQuality(prev)) best[scoreKey] = game;
       }
-      out.addAll(best.values);
+      out.addAll(_separateSeriesGames(group, best.values.toList()));
       continue;
     }
-    final hasYahoo = group.any(_yahooGameSource);
-    final hasHistorical = group.any((game) => !_yahooGameSource(game) && _asInt(game['id_game'] ?? game['id']) >= 2000);
-    if (hasYahoo && hasHistorical) {
-      out.add(group.first);
-      continue;
-    }
-    out.add(group.first);
+    out.addAll(_separateSeriesGames(group, [group.first]));
   }
   return _mergeAdjacentScoreDupes(out);
 }
@@ -1197,11 +1217,7 @@ void main() async {
           ''',
           parameters: [q],
         );
-        String stamp(dynamic value) {
-          if (value == null) return '';
-          if (value is DateTime) return value.toIso8601String();
-          return '$value';
-        }
+        String stamp(dynamic value) => LogDetail.formatJst(value);
 
         String textOf(Map<String, dynamic> detail, Map<String, dynamic> map, String key, String fallbackKey) {
           final fromDetail = '${detail[key] ?? ''}'.trim();
@@ -1618,6 +1634,12 @@ void main() async {
     });
     // 個人成績は初期表示では取らず、起動の数分後から定期登録する。
     PlayerStatsSchedule.start(onUpdated: _clearPredictionsCache);
+    // 明日以降の日程カードを定期的に見て、変わった試合だけ読み直す。
+    GameFetchSchedule.armFutureWatch('mlb', FetchMLB.refreshFutureIfChanged);
+    GameFetchSchedule.armFutureWatch('npb', FetchURL.refreshFutureIfChanged);
+    // 起動直後から今日の試合（進行中の出場成績を含む）を取りに行く。
+    GameFetchSchedule.scheduleTodayAgain('mlb', FetchMLB.refreshToday);
+    GameFetchSchedule.scheduleTodayAgain('npb', FetchURL.refreshTodayNPB);
   } catch (e, st) {
     print('🔥 void main ERROR: $e\n$st');
     stderr.writeln('🔥 /void main ERROR: $e\n$st');
@@ -1680,17 +1702,17 @@ Future<int> _saveErrorLog(
         },
       );
     });
-    print("エラーログのDBに登録しました。");
+          print("エラーログのDBに登録しました。");
     return id;
   } catch (e2, st2) {
-    print("エラーログのDB登録に失敗しました。");
+          print("エラーログのDB登録に失敗しました。");
     print('🔥 error-log ERROR: $e2\n$st2');
     try {
       File('error_log.txt').writeAsStringSync(
         '${DateTimeTool.getNow("")}\n$e\n$stacktrace\n---\n$e2\n$st2\n\n',
         mode: FileMode.append,
       );
-      print("エラーログをローカルディレクトリに書き込みました。");
+              print("エラーログをローカルディレクトリに書き込みました。");
     } catch (_) {}
     return 0;
   }
@@ -1720,19 +1742,19 @@ Future<void> _saveAccessLog(
   try {
     await Postgres.withConnection((conn) async {
       final failed = idError > 0 || httpStatus >= 400;
-      final log = t_system_log();
+        final log = t_system_log();
       log.method = _clipDb(request.method, 20);
       log.category = _clipDb(user.category_system, 20);
       log.code = _clipDb(user.code_system, 20);
-      log.memo = '';
-      log.flg_user = user.flg_user;
+        log.memo = '';
+        log.flg_user = user.flg_user;
       log.url = request.requestedUri.path;
-      log.url_pre = "";
+        log.url_pre = "";
       log.id_log_error = idError;
-      log.flg_check = false;
-      log.crtby = user.id;
+        log.flg_check = false;
+        log.crtby = user.id;
       log.crtpgm = _clipDb(user.code_system, 30);
-      log.updby = user.id;
+        log.updby = user.id;
       log.updpgm = _clipDb(user.code_system, 30);
       log.crtenv = 'server';
       log.txt_detail = LogDetail.encode({
@@ -1754,9 +1776,9 @@ Future<void> _saveAccessLog(
         'duration_ms': durationMs,
         'context': jsonEncode({'method': request.method, 'path': request.requestedUri.path}),
       });
-      await Postgres.insert(conn, log);
+        await Postgres.insert(conn, log);
     });
-    print("操作ログを登録しました。【${user.code_system}】");
+        print("操作ログを登録しました。【${user.code_system}】");
   } catch (e, st) {
     print('操作ログ登録失敗: $e\n$st');
   }
@@ -1812,8 +1834,8 @@ Future<Response> tryCatchAPIReadonly(
         requestId: requestId,
       ));
     }
-    print("🌐Responsed Successfully‼️【" + request.requestedUri.toString() + "】");
-  }
+        print("🌐Responsed Successfully‼️【" + request.requestedUri.toString() + "】");
+      }
   print('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
   return response;
 }
@@ -1829,16 +1851,15 @@ Future<Response> tryCatchAPI(Request request, String category_system, String cod
   user.code_system = code_system;
   user.flg_user = false;
   try {
+    await Postgres.withConnection((conn) => _attachRequestUser(conn, request, user));
     await FetchURL.ensureGameDetailsVelo();
     await FetchURL.ensureAppColumns();
     await Postgres.openConnection((conn) async {
       await Postgres.transactionCommit(conn, () async {
         print("🌐Routing...【" + request.requestedUri.toString() + "】");
         print("");
-        await _attachRequestUser(conn, request, user);
         user.category_system = category_system;
         user.code_system = code_system;
-        user.flg_user = false;
         response = await callback(conn);
       });
     });

@@ -2,6 +2,15 @@ import 'dart:convert';
 
 /// 操作ログとエラーログの共通項目。画面の列と `txt_detail` の中身を揃える。
 class LogDetail {
+  /// ログの発生日時。UTC でもローカルでも、表示は日本時間の壁時計にする。
+  static String formatJst(Object? value) {
+    final parsed = value is DateTime ? value : DateTime.tryParse('${value ?? ''}'.trim());
+    if (parsed == null) return '${value ?? ''}'.trim();
+    final jst = parsed.toUtc().add(const Duration(hours: 9));
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${jst.year}-${two(jst.month)}-${two(jst.day)} ${two(jst.hour)}:${two(jst.minute)}:${two(jst.second)}';
+  }
+
   static String clip(String value, int max) {
     final text = value.trim();
     if (text.length <= max) return text;

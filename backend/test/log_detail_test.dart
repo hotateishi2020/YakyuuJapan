@@ -19,4 +19,9 @@ void main() {
     expect(LogDetail.screenOf('年度を変更した'), '年度');
     expect(LogDetail.screenOf(''), '');
   });
+
+  test('発生日時は日本時間で出す', () {
+    expect(LogDetail.formatJst(DateTime.utc(2026, 10, 12, 12, 35, 4)), '2026-10-12 21:35:04');
+    expect(LogDetail.formatJst('2026-10-12T03:00:00Z'), '2026-10-12 12:00:00');
+  });
 }

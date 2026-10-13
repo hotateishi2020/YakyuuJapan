@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:math' as math;
 import '../tools/Env.dart';
 import '../tools/app_logger.dart';
+import '../tools/board_session.dart';
 import '../tools/browser_cookie.dart';
 import '../tools/page_visibility.dart';
 import '../tools/color_parse.dart';
@@ -151,6 +152,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   final Map<OrgKind, int> _gameDayOffset = {};
   final Map<OrgKind, String?> _loadingGameDateByOrg = {};
   final Set<String> _pastDateInflight = {};
+  Map<String, dynamic>? _boardSession;
 
   int get _gameDateOffset => _gameDayOffset[_orgKind] ?? 0;
 
@@ -181,6 +183,9 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     }
     _personalStatsLayout = readPersonalStatsLayout();
     if (readBrowserCookie(_bracketCookie) == '0') _bracketOpen = false;
+    // 前回の初期表示を先に出してから、通信結果で差し替える
+    _restoreBoardSession();
+    if (_predictGroupsOpen) _restorePredictSession(allowCookieUser: true);
     // ヘッダー〜団体タブはデータ待ちせず先に出す
     _shellReady = true;
     _bootstrapWithAuth();
@@ -202,17 +207,17 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     setState(() => _authEntryReady = true);
     if (_predictGroupsOpen) {
       if (AuthSession.instance.isLoggedIn) {
-        try {
-          await _loadInitialPredictGroups().timeout(const Duration(seconds: 60));
-        } catch (e, st) {
-          unawaited(AuthSession.instance.reportTimeout(e, st));
-          if (mounted && _predictGroups.isEmpty) {
-            setState(() {
-              _predictGroupsLoading = false;
-              _predictGroupsError = '予想グループを読み込めませんでした';
-            });
-          }
+        final userId = AuthSession.instance.user?.id ?? 0;
+        final savedUser = _savedPredictUserId();
+        if (savedUser > 0 && userId > 0 && savedUser != userId) {
+          _predictGroups = const [];
+          _predictTitleCatalog = const [];
         }
+        if (_predictGroups.isEmpty) _restorePredictSession();
+        if (mounted) {
+          setState(() => _predictGroupsLoading = _predictGroups.isEmpty);
+        }
+        unawaited(_loadInitialPredictGroups());
       } else if (mounted) {
         setState(() {
           _predictGroups = const [];
@@ -241,9 +246,11 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       if (_predictGroupsOpen) unawaited(_fetchPredictGroups());
       return;
     }
+    _clearPredictSession();
     setState(() {
       _predictInvites = const [];
       _predictGroups = const [];
+      _predictTitleCatalog = const [];
       _predictGroupsLoading = false;
       _predictGroupsError = null;
     });
@@ -303,12 +310,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     // 予想者名は取れたいずれかの団体データから Info に蓄える（空で上書きしない）
     _captureInfoUsers(predictions, npbPlayerStats);
     _scheduleTeamLogoPrecache(standings);
-  }
-
-  bool _cacheUsable(OrgKind kind) {
-    final cached = _orgCache[kind];
-    if (cached == null || !cached.hasContent) return false;
-    return _partLoadedForYear(kind, _LoadPart.games) || _partLoadedForYear(kind, _LoadPart.standings) || _partLoadedForYear(kind, _LoadPart.players);
   }
 
   /// キャッシュへ保存（リストはコピーして参照共有を避ける）
@@ -382,6 +383,204 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     for (final listener in List<VoidCallback>.of(_infoDialogListeners)) {
       listener();
     }
+  }
+
+  Map<String, dynamic> _sessionMap() {
+    final cached = _boardSession;
+    if (cached != null) return cached;
+    final raw = readBoardSession();
+    if (raw == null || raw.isEmpty) {
+      _boardSession = <String, dynamic>{};
+      return _boardSession!;
+    }
+    try {
+      final decoded = jsonDecode(raw);
+      _boardSession = decoded is Map ? Map<String, dynamic>.from(decoded) : <String, dynamic>{};
+    } catch (_) {
+      _boardSession = <String, dynamic>{};
+    }
+    return _boardSession!;
+  }
+
+  void _writeBoardSession() {
+    try {
+      writeBoardSession(jsonEncode(_sessionMap()));
+    } catch (_) {}
+  }
+
+  int _jsonInt(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse('$value') ?? 0;
+  }
+
+  Color? _colorFromJson(dynamic value) {
+    if (value == null) return null;
+    final parsed = _jsonInt(value);
+    if (parsed == 0) return null;
+    return Color(parsed);
+  }
+
+  _OrgBundle _bundleFromSession(Map<dynamic, dynamic> raw) {
+    final predictions = listMapFromJson(raw['predictions']);
+    final standings = listMapFromJson(raw['standings']);
+    final playerStats = listMapFromJson(raw['playerStats']);
+    final playerStatsActual = listMapFromJson(raw['playerStatsActual']);
+    final games = listMapFromJson(raw['games']);
+    final postseasonGames = listMapFromJson(raw['postseasonGames']);
+    final parts = <_LoadPart>{};
+    final names = raw['parts'];
+    if (names is List) {
+      for (final name in names) {
+        for (final part in _LoadPart.values) {
+          if (part != _LoadPart.info && part.name == '$name') parts.add(part);
+        }
+      }
+    }
+    if (parts.isEmpty) {
+      if (standings.isNotEmpty || predictions.isNotEmpty) parts.add(_LoadPart.standings);
+      if (playerStats.isNotEmpty || playerStatsActual.isNotEmpty) parts.add(_LoadPart.players);
+      if (games.isNotEmpty || postseasonGames.isNotEmpty) parts.add(_LoadPart.games);
+    }
+    return _OrgBundle(
+      predictions: predictions,
+      standings: standings,
+      playerStats: playerStats,
+      playerStatsActual: playerStatsActual,
+      games: games,
+      postseasonGames: postseasonGames,
+      showPostseasonBoard: raw['showPostseasonBoard'] == true,
+      readyParts: parts,
+    );
+  }
+
+  Map<String, dynamic> _bundleToSession(_OrgBundle bundle) => {
+        'predictions': bundle.predictions,
+        'standings': bundle.standings,
+        'playerStats': bundle.playerStats,
+        'playerStatsActual': bundle.playerStatsActual,
+        'games': bundle.games,
+        'postseasonGames': bundle.postseasonGames,
+        'showPostseasonBoard': bundle.showPostseasonBoard,
+        'parts': [
+          for (final part in bundle.readyParts)
+            if (part != _LoadPart.info) part.name,
+        ],
+      };
+
+  void _restoreBoardSession() {
+    final map = _sessionMap();
+    if (_jsonInt(map['year']) != _seasonYear) return;
+    final orgs = map['orgs'];
+    if (orgs is Map) {
+      for (final kind in OrgKind.values) {
+        final raw = orgs[kind.name];
+        if (raw is! Map) continue;
+        final bundle = _bundleFromSession(raw);
+        if (!bundle.hasContent) continue;
+        _orgCache[kind] = bundle;
+        _readyParts[kind] = {...bundle.readyParts};
+      }
+    }
+    final current = _orgCache[_orgKind];
+    if (current != null && current.hasContent) {
+      _applyBundle(current, kind: _orgKind);
+      isLoading = false;
+    }
+    final evts = listMapFromJson(map['events']);
+    final notifs = listMapFromJson(map['notifications']);
+    if (evts.isNotEmpty) events = evts;
+    if (notifs.isNotEmpty) notifications = notifs;
+    final name1 = '${map['infoName1'] ?? ''}'.trim();
+    final name2 = '${map['infoName2'] ?? ''}'.trim();
+    if (name1.isNotEmpty) _infoName1 = name1;
+    if (name2.isNotEmpty) _infoName2 = name2;
+    _infoColor1 = _colorFromJson(map['infoColor1']) ?? _infoColor1;
+    _infoColor2 = _colorFromJson(map['infoColor2']) ?? _infoColor2;
+  }
+
+  void _persistBoardSession() {
+    final orgs = <String, dynamic>{};
+    for (final kind in OrgKind.values) {
+      final bundle = _orgCache[kind];
+      if (bundle == null || !bundle.hasContent) continue;
+      orgs[kind.name] = _bundleToSession(bundle);
+    }
+    if (orgs.isEmpty && events.isEmpty && notifications.isEmpty) return;
+    final map = _sessionMap();
+    map['year'] = _seasonYear;
+    map['orgs'] = orgs;
+    map['events'] = events;
+    map['notifications'] = notifications;
+    map['infoName1'] = _infoName1;
+    map['infoName2'] = _infoName2;
+    map['infoColor1'] = _infoColor1?.toARGB32();
+    map['infoColor2'] = _infoColor2?.toARGB32();
+    _writeBoardSession();
+  }
+
+  int _savedPredictUserId() {
+    final predict = _sessionMap()['predict'];
+    if (predict is! Map) return 0;
+    return _jsonInt(predict['userId']);
+  }
+
+  int? _cookieUserId() {
+    if (readBrowserCookie(authManualLogoutCookie) == '1') return null;
+    final token = readBrowserCookie(authTokenCookie);
+    if (token == null || token.isEmpty) return null;
+    final raw = readBrowserCookie(authUserCookie);
+    if (raw == null || raw.isEmpty) return null;
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map) return null;
+      final id = _jsonInt(decoded['id']);
+      return id > 0 ? id : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  bool _restorePredictSession({bool allowCookieUser = false}) {
+    final predict = _sessionMap()['predict'];
+    if (predict is! Map) return false;
+    final savedUser = _jsonInt(predict['userId']);
+    if (savedUser <= 0) return false;
+    final sessionUser = AuthSession.instance.user?.id ?? 0;
+    if (sessionUser > 0) {
+      if (sessionUser != savedUser) return false;
+    } else if (allowCookieUser) {
+      if (_cookieUserId() != savedUser) return false;
+    } else {
+      return false;
+    }
+    final groups = listMapFromJson(predict['groups']);
+    if (groups.isEmpty) return false;
+    _predictGroups = groups;
+    _predictTitleCatalog = listMapFromJson(predict['catalog']);
+    _predictGroupsLoading = false;
+    _predictGroupsError = null;
+    return true;
+  }
+
+  void _persistPredictSession() {
+    final userId = AuthSession.instance.user?.id ?? 0;
+    if (userId <= 0 || _predictGroups.isEmpty) return;
+    final map = _sessionMap();
+    map['year'] = map['year'] ?? _seasonYear;
+    map['predict'] = {
+      'userId': userId,
+      'groups': _predictGroups,
+      'catalog': _predictTitleCatalog,
+    };
+    _writeBoardSession();
+  }
+
+  void _clearPredictSession() {
+    final map = _sessionMap();
+    if (!map.containsKey('predict')) return;
+    map.remove('predict');
+    _writeBoardSession();
   }
 
   _OrgBundle _snapshotCurrent() => _OrgBundle(
@@ -652,6 +851,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       _predictGroupsLoading = false;
       _predictGroupsError = null;
     });
+    _persistPredictSession();
     unawaited(_fetchPredictInvites());
     return true;
   }
@@ -737,11 +937,11 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       }
     });
     _gamesPollTimer?.cancel();
-    if (usable) {
-      // 足りないパートだけ補完。取得済みは再取得しない
+      if (usable) {
+      // 通信で確定していないパートは、画面に出ていても取り直す
       final missing = <_LoadPart>[
         for (final part in _LoadPart.values)
-          if (!cached.partReady(part)) part,
+          if (!_partLoadedForYear(kind, part)) part,
       ];
       if (missing.isNotEmpty) {
         unawaited(_fetchOrgParts(kind, background: true, only: _partsForItemView(missing)));
@@ -757,7 +957,10 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     await Future<void>.delayed(const Duration(seconds: 20));
     if (!mounted) return;
     final other = _orgKind == OrgKind.npb ? OrgKind.mlb : OrgKind.npb;
-    if (_cacheUsable(other) || _orgLoadFutures.containsKey(other)) return;
+    final otherConfirmed = _partLoadedForYear(other, _LoadPart.games) &&
+        _partLoadedForYear(other, _LoadPart.standings) &&
+        _partLoadedForYear(other, _LoadPart.players);
+    if (otherConfirmed || _orgLoadFutures.containsKey(other)) return;
     await fetchData(kind: other, background: true);
   }
 
@@ -765,11 +968,15 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         (kind) => _partReady(_LoadPart.standings, kind) && _partReady(_LoadPart.players, kind),
       );
 
+  bool get _scoreNetworkReady => OrgKind.values.every(
+        (kind) => _partLoadedForYear(kind, _LoadPart.standings) && _partLoadedForYear(kind, _LoadPart.players),
+      );
+
   /// スコアは NPB と MLB の順位・個人成績が揃ったときに確定する。揃うまで表示は出さない。
   Future<void> _loadScoreOnce() async {
     final year = _seasonYear;
     final gen = ++_scoreGen;
-    if (_scoreReady) {
+    if (_scoreNetworkReady) {
       if (_scoreLoading && gen == _scoreGen) {
         _scoreLoading = false;
         if (mounted) setState(() {});
@@ -1341,6 +1548,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           if (!background) error = null;
         }
       });
+      _persistBoardSession();
     } catch (e, st) {
       unawaited(AuthSession.instance.reportTimeout(e, st));
       logger.e('part ${part.name} 通信/解析エラー: $e\n$st');

@@ -188,6 +188,55 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
     final selected = _focusGroup == groupId && _focusYear == year || (_focusGroup == null && _focusYear == year && _featuredGroup(groupId));
     final users = _maps(yearRow['users']);
     final userLine = users.isEmpty ? '参加 未登録' : '参加 ${users.map(_userName).join('・')}';
+    const yearW = 48.0;
+    const usersW = 150.0;
+    const markW = 20.0;
+    const hitW = 96.0;
+    const editW = 36.0;
+    final natural = yearW + usersW + markW + hitW * slots + editW;
+    Widget row({required bool spacer}) {
+      return Row(
+        children: [
+          SizedBox(
+            width: yearW,
+            child: Text(
+              year == null ? '—' : '$year',
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            ),
+          ),
+          SizedBox(
+            width: usersW,
+            child: Text(userLine, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12)),
+          ),
+          const SizedBox(
+            width: markW,
+            child: Text('当', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+          ),
+          for (var i = 0; i < slots; i++)
+            SizedBox(
+              width: hitW,
+              child: KeyedSubtree(
+                key: ValueKey('predict-hit-$year-$i'),
+                child: i < users.length ? _hitCell(users[i]) : const SizedBox.shrink(),
+              ),
+            ),
+          if (spacer) const Spacer(),
+          SizedBox(
+            width: editW,
+            height: 32,
+            child: IconButton(
+              tooltip: '予想設定',
+              visualDensity: VisualDensity.compact,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: editW, minHeight: 32),
+              onPressed: _asInt(yearRow['id_setting']) <= 0 ? null : () => _openEditor(year, yearRow),
+              icon: const Icon(Icons.edit_outlined, size: 18),
+            ),
+          ),
+        ],
+      );
+    }
+
     return Material(
       color: selected ? const Color(0xFFE3F2FD) : Colors.white,
       child: InkWell(
@@ -197,45 +246,16 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
         }),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(8, 2, 0, 2),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 48,
-                child: Text(
-                  year == null ? '—' : '$year',
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-              ),
-              SizedBox(
-                width: 150,
-                child: Text(userLine, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12)),
-              ),
-              const SizedBox(
-                width: 20,
-                child: Text('当', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-              ),
-              for (var i = 0; i < slots; i++)
-                SizedBox(
-                  width: 96,
-                  child: KeyedSubtree(
-                    key: ValueKey('predict-hit-$year-$i'),
-                    child: i < users.length ? _hitCell(users[i]) : const SizedBox.shrink(),
-                  ),
-                ),
-              const Spacer(),
-              SizedBox(
-                width: 36,
-                height: 32,
-                child: IconButton(
-                  tooltip: '予想設定',
-                  visualDensity: VisualDensity.compact,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 36, minHeight: 32),
-                  onPressed: _asInt(yearRow['id_setting']) <= 0 ? null : () => _openEditor(year, yearRow),
-                  icon: const Icon(Icons.edit_outlined, size: 18),
-                ),
-              ),
-            ],
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final maxW = constraints.maxWidth;
+              if (!maxW.isFinite || maxW + 0.5 >= natural) return row(spacer: true);
+              return FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: SizedBox(width: natural, child: row(spacer: false)),
+              );
+            },
           ),
         ),
       ),
@@ -755,18 +775,15 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
     Color? Function(Map<String, dynamic> row)? titleColor,
   }) {
     const gridLine = Color(0xFFD0D0D6);
-    Widget cell(String text, {bool hit = false, Color? color, FontWeight weight = FontWeight.w600, Color? background}) {
+    Widget cell(String text, {bool hit = false, Color? color, FontWeight weight = FontWeight.w600, Color? background, bool names = false}) {
+      final style = TextStyle(fontSize: 13, fontWeight: weight, color: color ?? Colors.black87, height: 1.2);
       return TableCell(
         verticalAlignment: TableCellVerticalAlignment.intrinsicHeight,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
           alignment: Alignment.center,
           color: hit ? const Color(0xFFFFCC00) : (background ?? const Color(0xFFFFF3C4)),
-          child: Text(
-            text.isEmpty ? '—' : text,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, fontWeight: weight, color: color ?? Colors.black87, height: 1.2),
-          ),
+          child: names ? _fitNames(text, style) : Text(text.isEmpty ? '—' : text, textAlign: TextAlign.center, style: style),
         ),
       );
     }
@@ -818,8 +835,9 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
               centerOf(row),
               background: _resultBack(row),
               color: _resultFont(row),
+              names: true,
             ),
-            for (final user in users) cell(pickName(row, user), hit: pickHit(row, user)),
+            for (final user in users) cell(pickName(row, user), hit: pickHit(row, user), names: true),
           ]),
       ],
     );
@@ -838,6 +856,37 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
   Color _userColor(Map<String, dynamic> user) {
     return parseColorNameOrNull('${user['color'] ?? ''}') ?? const Color(0xFF37474F);
   }
+}
+
+List<String> _nameLines(String text) {
+  final trimmed = text.trim();
+  if (trimmed.isEmpty) return const ['—'];
+  if (!trimmed.contains('、')) return [trimmed];
+  final parts = [for (final part in trimmed.split('、')) part.trim()].where((part) => part.isNotEmpty).toList();
+  return parts.isEmpty ? const ['—'] : parts;
+}
+
+Widget _fitLine(String text, TextStyle style) {
+  return FittedBox(
+    fit: BoxFit.scaleDown,
+    alignment: Alignment.center,
+    child: Text(
+      text,
+      maxLines: 1,
+      softWrap: false,
+      textAlign: TextAlign.center,
+      style: style,
+    ),
+  );
+}
+
+Widget _fitNames(String text, TextStyle style) {
+  final lines = _nameLines(text);
+  if (lines.length == 1) return _fitLine(lines.single, style);
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [for (final line in lines) _fitLine(line, style)],
+  );
 }
 
 class _TitleDraft {

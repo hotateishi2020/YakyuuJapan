@@ -145,10 +145,16 @@ void main() {
       find.byWidgetPredicate((widget) => widget is Container && widget.color == const Color(0xFFFF6347)),
       findsOneWidget,
     );
-    final tied = find.text('佐藤輝明、近本光司');
-    expect(tester.widget<Text>(tied).style?.color, Colors.black);
+    expect(find.text('佐藤輝明、近本光司'), findsNothing);
+    final sato = find.byWidgetPredicate((widget) => widget is Text && widget.data == '佐藤輝明' && widget.style?.color == Colors.black);
+    final chikamoto = find.byWidgetPredicate((widget) => widget is Text && widget.data == '近本光司' && widget.style?.color == Colors.black);
+    expect(sato, findsOneWidget);
+    expect(chikamoto, findsOneWidget);
+    expect(tester.widget<Text>(sato).maxLines, 1);
+    expect(tester.widget<Text>(chikamoto).maxLines, 1);
+    expect(tester.getTopLeft(sato).dy, lessThan(tester.getTopLeft(chikamoto).dy));
     expect(
-      tester.widget<Container>(find.ancestor(of: tied, matching: find.byType(Container)).first).color,
+      tester.widget<Container>(find.ancestor(of: sato, matching: find.byType(Container)).first).color,
       Colors.white,
     );
     expect(
@@ -330,6 +336,42 @@ void main() {
     for (var i = 1; i < 13; i++) {
       expect(tester.getTopRight(icons.at(i)).dx, iconRight);
     }
+  });
+
+  testWidgets('狭い幅でも年度から編集アイコンまで収まる', (tester) async {
+    const width = 320.0;
+    await tester.binding.setSurfaceSize(const Size(width, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: PredictGroupBoard(
+          loading: false,
+          selectedYear: 2026,
+          groups: [
+            {
+              'id': 1,
+              'txt_name': '立石・江島',
+              'int_year': 2026,
+              'id_setting': 6,
+              'users': [
+                {'id': 1, 'name': '立石', 'hits': 3},
+                {'id': 2, 'name': '江島', 'hits': 1},
+              ],
+              'titles': ['打率'],
+              'players': const [],
+              'teams': const [],
+              'champions': const [],
+            },
+          ],
+        ),
+      ),
+    ));
+    expect(tester.takeException(), isNull);
+    final year = tester.getTopLeft(find.text('2026'));
+    final edit = tester.getTopRight(find.byIcon(Icons.edit_outlined));
+    expect(year.dx, greaterThanOrEqualTo(0));
+    expect(edit.dx, lessThanOrEqualTo(width));
+    expect(edit.dx, greaterThan(year.dx));
   });
 
   test('黄色のチーム地色だけ星を黄みのオレンジにする', () {

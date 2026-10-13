@@ -23,6 +23,7 @@ import '../View/LeagueLogo.dart';
 import '../View/SeasonTable.dart';
 import '../View/MlbPostseasonBracket.dart';
 import '../View/PostseasonBracket.dart';
+import '../View/PredictGroupBoard.dart';
 import '../View/BlinkNewMark.dart';
 import '../logic/postseason_bracket.dart';
 import '../logic/game_dedupe.dart';
@@ -140,6 +141,12 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   final Map<String, int> _loadedPartYears = {};
   PersonalStatsLayout _personalStatsLayout = PersonalStatsLayout.segment;
   Timer? _gamesPollTimer;
+  bool _predictGroupsOpen = false;
+  bool _predictGroupsLoading = false;
+  String? _predictGroupsError;
+  List<Map<String, dynamic>> _predictGroups = const [];
+  List<Map<String, dynamic>> _predictInvites = const [];
+  List<Map<String, dynamic>> _predictTitleCatalog = const [];
   bool _gamesPollRunning = false;
   final Map<OrgKind, int> _gameDayOffset = {};
   final Map<OrgKind, String?> _loadingGameDateByOrg = {};
@@ -161,9 +168,14 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     bindPageVisibility(_onPageBecameVisible);
-    // cookie の団体をそのまま初回表示（npb / mlb）
-    if (readBrowserCookie(_orgCookie) == 'mlb') {
+    // cookie のタブをそのまま初回表示（predict / npb / mlb）
+    final savedTab = readBrowserCookie(_orgCookie);
+    if (savedTab == 'mlb') {
       _orgKind = OrgKind.mlb;
+    } else if (savedTab == 'predict') {
+      _predictGroupsOpen = true;
+      _predictGroupsLoading = true;
+      _orgKind = OrgKind.npb;
     } else {
       _orgKind = OrgKind.npb;
     }
@@ -182,18 +194,40 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
 
   Future<void> _bootstrapWithAuth() async {
     try {
-      await _loadThenWatchGames().timeout(const Duration(seconds: 45));
-    } catch (e, st) {
-      unawaited(AuthSession.instance.reportTimeout(e, st));
-    }
-    if (!mounted) return;
-    try {
       await AuthSession.instance.restore().timeout(const Duration(seconds: 15));
     } catch (e, st) {
       unawaited(AuthSession.instance.reportTimeout(e, st));
     }
     if (!mounted) return;
     setState(() => _authEntryReady = true);
+    if (_predictGroupsOpen) {
+      if (AuthSession.instance.isLoggedIn) {
+        try {
+          await _loadInitialPredictGroups().timeout(const Duration(seconds: 60));
+        } catch (e, st) {
+          unawaited(AuthSession.instance.reportTimeout(e, st));
+          if (mounted && _predictGroups.isEmpty) {
+            setState(() {
+              _predictGroupsLoading = false;
+              _predictGroupsError = '予想グループを読み込めませんでした';
+            });
+          }
+        }
+      } else if (mounted) {
+        setState(() {
+          _predictGroups = const [];
+          _predictGroupsLoading = false;
+          _predictGroupsError = null;
+        });
+      }
+    }
+    try {
+      await _loadThenWatchGames().timeout(const Duration(seconds: 45));
+    } catch (e, st) {
+      unawaited(AuthSession.instance.reportTimeout(e, st));
+    }
+    if (!mounted) return;
+    if (AuthSession.instance.isLoggedIn) unawaited(_fetchPredictInvites());
     if (_boardContentReady) {
       unawaited(AuthSession.instance.reportAction('初期表示を読み込んだ'));
     }
@@ -203,8 +237,16 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     if (!mounted) return;
     if (AuthSession.instance.isLoggedIn) {
       setState(() => _authEntryReady = true);
+      unawaited(_fetchPredictInvites());
+      if (_predictGroupsOpen) unawaited(_fetchPredictGroups());
       return;
     }
+    setState(() {
+      _predictInvites = const [];
+      _predictGroups = const [];
+      _predictGroupsLoading = false;
+      _predictGroupsError = null;
+    });
     unawaited(_holdLoginUntilBoardReady());
   }
 
@@ -353,8 +395,316 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         readyParts: {...(_readyParts[_orgKind] ?? const <_LoadPart>{})},
       );
 
+  Future<String?> _savePredictGroupName(int id, String name) async {
+    final token = AuthSession.instance.token;
+    if (!AuthSession.instance.isLoggedIn || token == null || token.isEmpty) {
+      return 'ログインしてください';
+    }
+    try {
+      final res = await http
+          .post(
+            Env.api('/predict-group-name'),
+            headers: {
+              'Authorization': 'Bearer $token',
+              'content-type': 'application/json; charset=utf-8',
+            },
+            body: jsonEncode({'id': id, 'txt_name': name}),
+          )
+          .timeout(const Duration(seconds: 20));
+      if (res.statusCode == 401) return 'ログインしてください';
+      if (res.statusCode != 200) return 'グループ名を保存できませんでした';
+      final decoded = jsonDecode(res.body);
+      final saved = decoded is Map ? decoded['group'] : null;
+      if (saved is! Map) return 'グループ名を保存できませんでした';
+      final savedId = int.tryParse('${saved['id']}') ?? id;
+      final savedName = '${saved['txt_name'] ?? name}';
+      if (!mounted) return null;
+      setState(() {
+        _predictGroups = [
+          for (final row in _predictGroups)
+            if ((int.tryParse('${row['id']}') ?? 0) == savedId) {...row, 'txt_name': savedName} else row,
+        ];
+      });
+      return null;
+    } catch (_) {
+      return 'グループ名を保存できませんでした';
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> _searchPredictNames(String kind, int leagueId, String query) async {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) return const [];
+    try {
+      final res = await http
+          .get(Env.api('/predict-names?kind=$kind&league=$leagueId&q=${Uri.encodeQueryComponent(trimmed)}'))
+          .timeout(const Duration(seconds: 15));
+      if (res.statusCode != 200) return const [];
+      final decoded = jsonDecode(res.body);
+      final raw = decoded is Map ? decoded['names'] : null;
+      if (raw is! List) return const [];
+      return [
+        for (final row in raw)
+          if (row is Map) Map<String, dynamic>.from(row),
+      ];
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  Future<String?> _savePredictSetting(Map<String, dynamic> setting) async {
+    final token = AuthSession.instance.token;
+    if (!AuthSession.instance.isLoggedIn || token == null || token.isEmpty) {
+      return 'ログインしてください';
+    }
+    try {
+      final res = await http
+          .post(
+            Env.api('/predict-settings'),
+            headers: {
+              'Authorization': 'Bearer $token',
+              'content-type': 'application/json; charset=utf-8',
+            },
+            body: jsonEncode(setting),
+          )
+          .timeout(const Duration(seconds: 20));
+      if (res.statusCode == 401) return 'ログインしてください';
+      final decoded = jsonDecode(res.body);
+      if (res.statusCode != 200) {
+        final message = decoded is Map ? '${decoded['error'] ?? ''}'.trim() : '';
+        return message.isEmpty ? '予想設定を保存できませんでした' : message;
+      }
+      if (!mounted) return null;
+      final reloaded = await _fetchPredictGroups();
+      final pending = decoded is Map && decoded['setting'] is Map && decoded['setting']['proposal_pending'] == true;
+      if (pending) {
+        return reloaded
+            ? 'notice:予想は保存しました。期限とルールの変更は、参加ユーザー全員の賛成後に反映されます'
+            : 'notice:期限とルールの変更案を保存しました。画面を開き直してください';
+      }
+      return reloaded ? null : '保存しました。画面を開き直してください';
+    } catch (_) {
+      return '予想設定を保存できませんでした';
+    }
+  }
+
+  Future<String?> _postPredict(String path, Map<String, dynamic> body, String failure) async {
+    final token = AuthSession.instance.token;
+    if (!AuthSession.instance.isLoggedIn || token == null || token.isEmpty) return 'ログインしてください';
+    try {
+      final res = await http
+          .post(
+            Env.api(path),
+            headers: {
+              'Authorization': 'Bearer $token',
+              'content-type': 'application/json; charset=utf-8',
+            },
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 20));
+      final decoded = jsonDecode(res.body);
+      if (res.statusCode == 401) return 'ログインしてください';
+      if (res.statusCode != 200) {
+        final message = decoded is Map ? '${decoded['error'] ?? ''}'.trim() : '';
+        return message.isEmpty ? failure : message;
+      }
+      if (!mounted) return null;
+      await _fetchPredictGroups();
+      await _fetchPredictInvites();
+      return null;
+    } catch (_) {
+      return failure;
+    }
+  }
+
+  Future<String?> _createPredictGroup(String name, List<int> userIds) {
+    return _postPredict('/predict-group', {'txt_name': name, 'user_ids': userIds}, 'グループを作成できませんでした');
+  }
+
+  Future<String?> _answerPredictInvite(int inviteId, bool accept) {
+    return _postPredict('/predict-invite-answer', {'id': inviteId, 'accept': accept}, '招待への回答に失敗しました');
+  }
+
+  Future<String?> _deletePredictGroup(int groupId) {
+    return _postPredict('/predict-group-delete', {'id': groupId}, '削除を保存できませんでした');
+  }
+
+  Future<String?> _createPredictYear(int groupId, int year) {
+    return _postPredict('/predict-year', {'id': groupId, 'int_year': year}, '年度を追加できませんでした');
+  }
+
+  Future<List<Map<String, dynamic>>> _searchPredictUsers(String query) async {
+    final token = AuthSession.instance.token;
+    final trimmed = query.trim();
+    if (!AuthSession.instance.isLoggedIn || token == null || token.isEmpty || trimmed.isEmpty) return const [];
+    try {
+      final res = await http
+          .get(
+            Env.api('/predict-users?q=${Uri.encodeQueryComponent(trimmed)}'),
+            headers: {'Authorization': 'Bearer $token'},
+          )
+          .timeout(const Duration(seconds: 15));
+      if (res.statusCode != 200) return const [];
+      final decoded = jsonDecode(res.body);
+      final raw = decoded is Map ? decoded['users'] : null;
+      if (raw is! List) return const [];
+      return [
+        for (final row in raw)
+          if (row is Map) Map<String, dynamic>.from(row),
+      ];
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  Future<void> _fetchPredictInvites() async {
+    final token = AuthSession.instance.token;
+    if (!AuthSession.instance.isLoggedIn || token == null || token.isEmpty) {
+      if (mounted && _predictInvites.isNotEmpty) setState(() => _predictInvites = const []);
+      return;
+    }
+    try {
+      final res = await http
+          .get(
+            Env.api('/predict-invites'),
+            headers: {'Authorization': 'Bearer $token'},
+          )
+          .timeout(const Duration(seconds: 15));
+      if (!mounted || res.statusCode != 200) return;
+      final decoded = jsonDecode(res.body);
+      final raw = decoded is Map ? decoded['invites'] : null;
+      setState(() {
+        _predictInvites = [
+          if (raw is List)
+            for (final row in raw)
+              if (row is Map) Map<String, dynamic>.from(row),
+        ];
+      });
+    } catch (_) {}
+  }
+
+  Future<String?> _votePredictRule(int settingId) async {
+    final token = AuthSession.instance.token;
+    if (!AuthSession.instance.isLoggedIn || token == null || token.isEmpty) {
+      return 'ログインしてください';
+    }
+    try {
+      final res = await http
+          .post(
+            Env.api('/predict-setting-vote'),
+            headers: {
+              'Authorization': 'Bearer $token',
+              'content-type': 'application/json; charset=utf-8',
+            },
+            body: jsonEncode({'id_setting': settingId}),
+          )
+          .timeout(const Duration(seconds: 20));
+      final decoded = jsonDecode(res.body);
+      if (res.statusCode == 401) return 'ログインしてください';
+      if (res.statusCode != 200) {
+        final message = decoded is Map ? '${decoded['error'] ?? ''}'.trim() : '';
+        return message.isEmpty ? '賛成を保存できませんでした' : message;
+      }
+      if (!mounted) return null;
+      await _fetchPredictGroups();
+      final applied = decoded is Map && decoded['vote'] is Map && decoded['vote']['applied'] == true;
+      return applied ? 'notice:applied' : 'notice:pending';
+    } catch (_) {
+      return '賛成を保存できませんでした';
+    }
+  }
+
+  Future<bool> _fetchPredictGroups() async {
+    final token = AuthSession.instance.token;
+    if (!AuthSession.instance.isLoggedIn || token == null || token.isEmpty) {
+      if (mounted) {
+        setState(() {
+          _predictGroups = const [];
+          _predictGroupsLoading = false;
+          _predictGroupsError = null;
+        });
+      }
+      return true;
+    }
+    final res = await http
+        .get(
+          Env.api('/predict-groups'),
+          headers: {'Authorization': 'Bearer $token'},
+        )
+        .timeout(const Duration(seconds: 60));
+    if (!mounted || !AuthSession.instance.isLoggedIn || AuthSession.instance.token != token) return true;
+    if (res.statusCode != 200) return false;
+    final decoded = jsonDecode(res.body);
+    final raw = decoded is Map ? decoded['groups'] : null;
+    final catalogRaw = decoded is Map ? decoded['title_catalog'] : null;
+    final groups = <Map<String, dynamic>>[
+      if (raw is List)
+        for (final row in raw)
+          if (row is Map) Map<String, dynamic>.from(row),
+    ];
+    final catalog = <Map<String, dynamic>>[
+      if (catalogRaw is List)
+        for (final row in catalogRaw)
+          if (row is Map) Map<String, dynamic>.from(row),
+    ];
+    setState(() {
+      _predictGroups = groups;
+      _predictTitleCatalog = catalog;
+      _predictGroupsLoading = false;
+      _predictGroupsError = null;
+    });
+    unawaited(_fetchPredictInvites());
+    return true;
+  }
+
+  Future<void> _loadInitialPredictGroups() async {
+    try {
+      final loaded = await _fetchPredictGroups();
+      if (!mounted || loaded) return;
+      setState(() {
+        _predictGroupsLoading = false;
+        _predictGroupsError = '予想グループを読み込めませんでした';
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _predictGroupsLoading = false;
+        _predictGroupsError = '予想グループを読み込めませんでした';
+      });
+    }
+  }
+
+  Future<void> _openPredictGroups() async {
+    writeBrowserCookie(_orgCookie, 'predict');
+    if (_predictGroupsOpen && _predictGroups.isNotEmpty) return;
+    setState(() {
+      _predictGroupsOpen = true;
+      _predictGroupsLoading = _predictGroups.isEmpty;
+      _predictGroupsError = null;
+    });
+    unawaited(AuthSession.instance.reportAction('予想タブを開いた'));
+    try {
+      final loaded = await _fetchPredictGroups();
+      if (!mounted || loaded) return;
+      setState(() {
+        _predictGroupsLoading = false;
+        _predictGroupsError = '予想グループを読み込めませんでした';
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _predictGroupsLoading = false;
+        _predictGroupsError = '予想グループを読み込めませんでした';
+      });
+    }
+  }
+
   Future<void> _changeOrg(OrgKind kind) async {
-    if (kind == _orgKind) return;
+    if (kind == _orgKind && !_predictGroupsOpen) return;
+    if (_predictGroupsOpen && kind == _orgKind) {
+      writeBrowserCookie(_orgCookie, OrgConfig.of(kind).label.toLowerCase());
+      setState(() => _predictGroupsOpen = false);
+      return;
+    }
     unawaited(AuthSession.instance.reportAction(kind == OrgKind.npb ? 'npbタブを開いた' : 'mlbタブを開いた'));
     writeBrowserCookie(_orgCookie, OrgConfig.of(kind).label.toLowerCase());
     // 離れる団体の表示内容を必ず保持
@@ -362,6 +712,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     final cached = _orgCache[kind];
     final usable = cached != null && cached.hasContent;
         setState(() {
+      _predictGroupsOpen = false;
       _orgKind = kind;
       _itemTab = 0;
       error = null;
@@ -1254,7 +1605,54 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           border: Border.all(color: const Color(0xFFD0D0D6), width: 0.5),
         ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Padding(
+              padding: const EdgeInsets.all(2),
+              child: GestureDetector(
+                onTap: () => unawaited(_openPredictGroups()),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  curve: Curves.easeOut,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: _predictGroupsOpen ? Colors.black : OrgConfig.tabIdleColor,
+                    borderRadius: BorderRadius.circular(TAB_RADIUS - 2),
+                    border: Border.all(
+                      color: _predictGroupsOpen ? Colors.black54 : const Color(0xFFD0D0D6),
+                      width: _predictGroupsOpen ? 1.2 : 0.5,
+                    ),
+                  ),
+                  alignment: Alignment.center,
+                  child: Align(
+                    widthFactor: 2,
+                    alignment: Alignment.center,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Text(
+                          '予想',
+                          style: TextStyle(
+                            fontSize: TAB_BAR_H / 2,
+                            fontWeight: _predictGroupsOpen ? FontWeight.bold : FontWeight.w600,
+                            color: _predictGroupsOpen ? Colors.white : Colors.black54,
+                          ),
+                        ),
+                        if (_predictInvites.isNotEmpty)
+                          const Positioned(
+                            right: -6,
+                            top: -2,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(color: Color(0xFFC62828), shape: BoxShape.circle),
+                              child: SizedBox(width: 8, height: 8),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
             for (final kind in OrgKind.values)
               Expanded(
                 child: Padding(
@@ -1262,7 +1660,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                   child: Builder(
                     builder: (context) {
                       final org = OrgConfig.of(kind);
-                      final selected = _orgKind == kind;
+                      final selected = !_predictGroupsOpen && _orgKind == kind;
                       final bg = selected ? org.tabColor : OrgConfig.tabIdleColor;
                       final fg = selected ? org.tabForeground : Colors.black54;
                       return GestureDetector(
@@ -2120,11 +2518,32 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         );
 
         // 取れたデータがあるときはエラー表示で消さない
-        final Widget orgBody = orgContentLoading
-            ? const Center(child: CircularProgressIndicator())
-            : (error != null && !_boardContentReady)
-                ? Center(child: Text(error!))
-                : Column(
+        final Widget orgBody = _predictGroupsOpen
+            ? (!AuthSession.instance.isLoggedIn
+                ? const Center(child: Text('ログインすると予想を見られます'))
+                : PredictGroupBoard(
+                loading: _predictGroupsLoading,
+                error: _predictGroupsError,
+                selectedYear: _seasonYear,
+                groups: _predictGroups,
+                titleCatalog: _predictTitleCatalog,
+                viewerId: AuthSession.instance.user?.id,
+                onSaveSetting: _savePredictSetting,
+                onApproveRule: _votePredictRule,
+                onRenameGroup: _savePredictGroupName,
+                invites: _predictInvites,
+                onSearchNames: _searchPredictNames,
+                onSearchUsers: _searchPredictUsers,
+                onCreateGroup: _createPredictGroup,
+                onAnswerInvite: _answerPredictInvite,
+                onDeleteGroup: _deletePredictGroup,
+                onCreateYear: _createPredictYear,
+              ))
+            : orgContentLoading
+                ? const Center(child: CircularProgressIndicator())
+                : (error != null && !_boardContentReady)
+                    ? Center(child: Text(error!))
+                    : Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const SizedBox(height: 8),

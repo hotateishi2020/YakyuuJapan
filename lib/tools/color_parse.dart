@@ -58,3 +58,15 @@ Color? parseColorNameOrNull(String? name) {
   final v = m[n];
   return v == null ? null : Color(v);
 }
+
+/// チーム地色が黄色か。ソフトバンクのように星の黄と地色が重なる判定に使う。
+bool teamColorIsYellow(Color color) {
+  final hsl = HSLColor.fromColor(color);
+  return hsl.hue >= 42 && hsl.hue <= 70 && hsl.saturation >= 0.4 && hsl.lightness >= 0.45;
+}
+
+/// 試合情報のシリーズ星。地色が黄色のときだけ黄みのオレンジ。
+Color seriesStarColor(Color? teamColor) {
+  if (teamColor != null && teamColorIsYellow(teamColor)) return const Color(0xFFFFB300);
+  return const Color(0xFFFFD600);
+}

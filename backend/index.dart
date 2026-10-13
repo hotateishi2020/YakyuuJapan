@@ -29,6 +29,7 @@ import 'app/Value.dart';
 import 'app/Auth.dart';
 import 'app/EventReadReset.dart';
 import 'app/PlayerStatsSchedule.dart';
+import 'app/PredictGroup.dart';
 import 'app/GameFetchSchedule.dart';
 
 /// /predictions 用の短TTLキャッシュ（同一プロセス内・団体別）
@@ -552,6 +553,15 @@ bool _summaryIsPitcher(dynamic value) {
 
 int _asInt(dynamic value) => int.tryParse('$value') ?? (value is int ? value : 0);
 
+List<Map<String, dynamic>>? _predictMaps(dynamic raw) {
+  if (raw == null) return null;
+  if (raw is! List) return const [];
+  return [
+    for (final item in raw)
+      if (item is Map) Map<String, dynamic>.from(item),
+  ];
+}
+
 bool _asBool(dynamic value) {
   if (value == true) return true;
   final text = '$value'.trim().toLowerCase();
@@ -991,6 +1001,338 @@ void main() async {
     // ====== API ======
 
     app.get('/healthz', (Request _) => Response.ok('ok'));
+
+    app.post('/predict-group-name', (Request request) async {
+      try {
+        final body = jsonDecode(await request.readAsString());
+        if (body is! Map) {
+          return Response(400, body: jsonEncode({'ok': false, 'error': '不正な要求です'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        final saved = await Postgres.withConnection((conn) async {
+          final userId = await Auth.userIdOf(conn, request);
+          if (userId == null) return 'login';
+          return PredictGroup.updateName(
+            conn,
+            id: int.tryParse('${body['id']}') ?? 0,
+            name: '${body['txt_name'] ?? ''}',
+            updby: userId,
+          );
+        });
+        if (saved == 'login') {
+          return Response(401, body: jsonEncode({'ok': false, 'error': 'ログインしてください'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        if (saved is! Map) {
+          return Response(400, body: jsonEncode({'ok': false, 'error': 'グループ名を保存できませんでした'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        return Response.ok(jsonEncode({'ok': true, 'group': saved}), headers: {'content-type': 'application/json; charset=utf-8'});
+      } catch (e, st) {
+        print('グループ名の保存に失敗しました: $e');
+        print(st);
+        return Response.internalServerError(
+          body: jsonEncode({'ok': false, 'error': 'グループ名の保存に失敗しました'}),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+    });
+
+    app.post('/predict-settings', (Request request) async {
+      try {
+        final body = jsonDecode(await request.readAsString());
+        if (body is! Map) {
+          return Response(400, body: jsonEncode({'ok': false, 'error': '不正な要求です'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        final saved = await Postgres.withConnection((conn) async {
+          final userId = await Auth.userIdOf(conn, request);
+          if (userId == null) return 'login';
+          return PredictGroup.updateSetting(
+            conn,
+            id: int.tryParse('${body['id_setting']}') ?? 0,
+            dateLimitTeam: '${body['date_limit_team'] ?? ''}'.trim(),
+            dateLimitPlayer: '${body['date_limit_player'] ?? ''}'.trim(),
+            codeSelect: '${body['code_select'] ?? ''}'.trim(),
+            samePlayerLimit: int.tryParse('${body['int_same_player_limit']}') ?? 1,
+            codePoint: '${body['code_point'] ?? ''}'.trim(),
+            updby: userId,
+            titles: _predictMaps(body['titles']),
+            picks: _predictMaps(body['picks']),
+            ranks: _predictMaps(body['ranks']),
+            champions: _predictMaps(body['champions']),
+          );
+        });
+        if (saved == 'login') {
+          return Response(401, body: jsonEncode({'ok': false, 'error': 'ログインしてください'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        if (saved is Map && '${saved['error'] ?? ''}'.isNotEmpty) {
+          return Response(400, body: jsonEncode({'ok': false, 'error': saved['error']}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        if (saved is! Map) {
+          return Response(400, body: jsonEncode({'ok': false, 'error': '予想設定を保存できませんでした'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        return Response.ok(jsonEncode({'ok': true, 'setting': saved}), headers: {'content-type': 'application/json; charset=utf-8'});
+      } catch (e, st) {
+        print('予想設定の保存に失敗しました: $e');
+        print(st);
+        return Response.internalServerError(
+          body: jsonEncode({'ok': false, 'error': '予想設定の保存に失敗しました'}),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+    });
+
+    app.post('/predict-setting-vote', (Request request) async {
+      try {
+        final body = jsonDecode(await request.readAsString());
+        if (body is! Map) {
+          return Response(400, body: jsonEncode({'ok': false, 'error': '不正な要求です'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        final saved = await Postgres.withConnection((conn) async {
+          final userId = await Auth.userIdOf(conn, request);
+          if (userId == null) return 'login';
+          return PredictGroup.approveProposal(
+            conn,
+            settingId: int.tryParse('${body['id_setting']}') ?? 0,
+            userId: userId,
+          );
+        });
+        if (saved == 'login') {
+          return Response(401, body: jsonEncode({'ok': false, 'error': 'ログインしてください'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        if (saved is Map && '${saved['error'] ?? ''}'.isNotEmpty) {
+          return Response(400, body: jsonEncode({'ok': false, 'error': saved['error']}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        if (saved is! Map) {
+          return Response(400, body: jsonEncode({'ok': false, 'error': '賛成を保存できませんでした'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        return Response.ok(jsonEncode({'ok': true, 'vote': saved}), headers: {'content-type': 'application/json; charset=utf-8'});
+      } catch (e, st) {
+        print('予想ルールの賛成に失敗しました: $e');
+        print(st);
+        return Response.internalServerError(
+          body: jsonEncode({'ok': false, 'error': '賛成を保存できませんでした'}),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+    });
+
+    app.get('/predict-names', (Request request) async {
+      try {
+        final params = request.url.queryParameters;
+        final kind = '${params['kind'] ?? ''}';
+        final leagueId = int.tryParse('${params['league'] ?? ''}') ?? 0;
+        final query = '${params['q'] ?? ''}'.trim();
+        if (kind != 'player' && kind != 'team') {
+          return Response(400, body: jsonEncode({'ok': false, 'error': '不正な要求です'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        final names = query.isEmpty
+            ? const <Map<String, dynamic>>[]
+            : await Postgres.withConnection((conn) => PredictGroup.searchNames(conn, kind: kind, leagueId: leagueId, query: query));
+        return Response.ok(jsonEncode({'names': names}), headers: {'content-type': 'application/json; charset=utf-8'});
+      } catch (e, st) {
+        print('予想候補の取得に失敗しました: $e');
+        print(st);
+        return Response.internalServerError(
+          body: jsonEncode({'ok': false, 'error': '予想候補の取得に失敗しました'}),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+    });
+
+    app.get('/predict-users', (Request request) async {
+      try {
+        final query = '${request.url.queryParameters['q'] ?? ''}'.trim();
+        final names = await Postgres.withConnection((conn) async {
+          final userId = await Auth.userIdOf(conn, request);
+          if (userId == null) return 'login';
+          return PredictGroup.searchUsers(conn, query: query, actorId: userId);
+        });
+        if (names == 'login') {
+          return Response(401, body: jsonEncode({'ok': false, 'error': 'ログインしてください'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        return Response.ok(jsonEncode({'users': names}), headers: {'content-type': 'application/json; charset=utf-8'});
+      } catch (e, st) {
+        print('ユーザー検索に失敗しました: $e');
+        print(st);
+        return Response.internalServerError(
+          body: jsonEncode({'ok': false, 'error': 'ユーザー検索に失敗しました'}),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+    });
+
+    app.get('/predict-invites', (Request request) async {
+      try {
+        final invites = await Postgres.withConnection((conn) async {
+          final userId = await Auth.userIdOf(conn, request);
+          if (userId == null) return 'login';
+          return PredictGroup.listInvites(conn, userId: userId);
+        });
+        if (invites == 'login') {
+          return Response(401, body: jsonEncode({'ok': false, 'error': 'ログインしてください'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        return Response.ok(jsonEncode({'invites': invites}), headers: {'content-type': 'application/json; charset=utf-8'});
+      } catch (e, st) {
+        print('招待の取得に失敗しました: $e');
+        print(st);
+        return Response.internalServerError(
+          body: jsonEncode({'ok': false, 'error': '招待の取得に失敗しました'}),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+    });
+
+    app.post('/predict-group', (Request request) async {
+      try {
+        final body = jsonDecode(await request.readAsString());
+        if (body is! Map) {
+          return Response(400, body: jsonEncode({'ok': false, 'error': '不正な要求です'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        final invitees = <int>[
+          if (body['user_ids'] is List)
+            for (final id in body['user_ids'] as List) int.tryParse('$id') ?? 0,
+        ];
+        final saved = await Postgres.withConnection((conn) async {
+          final userId = await Auth.userIdOf(conn, request);
+          if (userId == null) return 'login';
+          return PredictGroup.createGroup(conn, name: '${body['txt_name'] ?? ''}', userId: userId, inviteeIds: invitees);
+        });
+        if (saved == 'login') {
+          return Response(401, body: jsonEncode({'ok': false, 'error': 'ログインしてください'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        if (saved is Map && '${saved['error'] ?? ''}'.isNotEmpty) {
+          return Response(400, body: jsonEncode({'ok': false, 'error': saved['error']}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        if (saved is! Map) {
+          return Response(400, body: jsonEncode({'ok': false, 'error': 'グループを作成できませんでした'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        return Response.ok(jsonEncode({'ok': true, 'group': saved}), headers: {'content-type': 'application/json; charset=utf-8'});
+      } catch (e, st) {
+        print('グループの作成に失敗しました: $e');
+        print(st);
+        return Response.internalServerError(
+          body: jsonEncode({'ok': false, 'error': 'グループの作成に失敗しました'}),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+    });
+
+    app.post('/predict-invite-answer', (Request request) async {
+      try {
+        final body = jsonDecode(await request.readAsString());
+        if (body is! Map) {
+          return Response(400, body: jsonEncode({'ok': false, 'error': '不正な要求です'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        final saved = await Postgres.withConnection((conn) async {
+          final userId = await Auth.userIdOf(conn, request);
+          if (userId == null) return 'login';
+          return PredictGroup.answerInvite(
+            conn,
+            inviteId: int.tryParse('${body['id']}') ?? 0,
+            userId: userId,
+            accept: body['accept'] == true || '${body['accept']}' == 'true',
+          );
+        });
+        if (saved == 'login') {
+          return Response(401, body: jsonEncode({'ok': false, 'error': 'ログインしてください'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        if (saved is Map && '${saved['error'] ?? ''}'.isNotEmpty) {
+          return Response(400, body: jsonEncode({'ok': false, 'error': saved['error']}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        return Response.ok(jsonEncode({'ok': true}), headers: {'content-type': 'application/json; charset=utf-8'});
+      } catch (e, st) {
+        print('招待への回答に失敗しました: $e');
+        print(st);
+        return Response.internalServerError(
+          body: jsonEncode({'ok': false, 'error': '招待への回答に失敗しました'}),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+    });
+
+    app.post('/predict-group-delete', (Request request) async {
+      try {
+        final body = jsonDecode(await request.readAsString());
+        if (body is! Map) {
+          return Response(400, body: jsonEncode({'ok': false, 'error': '不正な要求です'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        final saved = await Postgres.withConnection((conn) async {
+          final userId = await Auth.userIdOf(conn, request);
+          if (userId == null) return 'login';
+          return PredictGroup.requestDelete(conn, groupId: int.tryParse('${body['id']}') ?? 0, userId: userId);
+        });
+        if (saved == 'login') {
+          return Response(401, body: jsonEncode({'ok': false, 'error': 'ログインしてください'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        if (saved is Map && '${saved['error'] ?? ''}'.isNotEmpty) {
+          return Response(400, body: jsonEncode({'ok': false, 'error': saved['error']}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        if (saved is! Map) {
+          return Response(400, body: jsonEncode({'ok': false, 'error': '削除を保存できませんでした'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        return Response.ok(jsonEncode({'ok': true, 'delete': saved}), headers: {'content-type': 'application/json; charset=utf-8'});
+      } catch (e, st) {
+        print('グループ削除の保存に失敗しました: $e');
+        print(st);
+        return Response.internalServerError(
+          body: jsonEncode({'ok': false, 'error': '削除を保存できませんでした'}),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+    });
+
+    app.post('/predict-year', (Request request) async {
+      try {
+        final body = jsonDecode(await request.readAsString());
+        if (body is! Map) {
+          return Response(400, body: jsonEncode({'ok': false, 'error': '不正な要求です'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        final saved = await Postgres.withConnection((conn) async {
+          final userId = await Auth.userIdOf(conn, request);
+          if (userId == null) return 'login';
+          return PredictGroup.createYear(
+            conn,
+            groupId: int.tryParse('${body['id']}') ?? 0,
+            year: int.tryParse('${body['int_year']}') ?? 0,
+            userId: userId,
+          );
+        });
+        if (saved == 'login') {
+          return Response(401, body: jsonEncode({'ok': false, 'error': 'ログインしてください'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        if (saved is Map && '${saved['error'] ?? ''}'.isNotEmpty) {
+          return Response(400, body: jsonEncode({'ok': false, 'error': saved['error']}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        if (saved is! Map) {
+          return Response(400, body: jsonEncode({'ok': false, 'error': '年度を追加できませんでした'}), headers: {'content-type': 'application/json; charset=utf-8'});
+        }
+        return Response.ok(jsonEncode({'ok': true, 'year': saved}), headers: {'content-type': 'application/json; charset=utf-8'});
+      } catch (e, st) {
+        print('年度の追加に失敗しました: $e');
+        print(st);
+        return Response.internalServerError(
+          body: jsonEncode({'ok': false, 'error': '年度を追加できませんでした'}),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+    });
+
+    app.get('/predict-groups', (Request request) async {
+      try {
+        final payload = await Postgres.withConnection((conn) async {
+          final userId = await Auth.userIdOf(conn, request);
+          final groups = userId == null ? <Map<String, dynamic>>[] : await PredictGroup.list(conn, userId: userId);
+          final catalog = await PredictGroup.titleCatalog(conn);
+          return {'groups': groups, 'title_catalog': catalog};
+        });
+        return Response.ok(jsonEncode(payload), headers: {'content-type': 'application/json; charset=utf-8'});
+      } catch (e, st) {
+        print('予想グループの取得に失敗しました: $e');
+        print(st);
+        return Response.internalServerError(
+          body: jsonEncode({'ok': false, 'error': '予想グループを読み込めませんでした'}),
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+    });
 
     app.get('/fetchStatsTeamNPB', (Request request) async {
       final response = await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.STATS_TEAM, (conn) async {

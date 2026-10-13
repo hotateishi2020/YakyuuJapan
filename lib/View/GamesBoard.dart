@@ -1828,7 +1828,6 @@ class _TableGameCard extends StatelessWidget {
   double get _gameHeaderH => (_showRosterPicker ? TAB_BAR_H : _minHeaderH) * 2;
   static const _defenseRowH = 160.0;
   static const _statsToggleH = 32.0;
-  static const _statsGap = 8.0;
   static const _minTeamRowH = 46.0;
   static const _playerRowH = 18.0;
   static const _lineScoreH = 84.0;
@@ -3907,20 +3906,19 @@ class _TableGameCard extends StatelessWidget {
     final defenseH = _showDefense ? _defenseRowH : 0.0;
     final showPitchers = _showPitcherStats;
     final toggleH = _hasCollapsibleStats ? _statsToggleH : 0.0;
-    final statsGap = _hasCollapsibleStats ? _statsGap : 0.0;
     final rosterBarH = statsExpanded && _showRosterPicker ? _statsToggleH : 0.0;
-    // カード枠と、試合中の点滅枠の分だけ足す。余白は折りたたみヘッダーの下に置く。
+    // カード枠と、試合中の点滅枠の分だけ足す。
     final frame = 2.0 + (inProgress ? 6.0 : 0.0);
-    if (!statsExpanded) return headerH + _teamBlockH + statsGap + toggleH + frame;
+    if (!statsExpanded) return headerH + _teamBlockH + toggleH + frame;
     if (stackedTeams) {
       final homePitchH = showPitchers ? _pitcherBlockH(homePitchers.length) : 0.0;
       final awayPitchH = showPitchers ? _pitcherBlockH(awayPitchers.length) : 0.0;
-      return head + statsGap + toggleH + rosterBarH + homePitchH + batterHomeH + defenseH + awayPitchH + batterAwayH + defenseH + sectionPad * (_showBatterStats ? 4 : 2);
+      return head + toggleH + rosterBarH + homePitchH + batterHomeH + defenseH + awayPitchH + batterAwayH + defenseH + sectionPad * (_showBatterStats ? 4 : 2);
     }
     final pitcherN = math.max(1, math.max(homePitchers.length, awayPitchers.length));
     final pitcherH = showPitchers ? pitcherN * _playerRowH + _seasonBlockH() : 0.0;
     final batterH = _showBatterStats ? math.max(1, math.max(batterHome, batterAway)) * _playerRowH : 0.0;
-    return head + statsGap + toggleH + rosterBarH + pitcherH + batterH + defenseH + sectionPad * 2;
+    return head + toggleH + rosterBarH + pitcherH + batterH + defenseH + sectionPad * 2;
   }
 
   double _statLeadWidth(double badgeWidth) {
@@ -4444,7 +4442,8 @@ class _TableGameCard extends StatelessWidget {
     );
   }
 
-  Widget _seriesStarRow(SeriesStarCount stars, Color textColor) {
+  Widget _seriesStarRow(SeriesStarCount stars, Color textColor, Color? teamColor) {
+    final winColor = seriesStarColor(teamColor);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -4454,7 +4453,7 @@ class _TableGameCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 11,
               height: 1,
-              color: i < stars.wins ? const Color(0xFFFFD600) : textColor,
+              color: i < stars.wins ? winColor : textColor,
             ),
           ),
       ],
@@ -4524,7 +4523,7 @@ class _TableGameCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                  if (stars != null && stars.slots > 0) _seriesStarRow(stars, textColor),
+                  if (stars != null && stars.slots > 0) _seriesStarRow(stars, textColor, color),
                       ],
                     ),
                   ),
@@ -5955,10 +5954,7 @@ class _TableGameCard extends StatelessWidget {
                 );
               }),
             ),
-            if (_hasCollapsibleStats) ...[
-              _playerStatsToggle(),
-              const SizedBox(height: _statsGap),
-            ],
+            if (_hasCollapsibleStats) _playerStatsToggle(),
             if (showStats && _showRosterPicker) _allBattersBar(),
             if (showStats && stackedTeams) ...[
               teamStats(

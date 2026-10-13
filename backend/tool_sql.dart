@@ -24,7 +24,7 @@ INSERT INTO t_nortification (
     updpgm,
     updenv
 ) VALUES 
-('ゲーム差を視覚的に表現する図を表示するようにしました。', 'ゲーム差を視覚的に表現する図を表示するようにしました。', 1, false, 'SYS', 'UPD', '', 0, 'SQLCreator', 'SQLCreator', 0, 'SQLCreator', 'SQLCreator') 
+('予想の参照機能を追加しました。', '予想の参照機能を追加しました。', 1, false, 'SYS', 'UPD', '', 0, 'SQLCreator', 'SQLCreator', 0, 'SQLCreator', 'SQLCreator') 
 RETURNING id;
 ''';
 

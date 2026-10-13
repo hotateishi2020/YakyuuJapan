@@ -494,13 +494,17 @@ class PredictGroup {
       final key = '${_asInt(row['id_league'])}|${_asInt(row['id_stats'])}';
       final bucket = byTitle.putIfAbsent(key, () {
         final names = <String>[];
+        final backs = <String>[];
         final matched = <Map<String, dynamic>>[];
         for (final leader in leaders) {
           if (_asInt(leader['int_year']) != year) continue;
           if (_asInt(leader['id_league']) != _asInt(row['id_league'])) continue;
           if (_asInt(leader['id_stats']) != _asInt(row['id_stats'])) continue;
           final name = '${leader['player_name'] ?? ''}'.trim();
-          if (name.isNotEmpty && !names.contains(name)) names.add(name);
+          if (name.isNotEmpty && !names.contains(name)) {
+            names.add(name);
+            backs.add('${leader['color_back'] ?? ''}'.trim());
+          }
           matched.add(leader);
         }
         return {
@@ -510,6 +514,7 @@ class PredictGroup {
           'title': '${row['title'] ?? ''}',
           'pitcher': row['flg_pitcher'] == true,
           'current': names.join('、'),
+          'color_backs': backs,
           'color_back': names.length > 1 ? 'white' : _singlePaint(matched, 'color_back'),
           'color_font': names.length > 1 ? 'black' : _singlePaint(matched, 'color_font'),
           'picks': <Map<String, dynamic>>[],
@@ -670,12 +675,16 @@ class PredictGroup {
     required int? year,
   }) {
     final names = <String>[];
+    final backs = <String>[];
     final matched = <Map<String, dynamic>>[];
     for (final leader in leaders) {
       if (_asInt(leader['int_year']) != year) continue;
       if (_asInt(leader['id_league']) != leagueId || _asInt(leader['id_stats']) != statsId) continue;
       final name = '${leader['player_name'] ?? ''}'.trim();
-      if (name.isNotEmpty && !names.contains(name)) names.add(name);
+      if (name.isNotEmpty && !names.contains(name)) {
+        names.add(name);
+        backs.add('${leader['color_back'] ?? ''}'.trim());
+      }
       matched.add(leader);
     }
     return {
@@ -685,6 +694,7 @@ class PredictGroup {
       'title': title,
       'pitcher': pitcher,
       'current': names.join('、'),
+      'color_backs': backs,
       'color_back': names.length > 1 ? 'white' : _singlePaint(matched, 'color_back'),
       'color_font': names.length > 1 ? 'black' : _singlePaint(matched, 'color_font'),
       'picks': <Map<String, dynamic>>[],

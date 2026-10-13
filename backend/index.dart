@@ -38,6 +38,7 @@ final Map<String, DateTime> _predictionsCacheAt = {};
 
 /// /predictions/part 用（org|part）
 final Map<String, String> _predictionsPartCacheBody = {};
+final Map<String, Future<String>> _partBuildInflight = {};
 final Map<String, DateTime> _predictionsPartCacheAt = {};
 /// 試合パートで前回読んだ t_game の更新日時。同じなら集計SQLを出さない。
 final Map<String, String> _predictionsGamesRevision = {};
@@ -1789,8 +1790,20 @@ void main() async {
             );
           }
         }
-        final payload = await _buildPredictionsPart(part, org, year, from: window.from, to: window.to);
-        final body = jsonEncode(payload);
+        final inflight = _partBuildInflight[cacheKey];
+        final Future<String> build;
+        if (inflight != null) {
+          build = inflight;
+        } else {
+          build = _buildPredictionsPart(part, org, year, from: window.from, to: window.to).then(jsonEncode);
+          _partBuildInflight[cacheKey] = build;
+        }
+        final String body;
+        try {
+          body = await build;
+        } finally {
+          if (identical(_partBuildInflight[cacheKey], build)) _partBuildInflight.remove(cacheKey);
+        }
         _predictionsPartCacheBody[cacheKey] = body;
         _predictionsPartCacheAt[cacheKey] = DateTime.now();
         if (part == 'games') {

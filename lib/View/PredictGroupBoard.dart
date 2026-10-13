@@ -575,8 +575,22 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
     return current.contains('、');
   }
 
+  List<Color> _leaderColors(Map<String, dynamic> row) {
+    final raw = row['color_backs'];
+    if (raw is! List) return const [];
+    return [
+      for (final item in raw)
+        if (_teamPaint(item) != null) _teamPaint(item)!,
+    ];
+  }
+
   Color? _resultBack(Map<String, dynamic> row) {
-    if (_tiedLeaders(row)) return Colors.white;
+    if (_tiedLeaders(row)) {
+      final colors = _leaderColors(row);
+      if (colors.length == 1) return colors.first;
+      if (colors.isEmpty) return Colors.white;
+      return null;
+    }
     return _teamPaint(row['color_back']);
   }
 
@@ -775,14 +789,35 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
     Color? Function(Map<String, dynamic> row)? titleColor,
   }) {
     const gridLine = Color(0xFFD0D0D6);
-    Widget cell(String text, {bool hit = false, Color? color, FontWeight weight = FontWeight.w600, Color? background, bool names = false}) {
+    const headerBackground = Color(0xFFE0E0E0);
+    Widget cell(
+      String text, {
+      bool hit = false,
+      Color? color,
+      FontWeight weight = FontWeight.w600,
+      Color? background,
+      List<Color>? gradient,
+      bool names = false,
+    }) {
       final style = TextStyle(fontSize: 13, fontWeight: weight, color: color ?? Colors.black87, height: 1.2);
+      final paints = gradient ?? const <Color>[];
+      final useGradient = !hit && paints.length >= 2;
+      final fill = hit ? const Color(0xFFFFCC00) : (background ?? const Color(0xFFFFF3C4));
       return TableCell(
         verticalAlignment: TableCellVerticalAlignment.intrinsicHeight,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
           alignment: Alignment.center,
-          color: hit ? const Color(0xFFFFCC00) : (background ?? const Color(0xFFFFF3C4)),
+          color: useGradient ? null : fill,
+          decoration: useGradient
+              ? BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: paints,
+                  ),
+                )
+              : null,
           child: names ? _fitNames(text, style) : Text(text.isEmpty ? '—' : text, textAlign: TextAlign.center, style: style),
         ),
       );
@@ -822,11 +857,17 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
       children: [
         line(
           [
-            cell('', weight: FontWeight.bold, background: const Color(0xFFF7F7F7)),
-            cell(resultHeader, weight: FontWeight.bold, background: const Color(0xFFF7F7F7)),
-            for (final user in users) cell(_userName(user), weight: FontWeight.bold, color: _userColor(user), background: const Color(0xFFF7F7F7)),
+            cell('', weight: FontWeight.bold, background: headerBackground),
+            cell(resultHeader, weight: FontWeight.bold, background: headerBackground),
+            for (final user in users)
+              cell(
+                _userName(user),
+                weight: FontWeight.bold,
+                color: _userColor(user),
+                background: headerBackground,
+              ),
           ],
-          background: const Color(0xFFF7F7F7),
+          background: headerBackground,
         ),
         for (final row in rows)
           line([
@@ -835,6 +876,7 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
               centerOf(row),
               background: _resultBack(row),
               color: _resultFont(row),
+              gradient: _leaderColors(row),
               names: true,
             ),
             for (final user in users) cell(pickName(row, user), hit: pickHit(row, user), names: true),

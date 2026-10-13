@@ -198,8 +198,11 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   bool get _boardContentReady => _partReady(_LoadPart.standings) || _partReady(_LoadPart.games) || _partReady(_LoadPart.players);
 
   Future<void> _bootstrapWithAuth() async {
+    final authRestore = AuthSession.instance.restore();
+    // 試合・順位はログイン確認を待たない。確認中に DB が塞がってもタブ取得を遅らせない。
+    final boardLoad = _loadThenWatchGames();
     try {
-      await AuthSession.instance.restore().timeout(const Duration(seconds: 15));
+      await authRestore.timeout(const Duration(seconds: 15));
     } catch (e, st) {
       unawaited(AuthSession.instance.reportTimeout(e, st));
     }
@@ -227,7 +230,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       }
     }
     try {
-      await _loadThenWatchGames().timeout(const Duration(seconds: 45));
+      await boardLoad;
     } catch (e, st) {
       unawaited(AuthSession.instance.reportTimeout(e, st));
     }
@@ -771,7 +774,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       if (!mounted || res.statusCode != 200) return;
       final decoded = jsonDecode(res.body);
       final raw = decoded is Map ? decoded['invites'] : null;
-      setState(() {
+        setState(() {
         _predictInvites = [
           if (raw is List)
             for (final row in raw)
@@ -938,10 +941,10 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     });
     _gamesPollTimer?.cancel();
       if (usable) {
-      // 通信で確定していないパートは、画面に出ていても取り直す
+      // セッションにあればそのまま出す。無いパートだけ補う。
       final missing = <_LoadPart>[
         for (final part in _LoadPart.values)
-          if (!_partLoadedForYear(kind, part)) part,
+          if (!cached.partReady(part)) part,
       ];
       if (missing.isNotEmpty) {
         unawaited(_fetchOrgParts(kind, background: true, only: _partsForItemView(missing)));
@@ -957,10 +960,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     await Future<void>.delayed(const Duration(seconds: 20));
     if (!mounted) return;
     final other = _orgKind == OrgKind.npb ? OrgKind.mlb : OrgKind.npb;
-    final otherConfirmed = _partLoadedForYear(other, _LoadPart.games) &&
-        _partLoadedForYear(other, _LoadPart.standings) &&
-        _partLoadedForYear(other, _LoadPart.players);
-    if (otherConfirmed || _orgLoadFutures.containsKey(other)) return;
+    if ((_orgCache[other]?.hasContent ?? false) || _orgLoadFutures.containsKey(other)) return;
     await fetchData(kind: other, background: true);
   }
 
@@ -976,22 +976,18 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   Future<void> _loadScoreOnce() async {
     final year = _seasonYear;
     final gen = ++_scoreGen;
-    if (_scoreNetworkReady) {
+    if (_scoreNetworkReady || _scoreReady) {
       if (_scoreLoading && gen == _scoreGen) {
         _scoreLoading = false;
         if (mounted) setState(() {});
       }
+      if (!_scoreNetworkReady) unawaited(_refreshScoreQuietly(year, gen));
       return;
     }
     _scoreLoading = true;
     if (mounted) setState(() {});
     try {
-      await Future.wait([
-        for (final kind in OrgKind.values) ...[
-          _ensureScorePart(kind, _LoadPart.standings, year),
-          _ensureScorePart(kind, _LoadPart.players, year),
-        ],
-      ]).timeout(const Duration(seconds: 45));
+      await _refreshScoreQuietly(year, gen);
     } catch (e, st) {
       unawaited(AuthSession.instance.reportTimeout(e, st));
     } finally {
@@ -1011,6 +1007,16 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   Future<void> _ensureScorePart(OrgKind kind, _LoadPart part, int year) {
     if (_partLoadedForYear(kind, part)) return Future<void>.value();
     return _fetchPart(kind, part, year, background: true);
+  }
+
+  /// 順位と個人成績は団体ごとに順番に取る。同時に走らせると試合取得がタイムアウトする。
+  Future<void> _refreshScoreQuietly(int year, int gen) async {
+    for (final kind in [_orgKind, if (_orgKind == OrgKind.npb) OrgKind.mlb else OrgKind.npb]) {
+      if (!mounted || gen != _scoreGen || _seasonYear != year) return;
+      await _ensureScorePart(kind, _LoadPart.standings, year);
+      if (!mounted || gen != _scoreGen || _seasonYear != year) return;
+      await _ensureScorePart(kind, _LoadPart.players, year);
+    }
   }
 
   Future<void> _ensureSharedInfo() {
@@ -1427,15 +1433,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         if (part != _LoadPart.games) part,
     ];
     if (rest.isEmpty) return;
-    final awaitRest = only != null && !pending.contains(_LoadPart.games);
-    if (awaitRest) {
-      await Future.wait([
-        for (final part in rest) _fetchPart(target, part, _seasonYear, background: background),
-      ]);
-      return;
-    }
     for (final part in rest) {
-      unawaited(_fetchPart(target, part, _seasonYear, background: true));
+      await _fetchPart(target, part, _seasonYear, background: true);
     }
   }
 
@@ -1481,15 +1480,23 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         from = ymdOf(window.from);
         to = ymdOf(window.to);
       }
-      final haveGames = part == _LoadPart.games && _partLoadedForYear(target, part);
-      final res = await http.get(Env.api(_partPath(target, part.name, year, fresh: fresh, haveGames: haveGames, from: from, to: to))).timeout(const Duration(seconds: 60));
+      final cachedGames = _orgCache[target]?.games.isNotEmpty ?? false;
+      final haveGames = part == _LoadPart.games && (_partLoadedForYear(target, part) || cachedGames);
+      final res = await http
+          .get(Env.api(_partPath(target, part.name, year, fresh: fresh, haveGames: haveGames, from: from, to: to)))
+          .timeout(const Duration(seconds: 150));
       if (res.statusCode != 200) {
         logger.w('part ${part.name} HTTP ${res.statusCode}');
         _maybeSetPartError(target, background, 'HTTPエラー: ${res.statusCode}');
         return;
       }
       final map = jsonDecode(res.body) as Map<String, dynamic>;
-      if (part == _LoadPart.games && map['unchanged'] == true && _partLoadedForYear(target, part)) return;
+      if (part == _LoadPart.games && map['unchanged'] == true && (_partLoadedForYear(target, part) || (_orgCache[target]?.games.isNotEmpty ?? false))) {
+        _loadedPartYears['${target.name}|${part.name}'] = year;
+        _ensureCache(target).readyParts.add(part);
+        _readyParts.putIfAbsent(target, () => <_LoadPart>{}).add(part);
+        return;
+      }
       if (part != _LoadPart.info && year != _seasonYear) {
         return;
       }

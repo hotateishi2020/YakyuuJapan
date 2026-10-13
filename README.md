@@ -27,7 +27,7 @@ cp -R build/web/* backend/public/
 
 git add . 
 
-git commit -m "予想の参照機能を追加しました。" 
+git commit -m "表示の修正を行いました。" 
 
 git push 
 

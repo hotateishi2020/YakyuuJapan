@@ -2059,13 +2059,26 @@ class _TableGameCard extends StatelessWidget {
     return out;
   }
 
-  Widget _seasonStatTable(String stat, String predict, double fontSize, {required String pitcherName}) {
+  Widget _seasonStatTable(BuildContext context, String stat, String predict, double fontSize, {required String pitcherName}) {
+    // 試合カードが小さくても、画数の多いスタッツ名を読める大きさに保つ。
+    fontSize = math.max(12.0, fontSize);
     final lines = _seasonDisplayLines(stat, pitcherName);
     if (lines.isEmpty) return const SizedBox.shrink();
     final colors = _seasonChipColors(predict, [for (final line in lines) line.label]);
+    final scaler = MediaQuery.textScalerOf(context);
+    final labelStyle = DefaultTextStyle.of(context).style.merge(
+      TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold, height: 1),
+    );
     var labelW = 0.0;
     for (final line in lines) {
-      final w = _textWidth(line.label, fontSize, weight: FontWeight.bold) + 8;
+      final painter = TextPainter(
+        text: TextSpan(text: line.label, style: labelStyle),
+        textDirection: Directionality.of(context),
+        textScaler: scaler,
+        maxLines: 1,
+      )..layout();
+      final w = math.max(painter.width, scaler.scale(fontSize) * line.label.runes.length).ceilToDouble() + 8;
+      painter.dispose();
       if (w > labelW) labelW = w;
     }
     Widget valueText(int i) {
@@ -4714,7 +4727,7 @@ class _TableGameCard extends StatelessWidget {
                           if (_seasonDisplayLines(pitcher.stat, pitcher.name).isNotEmpty)
                             Padding(
                               padding: const EdgeInsets.only(top: _seasonGap),
-                              child: _seasonStatTable(pitcher.stat, pitcher.predict, statSize, pitcherName: pitcher.name),
+                              child: _seasonStatTable(context, pitcher.stat, pitcher.predict, statSize, pitcherName: pitcher.name),
                             ),
                         ],
                       ),

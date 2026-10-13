@@ -79,6 +79,7 @@ void main() {
                   'current': '佐藤輝明、近本光司',
                   'color_back': 'tomato',
                   'color_font': 'white',
+                  'color_backs': ['tomato', 'navy'],
                   'picks': [
                     {'id_user': 1, 'name': '佐藤輝明', 'hit': true},
                     {'id_user': 2, 'name': '近本光司', 'hit': false},
@@ -145,6 +146,10 @@ void main() {
       find.byWidgetPredicate((widget) => widget is Container && widget.color == const Color(0xFFFF6347)),
       findsOneWidget,
     );
+    expect(
+      find.byWidgetPredicate((widget) => widget is Container && widget.color == const Color(0xFF424242)),
+      findsWidgets,
+    );
     expect(find.text('佐藤輝明、近本光司'), findsNothing);
     final sato = find.byWidgetPredicate((widget) => widget is Text && widget.data == '佐藤輝明' && widget.style?.color == Colors.black);
     final chikamoto = find.byWidgetPredicate((widget) => widget is Text && widget.data == '近本光司' && widget.style?.color == Colors.black);
@@ -153,10 +158,11 @@ void main() {
     expect(tester.widget<Text>(sato).maxLines, 1);
     expect(tester.widget<Text>(chikamoto).maxLines, 1);
     expect(tester.getTopLeft(sato).dy, lessThan(tester.getTopLeft(chikamoto).dy));
-    expect(
-      tester.widget<Container>(find.ancestor(of: sato, matching: find.byType(Container)).first).color,
-      Colors.white,
-    );
+    final tiedBox = tester.widget<Container>(find.ancestor(of: sato, matching: find.byType(Container)).first);
+    final tiedGradient = (tiedBox.decoration as BoxDecoration).gradient as LinearGradient;
+    expect(tiedGradient.begin, Alignment.topCenter);
+    expect(tiedGradient.end, Alignment.bottomCenter);
+    expect(tiedGradient.colors, [const Color(0xFFFF6347), const Color(0xFF001F3F)]);
     expect(
       find.byWidgetPredicate((widget) => widget is Container && widget.color == const Color(0xFF001F3F)),
       findsOneWidget,

@@ -1149,6 +1149,52 @@ class AppSql {
     ''';
   }
 
+  /// 成績は登録済みスナップショットだけ読む。予想登録情報も同じ往復で取得する。
+  /// 団体の絞り込みをDB側で行い、画面要求ではランキング集計を実行しない。
+  static String selectPlayerDisplay(List<int> leagueIds) {
+    final ids = leagueIds.where((id) => id > 0).toSet().toList()..sort();
+    final leagues = ids.isEmpty ? 'NULL' : ids.join(', ');
+    return '''
+      SELECT 'stats' AS kind, s.row_no,
+        CASE WHEN (s.payload->>'int_rank')::int = 1 THEN
+          s.payload || jsonb_build_object(
+            'flg_pitcher', m_stats.flg_pitcher,
+            'league_name', m_league.name_short
+          )
+        ELSE s.payload END AS payload
+      FROM v_stats_player s
+      LEFT JOIN m_stats ON m_stats.id = (s.payload->>'id_stats')::int
+      LEFT JOIN m_league ON m_league.id = (s.payload->>'id_league')::int
+      WHERE s.int_year = \$1
+        AND (s.payload->>'id_league')::int IN ($leagues)
+      UNION ALL
+      SELECT 'prediction' AS kind, 0 AS row_no, to_jsonb(p) AS payload
+      FROM (
+        SELECT p.id_user, m_user.name_last AS username,
+          p.id_league, p.id_stats, p.id_player, p.id_team,
+          m_league.name_short AS league_name, m_stats.title,
+          m_player.name_last || m_player.name_first AS player_name,
+          m_player.name_full AS full_name,
+          m_stats.int_index, m_stats.flg_pitcher, m_user.code_color,
+          m_team.color_back, m_team.color_font,
+          CASE WHEN \$1 = EXTRACT(YEAR FROM CURRENT_DATE)::int AND EXISTS (
+            SELECT 1 FROM t_game g
+            WHERE g.datetime_start >= CURRENT_DATE
+              AND g.datetime_start < CURRENT_DATE + INTERVAL '1 day'
+              AND (g.id_pitcher_home = p.id_player OR g.id_pitcher_away = p.id_player)
+          ) THEN m_user.code_color ELSE '' END AS color_today
+        FROM t_predict_player p
+        LEFT JOIN m_user ON m_user.id = p.id_user
+        LEFT JOIN m_league ON m_league.id = p.id_league
+        LEFT JOIN m_stats ON m_stats.id = p.id_stats
+        LEFT JOIN m_player ON m_player.id = p.id_player
+        LEFT JOIN m_team ON m_team.id = p.id_team
+        WHERE p.year = \$1 AND p.id_league IN ($leagues)
+      ) p
+      ORDER BY kind, row_no
+    ''';
+  }
+
   // t_predict_player
   static String selectPredictPlayer() {
     return '''
@@ -1458,6 +1504,11 @@ ORDER BY mt.id_league, tpt.int_rank
       SELECT
         m_stats.title,
         tsp.int_rank,
+        tsp.id_player,
+        tsp.id_team,
+        m_stats.flg_pitcher,
+        m_league.name_short AS league_name,
+        COALESCE(m_player.name_last, '') || COALESCE(m_player.name_first, '') AS prediction_name,
         m_team.name_shortest AS name_team,
         m_team.color_font,
         m_team.color_back,
@@ -1620,6 +1671,10 @@ ORDER BY mt.id_league, tpt.int_rank
       GROUP BY
         m_stats.title,
         tsp.int_rank,
+        tsp.id_player,
+        tsp.id_team,
+        m_league.name_short,
+        m_player.name_first,
         m_team.name_shortest,
         m_team.color_font,
         m_team.color_back,

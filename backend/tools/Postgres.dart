@@ -15,12 +15,16 @@ class Postgres {
   /// 同時に保持する最大アイドル接続数（並列クエリ用に複数確保）
   static const int _maxPoolSize = 8;
   static const Duration _acquireWait = Duration(seconds: 4);
-  static const Duration _pingTimeout = Duration(seconds: 1);
+  static const Duration _pingTimeout = Duration(seconds: 3);
+  static const Duration _recentReleaseWindow = Duration(seconds: 30);
 
   static final Queue<Connection> _idle = Queue<Connection>();
+  static final Map<Connection, DateTime> _idleReleasedAt = Map.identity();
   static int _opened = 0;
   static final List<Completer<Connection>> _waiters = [];
   static final Set<Connection> _overflow = <Connection>{};
+  static Future<Connection> Function()? _openForTest;
+  static DateTime Function() _clock = DateTime.now;
 
   static Endpoint get _endpoint => Endpoint(
         host: _host,
@@ -37,6 +41,8 @@ class Postgres {
       );
 
   static Future<Connection> _openFresh() async {
+    final open = _openForTest;
+    if (open != null) return open();
     final conn = await Connection.open(_endpoint, settings: _settings);
     await conn.execute('SET search_path TO public');
     await conn.execute("SET TIME ZONE 'Asia/Tokyo'");
@@ -70,8 +76,15 @@ class Postgres {
   }
 
   static Future<bool> _isAlive(Connection conn) async {
+    final releasedAt = _idleReleasedAt.remove(conn);
     try {
       if (!conn.isOpen) return false;
+      if (releasedAt != null) {
+        final idleFor = _clock().difference(releasedAt);
+        // 直近の正常返却後にも毎回pingすると、遠隔DBとの往復と再接続が
+        // 初期表示に積み重なる。閉じた接続の確認と実クエリのretryは維持する。
+        if (!idleFor.isNegative && idleFor < _recentReleaseWindow) return true;
+      }
       await conn.execute('SELECT 1').timeout(_pingTimeout);
       return true;
     } catch (_) {
@@ -80,6 +93,7 @@ class Postgres {
   }
 
   static Future<void> _closeNow(Connection conn) async {
+    _idleReleasedAt.remove(conn);
     final overflow = _overflow.remove(conn);
     if (!overflow) {
       _opened = (_opened - 1).clamp(0, _maxPoolSize);
@@ -141,6 +155,7 @@ class Postgres {
       return;
     }
     if (_idle.length < _maxPoolSize) {
+      _idleReleasedAt[conn] = _clock();
       _idle.addLast(conn);
       return;
     }
@@ -149,11 +164,19 @@ class Postgres {
 
   static Future<void> _serveWaiter() async {
     if (_waiters.isEmpty) return;
-    if (_idle.isNotEmpty) {
-      _waiters.removeAt(0).complete(_idle.removeLast());
-      return;
+    while (_idle.isNotEmpty) {
+      final conn = _idle.removeLast();
+      if (await _isAlive(conn)) {
+        if (_waiters.isEmpty) {
+          await release(conn);
+        } else {
+          _waiters.removeAt(0).complete(conn);
+        }
+        return;
+      }
+      await _closeNow(conn);
     }
-    if (_opened < _maxPoolSize) {
+    if (_waiters.isNotEmpty && _opened < _maxPoolSize) {
       final waiter = _waiters.removeAt(0);
       try {
         waiter.complete(await _openCounted());
@@ -161,6 +184,24 @@ class Postgres {
         waiter.completeError(e, st);
       }
     }
+  }
+
+  /// テスト用。貸出中の接続がない状態で呼び、外部DBと実時間への依存を外す。
+  static Future<void> resetPoolForTest({
+    Future<Connection> Function()? open,
+    DateTime Function()? clock,
+  }) async {
+    if (_waiters.isNotEmpty ||
+        _opened != _idle.length ||
+        _overflow.isNotEmpty) {
+      throw StateError('接続の貸出・待機中にはテスト用プールを初期化できません');
+    }
+    while (_idle.isNotEmpty) {
+      await _closeNow(_idle.removeLast());
+    }
+    _idleReleasedAt.clear();
+    _openForTest = open;
+    _clock = clock ?? DateTime.now;
   }
 
   /// 1本の接続で処理し、終了後にプールへ戻す

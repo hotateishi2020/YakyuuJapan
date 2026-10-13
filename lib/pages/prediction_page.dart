@@ -8,6 +8,7 @@ import '../tools/app_logger.dart';
 import '../tools/board_session.dart';
 import '../tools/browser_cookie.dart';
 import '../tools/page_visibility.dart';
+import '../tools/startup_response.dart';
 import '../tools/color_parse.dart';
 import '../config/app_design.dart';
 import '../config/org_config.dart';
@@ -142,6 +143,9 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   final Map<String, int> _loadedPartYears = {};
   PersonalStatsLayout _personalStatsLayout = PersonalStatsLayout.segment;
   Timer? _gamesPollTimer;
+  bool _initialGamesDisplayComplete = false;
+  bool _gamesWatchNotified = false;
+  bool _gamesWatchNotifying = false;
   bool _predictGroupsOpen = false;
   bool _predictGroupsLoading = false;
   String? _predictGroupsError;
@@ -200,7 +204,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   Future<void> _bootstrapWithAuth() async {
     final authRestore = AuthSession.instance.restore();
     // 試合・順位はログイン確認を待たない。確認中に DB が塞がってもタブ取得を遅らせない。
-    final boardLoad = _loadThenWatchGames();
+    // 予想タブでは、表示しない試合の取得で予想一覧の DB 接続を奪わない。
+    Future<void>? boardLoad = _predictGroupsOpen ? null : _loadThenWatchGames();
     try {
       await authRestore.timeout(const Duration(seconds: 15));
     } catch (e, st) {
@@ -220,7 +225,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         if (mounted) {
           setState(() => _predictGroupsLoading = _predictGroups.isEmpty);
         }
-        unawaited(_loadInitialPredictGroups());
+        await _loadInitialPredictGroups();
       } else if (mounted) {
         setState(() {
           _predictGroups = const [];
@@ -229,6 +234,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         });
       }
     }
+    if (!mounted) return;
+    boardLoad ??= _loadThenWatchGames();
     try {
       await boardLoad;
     } catch (e, st) {
@@ -906,6 +913,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     if (_predictGroupsOpen && kind == _orgKind) {
       writeBrowserCookie(_orgCookie, OrgConfig.of(kind).label.toLowerCase());
       setState(() => _predictGroupsOpen = false);
+      unawaited(_loadThenWatchGames());
       return;
     }
     unawaited(AuthSession.instance.reportAction(kind == OrgKind.npb ? 'npbタブを開いた' : 'mlbタブを開いた'));
@@ -940,19 +948,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       }
     });
     _gamesPollTimer?.cancel();
-      if (usable) {
-      // セッションにあればそのまま出す。無いパートだけ補う。
-      final missing = <_LoadPart>[
-        for (final part in _LoadPart.values)
-          if (!cached.partReady(part)) part,
-      ];
-      if (missing.isNotEmpty) {
-        unawaited(_fetchOrgParts(kind, background: true, only: _partsForItemView(missing)));
-      }
-      await _startGamesWatch();
-      unawaited(_prefetchOtherOrg());
-        return;
-    }
     await _loadThenWatchGames();
   }
 
@@ -1238,20 +1233,40 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   Future<void> _startGamesWatch() async {
-    if (!mounted) return;
+    if (!_canWatchGames) return;
     // 一部パート失敗の error があっても、取れたデータがあれば監視は続ける。
     // 再取得は登録済みの集計テーブルを読むだけで、スクレイピングは呼ばない。
     // t_game の更新日時が前回と同じときはサーバが集計SQLを出さない。
     if (error != null && !_boardContentReady) return;
+    unawaited(_notifyGamesDisplayReady());
     _gamesPollTimer?.cancel();
     _gamesPollTimer = Timer.periodic(const Duration(minutes: 1), (_) {
       unawaited(_pollDisplayedGames());
     });
   }
 
+  bool get _canWatchGames => mounted && _initialGamesDisplayComplete &&
+      _partLoadedForYear(_orgKind, _LoadPart.games) &&
+      !_orgLoadFutures.containsKey(_orgKind) &&
+      _seasonYear == DateTime.now().year;
+
+  Future<void> _notifyGamesDisplayReady() async {
+    if (!_canWatchGames || _gamesWatchNotified || _gamesWatchNotifying) return;
+    _gamesWatchNotifying = true;
+    try {
+      final response = await http.post(Env.api('/predictions/ready'))
+          .timeout(const Duration(seconds: 10));
+      _gamesWatchNotified = response.statusCode == 204;
+    } catch (_) {
+      // 通知失敗で表示を止めず、次の定期取得時に再通知する。
+    } finally {
+      _gamesWatchNotifying = false;
+    }
+  }
+
   Future<void> _pollDisplayedGames() async {
-    if (!mounted || _gamesPollRunning) return;
-    if (_seasonYear != DateTime.now().year) return;
+    if (!_canWatchGames || _gamesPollRunning) return;
+    unawaited(_notifyGamesDisplayReady());
     _gamesPollRunning = true;
     try {
       await _fetchPart(_orgKind, _LoadPart.games, _seasonYear, background: true, force: true);
@@ -1261,7 +1276,12 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   Future<void> _loadThenWatchGames() async {
-    await fetchData();
+    final kind = _orgKind;
+    final year = _seasonYear;
+    _initialGamesDisplayComplete = false;
+    _gamesPollTimer?.cancel();
+    await fetchData(kind: kind);
+    if (!mounted || kind != _orgKind || year != _seasonYear) return;
     unawaited(_ensureSharedInfo());
     unawaited(_loadScoreOnce());
     if (!mounted) return;
@@ -1272,6 +1292,10 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       });
     }
     if (error != null && !_boardContentReady) return;
+    // 応答の受信だけでなく、読み込んだ内容の描画を待って定期取得を許可する。
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted || kind != _orgKind || year != _seasonYear) return;
+    _initialGamesDisplayComplete = true;
     await _startGamesWatch();
     unawaited(_prefetchOtherOrg());
   }
@@ -1396,12 +1420,17 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
 
   Future<void> _selectItemYear(int year) async {
     if (_seasonYear == year) return;
+    _initialGamesDisplayComplete = false;
+    _gamesPollTimer?.cancel();
     unawaited(AuthSession.instance.reportAction('年度を変更した', year: year));
     setState(() {
       _seasonYear = year;
       _invalidateYearParts();
     });
     await _ensureSeasonYearLoaded();
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted || year != _seasonYear) return;
+    _initialGamesDisplayComplete = true;
     unawaited(_loadScoreOnce());
     if (year == DateTime.now().year) {
       unawaited(_startGamesWatch());
@@ -1417,32 +1446,29 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     List<_LoadPart>? only,
   }) async {
     _ensureCache(target);
-    // タブを開いていなくても試合・順位・個人成績は取る。画面に出すのは試合を先に待つ。
+    // 試合が遅くても順位・個人成績を先に表示できるよう、取得を分ける。
+    final year = _seasonYear;
     final parts = only ?? _partsForItemView(null);
     final pending = [
       for (final part in parts)
         if (!_partLoadedForYear(target, part)) part,
     ];
-    if (pending.contains(_LoadPart.games)) {
-      await _fetchPart(target, _LoadPart.games, _seasonYear, background: background);
-    }
-    _warmStandingsForGames(target);
-    if (pending.isEmpty) return;
-    final rest = [
-      for (final part in pending)
-        if (part != _LoadPart.games) part,
-    ];
-    if (rest.isEmpty) return;
-    for (final part in rest) {
-      await _fetchPart(target, part, _seasonYear, background: true);
-    }
-  }
-
-  /// 試合情報のクライマックス消化判定に使う。表示は待たない。
-  void _warmStandingsForGames(OrgKind target) {
-    if (target != _orgKind || _itemTab != 0) return;
-    if (_partLoadedForYear(target, _LoadPart.standings)) return;
-    unawaited(_fetchPart(target, _LoadPart.standings, _seasonYear, background: true));
+    // 個人成績を順位待ちにしない。案内情報は順位・成績の後に取得する。
+    await Future.wait([
+      if (pending.contains(_LoadPart.games))
+        _fetchPart(target, _LoadPart.games, year, background: background),
+      () async {
+        await Future.wait([
+          for (final part in [_LoadPart.standings, _LoadPart.players])
+            if (pending.contains(part))
+              _fetchPart(target, part, year, background: background),
+        ]);
+        if (!mounted || _seasonYear != year) return;
+        if (pending.contains(_LoadPart.info)) {
+          await _fetchPart(target, _LoadPart.info, year, background: background);
+        }
+      }(),
+    ]);
   }
 
   /// 項目ごと表示。開いているタブに関係なく、試合・順位・個人成績と Info を取る。
@@ -1482,9 +1508,9 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       }
       final cachedGames = _orgCache[target]?.games.isNotEmpty ?? false;
       final haveGames = part == _LoadPart.games && (_partLoadedForYear(target, part) || cachedGames);
-      final res = await http
-          .get(Env.api(_partPath(target, part.name, year, fresh: fresh, haveGames: haveGames, from: from, to: to)))
-          .timeout(const Duration(seconds: 150));
+      final uri = Env.api(_partPath(target, part.name, year, fresh: fresh, haveGames: haveGames, from: from, to: to));
+      final startup = fresh ? null : await takeStartupResponse(uri);
+      final res = startup ?? await http.get(uri).timeout(const Duration(seconds: 150));
       if (res.statusCode != 200) {
         logger.w('part ${part.name} HTTP ${res.statusCode}');
         _maybeSetPartError(target, background, 'HTTPエラー: ${res.statusCode}');
@@ -1797,9 +1823,14 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                '$selected',
-                style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    '$selected',
+                    style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                  ),
+                ),
               ),
               const Icon(Icons.arrow_drop_down, color: Colors.white, size: 15),
             ],

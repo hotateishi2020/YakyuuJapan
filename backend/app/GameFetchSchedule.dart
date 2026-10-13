@@ -16,6 +16,19 @@ class GameFetchSchedule {
   static final _futureFetch = <String, Future<void> Function()>{};
   static final _cardPrint = <String, String>{};
   static int _futureEpoch = 0;
+  static bool _initialDisplayReady = false;
+
+  /// 起動時は取得処理の登録だけ行い、画面の初期表示完了後にタイマーを動かす。
+  static void markInitialDisplayReady() {
+    if (_initialDisplayReady) return;
+    _initialDisplayReady = true;
+    for (final entry in _todayFetch.entries.toList()) {
+      scheduleTodayAgain(entry.key, entry.value);
+    }
+    for (final entry in _futureFetch.entries.toList()) {
+      armFutureWatch(entry.key, entry.value);
+    }
+  }
 
   static bool takeFuture(String org, DateTime now) {
     final last = _lastFuture[org];
@@ -51,6 +64,7 @@ class GameFetchSchedule {
   /// 今日の取得が終わって [todayInterval] 後に、今日の分だけもう一度取る。
   static void scheduleTodayAgain(String org, Future<bool> Function() fetchToday) {
     _todayFetch[org] = fetchToday;
+    if (!_initialDisplayReady) return;
     if (_todayQueued[org] == true) return;
     _todayQueued[org] = true;
     final token = _todayEpoch;
@@ -81,9 +95,10 @@ class GameFetchSchedule {
 
   static bool isFutureQueued(String org) => _futureQueued[org] == true;
 
-  /// 起動後と、その後は [futureInterval] ごとに、明日以降の日程カードを見に行く。
+  /// 初期表示完了後と、その後は [futureInterval] ごとに日程カードを見に行く。
   static void armFutureWatch(String org, Future<void> Function() fetchFuture) {
     _futureFetch[org] = fetchFuture;
+    if (!_initialDisplayReady) return;
     if (_futureArmed.contains(org)) return;
     _futureArmed.add(org);
     _queueFuture(org, initial: true);
@@ -132,6 +147,7 @@ class GameFetchSchedule {
   }
 
   static void resetForTest() {
+    _initialDisplayReady = false;
     _todayEpoch++;
     _futureEpoch++;
     _lastFuture.clear();

@@ -81,6 +81,7 @@ void main() {
 
   test('今日の試合は読み込み後10秒で再取得する', () {
     GameFetchSchedule.resetForTest();
+    GameFetchSchedule.markInitialDisplayReady();
     expect(GameFetchSchedule.todayInterval, const Duration(seconds: 10));
     final now = DateTime(2026, 10, 7, 8, 0);
     expect(FetchMLB.scheduleDates(now, todayOnly: true).map((date) => date.day).toList(), [7]);
@@ -101,6 +102,7 @@ void main() {
 
   test('未来の日程カードは同じ内容なら取り直さず変わったら取り直す', () {
     GameFetchSchedule.resetForTest();
+    GameFetchSchedule.markInitialDisplayReady();
     const key = 'mlb|2026-10-15|/mlb/game/1/index';
     final first = GameFetchSchedule.normalizeCard(key, 'ドジャース 予想先発');
     expect(GameFetchSchedule.futureCardUnchanged(key, first), isFalse);

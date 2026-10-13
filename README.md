@@ -19,11 +19,10 @@ samples, guidance on mobile development, and a full API reference.
 
 cd /Users/standapp/StudioProjects/Koko 
 
-flutter build web --release 
+sh tool/build_web.sh
 
-rm -rf backend/public/* 
-
-cp -R build/web/* backend/public/ 
+`lib/` の変更は、そのままでは公開サイトに反映されません。このスクリプトで
+リリースビルドと `backend/public/` へのコピーを行い、生成ファイルもコミットしてください。
 
 git add . 
 
@@ -37,4 +36,4 @@ dart run tool_sql.dart
 
 dart run tool_sql2.dart
 
-コピペ：：dart run index.dart 
+コピペ：：dart run index.dart

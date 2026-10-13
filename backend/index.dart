@@ -16,6 +16,7 @@ import 'app/AppSql.dart';
 import 'app/Achieve.dart';
 import 'app/AceEvaluator.dart';
 import 'app/DisplaySnapshot.dart';
+import 'app/PlayerDisplay.dart';
 import 'app/GamesReadGate.dart';
 import 'app/FetchURL.dart';
 import 'app/LogDetail.dart';
@@ -44,8 +45,11 @@ final Map<String, DateTime> _predictionsPartCacheAt = {};
 final Map<String, String> _predictionsGamesRevision = {};
 final Map<String, String> _pendingGamesRevision = {};
 const Duration _predictionsCacheTtl = Duration(seconds: 45);
+int _predictionsCacheGeneration = 0;
 
 void _clearPredictionsCache() {
+  _predictionsCacheGeneration++;
+  _partBuildInflight.clear();
   _predictionsCacheBody.clear();
   _predictionsCacheAt.clear();
   _predictionsPartCacheBody.clear();
@@ -63,6 +67,9 @@ Future<Response?> _unchangedGamesResponse(
   String? to, {
   required bool clientHasGames,
 }) async {
+  // 初回は再利用する本文がないため、更新確認のためだけのDB接続を省く。
+  // 次回は revision 未登録として再取得し、その時点から更新判定を使う。
+  if (_predictionsPartCacheBody[cacheKey] == null) return null;
   String revision;
   try {
     revision = await Postgres.withConnection(
@@ -151,17 +158,23 @@ Future<Map<String, dynamic>> _buildPredictionsPartStandings(OrgKind org, int yea
 }
 
 Future<Map<String, dynamic>> _buildPredictionsPartPlayers(OrgKind org, int year) async {
-  final results = await Postgres.mapParallel([
-    (conn) => Postgres.execute(conn, AppSql.selectPredictPlayer(), data: [year]),
-    (conn) => DisplaySnapshot.players(conn, year),
-  ]);
-  final leagueIds = org.leagueIds;
+  final watch = Stopwatch()..start();
+  var acquiredMs = 0;
+  final result = await Postgres.withConnection(
+    (conn) {
+      acquiredMs = watch.elapsedMilliseconds;
+      return DisplaySnapshot.playerPart(conn, year, org.leagueIds);
+    },
+    urgent: true,
+  );
+  print('個人成績読取 ${org.code}/$year: 接続 ${acquiredMs}ms, '
+      '取得 ${watch.elapsedMilliseconds - acquiredMs}ms, ${result.stats.length}件');
   return {
     'org': org.code,
     'year': year,
     'part': 'players',
-    'predict_player': _filterByLeagues(Postgres.toJson(results[0] as Result), leagueIds),
-    'stats_player': _filterByLeagues(results[1] as List<Map<String, dynamic>>, leagueIds),
+    'predict_player': result.predictions,
+    'stats_player': result.stats,
   };
 }
 
@@ -984,10 +997,10 @@ Future<void> _warmSchemaInBackground() async {
     await FetchURL.ensureAppColumns();
     unawaited(FetchURL.seedStadiumImagesAndTeamColors());
     await Postgres.withConnection((conn) async {
-      final year = DateTimeTool.getThisYear();
-      await DisplaySnapshot.refreshTeams(conn, year);
-      await DisplaySnapshot.refreshPlayers(conn, year);
-      await DisplaySnapshot.refreshGames(conn, year);
+      // 起動時は既存スナップショットを利用する。全件再集計をキューへ
+      // 積むと、scrape のトランザクションと初期表示が互いを待ってしまう。
+      // 更新は各取得処理の完了時に行い、未作成の期間だけ読み出し時に補う。
+      await DisplaySnapshot.ensure(conn);
     });
   } catch (e, st) {
     print('schema warm failed: $e\n$st');
@@ -1069,6 +1082,7 @@ void main() async {
         if (saved is! Map) {
           return Response(400, body: jsonEncode({'ok': false, 'error': '予想設定を保存できませんでした'}), headers: {'content-type': 'application/json; charset=utf-8'});
         }
+        _clearPredictionsCache();
         return Response.ok(jsonEncode({'ok': true, 'setting': saved}), headers: {'content-type': 'application/json; charset=utf-8'});
       } catch (e, st) {
         print('予想設定の保存に失敗しました: $e');
@@ -1746,6 +1760,12 @@ void main() async {
       }
     });
 
+    // 初期表示が描画された後に届く通知。DB・認証処理を挟まず、一度だけ開始する。
+    app.post('/predictions/ready', (Request request) {
+      GameFetchSchedule.markInitialDisplayReady();
+      return Response(204);
+    });
+
     // 画面セクション単位の軽量取得（info / standings / players / games）
     // 初回表示を段階的に進めるため、重い games を待たずに他を返せる
     app.get('/predictions/part', (Request request) async {
@@ -1790,6 +1810,7 @@ void main() async {
             );
           }
         }
+        final cacheGeneration = _predictionsCacheGeneration;
         final inflight = _partBuildInflight[cacheKey];
         final Future<String> build;
         if (inflight != null) {
@@ -1804,9 +1825,11 @@ void main() async {
         } finally {
           if (identical(_partBuildInflight[cacheKey], build)) _partBuildInflight.remove(cacheKey);
         }
-        _predictionsPartCacheBody[cacheKey] = body;
-        _predictionsPartCacheAt[cacheKey] = DateTime.now();
-        if (part == 'games') {
+        if (cacheGeneration == _predictionsCacheGeneration) {
+          _predictionsPartCacheBody[cacheKey] = body;
+          _predictionsPartCacheAt[cacheKey] = DateTime.now();
+        }
+        if (part == 'games' && cacheGeneration == _predictionsCacheGeneration) {
           final revision = _pendingGamesRevision.remove(cacheKey);
           if (revision != null) _predictionsGamesRevision[cacheKey] = revision;
         }
@@ -1844,16 +1867,17 @@ void main() async {
         }
 
         final current_year = selectedYear;
+        final cacheGeneration = _predictionsCacheGeneration;
         final results = await Postgres.mapParallel([
           (conn) => Postgres.execute(conn, AppSql.selectPredictNPBTeams(), data: [current_year]),
-          (conn) => Postgres.execute(conn, AppSql.selectPredictPlayer(), data: [current_year]),
+          (conn) => DisplaySnapshot.playerPart(conn, current_year, org.leagueIds),
           (conn) => DisplaySnapshot.teams(conn, current_year),
-          (conn) => DisplaySnapshot.players(conn, current_year),
           (conn) => DisplaySnapshot.games(conn, current_year),
           (conn) => Postgres.execute(conn, AppSql.selectEventsDetails()),
           (conn) => Postgres.execute(conn, AppSql.selectNotification()),
         ]);
-        final snap = results[4] as DisplayGames;
+        final players = results[1] as PlayerDisplay;
+        final snap = results[3] as DisplayGames;
         final playRows = snap.plays;
         final gameRows = snap.games;
         final battingLines = _battingLinesOf(snap.batting);
@@ -1901,18 +1925,20 @@ void main() async {
           'org': org.code,
           'year': current_year,
           'predict_team': _filterByLeagues(Postgres.toJson(results[0] as Result), leagueIds),
-          'predict_player': _filterByLeagues(Postgres.toJson(results[1] as Result), leagueIds),
+          'predict_player': players.predictions,
           'stats_team': _filterByLeagues(results[2] as List<Map<String, dynamic>>, leagueIds),
-          'stats_player': _filterByLeagues(results[3] as List<Map<String, dynamic>>, leagueIds),
+          'stats_player': players.stats,
           'games': filteredGames,
-          'events': org.code == 'npb' ? Postgres.toJson(results[5] as Result) : const <Map<String, dynamic>>[],
-          'notification': org.code == 'npb' ? Postgres.toJson(results[6] as Result) : const <Map<String, dynamic>>[],
+          'events': org.code == 'npb' ? Postgres.toJson(results[4] as Result) : const <Map<String, dynamic>>[],
+          'notification': org.code == 'npb' ? Postgres.toJson(results[5] as Result) : const <Map<String, dynamic>>[],
           'postseason_games': _dedupeSameDayMatchups(postseason),
           'show_postseason_board': postseason.isNotEmpty || _showPostseasonBoard(snap.board),
         };
         final body = jsonEncode(payload);
-        _predictionsCacheBody[cacheKey] = body;
-        _predictionsCacheAt[cacheKey] = DateTime.now();
+        if (cacheGeneration == _predictionsCacheGeneration) {
+          _predictionsCacheBody[cacheKey] = body;
+          _predictionsCacheAt[cacheKey] = DateTime.now();
+        }
         return Response.ok(
           body,
           headers: {
@@ -1989,10 +2015,10 @@ void main() async {
     });
     // 個人成績は初期表示では取らず、起動の数分後から定期登録する。
     PlayerStatsSchedule.start(onUpdated: _clearPredictionsCache);
-    // 明日以降の日程カードを定期的に見て、変わった試合だけ読み直す。
+    // 取得処理だけ登録する。タイマーは /predictions/ready の通知後に開始する。
     GameFetchSchedule.armFutureWatch('mlb', FetchMLB.refreshFutureIfChanged);
     GameFetchSchedule.armFutureWatch('npb', FetchURL.refreshFutureIfChanged);
-    // 起動直後から今日の試合（進行中の出場成績を含む）を取りに行く。
+    // 当日の試合も初期表示完了まで定期取得を始めない。
     GameFetchSchedule.scheduleTodayAgain('mlb', FetchMLB.refreshToday);
     GameFetchSchedule.scheduleTodayAgain('npb', FetchURL.refreshTodayNPB);
   } catch (e, st) {
@@ -2161,7 +2187,9 @@ Future<Response> tryCatchAPIReadonly(
   user.code_system = code_system;
   user.flg_user = false;
   try {
-    await Postgres.withConnection((conn) => _attachRequestUser(conn, request, user));
+    if (Auth.hasSessionToken(request)) {
+      await Postgres.withConnection((conn) => _attachRequestUser(conn, request, user));
+    }
     print("🌐Routing...【" + request.requestedUri.toString() + "】");
     // DDL は待たない。列確認・seed は裏で進め、試合 SELECT を先に返す。
     FetchURL.kickSchemaEnsures();

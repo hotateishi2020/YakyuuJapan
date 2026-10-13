@@ -199,9 +199,9 @@ class Auth {
   }
 
   static Future<int?> _requireUserId(Connection conn, Request request) async {
-    await ensureSchema(conn);
     final token = _bearer(request);
     if (token == null) return null;
+    await ensureSchema(conn);
     final rows = await conn.execute(
       '''
         SELECT s.id_user
@@ -234,6 +234,9 @@ class Auth {
   }
 
   static Future<int?> userIdOf(Connection conn, Request request) => _requireUserId(conn, request);
+
+  /// 未ログインの公開ページで、認証用の接続やスキーマ確認を待たない。
+  static bool hasSessionToken(Request request) => _bearer(request) != null;
 
   static const _codeTtl = Duration(minutes: 15);
 

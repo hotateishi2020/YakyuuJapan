@@ -147,7 +147,7 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.byWidgetPredicate((widget) => widget is Container && widget.color == const Color(0xFF424242)),
+      find.byWidgetPredicate((widget) => widget is Container && widget.color == const Color(0xFFE0E0E0)),
       findsWidgets,
     );
     expect(find.text('佐藤輝明、近本光司'), findsNothing);

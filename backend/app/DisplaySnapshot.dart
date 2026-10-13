@@ -4,11 +4,11 @@ import 'package:postgres/postgres.dart';
 
 import '../tools/Postgres.dart';
 import 'AppSql.dart';
+import 'PlayerDisplay.dart';
 import 'Value.dart';
 
 /// 初期表示用の集計結果。スクレイピング登録のあとで埋め、画面はここだけ読む。
 class DisplaySnapshot {
-  static final Set<int> _playersTried = {};
   static final Set<int> _teamsTried = {};
   static bool _ensured = false;
   static Future<void> _tail = Future<void>.value();
@@ -21,7 +21,30 @@ class DisplaySnapshot {
 
   static Future<void> ensure(Connection conn) async {
     if (_ensured) return;
-    await conn.execute('''
+    // IF NOT EXISTS 付きの ALTER でも排他ロックを取る。
+    // scrape のトランザクションがスナップショット更新を待っていると、
+    // この ALTER と更新キューが互いを待ち、画面の SELECT まで止まる。
+    final schema = await conn.execute('''
+      SELECT
+        to_regclass('public.v_stats_player') IS NOT NULL
+        AND to_regclass('public.v_stats_teams') IS NOT NULL
+        AND to_regclass('public.v_games_details') IS NOT NULL
+        AND to_regclass('public.v_games_details_date') IS NOT NULL
+        AND EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_schema = 'public' AND table_name = 't_game'
+            AND column_name = 'txt_lineup_announced'
+        ) AS ready
+    ''');
+    if (schema.isNotEmpty && schema.first[0] == true) {
+      _ensured = true;
+      return;
+    }
+    // 未作成の環境でも、DDL のロック待ちを無期限にしない。
+    final previous = await conn.execute('SHOW lock_timeout');
+    await conn.execute("SET lock_timeout = '2s'");
+    try {
+      await conn.execute('''
       CREATE TABLE IF NOT EXISTS v_stats_player (
         int_year integer NOT NULL,
         row_no integer NOT NULL,
@@ -29,7 +52,7 @@ class DisplaySnapshot {
         PRIMARY KEY (int_year, row_no)
       )
     ''');
-    await conn.execute('''
+      await conn.execute('''
       CREATE TABLE IF NOT EXISTS v_stats_teams (
         int_year integer NOT NULL,
         row_no integer NOT NULL,
@@ -37,7 +60,7 @@ class DisplaySnapshot {
         PRIMARY KEY (int_year, row_no)
       )
     ''');
-    await conn.execute('''
+      await conn.execute('''
       CREATE TABLE IF NOT EXISTS v_games_details (
         int_year integer NOT NULL,
         code text NOT NULL,
@@ -48,12 +71,21 @@ class DisplaySnapshot {
         PRIMARY KEY (int_year, code, row_no)
       )
     ''');
-    await conn.execute('''
+      await conn.execute('''
       CREATE INDEX IF NOT EXISTS v_games_details_date
       ON v_games_details (int_year, code, date_game)
     ''');
-    await conn.execute("ALTER TABLE t_game ADD COLUMN IF NOT EXISTS txt_lineup_announced TEXT NOT NULL DEFAULT ''");
-    _ensured = true;
+      await conn.execute(
+          "ALTER TABLE t_game ADD COLUMN IF NOT EXISTS txt_lineup_announced TEXT NOT NULL DEFAULT ''");
+      _ensured = true;
+    } finally {
+      try {
+        await conn.execute("SELECT set_config('lock_timeout', \$1, false)",
+            parameters: ['${previous.first[0]}']);
+      } catch (_) {
+        // 呼び出し元のトランザクションが中断された場合は、その rollback が復元する。
+      }
+    }
   }
 
   static Future<void> refreshPlayers(Connection conn, int year) {
@@ -63,11 +95,17 @@ class DisplaySnapshot {
   static Future<void> _refreshPlayers(Connection conn, int year) async {
     await ensure(conn);
     final rows = Postgres.toJson(await Postgres.execute(conn, AppSql.selectStatsPlayer(), data: [year]));
+    for (final row in rows) {
+      if (_asInt(row['int_rank']) != 1) {
+        row.remove('prediction_name');
+        row.remove('flg_pitcher');
+        row.remove('league_name');
+      }
+    }
     await _atomic(conn, () async {
       await conn.execute('DELETE FROM v_stats_player WHERE int_year = \$1', parameters: [year]);
       await _insertPayloads(conn, 'v_stats_player', year, rows);
     });
-    _playersTried.add(year);
     print('初期表示スナップショット: 個人成績 $year ${rows.length}件');
   }
 
@@ -142,13 +180,18 @@ class DisplaySnapshot {
   }
 
   static Future<List<Map<String, dynamic>>> players(Connection conn, int year) async {
-    await ensure(conn);
-    var rows = await _readYear(conn, 'v_stats_player', year);
-    if (rows.isEmpty && !_playersTried.contains(year)) {
-      await refreshPlayers(conn, year);
-      rows = await _readYear(conn, 'v_stats_player', year);
+    // 読み出しで再集計や登録は行わない。未登録年は空のまま返す。
+    return _readYear(conn, 'v_stats_player', year);
+  }
+
+  static Future<PlayerDisplay> playerPart(Connection conn, int year, List<int> leagueIds) async {
+    final rows = await conn.execute(AppSql.selectPlayerDisplay(leagueIds), parameters: [year]);
+    final stats = <Map<String, dynamic>>[];
+    final predictions = <Map<String, dynamic>>[];
+    for (final row in rows) {
+      (row[0] == 'stats' ? stats : predictions).add(_decode(row[2]));
     }
-    return rows;
+    return buildPlayerDisplay(stats, predictions);
   }
 
   static Future<List<Map<String, dynamic>>> teams(Connection conn, int year) async {
@@ -168,17 +211,29 @@ class DisplaySnapshot {
     if (!spansCover(spans, window.from, window.to)) {
       await refreshGames(conn, year, from: window.from, to: window.to);
     }
-    final games = await _readCode(conn, year, 'game', window.from, window.to);
-    final plays = await _readCode(conn, year, 'play', window.from, window.to);
-    final batting = await _readCode(conn, year, 'batting', window.from, window.to);
-    final postseason = await _readCode(conn, year, 'postseason', null, null);
-    final board = await _readCode(conn, year, 'board', null, null);
+    // 同じスナップショットの読み取りをまとめ、遠隔DBとの5往復を避ける。
+    final rows = await conn.execute(
+      """
+        SELECT code, payload FROM v_games_details
+        WHERE int_year = \$1 AND (
+          (code IN ('game', 'play', 'batting')
+            AND date_game BETWEEN \$2::date AND \$3::date)
+          OR code IN ('postseason', 'board')
+        )
+        ORDER BY code, row_no
+      """,
+      parameters: [year, window.from, window.to],
+    );
+    final grouped = <String, List<Map<String, dynamic>>>{};
+    for (final row in rows) {
+      grouped.putIfAbsent('${row[0]}', () => []).add(_decode(row[1]));
+    }
     return DisplayGames(
-      games: games,
-      plays: plays,
-      batting: batting,
-      postseason: postseason,
-      board: board,
+      games: grouped['game'] ?? [],
+      plays: grouped['play'] ?? [],
+      batting: grouped['batting'] ?? [],
+      postseason: grouped['postseason'] ?? [],
+      board: grouped['board'] ?? [],
       from: window.from,
       to: window.to,
     );
@@ -330,25 +385,7 @@ class DisplaySnapshot {
     return [for (final row in rows) _decode(row[0])];
   }
 
-  static Future<List<Map<String, dynamic>>> _readCode(Connection conn, int year, String code, String? from, String? to) async {
-    final ranged = from != null && to != null;
-    final rows = await conn.execute(
-      ranged
-          ? '''
-              SELECT payload FROM v_games_details
-              WHERE int_year = \$1 AND code = \$2
-                AND date_game BETWEEN \$3::date AND \$4::date
-              ORDER BY row_no
-            '''
-          : '''
-              SELECT payload FROM v_games_details
-              WHERE int_year = \$1 AND code = \$2
-              ORDER BY row_no
-            ''',
-      parameters: ranged ? [year, code, from, to] : [year, code],
-    );
-    return [for (final row in rows) _decode(row[0])];
-  }
+
 
   static Map<String, dynamic> _decode(Object? value) {
     if (value is Map) return Map<String, dynamic>.from(value);

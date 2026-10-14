@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:postgres/postgres.dart';
 
 import '../tools/Postgres.dart';
+import 'PredictionSnapshot.dart';
 
 /// 予想グループ。
 /// 選手選択 code_select: FREE 自由選択 / DRAW 被ったらくじ引き / WAIVER ウェーバー方式
@@ -16,6 +19,18 @@ class PredictGroup {
         AND to_regclass('public.t_predict_group_user') IS NOT NULL
         AND to_regclass('public.t_predict_setting') IS NOT NULL
         AND to_regclass('public.t_predict_setting_details') IS NOT NULL
+        AND to_regclass('public.t_predict_rule_proposal') IS NOT NULL
+        AND to_regclass('public.t_predict_rule_vote') IS NOT NULL
+        AND to_regclass('public.t_predict_invite') IS NOT NULL
+        AND to_regclass('public.t_predict_group_delete_vote') IS NOT NULL
+        AND to_regclass('public.t_japan_champion') IS NOT NULL
+        AND to_regclass('public.uq_predict_group_user') IS NOT NULL
+        AND to_regclass('public.uq_predict_rule_vote') IS NOT NULL
+        AND to_regclass('public.uq_predict_invite_pending') IS NOT NULL
+        AND to_regclass('public.uq_predict_group_delete_vote') IS NOT NULL
+        AND (SELECT COUNT(*) FROM information_schema.columns
+          WHERE table_schema = 'public' AND table_name = 't_predict_setting'
+            AND column_name IN ('date_limit_team', 'date_limit_player')) = 2
         AND EXISTS (
           SELECT 1 FROM information_schema.columns
           WHERE table_schema = 'public'
@@ -29,9 +44,11 @@ class PredictGroup {
             AND column_name = 'id_predict_setting'
         ) AS ready
     ''');
-    if (present.first.toColumnMap()['ready'] != true) {
-      await _createBaseTables(conn);
+    if (present.isNotEmpty && present.first.toColumnMap()['ready'] == true) {
+      _ready = true;
+      return;
     }
+    await _createBaseTables(conn);
     await _ensureRuleColumns(conn);
     await conn.execute('''
       CREATE TABLE IF NOT EXISTS t_japan_champion (
@@ -188,141 +205,31 @@ class PredictGroup {
     ''');
   }
 
-  static Future<List<Map<String, dynamic>>> list(Connection conn, {required int userId}) async {
+  /// 画面要求では完成済みの集計だけ読み、現在のメンバー権限を確認する。
+  static Future<List<Map<String, dynamic>>> list(Connection conn, {required int userId}) {
+    return PredictionSnapshot.groups(conn, userId: userId);
+  }
+
+  /// 登録処理専用。初期表示からは呼び出さない。
+  static Future<List<Map<String, dynamic>>> aggregate(Connection conn, {Set<int>? years}) async {
     await ensureSchema(conn);
-    if (userId <= 0) return const [];
-    final settings = Postgres.toJson(await Postgres.execute(
-      conn,
-      '''
-        SELECT g.id, g.txt_name, s.id AS id_setting, s.int_year,
-               s.date_limit, s.date_limit_team, s.date_limit_player,
-               s.code_select, s.int_same_player_limit, s.code_point
-        FROM t_predict_group g
-        LEFT JOIN t_predict_setting s
-          ON s.id_predict_group = g.id
-         AND COALESCE(s.flg_delete, FALSE) = FALSE
-        WHERE COALESCE(g.flg_delete, FALSE) = FALSE
-          AND EXISTS (
-            SELECT 1 FROM t_predict_group_user mem
-            WHERE mem.id_predict_group = g.id
-              AND mem.id_user = \$1::int
-              AND COALESCE(mem.flg_delete, FALSE) = FALSE
-          )
-        ORDER BY s.int_year DESC NULLS LAST, g.txt_name, g.id
-      ''',
-      data: [userId],
-    ));
-    final users = Postgres.toJson(await Postgres.execute(
-      conn,
-      '''
-        SELECT u.id_predict_group, u.id_user, mu.name_last, mu.code_color
-        FROM t_predict_group_user u
-        JOIN m_user mu ON mu.id = u.id_user
-        WHERE COALESCE(u.flg_delete, FALSE) = FALSE
-        ORDER BY u.id_user
-      ''',
-    ));
-    final titles = Postgres.toJson(await Postgres.execute(
-      conn,
-      '''
-        SELECT d.id_predict_setting, d.txt_title, d.id_stats, st.int_index, st.flg_pitcher
-        FROM t_predict_setting_details d
-        LEFT JOIN m_stats st ON st.id = d.id_stats
-        WHERE COALESCE(d.flg_delete, FALSE) = FALSE
-        ORDER BY st.int_index NULLS LAST, d.id
-      ''',
-    ));
-    final leaders = Postgres.toJson(await Postgres.execute(
-      conn,
-      '''
-        SELECT src.int_year, src.id_league, src.id_stats, src.id_player,
-               replace(replace(COALESCE(pl.name_full, ''), ' ', ''), '　', '') AS player_name,
-               tm.color_back, tm.color_font
-        FROM (
-          SELECT EXTRACT(YEAR FROM CURRENT_DATE)::int AS int_year, id_league, id_stats, id_player, id_team
-          FROM t_stats_player_latest
-          WHERE int_rank = 1
-          UNION ALL
-          SELECT int_year, id_league, id_stats, id_player, id_team
-          FROM (
-            SELECT DISTINCT ON (int_year, id_league, id_stats, id_player)
-              int_year, id_league, id_stats, id_player, id_team, int_rank
-            FROM t_stats_player
-            WHERE COALESCE(flg_delete, FALSE) = FALSE
-              AND int_year <> EXTRACT(YEAR FROM CURRENT_DATE)::int
-              AND int_year IN (SELECT DISTINCT year FROM t_predict_player)
-            ORDER BY int_year, id_league, id_stats, id_player, crtat DESC
-          ) past
-          WHERE int_rank = 1
-        ) src
-        LEFT JOIN m_player pl ON pl.id = src.id_player
-        LEFT JOIN m_team tm ON tm.id = COALESCE(src.id_team, pl.id_team)
-      ''',
-    ));
-    final players = Postgres.toJson(await Postgres.execute(
-      conn,
-      '''
-        SELECT p.year AS int_year, p.id_predict_setting, p.id_user, p.id_league, p.id_stats, p.id_player,
-               lg.name_short AS league_name,
-               st.title, st.int_index, st.flg_pitcher,
-               replace(replace(COALESCE(pl.name_full, ''), ' ', ''), '　', '') AS player_name
-        FROM t_predict_player p
-        LEFT JOIN m_league lg ON lg.id = p.id_league
-        LEFT JOIN m_stats st ON st.id = p.id_stats
-        LEFT JOIN m_player pl ON pl.id = p.id_player
-        WHERE p.id_predict_setting IS NOT NULL
-        ORDER BY p.id_league, st.int_index, p.id_user
-      ''',
-    ));
-    final teams = Postgres.toJson(await Postgres.execute(
-      conn,
-      '''
-        SELECT p.int_year, p.id_predict_setting, p.id_user, p.int_rank, p.flg_champion, p.id_team,
-               pred.id_league,
-               lg.name_short AS league_name,
-               COALESCE(NULLIF(pred.name_short, ''), pred.name_shortest, '') AS pick_name
-        FROM t_predict_team p
-        JOIN m_team pred ON pred.id = p.id_team
-        LEFT JOIN m_league lg ON lg.id = pred.id_league
-        WHERE p.id_predict_setting IS NOT NULL
-        ORDER BY pred.id_league, p.int_rank, p.id_user
-      ''',
-    ));
-    final actualTeams = Postgres.toJson(await Postgres.execute(
-      conn,
-      '''
-        SELECT st.year AS int_year,
-               COALESCE(st.id_league, mt.id_league) AS id_league,
-               st.int_rank,
-               COALESCE(NULLIF(mt.name_short, ''), mt.name_shortest, '') AS name_team,
-               mt.color_back, mt.color_font,
-               st.id_team
-        FROM t_stats_team st
-        JOIN m_team mt ON mt.id = st.id_team
-        WHERE st.year IN (SELECT DISTINCT int_year FROM t_predict_team)
-          AND st.crtat = (
-            SELECT MAX(st2.crtat) FROM t_stats_team st2
-            WHERE st2.id_team = st.id_team AND st2.year = st.year
-          )
-        ORDER BY st.year, COALESCE(st.id_league, mt.id_league), st.int_rank, st.id_team
-      ''',
-    ));
-    final japanRows = Postgres.toJson(await Postgres.execute(
-      conn,
-      '''
-        SELECT j.int_year, j.id_team,
-               COALESCE(NULLIF(mt.name_short, ''), mt.name_shortest, '') AS name_team,
-               mt.color_back, mt.color_font
-        FROM t_japan_champion j
-        JOIN m_team mt ON mt.id = j.id_team
-        WHERE COALESCE(j.flg_delete, FALSE) = FALSE
-      ''',
-    ));
+    final sources = await _aggregateSources(conn, years: years);
+    final settings = sources['settings'] ?? const <Map<String, dynamic>>[];
+    final users = sources['users'] ?? const <Map<String, dynamic>>[];
+    final titles = sources['titles'] ?? const <Map<String, dynamic>>[];
+    final leaders = sources['leaders'] ?? const <Map<String, dynamic>>[];
+    final players = sources['players'] ?? const <Map<String, dynamic>>[];
+    final teams = sources['teams'] ?? const <Map<String, dynamic>>[];
+    final actualTeams = sources['actualTeams'] ?? const <Map<String, dynamic>>[];
+    final japanRows = sources['japanRows'] ?? const <Map<String, dynamic>>[];
     final japanByYear = <int, Map<String, dynamic>>{};
     for (final row in japanRows) {
       japanByYear[_asInt(row['int_year'])] = row;
     }
-    final hits = <String, int>{};
+    final groupBySetting = <int, int>{
+      for (final row in settings) _asInt(row['id_setting']): _asInt(row['id']),
+    };
+    final hitsByGroup = <int, Map<String, int>>{};
     final leaderKeys = <String>{};
     for (final row in leaders) {
       leaderKeys.add('${_asInt(row['int_year'])}|${_asInt(row['id_league'])}|${_asInt(row['id_stats'])}|${_asInt(row['id_player'])}');
@@ -336,7 +243,9 @@ class PredictGroup {
       final hit = leaderKeys.contains('$year|$league|$stats|${_asInt(row['id_player'])}');
       row['hit'] = hit;
       if (!hit) continue;
-      final once = '$year|$user|$league|$stats';
+      final group = groupBySetting[_asInt(row['id_predict_setting'])] ?? 0;
+      final hits = hitsByGroup.putIfAbsent(group, () => <String, int>{});
+      final once = '$group|$year|$user|$league|$stats';
       if (seenPlayerHits.add(once)) {
         hits['$year|$user'] = (hits['$year|$user'] ?? 0) + 1;
       }
@@ -352,6 +261,8 @@ class PredictGroup {
       final rank = _asInt(row['int_rank']);
       final team = _asInt(row['id_team']);
       final user = _asInt(row['id_user']);
+      final group = groupBySetting[_asInt(row['id_predict_setting'])] ?? 0;
+      final hits = hitsByGroup.putIfAbsent(group, () => <String, int>{});
       if (actualAtRank['$year|$league|$rank']?.contains(team) ?? false) {
         hits['$year|$user'] = (hits['$year|$user'] ?? 0) + 1;
       }
@@ -361,27 +272,8 @@ class PredictGroup {
       }
     }
 
-    final proposals = Postgres.toJson(await Postgres.execute(
-      conn,
-      '''
-        SELECT p.id, p.id_predict_setting, p.date_limit_team, p.date_limit_player,
-               p.code_select, p.int_same_player_limit, p.code_point, p.crtby,
-               mu.name_last
-        FROM t_predict_rule_proposal p
-        LEFT JOIN m_user mu ON mu.id = p.crtby
-        WHERE COALESCE(p.flg_delete, FALSE) = FALSE
-          AND COALESCE(p.flg_applied, FALSE) = FALSE
-      ''',
-    ));
-    final votes = Postgres.toJson(await Postgres.execute(
-      conn,
-      '''
-        SELECT v.id_proposal, v.id_user, mu.name_last
-        FROM t_predict_rule_vote v
-        LEFT JOIN m_user mu ON mu.id = v.id_user
-        WHERE COALESCE(v.flg_delete, FALSE) = FALSE
-      ''',
-    ));
+    final proposals = sources['proposals'] ?? const <Map<String, dynamic>>[];
+    final votes = sources['votes'] ?? const <Map<String, dynamic>>[];
     final proposalBySetting = <int, Map<String, dynamic>>{};
     for (final row in proposals) {
       proposalBySetting[_asInt(row['id_predict_setting'])] = row;
@@ -391,15 +283,7 @@ class PredictGroup {
       votesByProposal.putIfAbsent(_asInt(row['id_proposal']), () => []).add(row);
     }
 
-    final deleteVotes = Postgres.toJson(await Postgres.execute(
-      conn,
-      '''
-        SELECT v.id_predict_group, v.id_user, mu.name_last
-        FROM t_predict_group_delete_vote v
-        LEFT JOIN m_user mu ON mu.id = v.id_user
-        WHERE COALESCE(v.flg_delete, FALSE) = FALSE
-      ''',
-    ));
+    final deleteVotes = sources['deleteVotes'] ?? const <Map<String, dynamic>>[];
     final deleteByGroup = <int, List<Map<String, dynamic>>>{};
     for (final row in deleteVotes) {
       deleteByGroup.putIfAbsent(_asInt(row['id_predict_group']), () => []).add({
@@ -416,9 +300,166 @@ class PredictGroup {
     for (final row in titles) {
       titlesBySetting.putIfAbsent(_asInt(row['id_predict_setting']), () => []).add(row);
     }
-    final lastPicks = Postgres.toJson(await Postgres.execute(
-      conn,
-      '''
+    final lastPicks = sources['lastPicks'] ?? const <Map<String, dynamic>>[];
+    final lastBySetting = <int, Map<String, dynamic>>{};
+    for (final row in lastPicks) {
+      lastBySetting[_asInt(row['id_predict_setting'])] = row;
+    }
+
+    return [
+      for (final setting in settings)
+        if (years == null || setting['int_year'] == null || years.contains(_asInt(setting['int_year'])))
+          _yearGroup(
+            setting: setting,
+            members: usersByGroup[_asInt(setting['id'])] ?? const [],
+            titleRows: titlesBySetting[_asInt(setting['id_setting'])] ?? const [],
+            players: players,
+            teams: teams,
+            leaders: leaders,
+            actualTeams: actualTeams,
+            actualAtRank: actualAtRank,
+            hits: hitsByGroup[_asInt(setting['id'])] ?? const {},
+            japan: japanByYear[_asInt(setting['int_year'])],
+            proposal: proposalBySetting[_asInt(setting['id_setting'])],
+            votes: votesByProposal[_asInt(proposalBySetting[_asInt(setting['id_setting'])]?['id'])] ?? const [],
+            deleteApprovals: deleteByGroup[_asInt(setting['id'])] ?? const [],
+            lastPick: lastBySetting[_asInt(setting['id_setting'])],
+          ),
+    ];
+  }
+
+  /// 定期登録でも遠隔DBと12往復しないよう、独立した参照を1SQLにまとめる。
+  static Future<Map<String, List<Map<String, dynamic>>>> _aggregateSources(Connection conn, {Set<int>? years}) async {
+    final selected = years == null ? null : (<int>{...years, for (final year in years) year - 1}.where((year) => year > 0).toList()..sort());
+    String filter(String field) => selected == null ? 'TRUE' : '$field IN (${selected.isEmpty ? 'NULL' : selected.join(', ')})';
+    final currentYearFilter = filter('EXTRACT(YEAR FROM CURRENT_DATE)::int');
+    final pastYearFilter = filter('int_year');
+    final playerYearFilter = filter('p.year');
+    final teamYearFilter = filter('p.int_year');
+    final actualYearFilter = filter('st.year');
+    final japanYearFilter = filter('j.int_year');
+    final queries = <String, String>{
+      'settings': '''
+        SELECT g.id, g.txt_name, s.id AS id_setting, s.int_year,
+               s.date_limit, s.date_limit_team, s.date_limit_player,
+               s.code_select, s.int_same_player_limit, s.code_point
+        FROM t_predict_group g
+        LEFT JOIN t_predict_setting s
+          ON s.id_predict_group = g.id
+         AND COALESCE(s.flg_delete, FALSE) = FALSE
+        WHERE COALESCE(g.flg_delete, FALSE) = FALSE
+        ORDER BY s.int_year DESC NULLS LAST, g.txt_name, g.id
+      ''',
+      'users': '''
+        SELECT u.id_predict_group, u.id_user, mu.name_last, mu.code_color
+        FROM t_predict_group_user u
+        JOIN m_user mu ON mu.id = u.id_user
+        WHERE COALESCE(u.flg_delete, FALSE) = FALSE
+        ORDER BY u.id_user
+      ''',
+      'titles': '''
+        SELECT d.id_predict_setting, d.txt_title, d.id_stats, st.int_index, st.flg_pitcher
+        FROM t_predict_setting_details d
+        LEFT JOIN m_stats st ON st.id = d.id_stats
+        WHERE COALESCE(d.flg_delete, FALSE) = FALSE
+        ORDER BY st.int_index NULLS LAST, d.id
+      ''',
+      'leaders': '''
+        SELECT src.int_year, src.id_league, src.id_stats, src.id_player,
+               replace(replace(COALESCE(pl.name_full, ''), ' ', ''), '　', '') AS player_name,
+               tm.color_back, tm.color_font
+        FROM (
+          SELECT EXTRACT(YEAR FROM CURRENT_DATE)::int AS int_year, id_league, id_stats, id_player, id_team
+          FROM t_stats_player_latest
+          WHERE int_rank = 1 AND ($currentYearFilter)
+          UNION ALL
+          SELECT int_year, id_league, id_stats, id_player, id_team
+          FROM (
+            SELECT DISTINCT ON (int_year, id_league, id_stats, id_player)
+              int_year, id_league, id_stats, id_player, id_team, int_rank
+            FROM t_stats_player
+            WHERE COALESCE(flg_delete, FALSE) = FALSE
+              AND int_year <> EXTRACT(YEAR FROM CURRENT_DATE)::int
+              AND int_year IN (SELECT DISTINCT year FROM t_predict_player)
+              AND ($pastYearFilter)
+            ORDER BY int_year, id_league, id_stats, id_player, crtat DESC
+          ) past
+          WHERE int_rank = 1
+        ) src
+        LEFT JOIN m_player pl ON pl.id = src.id_player
+        LEFT JOIN m_team tm ON tm.id = COALESCE(src.id_team, pl.id_team)
+      ''',
+      'players': '''
+        SELECT p.year AS int_year, p.id_predict_setting, p.id_user, p.id_league, p.id_stats, p.id_player,
+               lg.name_short AS league_name,
+               st.title, st.int_index, st.flg_pitcher,
+               replace(replace(COALESCE(pl.name_full, ''), ' ', ''), '　', '') AS player_name
+        FROM t_predict_player p
+        LEFT JOIN m_league lg ON lg.id = p.id_league
+        LEFT JOIN m_stats st ON st.id = p.id_stats
+        LEFT JOIN m_player pl ON pl.id = p.id_player
+        WHERE p.id_predict_setting IS NOT NULL AND ($playerYearFilter)
+          AND COALESCE(p.flg_delete, FALSE) = FALSE
+        ORDER BY p.id_league, st.int_index, p.id_user
+      ''',
+      'teams': '''
+        SELECT p.int_year, p.id_predict_setting, p.id_user, p.int_rank, p.flg_champion, p.id_team,
+               pred.id_league,
+               lg.name_short AS league_name,
+               COALESCE(NULLIF(pred.name_short, ''), pred.name_shortest, '') AS pick_name
+        FROM t_predict_team p
+        JOIN m_team pred ON pred.id = p.id_team
+        LEFT JOIN m_league lg ON lg.id = pred.id_league
+        WHERE p.id_predict_setting IS NOT NULL AND ($teamYearFilter)
+          AND COALESCE(p.flg_delete, FALSE) = FALSE
+        ORDER BY pred.id_league, p.int_rank, p.id_user
+      ''',
+      'actualTeams': '''
+        SELECT st.year AS int_year,
+               COALESCE(st.id_league, mt.id_league) AS id_league,
+               st.int_rank,
+               COALESCE(NULLIF(mt.name_short, ''), mt.name_shortest, '') AS name_team,
+               mt.color_back, mt.color_font,
+               st.id_team
+        FROM t_stats_team st
+        JOIN m_team mt ON mt.id = st.id_team
+        WHERE ($actualYearFilter) AND st.year IN (SELECT DISTINCT int_year FROM t_predict_team)
+          AND st.crtat = (
+            SELECT MAX(st2.crtat) FROM t_stats_team st2
+            WHERE st2.id_team = st.id_team AND st2.year = st.year
+          )
+        ORDER BY st.year, COALESCE(st.id_league, mt.id_league), st.int_rank, st.id_team
+      ''',
+      'japanRows': '''
+        SELECT j.int_year, j.id_team,
+               COALESCE(NULLIF(mt.name_short, ''), mt.name_shortest, '') AS name_team,
+               mt.color_back, mt.color_font
+        FROM t_japan_champion j
+        JOIN m_team mt ON mt.id = j.id_team
+        WHERE COALESCE(j.flg_delete, FALSE) = FALSE AND ($japanYearFilter)
+      ''',
+      'proposals': '''
+        SELECT p.id, p.id_predict_setting, p.date_limit_team, p.date_limit_player,
+               p.code_select, p.int_same_player_limit, p.code_point, p.crtby,
+               mu.name_last
+        FROM t_predict_rule_proposal p
+        LEFT JOIN m_user mu ON mu.id = p.crtby
+        WHERE COALESCE(p.flg_delete, FALSE) = FALSE
+          AND COALESCE(p.flg_applied, FALSE) = FALSE
+      ''',
+      'votes': '''
+        SELECT v.id_proposal, v.id_user, mu.name_last
+        FROM t_predict_rule_vote v
+        LEFT JOIN m_user mu ON mu.id = v.id_user
+        WHERE COALESCE(v.flg_delete, FALSE) = FALSE
+      ''',
+      'deleteVotes': '''
+        SELECT v.id_predict_group, v.id_user, mu.name_last
+        FROM t_predict_group_delete_vote v
+        LEFT JOIN m_user mu ON mu.id = v.id_user
+        WHERE COALESCE(v.flg_delete, FALSE) = FALSE
+      ''',
+      'lastPicks': '''
         SELECT DISTINCT ON (p.id_predict_setting)
                p.id_predict_setting, mu.name_last,
                replace(replace(COALESCE(pl.name_full, ''), ' ', ''), '　', '') AS player_name,
@@ -433,31 +474,15 @@ class PredictGroup {
           AND COALESCE(p.flg_delete, FALSE) = FALSE
         ORDER BY p.id_predict_setting, p.crtat DESC NULLS LAST, p.id DESC
       ''',
-    ));
-    final lastBySetting = <int, Map<String, dynamic>>{};
-    for (final row in lastPicks) {
-      lastBySetting[_asInt(row['id_predict_setting'])] = row;
-    }
-
-    return [
-      for (final setting in settings)
-        _yearGroup(
-          setting: setting,
-          members: usersByGroup[_asInt(setting['id'])] ?? const [],
-          titleRows: titlesBySetting[_asInt(setting['id_setting'])] ?? const [],
-          players: players,
-          teams: teams,
-          leaders: leaders,
-          actualTeams: actualTeams,
-          actualAtRank: actualAtRank,
-          hits: hits,
-          japan: japanByYear[_asInt(setting['int_year'])],
-          proposal: proposalBySetting[_asInt(setting['id_setting'])],
-          votes: votesByProposal[_asInt(proposalBySetting[_asInt(setting['id_setting'])]?['id'])] ?? const [],
-          deleteApprovals: deleteByGroup[_asInt(setting['id'])] ?? const [],
-          lastPick: lastBySetting[_asInt(setting['id_setting'])],
-        ),
-    ];
+    };
+    final sql = queries.entries.map((entry) => "SELECT '${entry.key}' AS kind, COALESCE(jsonb_agg(to_jsonb(src)), '[]'::jsonb) AS payload FROM (${entry.value}) src").join(' UNION ALL ');
+    final rows = await conn.execute(sql);
+    return {
+      for (final row in rows)
+        '${row[0]}': [
+          for (final item in (row[1] is String ? jsonDecode(row[1] as String) : row[1]) as List) Map<String, dynamic>.from(item as Map),
+        ],
+    };
   }
 
   static Map<String, dynamic> _yearGroup({
@@ -495,6 +520,7 @@ class PredictGroup {
       final bucket = byTitle.putIfAbsent(key, () {
         final names = <String>[];
         final backs = <String>[];
+        final fonts = <String>[];
         final matched = <Map<String, dynamic>>[];
         for (final leader in leaders) {
           if (_asInt(leader['int_year']) != year) continue;
@@ -504,6 +530,7 @@ class PredictGroup {
           if (name.isNotEmpty && !names.contains(name)) {
             names.add(name);
             backs.add('${leader['color_back'] ?? ''}'.trim());
+            fonts.add('${leader['color_font'] ?? ''}'.trim());
           }
           matched.add(leader);
         }
@@ -515,6 +542,7 @@ class PredictGroup {
           'pitcher': row['flg_pitcher'] == true,
           'current': names.join('、'),
           'color_backs': backs,
+          'color_fonts': fonts,
           'color_back': names.length > 1 ? 'white' : _singlePaint(matched, 'color_back'),
           'color_font': names.length > 1 ? 'black' : _singlePaint(matched, 'color_font'),
           'picks': <Map<String, dynamic>>[],
@@ -538,7 +566,9 @@ class PredictGroup {
         final matched = <Map<String, dynamic>>[];
         for (final actual in actualTeams) {
           if (_asInt(actual['int_year']) != year) continue;
-          if (_asInt(actual['id_league']) != league || _asInt(actual['int_rank']) != rank) continue;
+          if (_asInt(actual['id_league']) != league || _asInt(actual['int_rank']) != rank) {
+            continue;
+          }
           final name = '${actual['name_team'] ?? ''}'.trim();
           if (name.isNotEmpty && !names.contains(name)) names.add(name);
           matched.add(actual);
@@ -586,8 +616,7 @@ class PredictGroup {
             'proposer_id': _asInt(proposal['crtby']),
             'proposer_name': '${proposal['name_last'] ?? ''}',
             'approvals': [
-              for (final vote in votes)
-                {'id_user': _asInt(vote['id_user']), 'name': '${vote['name_last'] ?? ''}'},
+              for (final vote in votes) {'id_user': _asInt(vote['id_user']), 'name': '${vote['name_last'] ?? ''}'},
             ],
           };
     return {
@@ -676,14 +705,18 @@ class PredictGroup {
   }) {
     final names = <String>[];
     final backs = <String>[];
+    final fonts = <String>[];
     final matched = <Map<String, dynamic>>[];
     for (final leader in leaders) {
       if (_asInt(leader['int_year']) != year) continue;
-      if (_asInt(leader['id_league']) != leagueId || _asInt(leader['id_stats']) != statsId) continue;
+      if (_asInt(leader['id_league']) != leagueId || _asInt(leader['id_stats']) != statsId) {
+        continue;
+      }
       final name = '${leader['player_name'] ?? ''}'.trim();
       if (name.isNotEmpty && !names.contains(name)) {
         names.add(name);
         backs.add('${leader['color_back'] ?? ''}'.trim());
+        fonts.add('${leader['color_font'] ?? ''}'.trim());
       }
       matched.add(leader);
     }
@@ -695,6 +728,7 @@ class PredictGroup {
       'pitcher': pitcher,
       'current': names.join('、'),
       'color_backs': backs,
+      'color_fonts': fonts,
       'color_back': names.length > 1 ? 'white' : _singlePaint(matched, 'color_back'),
       'color_font': names.length > 1 ? 'black' : _singlePaint(matched, 'color_font'),
       'picks': <Map<String, dynamic>>[],
@@ -754,7 +788,9 @@ class PredictGroup {
     }
     String nameOf(int id) {
       for (final member in members) {
-        if (_asInt(member['id_user']) == id) return '${member['name_last'] ?? ''}';
+        if (_asInt(member['id_user']) == id) {
+          return '${member['name_last'] ?? ''}';
+        }
       }
       return '';
     }
@@ -779,6 +815,7 @@ class PredictGroup {
     await ensureSchema(conn);
     final trimmed = name.trim();
     if (id <= 0 || trimmed.isEmpty || trimmed.length > 100) return null;
+    if (!(await _memberIds(conn, id)).contains(updby)) return null;
     final rows = await conn.execute(
       '''
       UPDATE t_predict_group
@@ -800,7 +837,11 @@ class PredictGroup {
   static const selectCodes = ['FREE', 'DRAW', 'WAIVER'];
   static const pointCodes = ['SINGLE', 'TOP', 'GAP'];
 
-  static Future<List<Map<String, dynamic>>> titleCatalog(Connection conn) async {
+  static Future<List<Map<String, dynamic>>> titleCatalog(Connection conn) {
+    return PredictionSnapshot.catalog(conn);
+  }
+
+  static Future<List<Map<String, dynamic>>> aggregateTitleCatalog(Connection conn) async {
     try {
       final rows = Postgres.toJson(await Postgres.execute(
         conn,
@@ -851,7 +892,9 @@ class PredictGroup {
     List<Map<String, dynamic>>? champions,
   }) async {
     await ensureSchema(conn);
-    if (!selectCodes.contains(codeSelect) || !pointCodes.contains(codePoint)) return null;
+    if (!selectCodes.contains(codeSelect) || !pointCodes.contains(codePoint)) {
+      return null;
+    }
     if (!_validDate(dateLimitTeam) || !_validDate(dateLimitPlayer)) {
       return {'error': '期限の日付が不正です'};
     }
@@ -889,11 +932,7 @@ class PredictGroup {
     if (preparedRanks != null && preparedRanks['error'] != null) {
       return {'error': preparedRanks['error']};
     }
-    final rulesDiffer = _dateText(current['date_limit_team']) != dateLimitTeam ||
-        _dateText(current['date_limit_player']) != dateLimitPlayer ||
-        '${current['code_select'] ?? ''}' != codeSelect ||
-        (_asInt(current['int_same_player_limit']) == 0 ? 1 : _asInt(current['int_same_player_limit'])) != limit ||
-        '${current['code_point'] ?? ''}' != codePoint;
+    final rulesDiffer = _dateText(current['date_limit_team']) != dateLimitTeam || _dateText(current['date_limit_player']) != dateLimitPlayer || '${current['code_select'] ?? ''}' != codeSelect || (_asInt(current['int_same_player_limit']) == 0 ? 1 : _asInt(current['int_same_player_limit'])) != limit || '${current['code_point'] ?? ''}' != codePoint;
     await conn.execute('BEGIN');
     try {
       final year = _asInt(current['int_year']);
@@ -1050,7 +1089,11 @@ class PredictGroup {
       if (statsId <= 0) return {'error': '$title は成績タイトルにありません'};
       final player = await _findPlayer(conn, name, leagueId, year);
       if (player == null) {
-        final leagueName = sawamura ? 'NPB' : leagueId == 1 ? 'セ・リーグ' : 'パ・リーグ';
+        final leagueName = sawamura
+            ? 'NPB'
+            : leagueId == 1
+                ? 'セ・リーグ'
+                : 'パ・リーグ';
         return {'error': '$name（$leagueName）が見つかりません'};
       }
       prepared.add({
@@ -1269,7 +1312,9 @@ class PredictGroup {
       final user = _asInt(map['id_user']);
       if (!counts.containsKey(user)) continue;
       counts[user] = (counts[user] ?? 0) + 1;
-      if (user == actorId) mine.add('${_asInt(map['id_league'])}|${_asInt(map['id_stats'])}|${_asInt(map['id_player'])}');
+      if (user == actorId) {
+        mine.add('${_asInt(map['id_league'])}|${_asInt(map['id_stats'])}|${_asInt(map['id_player'])}');
+      }
     }
     final filled = counts.values.fold<int>(0, (sum, count) => sum + count);
     if (expected <= 0 || filled >= expected) return null;
@@ -1277,8 +1322,9 @@ class PredictGroup {
       for (final pick in nextPicks) '${_asInt(pick['id_league'])}|${_asInt(pick['id_stats'])}|${_asInt(pick['id_player'])}',
     };
     if (next.length == mine.length && next.containsAll(mine)) return null;
-    final hits = await _previousHits(conn, year - 1, members);
-    final order = members.toList()..sort((a, b) {
+    final hits = await _previousHits(conn, year - 1, members, settingId);
+    final order = members.toList()
+      ..sort((a, b) {
         final rank = (hits[a] ?? 0).compareTo(hits[b] ?? 0);
         if (rank != 0) return rank;
         return a.compareTo(b);
@@ -1305,7 +1351,7 @@ class PredictGroup {
     return null;
   }
 
-  static Future<Map<int, int>> _previousHits(Connection conn, int year, Set<int> members) async {
+  static Future<Map<int, int>> _previousHits(Connection conn, int year, Set<int> members, int settingId) async {
     final hits = <int, int>{for (final id in members) id: 0};
     if (year <= 0) return hits;
     final players = await conn.execute(
@@ -1313,6 +1359,12 @@ class PredictGroup {
       SELECT DISTINCT p.id_user, p.id_league, p.id_stats
       FROM t_predict_player p
       WHERE p.year = \$1
+        AND EXISTS (
+          SELECT 1 FROM t_predict_setting prior
+          JOIN t_predict_setting current ON current.id_predict_group = prior.id_predict_group
+          WHERE current.id = \$2 AND prior.id = p.id_predict_setting
+            AND COALESCE(prior.flg_delete, FALSE) = FALSE
+        )
         AND COALESCE(p.flg_delete, FALSE) = FALSE
         AND EXISTS (
           SELECT 1 FROM t_stats_player s
@@ -1324,7 +1376,7 @@ class PredictGroup {
             AND COALESCE(s.flg_delete, FALSE) = FALSE
         )
       ''',
-      parameters: [year],
+      parameters: [year, settingId],
     );
     for (final row in players) {
       final user = _asInt(row.toColumnMap()['id_user']);
@@ -1337,6 +1389,12 @@ class PredictGroup {
       FROM t_predict_team p
       WHERE p.int_year = \$1
         AND EXISTS (
+          SELECT 1 FROM t_predict_setting prior
+          JOIN t_predict_setting current ON current.id_predict_group = prior.id_predict_group
+          WHERE current.id = \$2 AND prior.id = p.id_predict_setting
+            AND COALESCE(prior.flg_delete, FALSE) = FALSE
+        )
+        AND EXISTS (
           SELECT 1 FROM t_stats_team st
           WHERE st.year = p.int_year
             AND st.id_team = p.id_team
@@ -1347,7 +1405,7 @@ class PredictGroup {
             )
         )
       ''',
-      parameters: [year],
+      parameters: [year, settingId],
     );
     for (final row in teams) {
       final user = _asInt(row.toColumnMap()['id_user']);
@@ -1363,9 +1421,15 @@ class PredictGroup {
        AND j.id_team = p.id_team
        AND COALESCE(j.flg_delete, FALSE) = FALSE
       WHERE p.int_year = \$1
+        AND EXISTS (
+          SELECT 1 FROM t_predict_setting prior
+          JOIN t_predict_setting current ON current.id_predict_group = prior.id_predict_group
+          WHERE current.id = \$2 AND prior.id = p.id_predict_setting
+            AND COALESCE(prior.flg_delete, FALSE) = FALSE
+        )
         AND p.flg_champion = TRUE
       ''',
-      parameters: [year],
+      parameters: [year, settingId],
     );
     for (final row in champions) {
       final user = _asInt(row.toColumnMap()['id_user']);
@@ -1418,7 +1482,9 @@ class PredictGroup {
         return {'error': '日本一の $name が順位予想にありません'};
       }
       for (final rank in prepared) {
-        if (rank['id_user'] == userId && rank['id_team'] == teamId) rank['champion'] = true;
+        if (rank['id_user'] == userId && rank['id_team'] == teamId) {
+          rank['champion'] = true;
+        }
       }
     }
     return {'ranks': prepared};
@@ -1504,8 +1570,7 @@ class PredictGroup {
       );
       return [
         for (final row in rows)
-          if ('${row.toColumnMap()['name'] ?? ''}'.trim().isNotEmpty)
-            {'id': _asInt(row.toColumnMap()['id']), 'name': '${row.toColumnMap()['name']}'.trim()},
+          if ('${row.toColumnMap()['name'] ?? ''}'.trim().isNotEmpty) {'id': _asInt(row.toColumnMap()['id']), 'name': '${row.toColumnMap()['name']}'.trim()},
       ];
     }
     if (kind != 'player' || (leagueId != 1 && leagueId != 2)) return [];
@@ -1745,7 +1810,9 @@ class PredictGroup {
     await ensureSchema(conn);
     final trimmed = name.trim();
     if (userId <= 0) return {'error': 'ログインしてください'};
-    if (trimmed.isEmpty || trimmed.length > 100) return {'error': 'グループ名を入力してください'};
+    if (trimmed.isEmpty || trimmed.length > 100) {
+      return {'error': 'グループ名を入力してください'};
+    }
     await conn.execute('BEGIN');
     try {
       final inserted = await conn.execute(
@@ -1797,7 +1864,6 @@ class PredictGroup {
   }
 
   static Future<List<Map<String, dynamic>>> listInvites(Connection conn, {required int userId}) async {
-    await ensureSchema(conn);
     if (userId <= 0) return [];
     final rows = await conn.execute(
       '''

@@ -44,8 +44,10 @@ void main() {
 
   test('成績と予想の両方をDB側で団体別に絞る', () {
     final sql = AppSql.selectPlayerDisplay([4, 3, 3]);
-    expect(sql, contains("(s.payload->>'id_league')::int IN (3, 4)"));
-    expect(sql, contains('p.id_league IN (3, 4)'));
+    expect(sql, contains('FROM v_predict_stats'));
+    expect(sql, contains('id_league IN (3, 4)'));
+    expect(sql, isNot(contains('t_predict_player')));
+    expect(sql, isNot(contains('JOIN')));
     expect(AppSql.selectPlayerDisplay([]), contains('IN (NULL)'));
   });
 }

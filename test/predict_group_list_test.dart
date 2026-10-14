@@ -57,7 +57,7 @@ void main() {
           loading: false,
           selectedYear: 2026,
           onSaveSetting: (_) async => null,
-          groups: [
+          groups: const [
             {
               'id': 1,
               'txt_name': '立石・江島',
@@ -66,12 +66,12 @@ void main() {
               'code_select': 'FREE',
               'code_point': 'SINGLE',
               'int_same_player_limit': 1,
-              'users': [
+              'users': const [
                 {'id': 1, 'name': '立石', 'color': 'blue', 'hits': 3},
                 {'id': 2, 'name': '江島', 'color': 'red', 'hits': 1},
               ],
-              'titles': ['打率', 'チーム順位'],
-              'players': [
+              'titles': const ['打率', 'チーム順位'],
+              'players': const [
                 {
                   'league': 'セ・リーグ',
                   'title': '打率',
@@ -79,8 +79,9 @@ void main() {
                   'current': '佐藤輝明、近本光司',
                   'color_back': 'tomato',
                   'color_font': 'white',
-                  'color_backs': ['tomato', 'navy'],
-                  'picks': [
+                  'color_backs': const ['tomato', 'navy'],
+                  'color_fonts': const ['white', 'yellow'],
+                  'picks': const [
                     {'id_user': 1, 'name': '佐藤輝明', 'hit': true},
                     {'id_user': 2, 'name': '近本光司', 'hit': false},
                   ],
@@ -90,7 +91,7 @@ void main() {
                   'title': 'MVP',
                   'pitcher': false,
                   'current': '岡本和真',
-                  'picks': [
+                  'picks': const [
                     {'id_user': 1, 'name': '岡本和真', 'hit': false},
                   ],
                 },
@@ -99,17 +100,17 @@ void main() {
                   'title': '沢村賞',
                   'pitcher': true,
                   'current': '山本由伸',
-                  'picks': [
+                  'picks': const [
                     {'id_user': 1, 'name': '山本由伸', 'hit': false},
                   ],
                 },
               ],
               'teams': [
-                {'league': 'セ・リーグ', 'rank': 1, 'actual': '阪神', 'color_back': 'tomato', 'color_font': 'white', 'picks': const []},
-                {'league': 'パ・リーグ', 'rank': 1, 'actual': 'ソフトバンク', 'picks': const []},
+                {'league': 'セ・リーグ', 'rank': 1, 'actual': '阪神', 'color_back': 'tomato', 'color_font': 'white', 'picks': []},
+                {'league': 'パ・リーグ', 'rank': 1, 'actual': 'ソフトバンク', 'picks': []},
               ],
-              'japan': {'name': 'オリックス', 'color_back': 'navy', 'color_font': 'white'},
-              'champions': [
+              'japan': const {'name': 'オリックス', 'color_back': 'navy', 'color_font': 'white'},
+              'champions': const [
                 {'id_user': 1, 'name': 'オリックス', 'hit': true},
                 {'id_user': 2, 'name': '阪神', 'hit': false},
               ],
@@ -122,13 +123,13 @@ void main() {
               'code_select': 'WAIVER',
               'code_point': 'GAP',
               'int_same_player_limit': 2,
-              'users': [
+              'users': const [
                 {'id': 1, 'name': '立石', 'color': 'blue', 'hits': 2},
               ],
-              'titles': ['打点'],
-              'players': const [],
-              'teams': const [],
-              'champions': const [],
+              'titles': const ['打点'],
+              'players': [],
+              'teams': [],
+              'champions': [],
             },
           ],
         ),
@@ -151,10 +152,10 @@ void main() {
       findsWidgets,
     );
     expect(find.text('佐藤輝明、近本光司'), findsNothing);
-    final sato = find.byWidgetPredicate((widget) => widget is Text && widget.data == '佐藤輝明' && widget.style?.color == Colors.black);
-    final chikamoto = find.byWidgetPredicate((widget) => widget is Text && widget.data == '近本光司' && widget.style?.color == Colors.black);
+    final sato = find.byWidgetPredicate((widget) => widget is Text && widget.data == '佐藤輝明' && widget.style?.color == Colors.white);
+    final chikamoto = find.byWidgetPredicate((widget) => widget is Text && widget.data == '近本光司' && widget.style?.color == const Color(0xFFFFEB3B));
     expect(sato, findsOneWidget);
-    expect(chikamoto, findsOneWidget);
+    expect(chikamoto, findsOneWidget, reason: tester.widgetList<Text>(find.text('近本光司')).map((text) => text.style?.color).join(' | '));
     expect(tester.widget<Text>(sato).maxLines, 1);
     expect(tester.widget<Text>(chikamoto).maxLines, 1);
     expect(tester.getTopLeft(sato).dy, lessThan(tester.getTopLeft(chikamoto).dy));
@@ -251,7 +252,7 @@ void main() {
     expect(find.text('2025-02-21'), findsOneWidget);
     await tester.tap(find.text('4月中'));
     await tester.pump();
-    expect(find.text('2025-04-30'), findsOneWidget    );
+    expect(find.text('2025-04-30'), findsOneWidget);
   });
 
   test('予想期限は行事の前日と月末になる', () {
@@ -310,7 +311,7 @@ void main() {
           selectedYear: 2026,
           viewerId: 1,
           onSaveSetting: (_) async => null,
-          groups: [
+          groups: const [
             {
               'id': 1,
               'txt_name': '立石・江島',
@@ -318,14 +319,14 @@ void main() {
               'id_setting': 6,
               'date_limit_team': '2099-12-31',
               'date_limit_player': '2020-01-01',
-              'users': [
+              'users': const [
                 {'id': 1, 'name': '立石', 'color': 'blue', 'hits': 0},
                 {'id': 2, 'name': '江島', 'color': 'red', 'hits': 0},
               ],
-              'titles': ['打率'],
-              'players': const [],
-              'teams': const [],
-              'champions': const [],
+              'titles': const ['打率'],
+              'players': [],
+              'teams': [],
+              'champions': [],
             },
           ],
         ),
@@ -348,7 +349,7 @@ void main() {
     const width = 320.0;
     await tester.binding.setSurfaceSize(const Size(width, 800));
     addTearDown(() => tester.binding.setSurfaceSize(null));
-    await tester.pumpWidget(MaterialApp(
+    await tester.pumpWidget(const MaterialApp(
       home: Scaffold(
         body: PredictGroupBoard(
           loading: false,
@@ -359,14 +360,14 @@ void main() {
               'txt_name': '立石・江島',
               'int_year': 2026,
               'id_setting': 6,
-              'users': [
+              'users': const [
                 {'id': 1, 'name': '立石', 'hits': 3},
                 {'id': 2, 'name': '江島', 'hits': 1},
               ],
-              'titles': ['打率'],
-              'players': const [],
-              'teams': const [],
-              'champions': const [],
+              'titles': const ['打率'],
+              'players': [],
+              'teams': [],
+              'champions': [],
             },
           ],
         ),

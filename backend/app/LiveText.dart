@@ -208,7 +208,8 @@ class LiveText {
     final positions = _starterPositions(root);
 
     final halves = <ParsedHalf>[];
-    var finished = false;
+    // MLBの最終打席本文には「試合終了」がない。選択中試合の状態も見る。
+    var finished = doc.querySelector('span.bb-scoreList__state')?.text.trim() == '試合終了';
     for (final section in root.querySelectorAll('section.bb-liveText')) {
       final title = section.querySelector('.bb-liveText__inning')?.text.trim() ?? '';
       final heading = RegExp(r'(\d+)回(表|裏)').firstMatch(title);
@@ -522,7 +523,11 @@ class LiveText {
 
     final event = ParsedLiveEvent();
     final digits = _digits(text);
-    if (digits.contains('タッチアウト') || (digits.contains('けん制') && digits.contains('アウト'))) {
+    if (RegExp(r'^失策\s*[:：]').hasMatch(digits)) {
+      event.category = Value.CodeGameResultCategory.ERROR;
+      event.result = Value.CodeGameResult.ERROR_RUNNING;
+      event.enterName = summary.querySelector('a.bb-liveText__player')?.text.trim() ?? '';
+    } else if (digits.contains('タッチアウト') || (digits.contains('けん制') && digits.contains('アウト'))) {
       event.category = Value.CodeGameResultCategory.RUNNING_BASE;
       event.result = Value.CodeGameResult.RUN_DEAD;
     } else if (digits.contains('本塁打') || digits.contains('ホームラン')) {

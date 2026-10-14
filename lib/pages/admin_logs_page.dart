@@ -166,6 +166,7 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
     if (key == 'user_id') {
       final name = '${row['user_name'] ?? ''}'.trim();
       final id = '${row['user_id'] ?? ''}'.trim();
+      if (id == '-1') return 'システム';
       if (name.isEmpty && (id.isEmpty || id == '0')) return 'ゲスト';
       if (name.isEmpty) return id;
       return '$name ($id)';

@@ -42,11 +42,46 @@ Map<String, dynamic> _row({
 }
 
 void main() {
+  test('予告スタメンは未打席の枠だけ補完し、交代選手と両球団の打順を保持する', () {
+    Map<String, dynamic> slot(int team, int order, String name) => {
+          'id_team': team,
+          'order': order,
+          'players': [
+            {'name': name}
+          ],
+        };
+    final live = [
+      slot(1, 1, '代打'),
+      {'id_team': 1, 'order': 2, 'players': []}
+    ];
+    final announced = [
+      for (final team in [1, 2])
+        for (var order = 1; order <= 9; order++)
+          slot(team, order, '$team-$order'),
+    ];
+    final merged = mergeAnnouncedLineup(live, announced);
+    expect(merged.length, 18);
+    expect(merged.first['players'][0]['name'], '代打');
+    expect(merged[1]['players'][0]['name'], '1-2');
+    expect(merged.last['players'][0]['name'], '2-9');
+    expect(live.length, 2);
+    expect(mergeAnnouncedLineup(merged, announced), merged);
+  });
+
   test('代打のあとに打席だけ残る選手は代守になる', () {
     final lineups = battingLineupsOf(
       [
-        _row(id: 1, result: Value.CodeGameResult.STRIKE_OUT, batter: 'トリスタン・ピーターズ', inning: 2),
-        _row(id: 2, result: Value.CodeGameResult.OUT_FLY, batter: 'トミー・ファム', inning: 6, direction: 'LEFT'),
+        _row(
+            id: 1,
+            result: Value.CodeGameResult.STRIKE_OUT,
+            batter: 'トリスタン・ピーターズ',
+            inning: 2),
+        _row(
+            id: 2,
+            result: Value.CodeGameResult.OUT_FLY,
+            batter: 'トミー・ファム',
+            inning: 6,
+            direction: 'LEFT'),
         _row(
           id: 3,
           result: Value.CodeGameResult.PINCH_HITTER,
@@ -55,7 +90,12 @@ void main() {
           enter: 'トミー・ファム',
           exit: 'トリスタン・ピーターズ',
         ),
-        _row(id: 4, result: Value.CodeGameResult.OUT_GROUND, batter: 'ブレンドン・ドイル', inning: 8, direction: 'SECOND'),
+        _row(
+            id: 4,
+            result: Value.CodeGameResult.OUT_GROUND,
+            batter: 'ブレンドン・ドイル',
+            inning: 8,
+            direction: 'SECOND'),
       ],
       plays: const {},
       pitchers: const {},
@@ -71,7 +111,8 @@ void main() {
     expect(players[2]['role'], '代守');
   });
 
-  List<Map<String, dynamic>> playersOf(Map<int, List<Map<String, dynamic>>> lineups, int order) {
+  List<Map<String, dynamic>> playersOf(
+      Map<int, List<Map<String, dynamic>>> lineups, int order) {
     final slot = lineups[1]!.firstWhere((row) => row['order'] == order);
     return (slot['players'] as List).cast<Map<String, dynamic>>();
   }
@@ -144,7 +185,11 @@ void main() {
   test('中黒の有無が違う同じ選手を代守として重ねない', () {
     final lineups = battingLineupsOf(
       [
-        _row(id: 1, result: Value.CodeGameResult.STRIKE_OUT, batter: 'ダスティン・ハリス', order: 2),
+        _row(
+            id: 1,
+            result: Value.CodeGameResult.STRIKE_OUT,
+            batter: 'ダスティン・ハリス',
+            order: 2),
         _row(
           id: 2,
           result: Value.CodeGameResult.OUT_GROUND,
@@ -165,7 +210,11 @@ void main() {
   test('フル名の先発に略称の守備交代を代守として重ねない', () {
     final lineups = battingLineupsOf(
       [
-        _row(id: 1, result: Value.CodeGameResult.STRIKE_OUT, batter: 'ジャクソン・メリル', order: 5),
+        _row(
+            id: 1,
+            result: Value.CodeGameResult.STRIKE_OUT,
+            batter: 'ジャクソン・メリル',
+            order: 5),
         _row(
           id: 2,
           result: Value.CodeGameResult.PINCH_FIELDER,
@@ -200,9 +249,22 @@ void main() {
   test('同姓の先発打者は別の打順枠に残す', () {
     final lineups = battingLineupsOf(
       [
-        _row(id: 1, result: Value.CodeGameResult.STRIKE_OUT, batter: 'ブレーデン・モンゴメリー', order: 7),
-        _row(id: 2, result: Value.CodeGameResult.WALK_BALL, batter: 'コルソン・モンゴメリー', order: 9),
-        _row(id: 3, result: Value.CodeGameResult.STRIKE_OUT, batter: 'コルソン・モンゴメリー', order: 9, inning: 5),
+        _row(
+            id: 1,
+            result: Value.CodeGameResult.STRIKE_OUT,
+            batter: 'ブレーデン・モンゴメリー',
+            order: 7),
+        _row(
+            id: 2,
+            result: Value.CodeGameResult.WALK_BALL,
+            batter: 'コルソン・モンゴメリー',
+            order: 9),
+        _row(
+            id: 3,
+            result: Value.CodeGameResult.STRIKE_OUT,
+            batter: 'コルソン・モンゴメリー',
+            order: 9,
+            inning: 5),
       ],
       plays: const {
         '1|201|ブレーデン・モンゴメリー': '空三振|out',
@@ -221,8 +283,22 @@ void main() {
   test('試合中は未打席のスタメンも打順枠に残す', () {
     final lineups = battingLineupsOf(
       [
-        _row(id: 1, result: Value.CodeGameResult.HIT_SINGLE, batter: 'スティーブン・クワン', order: 1, team: 202, home: 202, away: 201),
-        _row(id: 2, result: Value.CodeGameResult.WALK_BALL, batter: 'ホセ・ラミレス', order: 2, team: 202, home: 202, away: 201),
+        _row(
+            id: 1,
+            result: Value.CodeGameResult.HIT_SINGLE,
+            batter: 'スティーブン・クワン',
+            order: 1,
+            team: 202,
+            home: 202,
+            away: 201),
+        _row(
+            id: 2,
+            result: Value.CodeGameResult.WALK_BALL,
+            batter: 'ホセ・ラミレス',
+            order: 2,
+            team: 202,
+            home: 202,
+            away: 201),
       ],
       plays: const {
         '1|202|スティーブン・クワン': '右安|single',
@@ -250,7 +326,8 @@ void main() {
       ],
     );
     final names = [
-      for (var order = 1; order <= 9; order++) playersOf(lineups, order).first['name'],
+      for (var order = 1; order <= 9; order++)
+        playersOf(lineups, order).first['name'],
     ];
     expect(names, [
       'スティーブン・クワン',
@@ -313,7 +390,8 @@ void main() {
       },
       pitchers: const {'1|202|木下'},
     );
-    final fourth = lineups[1]!.firstWhere((row) => row['order'] == 4 && row['id_team'] == 202);
+    final fourth = lineups[1]!
+        .firstWhere((row) => row['order'] == 4 && row['id_team'] == 202);
     final players = (fourth['players'] as List).cast<Map<String, dynamic>>();
     expect(players.map((player) => player['name']).toList(), ['佐藤輝明', '小野寺暖']);
     expect(players.last['role'], '代守');
@@ -322,7 +400,8 @@ void main() {
         (row) =>
             row['order'] == 9 &&
             row['id_team'] == 202 &&
-            (row['players'] as List).any((player) => '${player['name']}'.contains('小野寺')),
+            (row['players'] as List)
+                .any((player) => '${player['name']}'.contains('小野寺')),
       ),
       isFalse,
     );
@@ -359,7 +438,8 @@ void main() {
       pitchers: const {'1|202|木下'},
     );
     final namesOnNine = [
-      for (final row in lineups[1]!.where((row) => row['order'] == 9 && row['id_team'] == 202))
+      for (final row in lineups[1]!
+          .where((row) => row['order'] == 9 && row['id_team'] == 202))
         for (final player in (row['players'] as List)) player['name'],
     ];
     expect(namesOnNine, isNot(contains('小野寺暖')));

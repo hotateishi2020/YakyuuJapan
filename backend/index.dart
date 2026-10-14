@@ -17,6 +17,8 @@ import 'app/Achieve.dart';
 import 'app/AceEvaluator.dart';
 import 'app/DisplaySnapshot.dart';
 import 'app/PlayerDisplay.dart';
+import 'app/FieldingErrors.dart';
+import 'app/TeamStrength.dart';
 import 'app/GamesReadGate.dart';
 import 'app/FetchURL.dart';
 import 'app/LogDetail.dart';
@@ -31,6 +33,7 @@ import 'app/Auth.dart';
 import 'app/EventReadReset.dart';
 import 'app/PlayerStatsSchedule.dart';
 import 'app/PredictGroup.dart';
+import 'app/PredictionSnapshot.dart';
 import 'app/GameFetchSchedule.dart';
 
 /// /predictions 用の短TTLキャッシュ（同一プロセス内・団体別）
@@ -41,6 +44,7 @@ final Map<String, DateTime> _predictionsCacheAt = {};
 final Map<String, String> _predictionsPartCacheBody = {};
 final Map<String, Future<String>> _partBuildInflight = {};
 final Map<String, DateTime> _predictionsPartCacheAt = {};
+
 /// 試合パートで前回読んだ t_game の更新日時。同じなら集計SQLを出さない。
 final Map<String, String> _predictionsGamesRevision = {};
 final Map<String, String> _pendingGamesRevision = {};
@@ -126,25 +130,32 @@ Future<Response?> _unchangedGamesResponse(
 }
 
 Future<Map<String, dynamic>> _buildPredictionsPartInfo(OrgKind org) async {
-  final currentYear = DateTimeTool.getThisYear();
+  // ヘッダースコアは廃止。共通のお知らせを返すNPB以外ではDBを読まない。
+  if (org.code != 'npb') {
+    return {
+      'org': org.code,
+      'part': 'info',
+      'events': const <Map<String, dynamic>>[],
+      'notification': const <Map<String, dynamic>>[],
+      'predict_team': const <Map<String, dynamic>>[],
+    };
+  }
   final results = await Postgres.mapParallel([
     (conn) => Postgres.execute(conn, AppSql.selectEventsDetails()),
     (conn) => Postgres.execute(conn, AppSql.selectNotification()),
-    (conn) => Postgres.execute(conn, AppSql.selectPredictNPBTeams(), data: [currentYear]),
   ]);
-  final leagueIds = org.leagueIds;
   return {
     'org': org.code,
     'part': 'info',
-    'events': org.code == 'npb' ? Postgres.toJson(results[0]) : const <Map<String, dynamic>>[],
-    'notification': org.code == 'npb' ? Postgres.toJson(results[1]) : const <Map<String, dynamic>>[],
-    'predict_team': _filterByLeagues(Postgres.toJson(results[2]), leagueIds),
+    'events': Postgres.toJson(results[0]),
+    'notification': Postgres.toJson(results[1]),
+    'predict_team': const <Map<String, dynamic>>[],
   };
 }
 
 Future<Map<String, dynamic>> _buildPredictionsPartStandings(OrgKind org, int year) async {
   final results = await Postgres.mapParallel([
-    (conn) => Postgres.execute(conn, AppSql.selectPredictNPBTeams(), data: [year]),
+    (conn) => PredictionSnapshot.teams(conn, year, org.leagueIds),
     (conn) => DisplaySnapshot.teams(conn, year),
   ]);
   final leagueIds = org.leagueIds;
@@ -152,8 +163,8 @@ Future<Map<String, dynamic>> _buildPredictionsPartStandings(OrgKind org, int yea
     'org': org.code,
     'year': year,
     'part': 'standings',
-    'predict_team': _filterByLeagues(Postgres.toJson(results[0] as Result), leagueIds),
-    'stats_team': _filterByLeagues(results[1] as List<Map<String, dynamic>>, leagueIds),
+    'predict_team': results[0],
+    'stats_team': _filterByLeagues(results[1], leagueIds),
   };
 }
 
@@ -198,8 +209,8 @@ String? _queryYmd(String? raw) {
   if (year != now.year) return null;
   final today = DateTime(now.year, now.month, now.day);
   return (
-    from: _ymdOf(today.subtract(Duration(days: AppSql.gamesPastDays))),
-    to: _ymdOf(today.add(Duration(days: AppSql.gamesFutureDays))),
+    from: _ymdOf(today.subtract(const Duration(days: AppSql.gamesPastDays))),
+    to: _ymdOf(today.add(const Duration(days: AppSql.gamesFutureDays))),
   );
 }
 
@@ -277,8 +288,10 @@ Future<Map<String, dynamic>> _buildPredictionsPartGames(
     errors: {for (final entry in battingLines.entries) entry.key: _asInt(entry.value['int_error'])},
     starters: _lineupStartersOf(battingLines),
   );
+  final fieldingErrors = fieldingErrorsByGame(snap.batting);
   for (final game in games) {
     game['lineup'] = lineups[_asInt(game['id_game'])] ?? const <Map<String, dynamic>>[];
+    game['fielding_errors'] = fieldingErrors[_asInt(game['id_game'])] ?? const <Map<String, dynamic>>[];
     _useAnnouncedLineup(game);
   }
   _attachLiveBatters(games, playRows);
@@ -595,20 +608,13 @@ bool _isStarter(Map<String, dynamic> row) {
 /// 打席記録がまだ無い試合前は、発表済みスタメンを詳細欄に出す。
 void _useAnnouncedLineup(Map<String, dynamic> game) {
   final current = game['lineup'];
-  if (current is List && current.isNotEmpty) {
-    game.remove('txt_lineup_announced');
-    return;
-  }
   final raw = '${game['txt_lineup_announced'] ?? ''}'.trim();
   game.remove('txt_lineup_announced');
   if (raw.isEmpty) return;
   try {
     final decoded = jsonDecode(raw);
     if (decoded is List && decoded.isNotEmpty) {
-      game['lineup'] = [
-        for (final row in decoded)
-          if (row is Map) Map<String, dynamic>.from(row),
-      ];
+      game['lineup'] = mergeAnnouncedLineup(current is List ? current : [], decoded);
     }
   } catch (_) {}
 }
@@ -991,8 +997,21 @@ List<Map<String, dynamic>> _summariesOf(
   return summaries;
 }
 
+Future<Map<String, dynamic>?> _savePredictionChange(
+  Connection conn,
+  Future<Map<String, dynamic>?> Function() save,
+) async {
+  final result = await save();
+  if (result != null && result['error'] == null) {
+    await PredictionSnapshot.refreshAfterSave(conn, result);
+    _clearPredictionsCache();
+  }
+  return result;
+}
+
 Future<void> _warmSchemaInBackground() async {
   try {
+    await Postgres.withConnection(Auth.ensureSchema);
     await FetchURL.ensureGameDetailsVelo();
     await FetchURL.ensureAppColumns();
     unawaited(FetchURL.seedStadiumImagesAndTeamColors());
@@ -1001,6 +1020,7 @@ Future<void> _warmSchemaInBackground() async {
       // 積むと、scrape のトランザクションと初期表示が互いを待ってしまう。
       // 更新は各取得処理の完了時に行い、未作成の期間だけ読み出し時に補う。
       await DisplaySnapshot.ensure(conn);
+      await TeamStrength.ensure(conn);
     });
   } catch (e, st) {
     print('schema warm failed: $e\n$st');
@@ -1016,6 +1036,24 @@ void main() async {
 
     app.get('/healthz', (Request _) => Response.ok('ok'));
 
+    app.get('/team-strength', (Request request) async {
+      const headers = {'content-type': 'application/json; charset=utf-8'};
+      try {
+        final org = OrgKind.parse(request.url.queryParameters['org']);
+        final year = _seasonYear(request, org);
+        final data = await Postgres.withConnection(
+          (conn) => TeamStrength.read(conn, org: org.code, year: year),
+          urgent: true,
+        );
+        return Response.ok(jsonEncode(data), headers: headers);
+      } on FormatException catch (error) {
+        return Response.badRequest(body: jsonEncode({'error': error.message}), headers: headers);
+      } catch (error, stack) {
+        _printRequestError(request, error, stack);
+        return Response.internalServerError(body: jsonEncode({'error': '戦力情報を取得できませんでした'}), headers: headers);
+      }
+    });
+
     app.post('/predict-group-name', (Request request) async {
       try {
         final body = jsonDecode(await request.readAsString());
@@ -1025,12 +1063,14 @@ void main() async {
         final saved = await Postgres.withConnection((conn) async {
           final userId = await Auth.userIdOf(conn, request);
           if (userId == null) return 'login';
-          return PredictGroup.updateName(
-            conn,
-            id: int.tryParse('${body['id']}') ?? 0,
-            name: '${body['txt_name'] ?? ''}',
-            updby: userId,
-          );
+          return _savePredictionChange(
+              conn,
+              () => PredictGroup.updateName(
+                    conn,
+                    id: int.tryParse('${body['id']}') ?? 0,
+                    name: '${body['txt_name'] ?? ''}',
+                    updby: userId,
+                  ));
         });
         if (saved == 'login') {
           return Response(401, body: jsonEncode({'ok': false, 'error': 'ログインしてください'}), headers: {'content-type': 'application/json; charset=utf-8'});
@@ -1058,20 +1098,22 @@ void main() async {
         final saved = await Postgres.withConnection((conn) async {
           final userId = await Auth.userIdOf(conn, request);
           if (userId == null) return 'login';
-          return PredictGroup.updateSetting(
-            conn,
-            id: int.tryParse('${body['id_setting']}') ?? 0,
-            dateLimitTeam: '${body['date_limit_team'] ?? ''}'.trim(),
-            dateLimitPlayer: '${body['date_limit_player'] ?? ''}'.trim(),
-            codeSelect: '${body['code_select'] ?? ''}'.trim(),
-            samePlayerLimit: int.tryParse('${body['int_same_player_limit']}') ?? 1,
-            codePoint: '${body['code_point'] ?? ''}'.trim(),
-            updby: userId,
-            titles: _predictMaps(body['titles']),
-            picks: _predictMaps(body['picks']),
-            ranks: _predictMaps(body['ranks']),
-            champions: _predictMaps(body['champions']),
-          );
+          return _savePredictionChange(
+              conn,
+              () => PredictGroup.updateSetting(
+                    conn,
+                    id: int.tryParse('${body['id_setting']}') ?? 0,
+                    dateLimitTeam: '${body['date_limit_team'] ?? ''}'.trim(),
+                    dateLimitPlayer: '${body['date_limit_player'] ?? ''}'.trim(),
+                    codeSelect: '${body['code_select'] ?? ''}'.trim(),
+                    samePlayerLimit: int.tryParse('${body['int_same_player_limit']}') ?? 1,
+                    codePoint: '${body['code_point'] ?? ''}'.trim(),
+                    updby: userId,
+                    titles: _predictMaps(body['titles']),
+                    picks: _predictMaps(body['picks']),
+                    ranks: _predictMaps(body['ranks']),
+                    champions: _predictMaps(body['champions']),
+                  ));
         });
         if (saved == 'login') {
           return Response(401, body: jsonEncode({'ok': false, 'error': 'ログインしてください'}), headers: {'content-type': 'application/json; charset=utf-8'});
@@ -1103,11 +1145,13 @@ void main() async {
         final saved = await Postgres.withConnection((conn) async {
           final userId = await Auth.userIdOf(conn, request);
           if (userId == null) return 'login';
-          return PredictGroup.approveProposal(
-            conn,
-            settingId: int.tryParse('${body['id_setting']}') ?? 0,
-            userId: userId,
-          );
+          return _savePredictionChange(
+              conn,
+              () => PredictGroup.approveProposal(
+                    conn,
+                    settingId: int.tryParse('${body['id_setting']}') ?? 0,
+                    userId: userId,
+                  ));
         });
         if (saved == 'login') {
           return Response(401, body: jsonEncode({'ok': false, 'error': 'ログインしてください'}), headers: {'content-type': 'application/json; charset=utf-8'});
@@ -1132,15 +1176,13 @@ void main() async {
     app.get('/predict-names', (Request request) async {
       try {
         final params = request.url.queryParameters;
-        final kind = '${params['kind'] ?? ''}';
-        final leagueId = int.tryParse('${params['league'] ?? ''}') ?? 0;
-        final query = '${params['q'] ?? ''}'.trim();
+        final kind = params['kind'] ?? '';
+        final leagueId = int.tryParse(params['league'] ?? '') ?? 0;
+        final query = (params['q'] ?? '').trim();
         if (kind != 'player' && kind != 'team') {
           return Response(400, body: jsonEncode({'ok': false, 'error': '不正な要求です'}), headers: {'content-type': 'application/json; charset=utf-8'});
         }
-        final names = query.isEmpty
-            ? const <Map<String, dynamic>>[]
-            : await Postgres.withConnection((conn) => PredictGroup.searchNames(conn, kind: kind, leagueId: leagueId, query: query));
+        final names = query.isEmpty ? const <Map<String, dynamic>>[] : await Postgres.withConnection((conn) => PredictGroup.searchNames(conn, kind: kind, leagueId: leagueId, query: query));
         return Response.ok(jsonEncode({'names': names}), headers: {'content-type': 'application/json; charset=utf-8'});
       } catch (e, st) {
         print('予想候補の取得に失敗しました: $e');
@@ -1154,7 +1196,7 @@ void main() async {
 
     app.get('/predict-users', (Request request) async {
       try {
-        final query = '${request.url.queryParameters['q'] ?? ''}'.trim();
+        final query = (request.url.queryParameters['q'] ?? '').trim();
         final names = await Postgres.withConnection((conn) async {
           final userId = await Auth.userIdOf(conn, request);
           if (userId == null) return 'login';
@@ -1177,7 +1219,7 @@ void main() async {
     app.get('/predict-invites', (Request request) async {
       try {
         final invites = await Postgres.withConnection((conn) async {
-          final userId = await Auth.userIdOf(conn, request);
+          final userId = await Auth.readOnlyUserIdOf(conn, request);
           if (userId == null) return 'login';
           return PredictGroup.listInvites(conn, userId: userId);
         });
@@ -1208,7 +1250,7 @@ void main() async {
         final saved = await Postgres.withConnection((conn) async {
           final userId = await Auth.userIdOf(conn, request);
           if (userId == null) return 'login';
-          return PredictGroup.createGroup(conn, name: '${body['txt_name'] ?? ''}', userId: userId, inviteeIds: invitees);
+          return _savePredictionChange(conn, () => PredictGroup.createGroup(conn, name: '${body['txt_name'] ?? ''}', userId: userId, inviteeIds: invitees));
         });
         if (saved == 'login') {
           return Response(401, body: jsonEncode({'ok': false, 'error': 'ログインしてください'}), headers: {'content-type': 'application/json; charset=utf-8'});
@@ -1239,12 +1281,14 @@ void main() async {
         final saved = await Postgres.withConnection((conn) async {
           final userId = await Auth.userIdOf(conn, request);
           if (userId == null) return 'login';
-          return PredictGroup.answerInvite(
-            conn,
-            inviteId: int.tryParse('${body['id']}') ?? 0,
-            userId: userId,
-            accept: body['accept'] == true || '${body['accept']}' == 'true',
-          );
+          return _savePredictionChange(
+              conn,
+              () => PredictGroup.answerInvite(
+                    conn,
+                    inviteId: int.tryParse('${body['id']}') ?? 0,
+                    userId: userId,
+                    accept: body['accept'] == true || '${body['accept']}' == 'true',
+                  ));
         });
         if (saved == 'login') {
           return Response(401, body: jsonEncode({'ok': false, 'error': 'ログインしてください'}), headers: {'content-type': 'application/json; charset=utf-8'});
@@ -1272,7 +1316,7 @@ void main() async {
         final saved = await Postgres.withConnection((conn) async {
           final userId = await Auth.userIdOf(conn, request);
           if (userId == null) return 'login';
-          return PredictGroup.requestDelete(conn, groupId: int.tryParse('${body['id']}') ?? 0, userId: userId);
+          return _savePredictionChange(conn, () => PredictGroup.requestDelete(conn, groupId: int.tryParse('${body['id']}') ?? 0, userId: userId));
         });
         if (saved == 'login') {
           return Response(401, body: jsonEncode({'ok': false, 'error': 'ログインしてください'}), headers: {'content-type': 'application/json; charset=utf-8'});
@@ -1303,12 +1347,14 @@ void main() async {
         final saved = await Postgres.withConnection((conn) async {
           final userId = await Auth.userIdOf(conn, request);
           if (userId == null) return 'login';
-          return PredictGroup.createYear(
-            conn,
-            groupId: int.tryParse('${body['id']}') ?? 0,
-            year: int.tryParse('${body['int_year']}') ?? 0,
-            userId: userId,
-          );
+          return _savePredictionChange(
+              conn,
+              () => PredictGroup.createYear(
+                    conn,
+                    groupId: int.tryParse('${body['id']}') ?? 0,
+                    year: int.tryParse('${body['int_year']}') ?? 0,
+                    userId: userId,
+                  ));
         });
         if (saved == 'login') {
           return Response(401, body: jsonEncode({'ok': false, 'error': 'ログインしてください'}), headers: {'content-type': 'application/json; charset=utf-8'});
@@ -1333,10 +1379,8 @@ void main() async {
     app.get('/predict-groups', (Request request) async {
       try {
         final payload = await Postgres.withConnection((conn) async {
-          final userId = await Auth.userIdOf(conn, request);
-          final groups = userId == null ? <Map<String, dynamic>>[] : await PredictGroup.list(conn, userId: userId);
-          final catalog = await PredictGroup.titleCatalog(conn);
-          return {'groups': groups, 'title_catalog': catalog};
+          final userId = await Auth.readOnlyUserIdOf(conn, request);
+          return PredictionSnapshot.groupPayload(conn, userId: userId);
         });
         return Response.ok(jsonEncode(payload), headers: {'content-type': 'application/json; charset=utf-8'});
       } catch (e, st) {
@@ -1641,8 +1685,14 @@ void main() async {
           jsonEncode({
             'ok': true,
             'logs': logs,
-            'access': [for (final row in logs) if (row['log_type'] != 'エラー') row],
-            'errors': [for (final row in logs) if (row['log_type'] == 'エラー') row],
+            'access': [
+              for (final row in logs)
+                if (row['log_type'] != 'エラー') row
+            ],
+            'errors': [
+              for (final row in logs)
+                if (row['log_type'] == 'エラー') row
+            ],
           }),
           headers: {'content-type': 'application/json; charset=utf-8'},
         );
@@ -1866,13 +1916,13 @@ void main() async {
           );
         }
 
-        final current_year = selectedYear;
+        final currentYear = selectedYear;
         final cacheGeneration = _predictionsCacheGeneration;
         final results = await Postgres.mapParallel([
-          (conn) => Postgres.execute(conn, AppSql.selectPredictNPBTeams(), data: [current_year]),
-          (conn) => DisplaySnapshot.playerPart(conn, current_year, org.leagueIds),
-          (conn) => DisplaySnapshot.teams(conn, current_year),
-          (conn) => DisplaySnapshot.games(conn, current_year),
+          (conn) => PredictionSnapshot.teams(conn, currentYear, org.leagueIds),
+          (conn) => DisplaySnapshot.playerPart(conn, currentYear, org.leagueIds),
+          (conn) => DisplaySnapshot.teams(conn, currentYear),
+          (conn) => DisplaySnapshot.games(conn, currentYear),
           (conn) => Postgres.execute(conn, AppSql.selectEventsDetails()),
           (conn) => Postgres.execute(conn, AppSql.selectNotification()),
         ]);
@@ -1912,8 +1962,10 @@ void main() async {
           errors: {for (final entry in battingLines.entries) entry.key: _asInt(entry.value['int_error'])},
           starters: _lineupStartersOf(battingLines),
         );
+        final fieldingErrors = fieldingErrorsByGame(snap.batting);
         for (final game in games) {
           game['lineup'] = lineups[_asInt(game['id_game'])] ?? const <Map<String, dynamic>>[];
+          game['fielding_errors'] = fieldingErrors[_asInt(game['id_game'])] ?? const <Map<String, dynamic>>[];
           _useAnnouncedLineup(game);
         }
         _attachLiveBatters(games, playRows);
@@ -1923,8 +1975,8 @@ void main() async {
         final postseason = _postseasonForOrg(snap.postseason, org);
         final payload = <String, dynamic>{
           'org': org.code,
-          'year': current_year,
-          'predict_team': _filterByLeagues(Postgres.toJson(results[0] as Result), leagueIds),
+          'year': currentYear,
+          'predict_team': results[0],
           'predict_player': players.predictions,
           'stats_team': _filterByLeagues(results[2] as List<Map<String, dynamic>>, leagueIds),
           'stats_player': players.stats,
@@ -1988,12 +2040,12 @@ void main() async {
           .add(staticWithSpa) // ← 次に静的（+ SPA fallback）
           .handler;
 
-      handler = Pipeline().addMiddleware(logRequests()).addMiddleware(corsHeaders()).addHandler(handler);
+      handler = const Pipeline().addMiddleware(logRequests()).addMiddleware(corsHeaders()).addHandler(handler);
 
       stdout.writeln('🗂 Serving static from: ${publicDir.path}');
     } else {
       // 静的なし（dev表示）
-      handler = Pipeline().addMiddleware(logRequests()).addMiddleware(corsHeaders()).addHandler((req) {
+      handler = const Pipeline().addMiddleware(logRequests()).addMiddleware(corsHeaders()).addHandler((req) {
         if (req.url.path.isEmpty) {
           return Response.ok('Backend API (dev). Try /predictions', headers: {'content-type': 'text/plain; charset=utf-8'});
         }
@@ -2015,6 +2067,8 @@ void main() async {
     });
     // 個人成績は初期表示では取らず、起動の数分後から定期登録する。
     PlayerStatsSchedule.start(onUpdated: _clearPredictionsCache);
+    TeamStrength.start();
+    PredictionSnapshotSchedule.start(onUpdated: _clearPredictionsCache);
     // 取得処理だけ登録する。タイマーは /predictions/ready の通知後に開始する。
     GameFetchSchedule.armFutureWatch('mlb', FetchMLB.refreshFutureIfChanged);
     GameFetchSchedule.armFutureWatch('npb', FetchURL.refreshFutureIfChanged);
@@ -2083,17 +2137,17 @@ Future<int> _saveErrorLog(
         },
       );
     });
-          print("エラーログのDBに登録しました。");
+    print("エラーログのDBに登録しました。");
     return id;
   } catch (e2, st2) {
-          print("エラーログのDB登録に失敗しました。");
+    print("エラーログのDB登録に失敗しました。");
     print('🔥 error-log ERROR: $e2\n$st2');
     try {
       File('error_log.txt').writeAsStringSync(
         '${DateTimeTool.getNow("")}\n$e\n$stacktrace\n---\n$e2\n$st2\n\n',
         mode: FileMode.append,
       );
-              print("エラーログをローカルディレクトリに書き込みました。");
+      print("エラーログをローカルディレクトリに書き込みました。");
     } catch (_) {}
     return 0;
   }
@@ -2123,19 +2177,19 @@ Future<void> _saveAccessLog(
   try {
     await Postgres.withConnection((conn) async {
       final failed = idError > 0 || httpStatus >= 400;
-        final log = t_system_log();
+      final log = t_system_log();
       log.method = _clipDb(request.method, 20);
       log.category = _clipDb(user.category_system, 20);
       log.code = _clipDb(user.code_system, 20);
-        log.memo = '';
-        log.flg_user = user.flg_user;
+      log.memo = '';
+      log.flg_user = user.flg_user;
       log.url = request.requestedUri.path;
-        log.url_pre = "";
+      log.url_pre = "";
       log.id_log_error = idError;
-        log.flg_check = false;
-        log.crtby = user.id;
+      log.flg_check = false;
+      log.crtby = user.id;
       log.crtpgm = _clipDb(user.code_system, 30);
-        log.updby = user.id;
+      log.updby = user.id;
       log.updpgm = _clipDb(user.code_system, 30);
       log.crtenv = 'server';
       log.txt_detail = LogDetail.encode({
@@ -2157,46 +2211,46 @@ Future<void> _saveAccessLog(
         'duration_ms': durationMs,
         'context': jsonEncode({'method': request.method, 'path': request.requestedUri.path}),
       });
-        await Postgres.insert(conn, log);
+      await Postgres.insert(conn, log);
     });
-        print("操作ログを登録しました。【${user.code_system}】");
+    print("操作ログを登録しました。【${user.code_system}】");
   } catch (e, st) {
     print('操作ログ登録失敗: $e\n$st');
   }
 }
 
 bool _skipAccessLog(String path, {required bool readonly}) {
-  if (readonly) return path == '/predictions/part';
+  if (readonly) return false;
   return path == '/client/action' || path == '/client/error';
 }
 
 /// 読み取り専用API: トランザクションなし。ログINSERTのみ別接続で行う。
 Future<Response> tryCatchAPIReadonly(
   Request request,
-  String category_system,
-  String code_system,
+  String categorySystem,
+  String codeSystem,
   Future<Response> Function() callback,
 ) async {
   print('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
   final started = DateTime.now();
   final requestId = _requestId(request);
-  var id_error = 0;
+  var idError = 0;
   final user = m_user();
   var response = Response.ok('ok');
-  user.category_system = category_system;
-  user.code_system = code_system;
+  user.category_system = categorySystem;
+  user.code_system = codeSystem;
   user.flg_user = false;
   try {
     if (Auth.hasSessionToken(request)) {
       await Postgres.withConnection((conn) => _attachRequestUser(conn, request, user));
     }
-    print("🌐Routing...【" + request.requestedUri.toString() + "】");
+    print("🌐Routing...【${request.requestedUri}】");
     // DDL は待たない。列確認・seed は裏で進め、試合 SELECT を先に返す。
     FetchURL.kickSchemaEnsures();
     response = await callback();
   } catch (e, st) {
     _printRequestError(request, e, st);
-    id_error = await _saveErrorLog(
+    idError = await _saveErrorLog(
       e,
       st.toString(),
       user,
@@ -2211,27 +2265,27 @@ Future<Response> tryCatchAPIReadonly(
       unawaited(_saveAccessLog(
         request,
         user,
-        id_error,
+        idError,
         durationMs: DateTime.now().difference(started).inMilliseconds,
         httpStatus: response.statusCode,
         requestId: requestId,
       ));
     }
-        print("🌐Responsed Successfully‼️【" + request.requestedUri.toString() + "】");
-      }
+    print("🌐Responsed Successfully‼️【${request.requestedUri}】");
+  }
   print('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
   return response;
 }
 
-Future<Response> tryCatchAPI(Request request, String category_system, String code_system, Future<Response> callback(Connection conn)) async {
+Future<Response> tryCatchAPI(Request request, String categorySystem, String codeSystem, Future<Response> Function(Connection conn) callback) async {
   print('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
   final started = DateTime.now();
   final requestId = _requestId(request);
-  var id_error = 0;
+  var idError = 0;
   final user = m_user();
   var response = Response.ok('ok');
-  user.category_system = category_system;
-  user.code_system = code_system;
+  user.category_system = categorySystem;
+  user.code_system = codeSystem;
   user.flg_user = false;
   try {
     await Postgres.withConnection((conn) => _attachRequestUser(conn, request, user));
@@ -2239,16 +2293,16 @@ Future<Response> tryCatchAPI(Request request, String category_system, String cod
     await FetchURL.ensureAppColumns();
     await Postgres.openConnection((conn) async {
       await Postgres.transactionCommit(conn, () async {
-        print("🌐Routing...【" + request.requestedUri.toString() + "】");
+        print("🌐Routing...【${request.requestedUri}】");
         print("");
-        user.category_system = category_system;
-        user.code_system = code_system;
+        user.category_system = categorySystem;
+        user.code_system = codeSystem;
         response = await callback(conn);
       });
     });
   } catch (e, st) {
     _printRequestError(request, e, st);
-    id_error = await _saveErrorLog(
+    idError = await _saveErrorLog(
       e,
       st.toString(),
       user,
@@ -2263,13 +2317,13 @@ Future<Response> tryCatchAPI(Request request, String category_system, String cod
       unawaited(_saveAccessLog(
         request,
         user,
-        id_error,
+        idError,
         durationMs: DateTime.now().difference(started).inMilliseconds,
         httpStatus: response.statusCode,
         requestId: requestId,
       ));
     }
-    print("🌐Responsed Successfully‼️【" + request.requestedUri.toString() + "】");
+    print("🌐Responsed Successfully‼️【${request.requestedUri}】");
   }
   print('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
   return response;
@@ -2285,17 +2339,17 @@ Future<int> insertLogError(
   final message = LogDetail.clip(e.toString(), 2000);
   final stack = LogDetail.clip(stacktrace, 4000);
   final frame = LogDetail.stackFrame(stack);
-  final log_error = t_system_log_error();
-  log_error.message_error = message;
-  log_error.stacktrace = stack;
-  log_error.flg_check = false;
-  log_error.code_log_system = _clipDb(user.code_system, 20);
-  log_error.crtby = user.id;
-  log_error.crtpgm = _clipDb(user.code_system, 30);
-  log_error.updby = user.id;
-  log_error.updpgm = _clipDb(user.code_system, 30);
-  log_error.crtenv = LogDetail.clip('${detail?['environment'] ?? 'server'}', 20);
-  log_error.txt_detail = LogDetail.encode({
+  final logError = t_system_log_error();
+  logError.message_error = message;
+  logError.stacktrace = stack;
+  logError.flg_check = false;
+  logError.code_log_system = _clipDb(user.code_system, 20);
+  logError.crtby = user.id;
+  logError.crtpgm = _clipDb(user.code_system, 30);
+  logError.updby = user.id;
+  logError.updpgm = _clipDb(user.code_system, 30);
+  logError.crtenv = LogDetail.clip('${detail?['environment'] ?? 'server'}', 20);
+  logError.txt_detail = LogDetail.encode({
     'log_type': 'エラー',
     'level': 'ERROR',
     'user_id': user.id,
@@ -2312,5 +2366,5 @@ Future<int> insertLogError(
     'environment': 'server',
     ...?detail,
   });
-  return await Postgres.insert(conn, log_error);
+  return await Postgres.insert(conn, logError);
 }

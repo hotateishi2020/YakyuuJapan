@@ -2,27 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math' as math;
 import '../tools/Env.dart';
 import '../tools/app_logger.dart';
 import '../tools/board_session.dart';
 import '../tools/browser_cookie.dart';
 import '../tools/page_visibility.dart';
 import '../tools/startup_response.dart';
-import '../tools/color_parse.dart';
 import '../config/app_design.dart';
 import '../config/org_config.dart';
 import '../tools/json_utils.dart';
 import '../tools/date_format.dart';
-import '../logic/atari_counts.dart';
 import '../logic/auth_session.dart';
 import '../logic/show_user_predictions.dart';
 import '../View/EventCalendar.dart';
 import '../View/Headers.dart';
-import '../View/Text.dart';
 import '../View/GamesBoard.dart';
 import '../View/LeagueLogo.dart';
 import '../View/SeasonTable.dart';
+import '../View/team_strength_board.dart';
 import '../View/MlbPostseasonBracket.dart';
 import '../View/PostseasonBracket.dart';
 import '../View/PredictGroupBoard.dart';
@@ -109,12 +106,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   List<Map<String, dynamic>> notifications = [];
   bool _sharedInfoReady = false;
   final List<VoidCallback> _infoDialogListeners = [];
-  // Info / SCORE 専用（団体タブの predictions とは独立）
-  String _infoName1 = '';
-  String _infoName2 = '';
-  Color? _infoColor1;
-  Color? _infoColor2;
-
   bool isLoading = true;
 
   /// 初回表示後はヘッダー〜団体タブを残し、タブ下だけローディングする。
@@ -133,8 +124,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   static const _bracketCookie = 'koko_bracket_open';
   bool _bracketOpen = true;
   static const _orgCookie = 'koko_org';
-  bool _scoreLoading = false;
-  int _scoreGen = 0;
   OrgKind _orgKind = OrgKind.npb;
   final Map<OrgKind, _OrgBundle> _orgCache = {};
   final Map<OrgKind, Future<void>> _orgLoadFutures = {};
@@ -318,7 +307,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     showPostseasonBoard = bundle.showPostseasonBoard;
     _readyParts[kind ?? _orgKind] = {...bundle.readyParts};
     // 予想者名は取れたいずれかの団体データから Info に蓄える（空で上書きしない）
-    _captureInfoUsers(predictions, npbPlayerStats);
     _scheduleTeamLogoPrecache(standings);
   }
 
@@ -335,47 +323,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     if (evts.isNotEmpty) events = evts;
     if (notifs.isNotEmpty) notifications = notifs;
     if (settles) _sharedInfoReady = true;
-    _captureInfoUsers(listMapFromJson(map['predict_team']));
-  }
-
-  void _captureInfoUsers(
-    List<Map<String, dynamic>> preds, [
-    List<Map<String, dynamic>> playerStats = const [],
-  ]) {
-    for (final id in const ['1', '2']) {
-      final name = _lookupUserName(preds, playerStats, id);
-      if (name.isNotEmpty) {
-        if (id == '1') {
-          _infoName1 = name;
-        } else {
-          _infoName2 = name;
-        }
-      }
-      final teamColor = lookupField(preds, 'id_user', id, 'code_color', fallback: '');
-      final playerColor = lookupField(playerStats, 'id_user', id, 'code_color', fallback: '');
-      final parsed = parseColorNameOrNull(teamColor) ?? parseColorNameOrNull(playerColor);
-      if (parsed != null) {
-        if (id == '1') {
-          _infoColor1 = parsed;
-        } else {
-          _infoColor2 = parsed;
-        }
-      }
-    }
-  }
-
-  String _lookupUserName(
-    List<Map<String, dynamic>> preds,
-    List<Map<String, dynamic>> playerStats,
-    String id,
-  ) {
-    for (final rows in [preds, playerStats]) {
-      for (final key in const ['name_user_last', 'username', 'name_last']) {
-        final name = lookupField(rows, 'id_user', id, key, fallback: '').trim();
-        if (name.isNotEmpty && name != '—' && name != '現在') return name;
-      }
-    }
-    return '';
   }
 
   void addInfoDialogListener(VoidCallback listener) {
@@ -422,13 +369,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     if (value is int) return value;
     if (value is num) return value.toInt();
     return int.tryParse('$value') ?? 0;
-  }
-
-  Color? _colorFromJson(dynamic value) {
-    if (value == null) return null;
-    final parsed = _jsonInt(value);
-    if (parsed == 0) return null;
-    return Color(parsed);
   }
 
   _OrgBundle _bundleFromSession(Map<dynamic, dynamic> raw) {
@@ -501,12 +441,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     final notifs = listMapFromJson(map['notifications']);
     if (evts.isNotEmpty) events = evts;
     if (notifs.isNotEmpty) notifications = notifs;
-    final name1 = '${map['infoName1'] ?? ''}'.trim();
-    final name2 = '${map['infoName2'] ?? ''}'.trim();
-    if (name1.isNotEmpty) _infoName1 = name1;
-    if (name2.isNotEmpty) _infoName2 = name2;
-    _infoColor1 = _colorFromJson(map['infoColor1']) ?? _infoColor1;
-    _infoColor2 = _colorFromJson(map['infoColor2']) ?? _infoColor2;
   }
 
   void _persistBoardSession() {
@@ -522,10 +456,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     map['orgs'] = orgs;
     map['events'] = events;
     map['notifications'] = notifications;
-    map['infoName1'] = _infoName1;
-    map['infoName2'] = _infoName2;
-    map['infoColor1'] = _infoColor1?.toARGB32();
-    map['infoColor2'] = _infoColor2?.toARGB32();
     _writeBoardSession();
   }
 
@@ -959,61 +889,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     await fetchData(kind: other, background: true);
   }
 
-  bool get _scoreReady => OrgKind.values.every(
-        (kind) => _partReady(_LoadPart.standings, kind) && _partReady(_LoadPart.players, kind),
-      );
-
-  bool get _scoreNetworkReady => OrgKind.values.every(
-        (kind) => _partLoadedForYear(kind, _LoadPart.standings) && _partLoadedForYear(kind, _LoadPart.players),
-      );
-
-  /// スコアは NPB と MLB の順位・個人成績が揃ったときに確定する。揃うまで表示は出さない。
-  Future<void> _loadScoreOnce() async {
-    final year = _seasonYear;
-    final gen = ++_scoreGen;
-    if (_scoreNetworkReady || _scoreReady) {
-      if (_scoreLoading && gen == _scoreGen) {
-        _scoreLoading = false;
-        if (mounted) setState(() {});
-      }
-      if (!_scoreNetworkReady) unawaited(_refreshScoreQuietly(year, gen));
-      return;
-    }
-    _scoreLoading = true;
-    if (mounted) setState(() {});
-    try {
-      await _refreshScoreQuietly(year, gen);
-    } catch (e, st) {
-      unawaited(AuthSession.instance.reportTimeout(e, st));
-    } finally {
-      if (gen == _scoreGen) {
-        _scoreLoading = false;
-        if (mounted) setState(() {});
-        if (!_scoreReady && mounted && _seasonYear == year) {
-          Future<void>.delayed(const Duration(seconds: 3), () {
-            if (!mounted || _scoreReady || _seasonYear != year || gen != _scoreGen) return;
-            unawaited(_loadScoreOnce());
-          });
-        }
-      }
-    }
-  }
-
-  Future<void> _ensureScorePart(OrgKind kind, _LoadPart part, int year) {
-    if (_partLoadedForYear(kind, part)) return Future<void>.value();
-    return _fetchPart(kind, part, year, background: true);
-  }
-
-  /// 順位と個人成績は団体ごとに順番に取る。同時に走らせると試合取得がタイムアウトする。
-  Future<void> _refreshScoreQuietly(int year, int gen) async {
-    for (final kind in [_orgKind, if (_orgKind == OrgKind.npb) OrgKind.mlb else OrgKind.npb]) {
-      if (!mounted || gen != _scoreGen || _seasonYear != year) return;
-      await _ensureScorePart(kind, _LoadPart.standings, year);
-      if (!mounted || gen != _scoreGen || _seasonYear != year) return;
-      await _ensureScorePart(kind, _LoadPart.players, year);
-    }
-  }
-
   Future<void> _ensureSharedInfo() {
     if (_sharedInfoReady) return Future<void>.value();
     return _fetchPart(OrgKind.npb, _LoadPart.info, _seasonYear, background: true);
@@ -1048,7 +923,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
             ],
           ),
         ),
-        Expanded(child: _scoreNewsEventsRow(portrait: false, popup: true)),
+        Expanded(child: _newsEventsRow(portrait: false, popup: true)),
       ],
     );
   }
@@ -1078,140 +953,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           ),
         ),
       ),
-    );
-  }
-
-  static const _scoreNameStyle = TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w900, height: 1);
-  static const _scoreValueStyle = TextStyle(color: Colors.black, fontSize: 13, fontWeight: FontWeight.w900, height: 1);
-
-  ({String name1, String name2, String score1, String score2, Color color1, Color color2}) _headerScoreParts() {
-    final counts = _infoAtariCounts();
-    final loginId = AuthSession.instance.user?.id;
-    final selfLeft = loginId == 2;
-    final leftKey = selfLeft ? '2' : '1';
-    final rightKey = selfLeft ? '1' : '2';
-    return (
-      name1: selfLeft ? _infoName2 : _infoName1,
-      name2: selfLeft ? _infoName1 : _infoName2,
-      score1: '${counts[leftKey] ?? 0}',
-      score2: '${counts[rightKey] ?? 0}',
-      color1: (selfLeft ? _infoColor2 : _infoColor1) ?? const Color(0xFF0000FF),
-      color2: (selfLeft ? _infoColor1 : _infoColor2) ?? const Color(0xFFF44336),
-    );
-  }
-
-  double _textWidth(String text, TextStyle style) {
-    final painter = TextPainter(
-      text: TextSpan(text: text, style: style),
-      maxLines: 1,
-      textDirection: TextDirection.ltr,
-    )..layout();
-    return painter.width;
-  }
-
-  /// 名前と点数の文字が収まる幅。狭い画面ではここまで縮めてよい。
-  double _headerScorePreferredWidth() {
-    final parts = _headerScoreParts();
-    double col(String name, String score) {
-      final nameW = name.trim().isEmpty ? 22.0 : _textWidth(name.trim(), _scoreNameStyle);
-      final scoreW = _textWidth(score, _scoreValueStyle);
-      return math.max(nameW, math.max(scoreW, 14)) + 8;
-    }
-
-    final cell = math.max(col(parts.name1, parts.score1), col(parts.name2, parts.score2));
-    return cell * 2 + 3;
-  }
-
-  Widget _headerScore() {
-    final parts = _headerScoreParts();
-    final name1 = parts.name1;
-    final name2 = parts.name2;
-    final score1 = parts.score1;
-    final score2 = parts.score2;
-    final color1 = parts.color1;
-    final color2 = parts.color2;
-    final pending = !_scoreReady;
-    const tableH = HEADER_GLOBAL_H * 0.8;
-
-    Widget nameCell(String name, Color color) {
-      return ColoredBox(
-        color: color,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: Center(
-            child: name.trim().isEmpty
-                ? const SizedBox.shrink()
-                : FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      name.trim(),
-                      maxLines: 1,
-                      style: _scoreNameStyle,
-                    ),
-                  ),
-          ),
-        ),
-      );
-    }
-
-    Widget scoreCell(String score) {
-      return ColoredBox(
-        color: Colors.white,
-        child: Center(
-          child: pending
-              ? const SizedBox(
-                  width: 14,
-                  height: 14,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black),
-                )
-              : FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    score,
-                    maxLines: 1,
-                    style: _scoreValueStyle,
-                  ),
-                ),
-        ),
-      );
-    }
-
-    return SizedBox(
-      height: tableH,
-      width: double.infinity,
-      child: DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.black, width: 1),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          position: DecorationPosition.foreground,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(3),
-            child: Column(
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      Expanded(child: nameCell(name1, color1)),
-                      Container(width: 1, color: Colors.black),
-                      Expanded(child: nameCell(name2, color2)),
-                    ],
-                  ),
-                ),
-                Container(height: 1, color: Colors.black),
-                Expanded(
-                  child: Row(
-                    children: [
-                      Expanded(child: scoreCell(score1)),
-                      Container(width: 1, color: Colors.black),
-                      Expanded(child: scoreCell(score2)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
     );
   }
 
@@ -1250,11 +991,16 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       !_orgLoadFutures.containsKey(_orgKind) &&
       _seasonYear == DateTime.now().year;
 
+  Map<String, String> get _readHeaders {
+    final token = AuthSession.instance.token;
+    return {if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token'};
+  }
+
   Future<void> _notifyGamesDisplayReady() async {
     if (!_canWatchGames || _gamesWatchNotified || _gamesWatchNotifying) return;
     _gamesWatchNotifying = true;
     try {
-      final response = await http.post(Env.api('/predictions/ready'))
+      final response = await http.post(Env.api('/predictions/ready'), headers: _readHeaders)
           .timeout(const Duration(seconds: 10));
       _gamesWatchNotified = response.statusCode == 204;
     } catch (_) {
@@ -1283,7 +1029,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     await fetchData(kind: kind);
     if (!mounted || kind != _orgKind || year != _seasonYear) return;
     unawaited(_ensureSharedInfo());
-    unawaited(_loadScoreOnce());
     if (!mounted) return;
     if (!_shellReady || isLoading) {
       setState(() {
@@ -1396,7 +1141,20 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   Future<void> _ensureItemYearLoaded(int item) async {
-    await _ensureSeasonYearLoaded(only: [_partForItem(item)]);
+    if (item == 3) return; // 戦力はタブを開いたときだけ保存済みデータを取得する。
+    final kind = _orgKind;
+    final year = _seasonYear;
+    // 試合画面はトーナメントの順位と先発投手の個人成績も使用する。
+    await _ensureSeasonYearLoaded(only: item == 0
+        ? const [_LoadPart.games, _LoadPart.standings, _LoadPart.players]
+        : [_partForItem(item)]);
+    if (item != 0 || !mounted || _itemTab != item || kind != _orgKind || year != _seasonYear || _initialGamesDisplayComplete) return;
+    // 戦力タブで年度を変更したあとも、試合表示が整ってから定期取得を再開する。
+    if (!_partLoadedForYear(kind, _LoadPart.games)) return;
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted || _itemTab != item || kind != _orgKind || year != _seasonYear) return;
+    _initialGamesDisplayComplete = true;
+    await _startGamesWatch();
   }
 
   Future<void> _ensureSeasonYearLoaded({List<_LoadPart>? only}) async {
@@ -1427,11 +1185,11 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       _seasonYear = year;
       _invalidateYearParts();
     });
+    if (_itemTab == 3) return;
     await _ensureSeasonYearLoaded();
     await WidgetsBinding.instance.endOfFrame;
     if (!mounted || year != _seasonYear) return;
     _initialGamesDisplayComplete = true;
-    unawaited(_loadScoreOnce());
     if (year == DateTime.now().year) {
       unawaited(_startGamesWatch());
     } else {
@@ -1510,7 +1268,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       final haveGames = part == _LoadPart.games && (_partLoadedForYear(target, part) || cachedGames);
       final uri = Env.api(_partPath(target, part.name, year, fresh: fresh, haveGames: haveGames, from: from, to: to));
       final startup = fresh ? null : await takeStartupResponse(uri);
-      final res = startup ?? await http.get(uri).timeout(const Duration(seconds: 150));
+      final res = startup ?? await http.get(uri, headers: _readHeaders).timeout(const Duration(seconds: 150));
       if (res.statusCode != 200) {
         logger.w('part ${part.name} HTTP ${res.statusCode}');
         _maybeSetPartError(target, background, 'HTTPエラー: ${res.statusCode}');
@@ -1552,9 +1310,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         if (part == _LoadPart.info) {
           _applySharedInfo(map, settles: target == OrgKind.npb);
         }
-        if (part == _LoadPart.standings || part == _LoadPart.players) {
-          _captureInfoUsers(bundle.predictions, bundle.playerStats);
-        }
         if (target == _orgKind) {
           switch (part) {
             case _LoadPart.info:
@@ -1562,13 +1317,11 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
             case _LoadPart.standings:
               predictions = List<Map<String, dynamic>>.from(bundle.predictions);
               standings = List<Map<String, dynamic>>.from(bundle.standings);
-              _captureInfoUsers(predictions, npbPlayerStats);
               _scheduleTeamLogoPrecache(standings);
               break;
             case _LoadPart.players:
               npbPlayerStats = List<Map<String, dynamic>>.from(bundle.playerStats);
               npbPlayerStatsActual = List<Map<String, dynamic>>.from(bundle.playerStatsActual);
-              _captureInfoUsers(predictions, npbPlayerStats);
               break;
             case _LoadPart.games:
               games = List<Map<String, dynamic>>.from(bundle.games);
@@ -1669,7 +1422,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     if (mounted) setState(() => _loadingGameDateByOrg[kind] = ymd);
     try {
       final org = OrgConfig.of(kind);
-      final res = await http.get(Env.api(_partPath(kind, 'games', _seasonYear, date: ymd, fresh: true))).timeout(const Duration(seconds: 60));
+      final res = await http.get(Env.api(_partPath(kind, 'games', _seasonYear, date: ymd, fresh: true)), headers: _readHeaders).timeout(const Duration(seconds: 60));
       if (!mounted) return;
       if (res.statusCode != 200) {
         logger.w('past games $ymd HTTP ${res.statusCode}');
@@ -1721,7 +1474,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     });
   }
 
-  // flg_atari の合計（予想者のみ: id_user 1/2、セ+パ合算）
 
   Widget _portraitTabBar({
     required List<(String label, int index)> tabs,
@@ -1975,11 +1727,12 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
               ('試合情報', 0),
               ('チーム順位', 1),
               ('個人成績', 2),
+              ('戦力', 3),
             ],
             selectedIndex: _itemTab,
             onSelected: (i) {
               if (i == _itemTab) return;
-              const actions = ['試合情報タブを開いた', 'チーム順位タブを開いた', '個人成績タブを開いた'];
+              const actions = ['試合情報タブを開いた', 'チーム順位タブを開いた', '個人成績タブを開いた', '戦力タブを開いた'];
               if (i >= 0 && i < actions.length) {
                 unawaited(AuthSession.instance.reportAction(actions[i]));
               }
@@ -2025,6 +1778,13 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   Widget _itemBoard({bool wideLayout = false}) {
+    if (_itemTab == 3) {
+      return TeamStrengthBoard(
+        key: ValueKey('strength-${_orgKind.name}-$_seasonYear'),
+        org: _org,
+        year: _seasonYear,
+      );
+    }
     if (_itemTab == 2) {
       if (!_partReady(_LoadPart.players)) {
         return const Center(child: CircularProgressIndicator());
@@ -2236,208 +1996,15 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     );
   }
 
-  /// Info 用。NPB+MLB の当を合算し、団体タブ切替では数字が入れ替わらないようにする。
-  Map<String, int> _infoAtariCounts() {
-    final totals = <String, int>{'1': 0, '2': 0};
-    for (final kind in OrgKind.values) {
-      final ready = _partReady(_LoadPart.standings, kind) || _partReady(_LoadPart.players, kind);
-      if (!ready) continue;
-      final bundle = (kind == _orgKind) ? _snapshotCurrent() : _orgCache[kind];
-      if (bundle == null) continue;
-      final part = computeAtariCounts(
-        npbPlayerStats: bundle.playerStats,
-        standings: bundle.standings,
-      );
-      totals['1'] = (totals['1'] ?? 0) + (part['1'] ?? 0);
-      totals['2'] = (totals['2'] ?? 0) + (part['2'] ?? 0);
-    }
-    return totals;
-  }
-
   // 上部: News + イベント日程（NPB/MLB 共通。団体タブでは内容を切り替えない）
-  Widget _scoreNewsEventsRow({required bool portrait, bool popup = false}) {
-    final counts = _infoAtariCounts();
+  Widget _newsEventsRow({required bool portrait, bool popup = false}) {
     final infoLoading = !_sharedInfoReady;
-    final scoreLoading = _scoreLoading;
-    final namesLoading = infoLoading && !_partReady(_LoadPart.standings);
 
     Widget miniSpinner({double size = 18}) => SizedBox(
           width: size,
           height: size,
           child: const CircularProgressIndicator(strokeWidth: 2),
         );
-
-    Widget scoreBox({bool hideHeader = false, bool portraitCompact = false}) {
-      // ログインユーザーを左、相手を右に並べる（id=1/2 の予想者）
-      final loginId = AuthSession.instance.user?.id;
-      final selfLeft = loginId == 2;
-      final leftKey = selfLeft ? '2' : '1';
-      final rightKey = selfLeft ? '1' : '2';
-      final name1 = selfLeft ? _infoName2 : _infoName1;
-      final name2 = selfLeft ? _infoName1 : _infoName2;
-      final score1 = '${counts[leftKey] ?? 0}';
-      final score2 = '${counts[rightKey] ?? 0}';
-      final color1 = (selfLeft ? _infoColor2 : _infoColor1) ?? Colors.blue;
-      final color2 = (selfLeft ? _infoColor1 : _infoColor2) ?? Colors.red;
-      const double vBorder = 1.0;
-      const double cellPad = 6.0;
-
-      Widget nameCell(String name, Color background, {bool leftBorder = false}) {
-        final showSpinner = namesLoading && name.trim().isEmpty;
-        return Expanded(
-                child: Container(
-            decoration: BoxDecoration(
-              color: background,
-              border: leftBorder ? const Border(left: BorderSide(color: Colors.black45, width: vBorder)) : null,
-            ),
-                  alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(horizontal: cellPad, vertical: 4),
-            child: showSpinner
-                ? miniSpinner(size: 16)
-                : OneLineShrinkText(
-                    name,
-                    baseSize: 20,
-                    minSize: 10,
-                    weight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-        );
-      }
-
-      return Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: Colors.black87, width: 1.5),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        clipBehavior: Clip.antiAlias,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: portraitCompact ? MainAxisSize.min : MainAxisSize.max,
-                  children: [
-            if (!hideHeader)
-                    Container(
-                height: 30,
-                decoration: const BoxDecoration(
-                  color: Colors.black,
-                  border: Border(bottom: BorderSide(color: Colors.black45, width: vBorder)),
-                ),
-                      alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(horizontal: cellPad, vertical: 4),
-                child: const OneLineShrinkText(
-                  'SCORE',
-                  baseSize: 20,
-                        minSize: 10,
-                        weight: FontWeight.bold,
-                  align: TextAlign.center,
-                        color: Colors.white,
-                      ),
-                    ),
-            // 2行目: 立石 | 江島
-            Container(
-              height: portraitCompact ? 26 : 32,
-              decoration: const BoxDecoration(
-                border: Border(bottom: BorderSide(color: Colors.black45, width: vBorder)),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  nameCell(name1, color1),
-                  nameCell(name2, color2, leftBorder: true),
-                ],
-              ),
-            ),
-            // 3行目: 数字（両列とも同じフォントサイズ）
-            if (portraitCompact)
-              SizedBox(
-                height: 46,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(cellPad),
-                        alignment: Alignment.center,
-                        child: scoreLoading
-                            ? miniSpinner(size: 20)
-                            : FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Text(
-                                  score1,
-                                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, height: 1.0),
-                        ),
-                      ),
-                    ),
-                    ),
-                    Expanded(
-                      child: Container(
-                decoration: const BoxDecoration(
-                  border: Border(left: BorderSide(color: Colors.black45, width: vBorder)),
-                ),
-                        padding: const EdgeInsets.all(cellPad),
-                      alignment: Alignment.center,
-                        child: scoreLoading
-                            ? miniSpinner(size: 20)
-                            : FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Text(
-                                  score2,
-                                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, height: 1.0),
-                                ),
-                              ),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            else
-                    Expanded(
-                child: LayoutBuilder(builder: (context, c) {
-                  final double halfW = c.maxWidth / 2;
-                  final double availW = (halfW - cellPad * 2).clamp(0.0, double.infinity);
-                  final double availH = (c.maxHeight - cellPad * 2).clamp(0.0, double.infinity);
-                  final double byH = availH * 0.88;
-                  final double byW = availW * 0.88;
-                  final double scoreSize = (byH < byW ? byH : byW).clamp(16.0, 56.0);
-
-                  Widget scoreCell(String value, {bool leftBorder = false}) {
-                    return Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                        color: Colors.white,
-                          border: leftBorder ? const Border(left: BorderSide(color: Colors.black45, width: vBorder)) : null,
-                        ),
-                        padding: const EdgeInsets.all(cellPad),
-                        alignment: Alignment.center,
-                        child: scoreLoading
-                            ? miniSpinner(size: 22)
-                            : Text(
-                                value,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: scoreSize,
-                                  fontWeight: FontWeight.w800,
-                                  height: 1.0,
-                        ),
-                      ),
-                    ),
-                    );
-                  }
-
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      scoreCell(score1),
-                      scoreCell(score2, leftBorder: true),
-                    ],
-                  );
-                }),
-              ),
-          ],
-        ),
-      );
-    }
 
     Widget newsBox({bool hideHeader = false, double? boxHeight, bool fill = false}) {
       Color parse(String? name, Color fallback) {
@@ -2694,7 +2261,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
             showNew: AuthSession.instance.showEventNew,
             child: eventsBox(hideHeader: true, boxHeight: panelH),
           ),
-          if (_showUserPredictions) scoreBox(hideHeader: true, portraitCompact: true),
         ],
       );
     }
@@ -2713,7 +2279,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         return Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // イベント120 + 間隔6 + スコア名26 + 得点46
             SizedBox(width: standingsW, height: 198, child: newsBox(fill: true)),
             const SizedBox(width: seasonGap),
             SizedBox(
@@ -2723,10 +2288,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Expanded(child: eventsBox(fill: true)),
-                  if (_showUserPredictions) ...[
-                    const SizedBox(height: 6),
-                    scoreBox(hideHeader: true, portraitCompact: true),
-                  ],
                 ],
               ),
             ),
@@ -2785,11 +2346,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                 onDeleteGroup: _deletePredictGroup,
                 onCreateYear: _createPredictYear,
               ))
-            : orgContentLoading
-                ? const Center(child: CircularProgressIndicator())
-                : (error != null && !_boardContentReady)
-                    ? Center(child: Text(error!))
-                    : Column(
+            : Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const SizedBox(height: 8),
@@ -2797,7 +2354,13 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                       const SizedBox(height: ALL_SPACE_BLOCK),
                       Expanded(
                         flex: isPortrait ? 1 : ALL_RATIO_BLOCK_H[1] * 2,
-                        child: _itemBoard(wideLayout: !isPortrait),
+                        child: _itemTab == 3
+                            ? _itemBoard(wideLayout: !isPortrait)
+                            : orgContentLoading
+                                ? const Center(child: CircularProgressIndicator())
+                                : error != null && !_boardContentReady
+                                    ? Center(child: Text(error!))
+                                    : _itemBoard(wideLayout: !isPortrait),
                       ),
                       if (isPortrait) const SizedBox(height: ALL_SPACE_BLOCK),
                     ],
@@ -2835,8 +2398,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                         ALL_MARGIN_LEFT,
                         onAuthChanged: _onAuthChanged,
                         authReady: _authEntryReady,
-                        titleTrailing: _showUserPredictions ? _headerScore() : null,
-                        titleTrailingWidth: _showUserPredictions ? _headerScorePreferredWidth() : null,
                         actions: [
                           const SizedBox(width: 4),
                           _yearPicker(),

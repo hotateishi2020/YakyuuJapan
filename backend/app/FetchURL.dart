@@ -1670,151 +1670,32 @@ class FetchURL {
     required String awayShortest,
     required String awayShort,
   }) async {
-    final notes = <LivePlateNote>[];
-    if (parsed != null) {
-      var pitcherHome = idPitcherHome;
-      var pitcherAway = idPitcherAway;
-      var scoreHome = 0;
-      var scoreAway = 0;
-      for (final half in parsed.halves) {
-        final battingTeam = half.bottom ? idTeamHome : idTeamAway;
-        final pitchingTeam = half.bottom ? idTeamAway : idTeamHome;
-        for (final plate in half.plates) {
-          final enteringHome = scoreHome;
-          final enteringAway = scoreAway;
-          var plateRuns = 0;
-          var runsAssigned = false;
-          int? absoluteHome;
-          int? absoluteAway;
-          var battingResult = '';
-          var runs = 0;
-          var homerNumber = 0;
-          var stateScore = '';
-          var goodbye = false;
-          var direction = '';
-          final extras = <LiveExtra>[];
-          for (final event in plate.events) {
-            if (livePlateFinishedResults.contains(event.result)) {
-              battingResult = event.result;
-              homerNumber = event.homerNumber;
-              if (event.stateScore.isNotEmpty) stateScore = event.stateScore;
-              if (event.goodbye) goodbye = true;
-              if (event.direction.isNotEmpty) direction = event.direction;
-              if (!runsAssigned && (event.scoreLeft != null || event.linguisticRuns > 0 || event.timely)) {
-                final resolved = _resolvedLiveScore(
-                  event,
-                  homeShortest,
-                  homeShort,
-                  awayShortest,
-                  awayShort,
-                  bottom: half.bottom,
-                  beforeHome: scoreHome,
-                  beforeAway: scoreAway,
-                );
-                if (resolved != null) {
-                  final newHome = resolved.home;
-                  final newAway = resolved.away;
-                  final delta = half.bottom ? newHome - scoreHome : newAway - scoreAway;
-                  runs = preferredLiveRuns(
-                    result: event.result,
-                    linguisticRuns: event.linguisticRuns,
-                    runnerFirst: plate.runnerFirst,
-                    runnerSecond: plate.runnerSecond,
-                    runnerThird: plate.runnerThird,
-                    scoreDelta: delta < 0 ? 0 : delta,
-                  );
-                  absoluteHome = newHome;
-                  absoluteAway = newAway;
-                  if (stateScore.isEmpty && runs > 0) {
-                    stateScore = scoreStateFromTransition(
-                      bottom: half.bottom,
-                      beforeHome: scoreHome,
-                      beforeAway: scoreAway,
-                      afterHome: newHome,
-                      afterAway: newAway,
-                    );
-                  }
-                } else {
-                  runs = preferredLiveRuns(
-                    result: event.result,
-                    linguisticRuns: event.linguisticRuns,
-                    runnerFirst: plate.runnerFirst,
-                    runnerSecond: plate.runnerSecond,
-                    runnerThird: plate.runnerThird,
-                  );
-                }
-                if (stateScore.isEmpty && runs > 0) {
-                  stateScore = scoreStateFromTransition(
-                    bottom: half.bottom,
-                    beforeHome: scoreHome,
-                    beforeAway: scoreAway,
-                    afterHome: half.bottom ? scoreHome + runs : scoreHome,
-                    afterAway: half.bottom ? scoreAway : scoreAway + runs,
-                  );
-                }
-                final timelyHit = event.timely && (event.result == Value.CodeGameResult.HIT_SINGLE || event.result == Value.CodeGameResult.HIT_DOUBLE || event.result == Value.CodeGameResult.HIT_TRIPLE);
-                if (timelyHit && runs < 1) runs = 1;
-                runsAssigned = true;
-                plateRuns = runs;
-              }
-            } else if (event.result.isNotEmpty) {
-              extras.add(LiveExtra(
-                result: event.result,
-                category: event.category,
-                exitName: event.exitName,
-                enterName: event.enterName,
-                positionFrom: event.positionFrom,
-                positionTo: event.positionTo,
-                pitcherChange: event.pitcherChange,
-              ));
-            }
-          }
-          notes.add(LivePlateNote(
-            inning: half.inning,
-            bottom: half.bottom,
-            teamId: battingTeam,
-            batterName: plate.batterName,
-            battingOrder: plate.battingOrder,
-            outs: plate.outs,
-            runnerFirst: plate.runnerFirst,
-            runnerSecond: plate.runnerSecond,
-            runnerThird: plate.runnerThird,
-            battingResult: battingResult,
-            runs: runs,
-            homerNumber: homerNumber,
-            stateScore: stateScore,
-            goodbye: goodbye,
-            direction: direction,
-            scoreHome: enteringHome,
-            scoreAway: enteringAway,
-            pitcherId: half.bottom ? pitcherAway : pitcherHome,
-            extras: extras,
-          ));
-          for (final extra in extras) {
-            if (!extra.pitcherChange || extra.enterName.isEmpty) continue;
-            final entered = playerId(extra.enterName, pitchingTeam);
-            if (entered == 0) continue;
-            if (half.bottom) {
-              pitcherAway = entered;
-            } else {
-              pitcherHome = entered;
-            }
-          }
-          if (absoluteHome != null && absoluteAway != null) {
-            scoreHome = absoluteHome;
-            scoreAway = absoluteAway;
-          } else if (half.bottom) {
-            scoreHome += plateRuns;
-          } else {
-            scoreAway += plateRuns;
-          }
-        }
-      }
-    }
+    final notes = parsed == null ? <LivePlateNote>[] : boxLiveNotes(
+      parsed,
+      idTeamHome: idTeamHome,
+      idTeamAway: idTeamAway,
+      idPitcherHome: idPitcherHome,
+      idPitcherAway: idPitcherAway,
+      playerId: playerId,
+      resolveScore: (event, bottom, home, away) => _resolvedLiveScore(
+        event, homeShortest, homeShort, awayShortest, awayShort,
+        bottom: bottom, beforeHome: home, beforeAway: away,
+      ),
+    );
 
     final placed = attachLiveNotes(boxPlates, notes);
     applyBoxPlateScoring(boxPlates);
-    final storedRows = await Postgres.execute(conn, AppSql.selectGameDetails(), data: [gameId]);
+    final storedRows = await conn.execute(
+      'SELECT * FROM t_game_details WHERE id_game = \$1 AND COALESCE(flg_delete, false) = false ORDER BY id',
+      parameters: [gameId],
+    );
+    final storedVelocity = <int, int>{};
+    for (final row in storedRows) {
+      final map = row.toColumnMap();
+      final pitcher = _detailInt(map['id_pitcher']);
+      final velo = _detailInt(map['int_velo']);
+      if (velo > (storedVelocity[pitcher] ?? 0)) storedVelocity[pitcher] = velo;
+    }
     final storedBatting = <({int inning, bool bottom, String result, int batter, int runs, String state})>[];
     for (final row in storedRows) {
       final map = row.toColumnMap();
@@ -1836,8 +1717,10 @@ class FetchURL {
         if (old.inning != plate.inning || old.bottom != plate.bottom || old.result != plate.result || old.batter != batterId) {
           continue;
         }
-        if (old.runs > plate.runs) plate.runs = old.runs;
-        plate.stateScore = richerStateScore(old.state, plate.stateScore);
+        if (!plate.matched) {
+          if (old.runs > plate.runs) plate.runs = old.runs;
+          plate.stateScore = richerStateScore(old.state, plate.stateScore);
+        }
       }
     }
     final details = <t_game_details>[];
@@ -1919,6 +1802,9 @@ class FetchURL {
           detail.flg_runner_second = extra.runnerSecond;
           detail.flg_runner_third = extra.runnerThird;
           detail.code_category = extra.extra.category;
+          detail.int_runs = extra.extra.runs;
+          detail.code_state_score = extra.extra.stateScore;
+          detail.code_direction_batting = extra.extra.direction;
           detail.code_result = extra.extra.result;
           detail.code_position_from = extra.extra.positionFrom;
           detail.code_position_to = extra.extra.positionTo;
@@ -1932,7 +1818,7 @@ class FetchURL {
             half: bottom ? 1 : 0,
             outs: extra.outs,
             distance: dist(extra.order, start),
-            kind: 1,
+            kind: extra.extra.result == Value.CodeGameResult.ERROR_RUNNING || extra.extra.runs > 0 ? -1 : 1,
             seq: seq++,
             detail: detail,
           ));
@@ -1953,6 +1839,7 @@ class FetchURL {
       return a.seq.compareTo(b.seq);
     });
     for (final row in ordered) {
+      row.detail.int_velo = storedVelocity[row.detail.id_pitcher] ?? 0;
       details.add(row.detail);
     }
     if (details.isEmpty) return;
@@ -1966,7 +1853,8 @@ class FetchURL {
       final ord = halfOrd(old.inning, old.bottom);
       storedCounts[ord] = (storedCounts[ord] ?? 0) + 1;
     }
-    final resume = resumeHalfOrd(storedCounts: storedCounts, boxCounts: boxCounts);
+    // 終了時は訂正された打点や、途中で欠けた失策も確定記録で置き換える。
+    final resume = parsed?.finished == true ? 0 : resumeHalfOrd(storedCounts: storedCounts, boxCounts: boxCounts);
     await Postgres.execute(conn, 'BEGIN');
     try {
       if (resume <= 0) {
@@ -1999,6 +1887,19 @@ class FetchURL {
             if (halfOrd(row.inning, row.half == 1) >= resume) row.detail,
         ];
         if (fresh.isNotEmpty) await Postgres.insertMulti(conn, fresh);
+      }
+      final errors = <int, int>{};
+      for (final extra in placed) {
+        if (extra.extra.result != Value.CodeGameResult.ERROR_RUNNING || extra.extra.enterName.isEmpty) continue;
+        final fielder = playerId(extra.extra.enterName, extra.bottom ? idTeamAway : idTeamHome);
+        if (fielder > 0) errors[fielder] = (errors[fielder] ?? 0) + 1;
+      }
+      for (final entry in errors.entries) {
+        // MLB投手の出場成績表には失策列がないため、速報の名指し記録で補完する。
+        await conn.execute(
+          'UPDATE t_game_summary SET int_error = GREATEST(COALESCE(int_error, 0), \$3) WHERE id_game = \$1 AND id_player = \$2',
+          parameters: [gameId, entry.key, entry.value],
+        );
       }
       await Postgres.commit(conn);
     } catch (e) {
@@ -2103,13 +2004,16 @@ class FetchURL {
       }
     }
 
+    final participants = await conn.execute(
+      'SELECT DISTINCT id_player FROM t_game_summary WHERE id_game = \$1',
+      parameters: [gameId],
+    );
+    final participantIds = {for (final row in participants) _detailInt(row[0])};
+
     int playerId(String name, int teamId) {
       final key = StringTool.noSpace(name);
       if (key.isEmpty) return 0;
       final team = roster.where((player) => player.teamId == teamId).toList();
-      final exact = team.where((player) => player.name == key || player.nameLast == key).toList();
-      if (exact.isNotEmpty) return exact.first.id;
-
       final candidates = team
           .where((player) {
             return playerNameMatches(
@@ -2127,7 +2031,7 @@ class FetchURL {
               ))
           .toList();
 
-      final picked = pickBestPlayerId(query: key, candidates: candidates);
+      final picked = pickBestPlayerId(query: key, candidates: candidates, preferredIds: participantIds);
       if (picked == null) {
         print('選手IDが見つかりません: $name');
         return 0;

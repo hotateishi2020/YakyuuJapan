@@ -56,6 +56,11 @@ class LiveExtra {
   final String positionFrom;
   final String positionTo;
   final bool pitcherChange;
+  final int runs;
+  final String stateScore;
+  final String direction;
+  final int? scoreHome;
+  final int? scoreAway;
 
   const LiveExtra({
     required this.result,
@@ -65,6 +70,11 @@ class LiveExtra {
     this.positionFrom = '',
     this.positionTo = '',
     this.pitcherChange = false,
+    this.runs = 0,
+    this.stateScore = '',
+    this.direction = '',
+    this.scoreHome,
+    this.scoreAway,
   });
 }
 
@@ -353,6 +363,113 @@ _BoxPlay? classifyBoxPlay(String raw) {
   return null;
 }
 
+/// 得点の増分を出来事ごとに割り当て、独立した失策を打点へ混ぜない。
+List<LivePlateNote> boxLiveNotes(
+  ParsedLiveText parsed, {
+  required int idTeamHome,
+  required int idTeamAway,
+  required int idPitcherHome,
+  required int idPitcherAway,
+  required int Function(String name, int teamId) playerId,
+  required ({int home, int away})? Function(ParsedLiveEvent event, bool bottom, int home, int away) resolveScore,
+}) {
+  final notes = <LivePlateNote>[];
+  var pitcherHome = idPitcherHome;
+  var pitcherAway = idPitcherAway;
+  var scoreHome = 0;
+  var scoreAway = 0;
+  for (final half in parsed.halves) {
+    final battingTeam = half.bottom ? idTeamHome : idTeamAway;
+    final fieldingTeam = half.bottom ? idTeamAway : idTeamHome;
+    for (final plate in half.plates) {
+      var battingHome = scoreHome;
+      var battingAway = scoreAway;
+      var battingResult = '';
+      var runs = 0;
+      var homerNumber = 0;
+      var state = '';
+      var goodbye = false;
+      var direction = '';
+      final extras = <LiveExtra>[];
+      final hasSeparateError = plate.events.any((event) => event.result == Value.CodeGameResult.ERROR_RUNNING);
+      for (final event in plate.events) {
+        final beforeHome = scoreHome;
+        final beforeAway = scoreAway;
+        final batting = livePlateFinishedResults.contains(event.result);
+        // バント成功＋悪送球の得点は打点ではない。後続の失策行が得点を持つ。
+        final buntError = event.result == Value.CodeGameResult.SACRIFICE_BUNT && hasSeparateError;
+        final resolved = buntError ? null : resolveScore(event, half.bottom, scoreHome, scoreAway);
+        final delta = resolved == null ? 0 : (half.bottom ? resolved.home - scoreHome : resolved.away - scoreAway);
+        final eventRuns = buntError
+            ? 0
+            : preferredLiveRuns(
+                result: event.result,
+                linguisticRuns: resolved != null && delta <= 0 ? 0 : event.linguisticRuns,
+                runnerFirst: plate.runnerFirst,
+                runnerSecond: plate.runnerSecond,
+                runnerThird: plate.runnerThird,
+                scoreDelta: delta,
+              );
+        if (resolved != null) {
+          scoreHome = resolved.home;
+          scoreAway = resolved.away;
+        } else if (half.bottom) {
+          scoreHome += eventRuns;
+        } else {
+          scoreAway += eventRuns;
+        }
+        final eventState = eventRuns == 0 ? '' : event.stateScore.isNotEmpty ? event.stateScore : scoreStateFromTransition(
+          bottom: half.bottom,
+          beforeHome: beforeHome,
+          beforeAway: beforeAway,
+          afterHome: scoreHome,
+          afterAway: scoreAway,
+        );
+        if (batting) {
+          battingResult = event.result;
+          battingHome = beforeHome;
+          battingAway = beforeAway;
+          runs = eventRuns;
+          homerNumber = event.homerNumber;
+          state = eventState;
+          goodbye = event.goodbye;
+          direction = event.direction;
+        } else if (event.result.isNotEmpty) {
+          extras.add(LiveExtra(
+            result: event.result,
+            category: event.category,
+            exitName: event.exitName,
+            enterName: event.enterName,
+            positionFrom: event.positionFrom,
+            positionTo: event.positionTo,
+            pitcherChange: event.pitcherChange,
+            runs: eventRuns,
+            stateScore: eventState,
+            direction: event.direction,
+            scoreHome: beforeHome,
+            scoreAway: beforeAway,
+          ));
+        }
+      }
+      notes.add(LivePlateNote(
+        inning: half.inning, bottom: half.bottom, teamId: battingTeam,
+        batterName: plate.batterName, battingOrder: plate.battingOrder,
+        outs: plate.outs, runnerFirst: plate.runnerFirst, runnerSecond: plate.runnerSecond, runnerThird: plate.runnerThird,
+        battingResult: battingResult, runs: runs, homerNumber: homerNumber, stateScore: state,
+        goodbye: goodbye, direction: direction, scoreHome: battingHome, scoreAway: battingAway,
+        pitcherId: half.bottom ? pitcherAway : pitcherHome, extras: extras,
+      ));
+      for (final extra in extras) {
+        if (!extra.pitcherChange || extra.enterName.isEmpty) continue;
+        final entered = playerId(extra.enterName, fieldingTeam);
+        if (entered == 0) continue;
+        if (half.bottom) { pitcherAway = entered; } else { pitcherHome = entered; }
+      }
+    }
+  }
+  return notes;
+}
+
 /// テキスト速報の打撃結果を、同じ打者の出場成績の打席へ写す。
 /// 合わない速報の打席は作らない。盗塁や交代だけを別行で返す。
 List<PlacedExtra> attachLiveNotes(List<BoxPlate> plates, List<LivePlateNote> notes) {
@@ -389,8 +506,8 @@ List<PlacedExtra> attachLiveNotes(List<BoxPlate> plates, List<LivePlateNote> not
         runnerFirst: situation?.runnerFirst ?? note.runnerFirst,
         runnerSecond: situation?.runnerSecond ?? note.runnerSecond,
         runnerThird: situation?.runnerThird ?? note.runnerThird,
-        scoreHome: situation?.scoreHome ?? note.scoreHome,
-        scoreAway: situation?.scoreAway ?? note.scoreAway,
+        scoreHome: extra.scoreHome ?? situation?.scoreHome ?? note.scoreHome,
+        scoreAway: extra.scoreAway ?? situation?.scoreAway ?? note.scoreAway,
         pitcherId: situation?.pitcherId ?? note.pitcherId,
       ));
     }
@@ -484,6 +601,10 @@ void applyBoxPlateScoring(List<BoxPlate> plates) {
       plate.runnerThird = third;
       plate.scoreHome = scoreHome;
       plate.scoreAway = scoreAway;
+    } else {
+      // 打席間の失策・暴投による得点を、後続打席の場面判定にも反映する。
+      scoreHome = plate.scoreHome;
+      scoreAway = plate.scoreAway;
     }
     if (plate.result == r.HOME_RUN) {
       final fromRunners = 1 + (plate.runnerFirst ? 1 : 0) + (plate.runnerSecond ? 1 : 0) + (plate.runnerThird ? 1 : 0);

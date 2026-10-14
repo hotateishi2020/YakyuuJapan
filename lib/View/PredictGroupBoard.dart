@@ -595,7 +595,6 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
   }
 
   Color? _resultFont(Map<String, dynamic> row) {
-    if (_tiedLeaders(row)) return Colors.black;
     return _teamPaint(row['color_font']);
   }
 
@@ -797,6 +796,7 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
       FontWeight weight = FontWeight.w600,
       Color? background,
       List<Color>? gradient,
+      List<Color?>? nameColors,
       bool names = false,
     }) {
       final style = TextStyle(fontSize: 13, fontWeight: weight, color: color ?? Colors.black87, height: 1.2);
@@ -818,7 +818,7 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
                   ),
                 )
               : null,
-          child: names ? _fitNames(text, style) : Text(text.isEmpty ? '—' : text, textAlign: TextAlign.center, style: style),
+          child: names ? _fitNames(text, style, colors: nameColors) : Text(text.isEmpty ? '—' : text, textAlign: TextAlign.center, style: style),
         ),
       );
     }
@@ -877,6 +877,9 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
               background: _resultBack(row),
               color: _resultFont(row),
               gradient: _leaderColors(row),
+              nameColors: row['color_fonts'] is List
+                  ? [for (final color in row['color_fonts'] as List) _teamPaint(color)]
+                  : null,
               names: true,
             ),
             for (final user in users) cell(pickName(row, user), hit: pickHit(row, user), names: true),
@@ -922,12 +925,15 @@ Widget _fitLine(String text, TextStyle style) {
   );
 }
 
-Widget _fitNames(String text, TextStyle style) {
+Widget _fitNames(String text, TextStyle style, {List<Color?>? colors}) {
   final lines = _nameLines(text);
-  if (lines.length == 1) return _fitLine(lines.single, style);
+  TextStyle lineStyle(int index) => colors != null && index < colors.length && colors[index] != null
+      ? style.copyWith(color: colors[index])
+      : style;
+  if (lines.length == 1) return _fitLine(lines.single, lineStyle(0));
   return Column(
     mainAxisSize: MainAxisSize.min,
-    children: [for (final line in lines) _fitLine(line, style)],
+    children: [for (var i = 0; i < lines.length; i++) _fitLine(lines[i], lineStyle(i))],
   );
 }
 

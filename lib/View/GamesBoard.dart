@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
 
@@ -1540,6 +1541,19 @@ class _AnimatedGameSlotState extends State<_AnimatedGameSlot> with SingleTickerP
 
 class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> with AutomaticKeepAliveClientMixin {
   final Map<String, bool> _allBattersByGame = {};
+  final Map<String, GlobalKey> _statsAnchors = {};
+
+  Future<void> _revealStats(String gameKey) async {
+    // Wait for the card's 200 ms expansion before measuring its final position.
+    await Future<void>.delayed(const Duration(milliseconds: 240));
+    if (!mounted || _statsStore[gameKey] != true) return;
+    final target = _statsAnchors[gameKey]?.currentContext;
+    if (target == null || !target.mounted) return;
+    await Scrollable.ensureVisible(target,
+        alignment: 0.12, duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic);
+  }
+
   final Map<String, bool> _statsExpandedByGame = {};
 
   Map<String, bool> get _statsStore => widget.statsExpandedByGame ?? _statsExpandedByGame;
@@ -1575,6 +1589,7 @@ class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> with Automa
     final statsExpanded = _statsOpen(game);
     return _TableGameCard(
       rows,
+      statsAnchor: _statsAnchors.putIfAbsent(key, () => GlobalKey()),
       playerStats: widget.playerStats,
       seriesGames: widget.seriesGames,
       standings: widget.standings,
@@ -1589,6 +1604,7 @@ class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> with Automa
       onStatsExpandedChanged: (value) {
         if (value == statsExpanded) return;
         setState(() => _statsStore[key] = value);
+        if (value) unawaited(_revealStats(key));
       },
     );
   }
@@ -1798,6 +1814,7 @@ class _TableGameCard extends StatelessWidget {
   final List<Map<String, dynamic>> standings;
   final bool allBatters;
   final ValueChanged<bool> onAllBattersChanged;
+  final Key? statsAnchor;
   final bool statsExpanded;
 
   /// 0 で畳み、1 で選手成績を全部見せる。開閉中はその間。
@@ -1812,6 +1829,7 @@ class _TableGameCard extends StatelessWidget {
     this.standings = const [],
     this.allBatters = false,
     required this.onAllBattersChanged,
+    this.statsAnchor,
     this.statsExpanded = false,
     this.statsReveal = 0,
     this.statsLayoutHeight = 0,
@@ -2067,8 +2085,8 @@ class _TableGameCard extends StatelessWidget {
     final colors = _seasonChipColors(predict, [for (final line in lines) line.label]);
     final scaler = MediaQuery.textScalerOf(context);
     final labelStyle = DefaultTextStyle.of(context).style.merge(
-      TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold, height: 1),
-    );
+          TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold, height: 1),
+        );
     var labelW = 0.0;
     for (final line in lines) {
       final painter = TextPainter(
@@ -2699,7 +2717,7 @@ class _TableGameCard extends StatelessWidget {
     final parts = <String>[
       '$inningsLabel${runs == 0 ? '無失点' : '$runs失点'}|${tone == 'gray' ? 'dgray' : tone}',
       '被安打$hits|${lower(hits / ip, const [0, 0.3, 0.6, 0.9, 1.2, 1.5])}',
-      '${freePasses}四死|${walksTone(freePasses / ip)}',
+      '$freePasses四死|${walksTone(freePasses / ip)}',
       '${strikeouts}K|${starter ? higher(strikeouts / ip, const [1, 0.85, 0.7, 0.55, 0.4, 0.25]) : reliefK(strikeouts / ip)}',
     ];
     if (pitches > 0) parts.add('$pitches球|');
@@ -3160,7 +3178,7 @@ class _TableGameCard extends StatelessWidget {
         textScaler: scaler,
         maxLines: 1,
       )..layout();
-      final badges = marks.split(RegExp(r'\s+')).where((part) => part == 'E' || part == 'FP').length;
+      final badges = marks.split(RegExp(r'\s+')).where(_isFieldMark).length;
       return Size(painter.width + 6 + badges * 18, painter.height + 2);
     }
 
@@ -3311,6 +3329,29 @@ class _TableGameCard extends StatelessWidget {
         byPos['投'] = [(name: current, marks: '')];
       }
     }
+    // 打席に立たない投手も守備成績を持つ。交代後も失策した本人の表示を残す。
+    final errors = game['fielding_errors'];
+    if (errors is List) {
+      for (final error in errors) {
+        if (error is! Map || (int.tryParse('${error['id_team']}') ?? 0) != teamId) continue;
+        final name = '${error['name'] ?? ''}'.trim();
+        final count = int.tryParse('${error['count']}') ?? 0;
+        if (name.isEmpty || count <= 0) continue;
+        final mark = count == 1 ? 'E' : 'E$count';
+        var found = false;
+        for (final players in byPos.values) {
+          for (var i = 0; i < players.length; i++) {
+            if (!samePlayerStatName(players[i].name, name)) continue;
+            final other = players[i].marks.split(RegExp(r'\s+')).where((value) => value.isNotEmpty && !RegExp(r'^E\d*$').hasMatch(value));
+            players[i] = (name: players[i].name, marks: [mark, ...other].join(' '));
+            found = true;
+          }
+        }
+        if (found) continue;
+        final pitcher = rows.any((row) => _isPitcher(row) && (int.tryParse('${row['id_team_summary']}') ?? 0) == teamId && samePlayerStatName(name, '${row['name_full_summary'] ?? ''}')) || samePlayerStatName(name, _text(home ? 'name_pitcher_home' : 'name_pitcher_away'));
+        if (pitcher) byPos.putIfAbsent('投', () => []).add((name: name, marks: mark));
+      }
+    }
     return [
       for (final pos in _defensePosOrder)
         if (byPos[pos] != null && byPos[pos]!.isNotEmpty)
@@ -3332,9 +3373,11 @@ class _TableGameCard extends StatelessWidget {
     return short.substring(0, 6);
   }
 
+  bool _isFieldMark(String mark) => mark == 'FP' || RegExp(r'^E\d*$').hasMatch(mark);
+
   Widget _fieldMarkBadge(String mark) {
-    final error = mark == 'E';
-        return Container(
+    final error = mark.startsWith('E');
+    return Container(
       key: ValueKey('field-mark-$mark'),
       margin: const EdgeInsets.only(left: 2),
       padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 0.5),
@@ -3354,17 +3397,17 @@ class _TableGameCard extends StatelessWidget {
     final ink = _inkOn(bg);
     return Column(
       mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
+      children: [
+        Row(
           mainAxisSize: MainAxisSize.min,
-                children: [
+          children: [
             Container(
               key: ValueKey(pinch ? 'defense-bg-pinch-$name' : 'defense-bg-$name'),
               padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-                      decoration: BoxDecoration(
+              decoration: BoxDecoration(
                 color: bg,
-                        borderRadius: BorderRadius.circular(3),
-                      ),
+                borderRadius: BorderRadius.circular(3),
+              ),
               child: Text(
                 pinch ? '(${_diagramName(name)})' : _diagramName(name),
                 key: ValueKey(pinch ? 'defense-pinch-$name' : 'defense-name-$name'),
@@ -3373,10 +3416,10 @@ class _TableGameCard extends StatelessWidget {
                   fontSize: pinch ? 8 : 9,
                   fontWeight: FontWeight.w700,
                   height: 1.05,
-                      ),
-                    ),
-                  ),
-            for (final mark in marks.split(RegExp(r'\s+')).where((part) => part == 'E' || part == 'FP')) _fieldMarkBadge(mark),
+                ),
+              ),
+            ),
+            for (final mark in marks.split(RegExp(r'\s+')).where(_isFieldMark)) _fieldMarkBadge(mark),
           ],
         ),
       ],
@@ -3408,7 +3451,7 @@ class _TableGameCard extends StatelessWidget {
           width: w,
           height: h,
           child: ClipRRect(
-                          borderRadius: BorderRadius.circular(3),
+            borderRadius: BorderRadius.circular(3),
             child: Stack(
               fit: StackFit.expand,
               children: [
@@ -3594,7 +3637,7 @@ class _TableGameCard extends StatelessWidget {
           return SizedBox(
             height: fitRowH,
             child: Row(
-                children: [
+              children: [
                 SizedBox(
                   width: leadingW,
                   child: Row(
@@ -3620,7 +3663,7 @@ class _TableGameCard extends StatelessWidget {
                       ? const SizedBox()
                       : FittedBox(
                           fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
+                          alignment: Alignment.centerLeft,
                           child: _nameBox(
                             player,
                             baseSize: nameSize,
@@ -3661,7 +3704,7 @@ class _TableGameCard extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           for (final slot in slots)
-                          SizedBox(
+                            SizedBox(
                               height: fitRowH,
                               child: Align(
                                 alignment: Alignment.centerLeft,
@@ -4131,7 +4174,7 @@ class _TableGameCard extends StatelessWidget {
 
           return Row(
             children: [
-                  SizedBox(
+              SizedBox(
                 width: logoW,
                 child: _cell(
                   color: header ? const Color(0xFF555555) : Colors.white,
@@ -4193,7 +4236,7 @@ class _TableGameCard extends StatelessWidget {
     return _cell(
       color: Colors.white,
       padding: EdgeInsets.zero,
-                    child: Column(
+      child: Column(
         children: [
           SizedBox(
             height: _scoreOnBoardH,
@@ -4243,8 +4286,8 @@ class _TableGameCard extends StatelessWidget {
     final homeLogo = teamLogoVisual(homeName, abbrev: homeAbbrev);
     final awayLogo = teamLogoVisual(awayName, abbrev: awayAbbrev);
     final labels = Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
+      mainAxisSize: MainAxisSize.min,
+      children: [
         if (shownState.isNotEmpty)
           Text(
             shownState,
@@ -4265,7 +4308,7 @@ class _TableGameCard extends StatelessWidget {
           ),
         ),
         if (draw)
-                          Padding(
+          Padding(
             padding: const EdgeInsets.only(top: 2),
             child: Image.asset(
               resultBadgeDraw,
@@ -4435,7 +4478,7 @@ class _TableGameCard extends StatelessWidget {
       color: color,
       right: right,
       bottom: bottom,
-                          child: OneLineShrinkText(
+      child: OneLineShrinkText(
         text,
         baseSize: size,
         minSize: minSize,
@@ -4509,9 +4552,9 @@ class _TableGameCard extends StatelessWidget {
                   OneLineShrinkText(
                     name,
                     baseSize: size,
-                            minSize: 9,
+                    minSize: 9,
                     color: textColor,
-                            weight: FontWeight.bold,
+                    weight: FontWeight.bold,
                     align: TextAlign.center,
                   ),
                   if (milestone.isNotEmpty)
@@ -4537,9 +4580,9 @@ class _TableGameCard extends StatelessWidget {
                       ),
                     ),
                   if (stars != null && stars.slots > 0) _seriesStarRow(stars, textColor, color),
-                      ],
-                    ),
-                  ),
+                ],
+              ),
+            ),
           );
         },
       ),
@@ -4614,7 +4657,7 @@ class _TableGameCard extends StatelessWidget {
   }) {
     final nameSize = size < _minPlayerNameSize ? _minPlayerNameSize : size;
     final statSize = (nameSize * 0.92).clamp(_minPlayerStatSize, 12.0);
-    final rowH = _playerRowH;
+    const rowH = _playerRowH;
     final badgeWidth = (nameSize + 2).clamp(9.0, 16.0);
     const roleMarks = {'先', '中', '抑'};
 
@@ -4628,8 +4671,8 @@ class _TableGameCard extends StatelessWidget {
         return SizedBox(
           width: leadingBadgesW - 0.5,
           child: Row(
-                        children: [
-                          SizedBox(
+            children: [
+              SizedBox(
                 width: badgeWidth,
                 child: hasHr ? _resultBadge('HR', nameSize) : const SizedBox(),
               ),
@@ -4720,10 +4763,10 @@ class _TableGameCard extends StatelessWidget {
                                   role: pitcher.role,
                                   chips: pitcher.chips,
                                   stat: pitcher.stat,
+                                ),
                               ),
-                            ),
-                        ],
-                      ),
+                            ],
+                          ),
                           if (_seasonDisplayLines(pitcher.stat, pitcher.name).isNotEmpty)
                             Padding(
                               padding: const EdgeInsets.only(top: _seasonGap),
@@ -4894,14 +4937,14 @@ class _TableGameCard extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   nameCluster(pitcher, nameW: reservedNameW, scaleName: false),
-                                  if (hasAnyStats) SizedBox(width: nameStatGap),
+                                  if (hasAnyStats) const SizedBox(width: nameStatGap),
                                   if (hasAnyStats) statLine(pitcher),
                                 ],
                               ),
-                                  ),
-                                ],
-                              ),
                             ),
+                        ],
+                      ),
+                    ),
                   ),
                 );
               }
@@ -4910,25 +4953,25 @@ class _TableGameCard extends StatelessWidget {
                 width: cellW,
                 height: maxH.isFinite ? maxH : null,
                 child: ClipRect(
-                              child: Row(
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(
                         width: leadingW + nameBoxW,
                         child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
                             for (final pitcher in pitchers)
                               SizedBox(
                                 height: fitRowH,
                                 child: nameCluster(pitcher, nameW: nameBoxW),
-                                  ),
-                                ],
                               ),
-                            ),
+                          ],
+                        ),
+                      ),
                       if (statsViewportW > 0) ...[
                         if (gapW > 0) SizedBox(width: gapW),
-                            SizedBox(
+                        SizedBox(
                           width: statsViewportW,
                           height: maxH.isFinite ? maxH : fitRowH * pitchers.length,
                           child: ClipRect(
@@ -4954,9 +4997,9 @@ class _TableGameCard extends StatelessWidget {
                           ),
                         ),
                       ],
-                        ],
-                      ),
-                    ),
+                    ],
+                  ),
+                ),
               );
             }),
     );
@@ -5694,9 +5737,9 @@ class _TableGameCard extends StatelessWidget {
           child: Center(
             child: FittedBox(
               fit: BoxFit.scaleDown,
-                      child: Column(
+              child: Column(
                 mainAxisSize: MainAxisSize.min,
-                        children: [
+                children: [
                   for (final ch in chars)
                     Text(
                       // 縦書きでは長音「ー」を縦棒向きにする
@@ -5735,9 +5778,9 @@ class _TableGameCard extends StatelessWidget {
         final showPitchers = pitcherFlex > 0 && _showPitcherStats;
         return Expanded(
           flex: (showPitchers ? pitcherFlex : 0) + (showBatters ? batterFlex : 0) + (showDefense ? defenseFlex : 0),
-                              child: Row(
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
+            children: [
               SizedBox(
                 width: stackTeamHeaderW,
                 child: verticalTeamHeader(teamName, teamBg, teamFg),
@@ -5775,10 +5818,10 @@ class _TableGameCard extends StatelessWidget {
                           weight: FontWeight.bold,
                           bottom: bottom,
                         ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                      ),
+                  ],
+                ),
+              ),
               Expanded(
                 child: Column(
                   children: [
@@ -5836,7 +5879,7 @@ class _TableGameCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-                            SizedBox(
+            SizedBox(
               height: _gameHeaderH,
               child: _cell(
                 color: homeBg ?? const Color(0xFFF4D03F),
@@ -5848,9 +5891,9 @@ class _TableGameCard extends StatelessWidget {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
                         if (_text('time_game').isNotEmpty)
                           OneLineShrinkText(
                             _text('time_game'),
@@ -5896,7 +5939,7 @@ class _TableGameCard extends StatelessWidget {
                 ),
               ),
             ),
-                            SizedBox(
+            SizedBox(
               height: _teamBlockH,
               child: LayoutBuilder(builder: (context, teamConstraints) {
                 final rowW = teamConstraints.maxWidth.isFinite ? teamConstraints.maxWidth : 0.0;
@@ -5904,7 +5947,7 @@ class _TableGameCard extends StatelessWidget {
                 final sideW = math.max(0.0, (rowW - boardW) / 2);
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
+                  children: [
                     SizedBox(
                       width: sideW,
                       child: _teamNameCell(
@@ -5967,7 +6010,7 @@ class _TableGameCard extends StatelessWidget {
                 );
               }),
             ),
-            if (_hasCollapsibleStats) _playerStatsToggle(),
+            if (_hasCollapsibleStats) KeyedSubtree(key: statsAnchor, child: _playerStatsToggle()),
             if (showStats && _showRosterPicker) _allBattersBar(),
             if (showStats && stackedTeams) ...[
               teamStats(
@@ -6038,9 +6081,9 @@ class _TableGameCard extends StatelessWidget {
                           nameColW: awayNameColW,
                           centerNames: !started,
                           home: false,
-                              ),
-                            ),
-                        ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               if (started)
@@ -6081,10 +6124,10 @@ class _TableGameCard extends StatelessWidget {
                                 centerNames: !started,
                                 notableBatting: true,
                                 home: false,
+                              ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
                 ),
               if (_showDefense)
                 Expanded(
@@ -6132,14 +6175,14 @@ class _TableGameCard extends StatelessWidget {
           : inner;
       if (state.contains('回')) {
         card = BlinkBorder(
-                color: Colors.amber,
+          color: Colors.amber,
           radius: 4,
           width: 3,
-                duration: const Duration(milliseconds: 900),
-                baseBgColor: Colors.transparent,
-                fillUseColor: false,
+          duration: const Duration(milliseconds: 900),
+          baseBgColor: Colors.transparent,
+          fillUseColor: false,
           child: card,
-      );
+        );
       }
       final extraBelow = !clip && constraints.maxHeight.isFinite && constraints.maxHeight > layoutH + 0.5;
       if (extraBelow) {
@@ -6326,23 +6369,23 @@ class _PitcherNameBoxState extends State<_PitcherNameBox> with SingleTickerProvi
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
         decoration: deco,
-      child: Stack(
+        child: Stack(
           alignment: alignment,
           clipBehavior: Clip.hardEdge,
-        children: [
-          if (firstBlinkColor != null)
-            Positioned.fill(
+          children: [
+            if (firstBlinkColor != null)
+              Positioned.fill(
                 child: IgnorePointer(
-              child: AnimatedBuilder(
-                animation: _t,
-                builder: (context, _) {
+                  child: AnimatedBuilder(
+                    animation: _t,
+                    builder: (context, _) {
                       final alpha = (0.12 + 0.23 * _t.value).clamp(0.0, 1.0);
                       return ColoredBox(
                         color: firstBlinkColor!.withValues(alpha: alpha),
-                  );
-                },
-              ),
-            ),
+                      );
+                    },
+                  ),
+                ),
               ),
             Text(
               shownName.isNotEmpty ? shownName : '—',
@@ -6352,11 +6395,11 @@ class _PitcherNameBoxState extends State<_PitcherNameBox> with SingleTickerProvi
               style: TextStyle(
                 fontSize: widget.baseSize < widget.minSize ? widget.minSize : widget.baseSize,
                 fontWeight: weight,
-              color: textColor,
+                color: textColor,
                 height: 1.1,
+              ),
             ),
-          ),
-        ],
+          ],
         ),
       ),
     );

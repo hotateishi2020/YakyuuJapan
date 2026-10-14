@@ -2,6 +2,15 @@ import 'package:test/test.dart';
 import '../app/PlayerName.dart';
 
 void main() {
+  test('同じ選手の略称マスターより対象試合の出場IDを優先する', () {
+    const candidates = [
+      (id: 5733, nameFull: 'L.ヘンダーソン', nameLast: 'L.ヘンダーソン', initial: 'L'),
+      (id: 5103, nameFull: 'ローガン・ヘンダーソン', nameLast: 'ヘンダーソン', initial: 'L'),
+    ];
+    expect(pickBestPlayerId(query: 'L.ヘンダーソン', candidates: candidates, preferredIds: {5103}), 5103);
+    expect(pickBestPlayerId(query: 'L.ヘンダーソン', candidates: candidates), 5733);
+  });
+
   test('parse abbreviated MLB name', () {
     final p = parsePlayerName('J.チョウリオ');
     expect(p.initial, 'J');

@@ -37,6 +37,19 @@ class Auth {
     final done = Completer<void>();
     _schemaFlight = done.future;
     try {
+      final existing = await conn.execute('''
+        SELECT to_regclass('public.t_user_session') IS NOT NULL
+          AND to_regclass('public.t_auth_code') IS NOT NULL
+          AND (SELECT COUNT(*) FROM information_schema.columns
+            WHERE table_schema = 'public' AND table_name = 'm_user'
+              AND column_name IN ('nickname', 'name_handle', 'id_team_fav', 'id_player_fav',
+                'flg_notify_news', 'flg_notify_event', 'flg_admin')) = 7
+      ''');
+      if (existing.isNotEmpty && existing.first[0] == true) {
+        _schemaReady = true;
+        done.complete();
+        return;
+      }
       await conn.execute('''
         CREATE TABLE IF NOT EXISTS t_user_session (
           token VARCHAR(80) PRIMARY KEY,
@@ -198,10 +211,10 @@ class Auth {
     return rows.first.toColumnMap();
   }
 
-  static Future<int?> _requireUserId(Connection conn, Request request) async {
+  static Future<int?> _requireUserId(Connection conn, Request request, {bool readOnly = false}) async {
     final token = _bearer(request);
     if (token == null) return null;
-    await ensureSchema(conn);
+    if (!readOnly) await ensureSchema(conn);
     final rows = await conn.execute(
       '''
         SELECT s.id_user
@@ -234,6 +247,9 @@ class Auth {
   }
 
   static Future<int?> userIdOf(Connection conn, Request request) => _requireUserId(conn, request);
+
+  /// 初期表示では認証スキーマの作成や更新を行わない。
+  static Future<int?> readOnlyUserIdOf(Connection conn, Request request) => _requireUserId(conn, request, readOnly: true);
 
   /// 未ログインの公開ページで、認証用の接続やスキーマ確認を待たない。
   static bool hasSessionToken(Request request) => _bearer(request) != null;

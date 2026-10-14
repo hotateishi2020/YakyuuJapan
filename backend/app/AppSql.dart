@@ -1155,6 +1155,17 @@ class AppSql {
     final ids = leagueIds.where((id) => id > 0).toSet().toList()..sort();
     final leagues = ids.isEmpty ? 'NULL' : ids.join(', ');
     return '''
+      SELECT kind, row_no, payload FROM v_predict_stats
+      WHERE int_year = \$1 AND id_league IN ($leagues)
+      ORDER BY kind, row_no
+    ''';
+  }
+
+  /// 定期登録専用。画面 API からは呼ばない。
+  static String selectPlayerDisplaySource(List<int> leagueIds) {
+    final ids = leagueIds.where((id) => id > 0).toSet().toList()..sort();
+    final leagues = ids.isEmpty ? 'NULL' : ids.join(', ');
+    return '''
       SELECT 'stats' AS kind, s.row_no,
         CASE WHEN (s.payload->>'int_rank')::int = 1 THEN
           s.payload || jsonb_build_object(
@@ -1190,6 +1201,7 @@ class AppSql {
         LEFT JOIN m_player ON m_player.id = p.id_player
         LEFT JOIN m_team ON m_team.id = p.id_team
         WHERE p.year = \$1 AND p.id_league IN ($leagues)
+          AND COALESCE(p.flg_delete, FALSE) = FALSE
       ) p
       ORDER BY kind, row_no
     ''';
@@ -1358,6 +1370,7 @@ class AppSql {
           LEFT OUTER JOIN m_user ON m_user.id = t_predict_team.id_user
           LEFT OUTER JOIN m_team ON m_team.id = t_predict_team.id_team
       WHERE t_predict_team.int_year = \$1
+        AND COALESCE(t_predict_team.flg_delete, FALSE) = FALSE
       ORDER BY m_user.id, id_league, int_rank
     ''';
   }

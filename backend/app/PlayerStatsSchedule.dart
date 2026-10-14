@@ -1,3 +1,4 @@
+import 'ScheduledLog.dart';
 import 'dart:async';
 
 import '../tools/Postgres.dart';
@@ -5,6 +6,7 @@ import 'AceEvaluator.dart';
 import 'FetchMLB.dart';
 import 'FetchURL.dart';
 import 'OrgLeague.dart';
+import 'PredictionSnapshot.dart';
 
 /// 個人成績ランキングは画面の初期表示では取らない。サーバーが定期的に登録する。
 class PlayerStatsSchedule {
@@ -37,7 +39,11 @@ class PlayerStatsSchedule {
     var updated = false;
     try {
       final run = _runOverride ?? _runAll;
-      await run();
+      if (_runOverride != null) {
+        await run();
+      } else {
+        await ScheduledLog.run('player_stats', run);
+      }
       updated = true;
     } catch (e, st) {
       print('個人成績定期取得失敗: $e\n$st');
@@ -50,6 +56,7 @@ class PlayerStatsSchedule {
   static Future<void> _runAll() async {
     await _runNpb();
     await _runMlb();
+    await Postgres.withConnection(PredictionSnapshot.refresh);
   }
 
   static Future<void> _runNpb() async {

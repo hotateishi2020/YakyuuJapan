@@ -148,6 +148,8 @@ class _CodeGameResult {
   final String PINCH_HITTER = 'PINCH_HITTER';
   final String PINCH_FIELDER = 'PINCH_FIELDER';
   final String ERROR_FIELDING = 'ERROR_FIELDING';
+  /// 打席結果とは別の失策（牽制悪送球や安打後の進塁など）。
+  final String ERROR_RUNNING = 'ERROR_RUNNING';
   final String WILD_PITCH = 'WILD_PITCH';
   final String PASS_BALL = 'PASS_BALL';
   final String BALK = 'BALK';

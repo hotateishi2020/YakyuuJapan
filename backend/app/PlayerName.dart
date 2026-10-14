@@ -256,8 +256,12 @@ String? correctedNameInitial(String nameFull, String stored) {
 int? pickBestPlayerId({
   required String query,
   required List<({int id, String nameFull, String nameLast, String initial})> candidates,
+  Set<int> preferredIds = const {},
 }) {
   if (candidates.isEmpty) return null;
+  // 過去の略称マスターが残っていても、対象試合の出場記録と同じIDへ結び付ける。
+  final preferred = candidates.where((candidate) => preferredIds.contains(candidate.id)).toList();
+  if (preferred.isNotEmpty) candidates = preferred;
   if (candidates.length == 1) return candidates.first.id;
   final q = parsePlayerName(query);
   final exact = candidates.where((c) {

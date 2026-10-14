@@ -149,7 +149,8 @@ void main() {
           child: SizedBox(
             width: 240,
             height: 90,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 game,
                 {
@@ -173,13 +174,11 @@ void main() {
     expect(find.text('負'), findsNWidgets(2));
     expect(find.text('S'), findsNWidgets(2));
 
-    final starterX =
-        tester.getTopLeft(find.text('長い名前の先発投手').first).dx;
+    final starterX = tester.getTopLeft(find.text('長い名前の先発投手').first).dx;
     final saveX = tester.getTopLeft(find.text('長い名前の抑え投手').first).dx;
     expect(starterX, closeTo(saveX, 0.5));
     final markY = tester.getCenter(find.text('勝').first).dy;
-    final starterY =
-        tester.getCenter(find.text('長い名前の先発投手').first).dy;
+    final starterY = tester.getCenter(find.text('長い名前の先発投手').first).dy;
     expect(markY, closeTo(starterY, 1.0));
   });
 
@@ -209,7 +208,8 @@ void main() {
           child: SizedBox(
             width: 320,
             height: 420,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   ...base,
@@ -446,7 +446,8 @@ void main() {
           child: SizedBox(
             width: 320,
             height: 160,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: nested,
               horizontal: true,
             ),
@@ -605,16 +606,16 @@ void main() {
 
   testWidgets('試合情報のリーグ見出しは1.5倍の高さで名前の横にロゴを出す', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: SizedBox(
           width: 480,
           height: 420,
           child: BothLeagueGameDay(
             initialDate: '2026-10-09',
-            leagues: const [
+            leagues: [
               (id: 1, name: 'セ・リーグ', color: Color(0xFF0E8E2D)),
             ],
-            games: const [
+            games: [
               {
                 'date_game': '2026-10-09',
                 'time_game': '18:00',
@@ -796,7 +797,8 @@ void main() {
           child: SizedBox(
             width: 400,
             height: 120,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [game('巨人'), game('阪神')],
               horizontal: true,
             ),
@@ -822,12 +824,13 @@ void main() {
 
   testWidgets('short era title 防 colors the era season chip', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 420,
             height: 280,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-04',
@@ -876,12 +879,13 @@ void main() {
 
   testWidgets('unstarted starters show season stats under the name and user color on the label', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 420,
             height: 280,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-02',
@@ -984,7 +988,7 @@ void main() {
 
   testWidgets('スタメン starters still show season pitcher stats', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 420,
@@ -1036,12 +1040,13 @@ void main() {
 
   testWidgets('pregame score logos sit beside the 試合前 label at 80% cell height', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 420,
             height: 220,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -1090,12 +1095,13 @@ void main() {
 
   testWidgets('finished game state cell is about twice the old score-on-board height', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 520,
             height: 320,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -1132,7 +1138,7 @@ void main() {
     expect(homeLogo.height, closeTo(44 * 0.8, 6));
   });
 
-  Finder _resultBadge(String asset) {
+  Finder resultBadge(String asset) {
     return find.byWidgetPredicate((widget) {
       if (widget is! Image) return false;
       final provider = widget.image;
@@ -1140,7 +1146,7 @@ void main() {
     });
   }
 
-  Future<void> _pumpFinishedGame(
+  Future<void> pumpFinishedGame(
     WidgetTester tester, {
     required int scoreHome,
     required int scoreAway,
@@ -1181,12 +1187,12 @@ void main() {
   }
 
   testWidgets('finished games show win and lose above the team names', (tester) async {
-    await _pumpFinishedGame(tester, scoreHome: 3, scoreAway: 1);
-    expect(_resultBadge(resultBadgeWin), findsOneWidget);
-    expect(_resultBadge(resultBadgeLose), findsOneWidget);
-    expect(_resultBadge(resultBadgeDraw), findsNothing);
-    final win = tester.getRect(_resultBadge(resultBadgeWin));
-    final lose = tester.getRect(_resultBadge(resultBadgeLose));
+    await pumpFinishedGame(tester, scoreHome: 3, scoreAway: 1);
+    expect(resultBadge(resultBadgeWin), findsOneWidget);
+    expect(resultBadge(resultBadgeLose), findsOneWidget);
+    expect(resultBadge(resultBadgeDraw), findsNothing);
+    final win = tester.getRect(resultBadge(resultBadgeWin));
+    final lose = tester.getRect(resultBadge(resultBadgeLose));
     final homeName = tester.getRect(find.text('ヤクルト'));
     final awayName = tester.getRect(find.text('巨人'));
     expect(homeName.top - win.bottom, inInclusiveRange(3, 8));
@@ -1197,11 +1203,11 @@ void main() {
   });
 
   testWidgets('a draw shows DRAW under the score and not on the team names', (tester) async {
-    await _pumpFinishedGame(tester, scoreHome: 2, scoreAway: 2);
-    expect(_resultBadge(resultBadgeDraw), findsOneWidget);
-    expect(_resultBadge(resultBadgeWin), findsNothing);
-    expect(_resultBadge(resultBadgeLose), findsNothing);
-    final draw = tester.getRect(_resultBadge(resultBadgeDraw));
+    await pumpFinishedGame(tester, scoreHome: 2, scoreAway: 2);
+    expect(resultBadge(resultBadgeDraw), findsOneWidget);
+    expect(resultBadge(resultBadgeWin), findsNothing);
+    expect(resultBadge(resultBadgeLose), findsNothing);
+    final draw = tester.getRect(resultBadge(resultBadgeDraw));
     final score = tester.getRect(find.text('2 - 2'));
     expect(draw.top, greaterThanOrEqualTo(score.bottom - 1));
     expect(draw.center.dx, closeTo(score.center.dx, 16));
@@ -1219,7 +1225,8 @@ void main() {
           child: SizedBox(
             width: 520,
             height: 320,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               playerStats: [
                 stat('最多勝', '村上頌樹', 3),
                 stat('防御率', '村上頌樹', 2),
@@ -1228,7 +1235,7 @@ void main() {
                 stat('防御率', '戸郷翔征', 4),
                 stat('奪三振', '戸郷翔征', 1),
               ],
-              games: [
+              games: const [
                 {
                   'date_game': '2026-10-04',
                   'time_game': '🌙 18:00',
@@ -1269,12 +1276,13 @@ void main() {
 
   testWidgets('hold and save show prediction marks beside the pitching line', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 520,
             height: 220,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-03',
@@ -1373,7 +1381,8 @@ void main() {
           child: SizedBox(
             width: 320,
             height: 220,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [game('DeNA', 5), game('阪神', 2)],
               horizontal: true,
             ),
@@ -1395,12 +1404,13 @@ void main() {
 
   testWidgets('narrow cards keep full player names and clip stats', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 240,
             height: 180,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-09-28',
@@ -1496,12 +1506,13 @@ void main() {
   testWidgets('batting results line up to the right of the player name', (tester) async {
     const plays = '一ゴ|out 犠打|sacbunt 四球|walk スクイズ|squeeze 犠飛|sacfly 中安|single 左2|double 右3|triple 8回裏先制2点タイムリーツーベース|timely 1回表代打逆転サヨナラ19号ソロホームラン|hr';
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 520,
             height: 160,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-09-30',
@@ -1520,7 +1531,7 @@ void main() {
                   'color_back_away': '#003366',
                   'color_font_home': '#000000',
                   'color_font_away': '#FFFFFF',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 2,
@@ -1585,12 +1596,13 @@ void main() {
 
   testWidgets('all batters mode shortens outs, homers, and timely hits', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 420,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-03',
@@ -1617,11 +1629,11 @@ void main() {
                   'int_hit_home': 6,
                   'int_error_away': 0,
                   'int_error_home': 0,
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 7,
                       'order': 5,
-                      'players': [
+                      'players': const [
                         {
                           'name': '柳田悠岐',
                           'pos': '指',
@@ -1633,28 +1645,28 @@ void main() {
                     {
                       'id_team': 7,
                       'order': 6,
-                      'players': [
+                      'players': const [
                         {'name': '周東佑京', 'pos': '遊', 'role': '代打', 'plays': '', 'rbi': 0},
                       ],
                     },
                     {
                       'id_team': 7,
                       'order': 7,
-                      'players': [
+                      'players': const [
                         {'name': '柳町達', 'pos': '中', 'plays': ''},
                       ],
                     },
                     {
                       'id_team': 7,
                       'order': 8,
-                      'players': [
+                      'players': const [
                         {'name': '甲斐拓也', 'pos': '捕', 'plays': ''},
                       ],
                     },
                     {
                       'id_team': 7,
                       'order': 9,
-                      'players': [
+                      'players': const [
                         {'name': '松本晴', 'pos': '投', 'plays': ''},
                       ],
                     },
@@ -1734,12 +1746,13 @@ void main() {
 
   testWidgets('double digit strikeouts blink beside the pitching line', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 520,
             height: 220,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-02',
@@ -1985,12 +1998,13 @@ void main() {
   testWidgets('cycle and pitching feats use their colors', (tester) async {
     const pitching = '9回無失点(無安打無四球11奪三振)';
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 180,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-09-30',
@@ -2009,7 +2023,7 @@ void main() {
                   'color_back_away': '#003366',
                   'color_font_home': '#000000',
                   'color_font_away': '#FFFFFF',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 2,
@@ -2081,12 +2095,13 @@ void main() {
   testWidgets('pitching metrics sit side by side with their own colors', (tester) async {
     const chips = '9回無失点|crimson 被安打3|yorange 四死球0|crimson 10奪三振|crimson 98球|';
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 160,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-09-30',
@@ -2105,7 +2120,7 @@ void main() {
                   'color_back_away': '#003366',
                   'color_font_home': '#000000',
                   'color_font_away': '#FFFFFF',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 2,
@@ -2170,12 +2185,13 @@ void main() {
 
   testWidgets('runs alert paints innings chip not pitcher name', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 160,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-06',
@@ -2194,7 +2210,7 @@ void main() {
                   'color_font_home': '#000000',
                   'color_back_away': '#003366',
                   'color_font_away': '#FFFFFF',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 2,
@@ -2227,12 +2243,13 @@ void main() {
 
   testWidgets('walks alert paints 四死 chip black with red text', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 160,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -2251,7 +2268,7 @@ void main() {
                   'color_font_home': '#000000',
                   'color_back_away': '#003366',
                   'color_font_away': '#FFFFFF',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 2,
@@ -2285,12 +2302,13 @@ void main() {
 
   testWidgets('inning scores sit between team names with nine columns', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 240,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               horizontal: true,
               games: [
                 {
@@ -2316,7 +2334,7 @@ void main() {
                   'color_back_away': '#F15A22',
                   'color_font_home': 'white',
                   'color_font_away': 'black',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 4,
@@ -2367,11 +2385,14 @@ void main() {
     expect(cellW('E'), closeTo(cellW('1'), 0.6));
 
     bool logo(String asset) {
-      return find.byWidgetPredicate((widget) {
-        if (widget is! Image) return false;
-        final provider = widget.image;
-        return provider is AssetImage && provider.assetName == asset;
-      }).evaluate().isNotEmpty;
+      return find
+          .byWidgetPredicate((widget) {
+            if (widget is! Image) return false;
+            final provider = widget.image;
+            return provider is AssetImage && provider.assetName == asset;
+          })
+          .evaluate()
+          .isNotEmpty;
     }
 
     expect(logo('backend/assets/images/team_s.png'), isTrue);
@@ -2411,11 +2432,15 @@ void main() {
     expect(awayLogos.left - inningState.right, inInclusiveRange(2, 40));
     expect(homeLogos.height, closeTo(44 * 0.8, 8));
     final lineHome = tester.widget<Container>(
-      find.ancestor(of: find.byWidgetPredicate((widget) {
-        if (widget is! Image) return false;
-        final provider = widget.image;
-        return provider is AssetImage && provider.assetName == 'backend/assets/images/team_s.png';
-      }).at(1), matching: find.byType(Container)).first,
+      find
+          .ancestor(
+              of: find.byWidgetPredicate((widget) {
+                if (widget is! Image) return false;
+                final provider = widget.image;
+                return provider is AssetImage && provider.assetName == 'backend/assets/images/team_s.png';
+              }).at(1),
+              matching: find.byType(Container))
+          .first,
     );
     expect((lineHome.decoration as BoxDecoration).color, Colors.white);
   });
@@ -2427,12 +2452,13 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 360,
             height: 480,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-03',
@@ -2480,12 +2506,13 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 360,
             height: 220,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-06',
@@ -2526,12 +2553,13 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 360,
             height: 320,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-02',
@@ -2592,12 +2620,13 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 360,
             height: 520,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-08',
@@ -2650,12 +2679,13 @@ void main() {
 
   testWidgets('活躍表示は打球方向と打点・盗塁バッチを出す', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 520,
             height: 180,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-05',
@@ -2674,7 +2704,7 @@ void main() {
                   'color_back_away': '#12284B',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 101,
@@ -2721,12 +2751,13 @@ void main() {
 
   testWidgets('活躍表示の安打は打球方向を出し本塁打とタイムリーには付けない', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 560,
             height: 180,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-06',
@@ -2745,7 +2776,7 @@ void main() {
                   'color_back_away': '#0C2340',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 201,
@@ -2784,12 +2815,13 @@ void main() {
 
   testWidgets('活躍表示は本人の打席だけ並べ他人の代打は出さない', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 420,
             height: 200,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-06',
@@ -2808,7 +2840,7 @@ void main() {
                   'color_back_away': '#0C2340',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 201,
@@ -2817,11 +2849,11 @@ void main() {
                       'txt_plays': '中安|single 四球|walk 左飛|out 右タイムリー|timely',
                     },
                   ],
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 201,
                       'order': 6,
-                      'players': [
+                      'players': const [
                         {
                           'name': 'A.ベニンテンディ',
                           'pos': '左',
@@ -2864,12 +2896,13 @@ void main() {
 
   testWidgets('活躍表示の代打は本人の代打だけ出し他人の代守は出さない', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 220,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-06',
@@ -2890,7 +2923,7 @@ void main() {
                   'color_back_away': '#000000',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 201,
@@ -2899,11 +2932,11 @@ void main() {
                       'txt_plays': '左飛|out 代打同点タイムリー^右|timely',
                     },
                   ],
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 201,
                       'order': 6,
-                      'players': [
+                      'players': const [
                         {'name': 'トリスタン・ピーターズ', 'pos': '右', 'plays': '三振|out 左飛|out'},
                         {'name': 'トミー・ファム', 'pos': '右', 'role': '代打', 'plays': '左飛|out 代打同点タイムリー^右|timely'},
                         {'name': 'ブレンドン・ドイル', 'pos': '中', 'role': '代守', 'plays': '二ゴ|out'},
@@ -2939,12 +2972,13 @@ void main() {
 
   testWidgets('同じ選手をスタメンの代守として出さない', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 360,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-05',
@@ -2965,7 +2999,7 @@ void main() {
                   'color_back_away': '#2F241D',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 201,
@@ -2974,11 +3008,11 @@ void main() {
                       'txt_plays': '三振|out 遊フライ|out',
                     },
                   ],
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 201,
                       'order': 2,
-                      'players': [
+                      'players': const [
                         {'name': 'ダスティン・ハリス', 'pos': '左', 'plays': '三振|out'},
                         {'name': 'ダスティンハリス', 'pos': '左', 'role': '代守', 'plays': '遊フライ|out'},
                       ],
@@ -3005,12 +3039,13 @@ void main() {
 
   testWidgets('opening game label blinks in a tight centered band', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 420,
             height: 160,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-03-27',
@@ -3181,12 +3216,13 @@ void main() {
 
   testWidgets('White Sox 9th Montgomery keeps his own batting chips', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 360,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-06',
@@ -3207,18 +3243,18 @@ void main() {
                   'color_back_away': '#000000',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 201,
                       'order': 7,
-                      'players': [
+                      'players': const [
                         {'name': 'ブレーデン・モンゴメリー', 'pos': '右', 'plays': '空三振|out 右２|double'},
                       ],
                     },
                     {
                       'id_team': 201,
                       'order': 9,
-                      'players': [
+                      'players': const [
                         {'name': 'コルソン・モンゴメリー', 'pos': '遊', 'plays': '四球|walk 空三振|out 見三振|out 三邪飛|out'},
                       ],
                     },
@@ -3247,7 +3283,7 @@ void main() {
 
   testWidgets('死球は赤地に黒文字、5打席凡退は右端に5タコ', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 860,
@@ -3274,25 +3310,25 @@ void main() {
                   'color_back_away': 'orange',
                   'color_font_home': 'black',
                   'color_font_away': 'black',
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 2,
                       'order': 1,
-                      'players': [
+                      'players': const [
                         {'name': '死球選手', 'pos': '中', 'plays': '死球|dead'},
                       ],
                     },
                     {
                       'id_team': 2,
                       'order': 2,
-                      'players': [
+                      'players': const [
                         {'name': '五凡退', 'pos': '右', 'plays': '一ゴ|out 二ゴ|out 三ゴ|out 遊ゴ|out 中飛|out'},
                       ],
                     },
                     {
                       'id_team': 2,
                       'order': 3,
-                      'players': [
+                      'players': const [
                         {'name': '四球あり', 'pos': '左', 'plays': '一ゴ|out 二ゴ|out 三ゴ|out 遊ゴ|out 四球|walk'},
                       ],
                     },
@@ -3326,12 +3362,13 @@ void main() {
 
   testWidgets('MLB game cards put Japan flag to the right of Japanese names', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 420,
             height: 220,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-08',
@@ -3355,7 +3392,7 @@ void main() {
                   'color_font_away': 'white',
                 },
               ],
-              playerStats: const [
+              playerStats: [
                 {
                   'title': '防御率',
                   'name_player': '今永昇太',
@@ -3381,12 +3418,13 @@ void main() {
 
   testWidgets('postseason game cards put a crown on season stat leaders', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 420,
             height: 200,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-08',
@@ -3410,7 +3448,7 @@ void main() {
                   'color_font_away': 'white',
                 },
               ],
-              playerStats: const [
+              playerStats: [
                 {
                   'title': '奪三振',
                   'name_player': '山本由伸',
@@ -3434,7 +3472,7 @@ void main() {
 
   testWidgets('a shared family name does not crown another announced starter', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 420,
@@ -3464,7 +3502,7 @@ void main() {
                   'color_font_away': 'black',
                 },
               ],
-              playerStats: const [
+              playerStats: [
                 {
                   'title': '防御率',
                   'name_player': '髙橋奎二',
@@ -3495,7 +3533,7 @@ void main() {
 
   testWidgets('stolen base percentage leaders do not get a crown', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 520,
@@ -3529,7 +3567,7 @@ void main() {
                   'txt_batting': '2打数1安打(1打点)',
                 },
               ],
-              playerStats: const [
+              playerStats: [
                 {
                   'title': '盗塁成功率',
                   'name_player': '奈良間大己',
@@ -3711,12 +3749,13 @@ void main() {
 
   testWidgets('NPB regular season cards do not show Japan flag or crown', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 360,
             height: 180,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-08',
@@ -3740,7 +3779,7 @@ void main() {
                   'color_font_away': '#000000',
                 },
               ],
-              playerStats: const [
+              playerStats: [
                 {
                   'title': '防御率',
                   'name_player': '村上頌樹',
@@ -3762,12 +3801,13 @@ void main() {
 
   testWidgets('NPB notable mode still shows batters with hits', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 560,
             height: 220,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -3788,7 +3828,7 @@ void main() {
                   'color_back_away': '#FF6600',
                   'color_font_home': '#000000',
                   'color_font_away': '#000000',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 2,
@@ -3805,18 +3845,18 @@ void main() {
                       'txt_plays': '左3点タイムリー|timely',
                     },
                   ],
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 2,
                       'order': 4,
-                      'players': [
+                      'players': const [
                         {'name': '佐藤 輝明', 'pos': '三', 'plays': '中安|single 右2|double 左安|single'},
                       ],
                     },
                     {
                       'id_team': 1,
                       'order': 4,
-                      'players': [
+                      'players': const [
                         {'name': '岡本 和真', 'pos': '一', 'plays': '左3点タイムリー|timely'},
                       ],
                     },
@@ -3838,12 +3878,13 @@ void main() {
 
   testWidgets('notable batters keep HR left of position and sort by points', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 260,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -3864,7 +3905,7 @@ void main() {
                   'color_back_away': '#FF6600',
                   'color_font_home': '#000000',
                   'color_font_away': '#000000',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 2,
@@ -3894,32 +3935,32 @@ void main() {
                       'txt_plays': '犠飛|sacfly',
                     },
                   ],
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 2,
                       'order': 1,
-                      'players': [
+                      'players': const [
                         {'name': '近本 光司', 'pos': '中', 'plays': '中タイムリー|timely'},
                       ],
                     },
                     {
                       'id_team': 2,
                       'order': 4,
-                      'players': [
+                      'players': const [
                         {'name': '佐藤 輝明', 'pos': '三', 'plays': '20号ソロホームラン^左|hr'},
                       ],
                     },
                     {
                       'id_team': 2,
                       'order': 2,
-                      'players': [
+                      'players': const [
                         {'name': '中野 拓夢', 'pos': '遊', 'plays': '四球|walk 三振|out'},
                       ],
                     },
                     {
                       'id_team': 2,
                       'order': 5,
-                      'players': [
+                      'players': const [
                         {'name': '森下 翔太', 'pos': '右', 'plays': '犠飛|sacfly'},
                       ],
                     },
@@ -3948,12 +3989,13 @@ void main() {
 
   testWidgets('MLB Japanese batters show even without extra-base production', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 560,
             height: 220,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -3974,7 +4016,7 @@ void main() {
                   'color_back_away': '#2F241D',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 301,
@@ -3992,18 +4034,18 @@ void main() {
                       'txt_plays': '四球|walk 三振|out',
                     },
                   ],
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 301,
                       'order': 1,
-                      'players': [
+                      'players': const [
                         {'name': 'S.大谷', 'pos': '指', 'plays': '四球|walk 三振|out'},
                       ],
                     },
                     {
                       'id_team': 301,
                       'order': 2,
-                      'players': [
+                      'players': const [
                         {'name': 'M. Rojas', 'pos': '遊', 'plays': '四球|walk'},
                       ],
                     },
@@ -4024,12 +4066,13 @@ void main() {
 
   testWidgets('NPB notable mode uses lineup hits when batter summaries are missing', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 560,
             height: 280,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-06',
@@ -4050,7 +4093,7 @@ void main() {
                   'color_back_away': '#FF0000',
                   'color_font_home': '#000000',
                   'color_font_away': '#FFFFFF',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 2,
@@ -4059,39 +4102,39 @@ void main() {
                       'txt_pitching': '6回1失点',
                     },
                   ],
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 2,
                       'order': 1,
-                      'players': [
+                      'players': const [
                         {'name': '近本 光司', 'pos': '中', 'plays': '左２|double タイムリー^二|timely 四球|walk'},
                       ],
                     },
                     {
                       'id_team': 2,
                       'order': 4,
-                      'players': [
+                      'players': const [
                         {'name': '佐藤 輝明', 'pos': '三', 'plays': '先制タイムリー^中|timely 二併殺|out'},
                       ],
                     },
                     {
                       'id_team': 2,
                       'order': 6,
-                      'players': [
+                      'players': const [
                         {'name': '髙寺望夢', 'pos': '左', 'plays': '一ライナー|out 三振|out'},
                       ],
                     },
                     {
                       'id_team': 6,
                       'order': 4,
-                      'players': [
+                      'players': const [
                         {'name': '坂倉 将吾', 'pos': '一', 'plays': '中安|single タイムリー^中|timely'},
                       ],
                     },
                     {
                       'id_team': 6,
                       'order': 3,
-                      'players': [
+                      'players': const [
                         {'name': '菊池 涼介', 'pos': '二', 'plays': '三失|error'},
                       ],
                     },
@@ -4116,12 +4159,13 @@ void main() {
 
   testWidgets('活躍打者成績は本塁打タイムリー安打と打点犠打犠飛だけ', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 220,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -4142,7 +4186,7 @@ void main() {
                   'color_back_away': '#FF6600',
                   'color_font_home': '#000000',
                   'color_font_away': '#000000',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 2,
@@ -4151,11 +4195,11 @@ void main() {
                       'txt_plays': '四球|walk 中安|single 三振|out 2点犠打|sacbunt 犠飛|sacfly 左タイムリー|timely ソロホームラン|hr',
                     },
                   ],
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 2,
                       'order': 4,
-                      'players': [
+                      'players': const [
                         {
                           'name': '佐藤 輝明',
                           'pos': '三',
@@ -4185,12 +4229,13 @@ void main() {
 
   testWidgets('error and interference RBI only is not a notable batter', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 560,
             height: 220,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -4211,7 +4256,7 @@ void main() {
                   'color_back_away': '#FF6600',
                   'color_font_home': '#000000',
                   'color_font_away': '#000000',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 2,
@@ -4259,12 +4304,13 @@ void main() {
 
   testWidgets('MLB error and interference RBI only is not a notable batter', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 560,
             height: 220,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -4285,7 +4331,7 @@ void main() {
                   'color_back_away': '#E81828',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 301,
@@ -4326,12 +4372,13 @@ void main() {
 
   testWidgets('player names drop spaces between family and given', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 420,
             height: 180,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -4369,12 +4416,13 @@ void main() {
 
   testWidgets('multiple pinch players keep all batting chips left of names', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 280,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-06',
@@ -4395,7 +4443,7 @@ void main() {
                   'color_back_away': '#0C2340',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 201,
@@ -4404,18 +4452,18 @@ void main() {
                       'txt_plays': '中安|single 四球|walk 左飛|out 右タイムリー|timely',
                     },
                   ],
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 201,
                       'order': 5,
-                      'players': [
+                      'players': const [
                         {'name': 'L.サラベラ', 'pos': '遊', 'plays': '右安|single'},
                       ],
                     },
                     {
                       'id_team': 201,
                       'order': 6,
-                      'players': [
+                      'players': const [
                         {
                           'name': 'A.ベニンテンディ',
                           'pos': '左',
@@ -4473,12 +4521,13 @@ void main() {
 
   testWidgets('NPB all-batters attach steal badges to the batting chip', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 280,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-03',
@@ -4499,11 +4548,11 @@ void main() {
                   'color_back_away': '#000000',
                   'color_font_home': '#000000',
                   'color_font_away': '#FFFFFF',
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 7,
                       'order': 1,
-                      'players': [
+                      'players': const [
                         {
                           'name': '周東佑京',
                           'pos': '遊',
@@ -4542,7 +4591,8 @@ void main() {
             child: SizedBox(
               width: 520,
               height: 200,
-              child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+              child: GamesBoardYahooStyle(
+                initialStatsExpanded: true,
                 games: [
                   {
                     'date_game': '2026-10-07',
@@ -4597,12 +4647,13 @@ void main() {
 
   testWidgets('finished MLB pitcher max velo shows mph', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 520,
             height: 200,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -4623,7 +4674,7 @@ void main() {
                   'color_back_away': '#2F241D',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 301,
@@ -4654,7 +4705,8 @@ void main() {
           child: SizedBox(
             width: 640,
             height: 420,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -4725,7 +4777,8 @@ void main() {
           child: SizedBox(
             width: 640,
             height: 520,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -4747,10 +4800,10 @@ void main() {
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
                   'lineup': [
-                    {
+                    const {
                       'id_team': 28,
                       'order': 1,
-                      'players': [
+                      'players': const [
                         {'name': 'ボールドウィン', 'role': '', 'pos': '捕', 'plays': '三振|out 一ゴロ|out 遊ゴロ|out', 'rbi': 1},
                       ],
                     },
@@ -4780,12 +4833,13 @@ void main() {
 
   testWidgets('攻撃中の現在打者の成績ブロックは点滅する', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 520,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -4809,11 +4863,11 @@ void main() {
                   'color_back_away': '#005A9C',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 28,
                       'order': 3,
-                      'players': [
+                      'players': const [
                         {'name': 'オルソン', 'role': '', 'pos': '一', 'plays': '右安|single', 'rbi': 0},
                       ],
                     },
@@ -4846,7 +4900,7 @@ void main() {
 
   testWidgets('打席前が二死でもint_outsが3ならNowは相手の次打者へ移る', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
@@ -4877,18 +4931,18 @@ void main() {
                   'color_back_away': '#005A9C',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 40,
                       'order': 2,
-                      'players': [
+                      'players': const [
                         {'name': '大谷', 'role': '', 'pos': '指', 'plays': '', 'rbi': 0},
                       ],
                     },
                     {
                       'id_team': 28,
                       'order': 1,
-                      'players': [
+                      'players': const [
                         {'name': 'プロファー', 'role': '', 'pos': '左', 'plays': '', 'rbi': 0},
                       ],
                     },
@@ -4911,12 +4965,13 @@ void main() {
 
   testWidgets('3アウトでNowは次に攻撃するチームへ移る', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 520,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -4941,18 +4996,18 @@ void main() {
                   'color_back_away': '#005A9C',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 40,
                       'order': 1,
-                      'players': [
+                      'players': const [
                         {'name': '大谷', 'role': '', 'pos': '指', 'plays': '三振|out', 'rbi': 0},
                       ],
                     },
                     {
                       'id_team': 28,
                       'order': 1,
-                      'players': [
+                      'players': const [
                         {'name': 'プロファー', 'role': '', 'pos': '左', 'plays': '', 'rbi': 0},
                       ],
                     },
@@ -4975,12 +5030,13 @@ void main() {
 
   testWidgets('Nowは次打者の打順だけに出し同姓の他打者には出さない', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 520,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -5002,18 +5058,18 @@ void main() {
                   'color_back_away': '#FFD200',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#000000',
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 12,
                       'order': 1,
-                      'players': [
+                      'players': const [
                         {'name': '佐藤太郎', 'role': '', 'pos': '左', 'plays': '三振|out', 'rbi': 0},
                       ],
                     },
                     {
                       'id_team': 12,
                       'order': 5,
-                      'players': [
+                      'players': const [
                         {'name': '佐藤二郎', 'role': '', 'pos': '遊', 'plays': '', 'rbi': 0},
                       ],
                     },
@@ -5036,12 +5092,13 @@ void main() {
 
   testWidgets('非打撃の得点は直後の打撃の左上に青バッジを付け打点にはしない', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 420,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -5058,11 +5115,11 @@ void main() {
                   'color_back_away': '#12284B',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 41,
                       'order': 3,
-                      'players': [
+                      'players': const [
                         {'name': 'マニー・マチャド', 'pos': '三', 'plays': '中安|single/run', 'rbi': 0},
                       ],
                     },
@@ -5083,12 +5140,13 @@ void main() {
 
   testWidgets('詳細表示のタイムリーとライナーは打球方向を残す', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 420,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -5105,7 +5163,7 @@ void main() {
                   'color_back_away': '#2F241D',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 41,
@@ -5123,18 +5181,18 @@ void main() {
                       'txt_batting': '4打数3安打(1本塁打1打点1四球)',
                     },
                   ],
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 41,
                       'order': 3,
-                      'players': [
+                      'players': const [
                         {'name': 'マニー・マチャド', 'pos': '三', 'plays': '四球|walk タイムリー^左|timely 左ライナー|out 投ゴロ|out'},
                       ],
                     },
                     {
                       'id_team': 35,
                       'order': 3,
-                      'players': [
+                      'players': const [
                         {'name': 'ウィリアム・コントレラス', 'pos': '捕', 'plays': '中フライ|out ソロホームラン^左|hr 遊安|single 中安|single 四球|walk'},
                       ],
                     },
@@ -5166,12 +5224,13 @@ void main() {
 
   testWidgets('活躍表示は要約の安で出場記録の打席を上書きしない', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 280,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -5188,7 +5247,7 @@ void main() {
                   'color_back_away': '#2F241D',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 41,
@@ -5206,18 +5265,18 @@ void main() {
                       'txt_batting': '4打数3安打(1本塁打1打点1四球)',
                     },
                   ],
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 41,
                       'order': 3,
-                      'players': [
+                      'players': const [
                         {'name': 'マニー・マチャド', 'pos': '三', 'plays': '四球|walk タイムリー^左|timely 左ライナー|out 投ゴロ|out', 'rbi': 1},
                       ],
                     },
                     {
                       'id_team': 35,
                       'order': 3,
-                      'players': [
+                      'players': const [
                         {'name': 'ウィリアム・コントレラス', 'pos': '捕', 'plays': '中フライ|out ソロホームラン^左|hr 遊安|single 中安|single 四球|walk', 'rbi': 1},
                       ],
                     },
@@ -5245,12 +5304,13 @@ void main() {
 
   testWidgets('予告先発のスタッツ1位は金色ヘッダーで追加表示する', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 520,
             height: 320,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               playerStats: [
                 {
                   'title': 'WHIP',
@@ -5306,13 +5366,17 @@ void main() {
       );
       return (chip.decoration as BoxDecoration).color!;
     }
+
     expect(chipColor('WHIP'), const Color(0xFFFFD700));
     expect(
       [
         for (var i = 0; i < find.text('防御率').evaluate().length; i++)
-          ((tester.widget<Container>(
-            find.ancestor(of: find.text('防御率').at(i), matching: find.byType(Container)).first,
-          ).decoration as BoxDecoration).color),
+          ((tester
+                  .widget<Container>(
+                    find.ancestor(of: find.text('防御率').at(i), matching: find.byType(Container)).first,
+                  )
+                  .decoration as BoxDecoration)
+              .color),
       ].contains(const Color(0xFFFFD700)),
       isTrue,
     );
@@ -5342,12 +5406,13 @@ void main() {
 
   testWidgets('失策の得点は青バッジで打点にはしない', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
             height: 420,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -5365,11 +5430,11 @@ void main() {
                   'color_back_away': '#2F241D',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 41,
                       'order': 7,
-                      'players': [
+                      'players': const [
                         {'name': 'アンドゥハー', 'pos': '左', 'role': '代打', 'plays': '遊失|error/run', 'rbi': 0},
                       ],
                     },
@@ -5390,12 +5455,13 @@ void main() {
 
   testWidgets('タティスの打点は2打席目の遊ゴにつける', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 720,
             height: 420,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-07',
@@ -5413,11 +5479,11 @@ void main() {
                   'color_back_away': '#2F241D',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 41,
                       'order': 2,
-                      'players': [
+                      'players': const [
                         {
                           'name': 'タティス',
                           'pos': '右',
@@ -5480,12 +5546,13 @@ void main() {
 
   testWidgets('スタメン発表前は守備欄を出さない', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 720,
             height: 280,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-08',
@@ -5518,12 +5585,13 @@ void main() {
 
   testWidgets('予告先発が無い試合前は投手欄を出さない', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 720,
             height: 220,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-08',
@@ -5589,12 +5657,13 @@ void main() {
 
   testWidgets('守備図はスタメンと代守とE/FPを出す', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 900,
             height: 520,
-            child: GamesBoardYahooStyle(initialStatsExpanded: true, 
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
               games: [
                 {
                   'date_game': '2026-10-08',
@@ -5617,7 +5686,7 @@ void main() {
                   'color_back_away': '#003399',
                   'color_font_home': '#000000',
                   'color_font_away': '#FFFFFF',
-                  'summaries': [
+                  'summaries': const [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 8,
@@ -5626,11 +5695,11 @@ void main() {
                       'txt_pitching': '7回1失点',
                     },
                   ],
-                  'lineup': [
+                  'lineup': const [
                     {
                       'id_team': 8,
                       'order': 2,
-                      'players': [
+                      'players': const [
                         {'name': '源田壮亮', 'pos': '遊', 'field_marks': 'E'},
                         {'name': '外崎修汰', 'pos': '遊', 'role': '代守', 'field_marks': 'FP'},
                       ],
@@ -5638,56 +5707,56 @@ void main() {
                     {
                       'id_team': 8,
                       'order': 4,
-                      'players': [
+                      'players': const [
                         {'name': '山川穂高', 'pos': '一'},
                       ],
                     },
                     {
                       'id_team': 8,
                       'order': 5,
-                      'players': [
+                      'players': const [
                         {'name': '渡部健人', 'pos': '三'},
                       ],
                     },
                     {
                       'id_team': 8,
                       'order': 6,
-                      'players': [
+                      'players': const [
                         {'name': '森友哉', 'pos': '捕'},
                       ],
                     },
                     {
                       'id_team': 8,
                       'order': 3,
-                      'players': [
+                      'players': const [
                         {'name': 'コルデロ', 'pos': '指'},
                       ],
                     },
                     {
                       'id_team': 8,
                       'order': 1,
-                      'players': [
+                      'players': const [
                         {'name': '児玉亮涼', 'pos': '二'},
                       ],
                     },
                     {
                       'id_team': 8,
                       'order': 7,
-                      'players': [
+                      'players': const [
                         {'name': '西川愛也', 'pos': '左'},
                       ],
                     },
                     {
                       'id_team': 8,
                       'order': 8,
-                      'players': [
+                      'players': const [
                         {'name': '西川龍馬', 'pos': '中'},
                       ],
                     },
                     {
                       'id_team': 8,
                       'order': 9,
-                      'players': [
+                      'players': const [
                         {'name': '今井達也', 'pos': '投'},
                         {'name': '平良海馬', 'pos': '投', 'role': '代守'},
                       ],
@@ -5746,7 +5815,7 @@ void main() {
 
   testWidgets('選手成績は初期表示では畳まれていて開閉できる', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Center(
           child: SizedBox(
             width: 640,
@@ -5830,7 +5899,7 @@ void main() {
           width: 640,
           height: 280,
           child: ListView(
-            children: [
+            children: const [
               GamesBoardYahooStyle(
                 games: [
                   {
@@ -5896,14 +5965,14 @@ void main() {
       'color_font_away': '#000000',
     };
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: SizedBox(
           width: 640,
           height: 320,
           child: BothLeagueGameDay(
             games: [game],
             initialDate: '2026-10-08',
-            leading: const [SizedBox(height: 2400)],
+            leading: [SizedBox(height: 2400)],
           ),
         ),
       ),

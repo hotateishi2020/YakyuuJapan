@@ -86,6 +86,7 @@ String formatPlayLabels(Iterable<Map<String, dynamic>> rows) {
 
 bool _isNonBattingRunResult(String result) {
   return result == Value.CodeGameResult.WILD_PITCH ||
+      result == Value.CodeGameResult.ERROR_RUNNING ||
       result == Value.CodeGameResult.PASS_BALL ||
       result == Value.CodeGameResult.BALK ||
       result == Value.CodeGameResult.PICKOFF ||

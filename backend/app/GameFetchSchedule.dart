@@ -1,3 +1,5 @@
+import 'ScheduledLog.dart';
+
 /// 明日以降の日程カードは 10 分に 1 回だけ取る。
 /// 昨日以前は一度読み込み済みと判断したら、その日は再取得しない。
 /// 今日は読み込みが終わって 10 秒後に、今日の分だけ取りに行く。
@@ -51,9 +53,11 @@ class GameFetchSchedule {
 
   static String _pastKey(String org, String date) => '$org|$date';
 
-  static bool pastDateDone(String org, String date) => _pastDone.contains(_pastKey(org, date));
+  static bool pastDateDone(String org, String date) =>
+      _pastDone.contains(_pastKey(org, date));
 
-  static void markPastDateDone(String org, String date) => _pastDone.add(_pastKey(org, date));
+  static void markPastDateDone(String org, String date) =>
+      _pastDone.add(_pastKey(org, date));
 
   static bool isTodayBusy(String org) => _todayBusy[org] == true;
 
@@ -62,7 +66,8 @@ class GameFetchSchedule {
   static void markTodayBusy(String org, bool busy) => _todayBusy[org] = busy;
 
   /// 今日の取得が終わって [todayInterval] 後に、今日の分だけもう一度取る。
-  static void scheduleTodayAgain(String org, Future<bool> Function() fetchToday) {
+  static void scheduleTodayAgain(
+      String org, Future<bool> Function() fetchToday) {
     _todayFetch[org] = fetchToday;
     if (!_initialDisplayReady) return;
     if (_todayQueued[org] == true) return;
@@ -80,7 +85,7 @@ class GameFetchSchedule {
       _todayBusy[org] = true;
       var keep = true;
       try {
-        keep = await fetch();
+        keep = await ScheduledLog.run('games_today_$org', fetch);
       } catch (e, st) {
         print('今日の試合再取得失敗 ($org): $e');
         print(st);
@@ -108,7 +113,8 @@ class GameFetchSchedule {
     if (_futureQueued[org] == true) return;
     _futureQueued[org] = true;
     final token = _futureEpoch;
-    Future<void>.delayed(initial ? const Duration(seconds: 20) : futureInterval, () async {
+    Future<void>.delayed(initial ? const Duration(seconds: 20) : futureInterval,
+        () async {
       _futureQueued[org] = false;
       if (token != _futureEpoch) return;
       final fetch = _futureFetch[org];
@@ -119,7 +125,7 @@ class GameFetchSchedule {
       }
       _futureBusy[org] = true;
       try {
-        await fetch();
+        await ScheduledLog.run('games_future_$org', fetch);
       } catch (e, st) {
         print('未来の試合確認に失敗しました ($org): $e');
         print(st);

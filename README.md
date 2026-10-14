@@ -1,32 +1,14 @@
-# koko
+# README【YakyuuJapan】
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
-↓デプロイ記述↓
+【コミット&デプロイ記述】
 
 cd /Users/standapp/StudioProjects/Koko 
 
 sh tool/build_web.sh
 
-`lib/` の変更は、そのままでは公開サイトに反映されません。このスクリプトで
-リリースビルドと `backend/public/` へのコピーを行い、生成ファイルもコミットしてください。
-
 git add . 
 
-git commit -m "表示の修正を行いました。" 
+git commit -m "読み込みの修正を行いました。" 
 
 git push 
 
@@ -34,6 +16,39 @@ cd /Users/standapp/StudioProjects/Koko/backend
 
 dart run tool_sql.dart
 
+
+
+【別途実行】
+
 dart run tool_sql2.dart
 
-コピペ：：dart run index.dart
+コピペ：：dart run index.dart 
+
+
+
+【データ登録用URL】
+
+- ++[[http://127.0.0.1:8080/](http://127.0.0.1:8080/)++fetchGamesNPB]([http://127.0.0.1:8080/fetchGamesNPB](http://127.0.0.1:8080/fetchGamesNPB))
+- ++[http://127.0.0.1:8080/fetchStatsTeamNPB](http://127.0.0.1:8080/fetchStatsTeamNPB)++
+- ++[[http://127.0.0.1:8080/](http://127.0.0.1:8080/)++fetchStatsPlayerNPB]([http://127.0.0.1:8080/fetchStatsPlayerNPB](http://127.0.0.1:8080/fetchStatsPlayerNPB))
+- ++[[http://127.0.0.1:8080/](http://127.0.0.1:8080/)++insertNewPlayersNPB]([http://127.0.0.1:8080/insertNewPlayersNPB](http://127.0.0.1:8080/insertNewPlayersNPB))
+
+
+
+【ショートカット】
+
+関数をたたむショートカット（Cmd R → 0）
+
+
+
+【サーバーでの定期実行処理】
+
+ping.yml【github actionsでの定期実行処理】
+
+render.yaml【Renderのcronjobでの定期実行処理】
+
+
+
+【本番環境URL】
+
+++[https://yakyuujapan.onrender.com/](https://yakyuujapan.onrender.com/)++

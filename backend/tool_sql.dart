@@ -24,7 +24,7 @@ INSERT INTO t_nortification (
     updpgm,
     updenv
 ) VALUES 
-('予想の参照機能を追加しました。', '予想の参照機能を追加しました。', 1, false, 'SYS', 'UPD', '', 0, 'SQLCreator', 'SQLCreator', 0, 'SQLCreator', 'SQLCreator') 
+('チームの戦力を参照する機能を追加しました。', 'チームの戦力を参照する機能を追加しました。', 1, false, 'SYS', 'UPD', '', 0, 'SQLCreator', 'SQLCreator', 0, 'SQLCreator', 'SQLCreator') 
 RETURNING id;
 ''';
 

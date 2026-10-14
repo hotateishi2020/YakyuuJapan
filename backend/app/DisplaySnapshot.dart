@@ -5,11 +5,11 @@ import 'package:postgres/postgres.dart';
 import '../tools/Postgres.dart';
 import 'AppSql.dart';
 import 'PlayerDisplay.dart';
+import 'PredictionSnapshot.dart';
 import 'Value.dart';
 
 /// 初期表示用の集計結果。スクレイピング登録のあとで埋め、画面はここだけ読む。
 class DisplaySnapshot {
-  static final Set<int> _teamsTried = {};
   static bool _ensured = false;
   static Future<void> _tail = Future<void>.value();
 
@@ -75,13 +75,11 @@ class DisplaySnapshot {
       CREATE INDEX IF NOT EXISTS v_games_details_date
       ON v_games_details (int_year, code, date_game)
     ''');
-      await conn.execute(
-          "ALTER TABLE t_game ADD COLUMN IF NOT EXISTS txt_lineup_announced TEXT NOT NULL DEFAULT ''");
+      await conn.execute("ALTER TABLE t_game ADD COLUMN IF NOT EXISTS txt_lineup_announced TEXT NOT NULL DEFAULT ''");
       _ensured = true;
     } finally {
       try {
-        await conn.execute("SELECT set_config('lock_timeout', \$1, false)",
-            parameters: ['${previous.first[0]}']);
+        await conn.execute("SELECT set_config('lock_timeout', \$1, false)", parameters: ['${previous.first[0]}']);
       } catch (_) {
         // 呼び出し元のトランザクションが中断された場合は、その rollback が復元する。
       }
@@ -120,7 +118,6 @@ class DisplaySnapshot {
       await conn.execute('DELETE FROM v_stats_teams WHERE int_year = \$1', parameters: [year]);
       await _insertPayloads(conn, 'v_stats_teams', year, rows);
     });
-    _teamsTried.add(year);
     print('初期表示スナップショット: チーム成績 $year ${rows.length}件');
   }
 
@@ -150,6 +147,9 @@ class DisplaySnapshot {
       for (final game in games) _asInt(game['id_game']): _ymd('${game['date_game'] ?? ''}'),
     };
     await _atomic(conn, () async {
+      // 複数プロセスの定期登録でもrow_noの採番と置換を直列化する。
+      // SHARE ROW EXCLUSIVEは画面からの通常SELECTを妨げない。
+      await conn.execute('LOCK TABLE v_games_details IN SHARE ROW EXCLUSIVE MODE');
       await conn.execute(
         '''
           DELETE FROM v_games_details
@@ -184,24 +184,12 @@ class DisplaySnapshot {
     return _readYear(conn, 'v_stats_player', year);
   }
 
-  static Future<PlayerDisplay> playerPart(Connection conn, int year, List<int> leagueIds) async {
-    final rows = await conn.execute(AppSql.selectPlayerDisplay(leagueIds), parameters: [year]);
-    final stats = <Map<String, dynamic>>[];
-    final predictions = <Map<String, dynamic>>[];
-    for (final row in rows) {
-      (row[0] == 'stats' ? stats : predictions).add(_decode(row[2]));
-    }
-    return buildPlayerDisplay(stats, predictions);
+  static Future<PlayerDisplay> playerPart(Connection conn, int year, List<int> leagueIds) {
+    return PredictionSnapshot.players(conn, year, leagueIds);
   }
 
-  static Future<List<Map<String, dynamic>>> teams(Connection conn, int year) async {
-    await ensure(conn);
-    var rows = await _readYear(conn, 'v_stats_teams', year);
-    if (rows.isEmpty && !_teamsTried.contains(year)) {
-      await refreshTeams(conn, year);
-      rows = await _readYear(conn, 'v_stats_teams', year);
-    }
-    return rows;
+  static Future<List<Map<String, dynamic>>> teams(Connection conn, int year) {
+    return _readYear(conn, 'v_stats_teams', year);
   }
 
   static Future<DisplayGames> games(Connection conn, int year, {String? from, String? to}) async {
@@ -347,7 +335,9 @@ class DisplaySnapshot {
 
   static Future<void> _rememberSpan(Connection conn, int year, String from, String to) async {
     final spans = await _spans(conn, year);
-    if (spansCover(spans, from, to) && spans.any((span) => span.from == from && span.to == to)) return;
+    if (spansCover(spans, from, to) && spans.any((span) => span.from == from && span.to == to)) {
+      return;
+    }
     final maxRow = await conn.execute(
       "SELECT COALESCE(MAX(row_no), -1) FROM v_games_details WHERE int_year = \$1 AND code = 'span'",
       parameters: [year],
@@ -357,7 +347,11 @@ class DisplaySnapshot {
         INSERT INTO v_games_details (int_year, code, row_no, payload)
         VALUES (\$1, 'span', \$2, \$3::jsonb)
       ''',
-      parameters: [year, _asInt(maxRow.first[0]) + 1, jsonEncode({'from': from, 'to': to})],
+      parameters: [
+        year,
+        _asInt(maxRow.first[0]) + 1,
+        jsonEncode({'from': from, 'to': to})
+      ],
     );
   }
 
@@ -384,8 +378,6 @@ class DisplaySnapshot {
     );
     return [for (final row in rows) _decode(row[0])];
   }
-
-
 
   static Map<String, dynamic> _decode(Object? value) {
     if (value is Map) return Map<String, dynamic>.from(value);
@@ -449,6 +441,8 @@ int _asInt(Object? value) {
 
 String _ymd(String raw) {
   final text = raw.trim();
-  if (text.length >= 10 && RegExp(r'^\d{4}-\d{2}-\d{2}').hasMatch(text)) return text.substring(0, 10);
+  if (text.length >= 10 && RegExp(r'^\d{4}-\d{2}-\d{2}').hasMatch(text)) {
+    return text.substring(0, 10);
+  }
   return '';
 }

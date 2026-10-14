@@ -1,6 +1,6 @@
 /// 日本時間の日付が期限の翌日以降なら、その予想は変更できない。期限が空なら締めていない。
 bool predictDeadlinePassed(String? ymd, {DateTime? today}) {
-  final raw = '${ymd ?? ''}'.trim();
+  final raw = (ymd ?? '').trim();
   if (raw.length < 10) return false;
   final day = raw.substring(0, 10);
   if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(day)) return false;
@@ -77,7 +77,7 @@ List<({String label, String date})> predictDeadlineOptions(int year, [Map<String
   if (marks != null) {
     for (final entry in marks.entries) {
       final match = RegExp(r'^\d{4}-\d{2}-\d{2}').firstMatch('${entry.value ?? ''}'.trim());
-      if (match != null) merged['${entry.key}'] = match.group(0)!;
+      if (match != null) merged[entry.key] = match.group(0)!;
     }
   }
   String? before(String key) {

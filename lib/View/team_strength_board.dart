@@ -156,8 +156,14 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
     final lineupGames = _int(team['lineup_game_count']);
     final battingOrder = listMapFromJson(team['batting_order']);
     final positions = listMapFromJson(team['positions']);
+    final substitutions = listMapFromJson(team['substitutions']);
     final playerColors = <String, Color>{};
-    for (final row in [...battingOrder, ...positions, ...pitchingRates]) {
+    for (final row in [
+      ...battingOrder,
+      ...positions,
+      ...pitchingRates,
+      ...substitutions
+    ]) {
       for (final player in listMapFromJson(row['players'])) {
         playerColors.putIfAbsent(_playerKey(player), () {
           // Keep team-derived RGB variations, softened with white.
@@ -265,6 +271,18 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                                   bandHeight: bandHeight,
                                   headingHeight: headingHeight,
                                   headerHeight: headerHeight),
+                              const SizedBox(height: 16),
+                              _verticalRates(
+                                  '途中出場の起用割合',
+                                  '各役割の起用総数が分母',
+                                  substitutions,
+                                  headerBackground,
+                                  foreground,
+                                  playerColors,
+                                  bandHeight: bandHeight,
+                                  headingHeight: headingHeight,
+                                  headerHeight: headerHeight,
+                                  totalUnit: '回'),
                             ],
                           ),
                         )
@@ -282,6 +300,11 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                             detail: '$lineupGames試合の先発起用'),
                         _rates(battingOrder, headerBackground, foreground,
                             playerColors),
+                        _heading('途中出場の起用割合', headerBackground, foreground,
+                            detail: '各役割の起用総数が分母／途中出場時の役割で集計'),
+                        _rates(substitutions, headerBackground, foreground,
+                            playerColors,
+                            totalUnit: '回'),
                       ],
                       if (pitchingRates.isNotEmpty) _pitchingDetails(team),
                       const SizedBox(height: 12),
@@ -425,7 +448,10 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                                   final count = _int(player['count']);
                                   final value = row['unit'] == 'outs'
                                       ? inningsLabel(count)
-                                      : '$count試合';
+                                      : const ['PH', 'PR', 'DEF']
+                                              .contains(row['slot'])
+                                          ? '$count回'
+                                          : '$count試合';
                                   return Padding(
                                       padding:
                                           const EdgeInsets.only(bottom: 16),

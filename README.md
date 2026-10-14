@@ -8,7 +8,7 @@ sh tool/build_web.sh
 
 git add . 
 
-git commit -m "読み込みの修正を行いました。" 
+git commit -m "チームの戦力を参照する機能を追加しました。" 
 
 git push 
 
@@ -16,15 +16,11 @@ cd /Users/standapp/StudioProjects/Koko/backend
 
 dart run tool_sql.dart
 
-
-
 【別途実行】
 
 dart run tool_sql2.dart
 
 コピペ：：dart run index.dart 
-
-
 
 【データ登録用URL】
 
@@ -33,21 +29,15 @@ dart run tool_sql2.dart
 - ++[[http://127.0.0.1:8080/](http://127.0.0.1:8080/)++fetchStatsPlayerNPB]([http://127.0.0.1:8080/fetchStatsPlayerNPB](http://127.0.0.1:8080/fetchStatsPlayerNPB))
 - ++[[http://127.0.0.1:8080/](http://127.0.0.1:8080/)++insertNewPlayersNPB]([http://127.0.0.1:8080/insertNewPlayersNPB](http://127.0.0.1:8080/insertNewPlayersNPB))
 
-
-
 【ショートカット】
 
 関数をたたむショートカット（Cmd R → 0）
-
-
 
 【サーバーでの定期実行処理】
 
 ping.yml【github actionsでの定期実行処理】
 
 render.yaml【Renderのcronjobでの定期実行処理】
-
-
 
 【本番環境URL】
 

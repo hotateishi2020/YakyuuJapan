@@ -18,6 +18,17 @@ Map<String, dynamic> team(int id, String name) => {
       'color_back': 'navy',
       'color_font': 'white',
       'lineup_game_count': 100,
+      'substitutions': [
+        for (final role in [('PH', '代打'), ('PR', '代走'), ('DEF', '代守')])
+          {
+            'slot': role.$1,
+            'label': role.$2,
+            'total': 10,
+            'players': [
+              {'player_key': 'sub_$id', 'name': '途中選手$id', 'count': 10}
+            ]
+          },
+      ],
       'pitching_workload': [
         {
           'name': '先発選手$id',
@@ -706,6 +717,15 @@ void main() {
         expect(find.text('投手の投球回負担率'), findsOneWidget);
         expect(find.text('先発負担率'), findsOneWidget);
         expect(find.text('中継負担率'), findsOneWidget);
+        expect(find.text('途中出場の起用割合'), findsOneWidget);
+        expect(tester.getTopLeft(find.text('途中出場の起用割合')).dy,
+            greaterThan(tester.getTopLeft(find.text('打順のスタメン比率')).dy));
+        for (final role in ['PH', 'PR', 'DEF']) {
+          expect(find.byKey(ValueKey('strength-band-starts-$role')),
+              findsOneWidget);
+          expect(find.byKey(ValueKey('strength-detail-starts-$role')),
+              findsOneWidget);
+        }
         expect(find.text('30回（18.2%）'), findsOneWidget);
         expect(find.text('135回（81.8%）'), findsOneWidget);
         final header = find

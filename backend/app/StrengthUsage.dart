@@ -194,10 +194,122 @@ Map<String, int> parseUsageAppearances(String source, {required bool pitcher}) {
   return result;
 }
 
+List<Map<String, dynamic>> parseNpbSubstitutions(String source, String url) {
+  // Validate completion and exclusion of postseason/exhibition games first.
+  if (parseNpbUsageGame(source, url).isEmpty) return [];
+  final doc = html.parse(source);
+  final match = RegExp(r'/([a-z]+)-([a-z]+)-\d+/').firstMatch(url)!;
+  final result = <Map<String, dynamic>>[];
+  for (final side in ['top', 'bottom']) {
+    final table = doc.querySelector('#table_${side}_b tbody');
+    if (table == null) throw StateError('打者成績がありません: $url');
+    for (final tr in table.children) {
+      final cells = tr.children;
+      if (cells.length < 3 || cells[0].text.trim().isNotEmpty) continue;
+      final position = cells[1].text.trim();
+      final role = position.startsWith('打')
+          ? 'PH'
+          : position.startsWith('走')
+              ? 'PR'
+              : RegExp(r'^[捕一二三遊左右中]').hasMatch(position)
+                  ? 'DEF'
+                  : null;
+      if (role == null) continue;
+      final id = RegExp(r'/players/(\d+)\.html').firstMatch(
+          cells[2].querySelector('a')?.attributes['href'] ?? '')?[1];
+      if (id == null) throw StateError('途中出場選手IDがありません: $url');
+      result.add({
+        'source_player_id': id,
+        'name': cells[2].text.trim(),
+        'team_code': side == 'top' ? match[2] : match[1],
+        'role': role
+      });
+    }
+  }
+  return result;
+}
+
+List<Map<String, dynamic>> parseMlbSubstitutions(Map<String, dynamic> box) {
+  final result = <Map<String, dynamic>>[];
+  for (final side in ['home', 'away']) {
+    final team = usageMap(usageMap(box['teams'])[side]);
+    if (team.isEmpty) throw StateError('MLB球団成績がありません');
+    for (final raw in usageMap(team['players']).values) {
+      final p = usageMap(raw);
+      if (usageInt(p['battingOrder']) % 100 == 0) continue;
+      final positions = usageMaps(p['allPositions']);
+      if (positions.isEmpty) throw StateError('途中出場の守備位置がありません');
+      final first = '${positions.first['abbreviation']}';
+      final role = first == 'PH' || first == 'PR'
+          ? first
+          : const ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF']
+                  .contains(first)
+              ? 'DEF'
+              : null;
+      if (role == null) continue;
+      result.add({
+        'source_player_id': '${usageMap(p['person'])['id']}',
+        'name': usageMap(p['person'])['fullName'],
+        'team_code': '${usageMap(team['team'])['id']}',
+        'role': role
+      });
+    }
+  }
+  return result;
+}
+
+List<Map<String, dynamic>> substitutionBands(
+    List<Map<String, dynamic>> games, String teamCode,
+    {String org = 'npb'}) {
+  final counts = <String, Map<String, Map<String, dynamic>>>{};
+  final seen = <String>{};
+  for (final game in games) {
+    if (!seen.add('${game['game_key']}')) continue;
+    final seenPlayers = <String>{};
+    for (final p in usageMaps(game['substitutions'])) {
+      if ('${p['team_code']}' != teamCode) continue;
+      final id = '${p['source_player_id']}';
+      final role = '${p['role']}';
+      if (!seenPlayers.add('$role:$id')) continue;
+      final player = counts
+          .putIfAbsent(role, () => {})
+          .putIfAbsent(id, () => {...p, 'player_key': '$org:$id', 'count': 0});
+      player['count'] = usageInt(player['count']) + 1;
+    }
+  }
+  return [
+    for (final role in [('PH', '代打'), ('PR', '代走'), ('DEF', '代守')])
+      (() {
+        final players = (counts[role.$1]?.values.toList() ??
+            <Map<String, dynamic>>[])
+          ..sort(
+              (a, b) => usageInt(b['count']).compareTo(usageInt(a['count'])));
+        final total = players.fold<int>(0, (n, p) => n + usageInt(p['count']));
+        return <String, dynamic>{
+          'slot': role.$1,
+          'label': role.$2,
+          'total': total,
+          'players': [
+            for (final p in players)
+              {
+                ...p,
+                'usage_rate': total == 0 ? 0 : usageInt(p['count']) / total
+              }
+          ]
+        };
+      })()
+  ];
+}
+
 class StrengthUsage {
   static Future<void> ensure() => Postgres.withConnection((conn) async {
         await conn
             .execute('''CREATE TABLE IF NOT EXISTS t_strength_game_pitching (
+      code_org text NOT NULL, int_year integer NOT NULL, game_key text NOT NULL,
+      payload jsonb NOT NULL, updated_at timestamptz NOT NULL DEFAULT NOW(),
+      PRIMARY KEY(code_org, int_year, game_key))''');
+        await conn.execute(
+            '''CREATE TABLE IF NOT EXISTS t_strength_game_substitutions (
       code_org text NOT NULL, int_year integer NOT NULL, game_key text NOT NULL,
       payload jsonb NOT NULL, updated_at timestamptz NOT NULL DEFAULT NOW(),
       PRIMARY KEY(code_org, int_year, game_key))''');
@@ -237,9 +349,13 @@ class StrengthUsage {
       String org,
       int year,
       List<String> keys,
-      Future<List<Map<String, dynamic>>> Function(String key) fetch) async {
+      Future<List<Map<String, dynamic>>> Function(String key) fetch,
+      {bool substitutions = false}) async {
+    final table = substitutions
+        ? 't_strength_game_substitutions'
+        : 't_strength_game_pitching';
     final saved = await Postgres.withConnection((conn) async => conn.execute(
-        'SELECT game_key,payload FROM t_strength_game_pitching WHERE code_org=\$1 AND int_year=\$2',
+        'SELECT game_key,payload FROM $table WHERE code_org=\$1 AND int_year=\$2',
         parameters: [org, year]));
     final games = <String, Map<String, dynamic>>{};
     for (final row in saved) {
@@ -256,7 +372,7 @@ class StrengthUsage {
           .map((key) async => {'game_key': key, 'players': await fetch(key)}));
       await Postgres.withConnection((conn) async {
         await conn.execute(
-            '''INSERT INTO t_strength_game_pitching(code_org,int_year,game_key,payload)
+            '''INSERT INTO $table(code_org,int_year,game_key,payload)
           SELECT \$1,\$2,(p->>'game_key'),p FROM jsonb_array_elements(\$3::jsonb) p
           ON CONFLICT(code_org,int_year,game_key) DO UPDATE SET payload=EXCLUDED.payload,updated_at=NOW()''',
             parameters: [org, year, jsonEncode(batch)]);
@@ -267,7 +383,7 @@ class StrengthUsage {
       if (offset % (batchSize * 25) == 0 ||
           offset + batchSize >= missing.length)
         print(
-            '投球回取得 $org/$year ${offset + batch.length}/${missing.length}（保存済み${saved.length}試合）');
+            '${substitutions ? '途中出場' : '投球回'}取得 $org/$year ${offset + batch.length}/${missing.length}（保存済み${saved.length}試合）');
     }
     return [for (final key in keys.toSet()) games[key]!];
   }
@@ -282,8 +398,16 @@ class StrengthUsage {
       urls.addAll(npbSeasonGames(await get(client, url), year));
     }
     if (urls.isEmpty) throw StateError('NPB公式戦の日程がありません');
-    return cachedGames(client, 'npb', year, urls.toList(),
+    final games = await cachedGames(client, 'npb', year, urls.toList(),
         (url) async => parseNpbUsageGame(await get(client, url), url));
+    final subs = await cachedGames(client, 'npb', year, urls.toList(),
+        (url) async => parseNpbSubstitutions(await get(client, url), url),
+        substitutions: true);
+    final byKey = {for (final game in subs) game['game_key']: game['players']};
+    return [
+      for (final game in games)
+        {...game, 'substitutions': byKey[game['game_key']]}
+    ];
   }
 
   static Future<List<Map<String, dynamic>>> mlbGames(
@@ -298,7 +422,7 @@ class StrengthUsage {
           keys.add('${game['gamePk']}');
       }
     }
-    return cachedGames(client, 'mlb', year, keys, (key) async {
+    final games = await cachedGames(client, 'mlb', year, keys, (key) async {
       final box = usageMap(jsonDecode(await get(
           client, 'https://statsapi.mlb.com/api/v1/game/$key/boxscore')));
       final result = <Map<String, dynamic>>[];
@@ -321,6 +445,19 @@ class StrengthUsage {
       }
       return result;
     });
+    final subs = await cachedGames(
+        client,
+        'mlb',
+        year,
+        keys,
+        (key) async => parseMlbSubstitutions(usageMap(jsonDecode(await get(
+            client, 'https://statsapi.mlb.com/api/v1/game/$key/boxscore')))),
+        substitutions: true);
+    final byKey = {for (final game in subs) game['game_key']: game['players']};
+    return [
+      for (final game in games)
+        {...game, 'substitutions': byKey[game['game_key']]}
+    ];
   }
 
   static Future<void> saveTotals(Session conn, String org, int year,
@@ -476,6 +613,11 @@ Future<Map<String, dynamic>> enrichNpbUsage(
 
   return {
     ...team,
+    'substitutions': substitutionBands(games, code),
+    'substitution_game_count': games
+        .where(
+            (g) => usageMaps(g['players']).any((p) => p['team_code'] == code))
+        .length,
     'pitching_workload': workload,
     'pitching_game_count': games
         .where(

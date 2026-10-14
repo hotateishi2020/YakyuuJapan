@@ -314,11 +314,13 @@ class TeamStrength {
               'level_coverage': <int>[1],
             }
         ];
+        payload['substitutions'] = substitutionBands(usageGames, '$teamId', org: 'mlb');
         payload['pitching_workload'] = workload;
         payload['pitching_game_count'] = usageGames
             .where((g) =>
                 usageMaps(g['players']).any((p) => p['team_code'] == '$teamId'))
             .length;
+        payload['substitution_game_count'] = payload['pitching_game_count'];
         if (payload['pitching_game_count'] != payload['game_count']) {
           throw StateError('MLB球団の公式試合数と投球回取得試合数が一致しません: $teamId');
         }

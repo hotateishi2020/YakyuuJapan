@@ -1321,11 +1321,29 @@ double _standingsTeamNameWidth(List<({String label, List<Map<String, dynamic>> r
 Color? personalStatPositionColor(String raw) {
   final text = raw.trim();
   if (text.isEmpty) return null;
+  if (text.contains('指') || text == 'DH') return const Color(0xFFE1BEE7);
   if (text.contains('投')) return const Color(0xFFFFCDD2);
   if (text.contains('捕')) return const Color(0xFFB3E5FC);
   if (text.contains('外') || text == '左' || text == '中' || text == '右') return const Color(0xFFA5D6A7);
   if (text.contains('内') || text == '一' || text == '二' || text == '三' || text == '遊') return const Color(0xFFFFF59D);
   return null;
+}
+
+List<Color> personalStatPositionColors(Map<String,dynamic> row) {
+  final colors=<Color>[];
+  for(final role in ['${row['txt_position']??''}', ...?((row['season_position_groups'] is List)?(row['season_position_groups'] as List).map((v)=>'$v'):null)]) {
+    final color=personalStatPositionColor(role);
+    if(color!=null && !colors.contains(color)) colors.add(color);
+  }
+  return colors;
+}
+
+LinearGradient? personalStatPositionGradient(Map<String,dynamic> row) {
+  final colors=personalStatPositionColors(row);
+  if(colors.length<2) return null;
+  return LinearGradient(begin:Alignment.topLeft,end:Alignment.bottomRight,
+    colors:[for(final c in colors) ...[c,c]],
+    stops:[for(var i=0;i<colors.length;i++) ...[i/colors.length,(i+1)/colors.length]]);
 }
 
 class PlayerStatCell extends StatelessWidget {
@@ -1405,7 +1423,7 @@ class PlayerStatCell extends StatelessWidget {
 
     Widget cellBg({required Widget child, Color? overlay}) {
       return ColoredBox(
-        color: isNoRank ? (overlay ?? noRankBg) : (overlay ?? Colors.transparent),
+        color: isNoRank && personalStatPositionGradient(row) == null ? (overlay ?? noRankBg) : (overlay ?? Colors.transparent),
         child: child,
       );
     }
@@ -1452,7 +1470,7 @@ class PlayerStatCell extends StatelessWidget {
         key: const ValueKey('player-stat-bg'),
         color: isNoRank ? noRankBg : (positionBg ?? Colors.transparent),
         child: Container(
-          decoration: BoxDecoration(border: Border.all(color: Colors.black26, width: 1)),
+          decoration: BoxDecoration(gradient: personalStatPositionGradient(row), border: Border.all(color: Colors.black26, width: 1)),
           child: Row(children: [
             if (showRank)
               Expanded(

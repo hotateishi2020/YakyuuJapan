@@ -26,7 +26,8 @@ class DisplaySnapshot {
     // この ALTER と更新キューが互いを待ち、画面の SELECT まで止まる。
     final schema = await conn.execute('''
       SELECT
-        to_regclass('public.v_stats_player') IS NOT NULL
+        to_regclass('public.t_player_season_usage') IS NOT NULL
+        AND to_regclass('public.v_stats_player') IS NOT NULL
         AND to_regclass('public.v_stats_teams') IS NOT NULL
         AND to_regclass('public.v_games_details') IS NOT NULL
         AND to_regclass('public.v_games_details_date') IS NOT NULL
@@ -44,6 +45,7 @@ class DisplaySnapshot {
     final previous = await conn.execute('SHOW lock_timeout');
     await conn.execute("SET lock_timeout = '2s'");
     try {
+      await conn.execute('CREATE TABLE IF NOT EXISTS t_player_season_usage(int_year integer,id_player integer,groups jsonb NOT NULL,PRIMARY KEY(int_year,id_player))');
       await conn.execute('''
       CREATE TABLE IF NOT EXISTS v_stats_player (
         int_year integer NOT NULL,

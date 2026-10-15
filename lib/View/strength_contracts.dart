@@ -1,5 +1,8 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../logic/strength_usage.dart';
+import '../logic/contract_fa.dart';
+import 'strength_research.dart' show showStrengthSource;
 import '../tools/json_utils.dart';
 import '../tools/color_parse.dart';
 
@@ -31,9 +34,101 @@ String contractSalaryLabel(Map<String, dynamic> salary) {
 }
 
 String contractExchangeTooltip(Map<String, dynamic> salary) {
+  if (salary['projected'] == true) {
+    return '${contractSalaryLabel(salary)}\n${salary['projection_note']}\n${salary['contract_source_url'] ?? ''}';
+  }
   if (salary['usd_jpy_rate'] == null) return contractSalaryLabel(salary);
   return '${contractSalaryLabel(salary)}\n契約日：${salary['signed_date']}\n'
       '換算レート：${salary['exchange_date']}・1ドル＝${salary['usd_jpy_rate']}円（ECB）';
+}
+
+/// Fill future cells only within the current contract, keeping published pay intact.
+/// These display projections are never written back as salary history.
+List<Map<String, dynamic>> contractDisplaySalaries(
+    List<Map<String, dynamic>> salaries,
+    List<Map<String, dynamic>> periods,
+    int year) {
+  final result = [for (final s in salaries) Map<String, dynamic>.from(s)];
+  final current = salaries
+      .where((s) => usageInt(s['year']) == year && usageInt(s['amount']) > 0)
+      .firstOrNull;
+  if (current == null) return result;
+  final candidates = periods
+      .where((p) =>
+          usageInt(p['start_year']) > 0 &&
+          usageInt(p['start_year']) <= year &&
+          usageInt(p['end_year']) > year &&
+          (p['team'] == null ||
+              current['team'] == null ||
+              p['team'] == current['team']))
+      .toList();
+  if (candidates.length != 1) return result;
+  final contract = candidates.single;
+  final start = usageInt(contract['start_year']),
+      end = usageInt(contract['end_year']);
+  if (end - start > 30 ||
+      contract['variable_salary'] == true ||
+      RegExp(r'変動|変額|年俸見直し|毎年更改|オプション|option|escalat|opt.out',
+              caseSensitive: false)
+          .hasMatch('${contract['detail']} ${contract['total_label']}'))
+    return result;
+  final known = salaries.where((s) =>
+      usageInt(s['year']) >= start &&
+      usageInt(s['year']) <= end &&
+      s['amount'] != null);
+  if (known.any((s) =>
+      usageInt(s['amount']) != usageInt(current['amount']) ||
+      (s['currency'] ?? 'JPY') != (current['currency'] ?? 'JPY')))
+    return result;
+  for (var next = year + 1; next <= end; next++) {
+    if (salaries.any((s) => usageInt(s['year']) == next)) continue;
+    // A later contract/transfer takes precedence over the old term.
+    if (periods.any((p) =>
+        !identical(p, contract) &&
+        usageInt(p['start_year']) > year &&
+        usageInt(p['start_year']) <= next &&
+        usageInt(p['end_year']) >= next)) continue;
+    result.add({
+      ...current,
+      'year': next,
+      'projected': true,
+      'projection_note': '$year年の年俸が同額で継続すると仮定した表示（契約期限：$end年）',
+      'contract_source_url': contract['source_url'],
+    });
+  }
+  return result;
+}
+
+/// Explain future cells where a flat continuation cannot be shown.
+Map<int, String> contractFutureNotes(List<Map<String, dynamic>> salaries,
+    List<Map<String, dynamic>> periods, int year) {
+  final notes = <int, String>{};
+  for (final p in periods) {
+    final start = usageInt(p['start_year']), end = usageInt(p['end_year']);
+    if (start <= 0 || end < year || end - start > 30) continue;
+    for (var next = math.max(year + 1, start); next <= end; next++) {
+      final pay =
+          salaries.where((s) => usageInt(s['year']) == next).firstOrNull;
+      if (pay?['projected'] == true) continue;
+      final text = [
+        '${start == end ? '$start' : '$start–$end'}年 ${p['team'] ?? ''}',
+        if ('${p['detail'] ?? ''}'.trim().isNotEmpty) '${p['detail']}',
+        if ('${p['total_label'] ?? ''}'.trim().isNotEmpty)
+          '${p['total_label']}',
+        if (pay == null || pay['amount'] == null) '年俸額未公表',
+      ].join('\n');
+      notes[next] = [if (notes[next] != null) notes[next]!, text].join('\n');
+    }
+    if (end == year &&
+        !salaries.any(
+            (s) => usageInt(s['year']) == year + 1 && s['amount'] != null) &&
+        !periods.any((other) =>
+            usageInt(other['start_year']) <= year + 1 &&
+            usageInt(other['end_year']) > year)) {
+      notes[year + 1] = '契約満了\n次期契約の内容・年俸は未確認';
+    }
+  }
+  return notes;
 }
 
 /// Sum recorded annual salaries through the selected season, never contract totals.
@@ -520,14 +615,24 @@ class _StrengthContractsState extends State<StrengthContracts> {
             child: child),
       );
 
+  Widget get _notes => const Padding(
+      padding: EdgeInsets.all(8),
+      child: Text(
+          '札束は1段につきNPBは5億円、MLBは2000万ドルで折り返します。年ごとの推定年俸を契約帯の下に表示します。契約期間未確認の年も、年俸・所属が確認できれば球団色で表示します。確認状況は帯の詳細で確認できます。生涯年俸は選択年度までに取得できた年俸の合計（推定額を含む）です。未取得年と将来年は含みません。生涯年俸の札束はNPBでは20億円、MLBでは2000万ドルごとに折り返します。NPBのドル建て年俸は契約時レートで円換算できた分のみ描画します。円と米ドルは別の尺度です。円換算は契約日当日（休業日は直前公表日）のECBレートによる概算です。契約日・レート未確認の場合は換算しません。FAラベルは確認できた取得年（再取得を含む）のみ表示します。将来の最短試算は「見込み」と表示し、一軍登録日数等により変わります。ラベルから根拠を確認できます。',
+          style: TextStyle(fontSize: 11)));
+
+  bool get _pinCareer => MediaQuery.sizeOf(context).width >= 600;
+  Widget _careerCell(Widget child) => _pinCareer ? _pinnedName(child) : child;
+
   void _focusYear(String dataset, int first) {
     if (_focusedDataset == dataset) return;
     _focusedDataset = dataset;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || _focusedDataset != dataset || !_horizontal.hasClients)
         return;
-      _horizontal.jumpTo(((widget.year - first) * yearWidth)
-          .clamp(0.0, _horizontal.position.maxScrollExtent));
+      _horizontal.jumpTo(
+          ((widget.year - first) * yearWidth + (_pinCareer ? 0 : 180))
+              .clamp(0.0, _horizontal.position.maxScrollExtent));
     });
   }
 
@@ -562,8 +667,14 @@ class _StrengthContractsState extends State<StrengthContracts> {
         final record = records
             .where((p) => usagePlayerKey(p) == usagePlayerKey(player))
             .firstOrNull;
-        final salaries = listMapFromJson(record?['salary_history']);
         final periods = listMapFromJson(record?['periods']);
+        final salaries = contractDisplaySalaries(
+            listMapFromJson(record?['salary_history']), periods, year);
+        final futureNotes = contractFutureNotes(salaries, periods, year);
+        years.addAll(futureNotes.keys);
+        final faEvents = contractFaEvents(player, record,
+            isNpb: t['org'] != 'mlb' && usageInt(t['id_league']) <= 2);
+        years.addAll(faEvents.map((e) => usageInt(e['year'])));
         final affiliations = [
           ...listMapFromJson(record?['affiliation_history']),
           if (roster.any((p) => usagePlayerKey(p) == usagePlayerKey(player)))
@@ -595,6 +706,8 @@ class _StrengthContractsState extends State<StrengthContracts> {
           'player': player,
           'team': t,
           'salaries': salaries,
+          'future_notes': futureNotes,
+          'fa_events': faEvents,
           'affiliations': affiliations,
           'periods': periods,
           'source': record?['source_url']
@@ -665,7 +778,7 @@ class _StrengthContractsState extends State<StrengthContracts> {
                                   top: 0,
                                   bottom: 0,
                                   width: 180,
-                                  child: _pinnedName(Container(
+                                  child: _careerCell(Container(
                                       color: Colors.grey.shade200,
                                       alignment: Alignment.center,
                                       child: const Text('生涯年俸')))),
@@ -682,8 +795,15 @@ class _StrengthContractsState extends State<StrengthContracts> {
                                 primary: true,
                                 key: ValueKey(
                                     'contract-rows-${teams.map((t) => t['id_team']).join('-')}'),
-                                itemCount: entries.length,
+                                itemCount: entries.length + 1,
                                 itemBuilder: (context, index) {
+                                  if (index == entries.length)
+                                    return _pinnedName(Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: SizedBox(
+                                            width: MediaQuery.sizeOf(context)
+                                                .width,
+                                            child: _notes)));
                                   final e = entries[index];
                                   final periods = listMapFromJson(e['periods']);
                                   final salaries =
@@ -774,15 +894,41 @@ class _StrengthContractsState extends State<StrengthContracts> {
                                               fontWeight: FontWeight.bold),
                                           144) +
                                       8;
-                                  final rowHeight =
-                                      (topHeight + moneyHeight + 4)
-                                              .clamp(
-                                                  nameHeight > careerHeight
-                                                      ? nameHeight
-                                                      : careerHeight,
-                                                  double.infinity)
-                                              .ceilToDouble() +
-                                          1; // Bottom border.
+                                  final futureNotes =
+                                      (e['future_notes'] as Map<int, String>);
+                                  final noteHeight =
+                                      futureNotes.isEmpty ? 0.0 : 68.0;
+                                  final faByYear =
+                                      <int, List<Map<String, dynamic>>>{};
+                                  for (final event
+                                      in listMapFromJson(e['fa_events'])) {
+                                    faByYear
+                                        .putIfAbsent(
+                                            usageInt(event['year']), () => [])
+                                        .add(event);
+                                  }
+                                  final faLabelHeight = _textHeight(
+                                          context,
+                                          '国内FA権獲得（見込み）',
+                                          const TextStyle(fontSize: 10),
+                                          yearWidth - 16) +
+                                      8;
+                                  final faHeight = faByYear.values.fold<double>(
+                                      0,
+                                      (h, events) => math.max(
+                                          h, events.length * faLabelHeight));
+                                  final rowHeight = (topHeight +
+                                              moneyHeight +
+                                              noteHeight +
+                                              faHeight +
+                                              4)
+                                          .clamp(
+                                              nameHeight > careerHeight
+                                                  ? nameHeight
+                                                  : careerHeight,
+                                              double.infinity)
+                                          .ceilToDouble() +
+                                      1; // Bottom border.
                                   return Container(
                                       key: ValueKey(
                                           'contract-player-${e['team']['id_team']}-${usagePlayerKey(e['player'])}'),
@@ -846,6 +992,112 @@ class _StrengthContractsState extends State<StrengthContracts> {
                                                                     color: contractTeamColor(bands[i], colorTeams),
                                                                     borderRadius: BorderRadius.circular(4)),
                                                                 child: Text(bands[i]['start_year'] == bands[i]['end_year'] ? '${bands[i]['start_year']} ${bands[i]['team'] ?? ''}' : '${bands[i]['start_year']}–${bands[i]['end_year']} ${bands[i]['team'] ?? ''}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: contractTeamColor(bands[i], colorTeams).computeLuminance() > .179 ? Colors.black : Colors.white))))),
+                                                  for (final note
+                                                      in futureNotes.entries)
+                                                    Positioned(
+                                                      left: (note.key - first) *
+                                                              yearWidth +
+                                                          4,
+                                                      top: topHeight +
+                                                          moneyHeight +
+                                                          2,
+                                                      width: yearWidth - 8,
+                                                      height: noteHeight - 4,
+                                                      child: Tooltip(
+                                                        message: note.value,
+                                                        child: InkWell(
+                                                          onTap: () => showDialog<void>(
+                                                              context: context,
+                                                              builder: (context) =>
+                                                                  AlertDialog(
+                                                                      title: Text(
+                                                                          '${note.key}年の契約内容'),
+                                                                      content: SelectableText(note.value),
+                                                                      actions: [
+                                                                        TextButton(
+                                                                            onPressed: () =>
+                                                                                Navigator.pop(context),
+                                                                            child: const Text('閉じる'))
+                                                                      ])),
+                                                          child: Text(
+                                                              note.value,
+                                                              maxLines: 4,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: const TextStyle(
+                                                                  fontSize: 10,
+                                                                  color: Colors
+                                                                      .black87)),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  for (final entry
+                                                      in faByYear.entries)
+                                                    Positioned(
+                                                      left:
+                                                          (entry.key - first) *
+                                                                  yearWidth +
+                                                              4,
+                                                      top: topHeight +
+                                                          moneyHeight +
+                                                          noteHeight,
+                                                      width: yearWidth - 8,
+                                                      child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .stretch,
+                                                          children: [
+                                                            for (final event
+                                                                in entry.value)
+                                                              Tooltip(
+                                                                message:
+                                                                    '${event['detail']}\n${event['source_url']}',
+                                                                child: InkWell(
+                                                                  onTap: () => showStrengthSource(
+                                                                      context,
+                                                                      '${entry.key}年 ${contractFaLabel(event)}',
+                                                                      '${event['detail'] ?? ''}',
+                                                                      [
+                                                                        '${event['source_url']}'
+                                                                      ]),
+                                                                  child:
+                                                                      Container(
+                                                                    height:
+                                                                        faLabelHeight -
+                                                                            2,
+                                                                    margin: const EdgeInsets
+                                                                        .only(
+                                                                        bottom:
+                                                                            2),
+                                                                    alignment:
+                                                                        Alignment
+                                                                            .center,
+                                                                    decoration: BoxDecoration(
+                                                                        color: event['type'] ==
+                                                                                'international'
+                                                                            ? Colors
+                                                                                .purple.shade100
+                                                                            : Colors
+                                                                                .blue.shade100,
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(4)),
+                                                                    child: Text(
+                                                                        contractFaLabel(
+                                                                            event),
+                                                                        textAlign:
+                                                                            TextAlign
+                                                                                .center,
+                                                                        style: const TextStyle(
+                                                                            fontSize:
+                                                                                10,
+                                                                            color:
+                                                                                Colors.black87)),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                          ]),
+                                                    ),
                                                   for (final salary in salaries)
                                                     if (usageInt(
                                                             salary['year']) >
@@ -908,7 +1160,7 @@ class _StrengthContractsState extends State<StrengthContracts> {
                                           top: 0,
                                           bottom: 0,
                                           width: 180,
-                                          child: _pinnedName(Container(
+                                          child: _careerCell(Container(
                                             key: ValueKey(
                                                 'career-salary-${e['team']['id_team']}-${usagePlayerKey(e['player'])}'),
                                             padding: const EdgeInsets.all(8),
@@ -999,11 +1251,6 @@ class _StrengthContractsState extends State<StrengthContracts> {
                                       ]));
                                 }))
                       ]))))),
-      const Padding(
-          padding: EdgeInsets.all(8),
-          child: Text(
-              '札束は1段につきNPBは5億円、MLBは2000万ドルで折り返します。年ごとの推定年俸を契約帯の下に表示します。契約期間未確認の年も、年俸・所属が確認できれば球団色で表示します。確認状況は帯の詳細で確認できます。生涯年俸は選択年度までに取得できた年俸の合計（推定額を含む）です。未取得年と将来年は含みません。生涯年俸の札束はNPBでは20億円、MLBでは2000万ドルごとに折り返します。NPBのドル建て年俸は契約時レートで円換算できた分のみ描画します。円と米ドルは別の尺度です。円換算は契約日当日（休業日は直前公表日）のECBレートによる概算です。契約日・レート未確認の場合は換算しません。',
-              style: TextStyle(fontSize: 11))),
     ]);
   }
 }

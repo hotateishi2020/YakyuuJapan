@@ -37,9 +37,78 @@ void main() {
     expect(rosterPosition({'player_key': '1', 'position_group': '内野手'}, team),
         '一塁');
     expect(rosterPosition({'player_key': '2', 'position_group': '外野手'}, team),
-        '外野手');
+        '右翼');
     expect(rosterPosition({'player_key': '3', 'position_group': '指名打者'}, team),
         '守備位置未確認');
+  });
+
+  test('下部組織の起用は2軍→3軍→4軍の順に確認し不明時のみ指定列へ置く', () {
+    final team = <String, dynamic>{};
+    Map<String, dynamic> player(String group, Map<String, dynamic> lower) =>
+        {'position_group': group, 'lower_level_usage': lower};
+    final starter = player('投手', {
+      '2': {'starts': 8, 'relief': 2}
+    });
+    expect(rosterPosition(starter, team), '先発');
+    expect(rosterUsageUnknown(starter, team), false);
+    expect(
+        rosterPosition(
+            player('投手', {
+              '3': {'starts': 1, 'relief': 5}
+            }),
+            team),
+        '中継ぎ');
+    expect(
+        rosterPosition(
+            player('投手', {
+              '4': {'starts': 3, 'relief': 1}
+            }),
+            team),
+        '先発');
+    expect(
+        rosterPosition(
+            player('外野手', {
+              '4': {
+                'positions': {'LF': 4, 'CF': 7}
+              }
+            }),
+            team),
+        '中堅');
+    expect(
+        rosterPosition(
+            player('内野手', {
+              '3': {
+                'positions': {'SS': 5}
+              }
+            }),
+            team),
+        '遊撃');
+    for (final entry in {'投手': '中継ぎ', '外野手': '右翼', '内野手': '一塁'}.entries) {
+      final unknown = player(entry.key, {});
+      expect(rosterPosition(unknown, team), entry.value);
+      expect(rosterUsageUnknown(unknown, team), true);
+    }
+    expect(
+        rosterUsageUnknown(
+            player('内野手', {
+              '4': {
+                'positions': {'SS': 5}
+              }
+            }),
+            team),
+        true);
+    expect(
+        rosterPosition(
+            player('外野手', {
+              '2': {
+                'positions': {'LF': 2}
+              },
+              '3': {
+                'positions': {'CF': 20}
+              }
+            }),
+            team),
+        '左翼');
   });
 
   test('レギュラー名は同姓でも選手IDが一致する名簿のフルネームを表示する', () {

@@ -572,11 +572,12 @@ Future<Map<String, dynamic>> enrichNpbUsage(
     final status = announcements
         .where((s) =>
             s['team_code'] == code && s['player_key'] == player['player_key'])
-        .firstOrNull;
+        .lastOrNull;
     if (status != null)
       player.addAll({
         for (final key in [
           'departure_confirmed',
+          'departure_type',
           'status_source',
           'status_as_of'
         ])
@@ -718,6 +719,7 @@ List<Map<String, dynamic>> parseNpbStatusAnnouncements(
       'team_code': teamCode,
       'player_key': 'npb:$playerId',
       'departure_confirmed': true,
+      'departure_type': url.contains('pn_retired') ? 'retired' : 'released',
       'status_source': url,
       'status_as_of': date
     });

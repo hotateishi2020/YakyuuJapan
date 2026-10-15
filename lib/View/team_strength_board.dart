@@ -1,3 +1,5 @@
+import 'strength_research.dart';
+import 'strength_careers.dart';
 import '../tools/network_error.dart';
 import 'dart:convert';
 import 'dart:math' as math;
@@ -36,7 +38,16 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
   int _selectedView = 1;
   final _comparisonViews = <int>{4};
   static const _bandSideWidth = 88 * 1.2 + 8 + 48;
-  static const _views = ['成績', '選手起用', 'レギュラー', '選手一覧', '契約'];
+  static const _views = [
+    '成績',
+    '選手起用',
+    '主力選手',
+    '選手一覧',
+    '契約',
+    'ドラフト',
+    '功績',
+    '経歴'
+  ];
 
   @override
   void initState() {
@@ -115,17 +126,19 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                     onTap: () => setState(() => _selectedView = index),
                     borderRadius: BorderRadius.circular(TAB_RADIUS),
                     child: Center(
-                      child: Text(_views[index],
-                          style: TextStyle(
-                            fontSize: 12,
-                            height: 1,
-                            fontWeight: _selectedView == index
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                            color: _selectedView == index
-                                ? TAB_COLOR_FONT
-                                : Colors.black87,
-                          )),
+                      child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(_views[index],
+                              style: TextStyle(
+                                fontSize: 12,
+                                height: 1,
+                                fontWeight: _selectedView == index
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: _selectedView == index
+                                    ? TAB_COLOR_FONT
+                                    : Colors.black87,
+                              ))),
                     ),
                   ),
                 ),
@@ -222,7 +235,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
             .where((note) => note.isNotEmpty)
         : const <String>[];
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      if (_selectedView == 0 || _selectedView == 4)
+      if (_selectedView == 0 || _selectedView == 4 || _selectedView == 6)
         Padding(
             padding: const EdgeInsets.only(bottom: 6),
             child: Row(children: [
@@ -246,23 +259,31 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                                       }
                                     }),
                                 child: Padding(
-                                    padding: const EdgeInsets.all(8),
-                                    child: Text(
-                                        compare
-                                            ? (widget.org.kind.name == 'npb'
-                                                ? '12球団比較'
-                                                : '30球団比較')
-                                            : '各球団',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            color: _comparisonViews.contains(
-                                                        _selectedView) ==
-                                                    compare
-                                                ? Colors.white
-                                                : Colors.black87))))))),
+                                    padding: EdgeInsets.zero,
+                                    child: SizedBox(
+                                        height: TAB_BAR_H,
+                                        child: Center(
+                                            child: Text(
+                                                compare
+                                                    ? (widget.org.kind.name ==
+                                                            'npb'
+                                                        ? '12球団比較'
+                                                        : '30球団比較')
+                                                    : '各球団',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    color: _comparisonViews
+                                                                .contains(
+                                                                    _selectedView) ==
+                                                            compare
+                                                        ? Colors.white
+                                                        : Colors
+                                                            .black87))))))))),
             ])),
       if (_selectedView != 2 &&
-          !((_selectedView == 0 || _selectedView == 4) &&
+          _selectedView != 5 &&
+          _selectedView != 7 &&
+          !((_selectedView == 0 || _selectedView == 4 || _selectedView == 6) &&
               _comparisonViews.contains(_selectedView)))
         _teamSegments(),
       const SizedBox(height: 6),
@@ -300,19 +321,6 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                                       totalUnit: '個'),
                                   const Text(
                                       '塁打の内訳：本塁打×4・三塁打×3・二塁打×2・単打・四球。死球は含みません。'),
-                                  Wrap(spacing: 12, children: [
-                                    for (var i = 0; i < baseParts.length; i++)
-                                      Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Container(
-                                                width: 12,
-                                                height: 12,
-                                                color: _baseColors[i]),
-                                            const SizedBox(width: 4),
-                                            Text(baseParts[i].$3)
-                                          ])
-                                  ]),
                                 ] else ...[
                                   _heading(
                                       '投手の投球回負担率', headerBackground, foreground,
@@ -364,13 +372,26 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                       ? StrengthRegularGrid(teams: _teams)
                       : _selectedView == 3
                           ? StrengthRosterGrid(team: team, year: widget.year)
-                          : StrengthContracts(
-                              colorTeams: _teams,
-                              team: team,
-                              year: widget.year,
-                              comparisonTeams: _comparisonViews.contains(4)
-                                  ? _teams
-                                  : null)),
+                          : _selectedView == 5
+                              ? StrengthDraft(year: widget.year)
+                              : _selectedView == 6
+                                  ? StrengthAchievements(
+                                      team: team,
+                                      year: widget.year,
+                                      comparisonTeams:
+                                          _comparisonViews.contains(6)
+                                              ? _teams
+                                              : null)
+                                  : _selectedView == 7
+                                      ? StrengthCareers(teams: _teams)
+                                      : StrengthContracts(
+                                          colorTeams: _teams,
+                                          team: team,
+                                          year: widget.year,
+                                          comparisonTeams:
+                                              _comparisonViews.contains(4)
+                                                  ? _teams
+                                                  : null)),
     ]);
   }
 
@@ -395,6 +416,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                   for (final i in [1, 0, 2]) ...[
                     _heading(['本塁打', '塁打数', '打点'][i], widget.org.tabColor,
                         Colors.white),
+                    if (i == 1) _baseLegend(),
                     for (var t = 0; t < _teams.length; t++)
                       Align(
                           alignment: Alignment.centerLeft,
@@ -705,7 +727,10 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
         Padding(
           padding: const EdgeInsets.only(bottom: 8),
           child: SizedBox(
-            height: 72,
+            height: row['slot'] == 'total_bases_walks' &&
+                    row['header_color'] == null
+                ? 112
+                : 72,
             child:
                 Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               Container(
@@ -725,6 +750,9 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                               fontSize: 12,
                               fontWeight: FontWeight.bold)),
                       _bandTotalLabel(row, totalUnit),
+                      if (row['slot'] == 'total_bases_walks' &&
+                          row['header_color'] == null)
+                        _baseLegend(compact: true),
                     ]),
                   ),
                 ),
@@ -978,6 +1006,28 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
       ),
     );
   }
+
+  Widget _baseLegend({bool compact = false}) => Padding(
+        key: const ValueKey('total-bases-legend'),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+        child: Wrap(spacing: 12, runSpacing: 2, children: [
+          for (var i = 0; i < baseParts.length; i++)
+            Row(
+                mainAxisSize: compact ? MainAxisSize.max : MainAxisSize.min,
+                children: [
+                  Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          color: _baseColors[i],
+                          border: Border.all(color: Colors.black26))),
+                  const SizedBox(width: 4),
+                  Text(baseParts[i].$3,
+                      style: TextStyle(
+                          fontSize: compact ? 9 : 12, color: Colors.black87)),
+                ]),
+        ]),
+      );
 
   static const _baseColors = [
     Color(0xFFE86680),

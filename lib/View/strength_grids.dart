@@ -247,24 +247,51 @@ Widget _cell(String text, {Color? color}) => Padding(
         textAlign: TextAlign.center,
         style: TextStyle(fontSize: 12, color: color)));
 
-class StrengthRosterGrid extends StatelessWidget {
+class StrengthRosterGrid extends StatefulWidget {
   const StrengthRosterGrid({super.key, required this.team, required this.year});
   final Map<String, dynamic> team;
   final int year;
-  static const _minColumnWidth = 104.0 * 0.7;
   @override
-  Widget build(BuildContext context) {
+  State<StrengthRosterGrid> createState() => _StrengthRosterGridState();
+}
+
+class _StrengthRosterGridState extends State<StrengthRosterGrid> {
+  Map<String, dynamic> get team => widget.team;
+  int get year => widget.year;
+  bool _usageOrder = true;
+  @override
+  Widget build(BuildContext context) => Column(children: [
+        Row(children: [
+          for (final usage in [false, true])
+            Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: ChoiceChip(
+                    label: Text(usage ? '起用順' : '年齢順'),
+                    selected: _usageOrder == usage,
+                    onSelected: (_) => setState(() => _usageOrder = usage))),
+        ]),
+        Expanded(child: _grid(context)),
+      ]);
+  static const _minColumnWidth = 104.0 * 0.7;
+  Widget _grid(BuildContext context) {
     final roster = listMapFromJson(team['roster']);
     if (roster.isEmpty) return const Center(child: Text('選手一覧はまだ登録されていません。'));
-    final positions = ['先発', '中継ぎ', '捕手', '一塁', '二塁', '三塁', '遊撃', '外野手'];
+    final positions = [
+      '先発',
+      '中継ぎ',
+      '捕手',
+      '一塁',
+      '二塁',
+      '三塁',
+      '遊撃',
+      '左翼',
+      '中堅',
+      '右翼'
+    ];
     final groups = <String, List<Map<String, dynamic>>>{};
     for (final player in roster) {
       final rawPosition = rosterPosition(player, team);
-      final pos = ['左翼', '中堅', '右翼'].contains(rawPosition)
-          ? '外野手'
-          : rawPosition == '抑え'
-              ? '中継ぎ'
-              : rawPosition;
+      final pos = rawPosition == '抑え' ? '中継ぎ' : rawPosition;
       if (!positions.contains(pos)) {
         final after = {'投手': '中継ぎ', '内野手': '遊撃', '外野手': '右翼'}[pos];
         if (after == null) {
@@ -288,8 +315,20 @@ class StrengthRosterGrid extends StatelessWidget {
         columns.add((position: pos, hand: hand));
       }
     }
-    final ages = roster.map((p) => rosterAge(p, year)).toSet().toList()
-      ..sort((a, b) => (b ?? -1).compareTo(a ?? -1));
+    final ages = _usageOrder
+        ? <int?>[1, 2, 3, 4, 0]
+        : (roster.map((p) => rosterAge(p, year)).toSet().toList()
+          ..sort((a, b) => (b ?? -1).compareTo(a ?? -1)));
+    if (_usageOrder) {
+      for (final players in groups.values) {
+        players.sort((a, b) {
+          final av = rosterWorkload(a, team, rosterMainLevel(a));
+          final bv = rosterWorkload(b, team, rosterMainLevel(b));
+          final order = (bv ?? -1).compareTo(av ?? -1);
+          return order != 0 ? order : '${a['name']}'.compareTo('${b['name']}');
+        });
+      }
+    }
     return LayoutBuilder(builder: (context, constraints) {
       final columnWidth = (constraints.maxWidth / (columns.length + 1))
           .clamp(_minColumnWidth, double.infinity);
@@ -298,8 +337,8 @@ class StrengthRosterGrid extends StatelessWidget {
           width: columnWidth * (columns.length + 1),
           child: Column(children: [
             Row(children: [
-              _rosterHeader(
-                  '年齢', columnWidth, Colors.grey.shade200, Colors.black87),
+              _rosterHeader(_usageOrder ? '起用' : '年齢', columnWidth,
+                  Colors.grey.shade200, Colors.black87),
               for (final position in positions)
                 _rosterHeader(
                     position,
@@ -342,7 +381,9 @@ class StrengthRosterGrid extends StatelessWidget {
                           TableRow(children: [
                             ColoredBox(
                                 color: Colors.grey.shade100,
-                                child: _cell(age == null ? '不明' : '$age歳')),
+                                child: _cell(_usageOrder
+                                    ? (age == 0 ? '起用未確認' : '$age軍')
+                                    : (age == null ? '不明' : '$age歳'))),
                             for (final position in positions)
                               Container(
                                 color: Color.lerp(Colors.white,
@@ -350,7 +391,11 @@ class StrengthRosterGrid extends StatelessWidget {
                                 child: _positionPlayers(
                                     position,
                                     (groups[position] ?? [])
-                                        .where((p) => rosterAge(p, year) == age)
+                                        .where((p) =>
+                                            (_usageOrder
+                                                ? rosterMainLevel(p)
+                                                : rosterAge(p, year)) ==
+                                            age)
                                         .toList(),
                                     columns.any((c) =>
                                         c.position == position &&
@@ -363,7 +408,7 @@ class StrengthRosterGrid extends StatelessWidget {
                       key: const ValueKey('roster-notes'),
                       padding: const EdgeInsets.all(8),
                       child: Text(
-                          '年齢：${year == DateTime.now().year ? '本日時点' : '$year年末時点'}／投手は投げ腕、野手は打席で分類\n支配下・育成／起用が多い軍を併記。契＝契約満了、FA＝FA権あり、退＝退団決定。確認済みの情報のみ表示。\n一軍の起用位置が未確認の選手は「投手・内野手・外野手」の列に表示。',
+                          '起用順は最多出場の軍に配置し、投手は投球回、野手は打席数の降順。未取得の数値は末尾に表示。\n年齢：${year == DateTime.now().year ? '本日時点' : '$year年末時点'}／投手は投げ腕、野手は打席で分類\n支配下・育成／起用が多い軍を併記。契＝契約満了、FA＝FA権あり、退＝退団決定。確認済みの情報のみ表示。\n起用位置は1軍から順に2〜4軍の取得済み記録で判定（内野は3軍まで）。判定できない投手は中継ぎ、外野手は右翼、内野手は一塁に「起用不明」と表示。',
                           style: const TextStyle(fontSize: 12)),
                     ),
                   ]),
@@ -447,7 +492,8 @@ class StrengthRosterGrid extends StatelessWidget {
                   softWrap: false,
                   style: TextStyle(fontSize: 12, color: foreground))));
 
-  Widget _fitRosterText(String text, {bool bold = false, double size = 10}) =>
+  Widget _fitRosterText(String text,
+          {bool bold = false, double size = 10, Color? color}) =>
       FittedBox(
           fit: BoxFit.scaleDown,
           alignment: Alignment.centerLeft,
@@ -456,9 +502,11 @@ class StrengthRosterGrid extends StatelessWidget {
               softWrap: false,
               style: TextStyle(
                   fontSize: size,
+                  color: color,
                   fontWeight: bold ? FontWeight.bold : FontWeight.normal)));
 
   Widget _player(Map<String, dynamic> p, String position) {
+    final departure = rosterDepartureLabel(p);
     final marks = [
       if (usageInt(p['contract_end_year']) == year) '契',
       if (p['fa_eligible'] == true) 'FA',
@@ -466,6 +514,9 @@ class StrengthRosterGrid extends StatelessWidget {
     ];
     return Tooltip(
         message: [
+          if (p['lower_level_usage'] is Map)
+            for (final entry in (p['lower_level_usage'] as Map).entries)
+              '${entry.key}軍起用：${entry.value['coverage'] == 'verified_partial' ? '公開記録の一部' : '公式戦'} ${entry.value['appearances']}試合\n出典：${entry.value['source']}',
           if (p['status_source'] != null) '出典：${p['status_source']}',
           if (p['status_as_of'] != null) '確認日：${p['status_as_of']}',
           if (p['level_appearances'] is Map)
@@ -475,19 +526,30 @@ class StrengthRosterGrid extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 4),
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-              color: Color.lerp(
-                  Colors.white, _positionColor(position), rosterCardTint(p)),
+              color: departure != null
+                  ? Colors.white
+                  : Color.lerp(Colors.white, _positionColor(position),
+                      rosterCardTint(p)),
               borderRadius: BorderRadius.circular(4)),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            _fitRosterText(
-                '${p['name']}${marks.isEmpty ? '' : ' 【${marks.join('・')}】'}',
-                bold: true,
-                size: 12),
-            _fitRosterText(rosterLevel(p)),
-            if (p['registration'] != null)
-              _fitRosterText('${p['registration']}'),
-          ]),
+          child: DefaultTextStyle.merge(
+              style: TextStyle(color: departure != null ? Colors.grey : null),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _fitRosterText(
+                        '${p['name']}${marks.isEmpty ? '' : ' 【${marks.join('・')}】'}',
+                        bold: true,
+                        size: 12),
+                    if (departure != null)
+                      _fitRosterText(departure, color: Colors.red, bold: true),
+                    if (rosterUsageUnknown(p, team)) _fitRosterText('（起用不明）'),
+                    _fitRosterText(rosterLevel(p)),
+                    if (_usageOrder)
+                      _fitRosterText(
+                          rosterWorkloadLabel(p, team, rosterMainLevel(p))),
+                    if (p['registration'] != null)
+                      _fitRosterText('${p['registration']}'),
+                  ])),
         ));
   }
 }

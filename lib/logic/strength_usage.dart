@@ -172,12 +172,16 @@ int? rosterAge(Map<String, dynamic> player, int year) {
           : 0);
 }
 
-String rosterPosition(Map<String, dynamic> player, Map<String, dynamic> team) {
+String? _recordedRosterPosition(
+    Map<String, dynamic> player, Map<String, dynamic> team) {
   final key = usagePlayerKey(player);
   final pitching = listMapFromJson(team['pitching_workload'])
       .where((p) => usagePlayerKey(p) == key)
       .firstOrNull;
-  if (pitching != null && player['position_group'] == '投手') {
+  if (pitching != null &&
+      player['position_group'] == '投手' &&
+      (usageInt(pitching['appearances']) > 0 ||
+          usageInt(pitching['total_outs']) > 0)) {
     final all = listMapFromJson(team['pitching_workload']);
     final mostSaves = all.fold<int>(
         0, (n, p) => usageInt(p['saves']) > n ? usageInt(p['saves']) : n);
@@ -196,7 +200,7 @@ String rosterPosition(Map<String, dynamic> player, Map<String, dynamic> team) {
   var most = 0;
   for (final group in listMapFromJson(team['positions'])) {
     // DH is a batting role; place players by their actual defensive usage.
-    if (group['slot'] == 'DH') continue;
+    if (group['slot'] == 'DH' || group['slot'] == 'P') continue;
     for (final p in listMapFromJson(group['players'])) {
       if (usagePlayerKey(p) == key && usageInt(p['count']) > most) {
         most = usageInt(p['count']);
@@ -205,9 +209,52 @@ String rosterPosition(Map<String, dynamic> player, Map<String, dynamic> team) {
     }
   }
   if (position != null) return position;
+  // Prefer the highest level with actual usage, never a registration guess.
+  final lower = player['lower_level_usage'];
+  if (lower is Map) {
+    for (final level in ['2', '3', '4']) {
+      if (level == '4' && player['position_group'] == '内野手') continue;
+      final record = lower[level];
+      if (record is! Map) continue;
+      if (player['position_group'] == '投手') {
+        final starts = usageInt(record['starts']);
+        final relief = usageInt(record['relief']);
+        if (starts + relief > 0) return starts > relief ? '先発' : '中継ぎ';
+      } else {
+        final counts = record['positions'];
+        if (counts is! Map) continue;
+        String? best;
+        var maximum = 0;
+        for (final slot in ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF']) {
+          // Infield fallback is checked through the third team only.
+          if (level == '4' && !['LF', 'CF', 'RF'].contains(slot)) continue;
+          if (usageInt(counts[slot]) > maximum) {
+            maximum = usageInt(counts[slot]);
+            best = usagePositions[slot];
+          }
+        }
+        if (best != null) return best;
+      }
+    }
+  }
   final registered = '${player['position_group'] ?? '不明'}';
-  return registered == '指名打者' ? '守備位置未確認' : registered;
+  return ['捕手', '一塁', '二塁', '三塁', '遊撃', '左翼', '中堅', '右翼'].contains(registered)
+      ? registered
+      : null;
 }
+
+bool rosterUsageUnknown(
+        Map<String, dynamic> player, Map<String, dynamic> team) =>
+    _recordedRosterPosition(player, team) == null;
+
+String rosterPosition(Map<String, dynamic> player, Map<String, dynamic> team) =>
+    _recordedRosterPosition(player, team) ??
+    switch (player['position_group']) {
+      '投手' => '中継ぎ',
+      '外野手' => '右翼',
+      '内野手' => '一塁',
+      _ => '守備位置未確認',
+    };
 
 String rosterLevel(Map<String, dynamic> player) {
   final values = player['level_appearances'] is Map
@@ -241,4 +288,74 @@ double rosterCardTint(Map<String, dynamic> player) {
   if (player['registration'] == '支配下' && second) return 0.32;
   if (player['registration'] == '育成' && second && !first) return 0.19;
   return 0.08;
+}
+
+/// Each card appears once, at its most-used level; ties prefer the higher level.
+int rosterMainLevel(Map<String, dynamic> player) {
+  final counts = player['level_appearances'];
+  var level = 0, most = 0;
+  if (counts is Map) {
+    for (var n = 1; n <= 4; n++) {
+      if (usageInt(counts['$n']) > most) {
+        most = usageInt(counts['$n']);
+        level = n;
+      }
+    }
+  }
+  if (level == 0 && player['lower_level_usage'] is Map) {
+    final lower = player['lower_level_usage'] as Map;
+    for (var n = 2; n <= 4; n++) {
+      final p = lower['$n'];
+      if (p is Map && usageInt(p['appearances']) > most) {
+        most = usageInt(p['appearances']);
+        level = n;
+      }
+    }
+  }
+  return level;
+}
+
+int? rosterWorkload(
+    Map<String, dynamic> player, Map<String, dynamic> team, int level) {
+  final pitcher = player['position_group'] == '投手';
+  final levels = player['level_usage_metrics'];
+  if (levels is Map && levels['$level'] is Map) {
+    final value = (levels['$level'] as Map)[pitcher ? 'outs' : 'pa'];
+    if (value != null) return usageInt(value);
+  }
+  if (level == 1) {
+    for (final p in listMapFromJson(
+        team[pitcher ? 'pitching_workload' : 'batting_stats'])) {
+      if (usagePlayerKey(p) == usagePlayerKey(player)) {
+        final value = p[pitcher ? 'total_outs' : 'pa'];
+        if (value != null) return usageInt(value);
+      }
+    }
+  }
+  return null;
+}
+
+String rosterWorkloadLabel(
+    Map<String, dynamic> p, Map<String, dynamic> team, int level) {
+  final n = rosterWorkload(p, team, level);
+  final pitcher = p['position_group'] == '投手';
+  if (n == null) return pitcher ? '投球回未取得' : '打席数未取得';
+  return pitcher ? '${n ~/ 3}${n % 3 == 0 ? '' : '.${n % 3}'}回' : '$n打席';
+}
+
+/// Confirmed departures only; free agency alone does not mean retirement or release.
+String? rosterDepartureLabel(Map<String, dynamic> player) {
+  if (player['retirement_confirmed'] == true) return '引退';
+  if (player['transfer_confirmed'] == true) return '移籍';
+  if (player['released_confirmed'] == true) return '戦力外';
+  if (player['departure_confirmed'] != true) return null;
+  final reason =
+      '${player['departure_type'] ?? ''} ${player['departure_reason'] ?? ''}';
+  if (RegExp('引退|retired|retirement').hasMatch(reason) ||
+      '${player['status_source']}'.contains('pn_retired')) return '引退';
+  if (RegExp('移籍|transfer|trade').hasMatch(reason)) return '移籍';
+  if (RegExp('戦力外|non.tender').hasMatch(reason)) return '戦力外';
+  if ('${player['status_source']}'.contains('pn_released') ||
+      reason.contains('released')) return '自由契約';
+  return '退団';
 }

@@ -1,0 +1,665 @@
+{
+  "year": 2026,
+  "note": "西武公式手書きスコア4試合の両ページを目視照合。巨人と西武の部分記録でありシーズン合計ではない。",
+  "3": [
+    {
+      "game_key": "https://www.seibulions.jp/cmn/items/farm_third/2026score/pdf_260927_score.pdf",
+      "players": [
+        {
+          "source_player_id": "13515152",
+          "team_code": "l",
+          "positions": [
+            "3B"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "71375152",
+          "team_code": "l",
+          "positions": [
+            "2B"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "43345150",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "51955150",
+          "team_code": "l",
+          "positions": [
+            "1B"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "91195152",
+          "team_code": "l",
+          "positions": [
+            "LF"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "01005150",
+          "team_code": "l",
+          "positions": [
+            "CF"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "51855157",
+          "team_code": "l",
+          "positions": [
+            "RF"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "71675138",
+          "team_code": "l",
+          "positions": [
+            "C"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "21425157",
+          "team_code": "l",
+          "positions": [
+            "C"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "01205159",
+          "team_code": "l",
+          "positions": [
+            "CF",
+            "LF"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "43345152",
+          "team_code": "l",
+          "positions": [
+            "LF"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "71175152",
+          "team_code": "l",
+          "positions": [
+            "SS"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "63065152",
+          "team_code": "l",
+          "positions": [
+            "SS"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "81585150",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": true
+        },
+        {
+          "source_player_id": "51655155",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": false
+        },
+        {
+          "source_player_id": "33735152",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": false
+        },
+        {
+          "source_player_id": "31935152",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": false
+        },
+        {
+          "source_player_id": "03005152",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": false
+        },
+        {
+          "source_player_id": "93795152",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": false
+        },
+        {
+          "source_player_id": "01905159",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": false
+        }
+      ]
+    },
+    {
+      "game_key": "https://www.seibulions.jp/cmn/items/farm_third/2026score/pdf_260919_score.pdf",
+      "players": [
+        {
+          "source_player_id": "31735152",
+          "team_code": "l",
+          "positions": [
+            "2B"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "21425157",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "63065152",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "91195152",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "43345150",
+          "team_code": "l",
+          "positions": [
+            "LF"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "51955150",
+          "team_code": "l",
+          "positions": [
+            "1B"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "13515152",
+          "team_code": "l",
+          "positions": [
+            "SS"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "71675138",
+          "team_code": "l",
+          "positions": [
+            "C"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "51855157",
+          "team_code": "l",
+          "positions": [
+            "CF"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "01005150",
+          "team_code": "l",
+          "positions": [
+            "CF"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "01205159",
+          "team_code": "l",
+          "positions": [
+            "RF"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "71375152",
+          "team_code": "l",
+          "positions": [
+            "3B"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "91695152",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": true
+        },
+        {
+          "source_player_id": "51755159",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": false
+        },
+        {
+          "source_player_id": "03005152",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": false
+        },
+        {
+          "source_player_id": "31935152",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": false
+        },
+        {
+          "source_player_id": "31835152",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": false
+        },
+        {
+          "source_player_id": "91895152",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": false
+        },
+        {
+          "source_player_id": "33335159",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": false
+        }
+      ]
+    },
+    {
+      "game_key": "https://www.seibulions.jp/cmn/items/farm_third/2026score/pdf_260913_score.pdf",
+      "players": [
+        {
+          "source_player_id": "21525159",
+          "team_code": "l",
+          "positions": [
+            "2B"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "71675138",
+          "team_code": "l",
+          "positions": [
+            "C"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "43345150",
+          "team_code": "l",
+          "positions": [
+            "RF"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "51955150",
+          "team_code": "l",
+          "positions": [
+            "1B"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "01205159",
+          "team_code": "l",
+          "positions": [
+            "CF"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "13515152",
+          "team_code": "l",
+          "positions": [
+            "SS"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "91195152",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "01005150",
+          "team_code": "l",
+          "positions": [
+            "LF"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "51855157",
+          "team_code": "l",
+          "positions": [
+            "LF"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "11415138",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "71375152",
+          "team_code": "l",
+          "positions": [
+            "3B"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "21325151",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": true
+        },
+        {
+          "source_player_id": "91695152",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": false
+        },
+        {
+          "source_player_id": "31835152",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": false
+        },
+        {
+          "source_player_id": "91895152",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": false
+        },
+        {
+          "source_player_id": "81885157",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": false
+        }
+      ]
+    },
+    {
+      "game_key": "https://www.seibulions.jp/cmn/items/farm_third/2026score/pdf_260719_score.pdf",
+      "players": [
+        {
+          "source_player_id": "81985150",
+          "team_code": "g",
+          "positions": [
+            "C"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "03305159",
+          "team_code": "g",
+          "positions": [
+            "2B",
+            "RF"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "13115157",
+          "team_code": "g",
+          "positions": [
+            "LF"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "47545152",
+          "team_code": "g",
+          "positions": [],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "21625152",
+          "team_code": "g",
+          "positions": [
+            "3B"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "81285150",
+          "team_code": "g",
+          "positions": [
+            "LF"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "81485157",
+          "team_code": "g",
+          "positions": [
+            "RF"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "21525157",
+          "team_code": "g",
+          "positions": [
+            "2B"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "13215150",
+          "team_code": "g",
+          "positions": [
+            "1B"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "31135157",
+          "team_code": "g",
+          "positions": [
+            "CF"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "81785153",
+          "team_code": "g",
+          "positions": [
+            "SS"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "43145152",
+          "team_code": "g",
+          "positions": [],
+          "pitcher": true,
+          "starter": true
+        },
+        {
+          "source_player_id": "73275159",
+          "team_code": "g",
+          "positions": [],
+          "pitcher": true,
+          "starter": false
+        },
+        {
+          "source_player_id": "41045157",
+          "team_code": "g",
+          "positions": [],
+          "pitcher": true,
+          "starter": false
+        },
+        {
+          "source_player_id": "11415155",
+          "team_code": "g",
+          "positions": [],
+          "pitcher": true,
+          "starter": false
+        },
+        {
+          "source_player_id": "51555159",
+          "team_code": "l",
+          "positions": [
+            "LF"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "71375152",
+          "team_code": "l",
+          "positions": [
+            "1B"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "13515152",
+          "team_code": "l",
+          "positions": [
+            "SS"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "91195152",
+          "team_code": "l",
+          "positions": [
+            "RF"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "11415138",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "51455150",
+          "team_code": "l",
+          "positions": [
+            "C"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "21425157",
+          "team_code": "l",
+          "positions": [
+            "C"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "71875150",
+          "team_code": "l",
+          "positions": [
+            "3B"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "01205159",
+          "team_code": "l",
+          "positions": [
+            "CF"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "71175152",
+          "team_code": "l",
+          "positions": [
+            "2B"
+          ],
+          "pitcher": false
+        },
+        {
+          "source_player_id": "51155157",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": true
+        },
+        {
+          "source_player_id": "81485152",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": false
+        },
+        {
+          "source_player_id": "81685138",
+          "team_code": "l",
+          "positions": [],
+          "pitcher": true,
+          "starter": false
+        }
+      ]
+    }
+  ],
+  "4": [],
+  "source_checks": [
+    {
+      "url": "https://www.giants.jp/game/third/",
+      "result": "HTTP 403"
+    },
+    {
+      "url": "https://www.softbankhawks.co.jp/members/informal_game/score_third/20260920/",
+      "result": "有料会員ログインが必要"
+    },
+    {
+      "url": "https://www.softbankhawks.co.jp/farm/informal_game/schedule_fourth/2026/",
+      "result": "HTTP 404、4軍の個人別起用記録は未取得"
+    }
+  ]
+}

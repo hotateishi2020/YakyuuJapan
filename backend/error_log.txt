@@ -2785,3 +2785,86 @@ SocketException: Connection timed out, host: ep-fragrant-wave-b34kmerl.c-4.ap-so
 <asynchronous suspension>
 
 
+2026-10-15
+SocketException: Connection timed out, host: ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech, port: 5432 (OS Error: Connection timed out, errno = 110)
+#0      _NativeSocket.connect.<anonymous closure>.<anonymous closure> (dart:io-patch/socket_patch.dart:1155:13)
+#1      _rootRun (dart:async/zone.dart:1517:47)
+#2      _CustomZone.run (dart:async/zone.dart:1422:19)
+#3      Future.timeout.<anonymous closure> (dart:async/future_impl.dart:1054:34)
+<asynchronous suspension>
+#4      _RawSocket.connect.<anonymous closure> (dart:io-patch/socket_patch.dart:2281:12)
+<asynchronous suspension>
+#5      Socket._connect.<anonymous closure> (dart:io-patch/socket_patch.dart:2570:12)
+<asynchronous suspension>
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:18)
+<asynchronous suspension>
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:29)
+<asynchronous suspension>
+#8      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:46:18)
+<asynchronous suspension>
+#9      Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:55:14)
+<asynchronous suspension>
+#10     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:215:20)
+<asynchronous suspension>
+#11     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2245:7)
+<asynchronous suspension>
+#12     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1822:14)
+<asynchronous suspension>
+#13     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#14     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#15     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#16     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#17     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#18     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#19     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+SocketException: Connection timed out, host: ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech, port: 5432 (OS Error: Connection timed out, errno = 110)
+#0      _NativeSocket.connect.<anonymous closure>.<anonymous closure> (dart:io-patch/socket_patch.dart:1155:13)
+#1      _rootRun (dart:async/zone.dart:1517:47)
+#2      _CustomZone.run (dart:async/zone.dart:1422:19)
+#3      Future.timeout.<anonymous closure> (dart:async/future_impl.dart:1054:34)
+<asynchronous suspension>
+#4      _RawSocket.connect.<anonymous closure> (dart:io-patch/socket_patch.dart:2281:12)
+<asynchronous suspension>
+#5      Socket._connect.<anonymous closure> (dart:io-patch/socket_patch.dart:2570:12)
+<asynchronous suspension>
+#6      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:278:18)
+<asynchronous suspension>
+#7      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:29)
+<asynchronous suspension>
+#8      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:46:18)
+<asynchronous suspension>
+#9      Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:55:14)
+<asynchronous suspension>
+#10     Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:215:20)
+<asynchronous suspension>
+#11     _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2120:16)
+<asynchronous suspension>
+#12     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2253:15)
+<asynchronous suspension>
+#13     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:1822:14)
+<asynchronous suspension>
+#14     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#15     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#16     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#17     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#18     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#19     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#20     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+

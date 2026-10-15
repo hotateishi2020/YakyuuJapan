@@ -10,6 +10,8 @@ import 'package:postgres/postgres.dart';
 import '../tools/Postgres.dart';
 import 'StrengthUsage.dart';
 import 'StrengthMetrics.dart';
+import 'LowerLevelUsage.dart';
+import 'SeasonUsageEvidence.dart';
 
 /// 戦力タブは登録済みJSONを読むだけ。外部サイト取得・集計はrefreshで行う。
 class TeamStrength {
@@ -103,6 +105,12 @@ class TeamStrength {
       });
       if (org == null || org == 'npb') {
         final usageGames = await StrengthUsage.npbGames(client, year);
+        List<Map<String, dynamic>>? lowerGames;
+        try {
+          lowerGames = await LowerLevelUsage.fetch(client, year);
+        } catch (error) {
+          errors.add('2軍起用記録: $error');
+        }
         final announcements = await fetchNpbStatusAnnouncements(client, year);
         final npb = teams
             .where((team) =>
@@ -138,8 +146,13 @@ class TeamStrength {
               return null;
             }
           }));
-          registered += await _save(
-              'npb', year, payloads.whereType<Map<String, dynamic>>().toList());
+          final valid = payloads.whereType<Map<String, dynamic>>().toList();
+          if (lowerGames != null) {
+            await LowerLevelUsage.save(year, valid, lowerGames, {
+              for (final e in npbStrengthSources.entries) e.key: e.value.$2
+            });
+          }
+          registered += await _save('npb', year, valid);
         }
       }
       if (org == null || org == 'mlb') {
@@ -168,11 +181,15 @@ class TeamStrength {
     final metricsClient = http.Client();
     try {
       for (final team in teams) {
-        team['defense_substitutions'] = defenseSubstitutionBands(_maps(team['substitutions']));
+        team['defense_substitutions'] =
+            defenseSubstitutionBands(_maps(team['substitutions']));
         team.addAll(await fetchStrengthMetrics(metricsClient, team, year, org,
-          npbCode: npbStrengthSources['${team['name_team']}']?.$2));
+            npbCode: npbStrengthSources['${team['name_team']}']?.$2));
       }
-    } finally { metricsClient.close(); }
+      await enrichSeasonEvidence(metricsClient, year, org, teams, {for(final e in npbStrengthSources.entries) e.key:e.value.$2});
+    } finally {
+      metricsClient.close();
+    }
     await StrengthUsage.attachStatuses(org, year, teams);
     await Postgres.withConnection((conn) => conn.runTx((tx) async {
           await StrengthUsage.saveTotals(tx, org, year, teams);
@@ -323,7 +340,8 @@ class TeamStrength {
               'level_coverage': <int>[1],
             }
         ];
-        payload['substitutions'] = substitutionBands(usageGames, '$teamId', org: 'mlb');
+        payload['substitutions'] =
+            substitutionBands(usageGames, '$teamId', org: 'mlb');
         payload['pitching_workload'] = workload;
         payload['pitching_game_count'] = usageGames
             .where((g) =>

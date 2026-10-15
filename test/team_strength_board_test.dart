@@ -190,6 +190,8 @@ void main() {
           await tester.tap(find.text('12球団比較'));
           await tester.pumpAndSettle();
         }
+        expect(
+            find.byKey(const ValueKey('total-bases-legend')), findsOneWidget);
         final band = find
             .byKey(const ValueKey('strength-band-contribution-home_runs'))
             .first;
@@ -220,6 +222,51 @@ void main() {
     }, () => client);
   });
 
+  for (final org in [OrgConfig.npb, OrgConfig.mlb]) {
+    testWidgets('${org.label}功績の全球団比較は所属を表示して件数順に並べる', (tester) async {
+      final teams = [
+        for (var id = 1; id <= 2; id++)
+          team(id, '球団$id')
+            ..['roster'] = [
+              {
+                'player_key': 'a$id',
+                'name': '功績選手$id',
+                'achievements': [
+                  for (var n = 0; n < id; n++)
+                    {'label': '最多本塁打', 'kind': 'title', 'year': 2025 - n},
+                ]
+              }
+            ]
+      ];
+      final client = MockClient((_) async => http.Response(
+          jsonEncode({'teams': teams}), 200,
+          headers: {'content-type': 'application/json; charset=utf-8'}));
+      await http.runWithClient(() async {
+        await tester.pumpWidget(MaterialApp(
+            home: Scaffold(body: TeamStrengthBoard(org: org, year: 2026))));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const ValueKey('strength-view-6')));
+        await tester.pumpAndSettle();
+        expect(find.text('功績選手1'), findsOneWidget);
+        expect(find.text('功績選手2'), findsNothing);
+        await tester
+            .tap(find.byKey(const ValueKey('strength-comparison-true')));
+        await tester.pumpAndSettle();
+        expect(find.text(org == OrgConfig.npb ? '12球団比較' : '30球団比較'),
+            findsOneWidget);
+        expect(find.byKey(const ValueKey('strength-team-1')), findsNothing);
+        expect(find.text('球団1'), findsOneWidget);
+        expect(find.text('球団2'), findsOneWidget);
+        expect(tester.getTopLeft(find.text('功績選手2')).dy,
+            lessThan(tester.getTopLeft(find.text('功績選手1')).dy));
+        await tester.tap(find.text('各球団'));
+        await tester.pumpAndSettle();
+        expect(find.byKey(const ValueKey('strength-team-1')), findsOneWidget);
+        expect(find.text('功績選手2'), findsNothing);
+        expect(tester.takeException(), isNull);
+      }, () => client);
+    });
+  }
   testWidgets('成績と契約は各球団・全球団比較を切り替える', (tester) async {
     await tester.binding.setSurfaceSize(const Size(1200, 1000));
     addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -459,7 +506,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('一覧は外野を統合し不明打席の選手を左右にまたがって表示する', (tester) async {
+  testWidgets('一覧は外野3列に分け不明打席の選手を左右にまたがって表示する', (tester) async {
     await tester.pumpWidget(MaterialApp(
         home: Scaffold(
       body: StrengthRosterGrid(year: 2026, team: {
@@ -484,19 +531,19 @@ void main() {
       }),
     )));
     await tester.pumpAndSettle();
-    expect(find.text('外野手'), findsOneWidget);
-    for (final label in ['左翼', '中堅', '右翼', '不明打ち']) {
-      expect(find.text(label), findsNothing);
+    expect(find.text('外野手'), findsNothing);
+    for (final label in ['左翼', '中堅', '右翼']) {
+      expect(find.text(label), findsOneWidget);
     }
+    expect(find.text('不明打ち'), findsNothing);
     Rect card(String name) => tester.getRect(find
         .ancestor(of: find.text(name), matching: find.byType(Tooltip))
         .first);
     final right = card('左の選手');
     final left = card('中の選手');
     final unknown = card('右の選手');
-    expect(unknown.left, closeTo(right.left, 0.1));
-    expect(unknown.right, closeTo(left.right, 0.1));
-    expect(unknown.top, greaterThan(right.bottom));
+    expect(unknown.left, greaterThan(left.right));
+    expect(unknown.width, greaterThan(right.width * 1.8));
     expect(tester.takeException(), isNull);
   });
 
@@ -531,7 +578,7 @@ void main() {
     expect(headerColor('先発'), const Color(0xFFEF5350));
     expect(headerColor('捕手'), const Color(0xFF2196F3));
     expect(headerColor('一塁'), const Color(0xFFFFD54F));
-    expect(headerColor('外野手'), const Color(0xFF43A047));
+    expect(headerColor('左翼'), const Color(0xFF43A047));
     expect(find.text('指名打者'), findsNothing);
     final header = tester.getTopLeft(find.text('捕手'));
     final notes = tester.getRect(find.byKey(const ValueKey('roster-notes')));
@@ -869,7 +916,7 @@ void main() {
             home: Scaffold(
                 body: TeamStrengthBoard(org: OrgConfig.npb, year: 2026))));
         await tester.pumpAndSettle();
-        for (final label in ['選手起用', 'レギュラー', '選手一覧']) {
+        for (final label in ['選手起用', '主力選手', '選手一覧', '経歴']) {
           expect(find.text(label), findsOneWidget);
         }
         expect(find.byType(DropdownButton<int>), findsNothing);
@@ -948,9 +995,10 @@ void main() {
         expect(find.byType(Table), findsOneWidget);
         await tester.tap(find.byKey(const ValueKey('strength-view-3')));
         await tester.pumpAndSettle();
-        expect(find.text('年齢'), findsOneWidget);
+        expect(find.text('起用'), findsOneWidget);
         expect(find.text('育成選手1 【契・FA・退】'), findsOneWidget);
-        expect(find.text('内野手'), findsOneWidget);
+        expect(find.text('内野手'), findsNothing);
+        expect(find.text('（起用不明）'), findsWidgets);
         expect(find.text('両打ち'), findsOneWidget);
         expect(find.text('先発'), findsOneWidget);
         expect(find.textContaining('（確認範囲）'), findsNothing);

@@ -114,5 +114,10 @@ void main() {
     expect(rows.single['team_code'], 'b');
     expect(rows.single['player_key'], 'npb:123');
     expect(rows.single['departure_confirmed'], true);
+    expect(rows.single['departure_type'], 'released');
+    final retired = parseNpbStatusAnnouncements(
+        '<table><tr><th>2026/10/12</th><td><a href="./registered_b.html">球団</a></td><td><a href="https://npb.jp/bis/players/123.html">選手</a></td></tr></table>',
+        'https://npb.jp/announcement/2026/pn_retired.html');
+    expect(retired.single['departure_type'], 'retired');
   });
 }

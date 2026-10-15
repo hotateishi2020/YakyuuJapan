@@ -1,0 +1,2870 @@
+{
+  "year": 2026,
+  "checked_at": "2026-10-15",
+  "players": [
+    {
+      "category": "高校生",
+      "name": "織田翔希",
+      "team": "横浜高校",
+      "position": "投手",
+      "height": 186,
+      "weight": 81,
+      "hand": "右投右打",
+      "achievement": "2026年U-18日本代表。アジア選手権・台湾戦で6回7奪三振。",
+      "features": "長身の右腕。代表戦での奪三振能力に注目。",
+      "sources": [
+        "https://www.japan-baseball.jp/jp/news/press/20260912_1.html",
+        "https://www.japan-baseball.jp/jp/news/press/20260822_1.html",
+        "https://baseball.omyutech.com/draftplayer.action?year=2026",
+        "https://sp.baseball.findfriends.jp/player/20080002/"
+      ],
+      "date_birth": "2008-06-03",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080002/",
+      "attention_grade": "D",
+      "attention_reason": "米球界挑戦を表明。NPB指名は不確実なため暫定D。国内志望なら競合級との評価とは区別しています。",
+      "attention_source": "https://www.nikkansports.com/baseball/news/202610150001384.html",
+      "attention_as_of": "2026-10-15",
+      "predictions": [
+        {
+          "team": "西武",
+          "logo_asset": "backend/assets/images/team_l.png",
+          "status": "YouTube・仮想ドラフト1巡目",
+          "publisher": "スポーツナビ 野球チャンネル（赤星憲広・西尾典文・いけだてつや・菊地高弘）",
+          "title": "赤星・西尾ドラフト対談2026 #3／仮想ドラフト1・2巡目一覧",
+          "reason": "番組の仮想ドラフトで西武の1巡目として選択。他球団の指名と指名順を踏まえたシミュレーションの結果で、球団自身の方針発表ではありません。9月の予想履歴です。その後の米球界挑戦表明を反映した予想ではありません。",
+          "published_at": "2026-09-27",
+          "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=777s",
+          "verification_url": "https://dnomotoke.com/archives/20260928001000/",
+          "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
+          "checked_at": "2026-10-15"
+        }
+      ]
+    },
+    {
+      "category": "高校生",
+      "name": "杉本真滉",
+      "team": "智辯学園高校",
+      "position": "投手",
+      "height": 177,
+      "weight": 86,
+      "hand": "左投左打",
+      "achievement": "2026年U-18日本代表に選出。",
+      "features": "左投げの投手。国際大会代表に選ばれた左腕。",
+      "sources": [
+        "https://www.japan-baseball.jp/jp/news/press/20260331_2.html",
+        "https://www.japan-baseball.jp/jp/news/press/20260822_1.html",
+        "https://baseball.omyutech.com/draftplayer.action?year=2026",
+        "https://sp.baseball.findfriends.jp/player/20080014/"
+      ],
+      "date_birth": "2008-07-08",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080014/",
+      "attention_grade": "B",
+      "attention_reason": "掲載の総合評価Sを基に、アプリ基準でBに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "高校生",
+      "name": "菰田陽生",
+      "team": "山梨学院高",
+      "position": "投手",
+      "height": 194,
+      "weight": 101,
+      "hand": "右投右打",
+      "achievement": "甲子園出場経験。山梨学院高",
+      "features": "最速152km/h。先発型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+        "https://sp.baseball.findfriends.jp/player/20080007/"
+      ],
+      "date_birth": "2008-12-21",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080007/",
+      "predictions": [
+        {
+          "team": "巨人",
+          "logo_asset": "backend/assets/images/team_g.png",
+          "status": "報道による指名予想",
+          "reason": "長打力不足を補い、将来の中心選手に育てる筆頭候補。",
+          "source_url": "https://www.hb-nippon.com/articles/18340",
+          "published_at": "2026-10-15",
+          "additional_sources": [
+            {
+              "status": "YouTube連動記事・1位対抗",
+              "publisher": "AIデータ二刀流",
+              "title": "巨人ドラフト、野手1位で本当に正解？105人の編成×1203人のWARで徹底分析",
+              "reason": "次世代の中軸を担う長打力を重視する場合の候補。上位の指名結果と残存選手に応じて変わる筆者独自の条件付き案です。",
+              "published_at": "2026年9月時点（公開日の詳細未確認）",
+              "source_url": "https://www.youtube.com/watch?v=oOYEfvW9xOk",
+              "verification_url": "https://www.ainitoryu.com/hanshin-keiba/2026-giants-draft-roster-war-analysis/",
+              "evidence_scope": "動画作者の同テーマ解説記事で指名案・理由を確認。",
+              "checked_at": "2026-10-15"
+            }
+          ]
+        },
+        {
+          "team": "ソフトバンク",
+          "logo_asset": "backend/assets/images/team_h.png",
+          "status": "報道による指名予想",
+          "reason": "将来の先発右腕を補強する1位予想。投打双方の伸びしろを評価。",
+          "source_url": "https://www.hb-nippon.com/articles/18322",
+          "published_at": "2026-10-14"
+        },
+        {
+          "team": "DeNA",
+          "logo_asset": "backend/assets/images/team_db.png",
+          "status": "著者による指名予想（8月時点）",
+          "reason": "将来の中軸候補として長打力と二刀流の可能性を評価。",
+          "source_url": "https://dorafuto-stadium.com/dorafutoyosou-saisin-information/",
+          "published_at": "2026-08-23"
+        },
+        {
+          "team": "日本ハム",
+          "logo_asset": "backend/assets/images/team_f.png",
+          "status": "著者による指名予想（8月時点）",
+          "reason": "長距離打者の補強と二刀流の大きな可能性を理由とする1位予想。",
+          "source_url": "https://dorafuto-stadium.com/dorafutoyosou-saisin-information/",
+          "published_at": "2026-08-23",
+          "additional_sources": [
+            {
+              "status": "YouTube・仮想ドラフト1巡目",
+              "publisher": "スポーツナビ 野球チャンネル（赤星憲広・西尾典文・いけだてつや・菊地高弘）",
+              "title": "赤星・西尾ドラフト対談2026 #3／仮想ドラフト1・2巡目一覧",
+              "reason": "番組の仮想ドラフトで日本ハムの1巡目として選択。他球団の指名と指名順を踏まえたシミュレーションの結果で、球団自身の方針発表ではありません。",
+              "published_at": "2026-09-27",
+              "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=777s",
+              "verification_url": "https://dnomotoke.com/archives/20260928001000/",
+              "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
+              "checked_at": "2026-10-15"
+            }
+          ]
+        },
+        {
+          "team": "西武",
+          "logo_asset": "backend/assets/images/team_l.png",
+          "video_id": "nTWIjVSj6ZQ",
+          "title": "【ドラフト2026】西武ライオンズの１〜５位指名を完全予想！戦力＆編成を徹底分析！さあ来季こそパリーグ制覇だSP【プロ野球】",
+          "publisher": "フェードロー野球ちゃんねる",
+          "view_count": 102433,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-10-05",
+          "source_url": "https://www.youtube.com/watch?v=nTWIjVSj6ZQ&t=990s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "西武の指名シミュレーションで1位に選択。二刀流候補として紹介。",
+          "status": "YouTube・指名予想"
+        },
+        {
+          "team": "ヤクルト",
+          "logo_asset": "backend/assets/images/team_s.png",
+          "video_id": "vw9cPB88QE4",
+          "title": "【ドラフト2026】ヤクルトスワローズの１〜５位指名を完全予想！戦力＆編成を徹底分析！１位は未来のエースか４番か!?SP【プロ野球】",
+          "publisher": "フェードロー野球ちゃんねる",
+          "view_count": 81969,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-10-03",
+          "source_url": "https://www.youtube.com/watch?v=vw9cPB88QE4&t=910s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "大学投手を補強した後の将来の中心打者候補として、二刀流の菰田を1位入札する予想。",
+          "status": "YouTube・指名予想"
+        }
+      ],
+      "attention_grade": "S",
+      "attention_reason": "アプリ予想：長打力不足を補い、将来の中心選手に育てる筆頭候補。",
+      "attention_source": "https://www.hb-nippon.com/articles/18340",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "高校生",
+      "name": "末吉良丞",
+      "team": "沖縄尚学高",
+      "position": "投手",
+      "height": 175,
+      "weight": 91,
+      "hand": "左投左打",
+      "achievement": "甲子園出場経験。沖縄尚学高",
+      "features": "最速150km/h。先発型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+        "https://sp.baseball.findfriends.jp/player/20080003/"
+      ],
+      "date_birth": "2008-11-18",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080003/",
+      "attention_grade": "B",
+      "attention_reason": "掲載の総合評価Sを基に、アプリ基準でBに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+      "attention_as_of": "2026-10-15",
+      "predictions": [
+        {
+          "team": "ヤクルト",
+          "logo_asset": "backend/assets/images/team_s.png",
+          "status": "YouTube・仮想ドラフト2巡目",
+          "publisher": "スポーツナビ 野球チャンネル（赤星憲広・西尾典文・いけだてつや・菊地高弘）",
+          "title": "赤星・西尾ドラフト対談2026 #3／仮想ドラフト1・2巡目一覧",
+          "reason": "番組の仮想ドラフトでヤクルトの2巡目として選択。他球団の指名と指名順を踏まえたシミュレーションの結果で、球団自身の方針発表ではありません。",
+          "published_at": "2026-09-27",
+          "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=332s",
+          "verification_url": "https://dnomotoke.com/archives/20260928001000/",
+          "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
+          "checked_at": "2026-10-15"
+        }
+      ]
+    },
+    {
+      "category": "高校生",
+      "name": "高部陸",
+      "team": "聖隷クリストファー高",
+      "position": "投手",
+      "height": 174,
+      "weight": 71,
+      "hand": "左投左打",
+      "achievement": "甲子園出場経験。聖隷クリストファー高",
+      "features": "最速150km/h。先発型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+        "https://sp.baseball.findfriends.jp/player/20090001/"
+      ],
+      "date_birth": "2009-01-05",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20090001/",
+      "attention_grade": "C",
+      "attention_reason": "掲載の総合評価Aを基に、アプリ基準でCに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "高校生",
+      "name": "前田侑大",
+      "team": "高岡第一高",
+      "position": "投手",
+      "height": 173,
+      "weight": 70,
+      "hand": "左投左打",
+      "achievement": "高岡第一高",
+      "features": "最速150km/h。先発型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+        "https://sp.baseball.findfriends.jp/player/20090004/"
+      ],
+      "date_birth": "2009-01-23",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20090004/",
+      "attention_grade": "A",
+      "attention_reason": "外れ1位で4球団競合の予想があるためA。初回入札での競合確定を意味しません。",
+      "attention_source": "https://www.youtube.com/watch?v=aH64atzByoc&t=270s",
+      "attention_as_of": "2026-10-15",
+      "predictions": [
+        {
+          "team": "中日",
+          "logo_asset": "backend/assets/images/team_d.png",
+          "status": "YouTube・仮想ドラフト1巡目",
+          "publisher": "スポーツナビ 野球チャンネル（赤星憲広・西尾典文・いけだてつや・菊地高弘）",
+          "title": "赤星・西尾ドラフト対談2026 #3／仮想ドラフト1・2巡目一覧",
+          "reason": "番組の仮想ドラフトで中日の1巡目として選択。他球団の指名と指名順を踏まえたシミュレーションの結果で、球団自身の方針発表ではありません。",
+          "published_at": "2026-09-27",
+          "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=777s",
+          "verification_url": "https://dnomotoke.com/archives/20260928001000/",
+          "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
+          "checked_at": "2026-10-15",
+          "additional_sources": [
+            {
+              "status": "YouTube・1位候補予想",
+              "publisher": "田中大貴のアスリートチャンネル（西尾典文・デーブ大久保）",
+              "title": "ドラフト2026 1位指名予想 中日・ヤクルト・阪神 編",
+              "reason": "大学卒投手の1位指名が続く年齢構成を踏まえ、高校生投手を候補に挙げる予想。左腕の前田侑大が候補に挙がっています。",
+              "published_at": "2026-09-28",
+              "source_url": "https://www.youtube.com/watch?v=53jgQMN0oAc&t=34s",
+              "verification_url": "https://dnomotoke.com/archives/20261003001040/",
+              "evidence_scope": "動画紹介記事の発言要旨で確認。",
+              "checked_at": "2026-10-15"
+            },
+            {
+              "video_id": "aH64atzByoc",
+              "title": "【２０２６年外れ１２球団ドラフト１位予想】　ドラフト1ヶ月前の予想は？",
+              "publisher": "野球人",
+              "view_count": 77986,
+              "checked_at": "2026-10-15",
+              "published_at": "2026-09-25",
+              "source_url": "https://www.youtube.com/watch?v=aH64atzByoc&t=270s",
+              "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+              "reason": "全球団が初回入札を外した仮定での外れ1位予想。前田に4球団が重なる予想で、初回入札の予想とは区別。",
+              "status": "YouTube・外れ1位予想"
+            }
+          ]
+        },
+        {
+          "team": "西武",
+          "logo_asset": "backend/assets/images/team_l.png",
+          "video_id": "aH64atzByoc",
+          "title": "【２０２６年外れ１２球団ドラフト１位予想】　ドラフト1ヶ月前の予想は？",
+          "publisher": "野球人",
+          "view_count": 77986,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-09-25",
+          "source_url": "https://www.youtube.com/watch?v=aH64atzByoc&t=270s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "全球団が初回入札を外した仮定での外れ1位予想。前田に4球団が重なる予想で、初回入札の予想とは区別。",
+          "status": "YouTube・外れ1位予想"
+        },
+        {
+          "team": "楽天",
+          "logo_asset": "backend/assets/images/team_e.png",
+          "video_id": "aH64atzByoc",
+          "title": "【２０２６年外れ１２球団ドラフト１位予想】　ドラフト1ヶ月前の予想は？",
+          "publisher": "野球人",
+          "view_count": 77986,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-09-25",
+          "source_url": "https://www.youtube.com/watch?v=aH64atzByoc&t=270s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "全球団が初回入札を外した仮定での外れ1位予想。前田に4球団が重なる予想で、初回入札の予想とは区別。",
+          "status": "YouTube・外れ1位予想"
+        },
+        {
+          "team": "阪神",
+          "logo_asset": "backend/assets/images/team_t.png",
+          "video_id": "aH64atzByoc",
+          "title": "【２０２６年外れ１２球団ドラフト１位予想】　ドラフト1ヶ月前の予想は？",
+          "publisher": "野球人",
+          "view_count": 77986,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-09-25",
+          "source_url": "https://www.youtube.com/watch?v=aH64atzByoc&t=270s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "全球団が初回入札を外した仮定での外れ1位予想。前田に4球団が重なる予想で、初回入札の予想とは区別。",
+          "status": "YouTube・外れ1位予想"
+        }
+      ],
+      "attention_sources": [
+        {
+          "video_id": "aH64atzByoc",
+          "title": "【２０２６年外れ１２球団ドラフト１位予想】　ドラフト1ヶ月前の予想は？",
+          "publisher": "野球人",
+          "view_count": 77986,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-09-25",
+          "source_url": "https://www.youtube.com/watch?v=aH64atzByoc&t=270s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "外れ1位で4球団競合の予想があるためA。初回入札での競合確定を意味しません。",
+          "status": "注目度の参考評価"
+        }
+      ]
+    },
+    {
+      "category": "高校生",
+      "name": "鈴木悠悟",
+      "team": "中京高",
+      "position": "投手",
+      "height": 177,
+      "weight": 73,
+      "hand": "右投右打",
+      "achievement": "中京高",
+      "features": "最速147km/h。先発型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+        "https://sp.baseball.findfriends.jp/player/20080025/"
+      ],
+      "date_birth": "2008-07-16",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080025/",
+      "attention_grade": "D",
+      "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "高校生",
+      "name": "上田健介",
+      "team": "近江高",
+      "position": "投手",
+      "height": 182,
+      "weight": 80,
+      "hand": "右投右打",
+      "achievement": "甲子園出場経験。近江高",
+      "features": "最速148km/h。先発型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+        "https://sp.baseball.findfriends.jp/player/20080015/"
+      ],
+      "date_birth": "2008-11-15",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080015/",
+      "attention_grade": "D",
+      "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "高校生",
+      "name": "丹羽涼介",
+      "team": "市和歌山高",
+      "position": "投手",
+      "height": 185,
+      "weight": 77,
+      "hand": "右投右打",
+      "achievement": "甲子園出場経験。市和歌山高",
+      "features": "最速151km/h。先発型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+        "https://sp.baseball.findfriends.jp/player/20090002/"
+      ],
+      "date_birth": "2009-02-10",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20090002/",
+      "attention_grade": "D",
+      "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "高校生",
+      "name": "吉岡貫介",
+      "team": "大阪桐蔭高",
+      "position": "投手",
+      "height": 174,
+      "weight": 73,
+      "hand": "右投右打",
+      "achievement": "甲子園出場経験。大阪桐蔭高",
+      "features": "最速153km/h。先発型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+        "https://sp.baseball.findfriends.jp/player/20080012/"
+      ],
+      "date_birth": "2008-10-20",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080012/",
+      "attention_grade": "D",
+      "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "高校生",
+      "name": "木下瑛二",
+      "team": "高川学園高",
+      "position": "投手",
+      "height": 177,
+      "weight": 80,
+      "hand": "右投右打",
+      "achievement": "甲子園出場経験。高川学園高",
+      "features": "最速146km/h。先発型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+        "https://sp.baseball.findfriends.jp/player/20080023/"
+      ],
+      "date_birth": "2008-05-20",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080023/",
+      "attention_grade": "D",
+      "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "高校生",
+      "name": "三浦秀斗",
+      "team": "鵡川高",
+      "position": "投手",
+      "height": 184,
+      "weight": 87,
+      "hand": "右投右打",
+      "achievement": "鵡川高",
+      "features": "最速148km/h。先発型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+        "https://sp.baseball.findfriends.jp/player/20080019/"
+      ],
+      "date_birth": "2008-09-11",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080019/",
+      "attention_grade": "E",
+      "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "高校生",
+      "name": "林晃成",
+      "team": "桐光学園高",
+      "position": "投手",
+      "height": 190,
+      "weight": 80,
+      "hand": "右投右打",
+      "achievement": "桐光学園高",
+      "features": "最速151km/h。リリーフ型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+        "https://sp.baseball.findfriends.jp/player/20080024/"
+      ],
+      "date_birth": "2008-11-21",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080024/",
+      "attention_grade": "E",
+      "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "高校生",
+      "name": "西田陽紀",
+      "team": "福井商高",
+      "position": "投手",
+      "height": 185,
+      "weight": 81,
+      "hand": "右投右打",
+      "achievement": "福井商高",
+      "features": "最速144km/h。リリーフ型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+        "https://sp.baseball.findfriends.jp/player/20080016/"
+      ],
+      "date_birth": "2008-07-11",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080016/",
+      "attention_grade": "E",
+      "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "高校生",
+      "name": "西田櫂吏",
+      "team": "京都国際高",
+      "position": "投手",
+      "height": 177,
+      "weight": 74,
+      "hand": "左投左打",
+      "achievement": "京都国際高",
+      "features": "最速144km/h。リリーフ型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+        "https://sp.baseball.findfriends.jp/player/20080020/"
+      ],
+      "date_birth": "2008-12-12",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080020/",
+      "attention_grade": "E",
+      "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "高校生",
+      "name": "新城楓雅",
+      "team": "奈良大付高",
+      "position": "投手",
+      "height": 190,
+      "weight": 84,
+      "hand": "右投右打",
+      "achievement": "奈良大付高",
+      "features": "最速145km/h。先発型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+        "https://sp.baseball.findfriends.jp/player/20080017/"
+      ],
+      "date_birth": "2008-04-27",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080017/",
+      "attention_grade": "C",
+      "attention_reason": "スポーツナビの仮想ドラフトで2巡目に選択されたことを参考に更新。番組内の指名シミュレーションであり球団の公表ではありません。",
+      "attention_source": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=677s",
+      "attention_as_of": "2026-10-15",
+      "predictions": [
+        {
+          "team": "ソフトバンク",
+          "logo_asset": "backend/assets/images/team_h.png",
+          "status": "YouTube・仮想ドラフト2巡目",
+          "publisher": "スポーツナビ 野球チャンネル（赤星憲広・西尾典文・いけだてつや・菊地高弘）",
+          "title": "赤星・西尾ドラフト対談2026 #3／仮想ドラフト1・2巡目一覧",
+          "reason": "番組の仮想ドラフトでソフトバンクの2巡目として選択。他球団の指名と指名順を踏まえたシミュレーションの結果で、球団自身の方針発表ではありません。",
+          "published_at": "2026-09-27",
+          "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=677s",
+          "verification_url": "https://dnomotoke.com/archives/20260928001000/",
+          "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
+          "checked_at": "2026-10-15"
+        }
+      ],
+      "attention_sources": [
+        {
+          "video_id": "T4uNPuEJF7U",
+          "title": "【2026仮想ドラフト】注目の2巡目指名／赤星憲広「全部目の前で獲られる」ウェーバー順の妙／即戦力&将来性豊かな逸材がズラリ／番付で挙がらなかった甲子園優勝投手も【赤星・西尾ドラフト対談2026＃3】",
+          "publisher": "スポーツナビ 野球チャンネル",
+          "view_count": 646051,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-09-26",
+          "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=677s",
+          "evidence_scope": "動画説明欄と、公開記事に掲載された動画内の仮想指名一覧画像を照合。",
+          "reason": "スポーツナビの仮想ドラフトで2巡目に選択されたことを参考に更新。番組内の指名シミュレーションであり球団の公表ではありません。",
+          "status": "注目度の参考評価",
+          "verification_url": "https://dnomotoke.com/archives/20260928001000/"
+        }
+      ]
+    },
+    {
+      "category": "高校生",
+      "name": "竹谷陽人",
+      "team": "鳥栖工高",
+      "position": "投手",
+      "height": 180,
+      "weight": 75,
+      "hand": "右投右打",
+      "achievement": "鳥栖工高",
+      "features": "最速143km/h。先発型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+        "https://sp.baseball.findfriends.jp/player/20080021/"
+      ],
+      "date_birth": "2008-06-10",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080021/",
+      "attention_grade": "E",
+      "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "高校生",
+      "name": "一ノ瀬啓士朗",
+      "team": "嬉野高",
+      "position": "投手",
+      "height": 173,
+      "weight": 78,
+      "hand": "右投左打",
+      "achievement": "嬉野高",
+      "features": "最速140km/h。先発型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+        "https://sp.baseball.findfriends.jp/player/20080018/"
+      ],
+      "date_birth": "2008-06-24",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080018/",
+      "attention_grade": "E",
+      "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "高校生",
+      "name": "長山武蔵",
+      "team": "日本ウェルネス沖縄高校",
+      "position": "投手",
+      "height": 182,
+      "weight": 85,
+      "hand": "右投左打",
+      "achievement": "日本ウエルネス高",
+      "features": "最速144km/h。先発型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+        "https://sp.baseball.findfriends.jp/player/20080022/",
+        "https://baseball.omyutech.com/draftplayer.action?year=2026"
+      ],
+      "date_birth": "2008-05-24",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080022/",
+      "attention_grade": "E",
+      "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "高校生",
+      "name": "吉岡伸太朗",
+      "team": "専大松戸高",
+      "position": "捕手",
+      "height": 180,
+      "weight": 90,
+      "hand": "右投左打",
+      "achievement": "甲子園出場経験。専大松戸高",
+      "features": "長打力が注目される捕手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8725",
+        "https://sp.baseball.findfriends.jp/player/20090009/"
+      ],
+      "date_birth": "2009-02-11",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20090009/",
+      "attention_grade": "D",
+      "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8725",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "高校生",
+      "name": "後藤幸樹",
+      "team": "沼津商高",
+      "position": "捕手",
+      "height": 180,
+      "weight": 86,
+      "hand": "右投右打",
+      "achievement": "沼津商高",
+      "features": "守備力が注目される捕手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8725",
+        "https://sp.baseball.findfriends.jp/player/20080026/"
+      ],
+      "date_birth": "2008-05-09",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080026/",
+      "attention_grade": "E",
+      "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8725",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "高校生",
+      "name": "池田聖摩",
+      "team": "横浜高",
+      "position": "内野手",
+      "height": 175,
+      "weight": 78,
+      "hand": "右投左打",
+      "achievement": "甲子園出場経験。横浜高",
+      "features": "守備力が注目される内野手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8725",
+        "https://sp.baseball.findfriends.jp/player/20080013/"
+      ],
+      "date_birth": "2008-06-26",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080013/",
+      "attention_grade": "C",
+      "attention_reason": "掲載の総合評価Aを基に、アプリ基準でCに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8725",
+      "attention_as_of": "2026-10-15",
+      "predictions": [
+        {
+          "team": "巨人",
+          "logo_asset": "backend/assets/images/team_g.png",
+          "status": "YouTube連動記事・3位候補",
+          "publisher": "AIデータ二刀流",
+          "title": "巨人ドラフト、野手1位で本当に正解？105人の編成×1203人のWARで徹底分析",
+          "reason": "二遊間の不足よりも候補自身の評価を優先する場合に比較。上位の指名結果と残存選手に応じて変わる筆者独自の条件付き案です。",
+          "published_at": "2026年9月時点（公開日の詳細未確認）",
+          "source_url": "https://www.youtube.com/watch?v=oOYEfvW9xOk",
+          "verification_url": "https://www.ainitoryu.com/hanshin-keiba/2026-giants-draft-roster-war-analysis/",
+          "evidence_scope": "動画作者の同テーマ解説記事で指名案・理由を確認。",
+          "checked_at": "2026-10-15"
+        }
+      ]
+    },
+    {
+      "category": "高校生",
+      "name": "牟禮翔",
+      "team": "九州国際大付高",
+      "position": "外野手",
+      "height": 180,
+      "weight": 89,
+      "hand": "右投右打",
+      "achievement": "九州国際大付高",
+      "features": "長打力が注目される外野手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8725",
+        "https://sp.baseball.findfriends.jp/player/20080011/"
+      ],
+      "date_birth": "2008-07-14",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080011/",
+      "attention_grade": "B",
+      "attention_reason": "スポーツナビの仮想ドラフトで1巡目に選択されたことを参考に更新。番組内の指名シミュレーションであり球団の公表ではありません。",
+      "attention_source": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=777s",
+      "attention_as_of": "2026-10-15",
+      "predictions": [
+        {
+          "team": "ソフトバンク",
+          "logo_asset": "backend/assets/images/team_h.png",
+          "status": "YouTube・仮想ドラフト1巡目",
+          "publisher": "スポーツナビ 野球チャンネル（赤星憲広・西尾典文・いけだてつや・菊地高弘）",
+          "title": "赤星・西尾ドラフト対談2026 #3／仮想ドラフト1・2巡目一覧",
+          "reason": "番組の仮想ドラフトでソフトバンクの1巡目として選択。他球団の指名と指名順を踏まえたシミュレーションの結果で、球団自身の方針発表ではありません。",
+          "published_at": "2026-09-27",
+          "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=777s",
+          "verification_url": "https://dnomotoke.com/archives/20260928001000/",
+          "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
+          "checked_at": "2026-10-15"
+        }
+      ],
+      "attention_sources": [
+        {
+          "video_id": "T4uNPuEJF7U",
+          "title": "【2026仮想ドラフト】注目の2巡目指名／赤星憲広「全部目の前で獲られる」ウェーバー順の妙／即戦力&将来性豊かな逸材がズラリ／番付で挙がらなかった甲子園優勝投手も【赤星・西尾ドラフト対談2026＃3】",
+          "publisher": "スポーツナビ 野球チャンネル",
+          "view_count": 646051,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-09-26",
+          "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=777s",
+          "evidence_scope": "動画説明欄と、公開記事に掲載された動画内の仮想指名一覧画像を照合。",
+          "reason": "スポーツナビの仮想ドラフトで1巡目に選択されたことを参考に更新。番組内の指名シミュレーションであり球団の公表ではありません。",
+          "status": "注目度の参考評価",
+          "verification_url": "https://dnomotoke.com/archives/20260928001000/"
+        }
+      ]
+    },
+    {
+      "category": "大学生",
+      "name": "鈴木泰成",
+      "team": "青山学院大学",
+      "position": "投手",
+      "height": 187,
+      "weight": 92,
+      "hand": "右投右打",
+      "achievement": "2026年WCBC韓国戦で6回1安打14奪三振。",
+      "features": "長身の右腕。国際試合で高い奪三振力を示した。",
+      "sources": [
+        "https://www.japan-baseball.jp/jp/news/press/20260712_1.html",
+        "https://www.univbbl.com/alljapan/samuraijapan/2026.html",
+        "https://www.aoyama.ac.jp/sports_info/2026/news_20261008_01",
+        "https://baseball.omyutech.com/draftplayer.action?year=2026",
+        "https://sp.baseball.findfriends.jp/player/20040035/"
+      ],
+      "date_birth": "2004-05-28",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040035/",
+      "predictions": [
+        {
+          "team": "ヤクルト",
+          "logo_asset": "backend/assets/images/team_s.png",
+          "status": "著者による指名予想（8月時点）",
+          "reason": "投手陣の年齢構成を踏まえた即戦力投手の1位候補。",
+          "source_url": "https://dorafuto-stadium.com/dorafutoyosou-saisin-information/",
+          "published_at": "2026-08-23"
+        },
+        {
+          "team": "ロッテ",
+          "logo_asset": "backend/assets/images/team_m.png",
+          "status": "YouTube・仮想ドラフト1巡目",
+          "publisher": "スポーツナビ 野球チャンネル（赤星憲広・西尾典文・いけだてつや・菊地高弘）",
+          "title": "赤星・西尾ドラフト対談2026 #3／仮想ドラフト1・2巡目一覧",
+          "reason": "番組の仮想ドラフトでロッテの1巡目として選択。他球団の指名と指名順を踏まえたシミュレーションの結果で、球団自身の方針発表ではありません。",
+          "published_at": "2026-09-27",
+          "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=777s",
+          "verification_url": "https://dnomotoke.com/archives/20260928001000/",
+          "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
+          "checked_at": "2026-10-15"
+        },
+        {
+          "team": "巨人",
+          "logo_asset": "backend/assets/images/team_g.png",
+          "status": "YouTube連動記事・1位本命",
+          "publisher": "AIデータ二刀流",
+          "title": "巨人ドラフト、野手1位で本当に正解？105人の編成×1203人のWARで徹底分析",
+          "reason": "先発としての完成度と候補全体での評価を重視。上位の指名結果と残存選手に応じて変わる筆者独自の条件付き案です。",
+          "published_at": "2026年9月時点（公開日の詳細未確認）",
+          "source_url": "https://www.youtube.com/watch?v=oOYEfvW9xOk",
+          "verification_url": "https://www.ainitoryu.com/hanshin-keiba/2026-giants-draft-roster-war-analysis/",
+          "evidence_scope": "動画作者の同テーマ解説記事で指名案・理由を確認。",
+          "checked_at": "2026-10-15"
+        }
+      ],
+      "attention_grade": "A",
+      "attention_reason": "西尾典文の初回入札候補評価と、フェードローの夏時点の1位12人予想を参考にAを維持。",
+      "attention_source": "https://www.youtube.com/watch?v=D6JEL8LqVR0&t=190s",
+      "attention_as_of": "2026-10-15",
+      "attention_sources": [
+        {
+          "video_id": "pdKOQOJZTFs",
+          "title": "【ドラフト2026】最初の入札はこの4人！ 各球団の興味は？1位候補ランキング12人解説／西尾典文・若狭敬一の独自取材で”熱心な球団”まで公開！",
+          "publisher": "NextTV ネクストテレビ",
+          "view_count": 850854,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-09-11",
+          "source_url": "https://www.youtube.com/watch?v=pdKOQOJZTFs&t=450s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "西尾典文のランキング3位、初回入札の有力候補。競合の可能性があるAを維持。",
+          "status": "注目度の参考評価"
+        },
+        {
+          "video_id": "D6JEL8LqVR0",
+          "title": "【ドラフト2026】１位指名１２名を徹底予想！今年は大学生中心ドラフトか！？SP【夏の甲子園終了時点】",
+          "publisher": "フェードロー野球ちゃんねる",
+          "view_count": 140114,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-08-29",
+          "source_url": "https://www.youtube.com/watch?v=D6JEL8LqVR0&t=190s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "西尾典文の初回入札候補評価と、フェードローの夏時点の1位12人予想を参考にAを維持。",
+          "status": "注目度の参考評価"
+        }
+      ]
+    },
+    {
+      "category": "大学生",
+      "name": "渡部海",
+      "team": "青山学院大学",
+      "position": "捕手",
+      "height": 180,
+      "weight": 92,
+      "hand": "右投右打",
+      "achievement": "2026年大学日本代表の主将。",
+      "features": "右打ちの捕手。代表の主将として投手陣を支える。",
+      "sources": [
+        "https://www.univbbl.com/alljapan/samuraijapan/2026.html",
+        "https://www.aoyama.ac.jp/sports_info/2026/news_20261008_01",
+        "https://baseball.omyutech.com/draftplayer.action?year=2026",
+        "https://sp.baseball.findfriends.jp/player/20040068/"
+      ],
+      "date_birth": "2004-08-20",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040068/",
+      "predictions": [
+        {
+          "team": "阪神",
+          "logo_asset": "backend/assets/images/team_t.png",
+          "status": "報道による指名予想",
+          "reason": "捕手陣の世代交代と将来の正捕手確保を理由に、1位入札を予想。",
+          "source_url": "https://www.hb-nippon.com/articles/18304",
+          "published_at": "2026-10-13",
+          "additional_sources": [
+            {
+              "status": "YouTube・1位本命予想",
+              "publisher": "NPB戦士",
+              "title": "阪神の1位指名は渡部が本命⁉️2遊間が穴で2巡目指名以降の戦略が悩ましすぎる",
+              "reason": "公開タイトルで渡部を阪神の1位本命として提示。2巡目以降の二遊間補強との組み合わせを論点にしています。",
+              "published_at": "2026-06-25",
+              "source_url": "https://www.youtube.com/watch?v=_7rA1PCFrDI",
+              "evidence_scope": "公開タイトル・概要の確認。動画内の詳しい評価は未確認。",
+              "checked_at": "2026-10-15"
+            }
+          ]
+        },
+        {
+          "team": "楽天",
+          "logo_asset": "backend/assets/images/team_e.png",
+          "status": "報道による指名予想",
+          "reason": "捕手の打力と年齢構成、太田のFAを踏まえた1位予想。",
+          "source_url": "https://www.hb-nippon.com/articles/18321",
+          "published_at": "2026-10-14",
+          "additional_sources": [
+            {
+              "status": "YouTube・仮想ドラフト1巡目",
+              "publisher": "スポーツナビ 野球チャンネル（赤星憲広・西尾典文・いけだてつや・菊地高弘）",
+              "title": "赤星・西尾ドラフト対談2026 #3／仮想ドラフト1・2巡目一覧",
+              "reason": "番組の仮想ドラフトで楽天の1巡目として選択。他球団の指名と指名順を踏まえたシミュレーションの結果で、球団自身の方針発表ではありません。",
+              "published_at": "2026-09-27",
+              "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=777s",
+              "verification_url": "https://dnomotoke.com/archives/20260928001000/",
+              "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
+              "checked_at": "2026-10-15"
+            },
+            {
+              "video_id": "gwzV0aSSItI",
+              "title": "【ドラフト2026】１位入札を完全シミュレーション！競合はどのくらい発生しますのんSP【プロ野球】",
+              "publisher": "フェードロー野球ちゃんねる",
+              "view_count": 180255,
+              "checked_at": "2026-10-15",
+              "published_at": "2026-09-13",
+              "source_url": "https://www.youtube.com/watch?v=gwzV0aSSItI&t=180s",
+              "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+              "reason": "センターラインを担う即戦力野手を優先する見立てから、1位入札を予想。",
+              "status": "YouTube・指名予想"
+            }
+          ]
+        },
+        {
+          "team": "オリックス",
+          "logo_asset": "backend/assets/images/team_bs.png",
+          "status": "著者による指名予想（8月時点）",
+          "reason": "8月10日時点の1位候補表で挙げられた大学生捕手。",
+          "source_url": "https://dorafuto-stadium.com/dorafutoyosou-saisin-information/",
+          "published_at": "2026-08-23"
+        },
+        {
+          "team": "広島",
+          "logo_asset": "backend/assets/images/team_c.png",
+          "status": "著者による指名予想（8月時点）",
+          "reason": "8月10日時点の1位候補表で挙げられた捕手。記事は捕手層の補強を課題としている。",
+          "source_url": "https://dorafuto-stadium.com/dorafutoyosou-saisin-information/",
+          "published_at": "2026-08-23",
+          "additional_sources": [
+            {
+              "video_id": "gwzV0aSSItI",
+              "title": "【ドラフト2026】１位入札を完全シミュレーション！競合はどのくらい発生しますのんSP【プロ野球】",
+              "publisher": "フェードロー野球ちゃんねる",
+              "view_count": 180255,
+              "checked_at": "2026-10-15",
+              "published_at": "2026-09-13",
+              "source_url": "https://www.youtube.com/watch?v=gwzV0aSSItI&t=240s",
+              "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+              "reason": "捕手の将来の編成と青学担当スカウトの評価を踏まえた1位入札予想。",
+              "status": "YouTube・指名予想"
+            }
+          ]
+        }
+      ],
+      "attention_grade": "S",
+      "attention_reason": "アプリ予想：捕手陣の世代交代と将来の正捕手確保を理由に、1位入札を予想。",
+      "attention_source": "https://www.hb-nippon.com/articles/18304",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "大学生",
+      "name": "有馬伽久",
+      "team": "立命大",
+      "position": "投手",
+      "height": 175,
+      "weight": 77,
+      "hand": "左投左打",
+      "achievement": "甲子園出場経験。愛工大名電高 → 立命大",
+      "features": "最速151km/h。先発型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
+        "https://sp.baseball.findfriends.jp/player/20040137/"
+      ],
+      "date_birth": "2004-07-29",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040137/",
+      "predictions": [
+        {
+          "team": "阪神",
+          "logo_asset": "backend/assets/images/team_t.png",
+          "status": "報道による指名予想",
+          "reason": "若手左腕の層を厚くする上位候補。",
+          "source_url": "https://www.hb-nippon.com/articles/18304",
+          "published_at": "2026-10-13"
+        },
+        {
+          "team": "楽天",
+          "logo_asset": "backend/assets/images/team_e.png",
+          "status": "報道による指名予想",
+          "reason": "先発層の補強候補として上位指名を予想。",
+          "source_url": "https://www.hb-nippon.com/articles/18321",
+          "published_at": "2026-10-14"
+        },
+        {
+          "team": "オリックス",
+          "logo_asset": "backend/assets/images/team_bs.png",
+          "status": "YouTube・仮想ドラフト1巡目",
+          "publisher": "スポーツナビ 野球チャンネル（赤星憲広・西尾典文・いけだてつや・菊地高弘）",
+          "title": "赤星・西尾ドラフト対談2026 #3／仮想ドラフト1・2巡目一覧",
+          "reason": "番組の仮想ドラフトでオリックスの1巡目として選択。他球団の指名と指名順を踏まえたシミュレーションの結果で、球団自身の方針発表ではありません。",
+          "published_at": "2026-09-27",
+          "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=777s",
+          "verification_url": "https://dnomotoke.com/archives/20260928001000/",
+          "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
+          "checked_at": "2026-10-15"
+        }
+      ],
+      "attention_grade": "B",
+      "attention_reason": "掲載の総合評価Sを基に、アプリ基準でBに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "大学生",
+      "name": "川尻啓人",
+      "team": "亜大",
+      "position": "投手",
+      "height": 189,
+      "weight": 93,
+      "hand": "右投左打",
+      "achievement": "甲子園出場経験。高岡商高 → 亜大",
+      "features": "最速156km/h。リリーフ型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
+        "https://sp.baseball.findfriends.jp/player/20040156/"
+      ],
+      "date_birth": "2004-10-23",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040156/",
+      "predictions": [
+        {
+          "team": "楽天",
+          "logo_asset": "backend/assets/images/team_e.png",
+          "status": "報道による指名予想",
+          "reason": "捕手の抽選結果に応じた上位投手候補。",
+          "source_url": "https://www.hb-nippon.com/articles/18321",
+          "published_at": "2026-10-14"
+        },
+        {
+          "team": "オリックス",
+          "logo_asset": "backend/assets/images/team_bs.png",
+          "status": "YouTube・仮想ドラフト2巡目",
+          "publisher": "スポーツナビ 野球チャンネル（赤星憲広・西尾典文・いけだてつや・菊地高弘）",
+          "title": "赤星・西尾ドラフト対談2026 #3／仮想ドラフト1・2巡目一覧",
+          "reason": "番組の仮想ドラフトでオリックスの2巡目として選択。他球団の指名と指名順を踏まえたシミュレーションの結果で、球団自身の方針発表ではありません。",
+          "published_at": "2026-09-27",
+          "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=272s",
+          "verification_url": "https://dnomotoke.com/archives/20260928001000/",
+          "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
+          "checked_at": "2026-10-15"
+        },
+        {
+          "team": "ヤクルト",
+          "logo_asset": "backend/assets/images/team_s.png",
+          "video_id": "vw9cPB88QE4",
+          "title": "【ドラフト2026】ヤクルトスワローズの１〜５位指名を完全予想！戦力＆編成を徹底分析！１位は未来のエースか４番か!?SP【プロ野球】",
+          "publisher": "フェードロー野球ちゃんねる",
+          "view_count": 81969,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-10-03",
+          "source_url": "https://www.youtube.com/watch?v=vw9cPB88QE4&t=1080s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "ヤクルトの2位指名候補として表示。",
+          "status": "YouTube・指名予想"
+        }
+      ],
+      "attention_grade": "B",
+      "attention_reason": "西尾典文の1位候補12人に含まれ、単独1位・外れ1位の候補として紹介。Bを維持。",
+      "attention_source": "https://www.youtube.com/watch?v=pdKOQOJZTFs&t=1540s",
+      "attention_as_of": "2026-10-15",
+      "attention_sources": [
+        {
+          "video_id": "pdKOQOJZTFs",
+          "title": "【ドラフト2026】最初の入札はこの4人！ 各球団の興味は？1位候補ランキング12人解説／西尾典文・若狭敬一の独自取材で”熱心な球団”まで公開！",
+          "publisher": "NextTV ネクストテレビ",
+          "view_count": 850854,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-09-11",
+          "source_url": "https://www.youtube.com/watch?v=pdKOQOJZTFs&t=1540s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "西尾典文の1位候補12人に含まれ、単独1位・外れ1位の候補として紹介。Bを維持。",
+          "status": "注目度の参考評価"
+        }
+      ]
+    },
+    {
+      "category": "大学生",
+      "name": "仲井慎",
+      "team": "駒大",
+      "position": "投手",
+      "height": 177,
+      "weight": 83,
+      "hand": "右投右打",
+      "achievement": "甲子園出場経験。下関国際高 → 駒大",
+      "features": "最速158km/h。複数の役割を担える投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
+        "https://sp.baseball.findfriends.jp/player/20040099/"
+      ],
+      "date_birth": "2004-04-22",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040099/",
+      "predictions": [
+        {
+          "team": "中日",
+          "logo_asset": "backend/assets/images/team_d.png",
+          "status": "報道による指名予想",
+          "reason": "救援投手不足を補える即戦力右腕として2位候補。",
+          "source_url": "https://www.hb-nippon.com/articles/18336",
+          "published_at": "2026-10-15"
+        },
+        {
+          "team": "巨人",
+          "logo_asset": "backend/assets/images/team_g.png",
+          "status": "YouTube連動記事・2位候補",
+          "publisher": "AIデータ二刀流",
+          "title": "巨人ドラフト、野手1位で本当に正解？105人の編成×1203人のWARで徹底分析",
+          "reason": "上位投手が残る場合の比較候補。上位の指名結果と残存選手に応じて変わる筆者独自の条件付き案です。",
+          "published_at": "2026年9月時点（公開日の詳細未確認）",
+          "source_url": "https://www.youtube.com/watch?v=oOYEfvW9xOk",
+          "verification_url": "https://www.ainitoryu.com/hanshin-keiba/2026-giants-draft-roster-war-analysis/",
+          "evidence_scope": "動画作者の同テーマ解説記事で指名案・理由を確認。",
+          "checked_at": "2026-10-15"
+        },
+        {
+          "team": "西武",
+          "logo_asset": "backend/assets/images/team_l.png",
+          "video_id": "nTWIjVSj6ZQ",
+          "title": "【ドラフト2026】西武ライオンズの１〜５位指名を完全予想！戦力＆編成を徹底分析！さあ来季こそパリーグ制覇だSP【プロ野球】",
+          "publisher": "フェードロー野球ちゃんねる",
+          "view_count": 102433,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-10-05",
+          "source_url": "https://www.youtube.com/watch?v=nTWIjVSj6ZQ&t=1110s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "西武の2位指名候補として表示。",
+          "status": "YouTube・指名予想"
+        }
+      ],
+      "attention_grade": "C",
+      "attention_reason": "掲載の総合評価Aを基に、アプリ基準でCに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "大学生",
+      "name": "米沢友翔",
+      "team": "関大",
+      "position": "投手",
+      "height": 180,
+      "weight": 80,
+      "hand": "左投左打",
+      "achievement": "金沢高 → 関大",
+      "features": "最速149km/h。先発型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
+        "https://sp.baseball.findfriends.jp/player/20040161/"
+      ],
+      "date_birth": "2004-06-01",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040161/",
+      "predictions": [
+        {
+          "team": "阪神",
+          "logo_asset": "backend/assets/images/team_t.png",
+          "status": "報道による指名予想",
+          "reason": "若手左腕の補強候補。捕手の抽選結果次第で上位指名を予想。",
+          "source_url": "https://www.hb-nippon.com/articles/18304",
+          "published_at": "2026-10-13",
+          "additional_sources": [
+            {
+              "status": "YouTube・仮想ドラフト1巡目",
+              "publisher": "スポーツナビ 野球チャンネル（赤星憲広・西尾典文・いけだてつや・菊地高弘）",
+              "title": "赤星・西尾ドラフト対談2026 #3／仮想ドラフト1・2巡目一覧",
+              "reason": "番組の仮想ドラフトで阪神の1巡目として選択。他球団の指名と指名順を踏まえたシミュレーションの結果で、球団自身の方針発表ではありません。",
+              "published_at": "2026-09-27",
+              "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=777s",
+              "verification_url": "https://dnomotoke.com/archives/20260928001000/",
+              "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
+              "checked_at": "2026-10-15"
+            }
+          ]
+        },
+        {
+          "team": "楽天",
+          "logo_asset": "backend/assets/images/team_e.png",
+          "status": "報道による指名予想",
+          "reason": "先発層の補強候補として上位指名を予想。",
+          "source_url": "https://www.hb-nippon.com/articles/18321",
+          "published_at": "2026-10-14"
+        },
+        {
+          "team": "西武",
+          "logo_asset": "backend/assets/images/team_l.png",
+          "status": "著者による指名予想（8月時点）",
+          "reason": "8月10日時点の1位候補表で挙げられた大学生左腕。",
+          "source_url": "https://dorafuto-stadium.com/dorafutoyosou-saisin-information/",
+          "published_at": "2026-08-23"
+        },
+        {
+          "team": "ロッテ",
+          "logo_asset": "backend/assets/images/team_m.png",
+          "status": "著者による指名予想（8月時点）",
+          "reason": "8月10日時点の1位候補表で挙げられた大学生左腕。",
+          "source_url": "https://dorafuto-stadium.com/dorafutoyosou-saisin-information/",
+          "published_at": "2026-08-23"
+        },
+        {
+          "team": "オリックス",
+          "logo_asset": "backend/assets/images/team_bs.png",
+          "status": "著者による指名予想（8月時点）",
+          "reason": "8月10日時点の1位候補表で挙げられた大学生左腕。",
+          "source_url": "https://dorafuto-stadium.com/dorafutoyosou-saisin-information/",
+          "published_at": "2026-08-23"
+        },
+        {
+          "team": "ヤクルト",
+          "logo_asset": "backend/assets/images/team_s.png",
+          "status": "著者による指名予想（8月時点）",
+          "reason": "先発左腕と将来のエース候補の確保を理由とする1位候補。",
+          "source_url": "https://dorafuto-stadium.com/dorafutoyosou-saisin-information/",
+          "published_at": "2026-08-23"
+        },
+        {
+          "team": "巨人",
+          "logo_asset": "backend/assets/images/team_g.png",
+          "status": "YouTube連動記事・外れ1位候補",
+          "publisher": "AIデータ二刀流",
+          "title": "巨人ドラフト、野手1位で本当に正解？105人の編成×1203人のWARで徹底分析",
+          "reason": "未指名で残る場合に野手候補と比較する投手。上位の指名結果と残存選手に応じて変わる筆者独自の条件付き案です。",
+          "published_at": "2026年9月時点（公開日の詳細未確認）",
+          "source_url": "https://www.youtube.com/watch?v=oOYEfvW9xOk",
+          "verification_url": "https://www.ainitoryu.com/hanshin-keiba/2026-giants-draft-roster-war-analysis/",
+          "evidence_scope": "動画作者の同テーマ解説記事で指名案・理由を確認。",
+          "checked_at": "2026-10-15"
+        }
+      ],
+      "attention_grade": "A",
+      "attention_reason": "夏時点の1位12人予想に含まれる左腕。既存の競合可能性の評価Aを維持。",
+      "attention_source": "https://www.youtube.com/watch?v=D6JEL8LqVR0&t=760s",
+      "attention_as_of": "2026-10-15",
+      "attention_sources": [
+        {
+          "video_id": "D6JEL8LqVR0",
+          "title": "【ドラフト2026】１位指名１２名を徹底予想！今年は大学生中心ドラフトか！？SP【夏の甲子園終了時点】",
+          "publisher": "フェードロー野球ちゃんねる",
+          "view_count": 140114,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-08-29",
+          "source_url": "https://www.youtube.com/watch?v=D6JEL8LqVR0&t=760s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "夏時点の1位12人予想に含まれる左腕。既存の競合可能性の評価Aを維持。",
+          "status": "注目度の参考評価"
+        }
+      ]
+    },
+    {
+      "category": "大学生",
+      "name": "小松勇輝",
+      "team": "びわこ成蹊スポーツ大",
+      "position": "投手",
+      "height": 180,
+      "weight": 81,
+      "hand": "右投右打",
+      "achievement": "龍谷大平安高 → びわこ成蹊スポーツ大",
+      "features": "最速151km/h。先発型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
+        "https://sp.baseball.findfriends.jp/player/20040155/"
+      ],
+      "date_birth": "2004-04-12",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040155/",
+      "attention_grade": "C",
+      "attention_reason": "掲載の総合評価Aを基に、アプリ基準でCに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "大学生",
+      "name": "吉川凌平",
+      "team": "千葉商大",
+      "position": "投手",
+      "height": 186,
+      "weight": 89,
+      "hand": "右投右打",
+      "achievement": "習志野高 → 千葉商大",
+      "features": "最速151km/h。先発型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
+        "https://sp.baseball.findfriends.jp/player/20040159/"
+      ],
+      "date_birth": "2004-07-16",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040159/",
+      "predictions": [
+        {
+          "team": "中日",
+          "logo_asset": "backend/assets/images/team_d.png",
+          "status": "報道による指名予想",
+          "reason": "制球力と多彩な変化球を持つ即戦力投手として中位候補。",
+          "source_url": "https://www.hb-nippon.com/articles/18336",
+          "published_at": "2026-10-15"
+        }
+      ],
+      "attention_grade": "D",
+      "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "大学生",
+      "name": "渡辺和大",
+      "team": "慶大",
+      "position": "投手",
+      "height": 180,
+      "weight": 78,
+      "hand": "左投左打",
+      "achievement": "甲子園出場経験。高松商高 → 慶大",
+      "features": "最速151km/h。先発型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
+        "https://sp.baseball.findfriends.jp/player/20040138/"
+      ],
+      "date_birth": "2004-05-28",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040138/",
+      "predictions": [
+        {
+          "team": "楽天",
+          "logo_asset": "backend/assets/images/team_e.png",
+          "status": "報道による指名予想",
+          "reason": "先発投手の補強候補として上位指名を予想。",
+          "source_url": "https://www.hb-nippon.com/articles/18321",
+          "published_at": "2026-10-14"
+        },
+        {
+          "team": "DeNA",
+          "logo_asset": "backend/assets/images/team_db.png",
+          "status": "YouTube・仮想ドラフト1巡目",
+          "publisher": "スポーツナビ 野球チャンネル（赤星憲広・西尾典文・いけだてつや・菊地高弘）",
+          "title": "赤星・西尾ドラフト対談2026 #3／仮想ドラフト1・2巡目一覧",
+          "reason": "番組の仮想ドラフトでDeNAの1巡目として選択。他球団の指名と指名順を踏まえたシミュレーションの結果で、球団自身の方針発表ではありません。",
+          "published_at": "2026-09-27",
+          "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=777s",
+          "verification_url": "https://dnomotoke.com/archives/20260928001000/",
+          "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
+          "checked_at": "2026-10-15"
+        },
+        {
+          "team": "巨人",
+          "logo_asset": "backend/assets/images/team_g.png",
+          "status": "YouTube連動記事・2位候補",
+          "publisher": "AIデータ二刀流",
+          "title": "巨人ドラフト、野手1位で本当に正解？105人の編成×1203人のWARで徹底分析",
+          "reason": "上位評価の左腕が残った場合に比較。上位の指名結果と残存選手に応じて変わる筆者独自の条件付き案です。",
+          "published_at": "2026年9月時点（公開日の詳細未確認）",
+          "source_url": "https://www.youtube.com/watch?v=oOYEfvW9xOk",
+          "verification_url": "https://www.ainitoryu.com/hanshin-keiba/2026-giants-draft-roster-war-analysis/",
+          "evidence_scope": "動画作者の同テーマ解説記事で指名案・理由を確認。",
+          "checked_at": "2026-10-15"
+        },
+        {
+          "team": "ヤクルト",
+          "logo_asset": "backend/assets/images/team_s.png",
+          "video_id": "vw9cPB88QE4",
+          "title": "【ドラフト2026】ヤクルトスワローズの１〜５位指名を完全予想！戦力＆編成を徹底分析！１位は未来のエースか４番か!?SP【プロ野球】",
+          "publisher": "フェードロー野球ちゃんねる",
+          "view_count": 81969,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-10-03",
+          "source_url": "https://www.youtube.com/watch?v=vw9cPB88QE4&t=1010s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "初回入札を外した場合の1位候補として表示。",
+          "status": "YouTube・外れ1位予想"
+        }
+      ],
+      "attention_grade": "B",
+      "attention_reason": "ヤクルトの外れ1位予想を確認し、ドラ1候補のBへ更新。",
+      "attention_source": "https://www.youtube.com/watch?v=vw9cPB88QE4&t=1010s",
+      "attention_as_of": "2026-10-15",
+      "attention_sources": [
+        {
+          "video_id": "vw9cPB88QE4",
+          "title": "【ドラフト2026】ヤクルトスワローズの１〜５位指名を完全予想！戦力＆編成を徹底分析！１位は未来のエースか４番か!?SP【プロ野球】",
+          "publisher": "フェードロー野球ちゃんねる",
+          "view_count": 81969,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-10-03",
+          "source_url": "https://www.youtube.com/watch?v=vw9cPB88QE4&t=1010s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "ヤクルトの外れ1位予想を確認し、ドラ1候補のBへ更新。",
+          "status": "注目度の参考評価"
+        }
+      ]
+    },
+    {
+      "category": "大学生",
+      "name": "広池浩成",
+      "team": "慶大",
+      "position": "投手",
+      "height": 180,
+      "weight": 85,
+      "hand": "右投左打",
+      "achievement": "慶応高 → 慶大",
+      "features": "最速156km/h。リリーフ型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
+        "https://sp.baseball.findfriends.jp/player/20040157/"
+      ],
+      "date_birth": "2004-10-27",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040157/",
+      "attention_grade": "D",
+      "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
+      "attention_as_of": "2026-10-15",
+      "predictions": [
+        {
+          "team": "西武",
+          "logo_asset": "backend/assets/images/team_l.png",
+          "video_id": "nTWIjVSj6ZQ",
+          "title": "【ドラフト2026】西武ライオンズの１〜５位指名を完全予想！戦力＆編成を徹底分析！さあ来季こそパリーグ制覇だSP【プロ野球】",
+          "publisher": "フェードロー野球ちゃんねる",
+          "view_count": 102433,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-10-05",
+          "source_url": "https://www.youtube.com/watch?v=nTWIjVSj6ZQ&t=1320s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "西武の5位指名候補として表示。",
+          "status": "YouTube・指名予想"
+        }
+      ]
+    },
+    {
+      "category": "大学生",
+      "name": "馬場拓海",
+      "team": "日体大",
+      "position": "投手",
+      "height": 184,
+      "weight": 88,
+      "hand": "右投右打",
+      "achievement": "甲子園出場経験。福岡大大濠高 → 日体大",
+      "features": "最速154km/h。複数の役割を担える投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
+        "https://sp.baseball.findfriends.jp/player/20040160/"
+      ],
+      "date_birth": "2004-12-20",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040160/",
+      "predictions": [
+        {
+          "team": "巨人",
+          "logo_asset": "backend/assets/images/team_g.png",
+          "status": "報道による指名予想",
+          "reason": "右投手補強の2位候補。独特の投球動作と直球・スライダーを評価。",
+          "source_url": "https://www.hb-nippon.com/articles/18340",
+          "published_at": "2026-10-15"
+        },
+        {
+          "team": "ソフトバンク",
+          "logo_asset": "backend/assets/images/team_h.png",
+          "status": "報道による指名予想",
+          "reason": "地元福岡の高校出身で、実戦力を持つ上位右腕候補。",
+          "source_url": "https://www.hb-nippon.com/articles/18322",
+          "published_at": "2026-10-14"
+        },
+        {
+          "team": "西武",
+          "logo_asset": "backend/assets/images/team_l.png",
+          "status": "YouTube・仮想ドラフト2巡目",
+          "publisher": "スポーツナビ 野球チャンネル（赤星憲広・西尾典文・いけだてつや・菊地高弘）",
+          "title": "赤星・西尾ドラフト対談2026 #3／仮想ドラフト1・2巡目一覧",
+          "reason": "番組の仮想ドラフトで西武の2巡目として選択。他球団の指名と指名順を踏まえたシミュレーションの結果で、球団自身の方針発表ではありません。",
+          "published_at": "2026-09-27",
+          "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=554s",
+          "verification_url": "https://dnomotoke.com/archives/20260928001000/",
+          "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
+          "checked_at": "2026-10-15"
+        },
+        {
+          "team": "ヤクルト",
+          "logo_asset": "backend/assets/images/team_s.png",
+          "video_id": "vw9cPB88QE4",
+          "title": "【ドラフト2026】ヤクルトスワローズの１〜５位指名を完全予想！戦力＆編成を徹底分析！１位は未来のエースか４番か!?SP【プロ野球】",
+          "publisher": "フェードロー野球ちゃんねる",
+          "view_count": 81969,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-10-03",
+          "source_url": "https://www.youtube.com/watch?v=vw9cPB88QE4&t=1130s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "ヤクルトの3位指名候補として表示。",
+          "status": "YouTube・指名予想"
+        }
+      ],
+      "attention_grade": "B",
+      "attention_reason": "西尾典文の1位候補12人で11番目。単独1位・外れ1位の候補として紹介されているためB。",
+      "attention_source": "https://www.youtube.com/watch?v=pdKOQOJZTFs&t=1440s",
+      "attention_as_of": "2026-10-15",
+      "attention_sources": [
+        {
+          "video_id": "pdKOQOJZTFs",
+          "title": "【ドラフト2026】最初の入札はこの4人！ 各球団の興味は？1位候補ランキング12人解説／西尾典文・若狭敬一の独自取材で”熱心な球団”まで公開！",
+          "publisher": "NextTV ネクストテレビ",
+          "view_count": 850854,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-09-11",
+          "source_url": "https://www.youtube.com/watch?v=pdKOQOJZTFs&t=1440s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "西尾典文の1位候補12人で11番目。単独1位・外れ1位の候補として紹介されているためB。",
+          "status": "注目度の参考評価"
+        }
+      ]
+    },
+    {
+      "category": "大学生",
+      "name": "木口永翔",
+      "team": "上武大",
+      "position": "投手",
+      "height": 185,
+      "weight": 91,
+      "hand": "右投右打",
+      "achievement": "筑陽学園高 → 上武大",
+      "features": "最速151km/h。複数の役割を担える投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
+        "https://sp.baseball.findfriends.jp/player/20040158/"
+      ],
+      "date_birth": "2004-04-21",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040158/",
+      "attention_grade": "E",
+      "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "大学生",
+      "name": "松平快聖",
+      "team": "神奈川大",
+      "position": "投手",
+      "height": 191,
+      "weight": 87,
+      "hand": "右投右打",
+      "achievement": "市原中央高 → 神奈川大",
+      "features": "最速138km/h。複数の役割を担える投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
+        "https://sp.baseball.findfriends.jp/player/20040149/"
+      ],
+      "date_birth": "2004-12-24",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040149/",
+      "attention_grade": "E",
+      "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "大学生",
+      "name": "前嶋藍",
+      "team": "亜大",
+      "position": "捕手",
+      "height": 175,
+      "weight": 84,
+      "hand": "右投右打",
+      "achievement": "横浜隼人高 → 亜大",
+      "features": "守備力が注目される捕手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
+        "https://sp.baseball.findfriends.jp/player/20040030/"
+      ],
+      "date_birth": "2004-11-20",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040030/",
+      "predictions": [
+        {
+          "team": "阪神",
+          "logo_asset": "backend/assets/images/team_t.png",
+          "status": "報道による指名予想",
+          "reason": "渡部の抽選を外した場合の即戦力捕手候補。",
+          "source_url": "https://www.hb-nippon.com/articles/18304",
+          "published_at": "2026-10-13"
+        },
+        {
+          "team": "楽天",
+          "logo_asset": "backend/assets/images/team_e.png",
+          "status": "報道による指名予想",
+          "reason": "渡部を獲得できない場合の上位捕手候補。",
+          "source_url": "https://www.hb-nippon.com/articles/18321",
+          "published_at": "2026-10-14"
+        },
+        {
+          "team": "広島",
+          "logo_asset": "backend/assets/images/team_c.png",
+          "status": "YouTube・仮想ドラフト2巡目",
+          "publisher": "スポーツナビ 野球チャンネル（赤星憲広・西尾典文・いけだてつや・菊地高弘）",
+          "title": "赤星・西尾ドラフト対談2026 #3／仮想ドラフト1・2巡目一覧",
+          "reason": "番組の仮想ドラフトで広島の2巡目として選択。他球団の指名と指名順を踏まえたシミュレーションの結果で、球団自身の方針発表ではありません。",
+          "published_at": "2026-09-27",
+          "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=212s",
+          "verification_url": "https://dnomotoke.com/archives/20260928001000/",
+          "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
+          "checked_at": "2026-10-15"
+        }
+      ],
+      "attention_grade": "B",
+      "attention_reason": "アプリ予想：渡部の抽選を外した場合の即戦力捕手候補。",
+      "attention_source": "https://www.hb-nippon.com/articles/18304",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "大学生",
+      "name": "福原聖矢",
+      "team": "明大",
+      "position": "捕手",
+      "height": 167,
+      "weight": 74,
+      "hand": "右投右打",
+      "achievement": "甲子園出場経験。東海大菅生高 → 明大",
+      "features": "ミート力が注目される打者。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
+        "https://sp.baseball.findfriends.jp/player/20040145/"
+      ],
+      "date_birth": "2004-07-30",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040145/",
+      "predictions": [
+        {
+          "team": "中日",
+          "logo_asset": "backend/assets/images/team_d.png",
+          "status": "報道による指名予想",
+          "reason": "捕手層を厚くする候補。守備と投手を支える姿勢を評価。",
+          "source_url": "https://www.hb-nippon.com/articles/18336",
+          "published_at": "2026-10-15"
+        }
+      ],
+      "attention_grade": "D",
+      "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "大学生",
+      "name": "西野啓也",
+      "team": "立命大",
+      "position": "捕手",
+      "height": 180,
+      "weight": 78,
+      "hand": "右投右打",
+      "achievement": "甲子園出場経験。高知高 → 立命大",
+      "features": "長打力が注目される捕手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
+        "https://sp.baseball.findfriends.jp/player/20040154/"
+      ],
+      "date_birth": "2004-07-15",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040154/",
+      "predictions": [
+        {
+          "team": "阪神",
+          "logo_asset": "backend/assets/images/team_t.png",
+          "status": "報道による指名予想",
+          "reason": "捕手の補強を優先する場合の上位候補。",
+          "source_url": "https://www.hb-nippon.com/articles/18304",
+          "published_at": "2026-10-13",
+          "additional_sources": [
+            {
+              "status": "YouTube・仮想ドラフト2巡目",
+              "publisher": "スポーツナビ 野球チャンネル（赤星憲広・西尾典文・いけだてつや・菊地高弘）",
+              "title": "赤星・西尾ドラフト対談2026 #3／仮想ドラフト1・2巡目一覧",
+              "reason": "番組の仮想ドラフトで阪神の2巡目として選択。他球団の指名と指名順を踏まえたシミュレーションの結果で、球団自身の方針発表ではありません。",
+              "published_at": "2026-09-27",
+              "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=744s",
+              "verification_url": "https://dnomotoke.com/archives/20260928001000/",
+              "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
+              "checked_at": "2026-10-15"
+            }
+          ]
+        },
+        {
+          "team": "楽天",
+          "logo_asset": "backend/assets/images/team_e.png",
+          "status": "報道による指名予想",
+          "reason": "渡部を獲得できない場合の上位捕手候補。",
+          "source_url": "https://www.hb-nippon.com/articles/18321",
+          "published_at": "2026-10-14"
+        }
+      ],
+      "attention_grade": "C",
+      "attention_reason": "スポーツナビの仮想ドラフトで2巡目に選択されたことを参考に更新。番組内の指名シミュレーションであり球団の公表ではありません。",
+      "attention_source": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=744s",
+      "attention_as_of": "2026-10-15",
+      "attention_sources": [
+        {
+          "video_id": "T4uNPuEJF7U",
+          "title": "【2026仮想ドラフト】注目の2巡目指名／赤星憲広「全部目の前で獲られる」ウェーバー順の妙／即戦力&将来性豊かな逸材がズラリ／番付で挙がらなかった甲子園優勝投手も【赤星・西尾ドラフト対談2026＃3】",
+          "publisher": "スポーツナビ 野球チャンネル",
+          "view_count": 646051,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-09-26",
+          "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=744s",
+          "evidence_scope": "動画説明欄と、公開記事に掲載された動画内の仮想指名一覧画像を照合。",
+          "reason": "スポーツナビの仮想ドラフトで2巡目に選択されたことを参考に更新。番組内の指名シミュレーションであり球団の公表ではありません。",
+          "status": "注目度の参考評価",
+          "verification_url": "https://dnomotoke.com/archives/20260928001000/"
+        }
+      ]
+    },
+    {
+      "category": "大学生",
+      "name": "岡田啓吾",
+      "team": "明大",
+      "position": "内野手",
+      "height": 176,
+      "weight": 79,
+      "hand": "右投左打",
+      "achievement": "甲子園出場経験。前橋育英高 → 明大",
+      "features": "走力が注目される選手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
+        "https://sp.baseball.findfriends.jp/player/20040148/"
+      ],
+      "date_birth": "2004-05-07",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040148/",
+      "predictions": [
+        {
+          "team": "阪神",
+          "logo_asset": "backend/assets/images/team_t.png",
+          "status": "報道による指名予想",
+          "reason": "内野の補強候補。現有戦力に少ない俊足を評価。",
+          "source_url": "https://www.hb-nippon.com/articles/18304",
+          "published_at": "2026-10-13"
+        },
+        {
+          "team": "巨人",
+          "logo_asset": "backend/assets/images/team_g.png",
+          "status": "YouTube・仮想ドラフト2巡目",
+          "publisher": "スポーツナビ 野球チャンネル（赤星憲広・西尾典文・いけだてつや・菊地高弘）",
+          "title": "赤星・西尾ドラフト対談2026 #3／仮想ドラフト1・2巡目一覧",
+          "reason": "番組の仮想ドラフトで巨人の2巡目として選択。他球団の指名と指名順を踏まえたシミュレーションの結果で、球団自身の方針発表ではありません。",
+          "published_at": "2026-09-27",
+          "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=614s",
+          "verification_url": "https://dnomotoke.com/archives/20260928001000/",
+          "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
+          "checked_at": "2026-10-15"
+        }
+      ],
+      "attention_grade": "C",
+      "attention_reason": "スポーツナビの仮想ドラフトで2巡目に選択されたことを参考に更新。番組内の指名シミュレーションであり球団の公表ではありません。",
+      "attention_source": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=614s",
+      "attention_as_of": "2026-10-15",
+      "attention_sources": [
+        {
+          "video_id": "T4uNPuEJF7U",
+          "title": "【2026仮想ドラフト】注目の2巡目指名／赤星憲広「全部目の前で獲られる」ウェーバー順の妙／即戦力&将来性豊かな逸材がズラリ／番付で挙がらなかった甲子園優勝投手も【赤星・西尾ドラフト対談2026＃3】",
+          "publisher": "スポーツナビ 野球チャンネル",
+          "view_count": 646051,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-09-26",
+          "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=614s",
+          "evidence_scope": "動画説明欄と、公開記事に掲載された動画内の仮想指名一覧画像を照合。",
+          "reason": "スポーツナビの仮想ドラフトで2巡目に選択されたことを参考に更新。番組内の指名シミュレーションであり球団の公表ではありません。",
+          "status": "注目度の参考評価",
+          "verification_url": "https://dnomotoke.com/archives/20260928001000/"
+        }
+      ]
+    },
+    {
+      "category": "大学生",
+      "name": "光弘帆高",
+      "team": "明大",
+      "position": "内野手",
+      "height": 178,
+      "weight": 84,
+      "hand": "右投左打",
+      "achievement": "履正社高 → 明大",
+      "features": "守備力が注目される内野手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
+        "https://sp.baseball.findfriends.jp/player/20040050/"
+      ],
+      "date_birth": "2004-04-23",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040050/",
+      "attention_grade": "D",
+      "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "大学生",
+      "name": "榊原七斗",
+      "team": "明大",
+      "position": "外野手",
+      "height": 173,
+      "weight": 79,
+      "hand": "左投左打",
+      "achievement": "報徳学園高 → 明大",
+      "features": "ミート力が注目される打者。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
+        "https://sp.baseball.findfriends.jp/player/20040135/"
+      ],
+      "date_birth": "2004-07-15",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040135/",
+      "predictions": [
+        {
+          "team": "中日",
+          "logo_asset": "backend/assets/images/team_d.png",
+          "status": "報道による指名予想",
+          "reason": "中堅守備の強化を目的とした1位単独指名案。",
+          "source_url": "https://www.hb-nippon.com/articles/18336",
+          "published_at": "2026-10-15",
+          "additional_sources": [
+            {
+              "status": "YouTube・仮想ドラフト2巡目",
+              "publisher": "スポーツナビ 野球チャンネル（赤星憲広・西尾典文・いけだてつや・菊地高弘）",
+              "title": "赤星・西尾ドラフト対談2026 #3／仮想ドラフト1・2巡目一覧",
+              "reason": "番組の仮想ドラフトで中日の2巡目として選択。他球団の指名と指名順を踏まえたシミュレーションの結果で、球団自身の方針発表ではありません。",
+              "published_at": "2026-09-27",
+              "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=121s",
+              "verification_url": "https://dnomotoke.com/archives/20260928001000/",
+              "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
+              "checked_at": "2026-10-15"
+            }
+          ]
+        },
+        {
+          "team": "巨人",
+          "logo_asset": "backend/assets/images/team_g.png",
+          "status": "YouTube連動記事・外れ1位候補",
+          "publisher": "AIデータ二刀流",
+          "title": "巨人ドラフト、野手1位で本当に正解？105人の編成×1203人のWARで徹底分析",
+          "reason": "センターの守備と走攻守の即戦力性を重視。上位の指名結果と残存選手に応じて変わる筆者独自の条件付き案です。",
+          "published_at": "2026年9月時点（公開日の詳細未確認）",
+          "source_url": "https://www.youtube.com/watch?v=oOYEfvW9xOk",
+          "verification_url": "https://www.ainitoryu.com/hanshin-keiba/2026-giants-draft-roster-war-analysis/",
+          "evidence_scope": "動画作者の同テーマ解説記事で指名案・理由を確認。",
+          "checked_at": "2026-10-15"
+        },
+        {
+          "team": "DeNA",
+          "logo_asset": "backend/assets/images/team_db.png",
+          "video_id": "aH64atzByoc",
+          "title": "【２０２６年外れ１２球団ドラフト１位予想】　ドラフト1ヶ月前の予想は？",
+          "publisher": "野球人",
+          "view_count": 77986,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-09-25",
+          "source_url": "https://www.youtube.com/watch?v=aH64atzByoc&t=180s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "初回入札を外した場合の外れ1位として選択。",
+          "status": "YouTube・外れ1位予想"
+        },
+        {
+          "team": "日本ハム",
+          "logo_asset": "backend/assets/images/team_f.png",
+          "video_id": "aH64atzByoc",
+          "title": "【２０２６年外れ１２球団ドラフト１位予想】　ドラフト1ヶ月前の予想は？",
+          "publisher": "野球人",
+          "view_count": 77986,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-09-25",
+          "source_url": "https://www.youtube.com/watch?v=aH64atzByoc&t=180s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "初回入札を外した場合の外れ1位として選択。",
+          "status": "YouTube・外れ1位予想"
+        }
+      ],
+      "attention_grade": "B",
+      "attention_reason": "アプリ予想：中堅守備の強化を目的とした1位単独指名案。",
+      "attention_source": "https://www.hb-nippon.com/articles/18336",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "大学生",
+      "name": "黒田義信",
+      "team": "東日本国際大",
+      "position": "外野手",
+      "height": 180,
+      "weight": 84,
+      "hand": "右投左打",
+      "achievement": "甲子園出場経験。九州国際大付高 → 東日本国際大",
+      "features": "走力が注目される選手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
+        "https://sp.baseball.findfriends.jp/player/20040075/"
+      ],
+      "date_birth": "2004-05-26",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040075/",
+      "predictions": [
+        {
+          "team": "阪神",
+          "logo_asset": "backend/assets/images/team_t.png",
+          "status": "報道による指名予想",
+          "reason": "次代の外野手候補として、選球眼と打撃を評価。",
+          "source_url": "https://www.hb-nippon.com/articles/18304",
+          "published_at": "2026-10-13"
+        },
+        {
+          "team": "日本ハム",
+          "logo_asset": "backend/assets/images/team_f.png",
+          "status": "YouTube・仮想ドラフト2巡目",
+          "publisher": "スポーツナビ 野球チャンネル（赤星憲広・西尾典文・いけだてつや・菊地高弘）",
+          "title": "赤星・西尾ドラフト対談2026 #3／仮想ドラフト1・2巡目一覧",
+          "reason": "番組の仮想ドラフトで日本ハムの2巡目として選択。他球団の指名と指名順を踏まえたシミュレーションの結果で、球団自身の方針発表ではありません。",
+          "published_at": "2026-09-27",
+          "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=422s",
+          "verification_url": "https://dnomotoke.com/archives/20260928001000/",
+          "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
+          "checked_at": "2026-10-15"
+        },
+        {
+          "team": "巨人",
+          "logo_asset": "backend/assets/images/team_g.png",
+          "status": "YouTube連動記事・3位候補",
+          "publisher": "AIデータ二刀流",
+          "title": "巨人ドラフト、野手1位で本当に正解？105人の編成×1203人のWARで徹底分析",
+          "reason": "走攻守のバランスを持つ外野手として比較。上位の指名結果と残存選手に応じて変わる筆者独自の条件付き案です。",
+          "published_at": "2026年9月時点（公開日の詳細未確認）",
+          "source_url": "https://www.youtube.com/watch?v=oOYEfvW9xOk",
+          "verification_url": "https://www.ainitoryu.com/hanshin-keiba/2026-giants-draft-roster-war-analysis/",
+          "evidence_scope": "動画作者の同テーマ解説記事で指名案・理由を確認。",
+          "checked_at": "2026-10-15"
+        }
+      ],
+      "attention_grade": "C",
+      "attention_reason": "スポーツナビの仮想ドラフトで2巡目に選択されたことを参考に更新。番組内の指名シミュレーションであり球団の公表ではありません。",
+      "attention_source": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=422s",
+      "attention_as_of": "2026-10-15",
+      "attention_sources": [
+        {
+          "video_id": "T4uNPuEJF7U",
+          "title": "【2026仮想ドラフト】注目の2巡目指名／赤星憲広「全部目の前で獲られる」ウェーバー順の妙／即戦力&将来性豊かな逸材がズラリ／番付で挙がらなかった甲子園優勝投手も【赤星・西尾ドラフト対談2026＃3】",
+          "publisher": "スポーツナビ 野球チャンネル",
+          "view_count": 646051,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-09-26",
+          "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=422s",
+          "evidence_scope": "動画説明欄と、公開記事に掲載された動画内の仮想指名一覧画像を照合。",
+          "reason": "スポーツナビの仮想ドラフトで2巡目に選択されたことを参考に更新。番組内の指名シミュレーションであり球団の公表ではありません。",
+          "status": "注目度の参考評価",
+          "verification_url": "https://dnomotoke.com/archives/20260928001000/"
+        }
+      ]
+    },
+    {
+      "category": "大学生",
+      "name": "佐藤悠太",
+      "team": "東北福祉大",
+      "position": "外野手",
+      "height": 180,
+      "weight": 83,
+      "hand": "右投右打",
+      "achievement": "報徳学園高 → 東北福祉大",
+      "features": "ミート力が注目される打者。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
+        "https://sp.baseball.findfriends.jp/player/20040147/"
+      ],
+      "date_birth": "2004-11-22",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040147/",
+      "attention_grade": "D",
+      "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
+      "attention_as_of": "2026-10-15",
+      "predictions": [
+        {
+          "team": "巨人",
+          "logo_asset": "backend/assets/images/team_g.png",
+          "status": "YouTube連動記事・3位候補",
+          "publisher": "AIデータ二刀流",
+          "title": "巨人ドラフト、野手1位で本当に正解？105人の編成×1203人のWARで徹底分析",
+          "reason": "右の長打力を持つ大学生野手として比較。上位の指名結果と残存選手に応じて変わる筆者独自の条件付き案です。",
+          "published_at": "2026年9月時点（公開日の詳細未確認）",
+          "source_url": "https://www.youtube.com/watch?v=oOYEfvW9xOk",
+          "verification_url": "https://www.ainitoryu.com/hanshin-keiba/2026-giants-draft-roster-war-analysis/",
+          "evidence_scope": "動画作者の同テーマ解説記事で指名案・理由を確認。",
+          "checked_at": "2026-10-15"
+        }
+      ]
+    },
+    {
+      "category": "大学生",
+      "name": "春山陽登",
+      "team": "大商大",
+      "position": "外野手",
+      "height": 177,
+      "weight": 85,
+      "hand": "右投右打",
+      "achievement": "甲子園出場経験。敦賀気比高 → 大商大",
+      "features": "長打力が注目される外野手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
+        "https://sp.baseball.findfriends.jp/player/20040146/"
+      ],
+      "date_birth": "2004-12-10",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040146/",
+      "attention_grade": "C",
+      "attention_reason": "スポーツナビの仮想ドラフトで2巡目に選択されたことを参考に更新。番組内の指名シミュレーションであり球団の公表ではありません。",
+      "attention_source": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=164s",
+      "attention_as_of": "2026-10-15",
+      "predictions": [
+        {
+          "team": "ロッテ",
+          "logo_asset": "backend/assets/images/team_m.png",
+          "status": "YouTube・仮想ドラフト2巡目",
+          "publisher": "スポーツナビ 野球チャンネル（赤星憲広・西尾典文・いけだてつや・菊地高弘）",
+          "title": "赤星・西尾ドラフト対談2026 #3／仮想ドラフト1・2巡目一覧",
+          "reason": "番組の仮想ドラフトでロッテの2巡目として選択。他球団の指名と指名順を踏まえたシミュレーションの結果で、球団自身の方針発表ではありません。",
+          "published_at": "2026-09-27",
+          "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=164s",
+          "verification_url": "https://dnomotoke.com/archives/20260928001000/",
+          "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
+          "checked_at": "2026-10-15"
+        },
+        {
+          "team": "巨人",
+          "logo_asset": "backend/assets/images/team_g.png",
+          "status": "YouTube連動記事・2位候補",
+          "publisher": "AIデータ二刀流",
+          "title": "巨人ドラフト、野手1位で本当に正解？105人の編成×1203人のWARで徹底分析",
+          "reason": "1位で中軸候補を確保できなかった場合の長距離打者候補。上位の指名結果と残存選手に応じて変わる筆者独自の条件付き案です。",
+          "published_at": "2026年9月時点（公開日の詳細未確認）",
+          "source_url": "https://www.youtube.com/watch?v=oOYEfvW9xOk",
+          "verification_url": "https://www.ainitoryu.com/hanshin-keiba/2026-giants-draft-roster-war-analysis/",
+          "evidence_scope": "動画作者の同テーマ解説記事で指名案・理由を確認。",
+          "checked_at": "2026-10-15"
+        }
+      ],
+      "attention_sources": [
+        {
+          "video_id": "T4uNPuEJF7U",
+          "title": "【2026仮想ドラフト】注目の2巡目指名／赤星憲広「全部目の前で獲られる」ウェーバー順の妙／即戦力&将来性豊かな逸材がズラリ／番付で挙がらなかった甲子園優勝投手も【赤星・西尾ドラフト対談2026＃3】",
+          "publisher": "スポーツナビ 野球チャンネル",
+          "view_count": 646051,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-09-26",
+          "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=164s",
+          "evidence_scope": "動画説明欄と、公開記事に掲載された動画内の仮想指名一覧画像を照合。",
+          "reason": "スポーツナビの仮想ドラフトで2巡目に選択されたことを参考に更新。番組内の指名シミュレーションであり球団の公表ではありません。",
+          "status": "注目度の参考評価",
+          "verification_url": "https://dnomotoke.com/archives/20260928001000/"
+        }
+      ]
+    },
+    {
+      "category": "大学生",
+      "name": "寺尾拳聖",
+      "team": "早大",
+      "position": "外野手",
+      "height": 178,
+      "weight": 85,
+      "hand": "右投右打",
+      "achievement": "甲子園出場経験。佐久長聖高 → 早大",
+      "features": "長打力が注目される外野手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
+        "https://sp.baseball.findfriends.jp/player/20040153/"
+      ],
+      "date_birth": "2004-04-23",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040153/",
+      "attention_grade": "E",
+      "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "社会人",
+      "name": "森煌誠",
+      "team": "NTT東日本",
+      "position": "投手",
+      "height": 183,
+      "weight": 90,
+      "hand": "右投右打",
+      "achievement": "2023年U-18W杯優勝メンバー。2025年日本選手権ベスト4。",
+      "features": "直球とフォークを組み合わせる右腕。",
+      "sources": [
+        "https://www.ntt-east.co.jp/symbol/baseball/contents/mori.html",
+        "https://www.sponichi.co.jp/baseball/news/2026/03/03/kiji/20260303s00001003009000c.html",
+        "https://baseball.omyutech.com/draftplayer.action?year=2026",
+        "https://sp.baseball.findfriends.jp/player/20050057/"
+      ],
+      "date_birth": "2005-10-01",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20050057/",
+      "attention_grade": "E",
+      "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "社会人",
+      "name": "印出太一",
+      "team": "三菱重工East",
+      "position": "捕手",
+      "height": 185,
+      "weight": 91,
+      "hand": "右投右打",
+      "achievement": "早稲田大学と大学日本代表で主将を経験。",
+      "features": "正捕手・主将の経験が豊富。投手を導くリーダーシップ。",
+      "sources": [
+        "https://sp.baseball.findfriends.jp/player/20020050/",
+        "https://www.mhi.com/jp/company/sports/baseball/east/member",
+        "https://baseball.omyutech.com/draftplayer.action?year=2026"
+      ],
+      "date_birth": "2002-05-15",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20020050/",
+      "attention_grade": "E",
+      "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "社会人",
+      "name": "沢山優介",
+      "team": "ヤマハ",
+      "position": "投手",
+      "height": 187,
+      "weight": 83,
+      "hand": "左投左打",
+      "achievement": "掛川西高 → ヤマハ",
+      "features": "最速151km/h。複数の役割を担える投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
+        "https://sp.baseball.findfriends.jp/player/20030071/"
+      ],
+      "date_birth": "2003-10-15",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20030071/",
+      "attention_grade": "C",
+      "attention_reason": "掲載の総合評価Aを基に、アプリ基準でCに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "社会人",
+      "name": "柿本晟弥",
+      "team": "パナソニック",
+      "position": "投手",
+      "height": 183,
+      "weight": 80,
+      "hand": "右投右打",
+      "achievement": "東洋大姫路高 → 東洋大 → パナソニック",
+      "features": "最速151km/h。リリーフ型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
+        "https://sp.baseball.findfriends.jp/player/20020249/"
+      ],
+      "date_birth": "2002-05-09",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20020249/",
+      "attention_grade": "B",
+      "attention_reason": "ロッテの外れ1位予想を確認し、ドラ1候補のBへ更新。",
+      "attention_source": "https://www.youtube.com/watch?v=aH64atzByoc&t=110s",
+      "attention_as_of": "2026-10-15",
+      "predictions": [
+        {
+          "team": "ロッテ",
+          "logo_asset": "backend/assets/images/team_m.png",
+          "video_id": "aH64atzByoc",
+          "title": "【２０２６年外れ１２球団ドラフト１位予想】　ドラフト1ヶ月前の予想は？",
+          "publisher": "野球人",
+          "view_count": 77986,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-09-25",
+          "source_url": "https://www.youtube.com/watch?v=aH64atzByoc&t=110s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "全球団が初回入札を外した想定でロッテの外れ1位に選択。",
+          "status": "YouTube・外れ1位予想"
+        }
+      ],
+      "attention_sources": [
+        {
+          "video_id": "aH64atzByoc",
+          "title": "【２０２６年外れ１２球団ドラフト１位予想】　ドラフト1ヶ月前の予想は？",
+          "publisher": "野球人",
+          "view_count": 77986,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-09-25",
+          "source_url": "https://www.youtube.com/watch?v=aH64atzByoc&t=110s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "ロッテの外れ1位予想を確認し、ドラ1候補のBへ更新。",
+          "status": "注目度の参考評価"
+        }
+      ]
+    },
+    {
+      "category": "社会人",
+      "name": "樋口新",
+      "team": "王子",
+      "position": "投手",
+      "height": 178,
+      "weight": 84,
+      "hand": "左投左打",
+      "achievement": "千葉経大付高 → 愛知工大 → 王子",
+      "features": "最速151km/h。先発型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
+        "https://sp.baseball.findfriends.jp/player/20020242/"
+      ],
+      "date_birth": "2002-06-28",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20020242/",
+      "attention_grade": "C",
+      "attention_reason": "西武の3位指名予想を確認し、上位指名の可能性があるCへ更新。",
+      "attention_source": "https://www.youtube.com/watch?v=nTWIjVSj6ZQ&t=1180s",
+      "attention_as_of": "2026-10-15",
+      "predictions": [
+        {
+          "team": "西武",
+          "logo_asset": "backend/assets/images/team_l.png",
+          "video_id": "nTWIjVSj6ZQ",
+          "title": "【ドラフト2026】西武ライオンズの１〜５位指名を完全予想！戦力＆編成を徹底分析！さあ来季こそパリーグ制覇だSP【プロ野球】",
+          "publisher": "フェードロー野球ちゃんねる",
+          "view_count": 102433,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-10-05",
+          "source_url": "https://www.youtube.com/watch?v=nTWIjVSj6ZQ&t=1180s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "西武の3位指名候補として表示。",
+          "status": "YouTube・指名予想"
+        }
+      ],
+      "attention_sources": [
+        {
+          "video_id": "nTWIjVSj6ZQ",
+          "title": "【ドラフト2026】西武ライオンズの１〜５位指名を完全予想！戦力＆編成を徹底分析！さあ来季こそパリーグ制覇だSP【プロ野球】",
+          "publisher": "フェードロー野球ちゃんねる",
+          "view_count": 102433,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-10-05",
+          "source_url": "https://www.youtube.com/watch?v=nTWIjVSj6ZQ&t=1180s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "西武の3位指名予想を確認し、上位指名の可能性があるCへ更新。",
+          "status": "注目度の参考評価"
+        }
+      ]
+    },
+    {
+      "category": "社会人",
+      "name": "真野凜風",
+      "team": "日本生命",
+      "position": "投手",
+      "height": 189,
+      "weight": 90,
+      "hand": "右投右打",
+      "achievement": "天理高 → 同大 → 日本生命",
+      "features": "最速152km/h。複数の役割を担える投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
+        "https://sp.baseball.findfriends.jp/player/20020142/"
+      ],
+      "date_birth": "2002-01-08",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20020142/",
+      "attention_grade": "E",
+      "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "社会人",
+      "name": "杉崎成",
+      "team": "JR東日本",
+      "position": "内野手",
+      "height": 176,
+      "weight": 82,
+      "hand": "右投右打",
+      "achievement": "東海大菅生高 → 明大 → JR東日本",
+      "features": "ミート力が注目される打者。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
+        "https://sp.baseball.findfriends.jp/player/20020239/"
+      ],
+      "date_birth": "2002-10-09",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20020239/",
+      "attention_grade": "E",
+      "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "社会人",
+      "name": "藤澤涼介",
+      "team": "東京ガス",
+      "position": "外野手",
+      "height": 187,
+      "weight": 90,
+      "hand": "右投右打",
+      "achievement": "佐野日大高 → 横浜国大 → 東京ガス",
+      "features": "走力が注目される選手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
+        "https://sp.baseball.findfriends.jp/player/20020174/"
+      ],
+      "date_birth": "2002-06-04",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20020174/",
+      "predictions": [
+        {
+          "team": "巨人",
+          "logo_asset": "backend/assets/images/team_g.png",
+          "status": "報道による指名予想",
+          "reason": "右の強打者が補強点に合い、即戦力野手を優先する場合の1位候補。",
+          "source_url": "https://www.hb-nippon.com/articles/18340",
+          "published_at": "2026-10-15",
+          "additional_sources": [
+            {
+              "status": "YouTube連動記事・外れ1位候補",
+              "publisher": "AIデータ二刀流",
+              "title": "巨人ドラフト、野手1位で本当に正解？105人の編成×1203人のWARで徹底分析",
+              "reason": "長打力を持つセンター候補として比較。上位の指名結果と残存選手に応じて変わる筆者独自の条件付き案です。",
+              "published_at": "2026年9月時点（公開日の詳細未確認）",
+              "source_url": "https://www.youtube.com/watch?v=oOYEfvW9xOk",
+              "verification_url": "https://www.ainitoryu.com/hanshin-keiba/2026-giants-draft-roster-war-analysis/",
+              "evidence_scope": "動画作者の同テーマ解説記事で指名案・理由を確認。",
+              "checked_at": "2026-10-15"
+            },
+            {
+              "video_id": "aH64atzByoc",
+              "title": "【２０２６年外れ１２球団ドラフト１位予想】　ドラフト1ヶ月前の予想は？",
+              "publisher": "野球人",
+              "view_count": 77986,
+              "checked_at": "2026-10-15",
+              "published_at": "2026-09-25",
+              "source_url": "https://www.youtube.com/watch?v=aH64atzByoc&t=990s",
+              "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+              "reason": "初回入札を外した場合、巨人の外れ1位に単独で選択。",
+              "status": "YouTube・外れ1位予想"
+            }
+          ]
+        },
+        {
+          "team": "ヤクルト",
+          "logo_asset": "backend/assets/images/team_s.png",
+          "status": "YouTube・仮想ドラフト1巡目",
+          "publisher": "スポーツナビ 野球チャンネル（赤星憲広・西尾典文・いけだてつや・菊地高弘）",
+          "title": "赤星・西尾ドラフト対談2026 #3／仮想ドラフト1・2巡目一覧",
+          "reason": "番組の仮想ドラフトでヤクルトの1巡目として選択。他球団の指名と指名順を踏まえたシミュレーションの結果で、球団自身の方針発表ではありません。",
+          "published_at": "2026-09-27",
+          "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U&t=777s",
+          "verification_url": "https://dnomotoke.com/archives/20260928001000/",
+          "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
+          "checked_at": "2026-10-15"
+        }
+      ],
+      "attention_grade": "B",
+      "attention_reason": "10月の動画でも1位指名候補の章で長打力を紹介。外れ1位予想・仮想2位の両方があるためBを維持。",
+      "attention_source": "https://www.youtube.com/watch?v=eNz_nWmHMXM&t=1460s",
+      "attention_as_of": "2026-10-15",
+      "attention_sources": [
+        {
+          "video_id": "pwIQABcN0K8",
+          "title": "【今年は豊作ジャンルは⁉】野球人が選ぶ２０２６年ドラフト１位指名選手予想１２人【４月末編】『ヤクルト』『阪神』『巨人』『DeNA』『広島』『中日』『オリ』『ＳＢ』『楽天』『西武』『日ハム』『ロッテ』",
+          "publisher": "野球人",
+          "view_count": 50961,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-04-28",
+          "source_url": "https://www.youtube.com/watch?v=pwIQABcN0K8&t=850s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "4月末の予想では外れ1位候補。時点の古い予想として、9〜10月の評価と併せてBの根拠に使用。",
+          "status": "注目度の参考評価"
+        },
+        {
+          "video_id": "UKNyDpZwqWc",
+          "title": "【2026ドラフト超目玉・織田翔希】高卒メジャーはあるのか？／投手は中学軟式の方が伸びる／仮想ドラフト「GMなら誰を1位指名？」／西尾典文の別班説【PIVOT BASEBALL】",
+          "publisher": "PIVOT 公式チャンネル",
+          "view_count": 320241,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-09-12",
+          "source_url": "https://www.youtube.com/watch?v=UKNyDpZwqWc&t=1310s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "PIVOTの仮想ドラフトでは2位の選択として紹介。1位予想もある一方、評価の幅を考慮してBを維持。",
+          "status": "注目度の参考評価"
+        },
+        {
+          "video_id": "eNz_nWmHMXM",
+          "title": "【注目株】2026年ドラフト候補を徹底チェック！競合必至の1位候補からサプライズ指名候補まで一挙紹介します",
+          "publisher": "熱闘ベースボールレコード",
+          "view_count": 120640,
+          "checked_at": "2026-10-15",
+          "published_at": "2026-10-08",
+          "source_url": "https://www.youtube.com/watch?v=eNz_nWmHMXM&t=1460s",
+          "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+          "reason": "10月の動画でも1位指名候補の章で長打力を紹介。外れ1位予想・仮想2位の両方があるためBを維持。",
+          "status": "注目度の参考評価"
+        }
+      ]
+    },
+    {
+      "category": "社会人",
+      "name": "柴崎聖人",
+      "team": "王子",
+      "position": "外野手",
+      "height": 173,
+      "weight": 83,
+      "hand": "右投左打",
+      "achievement": "岐阜第一高 → 大経大 → 王子",
+      "features": "ミート力が注目される打者。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
+        "https://sp.baseball.findfriends.jp/player/20020196/"
+      ],
+      "date_birth": "2002-04-04",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20020196/",
+      "predictions": [
+        {
+          "team": "阪神",
+          "logo_asset": "backend/assets/images/team_t.png",
+          "status": "報道による指名予想",
+          "reason": "外野手補強の候補。強肩と長打力を評価。",
+          "source_url": "https://www.hb-nippon.com/articles/18304",
+          "published_at": "2026-10-13"
+        },
+        {
+          "team": "巨人",
+          "logo_asset": "backend/assets/images/team_g.png",
+          "status": "YouTube連動記事・3位候補",
+          "publisher": "AIデータ二刀流",
+          "title": "巨人ドラフト、野手1位で本当に正解？105人の編成×1203人のWARで徹底分析",
+          "reason": "長打・走力・肩を持つ社会人外野手として比較。上位の指名結果と残存選手に応じて変わる筆者独自の条件付き案です。",
+          "published_at": "2026年9月時点（公開日の詳細未確認）",
+          "source_url": "https://www.youtube.com/watch?v=oOYEfvW9xOk",
+          "verification_url": "https://www.ainitoryu.com/hanshin-keiba/2026-giants-draft-roster-war-analysis/",
+          "evidence_scope": "動画作者の同テーマ解説記事で指名案・理由を確認。",
+          "checked_at": "2026-10-15"
+        }
+      ],
+      "attention_grade": "D",
+      "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "社会人",
+      "name": "飯山志夢",
+      "team": "ENEOS",
+      "position": "外野手",
+      "height": 178,
+      "weight": 82,
+      "hand": "右投左打",
+      "achievement": "中央学院高 → 立正大 → ENEOS",
+      "features": "走力が注目される選手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
+        "https://sp.baseball.findfriends.jp/player/20030126/"
+      ],
+      "date_birth": "2003-02-13",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20030126/",
+      "attention_grade": "E",
+      "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "社会人",
+      "name": "中津大和",
+      "team": "日本生命",
+      "position": "内野手",
+      "height": 178,
+      "weight": 80,
+      "hand": "右投左打",
+      "achievement": "小松大谷高 → 法大 → 日本生命",
+      "features": "走力が注目される選手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
+        "https://sp.baseball.findfriends.jp/player/20020195/"
+      ],
+      "date_birth": "2002-10-02",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20020195/",
+      "predictions": [
+        {
+          "team": "阪神",
+          "logo_asset": "backend/assets/images/team_t.png",
+          "status": "報道による指名予想",
+          "reason": "外野手の補強候補として走力と長打力に注目。",
+          "source_url": "https://www.hb-nippon.com/articles/18304",
+          "published_at": "2026-10-13"
+        }
+      ],
+      "attention_grade": "E",
+      "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "独立リーグ",
+      "name": "鎌田州真",
+      "team": "徳島インディゴソックス",
+      "position": "投手",
+      "height": 185,
+      "weight": 89,
+      "hand": "右投左打",
+      "achievement": "2026年30登板、6セーブ、防御率1.18。",
+      "features": "38回で42奪三振・8四球。救援での安定感。",
+      "sources": [
+        "https://indigo-socks.com/players/no18/",
+        "https://baseball.omyutech.com/draftplayer.action?year=2026",
+        "https://sp.baseball.findfriends.jp/player/20020250/"
+      ],
+      "date_birth": "2002-06-12",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20020250/",
+      "attention_grade": "D",
+      "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8729",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "独立リーグ",
+      "name": "池田凜",
+      "team": "徳島インディゴソックス",
+      "position": "内野手",
+      "height": 175,
+      "weight": 82,
+      "hand": "右投左打",
+      "achievement": "2026年70試合、打率.300、12本塁打、51打点。",
+      "features": "左打ちの内野手。打率と長打の両面で実績。",
+      "sources": [
+        "https://indigo-socks.com/players/no1/",
+        "https://baseball.omyutech.com/draftplayer.action?year=2026"
+      ],
+      "date_birth": "2003-03-09",
+      "birth_source_url": "https://indigo-socks.com/players/no1/",
+      "attention_grade": "E",
+      "attention_reason": "候補掲載と公開プロフィールを基にした暫定E。指名順位の評価資料は不足しています。",
+      "attention_source": "https://indigo-socks.com/players/no1/",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "独立リーグ",
+      "name": "三浦遼大",
+      "team": "茨城アストロプラネッツ",
+      "position": "投手",
+      "height": 175,
+      "weight": 82,
+      "hand": "右投左打",
+      "achievement": "青森山田高 → BCL/茨城",
+      "features": "最速154km/h。リリーフ型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8729",
+        "https://sp.baseball.findfriends.jp/player/20060059/"
+      ],
+      "date_birth": "2006-01-02",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20060059/",
+      "attention_grade": "D",
+      "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8729",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "独立リーグ",
+      "name": "窪田寛之",
+      "team": "愛媛マンダリンパイレーツ",
+      "position": "投手",
+      "height": 180,
+      "weight": 86,
+      "hand": "右投右打",
+      "achievement": "大分商高 → 聖カタリナ大 → 四国IL/愛媛",
+      "features": "最速152km/h。複数の役割を担える投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8729",
+        "https://sp.baseball.findfriends.jp/player/20010267/"
+      ],
+      "date_birth": "2001-09-29",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20010267/",
+      "attention_grade": "D",
+      "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8729",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "独立リーグ",
+      "name": "渡邉都斗",
+      "team": "高知ファイティングドッグス",
+      "position": "投手",
+      "height": 176,
+      "weight": 77,
+      "hand": "左投左打",
+      "achievement": "至学館高 → 中京大 → 四国IL/高知",
+      "features": "最速150km/h。複数の役割を担える投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8729",
+        "https://sp.baseball.findfriends.jp/player/20020251/"
+      ],
+      "date_birth": "2002-07-10",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20020251/",
+      "predictions": [
+        {
+          "team": "阪神",
+          "logo_asset": "backend/assets/images/team_t.png",
+          "status": "報道による指名予想",
+          "reason": "左投手補強に合う独立リーグの候補。速球とチェンジアップを評価。",
+          "source_url": "https://www.hb-nippon.com/articles/18304",
+          "published_at": "2026-10-13"
+        }
+      ],
+      "attention_grade": "D",
+      "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8729",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "独立リーグ",
+      "name": "金韓根",
+      "team": "茨城アストロプラネッツ",
+      "position": "投手",
+      "height": 178,
+      "weight": 83,
+      "hand": "左投左打",
+      "achievement": "東海大浦安高 → 東海大(中退) → BCL/茨城",
+      "features": "最速150km/h。先発型の投手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8729",
+        "https://sp.baseball.findfriends.jp/player/20040127/"
+      ],
+      "date_birth": "2004-04-07",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040127/",
+      "attention_grade": "E",
+      "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8729",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "独立リーグ",
+      "name": "遠藤桃次郎",
+      "team": "栃木ゴールデンブレーブス",
+      "position": "内野手",
+      "height": 170,
+      "weight": 67,
+      "hand": "右投左打",
+      "achievement": "盛岡大付高 → 白鴎大 → BCL/栃木",
+      "features": "走力が注目される選手。",
+      "sources": [
+        "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8729",
+        "https://sp.baseball.findfriends.jp/player/20020236/"
+      ],
+      "date_birth": "2002-09-21",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20020236/",
+      "attention_grade": "E",
+      "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
+      "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8729",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "独立リーグ",
+      "name": "高橋空大",
+      "team": "埼玉武蔵ヒートベアーズ",
+      "position": "内野手",
+      "height": 174,
+      "weight": 76,
+      "hand": "右投左打",
+      "achievement": "2026年のチーム主将。関東学園大学附属高校出身。",
+      "features": "球団プロフィールでミート力と好機での打撃をアピール。",
+      "sources": [
+        "https://musashibears.com/player/takahashi-kuta",
+        "https://musashibears.com/playgame/2026シーズン-キャプテン決定のお知らせ"
+      ],
+      "date_birth": "2005-07-23",
+      "birth_source_url": "https://musashibears.com/player/takahashi-kuta",
+      "attention_grade": "E",
+      "attention_reason": "候補掲載と公開プロフィールを基にした暫定E。指名順位の評価資料は不足しています。",
+      "attention_source": "https://musashibears.com/player/takahashi-kuta",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "独立リーグ",
+      "name": "坪井壮地",
+      "team": "埼玉武蔵ヒートベアーズ",
+      "position": "外野手",
+      "height": 180,
+      "weight": 90,
+      "hand": "右投右打",
+      "achievement": "2026年4月22日の西武3軍戦でサイクル安打を達成。",
+      "features": "社会人FedExを経て独立リーグへ。好機での打撃をアピール。",
+      "sources": [
+        "https://musashibears.com/player/tsuboi-sohji",
+        "https://bc-l.jp/news.php?keyno=1717",
+        "https://sp.baseball.findfriends.jp/player/20000294/"
+      ],
+      "date_birth": "2000-12-10",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20000294/",
+      "attention_grade": "E",
+      "attention_reason": "候補掲載と公開プロフィールを基にした暫定E。指名順位の評価資料は不足しています。",
+      "attention_source": "https://musashibears.com/player/tsuboi-sohji",
+      "attention_as_of": "2026-10-15"
+    },
+    {
+      "category": "独立リーグ",
+      "name": "大城龍馬",
+      "team": "埼玉武蔵ヒートベアーズ",
+      "position": "内野手",
+      "height": 172,
+      "weight": 82,
+      "hand": "右投右打",
+      "achievement": "日本大学第三高校 → 創価大学 → 埼玉武蔵ヒートベアーズ。",
+      "features": "球団プロフィールで広角への打撃を持ち味に挙げる。",
+      "sources": [
+        "https://musashibears.com/player/ohshiro-ryoma",
+        "https://baseball.omyutech.com/draftplayer.action?year=2026"
+      ],
+      "date_birth": "2002-05-11",
+      "birth_source_url": "https://musashibears.com/player/ohshiro-ryoma",
+      "attention_grade": "E",
+      "attention_reason": "候補掲載と公開プロフィールを基にした暫定E。指名順位の評価資料は不足しています。",
+      "attention_source": "https://musashibears.com/player/ohshiro-ryoma",
+      "attention_as_of": "2026-10-15"
+    }
+  ],
+  "reference_videos": [
+    {
+      "video_id": "pdKOQOJZTFs",
+      "title": "【ドラフト2026】最初の入札はこの4人！ 各球団の興味は？1位候補ランキング12人解説／西尾典文・若狭敬一の独自取材で”熱心な球団”まで公開！",
+      "publisher": "NextTV ネクストテレビ",
+      "view_count": 850854,
+      "checked_at": "2026-10-15",
+      "published_at": "2026-09-11",
+      "source_url": "https://www.youtube.com/watch?v=pdKOQOJZTFs",
+      "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+      "used_for": [
+        "西尾典文の1位候補12人で11番目。単独1位・外れ1位の候補として紹介されているためB。",
+        "西尾典文の1位候補12人に含まれ、単独1位・外れ1位の候補として紹介。Bを維持。",
+        "西尾典文のランキング3位、初回入札の有力候補。競合の可能性があるAを維持。"
+      ],
+      "used_for_count": 3
+    },
+    {
+      "video_id": "T4uNPuEJF7U",
+      "title": "【2026仮想ドラフト】注目の2巡目指名／赤星憲広「全部目の前で獲られる」ウェーバー順の妙／即戦力&将来性豊かな逸材がズラリ／番付で挙がらなかった甲子園優勝投手も【赤星・西尾ドラフト対談2026＃3】",
+      "publisher": "スポーツナビ 野球チャンネル",
+      "view_count": 646051,
+      "checked_at": "2026-10-15",
+      "published_at": "2026-09-26",
+      "source_url": "https://www.youtube.com/watch?v=T4uNPuEJF7U",
+      "evidence_scope": "動画説明欄の指名順・章立てと、公開記事に掲載された動画内の仮想指名一覧画像を照合。",
+      "used_for": [
+        "スポーツナビの仮想ドラフトで1巡目に選択されたことを参考に更新。番組内の指名シミュレーションであり球団の公表ではありません。",
+        "スポーツナビの仮想ドラフトで2巡目に選択されたことを参考に更新。番組内の指名シミュレーションであり球団の公表ではありません。"
+      ],
+      "used_for_count": 2,
+      "verification_url": "https://dnomotoke.com/archives/20260928001000/"
+    },
+    {
+      "video_id": "eNz_nWmHMXM",
+      "title": "【注目株】2026年ドラフト候補を徹底チェック！競合必至の1位候補からサプライズ指名候補まで一挙紹介します",
+      "publisher": "熱闘ベースボールレコード",
+      "view_count": 120640,
+      "checked_at": "2026-10-15",
+      "published_at": "2026-10-08",
+      "source_url": "https://www.youtube.com/watch?v=eNz_nWmHMXM",
+      "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+      "used_for": [
+        "10月の動画でも1位指名候補の章で長打力を紹介。外れ1位予想・仮想2位の両方があるためBを維持。"
+      ],
+      "used_for_count": 1
+    },
+    {
+      "video_id": "UKNyDpZwqWc",
+      "title": "【2026ドラフト超目玉・織田翔希】高卒メジャーはあるのか？／投手は中学軟式の方が伸びる／仮想ドラフト「GMなら誰を1位指名？」／西尾典文の別班説【PIVOT BASEBALL】",
+      "publisher": "PIVOT 公式チャンネル",
+      "view_count": 320241,
+      "checked_at": "2026-10-15",
+      "published_at": "2026-09-12",
+      "source_url": "https://www.youtube.com/watch?v=UKNyDpZwqWc",
+      "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+      "used_for": [
+        "PIVOTの仮想ドラフトでは2位の選択として紹介。1位予想もある一方、評価の幅を考慮してBを維持。"
+      ],
+      "used_for_count": 1
+    },
+    {
+      "video_id": "D6JEL8LqVR0",
+      "title": "【ドラフト2026】１位指名１２名を徹底予想！今年は大学生中心ドラフトか！？SP【夏の甲子園終了時点】",
+      "publisher": "フェードロー野球ちゃんねる",
+      "view_count": 140114,
+      "checked_at": "2026-10-15",
+      "published_at": "2026-08-29",
+      "source_url": "https://www.youtube.com/watch?v=D6JEL8LqVR0",
+      "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+      "used_for": [
+        "西尾典文の初回入札候補評価と、フェードローの夏時点の1位12人予想を参考にAを維持。",
+        "夏時点の1位12人予想に含まれる左腕。既存の競合可能性の評価Aを維持。"
+      ],
+      "used_for_count": 2
+    },
+    {
+      "video_id": "aH64atzByoc",
+      "title": "【２０２６年外れ１２球団ドラフト１位予想】　ドラフト1ヶ月前の予想は？",
+      "publisher": "野球人",
+      "view_count": 77986,
+      "checked_at": "2026-10-15",
+      "published_at": "2026-09-25",
+      "source_url": "https://www.youtube.com/watch?v=aH64atzByoc",
+      "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+      "used_for": [
+        "全球団が初回入札を外した仮定での外れ1位予想。前田に4球団が重なる予想で、初回入札の予想とは区別。",
+        "全球団が初回入札を外した想定でロッテの外れ1位に選択。",
+        "初回入札を外した場合の外れ1位として選択。",
+        "初回入札を外した場合、巨人の外れ1位に単独で選択。",
+        "外れ1位で4球団競合の予想があるためA。初回入札での競合確定を意味しません。",
+        "ロッテの外れ1位予想を確認し、ドラ1候補のBへ更新。"
+      ],
+      "used_for_count": 6
+    },
+    {
+      "video_id": "gwzV0aSSItI",
+      "title": "【ドラフト2026】１位入札を完全シミュレーション！競合はどのくらい発生しますのんSP【プロ野球】",
+      "publisher": "フェードロー野球ちゃんねる",
+      "view_count": 180255,
+      "checked_at": "2026-10-15",
+      "published_at": "2026-09-13",
+      "source_url": "https://www.youtube.com/watch?v=gwzV0aSSItI",
+      "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+      "used_for": [
+        "センターラインを担う即戦力野手を優先する見立てから、1位入札を予想。",
+        "捕手の将来の編成と青学担当スカウトの評価を踏まえた1位入札予想。"
+      ],
+      "used_for_count": 2
+    },
+    {
+      "video_id": "nTWIjVSj6ZQ",
+      "title": "【ドラフト2026】西武ライオンズの１〜５位指名を完全予想！戦力＆編成を徹底分析！さあ来季こそパリーグ制覇だSP【プロ野球】",
+      "publisher": "フェードロー野球ちゃんねる",
+      "view_count": 102433,
+      "checked_at": "2026-10-15",
+      "published_at": "2026-10-05",
+      "source_url": "https://www.youtube.com/watch?v=nTWIjVSj6ZQ",
+      "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+      "used_for": [
+        "西武の指名シミュレーションで1位に選択。二刀流候補として紹介。",
+        "西武の2位指名候補として表示。",
+        "西武の3位指名候補として表示。",
+        "西武の5位指名候補として表示。",
+        "西武の3位指名予想を確認し、上位指名の可能性があるCへ更新。"
+      ],
+      "used_for_count": 5
+    },
+    {
+      "video_id": "vw9cPB88QE4",
+      "title": "【ドラフト2026】ヤクルトスワローズの１〜５位指名を完全予想！戦力＆編成を徹底分析！１位は未来のエースか４番か!?SP【プロ野球】",
+      "publisher": "フェードロー野球ちゃんねる",
+      "view_count": 81969,
+      "checked_at": "2026-10-15",
+      "published_at": "2026-10-03",
+      "source_url": "https://www.youtube.com/watch?v=vw9cPB88QE4",
+      "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+      "used_for": [
+        "大学投手を補強した後の将来の中心打者候補として、二刀流の菰田を1位入札する予想。",
+        "初回入札を外した場合の1位候補として表示。",
+        "ヤクルトの2位指名候補として表示。",
+        "ヤクルトの3位指名候補として表示。",
+        "ヤクルトの外れ1位予想を確認し、ドラ1候補のBへ更新。"
+      ],
+      "used_for_count": 5
+    },
+    {
+      "video_id": "pwIQABcN0K8",
+      "title": "【今年は豊作ジャンルは⁉】野球人が選ぶ２０２６年ドラフト１位指名選手予想１２人【４月末編】『ヤクルト』『阪神』『巨人』『DeNA』『広島』『中日』『オリ』『ＳＢ』『楽天』『西武』『日ハム』『ロッテ』",
+      "publisher": "野球人",
+      "view_count": 50961,
+      "checked_at": "2026-10-15",
+      "published_at": "2026-04-28",
+      "source_url": "https://www.youtube.com/watch?v=pwIQABcN0K8",
+      "evidence_scope": "公開動画のプレビュー画像内の予想表・字幕を照合。音声全編の確認ではありません。",
+      "used_for": [
+        "4月末の予想では外れ1位候補。時点の古い予想として、9〜10月の評価と併せてBの根拠に使用。"
+      ],
+      "used_for_count": 1
+    }
+  ]
+}

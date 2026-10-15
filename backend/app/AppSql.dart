@@ -1586,6 +1586,7 @@ ORDER BY mt.id_league, tpt.int_rank
         COALESCE(BOOL_OR(m_player.flg_injury), FALSE) AS flg_injury,
         COALESCE(MAX(m_player.txt_injury), '') AS txt_injury,
         COALESCE(NULLIF(MAX(m_player.txt_position), ''), '') AS txt_position,
+        COALESCE((SELECT groups FROM t_player_season_usage u WHERE u.int_year = \$1 AND u.id_player = tsp.id_player), '[]'::jsonb) AS season_position_groups,
         tsp.id_league,
         tsp.cnt_play,
         m_stats.int_index,

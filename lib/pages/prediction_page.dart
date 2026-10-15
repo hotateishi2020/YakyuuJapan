@@ -1,3 +1,4 @@
+import '../tools/network_error.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
@@ -565,8 +566,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         ];
       });
       return null;
-    } catch (_) {
-      return 'グループ名を保存できませんでした';
+    } catch (e) {
+      return networkErrorMessage(e, fallback: 'グループ名を保存できませんでした');
     }
   }
 
@@ -621,8 +622,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
             : 'notice:期限とルールの変更案を保存しました。画面を開き直してください';
       }
       return reloaded ? null : '保存しました。画面を開き直してください';
-    } catch (_) {
-      return '予想設定を保存できませんでした';
+    } catch (e) {
+      return networkErrorMessage(e, fallback: '予想設定を保存できませんでした');
     }
   }
 
@@ -650,8 +651,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       await _fetchPredictGroups();
       await _fetchPredictInvites();
       return null;
-    } catch (_) {
-      return failure;
+    } catch (e) {
+      return networkErrorMessage(e, fallback: failure);
     }
   }
 
@@ -747,8 +748,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       await _fetchPredictGroups();
       final applied = decoded is Map && decoded['vote'] is Map && decoded['vote']['applied'] == true;
       return applied ? 'notice:applied' : 'notice:pending';
-    } catch (_) {
-      return '賛成を保存できませんでした';
+    } catch (e) {
+      return networkErrorMessage(e, fallback: '賛成を保存できませんでした');
     }
   }
 
@@ -804,11 +805,11 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         _predictGroupsLoading = false;
         _predictGroupsError = '予想グループを読み込めませんでした';
       });
-    } catch (_) {
+    } catch (e) {
       if (!mounted) return;
       setState(() {
         _predictGroupsLoading = false;
-        _predictGroupsError = '予想グループを読み込めませんでした';
+        _predictGroupsError = networkErrorMessage(e, fallback: '予想グループを読み込めませんでした');
       });
     }
   }
@@ -829,11 +830,11 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         _predictGroupsLoading = false;
         _predictGroupsError = '予想グループを読み込めませんでした';
       });
-    } catch (_) {
+    } catch (e) {
       if (!mounted) return;
       setState(() {
         _predictGroupsLoading = false;
-        _predictGroupsError = '予想グループを読み込めませんでした';
+        _predictGroupsError = networkErrorMessage(e, fallback: '予想グループを読み込めませんでした');
       });
     }
   }
@@ -1338,7 +1339,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     } catch (e, st) {
       unawaited(AuthSession.instance.reportTimeout(e, st));
       logger.e('part ${part.name} 通信/解析エラー: $e\n$st');
-      _maybeSetPartError(target, background, '通信エラー: $e');
+      _maybeSetPartError(target, background, networkErrorMessage(e, fallback: '通信エラー: $e'));
     }
   }
 

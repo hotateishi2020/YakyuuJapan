@@ -1,0 +1,1009 @@
+import 'package:flutter/material.dart';
+import '../logic/strength_usage.dart';
+import '../tools/json_utils.dart';
+import '../tools/color_parse.dart';
+
+String salaryAmount(int amount, String currency) {
+  if (currency == 'USD') {
+    final unit = amount > 100000000 ? 100000000 : 10000;
+    final tenths = amount ~/ (unit ~/ 10);
+    return '${tenths ~/ 10}.${tenths % 10}${unit == 100000000 ? '億' : '万'}ドル';
+  }
+  if (amount >= 100000000) {
+    final tenths = amount ~/ 10000000;
+    return '${tenths ~/ 10}.${tenths % 10}億円';
+  }
+  final oku = amount ~/ 100000000, remainder = amount % 100000000;
+  final man =
+      (remainder / 10000).toStringAsFixed(remainder % 10000 == 0 ? 0 : 1);
+  return '${oku > 0 ? '$oku億' : ''}${remainder > 0 || oku == 0 ? '$man万' : ''}円';
+}
+
+String contractSalaryLabel(Map<String, dynamic> salary) {
+  final currency = '${salary['currency'] ?? 'JPY'}';
+  final amount = usageInt(salary['amount']);
+  final label = salaryAmount(amount, currency);
+  if (currency != 'USD') return label;
+  final rate = double.tryParse('${salary['usd_jpy_rate']}');
+  return rate != null && rate.isFinite && rate > 0
+      ? '$label（約${salaryAmount((amount * rate).floor(), 'JPY')}）'
+      : '$label（円換算未確認）';
+}
+
+String contractExchangeTooltip(Map<String, dynamic> salary) {
+  if (salary['usd_jpy_rate'] == null) return contractSalaryLabel(salary);
+  return '${contractSalaryLabel(salary)}\n契約日：${salary['signed_date']}\n'
+      '換算レート：${salary['exchange_date']}・1ドル＝${salary['usd_jpy_rate']}円（ECB）';
+}
+
+/// Sum recorded annual salaries through the selected season, never contract totals.
+String careerSalaryLabel(List<Map<String, dynamic>> salaries, int year) {
+  final totals = <String, int>{};
+  for (final salary in salaries) {
+    final season = usageInt(salary['year']);
+    final amount = usageInt(salary['amount']);
+    if (season <= 0 || season > year || amount < 0) continue;
+    final currency = '${salary['currency'] ?? 'JPY'}';
+    totals[currency] = (totals[currency] ?? 0) + amount;
+  }
+  return totals.isEmpty
+      ? '未確認'
+      : totals.entries.map((e) => salaryAmount(e.value, e.key)).join('\n');
+}
+
+({int yen, int missing}) careerSalaryYen(
+    List<Map<String, dynamic>> salaries, int year) {
+  var yen = 0, missing = 0;
+  for (final salary in salaries) {
+    final season = usageInt(salary['year']);
+    if (season <= 0 || season > year || salary['amount'] == null) continue;
+    final amount = usageInt(salary['amount']);
+    if (amount < 0) continue;
+    final currency = '${salary['currency'] ?? 'JPY'}';
+    if (currency == 'JPY') {
+      yen += amount;
+    } else {
+      final rate = double.tryParse('${salary['usd_jpy_rate']}');
+      if (currency == 'USD' && rate != null && rate.isFinite && rate > 0) {
+        yen += (amount * rate).floor();
+      } else {
+        missing++;
+      }
+    }
+  }
+  return (yen: yen, missing: missing);
+}
+
+Color contractTeamColor(
+    Map<String, dynamic> period, List<Map<String, dynamic>> teams) {
+  final name = '${period['team'] ?? ''}'.trim();
+  if (name.isNotEmpty) {
+    for (final team in teams) {
+      if (['name_team', 'name_shortest', 'name_full', 'abbreviation']
+          .any((field) => '${team[field] ?? ''}'.trim() == name)) {
+        return parseColorNameOrNull('${team['color_back']}') ?? Colors.blueGrey;
+      }
+    }
+  }
+  return Colors.blueGrey;
+}
+
+/// Annual evidence fills gaps without inventing a multi-year contract term.
+List<Map<String, dynamic>> contractTimelineBands(
+    List<Map<String, dynamic>> periods, List<Map<String, dynamic>> salaries,
+    [List<Map<String, dynamic>> affiliations = const []]) {
+  final bands = periods
+      .where((p) =>
+          usageInt(p['start_year']) > 0 &&
+          usageInt(p['end_year']) >= usageInt(p['start_year']))
+      .map((p) => Map<String, dynamic>.from(p))
+      .toList();
+  final confirmed = List<Map<String, dynamic>>.from(bands);
+  final seen = <int>{};
+  for (final salary in [
+    ...salaries,
+    ...affiliations,
+    ...periods
+        .where((p) => usageInt(p['start_year']) > 0)
+        .map((p) => {'year': p['start_year'], 'team': p['team']}),
+  ]) {
+    final year = usageInt(salary['year']);
+    if (year <= 0 ||
+        !seen.add(year) ||
+        confirmed.any((p) =>
+            year >= usageInt(p['start_year']) &&
+            year <= usageInt(p['end_year']))) continue;
+    bands.add({
+      'start_year': year,
+      'end_year': year,
+      'team': salary['team'],
+      'annual_evidence': true,
+      'period': '$year年 所属履歴',
+      'detail': '${salary['detail'] ?? ''}\n${salary['source_url'] ?? ''}',
+    });
+  }
+  return bands;
+}
+
+/// A horizontal banknote stack. Every bar uses the same currency-specific scale.
+int salaryWrapAmount(String currency) =>
+    currency == 'USD' ? 20000000 : 500000000;
+int salaryBarRows(int amount, int limit) =>
+    amount <= 0 || limit <= 0 ? 1 : (amount + limit - 1) ~/ limit;
+
+String salaryBanknoteCurrency(Map<String, dynamic> salary) {
+  if (salary['currency'] == 'USD' || salary['code_org'] == 'mlb') return 'USD';
+  const mlbTeams = {
+    'オリオールズ',
+    'レッドソックス',
+    'ヤンキース',
+    'レイズ',
+    'ブルージェイズ',
+    'ホワイトソックス',
+    'ガーディアンズ',
+    'インディアンス',
+    'タイガース',
+    'ロイヤルズ',
+    'ツインズ',
+    'アストロズ',
+    'エンゼルス',
+    'アスレチックス',
+    'マリナーズ',
+    'レンジャーズ',
+    'ブレーブス',
+    'マーリンズ',
+    'メッツ',
+    'フィリーズ',
+    'ナショナルズ',
+    'エクスポズ',
+    'カブス',
+    'レッズ',
+    'ブルワーズ',
+    'パイレーツ',
+    'カージナルス',
+    'ダイヤモンドバックス',
+    'ロッキーズ',
+    'ドジャース',
+    'パドレス',
+    'ジャイアンツ',
+    'BAL',
+    'BOS',
+    'NYY',
+    'TB',
+    'TOR',
+    'CWS',
+    'CLE',
+    'DET',
+    'KC',
+    'MIN',
+    'HOU',
+    'LAA',
+    'ATH',
+    'OAK',
+    'SEA',
+    'TEX',
+    'ATL',
+    'MIA',
+    'NYM',
+    'PHI',
+    'WSH',
+    'CHC',
+    'CIN',
+    'MIL',
+    'PIT',
+    'STL',
+    'AZ',
+    'ARI',
+    'COL',
+    'LAD',
+    'SD',
+    'SF',
+  };
+  final teams = '${salary['team'] ?? ''}'.split(RegExp(r'\s*(?:→|/|、)\s*'));
+  return teams.isNotEmpty && teams.every((t) => mlbTeams.contains(t.trim()))
+      ? 'USD'
+      : '${salary['currency'] ?? 'JPY'}';
+}
+
+class SalaryMoneyBar extends StatelessWidget {
+  const SalaryMoneyBar(
+      {super.key,
+      required this.amount,
+      required this.maximum,
+      this.currency = 'JPY',
+      this.banknoteCurrency,
+      this.wrapAt});
+  final int amount;
+  final int maximum;
+  final int? wrapAt;
+  final String currency;
+  final String? banknoteCurrency;
+  @override
+  Widget build(BuildContext context) => Semantics(
+      label: '年俸 ${salaryAmount(amount, currency)}',
+      child: Tooltip(
+          message: salaryAmount(amount, currency),
+          child: LayoutBuilder(builder: (context, constraints) {
+            final limit = wrapAt ?? maximum;
+            final rows = wrapAt == null ? 1 : salaryBarRows(amount, limit);
+            return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: List.generate(rows, (index) {
+                  final remaining = amount - index * limit;
+                  final ratio =
+                      limit > 0 ? (remaining / limit).clamp(0.0, 1.0) : 0.0;
+                  return SizedBox(
+                      height: 32,
+                      child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: SizedBox(
+                              width: constraints.maxWidth * ratio,
+                              height: 28,
+                              child: CustomPaint(
+                                  painter: _MoneyBarPainter(
+                                      banknoteCurrency ?? currency)))));
+                }));
+          })));
+}
+
+class _MoneyBarPainter extends CustomPainter {
+  const _MoneyBarPainter(this.currency);
+  final String currency;
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.width <= 0 || size.height <= 0) return;
+    final usd = currency == 'USD';
+    final face = usd ? const Color(0xFFBDD0AE) : const Color(0xFFE5DCBC);
+    final edge = usd ? const Color(0xFF668460) : const Color(0xFF9C8D64);
+    final ink = usd ? const Color(0xFF315D3A) : const Color(0xFF675A3B);
+    canvas.save();
+    canvas.clipRect(Offset.zero & size);
+    // Identical bundles overlap in one direction, from left to right.
+    final count = ((size.width - 28) / 10).ceil().clamp(0, 1000) + 1;
+    final step = count > 1 ? (size.width - 28) / (count - 1) : 0.0;
+    if (size.width < 28) canvas.scale(size.width / 28, 1);
+    for (var i = 0; i < count; i++) {
+      final x = i * step;
+      final side = Path()
+        ..moveTo(x, 5)
+        ..lineTo(x + 24, 5)
+        ..lineTo(x + 28, 9)
+        ..lineTo(x + 28, 24)
+        ..lineTo(x + 4, 24)
+        ..lineTo(x, 20)
+        ..close();
+      canvas.drawPath(side, Paint()..color = edge);
+      for (var dy = 1.0; dy <= 3; dy++) {
+        canvas.drawLine(
+            Offset(x + 4, 20 + dy),
+            Offset(x + 27, 20 + dy),
+            Paint()
+              ..color = face
+              ..strokeWidth = .5);
+      }
+      final rect = Rect.fromLTWH(x, 4, 24, 16);
+      canvas.drawRect(rect, Paint()..color = face);
+      canvas.drawRect(
+          rect.deflate(1),
+          Paint()
+            ..color = ink
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = .6);
+      canvas.drawOval(Rect.fromLTWH(x + 13, 7, 7, 10), Paint()..color = edge);
+      canvas.drawRect(Rect.fromLTWH(x + 9, 4, 3, 16),
+          Paint()..color = const Color(0xFFF3F0DF));
+      final text = TextPainter(
+          text: TextSpan(
+              text: usd ? '\$' : '¥',
+              style: TextStyle(
+                  fontSize: 8, fontWeight: FontWeight.bold, color: ink)),
+          textDirection: TextDirection.ltr)
+        ..layout();
+      text.paint(canvas, Offset(x + 2, 7));
+      text.dispose();
+    }
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_MoneyBarPainter old) => old.currency != currency;
+}
+
+List<Map<String, dynamic>> teamSalaryTotals(
+    List<Map<String, dynamic>> teams, int year) {
+  final rows = <Map<String, dynamic>>[];
+  for (final team in teams) {
+    final totals = <String, int>{};
+    final seen = <String>{};
+    var count = 0;
+    for (final player in listMapFromJson(team['contracts'])) {
+      final key = usagePlayerKey(player);
+      if (!seen.add(key)) continue;
+      final salary = listMapFromJson(player['salary_history'])
+          .where((s) => usageInt(s['year']) == year && s['amount'] != null)
+          .firstOrNull;
+      if (salary == null || usageInt(salary['amount']) < 0) continue;
+      final currency = '${salary['currency'] ?? 'JPY'}';
+      totals[currency] = (totals[currency] ?? 0) + usageInt(salary['amount']);
+      count++;
+    }
+    rows.add({'team': team, 'totals': totals, 'count': count});
+  }
+  return rows;
+}
+
+class VerticalSalaryMoneyBar extends StatelessWidget {
+  const VerticalSalaryMoneyBar(
+      {super.key,
+      required this.amount,
+      required this.maximum,
+      required this.currency});
+  final int amount;
+  final int maximum;
+  final String currency;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        label: '総年俸 ${salaryAmount(amount, currency)}',
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: FractionallySizedBox(
+            heightFactor: maximum > 0 ? (amount / maximum).clamp(0.0, 1.0) : 0,
+            child: SizedBox(
+                width: 56,
+                child: CustomPaint(painter: _VerticalMoneyPainter(currency))),
+          ),
+        ),
+      );
+}
+
+class _VerticalMoneyPainter extends CustomPainter {
+  const _VerticalMoneyPainter(this.currency);
+  final String currency;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.width <= 0 || size.height <= 0) return;
+    canvas.save();
+    canvas.clipRect(Offset.zero & size);
+    // Keep each banknote horizontal and stack identical bundles upward.
+    final height = size.height < 24 ? 24.0 : size.height;
+    if (size.height < 24) canvas.scale(1, size.height / 24);
+    final count = ((height - 24) / 5).ceil() + 1;
+    final step = count > 1 ? (height - 24) / (count - 1) : 0.0;
+    for (var i = 0; i < count; i++) {
+      canvas.save();
+      canvas.translate(0, height - 24 - i * step - 4);
+      canvas.scale(size.width / 28, 1);
+      _MoneyBarPainter(currency).paint(canvas, const Size(28, 28));
+      canvas.restore();
+    }
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_VerticalMoneyPainter old) => old.currency != currency;
+}
+
+class TeamSalaryChart extends StatelessWidget {
+  const TeamSalaryChart({super.key, required this.teams, required this.year});
+  final List<Map<String, dynamic>> teams;
+  final int year;
+
+  @override
+  Widget build(BuildContext context) {
+    final rows = teamSalaryTotals(teams, year);
+    final maxima = <String, int>{};
+    for (final row in rows) {
+      for (final entry in (row['totals'] as Map<String, int>).entries) {
+        if (entry.value > (maxima[entry.key] ?? 0))
+          maxima[entry.key] = entry.value;
+      }
+    }
+    final isMlb = teams.isNotEmpty &&
+        teams.every((t) => [3, 4].contains(usageInt(t['id_league'])));
+    Widget graphRow(List<Map<String, dynamic>> group) => SizedBox(
+        height: 128,
+        child: LayoutBuilder(builder: (context, constraints) {
+          final width =
+              (constraints.maxWidth / (group.isEmpty ? 1 : group.length))
+                  .clamp(94.0, 180.0);
+          return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                for (final row in group)
+                  SizedBox(
+                      width: width,
+                      child: Tooltip(
+                          message:
+                              '${row['team']['name_team']}：${row['count']}人分。未取得の年俸は含みません。',
+                          child: Column(children: [
+                            for (final entry
+                                in (row['totals'] as Map<String, int>).entries)
+                              Expanded(
+                                  child: Column(children: [
+                                Text(salaryAmount(entry.value, entry.key),
+                                    maxLines: 1,
+                                    style: const TextStyle(fontSize: 11)),
+                                const SizedBox(height: 6),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8),
+                                    child: VerticalSalaryMoneyBar(
+                                        key: ValueKey(
+                                            'team-salary-bar-${row['team']['id_team']}-${entry.key}'),
+                                        amount: entry.value,
+                                        maximum: maxima[entry.key] ?? 0,
+                                        currency: entry.key),
+                                  ),
+                                ),
+                              ])),
+                            if ((row['totals'] as Map).isEmpty)
+                              const Expanded(
+                                  child: Center(
+                                      child: Text('未確認',
+                                          style: TextStyle(fontSize: 11)))),
+                            Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 4),
+                                child: Text('${row['team']['name_team']}',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(fontSize: 11))),
+                          ]))),
+              ]));
+        }));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text('$year年度 球団別総年俸（取得済み・推定額を含む）',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                    fontSize: 12, fontWeight: FontWeight.bold))),
+        if (isMlb)
+          for (final league in [3, 4]) ...[
+            Padding(
+                padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+                child: Text(league == 3 ? 'ア・リーグ' : 'ナ・リーグ',
+                    style: const TextStyle(
+                        fontSize: 12, fontWeight: FontWeight.bold))),
+            graphRow(rows
+                .where((row) => usageInt(row['team']['id_league']) == league)
+                .toList()),
+          ]
+        else
+          graphRow(rows),
+      ],
+    );
+  }
+}
+
+class StrengthContracts extends StatefulWidget {
+  const StrengthContracts(
+      {super.key,
+      required this.team,
+      required this.year,
+      this.comparisonTeams,
+      this.colorTeams});
+  final Map<String, dynamic> team;
+  final int year;
+  final List<Map<String, dynamic>>? comparisonTeams;
+  final List<Map<String, dynamic>>? colorTeams;
+  static const yearWidth = 160.0;
+  @override
+  State<StrengthContracts> createState() => _StrengthContractsState();
+}
+
+class _StrengthContractsState extends State<StrengthContracts> {
+  final _horizontal = ScrollController(keepScrollOffset: false);
+  String? _focusedDataset;
+  bool _sortByCareer = false;
+  static const yearWidth = StrengthContracts.yearWidth;
+  @override
+  void dispose() {
+    _horizontal.dispose();
+    super.dispose();
+  }
+
+  Widget _pinnedName(Widget child) => AnimatedBuilder(
+        animation: _horizontal,
+        child: ColoredBox(
+            color: Theme.of(context).scaffoldBackgroundColor, child: child),
+        builder: (context, child) => Transform.translate(
+            offset: Offset(_horizontal.hasClients ? _horizontal.offset : 0, 0),
+            child: child),
+      );
+
+  void _focusYear(String dataset, int first) {
+    if (_focusedDataset == dataset) return;
+    _focusedDataset = dataset;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _focusedDataset != dataset || !_horizontal.hasClients)
+        return;
+      _horizontal.jumpTo(((widget.year - first) * yearWidth)
+          .clamp(0.0, _horizontal.position.maxScrollExtent));
+    });
+  }
+
+  double _textHeight(
+      BuildContext context, String text, TextStyle style, double width) {
+    final painter = TextPainter(
+      text: TextSpan(
+          text: text, style: DefaultTextStyle.of(context).style.merge(style)),
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+    )..layout(maxWidth: width);
+    final height = painter.height;
+    painter.dispose();
+    return height;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final year = widget.year;
+    final teams = widget.comparisonTeams ?? [widget.team];
+    final colorTeams = widget.colorTeams ?? teams;
+    final entries = <Map<String, dynamic>>[];
+    final years = <int>[year];
+    for (final t in teams) {
+      final records = listMapFromJson(t['contracts']);
+      final roster = listMapFromJson(t['roster']);
+      for (final player in [
+        ...roster,
+        ...records.where(
+            (p) => !roster.any((r) => usagePlayerKey(r) == usagePlayerKey(p)))
+      ]) {
+        final record = records
+            .where((p) => usagePlayerKey(p) == usagePlayerKey(player))
+            .firstOrNull;
+        final salaries = listMapFromJson(record?['salary_history']);
+        final periods = listMapFromJson(record?['periods']);
+        final affiliations = [
+          ...listMapFromJson(record?['affiliation_history']),
+          if (roster.any((p) => usagePlayerKey(p) == usagePlayerKey(player)))
+            {'year': year, 'team': t['name_team']},
+        ];
+        for (final affiliation in affiliations) {
+          if (usageInt(affiliation['year']) > 0)
+            years.add(usageInt(affiliation['year']));
+        }
+        for (final salary in salaries) {
+          if (usageInt(salary['year']) > 0) years.add(usageInt(salary['year']));
+        }
+        for (final period in periods) {
+          for (final field in ['start_year', 'end_year']) {
+            if (usageInt(period[field]) > 0) years.add(usageInt(period[field]));
+          }
+        }
+        entries.add({
+          'order': entries.length,
+          'career_salary': salaries
+              .where((s) =>
+                  usageInt(s['year']) > 0 &&
+                  usageInt(s['year']) <= year &&
+                  s['amount'] != null)
+              .fold<int?>(null, (sum, s) => (sum ?? 0) + usageInt(s['amount'])),
+          'current_salary': salaries
+              .where((salary) => usageInt(salary['year']) == year)
+              .firstOrNull?['amount'],
+          'player': player,
+          'team': t,
+          'salaries': salaries,
+          'affiliations': affiliations,
+          'periods': periods,
+          'source': record?['source_url']
+        });
+      }
+    }
+    entries.sort((a, b) {
+      final field = _sortByCareer ? 'career_salary' : 'current_salary';
+      final left = a[field] == null ? -1 : usageInt(a[field]);
+      final right = b[field] == null ? -1 : usageInt(b[field]);
+      final salaryOrder = right.compareTo(left);
+      return salaryOrder != 0
+          ? salaryOrder
+          : usageInt(a['order']).compareTo(usageInt(b['order']));
+    });
+    years.sort();
+    final first = years.first, last = years.last;
+    final chartWidth = (last - first + 1) * yearWidth;
+    _focusYear('$year/$first/$last/${teams.map((t) => t['id_team']).join('-')}',
+        first);
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Wrap(spacing: 8, children: [
+          ChoiceChip(
+              label: const Text('今年度年俸順'),
+              selected: !_sortByCareer,
+              onSelected: (_) => setState(() => _sortByCareer = false)),
+          ChoiceChip(
+              label: const Text('生涯年俸順'),
+              selected: _sortByCareer,
+              onSelected: (_) => setState(() => _sortByCareer = true)),
+        ]),
+      ),
+      Expanded(
+          child: NestedScrollView(
+              key: const ValueKey('contract-vertical-scroll'),
+              headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                    if (widget.comparisonTeams != null)
+                      SliverToBoxAdapter(
+                          child: TeamSalaryChart(teams: teams, year: year)),
+                  ],
+              body: SingleChildScrollView(
+                  key: const ValueKey('contract-horizontal-scroll'),
+                  controller: _horizontal,
+                  scrollDirection: Axis.horizontal,
+                  child: SizedBox(
+                      width: 160 + chartWidth + 180,
+                      child: Column(children: [
+                        SizedBox(
+                            height: 32,
+                            child: Stack(children: [
+                              Row(children: [
+                                const SizedBox(width: 340),
+                                for (var y = first; y <= last; y++)
+                                  Container(
+                                      key: ValueKey('contract-year-$y'),
+                                      width: yearWidth,
+                                      height: 32,
+                                      alignment: Alignment.center,
+                                      color: y == year
+                                          ? Colors.amber.shade300
+                                          : Colors.grey.shade200,
+                                      child: Text('$y年')),
+                              ]),
+                              Positioned(
+                                  left: 160,
+                                  top: 0,
+                                  bottom: 0,
+                                  width: 180,
+                                  child: _pinnedName(Container(
+                                      color: Colors.grey.shade200,
+                                      alignment: Alignment.center,
+                                      child: const Text('生涯年俸')))),
+                              Positioned(
+                                  left: 0,
+                                  top: 0,
+                                  bottom: 0,
+                                  width: 160,
+                                  child: _pinnedName(
+                                      const Center(child: Text('球団・選手')))),
+                            ])),
+                        Expanded(
+                            child: ListView.builder(
+                                primary: true,
+                                key: ValueKey(
+                                    'contract-rows-${teams.map((t) => t['id_team']).join('-')}'),
+                                itemCount: entries.length,
+                                itemBuilder: (context, index) {
+                                  final e = entries[index];
+                                  final periods = listMapFromJson(e['periods']);
+                                  final salaries =
+                                      listMapFromJson(e['salaries']);
+                                  final career =
+                                      careerSalaryYen(salaries, year);
+                                  final isMlb = e['team']['org'] == 'mlb' ||
+                                      [3, 4].contains(
+                                          usageInt(e['team']['id_league']));
+                                  final careerCurrency = isMlb ? 'USD' : 'JPY';
+                                  final careerAmount = isMlb
+                                      ? salaries
+                                          .where((s) =>
+                                              usageInt(s['year']) > 0 &&
+                                              usageInt(s['year']) <= year &&
+                                              s['currency'] == 'USD')
+                                          .fold<int>(
+                                              0,
+                                              (sum, s) =>
+                                                  sum + usageInt(s['amount']))
+                                      : career.yen;
+                                  final careerWrap =
+                                      isMlb ? 20000000 : 2000000000;
+                                  final hasForeign = salaries.any((s) =>
+                                      usageInt(s['year']) > 0 &&
+                                      usageInt(s['year']) <= year &&
+                                      (s['currency'] ?? 'JPY') != 'JPY');
+                                  final careerLabel = careerSalaryLabel(
+                                          salaries, year) +
+                                      (hasForeign
+                                          ? '\n${career.missing > 0 ? '円換算確認分' : '円換算'}：${salaryAmount(career.yen, 'JPY')}'
+                                          : '');
+                                  final careerHeight = 16 +
+                                      _textHeight(
+                                          context,
+                                          careerLabel,
+                                          const TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold),
+                                          164) +
+                                      (careerAmount > 0
+                                          ? salaryBarRows(
+                                                  careerAmount, careerWrap) *
+                                              32.0
+                                          : 0) +
+                                      (career.missing > 0
+                                          ? _textHeight(
+                                              context,
+                                              '未換算：${career.missing}年分',
+                                              const TextStyle(fontSize: 10),
+                                              164)
+                                          : 0);
+                                  final bands = contractTimelineBands(
+                                      periods,
+                                      salaries,
+                                      listMapFromJson(e['affiliations']));
+                                  final lineHeight = _textHeight(
+                                      context,
+                                      '年俸',
+                                      const TextStyle(fontSize: 11),
+                                      yearWidth - 8);
+                                  final periodHeight = (lineHeight + 4)
+                                      .clamp(22.0, double.infinity);
+                                  final topHeight = 4.0 +
+                                      (bands.isEmpty ? 0 : periodHeight + 2);
+                                  final moneyHeight = salaries
+                                          .any((s) => usageInt(s['year']) > 0)
+                                      ? salaries
+                                                  .map((s) => salaryBarRows(
+                                                      usageInt(s['amount']),
+                                                      salaryWrapAmount(
+                                                          '${s['currency'] ?? 'JPY'}')))
+                                                  .fold<int>(1,
+                                                      (a, b) => a > b ? a : b) *
+                                              32.0 +
+                                          lineHeight +
+                                          2
+                                      : 0.0;
+                                  final nameHeight = _textHeight(
+                                          context,
+                                          '${e['team']['name_team']}',
+                                          const TextStyle(fontSize: 11),
+                                          144) +
+                                      _textHeight(
+                                          context,
+                                          '${e['player']['name']}',
+                                          const TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                          144) +
+                                      8;
+                                  final rowHeight =
+                                      (topHeight + moneyHeight + 4)
+                                              .clamp(
+                                                  nameHeight > careerHeight
+                                                      ? nameHeight
+                                                      : careerHeight,
+                                                  double.infinity)
+                                              .ceilToDouble() +
+                                          1; // Bottom border.
+                                  return Container(
+                                      key: ValueKey(
+                                          'contract-player-${e['team']['id_team']}-${usagePlayerKey(e['player'])}'),
+                                      height: rowHeight,
+                                      decoration: BoxDecoration(
+                                          border: Border(
+                                              bottom: BorderSide(
+                                                  color:
+                                                      Colors.grey.shade400))),
+                                      child: Stack(children: [
+                                        Positioned(
+                                            left: 340,
+                                            top: 0,
+                                            bottom: 0,
+                                            child: SizedBox(
+                                                width: chartWidth,
+                                                child: Stack(children: [
+                                                  for (var y = first;
+                                                      y <= last;
+                                                      y++)
+                                                    Positioned(
+                                                        left: (y - first) *
+                                                            yearWidth,
+                                                        top: 0,
+                                                        bottom: 0,
+                                                        child: Container(
+                                                            width: yearWidth,
+                                                            decoration: BoxDecoration(
+                                                                color: y == year
+                                                                    ? Colors
+                                                                        .amber
+                                                                        .withValues(
+                                                                            alpha:
+                                                                                .18)
+                                                                    : null,
+                                                                border: Border(
+                                                                    left: BorderSide(
+                                                                        color: Colors
+                                                                            .grey
+                                                                            .shade300))))),
+                                                  for (var i = 0; i < bands.length; i++)
+                                                    Positioned(
+                                                        left: (usageInt(bands[i]['start_year']) - first) *
+                                                                yearWidth +
+                                                            2,
+                                                        top: 4,
+                                                        width: (usageInt(bands[i]['end_year']) - usageInt(bands[i]['start_year']) + 1) *
+                                                                yearWidth -
+                                                            4,
+                                                        height: periodHeight,
+                                                        child: Tooltip(
+                                                            message:
+                                                                '${bands[i]['period'] ?? ''} ${bands[i]['detail'] ?? ''}\n${bands[i]['source_url'] ?? ''}',
+                                                            child: Container(
+                                                                alignment: Alignment
+                                                                    .centerLeft,
+                                                                padding: const EdgeInsets.symmetric(
+                                                                    horizontal:
+                                                                        6),
+                                                                decoration: BoxDecoration(
+                                                                    color: contractTeamColor(bands[i], colorTeams),
+                                                                    borderRadius: BorderRadius.circular(4)),
+                                                                child: Text(bands[i]['start_year'] == bands[i]['end_year'] ? '${bands[i]['start_year']} ${bands[i]['team'] ?? ''}' : '${bands[i]['start_year']}–${bands[i]['end_year']} ${bands[i]['team'] ?? ''}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: contractTeamColor(bands[i], colorTeams).computeLuminance() > .179 ? Colors.black : Colors.white))))),
+                                                  for (final salary in salaries)
+                                                    if (usageInt(
+                                                            salary['year']) >
+                                                        0)
+                                                      Positioned(
+                                                          left: (usageInt(salary[
+                                                                          'year']) -
+                                                                      first) *
+                                                                  yearWidth +
+                                                              4,
+                                                          top: topHeight,
+                                                          width: yearWidth - 8,
+                                                          child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Tooltip(
+                                                                  message:
+                                                                      contractExchangeTooltip(
+                                                                          salary),
+                                                                  child:
+                                                                      SizedBox(
+                                                                    height:
+                                                                        lineHeight +
+                                                                            2,
+                                                                    child:
+                                                                        FittedBox(
+                                                                      fit: BoxFit
+                                                                          .scaleDown,
+                                                                      alignment:
+                                                                          Alignment
+                                                                              .centerLeft,
+                                                                      child: Text(
+                                                                          contractSalaryLabel(
+                                                                              salary),
+                                                                          style:
+                                                                              const TextStyle(fontSize: 11)),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                SalaryMoneyBar(
+                                                                    banknoteCurrency:
+                                                                        salaryBanknoteCurrency(
+                                                                            salary),
+                                                                    amount: usageInt(
+                                                                        salary[
+                                                                            'amount']),
+                                                                    maximum:
+                                                                        salaryWrapAmount(
+                                                                            '${salary['currency'] ?? 'JPY'}'),
+                                                                    wrapAt: salaryWrapAmount(
+                                                                        '${salary['currency'] ?? 'JPY'}'),
+                                                                    currency:
+                                                                        '${salary['currency'] ?? 'JPY'}'),
+                                                              ])),
+                                                ]))),
+                                        Positioned(
+                                          left: 160,
+                                          top: 0,
+                                          bottom: 0,
+                                          width: 180,
+                                          child: _pinnedName(Container(
+                                            key: ValueKey(
+                                                'career-salary-${e['team']['id_team']}-${usagePlayerKey(e['player'])}'),
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                                color: Color.lerp(
+                                                    contractTeamColor({
+                                                      'team': e['team']
+                                                          ['name_team']
+                                                    }, colorTeams),
+                                                    Colors.white,
+                                                    .85),
+                                                border: Border(
+                                                    left: BorderSide(
+                                                        color: Colors
+                                                            .grey.shade300))),
+                                            child: Tooltip(
+                                              message:
+                                                  '$year年度までの取得済み年俸の合計。札束は${isMlb ? 'ドル建ての年俸を2000万ドル' : '円換算できた年俸を20億円'}ごとに折り返します。',
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(careerLabel,
+                                                      style: const TextStyle(
+                                                          fontSize: 11,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                  if (careerAmount > 0)
+                                                    SalaryMoneyBar(
+                                                        key: ValueKey(
+                                                            'career-money-${e['team']['id_team']}-${usagePlayerKey(e['player'])}'),
+                                                        amount: careerAmount,
+                                                        currency:
+                                                            careerCurrency,
+                                                        maximum: careerWrap,
+                                                        wrapAt: careerWrap),
+                                                  if (career.missing > 0)
+                                                    Text(
+                                                        '未換算：${career.missing}年分',
+                                                        style: const TextStyle(
+                                                            fontSize: 10)),
+                                                ],
+                                              ),
+                                            ),
+                                          )),
+                                        ),
+                                        Positioned(
+                                          left: 0,
+                                          top: 0,
+                                          bottom: 0,
+                                          width: 160,
+                                          child: _pinnedName(Container(
+                                            key: ValueKey(
+                                                'contract-name-${e['team']['id_team']}-${usagePlayerKey(e['player'])}'),
+                                            color: contractTeamColor({
+                                              'team': e['team']['name_team']
+                                            }, colorTeams),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8, vertical: 4),
+                                            child: DefaultTextStyle.merge(
+                                              style: TextStyle(
+                                                  color: contractTeamColor({
+                                                            'team': e['team']
+                                                                ['name_team']
+                                                          }, colorTeams)
+                                                              .computeLuminance() >
+                                                          .179
+                                                      ? Colors.black
+                                                      : Colors.white),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                      '${e['team']['name_team']}',
+                                                      style: const TextStyle(
+                                                          fontSize: 11)),
+                                                  Text('${e['player']['name']}',
+                                                      style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                ],
+                                              ),
+                                            ),
+                                          )),
+                                        ),
+                                      ]));
+                                }))
+                      ]))))),
+      const Padding(
+          padding: EdgeInsets.all(8),
+          child: Text(
+              '札束は1段につきNPBは5億円、MLBは2000万ドルで折り返します。年ごとの推定年俸を契約帯の下に表示します。契約期間未確認の年も、年俸・所属が確認できれば球団色で表示します。確認状況は帯の詳細で確認できます。生涯年俸は選択年度までに取得できた年俸の合計（推定額を含む）です。未取得年と将来年は含みません。生涯年俸の札束はNPBでは20億円、MLBでは2000万ドルごとに折り返します。NPBのドル建て年俸は契約時レートで円換算できた分のみ描画します。円と米ドルは別の尺度です。円換算は契約日当日（休業日は直前公表日）のECBレートによる概算です。契約日・レート未確認の場合は換算しません。',
+              style: TextStyle(fontSize: 11))),
+    ]);
+  }
+}

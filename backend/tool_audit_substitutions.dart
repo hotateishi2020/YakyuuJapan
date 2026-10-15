@@ -15,6 +15,17 @@ Future<void> main(List<String> args) async {
       final team =
           usageMap(row[1] is String ? jsonDecode(row[1] as String) : row[1]);
       final bands = usageMaps(team['substitutions']);
+      final defenseBands = usageMaps(team['defense_substitutions']);
+      if (defenseBands.length != 2) failures++;
+      for (final band in defenseBands) {
+        final total = usageMaps(band['players'])
+            .fold<int>(0, (sum, p) => sum + usageInt(p['count']));
+        if (total != usageInt(band['total'])) failures++;
+      }
+      for (final p in usageMaps(bands.where((b) => b['slot'] == 'DEF').firstOrNull?['players'])) {
+        final counts = usageMap(p['defense_counts']);
+        if (counts.values.fold<int>(0, (sum, n) => sum + usageInt(n)) != usageInt(p['count'])) failures++;
+      }
       final summary = counts.putIfAbsent('${row[0]}',
           () => {'teams': 0, 'team_games': 0, 'PH': 0, 'PR': 0, 'DEF': 0});
       summary['teams'] = summary['teams']! + 1;
@@ -23,7 +34,7 @@ Future<void> main(List<String> args) async {
       if (bands.length != 3 ||
           usageInt(team['substitution_game_count']) !=
               usageInt(team['pitching_game_count'])) failures++;
-      for (final band in bands) {
+      for (final band in [...bands, ...defenseBands]) {
         final players = usageMaps(band['players']);
         final total = players.fold<int>(0, (n, p) => n + usageInt(p['count']));
         if (total != usageInt(band['total']) ||

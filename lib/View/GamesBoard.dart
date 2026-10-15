@@ -3321,7 +3321,12 @@ class _TableGameCard extends StatelessWidget {
       }
     }
     final pitchers = byPos['投'];
-    if (pitchers != null && pitchers.isNotEmpty) {
+    final finished = _text('state').contains('試合終了') || _text('state').contains('コールド');
+    final starterName = _text(home ? 'name_pitcher_home' : 'name_pitcher_away');
+    if (finished && (starterName.isNotEmpty || (pitchers?.isNotEmpty ?? false))) {
+      final starter = pitchers?.where((p) => samePlayerStatName(p.name, starterName)).firstOrNull;
+      byPos['投'] = [starter ?? (name: starterName.isNotEmpty ? starterName : pitchers!.first.name, marks: '')];
+    } else if (pitchers != null && pitchers.isNotEmpty) {
       byPos['投'] = [pitchers.last];
     } else {
       final current = _currentPitcherName(home: home);

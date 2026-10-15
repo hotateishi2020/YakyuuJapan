@@ -39,8 +39,11 @@ Future<void> main(List<String> args) async {
         await conn.execute(
             "UPDATE t_team_strength SET payload=payload || \$1::jsonb, updated_at=NOW() WHERE code_org=\$4 AND int_year=\$2 AND id_team=\$3",
             parameters: [
-              jsonEncode(
-                  {'substitutions': bands, 'substitution_game_count': count}),
+              jsonEncode({
+                'substitutions': bands,
+                'defense_substitutions': defenseSubstitutionBands(bands),
+                'substitution_game_count': count
+              }),
               year,
               row[0],
               org

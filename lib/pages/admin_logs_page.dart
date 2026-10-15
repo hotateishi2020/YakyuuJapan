@@ -1,3 +1,4 @@
+import '../tools/network_error.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -97,11 +98,11 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
         _logs = _rowsOf(map);
         _loading = false;
       });
-    } catch (_) {
+    } catch (e) {
       if (!mounted) return;
       setState(() {
         _loading = false;
-        _error = 'ログを読み込めませんでした';
+        _error = networkErrorMessage(e, fallback: 'ログを読み込めませんでした');
       });
     }
   }

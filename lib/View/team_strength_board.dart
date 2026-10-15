@@ -1,4 +1,6 @@
+import '../tools/network_error.dart';
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -11,6 +13,8 @@ import '../tools/json_utils.dart';
 import 'strength_vertical_label.dart';
 import 'strength_grids.dart';
 import '../logic/strength_usage.dart';
+import '../logic/strength_analytics.dart';
+import 'strength_contracts.dart';
 
 /// 戦力タブを開いたときだけ、登録済みの球団別データを取得する。
 class TeamStrengthBoard extends StatefulWidget {
@@ -29,8 +33,10 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
   bool _loading = true;
   String? _error;
   int _request = 0;
-  int _selectedView = 0;
-  static const _views = ['選手起用', 'レギュラー', '選手一覧'];
+  int _selectedView = 1;
+  final _comparisonViews = <int>{4};
+  static const _bandSideWidth = 88 * 1.2 + 8 + 48;
+  static const _views = ['成績', '選手起用', 'レギュラー', '選手一覧', '契約'];
 
   @override
   void initState() {
@@ -72,9 +78,10 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
           _selectedTeam = _teams.isEmpty ? null : _int(_teams.first['id_team']);
         }
       });
-    } catch (_) {
+    } catch (e) {
       if (!mounted || request != _request) return;
-      setState(() => _error = '戦力情報を取得できませんでした。再読み込みしてください。');
+      setState(() => _error =
+          networkErrorMessage(e, fallback: '戦力情報を取得できませんでした。再読み込みしてください。'));
     } finally {
       if (mounted && request == _request) setState(() => _loading = false);
     }
@@ -151,18 +158,32 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
     final foreground = headerBackground.computeLuminance() > 0.179
         ? Colors.black
         : Colors.white;
-    final pitchingRates =
-        pitchingWorkloadBands(listMapFromJson(team['pitching_workload']));
+    final pitchingRates = enrichStrengthBands(
+        team,
+        pitchingWorkloadBands(listMapFromJson(team['pitching_workload'])),
+        'pitching');
     final lineupGames = _int(team['lineup_game_count']);
-    final battingOrder = listMapFromJson(team['batting_order']);
-    final positions = listMapFromJson(team['positions']);
+    final battingOrder = enrichStrengthBands(
+        team, listMapFromJson(team['batting_order']), 'batting');
+    final positions = enrichStrengthBands(
+        team,
+        listMapFromJson(team['positions'])
+            .where((row) => row['slot'] != 'P')
+            .toList(),
+        'fielding');
     final substitutions = listMapFromJson(team['substitutions']);
+    final pitchingHand = handednessBand(team, pitching: true);
+    final battingHand = handednessBand(team, pitching: false);
+    final performance = contributionBands(team);
     final playerColors = <String, Color>{};
     for (final row in [
       ...battingOrder,
       ...positions,
       ...pitchingRates,
-      ...substitutions
+      ...substitutions,
+      pitchingHand,
+      battingHand,
+      ...performance
     ]) {
       for (final player in listMapFromJson(row['players'])) {
         playerColors.putIfAbsent(_playerKey(player), () {
@@ -201,131 +222,214 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
             .where((note) => note.isNotEmpty)
         : const <String>[];
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      if (_selectedView != 1) _teamSegments(),
+      if (_selectedView == 0 || _selectedView == 4)
+        Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Row(children: [
+              for (final compare in [false, true])
+                Expanded(
+                    child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                        child: Material(
+                            color: _comparisonViews.contains(_selectedView) ==
+                                    compare
+                                ? widget.org.tabColor
+                                : Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(20),
+                            child: InkWell(
+                                key: ValueKey('strength-comparison-$compare'),
+                                onTap: () => setState(() {
+                                      if (compare) {
+                                        _comparisonViews.add(_selectedView);
+                                      } else {
+                                        _comparisonViews.remove(_selectedView);
+                                      }
+                                    }),
+                                child: Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: Text(
+                                        compare
+                                            ? (widget.org.kind.name == 'npb'
+                                                ? '12球団比較'
+                                                : '30球団比較')
+                                            : '各球団',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            color: _comparisonViews.contains(
+                                                        _selectedView) ==
+                                                    compare
+                                                ? Colors.white
+                                                : Colors.black87))))))),
+            ])),
+      if (_selectedView != 2 &&
+          !((_selectedView == 0 || _selectedView == 4) &&
+              _comparisonViews.contains(_selectedView)))
+        _teamSegments(),
       const SizedBox(height: 6),
       Expanded(
-          child: _selectedView == 0
-              ? LayoutBuilder(builder: (context, constraints) {
-                  final compact = constraints.maxWidth < COMPACT_LAYOUT_PX;
-                  final scaler = MediaQuery.textScalerOf(context);
-                  final headingHeight =
-                      (scaler.scale(13) * 2.4 + scaler.scale(11) * 1.2 + 14)
-                          .clamp(60.0, double.infinity);
-                  final headerHeight =
-                      (scaler.scale(12) * 2.4 + scaler.scale(10) * 2.4 + 12)
-                          .clamp(76.0, double.infinity);
-                  final bandHeight = ((constraints.maxHeight -
-                              headingHeight -
-                              headerHeight -
-                              28)
-                          .clamp(360.0, 520.0)) *
-                      1.5;
-                  return ListView(
-                    key: PageStorageKey(
-                        'strength-lineup-${widget.org.kind.name}-${widget.year}-$_selectedTeam'),
-                    padding: const EdgeInsets.only(bottom: 16),
-                    children: [
-                      if (compact)
-                        SingleChildScrollView(
-                          key: PageStorageKey(
-                              'strength-columns-${widget.org.kind.name}-${widget.year}-$_selectedTeam'),
-                          scrollDirection: Axis.horizontal,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _verticalRates(
-                                      '投手の投球回負担率',
-                                      'チーム全投球回が分母',
-                                      pitchingRates,
+          child: _selectedView == 0 && _comparisonViews.contains(0)
+              ? _performanceComparison()
+              : _selectedView == 0 || _selectedView == 1
+                  ? LayoutBuilder(builder: (context, constraints) {
+                      final bands = _selectedView == 0
+                          ? performance
+                          : [
+                              ...pitchingRates,
+                              pitchingHand,
+                              ...positions,
+                              ...battingOrder,
+                              battingHand,
+                              ...substitutions
+                            ];
+                      final width = _bandsWidth(bands, constraints.maxWidth);
+                      return SingleChildScrollView(
+                        key: const ValueKey('strength-horizontal-scroll'),
+                        scrollDirection: Axis.horizontal,
+                        child: SizedBox(
+                            width: width,
+                            child: ListView(
+                              key: PageStorageKey(
+                                  'strength-rows-${widget.org.kind.name}-${widget.year}-$_selectedTeam-$_selectedView'),
+                              padding: const EdgeInsets.only(bottom: 16),
+                              children: [
+                                if (_selectedView == 0) ...[
+                                  _heading('チーム成績への貢献割合', headerBackground,
+                                      foreground),
+                                  _rates(performance, headerBackground,
+                                      foreground, playerColors,
+                                      totalUnit: '個'),
+                                  const Text(
+                                      '塁打の内訳：本塁打×4・三塁打×3・二塁打×2・単打・四球。死球は含みません。'),
+                                  Wrap(spacing: 12, children: [
+                                    for (var i = 0; i < baseParts.length; i++)
+                                      Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                                width: 12,
+                                                height: 12,
+                                                color: _baseColors[i]),
+                                            const SizedBox(width: 4),
+                                            Text(baseParts[i].$3)
+                                          ])
+                                  ]),
+                                ] else ...[
+                                  _heading(
+                                      '投手の投球回負担率', headerBackground, foreground,
+                                      detail: 'チーム全投球回が分母／WHIPはシーズン通算'),
+                                  _rates(
+                                      [pitchingHand, ...pitchingRates],
                                       headerBackground,
                                       foreground,
                                       playerColors,
-                                      bandHeight: bandHeight,
-                                      headingHeight: headingHeight,
-                                      headerHeight: headerHeight,
                                       totalUnit: '回'),
-                                  const SizedBox(width: 16),
-                                  _verticalRates(
-                                      '守備位置のスタメン比率',
-                                      '途中出場は含みません',
-                                      positions,
-                                      headerBackground,
+                                  _heading('守備位置のスタメン比率', headerBackground,
                                       foreground,
-                                      playerColors,
-                                      bandHeight: bandHeight,
-                                      headingHeight: headingHeight,
-                                      headerHeight: headerHeight),
+                                      detail: '途中出場は含みません／UZR未取得は —'),
+                                  _rates(positions, headerBackground,
+                                      foreground, playerColors),
+                                  _heading(
+                                      '打順のスタメン比率', headerBackground, foreground,
+                                      detail:
+                                          '$lineupGames試合の先発起用／OPS・本塁打はシーズン通算'),
+                                  _rates([battingHand], headerBackground,
+                                      foreground, playerColors,
+                                      totalUnit: '打席'),
+                                  const Text('両打ちは打席の左右内訳を推測せず、両打として表示します。'),
+                                  _rates(battingOrder, headerBackground,
+                                      foreground, playerColors),
+                                  _heading(
+                                      '途中出場の起用割合', headerBackground, foreground,
+                                      detail: '各役割の起用総数が分母／途中出場時の役割で集計'),
+                                  _rates(substitutions, headerBackground,
+                                      foreground, playerColors,
+                                      totalUnit: '回'),
+                                  if (pitchingRates.isNotEmpty)
+                                    _pitchingDetails(team),
                                 ],
-                              ),
-                              const SizedBox(height: 16),
-                              _verticalRates(
-                                  '打順のスタメン比率',
-                                  '$lineupGames試合の先発起用',
-                                  battingOrder,
-                                  headerBackground,
-                                  foreground,
-                                  playerColors,
-                                  bandHeight: bandHeight,
-                                  headingHeight: headingHeight,
-                                  headerHeight: headerHeight),
-                              const SizedBox(height: 16),
-                              _verticalRates(
-                                  '途中出場の起用割合',
-                                  '各役割の起用総数が分母',
-                                  substitutions,
-                                  headerBackground,
-                                  foreground,
-                                  playerColors,
-                                  bandHeight: bandHeight,
-                                  headingHeight: headingHeight,
-                                  headerHeight: headerHeight,
-                                  totalUnit: '回'),
-                            ],
-                          ),
-                        )
-                      else ...[
-                        _heading('投手の投球回負担率', headerBackground, foreground,
-                            detail: 'チーム全投球回が分母／中継ぎは抑えを含む'),
-                        _rates(pitchingRates, headerBackground, foreground,
-                            playerColors,
-                            totalUnit: '回'),
-                        _heading('守備位置のスタメン比率', headerBackground, foreground,
-                            detail: '途中出場は含みません'),
-                        _rates(positions, headerBackground, foreground,
-                            playerColors),
-                        _heading('打順のスタメン比率', headerBackground, foreground,
-                            detail: '$lineupGames試合の先発起用'),
-                        _rates(battingOrder, headerBackground, foreground,
-                            playerColors),
-                        _heading('途中出場の起用割合', headerBackground, foreground,
-                            detail: '各役割の起用総数が分母／途中出場時の役割で集計'),
-                        _rates(substitutions, headerBackground, foreground,
-                            playerColors,
-                            totalUnit: '回'),
-                      ],
-                      if (pitchingRates.isNotEmpty) _pitchingDetails(team),
-                      const SizedBox(height: 12),
-                      for (final note in notes)
-                        Padding(
-                            padding: const EdgeInsets.only(bottom: 4),
-                            child: Text(note,
-                                style: const TextStyle(
-                                    fontSize: 11, color: Colors.black54))),
-                      if ('${team['updated_at'] ?? ''}'.isNotEmpty)
-                        Text('更新：${_updatedAt(team['updated_at'])}',
-                            style: const TextStyle(
-                                fontSize: 11, color: Colors.black54)),
-                    ],
-                  );
-                })
-              : _selectedView == 1
-                  ? StrengthRegularGrid(teams: _teams)
-                  : StrengthRosterGrid(team: team, year: widget.year)),
+                                const SizedBox(height: 12),
+                                for (final note in notes)
+                                  Text(note,
+                                      style: const TextStyle(
+                                          fontSize: 11, color: Colors.black54)),
+                                if ('${team['updated_at'] ?? ''}'.isNotEmpty)
+                                  Text('更新：${_updatedAt(team['updated_at'])}',
+                                      style: const TextStyle(
+                                          fontSize: 11, color: Colors.black54)),
+                              ],
+                            )),
+                      );
+                    })
+                  : _selectedView == 2
+                      ? StrengthRegularGrid(teams: _teams)
+                      : _selectedView == 3
+                          ? StrengthRosterGrid(team: team, year: widget.year)
+                          : StrengthContracts(
+                              colorTeams: _teams,
+                              team: team,
+                              year: widget.year,
+                              comparisonTeams: _comparisonViews.contains(4)
+                                  ? _teams
+                                  : null)),
     ]);
   }
+
+  Widget _performanceComparison() =>
+      LayoutBuilder(builder: (context, constraints) {
+        final all = [for (final team in _teams) contributionBands(team)];
+        final maxima = [
+          for (var i = 0; i < 3; i++)
+            all.fold<int>(0, (n, bands) => math.max(n, _int(bands[i]['total'])))
+        ];
+        final width = _bandsWidth([
+          for (final bands in all) {...bands[0], 'total': maxima[0]}
+        ], math.max(1000.0, constraints.maxWidth));
+        return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+                width: width,
+                child: ListView(children: [
+                  const Padding(
+                      padding: EdgeInsets.all(8),
+                      child: Text('球団比較：各指標の最多球団を基準に帯の長さを揃えています。')),
+                  for (final i in [1, 0, 2]) ...[
+                    _heading(['本塁打', '塁打数', '打点'][i], widget.org.tabColor,
+                        Colors.white),
+                    for (var t = 0; t < _teams.length; t++)
+                      Align(
+                          alignment: Alignment.centerLeft,
+                          child: SizedBox(
+                              width: _bandSideWidth +
+                                  (width - _bandSideWidth) *
+                                      (maxima[i] > 0
+                                          ? _int(all[t][i]['total']) / maxima[i]
+                                          : 0),
+                              child: _rates(
+                                  [
+                                    {
+                                      ...all[t][i],
+                                      'label': _teams[t]['name_team'],
+                                      'header_color': parseColorNameOrNull(
+                                              '${_teams[t]['color_back']}') ??
+                                          widget.org.tabColor
+                                    }
+                                  ],
+                                  Colors.grey,
+                                  Colors.black,
+                                  {
+                                    for (final (index, p)
+                                        in listMapFromJson(all[t][i]['players'])
+                                            .indexed)
+                                      _playerKey(p): Color.lerp(
+                                          parseColorNameOrNull(
+                                                  '${_teams[t]['color_back']}') ??
+                                              Colors.blueGrey,
+                                          Colors.white,
+                                          .35 + (index % 4) * .1)!
+                                  }))),
+                  ],
+                ])));
+      });
 
   Widget _teamButton(Map<String, dynamic> row) => Semantics(
         selected: _int(row['id_team']) == _selectedTeam,
@@ -448,10 +552,14 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                                   final count = _int(player['count']);
                                   final value = row['unit'] == 'outs'
                                       ? inningsLabel(count)
-                                      : const ['PH', 'PR', 'DEF']
-                                              .contains(row['slot'])
-                                          ? '$count回'
-                                          : '$count試合';
+                                      : row['unit'] == 'pa'
+                                          ? '$count打席'
+                                          : row['unit'] == 'contribution'
+                                              ? '$count${row['slot'] == 'home_runs' ? '本' : row['slot'] == 'rbi' ? '点' : '塁打'}'
+                                              : const ['PH', 'PR', 'DEF']
+                                                      .contains(row['slot'])
+                                                  ? '$count回'
+                                                  : '$count試合';
                                   return Padding(
                                       padding:
                                           const EdgeInsets.only(bottom: 16),
@@ -463,6 +571,10 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                                                 '${player['name']}　$value（${(total > 0 ? count * 100 / total : 0).toStringAsFixed(1)}%）',
                                                 style: const TextStyle(
                                                     fontSize: 12)),
+                                            if (player['metric_label'] != null)
+                                              Text('${player['metric_label']}',
+                                                  style: const TextStyle(
+                                                      fontSize: 11)),
                                             const SizedBox(height: 4),
                                             ClipRRect(
                                                 borderRadius:
@@ -499,18 +611,22 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
             color: background, borderRadius: BorderRadius.circular(4)),
-        child: Column(children: [
-          Text(title,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  color: foreground,
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold)),
-          if (detail != null)
-            Text(detail,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 11, color: foreground)),
-        ]),
+        child: Align(
+            alignment: Alignment.centerLeft,
+            child: SizedBox(
+                width: math.max(280.0, MediaQuery.sizeOf(context).width - 32),
+                child: Column(children: [
+                  Text(title,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: foreground,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold)),
+                  if (detail != null)
+                    Text(detail,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 11, color: foreground)),
+                ]))),
       );
 
   Widget _pitchingDetails(Map<String, dynamic> team) {
@@ -541,6 +657,9 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
   }
 
   String _bandTotal(Map<String, dynamic> row, String unit) {
+    if (row['unit'] == 'contribution')
+      return '${_int(row['total'])}${row['slot'] == 'home_runs' ? '本' : row['slot'] == 'rbi' ? '点' : '塁打'}';
+    if (row['slot'] == 'pitching_hand') return inningsLabel(_int(row['total']));
     if (row['unit'] != 'outs') return '${_int(row['total'])}$unit';
     final outs = _int(row['role_outs']);
     final total = _int(row['total']);
@@ -548,11 +667,13 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
   }
 
   Color _rateHeaderColor(Map<String, dynamic> row) =>
+      row['header_color'] as Color? ??
       switch ('${row['slot']}') {
         'starter' || 'relief' || 'P' => const Color(0xFFEF5350),
         'C' => const Color(0xFF2196F3),
         'LF' || 'CF' || 'RF' || 'OF' => const Color(0xFF43A047),
         'DH' => const Color(0xFF9C27B0),
+        'pitching_hand' => const Color(0xFFEF5350),
         _ => const Color(0xFFFFD54F),
       };
   Color _rateHeaderTextColor(Map<String, dynamic> row) =>
@@ -583,117 +704,40 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
       for (final row in rows)
         Padding(
           padding: const EdgeInsets.only(bottom: 8),
-          child: Row(children: [
-            Container(
-              width: 88 * 1.2,
-              padding: const EdgeInsets.symmetric(vertical: 5),
-              decoration: BoxDecoration(
-                  color: _rateHeaderColor(row),
-                  borderRadius: BorderRadius.circular(4)),
-              child: Column(children: [
-                Text('${row['label'] ?? row['slot'] ?? ''}',
-                    style: TextStyle(
-                        color: _rateHeaderTextColor(row),
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold)),
-                _bandTotalLabel(row, totalUnit),
-              ]),
-            ),
-            const SizedBox(width: 8),
-            Expanded(child: _rateBand(row, playerColors)),
-            _bandDetailsButton(row, playerColors),
-          ]),
+          child: SizedBox(
+            height: 72,
+            child:
+                Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              Container(
+                width: 88 * 1.2,
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                decoration: BoxDecoration(
+                    color: _rateHeaderColor(row),
+                    borderRadius: BorderRadius.circular(4)),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: SizedBox(
+                    width: 88 * 1.2,
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [
+                      Text('${row['label'] ?? row['slot'] ?? ''}',
+                          style: TextStyle(
+                              color: _rateHeaderTextColor(row),
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold)),
+                      _bandTotalLabel(row, totalUnit),
+                    ]),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(child: _rateBand(row, playerColors)),
+              SizedBox(
+                  width: 48,
+                  child: Center(child: _bandDetailsButton(row, playerColors))),
+            ]),
+          ),
         ),
     ]);
-  }
-
-  Widget _verticalRates(
-      String title,
-      String detail,
-      List<Map<String, dynamic>> rows,
-      Color background,
-      Color foreground,
-      Map<String, Color> playerColors,
-      {required double bandHeight,
-      required double headingHeight,
-      required double headerHeight,
-      String totalUnit = '試合'}) {
-    const width = 88.0;
-    return SizedBox(
-      width: rows.isEmpty
-          ? 180
-          : (rows.length * (width + 4) - 4).clamp(116.0, double.infinity),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(
-          height: headingHeight,
-          width: double.infinity,
-          margin: const EdgeInsets.only(bottom: 4),
-          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
-          decoration: BoxDecoration(
-              color: background, borderRadius: BorderRadius.circular(4)),
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text(title,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                    color: foreground,
-                    fontSize: 13,
-                    height: 1.2,
-                    fontWeight: FontWeight.bold)),
-            Text(detail,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 11, height: 1.2, color: foreground)),
-          ]),
-        ),
-        if (rows.isEmpty)
-          const Text('起用情報はまだ登録されていません。',
-              style: TextStyle(fontSize: 12, color: Colors.black54))
-        else
-          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            for (var i = 0; i < rows.length; i++) ...[
-              if (i > 0) const SizedBox(width: 4),
-              SizedBox(
-                width: width,
-                child: Column(children: [
-                  Container(
-                    height: headerHeight,
-                    width: width,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
-                    decoration: BoxDecoration(
-                        color: _rateHeaderColor(rows[i]),
-                        borderRadius: BorderRadius.circular(4)),
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text('${rows[i]['label'] ?? rows[i]['slot'] ?? ''}',
-                              textAlign: TextAlign.center,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  color: _rateHeaderTextColor(rows[i]),
-                                  fontSize: 12,
-                                  height: 1.2,
-                                  fontWeight: FontWeight.bold)),
-                          _bandTotalLabel(rows[i], totalUnit),
-                        ]),
-                  ),
-                  const SizedBox(height: 4),
-                  SizedBox(
-                    width: width,
-                    child: _rateBand(rows[i], playerColors,
-                        verticalHeight: bandHeight),
-                  ),
-                  _bandDetailsButton(rows[i], playerColors),
-                ]),
-              ),
-            ],
-          ]),
-      ]),
-    );
   }
 
   Widget _rateBand(Map<String, dynamic> row, Map<String, Color> playerColors,
@@ -705,11 +749,8 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
     final total = _int(row['total']);
     final used =
         players.fold<int>(0, (sum, player) => sum + _int(player['count']));
-    final height = verticalHeight ??
-        (MediaQuery.textScalerOf(context).scale(12) +
-                    MediaQuery.textScalerOf(context).scale(10)) *
-                1.2 +
-            12;
+    final height = verticalHeight ?? 72.0;
+
     return ClipRRect(
       key: ValueKey('strength-band-${row['unit'] ?? 'starts'}-${row['slot']}'),
       borderRadius: BorderRadius.circular(4),
@@ -759,15 +800,21 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
     final role = '${player['role'] ?? ''}';
     final relief = player['unit'] == 'outs' && role == '中継ぎ・抑え';
     final starter = player['unit'] == 'outs' && role == '先発';
+    final homeRuns = player['contribution_metric'] == 'home_runs';
+    final displayValue = player['contribution_metric'] != null
+        ? '$count'
+        : '${player['value_label']}';
     final showLabels = total > 0 &&
-        (relief
-            ? count * 50 >= total
-            : starter
-                ? count * 100 >= total * 3
-                : count * 20 > total);
+        (homeRuns
+            ? count >= 5
+            : relief
+                ? count * 50 >= total
+                : starter
+                    ? count * 100 >= total * 3
+                    : count * 20 > total);
     final description = player['unit'] == 'outs'
-        ? '$name（$role）：${inningsLabel(count)}（チーム全体の$rate）'
-        : '$name：$count回（$rate）';
+        ? '$name${role.isEmpty ? '' : '（$role）'}：${inningsLabel(count)}（チーム全体の$rate）'
+        : '$name：${player['value_label'] ?? '$count${player['unit'] == 'pa' ? '打席' : '回'}'}（$rate）';
     final textColor =
         color.computeLuminance() > 0.179 ? Colors.black : Colors.white;
     final nameStyle = DefaultTextStyle.of(context).style.copyWith(
@@ -837,7 +884,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                 // 中継ぎは2%以上を対象にし、細い帯でも8pxまで縮小して名前を出す。
                 if (showLabels) {
                   for (var size = 12.0;
-                      size >= (relief ? 8.0 : 10.0);
+                      size >= (relief || homeRuns ? 8.0 : 10.0);
                       size -= 0.5) {
                     final candidate = nameStyle.copyWith(fontSize: size);
                     if (fits(name, candidate)) {
@@ -847,18 +894,141 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                   }
                 }
 
-                return Center(
-                    child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  if (fittedNameStyle != null)
-                    Text(name,
-                        style: fittedNameStyle, maxLines: 1, softWrap: false),
-                  if (showLabels && fits(rate, rateStyle))
-                    Text(rate, style: rateStyle, maxLines: 1, softWrap: false),
-                ]));
+                return Stack(children: [
+                  if (player['parts'] is List)
+                    Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        height: 18,
+                        child: Row(children: [
+                          for (var i = 0;
+                              i < listMapFromJson(player['parts']).length;
+                              i++)
+                            if (_int(listMapFromJson(player['parts'])[i]
+                                    ['count']) >
+                                0)
+                              Expanded(
+                                  flex: _int(listMapFromJson(player['parts'])[i]
+                                      ['count']),
+                                  child: Tooltip(
+                                      message:
+                                          '${listMapFromJson(player['parts'])[i]['label']}: ${listMapFromJson(player['parts'])[i]['count']}塁打（${(_int(listMapFromJson(player['parts'])[i]['count']) * 100 / count).toStringAsFixed(1)}%）',
+                                      child: ColoredBox(
+                                          color: _baseColors[i],
+                                          child: LayoutBuilder(
+                                              builder: (context, bounds) {
+                                            final part = listMapFromJson(
+                                                player['parts'])[i];
+                                            final text = '${part['events']}';
+                                            final painter = TextPainter(
+                                                text: TextSpan(
+                                                    text: text,
+                                                    style: const TextStyle(
+                                                        fontSize: 10)),
+                                                textDirection:
+                                                    TextDirection.ltr,
+                                                textScaler:
+                                                    MediaQuery.textScalerOf(
+                                                        context))
+                                              ..layout();
+                                            final fits = painter.width + 4 <=
+                                                    bounds.maxWidth &&
+                                                painter.height <=
+                                                    bounds.maxHeight;
+                                            painter.dispose();
+                                            return Center(
+                                                child: fits
+                                                    ? Text(text,
+                                                        style: TextStyle(
+                                                            fontSize: 10,
+                                                            color: _baseColors[
+                                                                            i]
+                                                                        .computeLuminance() >
+                                                                    .179
+                                                                ? Colors.black
+                                                                : Colors.white))
+                                                    : null);
+                                          }))))
+                        ])),
+                  Padding(
+                      padding: EdgeInsets.only(
+                          bottom: player['parts'] is List ? 18 : 0),
+                      child: Center(
+                          child:
+                              Column(mainAxisSize: MainAxisSize.min, children: [
+                        if (fittedNameStyle != null)
+                          Text(name,
+                              style: fittedNameStyle,
+                              maxLines: 1,
+                              softWrap: false),
+                        if (player['value_label'] != null &&
+                            fits(displayValue, rateStyle))
+                          Text(displayValue, style: rateStyle, maxLines: 1),
+                        if (showLabels && fits(rate, rateStyle))
+                          Text(rate,
+                              style: rateStyle, maxLines: 1, softWrap: false),
+                        if (showLabels && player['metric_label'] != null)
+                          Text('${player['metric_label']}',
+                              style: rateStyle, maxLines: 1, softWrap: false),
+                      ]))),
+                ]);
               },
             )),
       ),
     );
+  }
+
+  static const _baseColors = [
+    Color(0xFFE86680),
+    Color(0xFFF8B6CC),
+    Color(0xFFFFBC59),
+    Color(0xFFFFF280),
+    Color(0xFF8BCB8D)
+  ];
+  double _bandsWidth(List<Map<String, dynamic>> bands, double viewport) {
+    var body = math.max(800.0, viewport - _bandSideWidth);
+    for (final band in bands) {
+      final total = _int(band['total']);
+      for (final p in listMapFromJson(band['players'])) {
+        final count = _int(p['count']);
+        final threshold = band['slot'] == 'relief'
+            ? 0.02
+            : band['slot'] == 'starter'
+                ? 0.03
+                : 0.05;
+        final homeRuns =
+            band['unit'] == 'contribution' && band['slot'] == 'home_runs';
+        if (count <= 0 ||
+            total <= 0 ||
+            (homeRuns ? count < 5 : count / total < threshold)) continue;
+        final name = TextPainter(
+            text: TextSpan(
+                text: '${p['name']}',
+                style: TextStyle(
+                    fontSize: homeRuns ? 8 : 12, fontWeight: FontWeight.w600)),
+            textDirection: TextDirection.ltr,
+            textScaler: MediaQuery.textScalerOf(context))
+          ..layout();
+        final metric = TextPainter(
+            text: TextSpan(
+                text: '${p['metric_label'] ?? ''}',
+                style: const TextStyle(fontSize: 10)),
+            textDirection: TextDirection.ltr,
+            textScaler: MediaQuery.textScalerOf(context))
+          ..layout();
+        body = math.max(
+            body,
+            (math.max(name.width, metric.width) + 12) *
+                (band['unit'] == 'outs' && band['role_outs'] != null
+                    ? _int(band['role_outs'])
+                    : total) /
+                count);
+        name.dispose();
+        metric.dispose();
+      }
+    }
+    return body + _bandSideWidth;
   }
 
   String _updatedAt(dynamic value) {

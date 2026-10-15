@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../logic/strength_usage.dart';
+import '../logic/strength_analytics.dart';
 import '../tools/color_parse.dart';
 import '../tools/json_utils.dart';
 
@@ -37,9 +38,19 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
     super.dispose();
   }
 
-  Iterable<String> get _slots =>
-      usagePositions.keys.where((slot) => slot != 'P');
+  Iterable<String> get _slots => [
+        ...pitcherAceSlots.keys,
+        ...usagePositions.keys.where((slot) => slot != 'P'),
+        ...benchRegularSlots.keys
+      ];
   Color _positionColor(String slot) => switch (slot) {
+        'PH_L' ||
+        'PH_R' ||
+        'PR' ||
+        'DEF_IF' ||
+        'DEF_OF' =>
+          const Color(0xFF757575),
+        'SP_L' || 'SP_R' || 'RP_L' || 'RP_R' || 'CL' => const Color(0xFFEF5350),
         'C' => const Color(0xFF2196F3),
         '1B' || '2B' || '3B' || 'SS' => const Color(0xFFFFD54F),
         'LF' || 'CF' || 'RF' => const Color(0xFF43A047),
@@ -67,7 +78,9 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
                 child: Row(children: [
                   for (final slot in _slots)
                     _fixedCell(
-                        usagePositions[slot]!,
+                        (pitcherAceSlots[slot] ??
+                            usagePositions[slot] ??
+                            benchRegularSlots[slot])!,
                         _positionColor(slot),
                         ['1B', '2B', '3B', 'SS'].contains(slot)
                             ? Colors.black87
@@ -123,7 +136,7 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
                     const Padding(
                         padding: EdgeInsets.all(8),
                         child: Text(
-                            '守備位置別のスタメン数・起用率。各位置の最多スタメン数の70%以上の選手も表示します。重複選手は起用率の高い位置を優先し、追加の選手は薄い背景で表示します。',
+                            '先発エースは左右別の先発投球回最多、リリーフエースは守護神を除く左右別のホールド最多（同数は救援投球回）、守護神はセーブ最多。WHIPはシーズン通算。守備位置別のスタメン数・起用率。各位置の最多スタメン数の70%以上の選手も表示します。重複選手は起用率の高い位置を優先し、追加の選手は薄い背景で表示します。途中出場は既存レギュラーを除外し、各項目の最多起用者とその70%以上を表示。両打ちは左右の候補とし重複表示しません。代守は出場時の守備位置で分類します。',
                             style: TextStyle(fontSize: 12))),
                   ],
                 ),
@@ -150,7 +163,11 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
                   style: TextStyle(fontSize: 12, color: foreground))));
 
   TableRow _row(Map<String, dynamic> team) {
-    final selected = selectRegularGroups(listMapFromJson(team['positions']));
+    final selected = {
+      ...selectRegularGroups(listMapFromJson(team['positions'])),
+      ...selectPitcherAces(team)
+    };
+    selected.addAll(selectBenchRegulars(team, selected));
     final roster = listMapFromJson(team['roster']);
     final teamColor =
         parseColorNameOrNull('${team['color_back']}') ?? Colors.blueGrey;
@@ -159,7 +176,11 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
         SizedBox(
           height: 84,
           child: (selected[slot] ?? []).isEmpty
-              ? const Center(child: Text('—'))
+              ? ColoredBox(
+                  color: benchRegularSlots.containsKey(slot)
+                      ? Color.lerp(Colors.white, _positionColor(slot), 0.24)!
+                      : Colors.transparent,
+                  child: const Center(child: Text('—')))
               : Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                   for (var i = 0; i < selected[slot]!.length; i++)
                     Expanded(
@@ -182,10 +203,23 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
                         _regularLine(
                             regularPlayerName(selected[slot]![i], roster),
                             bold: true),
-                        _regularLine(
-                            '${usageInt(selected[slot]![i]['count'])}試合'),
-                        _regularLine(
-                            '${((selected[slot]![i]['usage_rate'] as double) * 100).toStringAsFixed(1)}%'),
+                        if (pitcherAceSlots.containsKey(slot)) ...[
+                          _regularLine(
+                              'WHIP ${metricValue(selected[slot]![i]['whip'], 2)}'),
+                          _regularLine(slot == 'CL'
+                              ? '${usageInt(selected[slot]![i]['saves'])}セーブ'
+                              : slot.startsWith('RP')
+                                  ? '${usageInt(selected[slot]![i]['holds'])}ホールド'
+                                  : inningsLabel(usageInt(
+                                      selected[slot]![i]['starter_outs']))),
+                        ] else ...[
+                          _regularLine(
+                              '${usageInt(selected[slot]![i]['count'])}${benchRegularSlots.containsKey(slot) ? '回' : '試合'}'),
+                          _regularLine(
+                              '${((selected[slot]![i]['usage_rate'] as double) * 100).toStringAsFixed(1)}%'),
+                          _regularLine(battingMetricLabel(
+                              strengthPlayerMetrics(team, selected[slot]![i]))),
+                        ],
                       ]),
                     )),
                 ]),

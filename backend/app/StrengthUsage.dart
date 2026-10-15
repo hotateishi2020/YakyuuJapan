@@ -222,7 +222,18 @@ List<Map<String, dynamic>> parseNpbSubstitutions(String source, String url) {
         'source_player_id': id,
         'name': cells[2].text.trim(),
         'team_code': side == 'top' ? match[2] : match[1],
-        'role': role
+        'role': role,
+        if (role == 'DEF')
+          'entry_position': const {
+            '捕': 'C',
+            '一': '1B',
+            '二': '2B',
+            '三': '3B',
+            '遊': 'SS',
+            '左': 'LF',
+            '中': 'CF',
+            '右': 'RF'
+          }[position.substring(0, 1)]
       });
     }
   }
@@ -251,7 +262,8 @@ List<Map<String, dynamic>> parseMlbSubstitutions(Map<String, dynamic> box) {
         'source_player_id': '${usageMap(p['person'])['id']}',
         'name': usageMap(p['person'])['fullName'],
         'team_code': '${usageMap(team['team'])['id']}',
-        'role': role
+        'role': role,
+        if (role == 'DEF') 'entry_position': first
       });
     }
   }
@@ -275,6 +287,12 @@ List<Map<String, dynamic>> substitutionBands(
           .putIfAbsent(role, () => {})
           .putIfAbsent(id, () => {...p, 'player_key': '$org:$id', 'count': 0});
       player['count'] = usageInt(player['count']) + 1;
+      if (role == 'DEF' && p['entry_position'] != null) {
+        final counts = usageMap(player['defense_counts']);
+        final pos = '${p['entry_position']}';
+        counts[pos] = usageInt(counts[pos]) + 1;
+        player['defense_counts'] = counts;
+      }
     }
   }
   return [
@@ -296,6 +314,35 @@ List<Map<String, dynamic>> substitutionBands(
                 'usage_rate': total == 0 ? 0 : usageInt(p['count']) / total
               }
           ]
+        };
+      })()
+  ];
+}
+
+List<Map<String, dynamic>> defenseSubstitutionBands(
+    List<Map<String, dynamic>> bands) {
+  final defenders =
+      usageMaps(bands.where((b) => b['slot'] == 'DEF').firstOrNull?['players']);
+  return [
+    for (final role in [
+      ('DEF_IF', '内野代守', ['1B', '2B', '3B', 'SS']),
+      ('DEF_OF', '外野代守', ['LF', 'CF', 'RF'])
+    ])
+      (() {
+        final players = <Map<String, dynamic>>[];
+        for (final p in defenders) {
+          final counts = usageMap(p['defense_counts']);
+          final count =
+              role.$3.fold<int>(0, (n, pos) => n + usageInt(counts[pos]));
+          if (count > 0) players.add({...p, 'count': count});
+        }
+        players.sort(
+            (a, b) => usageInt(b['count']).compareTo(usageInt(a['count'])));
+        return <String, dynamic>{
+          'slot': role.$1,
+          'label': role.$2,
+          'total': players.fold<int>(0, (n, p) => n + usageInt(p['count'])),
+          'players': players
         };
       })()
   ];
@@ -362,8 +409,14 @@ class StrengthUsage {
       final value = row[1] is String ? jsonDecode(row[1] as String) : row[1];
       games['${row[0]}'] = usageMap(value);
     }
-    final missing =
-        keys.toSet().where((key) => !games.containsKey(key)).toList();
+    final missing = keys
+        .toSet()
+        .where((key) =>
+            !games.containsKey(key) ||
+            (substitutions &&
+                usageMaps(games[key]?['players']).any(
+                    (p) => p['role'] == 'DEF' && p['entry_position'] == null)))
+        .toList();
     final batchSize = org == 'mlb' ? 12 : 4;
     for (var offset = 0; offset < missing.length; offset += batchSize) {
       final batch = await Future.wait(missing

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../config/app_design.dart';
 import '../config/org_config.dart';
 import '../logic/auth_session.dart';
+import '../logic/display_settings.dart';
 import '../logic/show_user_predictions.dart';
 import '../tools/browser_cookie.dart';
 import '../tools/color_parse.dart';
@@ -1342,7 +1343,12 @@ class PlayerStatCell extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ValueListenableBuilder<Set<String>>(
+    valueListenable: DisplaySettings.instance,
+    builder: (context, _, child) => _buildCell(context),
+  );
+
+  Widget _buildCell(BuildContext context) {
     final rankRaw = row['int_rank'];
     final rankText = '${rankRaw ?? ''}';
     final int rankNum = rankRaw is int
@@ -1364,17 +1370,17 @@ class PlayerStatCell extends StatelessWidget {
     }
 
     final showUserPredictions = ShowUserPredictions.of(context);
-    final isJapan = showJapanFlag && isTrue(row['flg_japan']);
+    final isJapan = showJapanFlag && (DisplaySettings.instance.shows('flg_japan') && isTrue(row['flg_japan']));
     final countryEmoji = '${row['emoji_country'] ?? ''}'.trim();
     final marks = [
       if (isJapan) (countryEmoji.isNotEmpty ? countryEmoji : '🇯🇵'),
-      if (isTrue(row['flg_saga'])) '佐',
-      if (isTrue(row['flg_rookie'])) '🔰',
-      if (isTrue(row['flg_career_this_year'])) '✨',
-      if (isTrue(row['flg_under21'])) '🌱',
-      if (isTrue(row['flg_age35'])) '🍁',
-      if (isTrue(row['flg_retired'])) '💐',
-      if (isTrue(row['flg_injury'])) '🤕',
+      if ((DisplaySettings.instance.shows('flg_saga') && isTrue(row['flg_saga']))) '佐',
+      if ((DisplaySettings.instance.shows('flg_rookie') && isTrue(row['flg_rookie']))) '🔰',
+      if ((DisplaySettings.instance.shows('flg_career_this_year') && isTrue(row['flg_career_this_year']))) '✨',
+      if ((DisplaySettings.instance.shows('flg_under21') && isTrue(row['flg_under21']))) '🌱',
+      if ((DisplaySettings.instance.shows('flg_age35') && isTrue(row['flg_age35']))) '🍁',
+      if ((DisplaySettings.instance.shows('flg_retired') && isTrue(row['flg_retired']))) '💐',
+      if ((DisplaySettings.instance.shows('flg_injury') && isTrue(row['flg_injury']))) '🤕',
     ];
     final positionBg = personalStatPositionColor('${row['txt_position'] ?? ''}');
     final compacted = compactPersonalStatName(name);

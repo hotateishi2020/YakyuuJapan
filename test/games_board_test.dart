@@ -5655,6 +5655,35 @@ void main() {
     expect(height, lessThan(160));
   });
 
+  for (final state in ['8回裏', '試合終了', 'コールド']) {
+    testWidgets('守備図の投手は$stateに合わせて切り替わる', (tester) async {
+      await tester.pumpWidget(MaterialApp(home: SizedBox(width: 900, height: 520,
+        child: GamesBoardYahooStyle(initialStatsExpanded: true, horizontal: true,
+          games: [{
+            'date_game': '2026-10-08', 'state': state,
+            'name_team_home': '阪神', 'name_team_away': '西武',
+            'id_team_home': 2, 'id_team_away': 8,
+            'id_league_home': 1, 'id_league_away': 2,
+            'name_pitcher_home': '先発甲', 'name_pitcher_away': '先発乙',
+            'score_home': 2, 'score_away': 1,
+            'lineup': [{'id_team': 8, 'order': 9, 'players': [
+              {'name': '先発乙', 'pos': '投'},
+              {'name': '救援乙', 'pos': '投', 'role': '代守'},
+            ]}]
+          }]))));
+      await tester.pump();
+      if (state != '8回裏') {
+        await tester.tap(find.text('詳細表示'));
+        await tester.pump();
+      }
+      final expected = state == '8回裏' ? '救援乙' : '先発乙';
+      final excluded = state == '8回裏' ? '先発乙' : '救援乙';
+      expect(find.byKey(ValueKey('defense-bg-$expected')), findsOneWidget);
+      expect(find.byKey(ValueKey('defense-bg-$excluded')), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('守備図はスタメンと代守とE/FPを出す', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(

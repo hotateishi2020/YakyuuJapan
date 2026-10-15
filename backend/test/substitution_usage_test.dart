@@ -14,6 +14,7 @@ void main() {
         source, 'https://npb.jp/scores/2026/1001/t-g-25/box.html');
     expect(rows.length, 6);
     expect(rows.take(3).map((p) => p['role']), ['PH', 'PR', 'DEF']);
+    expect(rows[2]['entry_position'], 'C');
     expect(rows.first['team_code'], 'g');
     expect(rows.last['team_code'], 't');
     final game = {
@@ -23,6 +24,8 @@ void main() {
     final bands = substitutionBands([game, game], 'g');
     expect(bands.map((b) => b['total']), [1, 1, 1]);
     expect(usageMaps(bands.first['players']).first['player_key'], 'npb:2');
+    expect(usageMaps(bands.last['players']).single['defense_counts'], {'C': 1});
+    expect(defenseSubstitutionBands(bands).map((b) => b['total']), [0, 0]);
   });
   test('MLBは交代打順と最初の守備位置から途中出場を判定', () {
     final rows = parseMlbSubstitutions({
@@ -51,5 +54,17 @@ void main() {
     });
     expect(rows.length, 6);
     expect(rows.take(3).map((p) => p['role']), ['PH', 'PR', 'DEF']);
+    expect(rows[2]['entry_position'], 'SS');
+  });
+  test('複数ポジションの代守は出場時の位置で内外野別に集計する', () {
+    final games = [for (final pos in ['1B', 'SS', 'LF', 'CF', 'RF', 'C']) {
+      'game_key': pos,
+      'substitutions': [{'team_code': 'g', 'source_player_id': '1',
+        'name': '兼任', 'role': 'DEF', 'entry_position': pos}]
+    }];
+    final bands = defenseSubstitutionBands(substitutionBands([...games, games.first], 'g'));
+    expect(bands.map((b) => b['total']), [2, 3]);
+    expect(usageMaps(bands.first['players']).single['count'], 2);
+    expect(usageMaps(bands.last['players']).single['count'], 3);
   });
 }

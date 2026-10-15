@@ -1,3 +1,4 @@
+import '../tools/network_error.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -72,11 +73,12 @@ bool isClientTimeout(Object error) {
 }
 
 String authNetworkError(Object e, String action) {
+  if (e is http.ClientException) return serverNotRunningMessage;
   if (isClientTimeout(e)) {
     unawaited(AuthSession.instance.reportTimeout(e, StackTrace.current));
     return '$actionがタイムアウトしました。少し待って再度お試しください';
   }
-  return '通信エラー: $e';
+  return networkErrorMessage(e, fallback: '通信エラー: $e');
 }
 
 /// デバッグ起動時の自動ログイン（本番ビルドでは使わない）
@@ -395,7 +397,7 @@ class AuthSession {
       if (map['need_code'] == true) return (error: null, codeSent: true);
       return (error: null, codeSent: false);
     } catch (e) {
-      return (error: '通信エラー: $e', codeSent: false);
+      return (error: networkErrorMessage(e, fallback: '通信エラー: $e'), codeSent: false);
     }
   }
 
@@ -427,7 +429,7 @@ class AuthSession {
       }
       return null;
     } catch (e) {
-      return '通信エラー: $e';
+      return networkErrorMessage(e, fallback: '通信エラー: $e');
     }
   }
 
@@ -449,7 +451,7 @@ class AuthSession {
       }
       return null;
     } catch (e) {
-      return '通信エラー: $e';
+      return networkErrorMessage(e, fallback: '通信エラー: $e');
     }
   }
 
@@ -474,7 +476,7 @@ class AuthSession {
       }
       return null;
     } catch (e) {
-      return '通信エラー: $e';
+      return networkErrorMessage(e, fallback: '通信エラー: $e');
     }
   }
 

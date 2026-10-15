@@ -159,6 +159,134 @@ Map<String, dynamic> team(int id, String name) => {
     };
 
 void main() {
+  testWidgets('本塁打5本以上は比率が低くても名前を表示し比較ヘッダーは球団色', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 900));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final teams = [
+      team(1, '球団A')
+        ..['color_back'] = '#123456'
+        ..['batting_stats'] = [
+          {'player_key': 'a', 'name': '本塁打最多', 'home_runs': 191},
+          {'player_key': 'b', 'name': '五本打った長い選手名', 'home_runs': 5},
+          {'player_key': 'c', 'name': '四本の選手', 'home_runs': 4},
+        ],
+      team(2, '球団B')
+        ..['batting_stats'] = [
+          {'player_key': 'd', 'name': '比較選手', 'home_runs': 400},
+        ]
+    ];
+    final client = MockClient((_) async => http.Response(
+        jsonEncode({'teams': teams}), 200,
+        headers: {'content-type': 'application/json; charset=utf-8'}));
+    await http.runWithClient(() async {
+      await tester.pumpWidget(const MaterialApp(
+          home: Scaffold(
+              body: TeamStrengthBoard(org: OrgConfig.npb, year: 2026))));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('strength-view-0')));
+      await tester.pumpAndSettle();
+      for (final comparison in [false, true]) {
+        if (comparison) {
+          await tester.tap(find.text('12球団比較'));
+          await tester.pumpAndSettle();
+        }
+        final band = find
+            .byKey(const ValueKey('strength-band-contribution-home_runs'))
+            .first;
+        final name =
+            find.descendant(of: band, matching: find.text('五本打った長い選手名'));
+        expect(name, findsOneWidget);
+        expect(find.descendant(of: band, matching: find.text('四本の選手')),
+            findsNothing);
+        expect(find.descendant(of: band, matching: find.text('5')),
+            findsOneWidget);
+        expect(
+            find.descendant(of: band, matching: find.text('5本')), findsNothing);
+        final segment = find.byTooltip('五本打った長い選手名：5本（2.5%）');
+        expect(tester.getSize(name).width,
+            lessThanOrEqualTo(tester.getSize(segment).width));
+        if (comparison) {
+          final header = find
+              .ancestor(
+                  of: find.text('球団A').first, matching: find.byType(Container))
+              .first;
+          expect(
+              (tester.widget<Container>(header).decoration as BoxDecoration)
+                  .color,
+              const Color(0xFF123456));
+        }
+        expect(tester.takeException(), isNull);
+      }
+    }, () => client);
+  });
+
+  testWidgets('成績と契約は各球団・全球団比較を切り替える', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(1200, 1000));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final teams = [
+      for (var id = 1; id <= 2; id++)
+        team(id, '球団$id')
+          ..['batting_stats'] = [
+            {
+              'player_key': 'b$id',
+              'name': '打者$id',
+              'home_runs': 10 * id,
+              'rbi': 30 * id,
+              'total_bases_walks': 100 * id,
+              'triples': 2 * id,
+              'doubles': 5 * id,
+              'singles': 24 * id,
+              'walks': 20 * id
+            }
+          ]
+    ];
+    final client = MockClient((_) async => http.Response(
+        jsonEncode({'teams': teams}), 200,
+        headers: {'content-type': 'application/json; charset=utf-8'}));
+    await http.runWithClient(() async {
+      await tester.pumpWidget(const MaterialApp(
+          home: Scaffold(
+              body: TeamStrengthBoard(org: OrgConfig.npb, year: 2026))));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('strength-view-0')));
+      await tester.pumpAndSettle();
+      expect(find.text('10本'), findsWidgets);
+      expect(find.text('30'), findsOneWidget);
+      await tester.tap(find.text('12球団比較'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('strength-team-1')), findsNothing);
+      expect(find.text('60'), findsOneWidget);
+      final bands = tester.getRect(find
+          .byKey(const ValueKey('strength-band-contribution-home_runs'))
+          .first);
+      final second = tester.getRect(find
+          .byKey(const ValueKey('strength-band-contribution-home_runs'))
+          .last);
+      expect(second.width, closeTo(bands.width * 2, .1));
+      expect(find.text('塁打数（四球含む）'), findsNothing);
+      final basesLast = tester.getRect(find
+          .byKey(const ValueKey('strength-band-contribution-total_bases_walks'))
+          .last);
+      final rbiFirst = tester.getRect(
+          find.byKey(const ValueKey('strength-band-contribution-rbi')).first);
+      expect(basesLast.bottom, lessThan(bands.top));
+      expect(second.bottom, lessThan(rbiFirst.top));
+      expect(find.text('球団1'), findsNWidgets(3));
+      await tester.tap(find.byKey(const ValueKey('strength-view-4')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('strength-team-1')), findsNothing);
+      await tester.tap(find.text('各球団'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('strength-team-1')), findsOneWidget);
+      await tester.tap(find.text('12球団比較'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('strength-team-1')), findsNothing);
+      expect(find.byKey(const ValueKey('contract-horizontal-scroll')),
+          findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }, () => client);
+  });
+
   testWidgets('球団セグメントは折り返す場合セとパで段を分ける', (tester) async {
     await tester.binding.setSurfaceSize(const Size(700, 900));
     addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -206,6 +334,9 @@ void main() {
           home: Scaffold(
               body: TeamStrengthBoard(org: OrgConfig.npb, year: 2026))));
       await tester.pumpAndSettle();
+      await tester.ensureVisible(
+          find.byKey(const ValueKey('strength-detail-outs-relief')));
+      await tester.pumpAndSettle();
       await tester
           .tap(find.byKey(const ValueKey('strength-detail-outs-relief')));
       await tester.pumpAndSettle();
@@ -227,6 +358,9 @@ void main() {
       await tester.tap(find.byTooltip('閉じる'));
       await tester.pumpAndSettle();
       expect(find.byType(Dialog), findsNothing);
+      await tester.ensureVisible(
+          find.byKey(const ValueKey('strength-detail-starts-C')));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('strength-detail-starts-C')));
       await tester.pumpAndSettle();
       expect(find.text('捕手1　80試合（80.0%）'), findsOneWidget);
@@ -414,6 +548,28 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('レギュラー野手にシーズンOPSと本塁打を表示する', (tester) async {
+    final data = team(1, '球団A');
+    data['positions'] = [
+      {
+        'slot': 'C',
+        'total': 100,
+        'players': [
+          {'player_key': 'batter', 'name': '捕手選手', 'count': 80}
+        ]
+      }
+    ];
+    data['batting_stats'] = [
+      {'player_key': 'batter', 'ops': 0.85, 'home_runs': 12}
+    ];
+    await tester.pumpWidget(
+        MaterialApp(home: Scaffold(body: StrengthRegularGrid(teams: [data]))));
+    await tester.pumpAndSettle();
+    expect(find.text('OPS .850  12本'), findsOneWidget);
+    expect(find.text('80試合'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('レギュラー表は広い画面で列を均等に広げ右端まで表示する', (tester) async {
     await tester.binding.setSurfaceSize(const Size(600, 600));
     addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -428,16 +584,16 @@ void main() {
         .controller!;
     scroll.jumpTo(200);
     await tester.pump();
-    await tester.binding.setSurfaceSize(const Size(1600, 600));
+    await tester.binding.setSurfaceSize(const Size(3200, 600));
     await tester.pumpAndSettle();
     final table = tester.getRect(find.byType(Table));
     expect(table.left, closeTo(160, 0.1));
-    expect(table.right, closeTo(1600, 0.1));
+    expect(table.right, closeTo(3200, 0.1));
     expect(scroll.offset, 0);
     expect(scroll.position.maxScrollExtent, 0);
     expect(tester.getCenter(find.text('球団')).dx, closeTo(80, 0.1));
-    expect(tester.getCenter(find.text('捕手')).dx, closeTo(240, 0.1));
-    expect(tester.getCenter(find.text('指名打者')).dx, closeTo(1520, 0.1));
+    expect(tester.getCenter(find.text('捕手')).dx, closeTo(1040, 0.1));
+    expect(tester.getCenter(find.text('指名打者')).dx, closeTo(2320, 0.1));
     expect(tester.takeException(), isNull);
   });
 
@@ -535,7 +691,7 @@ void main() {
 
   testWidgets('スクロール位置の保存値を投手詳細の開閉状態として読み込まない', (tester) async {
     final bucket = PageStorageBucket();
-    const listKey = PageStorageKey('strength-lineup-npb-2026-1');
+    const listKey = PageStorageKey('strength-rows-npb-2026-1-1');
     await tester.pumpWidget(MaterialApp(
         home: PageStorage(
       bucket: bucket,
@@ -561,20 +717,23 @@ void main() {
         child: const TeamStrengthBoard(org: OrgConfig.npb, year: 2026),
       ))));
       await tester.pumpAndSettle();
-      await tester.scrollUntilVisible(find.text('各投手の投球回・負担率'), 300,
-          scrollable: find
-              .descendant(
-                  of: find.byKey(listKey), matching: find.byType(Scrollable))
-              .first);
+      final scrollable = tester.state<ScrollableState>(find
+          .descendant(
+              of: find.byKey(listKey), matching: find.byType(Scrollable))
+          .first);
+      scrollable.position.jumpTo(scrollable.position.maxScrollExtent);
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('各投手の投球回・負担率'));
+      await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
       await tester.tap(find.text('各投手の投球回・負担率'));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
       expect(
           bucket.readState(tester.element(find.byKey(listKey))), isA<double>());
-      await tester.tap(find.byKey(const ValueKey('strength-view-1')));
+      await tester.tap(find.byKey(const ValueKey('strength-view-2')));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const ValueKey('strength-view-0')));
+      await tester.tap(find.byKey(const ValueKey('strength-view-1')));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
     }, () => client);
@@ -692,7 +851,7 @@ void main() {
 
   for (final width in [390.0, 1200.0]) {
     testWidgets('幅$widthで投手とスタメン比率を表示し、球団変更で通信しない', (tester) async {
-      final vertical = width < 600;
+      const vertical = false;
       await tester.binding.setSurfaceSize(Size(width, 1200));
       addTearDown(() => tester.binding.setSurfaceSize(null));
       var requests = 0;
@@ -717,6 +876,12 @@ void main() {
         expect(find.text('投手の投球回負担率'), findsOneWidget);
         expect(find.text('先発負担率'), findsOneWidget);
         expect(find.text('中継負担率'), findsOneWidget);
+        double bandTop(String key) =>
+            tester.getTopLeft(find.byKey(ValueKey(key))).dy;
+        expect(bandTop('strength-band-outs-pitching_hand'),
+            lessThan(bandTop('strength-band-outs-starter')));
+        expect(bandTop('strength-band-pa-batting_hand'),
+            lessThan(bandTop('strength-band-starts-1')));
         expect(find.text('途中出場の起用割合'), findsOneWidget);
         expect(tester.getTopLeft(find.text('途中出場の起用割合')).dy,
             greaterThan(tester.getTopLeft(find.text('打順のスタメン比率')).dy));
@@ -748,6 +913,10 @@ void main() {
             tester.getRect(find.byTooltip('兼任1（先発）：10回（チーム全体の6.1%）'));
         final band = tester
             .getRect(find.byKey(const ValueKey('strength-band-outs-starter')));
+        final headerRect = tester.getRect(header);
+        expect(headerRect.height, closeTo(band.height, 0.01));
+        expect(headerRect.top, closeTo(band.top, 0.01));
+        expect(headerRect.bottom, closeTo(band.bottom, 0.01));
         if (vertical) {
           final detail = tester.getRect(
               find.byKey(const ValueKey('strength-detail-outs-starter')));
@@ -772,12 +941,12 @@ void main() {
           expect(starterRect.height, closeTo(780 * 60 / 90, 0.01));
         }
         expect(tester.takeException(), isNull);
-        await tester.tap(find.byKey(const ValueKey('strength-view-1')));
+        await tester.tap(find.byKey(const ValueKey('strength-view-2')));
         await tester.pumpAndSettle();
         expect(find.text('球団A'), findsOneWidget);
         expect(find.text('球団B'), findsOneWidget);
         expect(find.byType(Table), findsOneWidget);
-        await tester.tap(find.byKey(const ValueKey('strength-view-2')));
+        await tester.tap(find.byKey(const ValueKey('strength-view-3')));
         await tester.pumpAndSettle();
         expect(find.text('年齢'), findsOneWidget);
         expect(find.text('育成選手1 【契・FA・退】'), findsOneWidget);
@@ -792,7 +961,7 @@ void main() {
         await tester.tap(find.byKey(const ValueKey('strength-team-2')));
         await tester.pumpAndSettle();
         expect(find.text('育成選手2 【契・FA・退】'), findsOneWidget);
-        await tester.tap(find.byKey(const ValueKey('strength-view-0')));
+        await tester.tap(find.byKey(const ValueKey('strength-view-1')));
         await tester.pumpAndSettle();
         expect(find.byTooltip('先発選手2（先発）：20回（チーム全体の12.1%）'), findsOneWidget);
         expect(requests, 1);
@@ -802,7 +971,7 @@ void main() {
     });
   }
 
-  testWidgets('狭い画面は帯を横スクロールでき、画面を広げると通信せず横向きの帯に戻る', (tester) async {
+  testWidgets('縦横どちらの画面でも横向きの帯を横スクロールできる', (tester) async {
     await tester.binding.setSurfaceSize(const Size(390, 900));
     addTearDown(() => tester.binding.setSurfaceSize(null));
     var requests = 0;
@@ -828,7 +997,7 @@ void main() {
       await tester.pumpAndSettle();
       final starter = find.byTooltip('先発選手1（先発）：20回（チーム全体の12.1%）');
       final before = tester.getRect(starter);
-      expect(before.height, greaterThan(before.width));
+      expect(before.width, greaterThan(before.height));
       final horizontalScroll = find.byWidgetPredicate((widget) =>
           widget is SingleChildScrollView &&
           widget.scrollDirection == Axis.horizontal);
@@ -851,6 +1020,20 @@ void main() {
       expect(requests, 1);
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox.shrink());
+    }, () => client);
+  });
+
+  testWidgets('ClientExceptionはサーバー未起動の案内を表示する', (tester) async {
+    final client =
+        MockClient((_) async => throw http.ClientException('Failed to fetch'));
+    await http.runWithClient(() async {
+      await tester.pumpWidget(const MaterialApp(
+          home: Scaffold(
+              body: TeamStrengthBoard(org: OrgConfig.npb, year: 2026))));
+      await tester.pumpAndSettle();
+      expect(find.text('サーバーが起動されていません'), findsOneWidget);
+      expect(find.textContaining('ClientException'), findsNothing);
+      expect(find.text('再読み込み'), findsOneWidget);
     }, () => client);
   });
 

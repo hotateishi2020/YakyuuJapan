@@ -9,6 +9,7 @@ import 'package:postgres/postgres.dart';
 
 import '../tools/Postgres.dart';
 import 'StrengthUsage.dart';
+import 'StrengthMetrics.dart';
 
 /// 戦力タブは登録済みJSONを読むだけ。外部サイト取得・集計はrefreshで行う。
 class TeamStrength {
@@ -164,6 +165,14 @@ class TeamStrength {
   static Future<int> _save(
       String org, int year, List<Map<String, dynamic>> teams) async {
     if (teams.isEmpty) return 0;
+    final metricsClient = http.Client();
+    try {
+      for (final team in teams) {
+        team['defense_substitutions'] = defenseSubstitutionBands(_maps(team['substitutions']));
+        team.addAll(await fetchStrengthMetrics(metricsClient, team, year, org,
+          npbCode: npbStrengthSources['${team['name_team']}']?.$2));
+      }
+    } finally { metricsClient.close(); }
     await StrengthUsage.attachStatuses(org, year, teams);
     await Postgres.withConnection((conn) => conn.runTx((tx) async {
           await StrengthUsage.saveTotals(tx, org, year, teams);
@@ -172,7 +181,7 @@ class TeamStrength {
         SELECT \$1::integer, \$2::text, (payload->>'id_team')::integer, payload
         FROM jsonb_array_elements(\$3::jsonb) AS rows(payload)
         ON CONFLICT (int_year, code_org, id_team) DO UPDATE
-        SET payload = EXCLUDED.payload, updated_at = NOW()
+        SET payload = t_team_strength.payload || EXCLUDED.payload, updated_at = NOW()
       ''', parameters: [year, org, jsonEncode(teams)]);
         }));
     for (final team in teams) {

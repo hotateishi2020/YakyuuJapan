@@ -1,9 +1,11 @@
+import '../tools/network_error.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../logic/auth_session.dart';
+import '../pages/display_settings_page.dart';
 
 Future<void> showAccountMenu(BuildContext context, {VoidCallback? onChanged}) async {
   final box = context.findRenderObject() as RenderBox?;
@@ -25,6 +27,7 @@ Future<void> showAccountMenu(BuildContext context, {VoidCallback? onChanged}) as
     items: const [
       PopupMenuItem(value: 'password', child: Text('パスワード変更')),
       PopupMenuItem(value: 'notify', child: Text('通知設定')),
+      PopupMenuItem(value: 'display', child: Text('表示設定')),
       PopupMenuItem(value: 'profile', child: Text('基本設定')),
       PopupMenuDivider(),
       PopupMenuItem(value: 'logout', child: Text('ログアウト')),
@@ -33,6 +36,10 @@ Future<void> showAccountMenu(BuildContext context, {VoidCallback? onChanged}) as
   if (!context.mounted || action == null) return;
 
   switch (action) {
+    case 'display':
+      await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const DisplaySettingsPage()));
+      onChanged?.call();
+      break;
     case 'password':
       await showChangePasswordDialog(context);
       break;
@@ -344,7 +351,7 @@ class _BasicSettingsDialogState extends State<_BasicSettingsDialog> {
       if (!mounted) return;
       setState(() {
         _loading = false;
-        _error = '読み込みに失敗しました: $e';
+        _error = networkErrorMessage(e, fallback: '読み込みに失敗しました: $e');
       });
     }
   }

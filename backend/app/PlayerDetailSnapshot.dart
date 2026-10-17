@@ -4,12 +4,11 @@ import 'package:postgres/postgres.dart';
 import '../tools/Postgres.dart';
 import 'PlayerDetail.dart';
 import 'ScheduledLog.dart';
-import 'StrengthUsage.dart' show usageMaps;
 
 /// Request path reads one indexed JSON snapshot. All aggregation and upstream
 /// requests belong to refresh(), never to opening a player dialog.
 class PlayerDetailSnapshot {
-  static Timer? _startup, _timer;
+  static Timer? _timer;
   static bool _busy = false;
   static bool _ready = false;
   static Future<void> ensure(Connection conn) async {
@@ -75,40 +74,35 @@ class PlayerDetailSnapshot {
                 '''SELECT p.id,t.id_league,d.updated_at::text AS snapshot_updated FROM m_player p JOIN m_team t ON t.id=p.id_team
           LEFT JOIN t_player_detail_snapshot d ON d.id_player=p.id AND d.int_year=\$1
           WHERE t.id_league IN (1,2,3,4) AND NOT COALESCE(p.flg_delete,false)
+          AND (CASE WHEN \$2::int[] IS NOT NULL THEN p.id=ANY(\$2::int[]) ELSE
+            (COALESCE(p.year_retire,0)=0 OR p.year_retire>\$1)
+            AND (EXISTS(SELECT 1 FROM m_player_career c WHERE c.id_player=p.id AND c.int_year=\$1 AND NOT COALESCE(c.flg_delete,false))
+            OR EXISTS(SELECT 1 FROM v_stats_player s WHERE s.int_year=\$1 AND (s.payload->>'id_player')::int=p.id)
+            OR EXISTS(SELECT 1 FROM t_team_strength ts CROSS JOIN LATERAL jsonb_array_elements(COALESCE(ts.payload->'roster','[]'::jsonb)) r
+              WHERE ts.int_year=\$1 AND ts.id_team=p.id_team AND regexp_replace(r->>'name','[[:space:]　]','','g')=regexp_replace(p.name_full,'[[:space:]　]','','g'))
+            )
+          END)
           ORDER BY d.updated_at NULLS FIRST,p.id''',
-                parameters: [year]))
+                parameters: [year, playerIds?.toList()]))
             .map((r) => r.toColumnMap())
             .toList();
       });
-      print('選手詳細: 対象 ${people.length} 人、共通データ読込');
-      final batch = await Postgres.withConnection(
-          (conn) => PlayerDetailBatch.load(conn, year));
-      final activeIds = <int>{
-        for (final r in batch.stats)
-          if (r['id_player'] is int) r['id_player'] as int,
-        for (final r in batch.careers)
-          if (r['int_year'] == year && r['id_player'] is int)
-            r['id_player'] as int,
-      };
-      for (final team in batch.teams) {
-        final candidates =
-            batch.people.where((p) => p['id_team'] == team['id_team']).toList();
-        for (final r in usageMaps(team['roster'])) {
-          final p = matchPlayer(
-              {'name': r['name'], 'id_team': team['id_team']}, candidates);
-          if (p != null) activeIds.add(p['id'] as int);
-        }
+      // Explicit IDs allow maintenance of retired players; automatic refresh
+      // keeps their saved snapshots and only loads current-season candidates.
+      final cutoff = DateTime.now().subtract(const Duration(hours: 1));
+      final selected = people.where((p) => playerIds != null ||
+          DateTime.tryParse('${p['snapshot_updated']}')?.isAfter(cutoff) != true).toList();
+      if (selected.isEmpty) {
+        return {'year': year, 'updated': 0, 'failed': 0, 'fresh': people.isNotEmpty};
       }
-      print('選手詳細: 共通データ読込完了、今季対象 ${activeIds.length} 人');
-      final selected = people
-          .where((p) => (playerIds ?? activeIds).contains(p['id']))
-          .where((p) => playerIds != null || (DateTime.tryParse('${p['snapshot_updated']}')?.isAfter(DateTime.now().subtract(const Duration(hours:1))) != true))
-          .toList();
-      await Postgres.withConnection((conn) => batch.loadRecentGames(
-          conn, year, selected.map((p) => p['id'] as int).toList()));
+      print('選手詳細: 対象 ${selected.length} 人、共通データ読込');
+      final batch = await Postgres.withConnection((conn) => PlayerDetailBatch.load(
+          conn, year, playerIds: selected.map((p) => p['id'] as int).toList()));
+      // Never retain all players' career and game JSON at once on the web server.
       for (var offset = 0; offset < selected.length; offset += 20) {
         final group = selected.skip(offset).take(20).toList();
         await Postgres.withConnection((conn) async {
+          await batch.loadPlayerGroup(conn, year, group.map((p) => p['id'] as int).toList());
           final records = <Map<String,dynamic>>[];
           Future<void> prepare(Map<String,dynamic> person) async {
             try {
@@ -142,7 +136,6 @@ class PlayerDetailSnapshot {
   }
 
   static void start() {
-    _startup?.cancel();
     _timer?.cancel();
     Future<void> tick() async {
       try {
@@ -153,7 +146,7 @@ class PlayerDetailSnapshot {
       }
     }
 
-    _startup = Timer(const Duration(seconds: 30), tick);
+    // Startup serves stored snapshots; never trigger a full refresh on restart.
     _timer = Timer.periodic(const Duration(hours: 6), (_) => unawaited(tick()));
   }
 }

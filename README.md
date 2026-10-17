@@ -8,7 +8,7 @@ sh tool/build_web.sh
 
 git add . 
 
-git commit -m "功績タブと経歴タブとドラフトタブを追加しました。" 
+git commit -m "表示を修正しました。" 
 
 git push 
 

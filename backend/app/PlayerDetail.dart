@@ -359,6 +359,18 @@ class PlayerDetailBatch {
   Map<String,dynamic> npbRecent = {}, profiles = {};
   PlayerDetailBatch(
       this.people, this.careers, this.stats, this.extra, this.teams);
+  /// Keep only the current processing group in memory, including past seasons.
+  Future<void> loadPlayerGroup(Connection conn, int year, List<int> ids) async {
+    careers.clear();
+    games = {};
+    if (ids.isEmpty) return;
+    final rows = await conn.execute(
+        "SELECT to_jsonb(c) || jsonb_build_object('name_team',t.name_short) FROM m_player_career c LEFT JOIN m_team t ON t.id=c.id_team WHERE c.id_player=ANY(\$1::int[]) AND c.int_year<=\$2 AND NOT COALESCE(c.flg_delete,false) ORDER BY c.int_year DESC,c.id",
+        parameters: [ids, year]);
+    careers.addAll(rows.map((r) => detailMap(r[0])));
+    await loadRecentGames(conn, year, ids);
+  }
+
   Future<void> loadRecentGames(Connection conn, int year, List<int> ids) async {
     final rows = await conn.execute('''WITH grouped AS (
       SELECT s.id_player,g.id,g.datetime_start,g.code_game,g.state,g.score_home,g.score_away,
@@ -383,24 +395,20 @@ class PlayerDetailBatch {
     }
   }
 
-  static Future<PlayerDetailBatch> load(Connection conn, int year) async {
+  static Future<PlayerDetailBatch> load(Connection conn, int year, {required List<int> playerIds}) async {
     final people = (await conn.execute(
-            "SELECT p.id,p.name_full,p.url,p.id_team,p.txt_position,p.date_birth::text,p.height,p.weight,p.pitching,p.batting,p.uniform_number,c.name AS birth_country,b.name AS birth_place,t.name_short AS name_team,t.color_back,t.color_font,t.id_league FROM m_player p JOIN m_team t ON t.id=p.id_team LEFT JOIN m_country c ON c.id=p.id_country LEFT JOIN m_place_birth b ON b.id=p.id_place_birth WHERE t.id_league IN (1,2,3,4) AND NOT COALESCE(p.flg_delete,false)"))
+            "SELECT p.id,p.name_full,p.url,p.id_team,p.txt_position,p.date_birth::text,p.height,p.weight,p.pitching,p.batting,p.uniform_number,c.name AS birth_country,b.name AS birth_place,t.name_short AS name_team,t.color_back,t.color_font,t.id_league FROM m_player p JOIN m_team t ON t.id=p.id_team LEFT JOIN m_country c ON c.id=p.id_country LEFT JOIN m_place_birth b ON b.id=p.id_place_birth WHERE t.id_league IN (1,2,3,4) AND NOT COALESCE(p.flg_delete,false) AND p.id=ANY(\$1::int[])", parameters: [playerIds]))
         .map((r) => r.toColumnMap())
         .toList();
     await attachOfficialIdentity(conn, year, people);
-    final careers = (await conn.execute(
-            "SELECT to_jsonb(c) || jsonb_build_object('name_team',t.name_short) FROM m_player_career c LEFT JOIN m_team t ON t.id=c.id_team WHERE c.int_year<=\$1 AND NOT COALESCE(c.flg_delete,false) ORDER BY c.int_year DESC,c.id",
-            parameters: [year]))
-        .map((r) => detailMap(r[0]))
-        .toList();
+    final careers = <Map<String, dynamic>>[];
     final stats = (await conn.execute(
             'SELECT payload FROM v_stats_player WHERE int_year=\$1 ORDER BY row_no',
             parameters: [year]))
         .map((r) => detailMap(r[0]))
         .toList();
     final teams = (await conn.execute(
-            'SELECT payload FROM t_team_strength WHERE int_year=\$1',
+            "SELECT jsonb_build_object('id_team',id_team,'roster',payload->'roster','positions',payload->'positions','pitching_workload',payload->'pitching_workload','batting_stats',payload->'batting_stats','pitching_stats',payload->'pitching_stats','contracts',payload->'contracts') FROM t_team_strength WHERE int_year=\$1",
             parameters: [year]))
         .map((r) => detailMap(r[0]))
         .toList();

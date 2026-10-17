@@ -1,3 +1,4 @@
+import 'app/MlbScheduleWatch.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
@@ -2141,6 +2142,7 @@ void main() async {
     PlayerDetailSnapshot.start();
     PredictionSnapshotSchedule.start(onUpdated: _clearPredictionsCache);
     // 取得処理だけ登録する。タイマーは /predictions/ready の通知後に開始する。
+    MlbScheduleWatch.start(onUpdated: _clearPredictionsCache);
     GameFetchSchedule.armFutureWatch('mlb', FetchMLB.refreshFutureIfChanged);
     GameFetchSchedule.armFutureWatch('npb', FetchURL.refreshFutureIfChanged);
     // 当日の試合も初期表示完了まで定期取得を始めない。

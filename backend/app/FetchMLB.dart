@@ -1,3 +1,4 @@
+import 'MlbScheduleReconcile.dart';
 import 'package:html/dom.dart';
 import 'package:intl/intl.dart';
 import 'package:postgres/postgres.dart';
@@ -689,6 +690,28 @@ class FetchMLB {
     return keep;
   }
 
+  /// Browser-independent preflight: today's and tomorrow's Japanese dates.
+  static Future<void> refreshNearSchedule() async {
+    final changed = <String>{};
+    await Postgres.withConnection((conn) async {
+      await Postgres.begin(conn);
+      try {
+        await fetchGames(conn, nearDaysOnly: true, reloadedDates: changed);
+        await Postgres.commit(conn);
+      } catch (_) {
+        await Postgres.rollback(conn);
+        rethrow;
+      }
+      final now = JapanClock.now();
+      for (final offset in [0, 1]) {
+        changed.add(DateFormat('yyyy-MM-dd').format(now.add(Duration(days: offset))));
+      }
+      for (final day in changed) {
+        await DisplaySnapshot.refreshGames(conn, int.parse(day.substring(0, 4)), from: day, to: day);
+      }
+    });
+  }
+
   /// 明日以降の日程カードを見て、表示が変わった試合だけ取り直す。
   static Future<void> refreshFutureIfChanged() async {
     final changed = <String>{};
@@ -715,6 +738,7 @@ class FetchMLB {
     Connection conn, {
     bool todayOnly = false,
     bool futureOnly = false,
+    bool nearDaysOnly = false,
     Set<String>? reloadedDates,
   }) async {
     GameFetchSchedule.armFutureWatch('mlb', refreshFutureIfChanged);
@@ -726,7 +750,7 @@ class FetchMLB {
       print('MLB明日以降は${GameFetchSchedule.futureInterval.inMinutes}分以内のためスキップ');
     }
     final today = DateTime(now.year, now.month, now.day);
-    final dates = futureOnly
+    final dates = nearDaysOnly ? [today, today.add(const Duration(days: 1))] : futureOnly
         ? [for (var i = 1; i <= 10; i++) today.add(Duration(days: i))]
         : scheduleDates(now, includeFuture: includeFuture, todayOnly: todayOnly);
     final formatter = DateFormat('yyyy-MM-dd');
@@ -766,6 +790,7 @@ class FetchMLB {
         continue;
       }
 
+      if (await reconcileMlbSchedule(conn, formatted, document) > 0) reloadedDates?.add(formatted);
       final cardsRoot = document.querySelector('#gm_card');
       if (cardsRoot == null) {
         print('MLB: この日の試合カードはありません。');
@@ -790,10 +815,11 @@ class FetchMLB {
 
           final linkText = card.querySelector('.bb-score__link')?.text.trim() ?? '';
           final statusText = card.querySelector('.bb-score__status')?.text.trim() ?? '';
+          if (cancelledMlbCard('$linkText $statusText')) continue;
           final fingerprint = GameFetchSchedule.normalizeCard(href, card.text);
           final cardKey = 'mlb|$formatted|$href';
           final futureDay = GameFetchSchedule.isFutureDay(date, now);
-          if (futureDay && GameFetchSchedule.futureCardUnchanged(cardKey, fingerprint)) continue;
+          if (!nearDaysOnly && futureDay && GameFetchSchedule.futureCardUnchanged(cardKey, fingerprint)) continue;
 
           final homeRaw = card.querySelector('.bb-score__homeLogo')?.text.trim() ?? '';
           final awayRaw = card.querySelector('.bb-score__awayLogo')?.text.trim() ?? '';

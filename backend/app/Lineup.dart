@@ -52,8 +52,7 @@ bool _sameLineupName(String left, String right) {
   final b = _lineupCompact(right);
   if (a.isEmpty || b.isEmpty) return false;
   if (a == b) return true;
-  return playerNameMatches(query: left, nameFull: right) ||
-      playerNameMatches(query: right, nameFull: left);
+  return playerNameMatches(query: left, nameFull: right) || playerNameMatches(query: right, nameFull: left);
 }
 
 /// 打順1〜9。各枠は先発打者から、代打・代走・代守で入った選手の順。
@@ -82,8 +81,7 @@ Map<int, List<Map<String, dynamic>>> battingLineupsOf(
       pitchers: pitchers,
       rbi: rbi,
       errors: errors,
-      starters:
-          starters.where((row) => _asInt(row['id_game']) == entry.key).toList(),
+      starters: starters.where((row) => _asInt(row['id_game']) == entry.key).toList(),
     );
   }
   return lineups;
@@ -106,8 +104,7 @@ List<Map<String, dynamic>> _lineupOf(
       final half = _halfKey(a).compareTo(_halfKey(b));
       if (half != 0) return half;
       // 同じイニングでは打席結果を交代より先に置く。記録順が前後しても、代走のあとに元の打者が戻らない。
-      final phase =
-          (_isBattingPlate(a) ? 0 : 1).compareTo(_isBattingPlate(b) ? 0 : 1);
+      final phase = (_isBattingPlate(a) ? 0 : 1).compareTo(_isBattingPlate(b) ? 0 : 1);
       if (phase != 0) return phase;
       return _asInt(a['id']).compareTo(_asInt(b['id']));
     });
@@ -140,8 +137,7 @@ List<Map<String, dynamic>> _lineupOf(
     if (current == order) return;
     if (current != null) {
       // 投手交代直後の代守が9番に載っていたら、打席の打順（守備変更で外れた野手の枠）へ移す。
-      slots['$team|$current']
-          ?.removeWhere((existing) => _sameLineupName(existing, name));
+      slots['$team|$current']?.removeWhere((existing) => _sameLineupName(existing, name));
     }
     final slot = slots.putIfAbsent('$team|$order', () => <String>[]);
     // 打順枠に後から入ったのに代打・代走の記録がない選手は、代守（守備交代後の打席）とみなす。
@@ -154,8 +150,9 @@ List<Map<String, dynamic>> _lineupOf(
   int? occupiedBy(int team, String name) {
     for (var order = 1; order <= 9; order++) {
       final slot = slots['$team|$order'];
-      if (slot != null && slot.isNotEmpty && _sameLineupName(slot.last, name))
+      if (slot != null && slot.isNotEmpty && _sameLineupName(slot.last, name)) {
         return order;
+      }
     }
     return null;
   }
@@ -166,8 +163,9 @@ List<Map<String, dynamic>> _lineupOf(
     for (final key in pitchers) {
       if (!key.startsWith(prefix)) continue;
       final full = key.substring(prefix.length);
-      if (full == name || full.startsWith(name) || name.startsWith(full))
+      if (full == name || full.startsWith(name) || name.startsWith(full)) {
         return true;
+      }
     }
     return false;
   }
@@ -183,8 +181,7 @@ List<Map<String, dynamic>> _lineupOf(
     return 9;
   }
 
-  void pinch(int team, String exit, String enter, String role,
-      {bool pitcherSlotFallback = true}) {
+  void pinch(int team, String exit, String enter, String role, {bool pitcherSlotFallback = true}) {
     if (team <= 0 || enter.isEmpty) return;
     // すでに出場している選手の守備位置変更・同選手の別名は、代守にしない。
     if (_sameLineupName(enter, exit) || listed(team, enter)) return;
@@ -236,20 +233,19 @@ List<Map<String, dynamic>> _lineupOf(
       pinch(fieldingTeam, exit, enter, '代守', pitcherSlotFallback: false);
       var to = _defenseLabel('${row['code_position_to'] ?? ''}');
       if (to.isEmpty) to = _defenseLabel('${row['code_position_from'] ?? ''}');
-      if (to.isEmpty && exit.isNotEmpty)
+      if (to.isEmpty && exit.isNotEmpty) {
         to = positions['$fieldingTeam|$exit'] ?? '';
-      if (to.isNotEmpty && enter.isNotEmpty)
+      }
+      if (to.isNotEmpty && enter.isNotEmpty) {
         positions['$fieldingTeam|$enter'] = to;
+      }
       continue;
     }
     if (code == 'CHANGE_PITCHER' && enter.isNotEmpty) {
       positions.putIfAbsent('$fieldingTeam|$enter', () => '投');
       continue;
     }
-    if (code == 'CHANGE_POSITION' &&
-        enter.isNotEmpty &&
-        exit.isNotEmpty &&
-        !_sameLineupName(enter, exit)) {
+    if (code == 'CHANGE_POSITION' && enter.isNotEmpty && exit.isNotEmpty && !_sameLineupName(enter, exit)) {
       pinch(fieldingTeam, exit, enter, '代守');
       continue;
     }
@@ -257,8 +253,9 @@ List<Map<String, dynamic>> _lineupOf(
     final team = _asInt(row['id_team']);
     final batting = team > 0 ? team : battingTeam;
     final pos = _defenseLabel('${row['code_position_from'] ?? ''}');
-    if (pos.isNotEmpty && batter.isNotEmpty)
+    if (pos.isNotEmpty && batter.isNotEmpty) {
       positions.putIfAbsent('$batting|$batter', () => pos);
+    }
     place(batting, order, batter);
   }
 
@@ -266,8 +263,7 @@ List<Map<String, dynamic>> _lineupOf(
     final team = _asInt(starter['id_team']);
     final order = _asInt(starter['int_batting_order']);
     final name = _name(starter['name_full'] ?? starter['name']);
-    final pos = _defenseLabel(
-        '${starter['code_position_from'] ?? starter['pos'] ?? ''}');
+    final pos = _defenseLabel('${starter['code_position_from'] ?? starter['pos'] ?? ''}');
     if (team <= 0 || order < 1 || order > 9 || name.isEmpty) continue;
     if (pos.isNotEmpty) positions.putIfAbsent('$team|$name', () => pos);
     if (listed(team, name)) continue;
@@ -296,10 +292,7 @@ List<Map<String, dynamic>> _lineupOf(
               'pos': positions['$team|$name'] ?? '',
               'plays': plays[playPlayerKey(gameId, team, name)] ?? '',
               'rbi': rbi[playPlayerKey(gameId, team, name)] ?? 0,
-              'field_marks':
-                  (errors[playPlayerKey(gameId, team, name)] ?? 0) > 0
-                      ? 'E'
-                      : '',
+              'field_marks': (errors[playPlayerKey(gameId, team, name)] ?? 0) > 0 ? 'E' : '',
             },
         ],
       });
@@ -342,24 +335,20 @@ void _applyFieldingMarks(
     final code = '${row['code_result'] ?? ''}'.trim();
     final enter = _name(row['name_enter']);
     final exit = _name(row['name_exit']);
-    if (code == 'PINCH_FIELDER' ||
-        (code == 'CHANGE_POSITION' &&
-            enter.isNotEmpty &&
-            exit.isNotEmpty &&
-            !_sameLineupName(enter, exit))) {
+    if (code == 'PINCH_FIELDER' || (code == 'CHANGE_POSITION' && enter.isNotEmpty && exit.isNotEmpty && !_sameLineupName(enter, exit))) {
       var to = _defenseLabel('${row['code_position_to'] ?? ''}');
       if (to.isEmpty) to = _defenseLabel('${row['code_position_from'] ?? ''}');
       if (to.isEmpty && exit.isNotEmpty) {
         for (final entry in [...current.entries]) {
-          if (entry.key.startsWith('$fieldingTeam|') &&
-              _sameLineupName(entry.value, exit)) {
+          if (entry.key.startsWith('$fieldingTeam|') && _sameLineupName(entry.value, exit)) {
             to = entry.key.substring('$fieldingTeam|'.length);
             break;
           }
         }
       }
-      if (to.isNotEmpty && enter.isNotEmpty)
+      if (to.isNotEmpty && enter.isNotEmpty) {
         current['$fieldingTeam|$to'] = enter;
+      }
       continue;
     }
     if (code == 'CHANGE_PITCHER' && enter.isNotEmpty) {
@@ -447,9 +436,7 @@ void _fillBattingOrders(List<Map<String, dynamic>> rows) {
       final code = '${row['code_result'] ?? ''}'.trim();
       if (code != 'PINCH_HITTER' && code != 'PINCH_RUNNER') continue;
       if (_asInt(row['int_batting_order']) >= 1) continue;
-      final name = _name(row['name_enter']).isNotEmpty
-          ? _name(row['name_enter'])
-          : _name(row['name_full']);
+      final name = _name(row['name_enter']).isNotEmpty ? _name(row['name_enter']) : _name(row['name_full']);
       final known = knownOrder(name);
       if (known != null) row['int_batting_order'] = known;
     }
@@ -530,9 +517,7 @@ Set<String> pitcherKeysOf(List<Map<String, dynamic>> gameRows) {
     final gameId = _asInt(row['id_game']);
     if (gameId <= 0) continue;
     final pitcher = row['flg_pitcher'];
-    final isPitcher = pitcher == true ||
-        '$pitcher'.trim().toLowerCase() == 'true' ||
-        '$pitcher'.trim() == 't';
+    final isPitcher = pitcher == true || '$pitcher'.trim().toLowerCase() == 'true' || '$pitcher'.trim() == 't';
     final name = _name(row['name_full_summary']);
     final team = _asInt(row['id_team_summary']);
     if (isPitcher && name.isNotEmpty && team > 0) {
@@ -563,12 +548,10 @@ List<Map<String, dynamic>> mergeAnnouncedLineup(List live, List announced) {
     if (raw is! Map) continue;
     final team = _asInt(raw['id_team']);
     final order = _asInt(raw['order']);
-    final index = result.indexWhere((row) =>
-        _asInt(row['id_team']) == team && _asInt(row['order']) == order);
+    final index = result.indexWhere((row) => _asInt(row['id_team']) == team && _asInt(row['order']) == order);
     if (index < 0) {
       result.add(Map<String, dynamic>.from(raw));
-    } else if (result[index]['players'] is! List ||
-        (result[index]['players'] as List).isEmpty) {
+    } else if (result[index]['players'] is! List || (result[index]['players'] as List).isEmpty) {
       result[index] = Map<String, dynamic>.from(raw);
     }
   }

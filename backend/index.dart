@@ -19,9 +19,15 @@ import 'app/DisplaySnapshot.dart';
 import 'app/PlayerDisplay.dart';
 import 'app/FieldingErrors.dart';
 import 'app/TeamStrength.dart';
+import 'app/Records.dart';
+import 'app/ClubData.dart';
+import 'app/PlayerDetailSnapshot.dart';
+import 'app/PostseasonForm.dart';
+import 'app/PlayerMetricSchedule.dart';
 import 'app/GamesReadGate.dart';
 import 'app/FetchURL.dart';
 import 'app/LogDetail.dart';
+import 'app/ScheduledLog.dart';
 import 'app/GamesFetch.dart';
 import 'app/FetchMLB.dart';
 import 'app/Lineup.dart';
@@ -236,7 +242,10 @@ Future<Map<String, dynamic>> _buildPredictionsPartGames(
     }
   }
   final snap = await Postgres.withConnection(
-    (conn) => DisplaySnapshot.games(conn, year, from: windowFrom, to: windowTo),
+    (conn) async {
+      final snapshot=await DisplaySnapshot.games(conn, year, from: windowFrom, to: windowTo);
+      return snapshot;
+    },
   );
   windowFrom = snap.from;
   windowTo = snap.to;
@@ -279,6 +288,7 @@ Future<Map<String, dynamic>> _buildPredictionsPartGames(
     plateFeats,
     maxInningByGame(playRows),
   ));
+  await Postgres.withConnection((conn) => attachPostseasonForm(conn, games, year));
   _fillMissingLineScores(games, playRows);
   final lineups = battingLineupsOf(
     playRows,
@@ -522,8 +532,6 @@ String _matchupCodeKey(Map<String, dynamic> game) {
 bool _yahooHistoricalMix(Map<String, dynamic> a, Map<String, dynamic> b) {
   return _yahooGameSource(a) != _yahooGameSource(b);
 }
-
-bool _rowUnstarted(Map<String, dynamic> game) => !_rowFinished(game) && !_rowInProgress(game);
 
 bool _nearSameGameDay(Map<String, dynamic> a, Map<String, dynamic> b) {
   String dateOnly(dynamic value) {
@@ -943,6 +951,8 @@ List<Map<String, dynamic>> _summariesOf(
           'id_game_summary': row['id_game_summary'],
           'id_team_summary': row['id_team_summary'],
           'name_full_summary': row['name_full_summary'],
+          'pitching_hand': row['pitching_hand'],
+          'batting_hand': row['batting_hand'],
           'txt_batting': row['txt_batting'],
           'txt_pitching': row['txt_pitching'],
           'txt_homerun_total': row['txt_homerun_total'],
@@ -1035,6 +1045,64 @@ void main() async {
     // ====== API ======
 
     app.get('/healthz', (Request _) => Response.ok('ok'));
+
+    app.get('/club-logos/<year>/<club>/<image>', (Request request,String year,String club,String image) async {
+      if(!RegExp(r'^\d{4}$').hasMatch(year)||!npbClubNames.containsKey(club)||!RegExp(r'^[a-z0-9]+\.(png|jpg|jpeg|gif|webp)$').hasMatch(image))return Response.notFound('Not found');
+      for(final root in ['public','backend/public']) {
+        final file=File('$root/club-logos/$year/$club/$image');
+        if(await file.exists())return Response.ok(file.openRead(),headers:{'content-type':'image/${image.endsWith('.jpg')?'jpeg':image.split('.').last}','cache-control':'public, max-age=86400'});
+      }
+      return Response.notFound('Not found');
+    });
+    app.get('/player-detail', (Request request) async {
+      const headers={'content-type':'application/json; charset=utf-8'};
+      try {
+        final org=OrgKind.parse(request.url.queryParameters['org']);
+        final year=_seasonYear(request,org);
+        final query=request.url.queryParameters;
+        if((query['name']??'').length>100)throw const FormatException('選手名が長すぎます');
+        final identity=<String,dynamic>{'name':query['name']??'',if(query['id_player']!=null)'id_player':int.tryParse(query['id_player']!),if(query['id_team']!=null)'id_team':int.tryParse(query['id_team']!),if(query['source_player_id']!=null)'source_player_id':query['source_player_id']};
+        final data=await Postgres.withConnection((conn)=>PlayerDetailSnapshot.read(conn,year:year,leagues:org.leagueIds,identity:identity),urgent:true);
+        return Response.ok(jsonEncode(data),headers:headers);
+      } on FormatException catch(e) {return Response.badRequest(body:jsonEncode({'error':e.message}),headers:headers);
+      } catch(e,st) {_printRequestError(request,e,st);return Response.internalServerError(body:jsonEncode({'error':'選手情報を取得できませんでした'}),headers:headers);}
+    });
+
+    app.get('/club-hub', (Request request) async {
+      const headers={'content-type':'application/json; charset=utf-8'};
+      try {final org=OrgKind.parse(request.url.queryParameters['org']);final year=_seasonYear(request,org);
+        return Response.ok(jsonEncode(readClubFile('club-hub-${org.code}-$year.json')),headers:headers);
+      } on FormatException catch(e){return Response.badRequest(body:jsonEncode({'error':e.message}),headers:headers);}
+    });
+    app.get('/season-schedule', (Request request) async {
+      const headers={'content-type':'application/json; charset=utf-8'};
+      try {
+        final org=OrgKind.parse(request.url.queryParameters['org']);
+        final year=int.tryParse(request.url.queryParameters['year']??'')??DateTimeTool.getThisYear();
+        if(year<(org==OrgKind.mlb?1876:1936)||year>DateTimeTool.getThisYear()+1)throw const FormatException('指定年度の日程は対象外です');
+        final data=await Postgres.withConnection((conn)=>readSeasonSchedule(conn,org,year),urgent:true);
+        return Response.ok(jsonEncode(data),headers:headers);
+      } on FormatException catch(e){return Response.badRequest(body:jsonEncode({'error':e.message}),headers:headers);
+      } catch(error,stack) {
+        _printRequestError(request,error,stack);
+        return Response.internalServerError(body:jsonEncode({'error':'日程を取得できませんでした'}),headers:headers);
+      }
+    });
+
+    app.get('/records', (Request request) async {
+      const headers = {'content-type': 'application/json; charset=utf-8'};
+      try {
+        final org = OrgKind.parse(request.url.queryParameters['org']);
+        final year = _seasonYear(request, org);
+        final data = await Postgres.withConnection((conn) => Records.read(conn, org: org, year: year), urgent: true);
+        return Response.ok(jsonEncode(data), headers: headers);
+      } on FormatException catch (error) {
+        return Response.badRequest(body: jsonEncode({'error': error.message}), headers: headers);
+      } catch (error, stack) {
+        _printRequestError(request, error, stack);
+        return Response.internalServerError(body: jsonEncode({'error': '記録情報を取得できませんでした'}), headers: headers);
+      }
+    });
 
     app.get('/team-strength', (Request request) async {
       const headers = {'content-type': 'application/json; charset=utf-8'};
@@ -1953,6 +2021,7 @@ void main() async {
           plateFeats,
           maxInningByGame(playRows),
         ));
+        await Postgres.withConnection((conn) => attachPostseasonForm(conn, games, currentYear));
         _fillMissingLineScores(games, playRows);
         final lineups = battingLineupsOf(
           playRows,
@@ -2068,6 +2137,8 @@ void main() async {
     // 個人成績は初期表示では取らず、起動の数分後から定期登録する。
     PlayerStatsSchedule.start(onUpdated: _clearPredictionsCache);
     TeamStrength.start();
+    PlayerMetricSchedule.start(onUpdated: _clearPredictionsCache);
+    PlayerDetailSnapshot.start();
     PredictionSnapshotSchedule.start(onUpdated: _clearPredictionsCache);
     // 取得処理だけ登録する。タイマーは /predictions/ready の通知後に開始する。
     GameFetchSchedule.armFutureWatch('mlb', FetchMLB.refreshFutureIfChanged);
@@ -2283,6 +2354,8 @@ Future<Response> tryCatchAPI(Request request, String categorySystem, String code
   final requestId = _requestId(request);
   var idError = 0;
   final user = m_user();
+  // Set the actor before opening the DB so connection failures retain it too.
+  if (ScheduledLog.isScheduledRequest(request)) user.id = ScheduledLog.userId;
   var response = Response.ok('ok');
   user.category_system = categorySystem;
   user.code_system = codeSystem;

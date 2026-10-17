@@ -66,12 +66,12 @@ void main() {
               'code_select': 'FREE',
               'code_point': 'SINGLE',
               'int_same_player_limit': 1,
-              'users': const [
+              'users': [
                 {'id': 1, 'name': '立石', 'color': 'blue', 'hits': 3},
                 {'id': 2, 'name': '江島', 'color': 'red', 'hits': 1},
               ],
-              'titles': const ['打率', 'チーム順位'],
-              'players': const [
+              'titles': ['打率', 'チーム順位'],
+              'players': [
                 {
                   'league': 'セ・リーグ',
                   'title': '打率',
@@ -79,9 +79,9 @@ void main() {
                   'current': '佐藤輝明、近本光司',
                   'color_back': 'tomato',
                   'color_font': 'white',
-                  'color_backs': const ['tomato', 'navy'],
-                  'color_fonts': const ['white', 'yellow'],
-                  'picks': const [
+                  'color_backs': ['tomato', 'navy'],
+                  'color_fonts': ['white', 'yellow'],
+                  'picks': [
                     {'id_user': 1, 'name': '佐藤輝明', 'hit': true},
                     {'id_user': 2, 'name': '近本光司', 'hit': false},
                   ],
@@ -91,7 +91,7 @@ void main() {
                   'title': 'MVP',
                   'pitcher': false,
                   'current': '岡本和真',
-                  'picks': const [
+                  'picks': [
                     {'id_user': 1, 'name': '岡本和真', 'hit': false},
                   ],
                 },
@@ -100,7 +100,7 @@ void main() {
                   'title': '沢村賞',
                   'pitcher': true,
                   'current': '山本由伸',
-                  'picks': const [
+                  'picks': [
                     {'id_user': 1, 'name': '山本由伸', 'hit': false},
                   ],
                 },
@@ -109,8 +109,8 @@ void main() {
                 {'league': 'セ・リーグ', 'rank': 1, 'actual': '阪神', 'color_back': 'tomato', 'color_font': 'white', 'picks': []},
                 {'league': 'パ・リーグ', 'rank': 1, 'actual': 'ソフトバンク', 'picks': []},
               ],
-              'japan': const {'name': 'オリックス', 'color_back': 'navy', 'color_font': 'white'},
-              'champions': const [
+              'japan': {'name': 'オリックス', 'color_back': 'navy', 'color_font': 'white'},
+              'champions': [
                 {'id_user': 1, 'name': 'オリックス', 'hit': true},
                 {'id_user': 2, 'name': '阪神', 'hit': false},
               ],
@@ -123,10 +123,10 @@ void main() {
               'code_select': 'WAIVER',
               'code_point': 'GAP',
               'int_same_player_limit': 2,
-              'users': const [
+              'users': [
                 {'id': 1, 'name': '立石', 'color': 'blue', 'hits': 2},
               ],
-              'titles': const ['打点'],
+              'titles': ['打点'],
               'players': [],
               'teams': [],
               'champions': [],
@@ -319,11 +319,11 @@ void main() {
               'id_setting': 6,
               'date_limit_team': '2099-12-31',
               'date_limit_player': '2020-01-01',
-              'users': const [
+              'users': [
                 {'id': 1, 'name': '立石', 'color': 'blue', 'hits': 0},
                 {'id': 2, 'name': '江島', 'color': 'red', 'hits': 0},
               ],
-              'titles': const ['打率'],
+              'titles': ['打率'],
               'players': [],
               'teams': [],
               'champions': [],
@@ -360,11 +360,11 @@ void main() {
               'txt_name': '立石・江島',
               'int_year': 2026,
               'id_setting': 6,
-              'users': const [
+              'users': [
                 {'id': 1, 'name': '立石', 'hits': 3},
                 {'id': 2, 'name': '江島', 'hits': 1},
               ],
-              'titles': const ['打率'],
+              'titles': ['打率'],
               'players': [],
               'teams': [],
               'champions': [],

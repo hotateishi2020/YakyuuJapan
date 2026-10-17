@@ -1,10 +1,15 @@
+import 'GamesBoard.dart' show teamLogoVisual;
 import 'package:flutter/material.dart';
+import '../logic/season_schedule.dart';
 
 /// イベント日程の月間カレンダー。左のカテゴリ高さは News のタグ（20）に揃える。
 class EventCalendar extends StatefulWidget {
   final List<Map<String, dynamic>> events;
+  final List<Map<String, dynamic>> games;
+  final DateTime? initialMonth;
+  final ValueChanged<DateTime>? onMonthChanged;
 
-  const EventCalendar({super.key, required this.events});
+  const EventCalendar({super.key, required this.events, this.games = const [], this.initialMonth, this.onMonthChanged});
 
   @override
   State<EventCalendar> createState() => _EventCalendarState();
@@ -16,10 +21,24 @@ class _EventCalendarState extends State<EventCalendar> {
   @override
   void initState() {
     super.initState();
-    final now = DateTime.now();
+    final now = widget.initialMonth ?? DateTime.now();
     _month = DateTime(now.year, now.month);
   }
 
+  @override
+  void didUpdateWidget(covariant EventCalendar old) {
+    super.didUpdateWidget(old);
+    if (old.initialMonth != widget.initialMonth && widget.initialMonth != null) {
+      _month = widget.initialMonth!;
+    }
+  }
+
+  void _move(int delta) {
+    setState(() => _month = DateTime(_month.year, _month.month + delta));
+    widget.onMonthChanged?.call(_month);
+  }
+
+  List<Map<String, dynamic>> _gamesOn(DateTime? d) => d == null ? [] : widget.games.where((g) => g['date'] == scheduleDate(d)).toList();
   DateTime? _dayOf(dynamic value) {
     final text = '$value'.trim();
     if (text.isEmpty || text == 'null') return null;
@@ -79,7 +98,7 @@ class _EventCalendarState extends State<EventCalendar> {
                 padding: EdgeInsets.zero,
                 visualDensity: VisualDensity.compact,
                 constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-                onPressed: () => setState(() => _month = DateTime(_month.year, _month.month - 1)),
+                onPressed: () => _move(-1),
                 icon: const Icon(Icons.chevron_left, size: 18),
               ),
               Expanded(
@@ -93,7 +112,7 @@ class _EventCalendarState extends State<EventCalendar> {
                 padding: EdgeInsets.zero,
                 visualDensity: VisualDensity.compact,
                 constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-                onPressed: () => setState(() => _month = DateTime(_month.year, _month.month + 1)),
+                onPressed: () => _move(1),
                 icon: const Icon(Icons.chevron_right, size: 18),
               ),
             ],
@@ -138,7 +157,8 @@ class _EventCalendarState extends State<EventCalendar> {
     final bars = _barsForWeek(row, lead, days);
     const barH = 14.0;
     final lanes = bars.isEmpty ? 0 : bars.map((bar) => bar.lane).reduce((a, b) => a > b ? a : b) + 1;
-    return 18.0 + (lanes == 0 ? 8.0 : lanes * (barH + 2));
+    final maxGames = [for (var c = 0; c < 7; c++) _gamesOn(_cellDate(row * 7 + c, lead, days)).length].reduce((a, b) => a > b ? a : b);
+    return 26.0 + lanes * (barH + 2) + maxGames * 17;
   }
 
   Widget _week(int row, int lead, int days, double width, double height) {
@@ -146,6 +166,7 @@ class _EventCalendarState extends State<EventCalendar> {
     final bars = _barsForWeek(row, lead, days);
     const barH = 14.0;
     final today = DateTime.now();
+    final lanes = bars.isEmpty ? 0 : bars.map((b) => b.lane).reduce((a, b) => a > b ? a : b) + 1;
     return SizedBox(
       height: height,
       child: Stack(
@@ -166,10 +187,7 @@ class _EventCalendarState extends State<EventCalendar> {
                         border: Border.all(color: Colors.black26),
                       ),
                       alignment: Alignment.topLeft,
-                      child: Text(
-                        date == null ? '' : '${date.day}',
-                        style: const TextStyle(fontSize: 10, height: 1.1, fontWeight: FontWeight.bold),
-                      ),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(date == null ? '' : '${date.day}', style: const TextStyle(fontSize: 10, height: 1.1, fontWeight: FontWeight.bold)), SizedBox(height: lanes * 16.0 + 5), for (final game in _gamesOn(date)) SizedBox(height: 17, child: Tooltip(message: '${scheduleMatchup(game)} ${game['time'] ?? ''} ${game['stadium'] ?? ''}', child: ScheduleGameTile(game: game)))]),
                     );
                   }),
                 ),
@@ -254,4 +272,28 @@ class _EventBar {
     required this.color,
     required this.font,
   });
+}
+
+class ScheduleGameTile extends StatelessWidget {
+  const ScheduleGameTile({super.key, required this.game});
+  final Map<String, dynamic> game;
+  Widget logo(String side) {
+    final raw = '${game['name_$side'] ?? ''}';
+    const names = {'巨':'巨人','神':'阪神','中':'中日','ヤ':'ヤクルト','広':'広島','De':'DeNA','ソ':'ソフトバンク','日':'日本ハム','ロ':'ロッテ','西':'西武','楽':'楽天','オ':'オリックス'};
+    final name = names[raw] ?? raw;
+    final visual = teamLogoVisual(name, abbrev: '${game['${side}_code'] ?? ''}');
+    Widget fallback() => const Icon(Icons.sports_baseball, size: 14, color: Colors.grey);
+    return Semantics(label: name, child: SizedBox(width: 16, height: 16,
+      child: visual.asset != null ? Image.asset(visual.asset!, fit: BoxFit.contain, errorBuilder: (_, __, ___) => fallback())
+      : visual.networkUrl != null ? Image.network(visual.networkUrl!, fit: BoxFit.contain, errorBuilder: (_, __, ___) => fallback()) : fallback()));
+  }
+  @override
+  Widget build(BuildContext context) => FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft,
+    child: Row(mainAxisSize: MainAxisSize.min, children: [
+      logo('away'),
+      Padding(padding: const EdgeInsets.symmetric(horizontal: 2), child: Text(
+        game['finished'] == true ? '${game['score_away'] ?? '—'}–${game['score_home'] ?? '—'}' : 'vs',
+        style: const TextStyle(fontSize: 9))),
+      logo('home'),
+    ]));
 }

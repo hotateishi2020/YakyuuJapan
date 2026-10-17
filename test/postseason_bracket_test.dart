@@ -348,6 +348,15 @@ void main() {
     final pacificStars = tester.getRect(find.byKey(const Key('postseason-js-stars-7')));
     expect(centralStars.right, lessThanOrEqualTo(central.left + 1));
     expect(pacificStars.left, greaterThanOrEqualTo(pacific.right - 1));
+    final bounds = tester.getRect(find.byKey(const Key('postseason-js-content')));
+    for (final mark in [central, pacific, centralStars, pacificStars]) {
+      expect(mark.left, greaterThanOrEqualTo(bounds.left));
+      expect(mark.right, lessThanOrEqualTo(bounds.right));
+      expect(mark.top, greaterThanOrEqualTo(bounds.top));
+      expect(mark.bottom, lessThanOrEqualTo(bounds.bottom));
+    }
+    expect(central.left, greaterThan(bounds.left + bounds.width * .2));
+    expect(pacific.right, lessThan(bounds.right - bounds.width * .2));
     expect(centralStars.height, greaterThan(centralStars.width));
     expect(pacificStars.height, greaterThan(pacificStars.width));
     expect(
@@ -682,4 +691,26 @@ void main() {
     expect(board.nlCs.winsHigh, 1);
     expect(board.nlCs.winsLow, 0);
   });
+  test('NLCS敗退のドジャースはNLDSまで、勝者だけNLCSの線を強調する', () {
+    final board = buildMlbPostseasonBoard(standings: [
+      for (var rank = 1; rank <= 6; rank++)
+        {'id_team': rank == 2 ? 40 : rank, 'id_league': 4, 'int_rank': rank,
+         'name_team': rank == 2 ? 'ドジャース' : 'NL$rank', 'int_win': 100 - rank, 'int_lose': 60 + rank}
+    ], games: [
+      for (var i = 1; i <= 3; i++) ...[
+        game(code: 'NLDS', home: 1, away: 4, scoreHome: 3, scoreAway: 0, date: '2026-10-0$i'),
+        game(code: 'NLDS', home: 40, away: 3, scoreHome: 3, scoreAway: 0, date: '2026-10-0$i'),
+      ],
+      for (var i = 1; i <= 4; i++)
+        game(code: 'NLCS', home: 1, away: 40, scoreHome: 3, scoreAway: 0, date: '2026-10-1$i'),
+    ]);
+    expect(board.nlDs2.winnerId, 40);
+    expect(board.nlCs.loserId, 40);
+    expect(board.eliminated(40), isTrue);
+    expect(wonNextMlbRound(board.nlDs2, board.nlCs), isFalse);
+    expect(wonNextMlbRound(board.nlDs1, board.nlCs), isTrue);
+    expect(wonNextMlbRound(board.nlCs, board.worldSeries), isFalse);
+    expect(wonNextMlbRound(StageResult.empty, StageResult.empty), isFalse);
+  });
+
 }

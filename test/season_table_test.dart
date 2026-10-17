@@ -9,13 +9,15 @@ import 'package:Yakyuu_Japan/View/SeasonTable.dart';
 void main() {
   testWidgets('スターの有無でスタッツヘッダーの高さを変えない', (tester) async {
     Future<double> height(Set<String> stars) async {
-      await tester.pumpWidget(MaterialApp(home: Scaffold(body: Align(
+      await tester.pumpWidget(MaterialApp(
+          home: Scaffold(
+              body: Align(
         alignment: Alignment.topLeft,
-        child: StatsSegmentControl(labels: const ['打率', '本塁打'], fallbackColor: Colors.red,
-          starredTitles: stars, selectedIndex: 0, onSelected: (_) {}),
+        child: StatsSegmentControl(labels: const ['打率', '本塁打'], fallbackColor: Colors.red, starredTitles: stars, selectedIndex: 0, onSelected: (_) {}),
       ))));
       return tester.getSize(find.byType(StatsSegmentControl)).height;
     }
+
     expect(await height({}), await height({'打率'}));
   });
 
@@ -27,16 +29,14 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
       await tester.binding.setSurfaceSize(const Size(1400, 800));
       addTearDown(() => tester.binding.setSurfaceSize(null));
-      await tester.pumpWidget(MaterialApp(home: Scaffold(body:
-        DualBandBothLeaguePersonalStats(org: org, stats: [
-          for (var i = 0; i < 2; i++) {'id_league': org.leagues[i].id,
-            'title': '打率', 'stats': '.300', 'int_rank': 1,
-            'name_player': '選手$i', 'name_team': '球団', 'flg_pitcher': false},
-        ]))));
-      expect(tester.widget<PlayerStatCell>(find.byType(PlayerStatCell).first).width,
-          closeTo(1400, 0.1));
+      await tester.pumpWidget(MaterialApp(
+          home: Scaffold(
+              body: DualBandBothLeaguePersonalStats(org: org, stats: [
+        for (var i = 0; i < 2; i++) {'id_league': org.leagues[i].id, 'title': '打率', 'stats': '.300', 'int_rank': 1, 'name_player': '選手$i', 'name_team': '球団', 'flg_pitcher': false},
+      ]))));
+      expect(tester.widget<PlayerStatCell>(find.byType(PlayerStatCell).first).width, closeTo(1400, 0.1));
       expect(find.text('選手0'), findsOneWidget);
-      await tester.drag(find.byType(TabBarView), const Offset(-700, 0));
+      await tester.drag(find.byType(TabBarView).first, const Offset(-700, 0));
       await tester.pumpAndSettle();
       expect(find.text('選手0'), findsOneWidget);
       expect(find.text(org.leagues[0].name.replaceAll('・リーグ', '')), findsNothing);
@@ -51,12 +51,11 @@ void main() {
     testWidgets('NPB縦画面の${layout.name}表示でもセパ切替', (tester) async {
       await tester.binding.setSurfaceSize(const Size(390, 800));
       addTearDown(() => tester.binding.setSurfaceSize(null));
-      await tester.pumpWidget(MaterialApp(home: Scaffold(body:
-        BothLeaguePersonalStats(layout: layout, stats: [
-          for (var i = 1; i <= 2; i++) {'id_league': i,
-            'title': '打率', 'stats': '.300', 'int_rank': 1,
-            'name_player': '選手$i', 'name_team': '球団', 'flg_pitcher': false},
-        ]))));
+      await tester.pumpWidget(MaterialApp(
+          home: Scaffold(
+              body: BothLeaguePersonalStats(layout: layout, stats: [
+        for (var i = 1; i <= 2; i++) {'id_league': i, 'title': '打率', 'stats': '.300', 'int_rank': 1, 'name_player': '選手$i', 'name_team': '球団', 'flg_pitcher': false},
+      ]))));
       expect(find.text('選手1'), findsOneWidget);
       await tester.tap(find.text('パ・リーグ'));
       await tester.pumpAndSettle();
@@ -69,13 +68,12 @@ void main() {
   testWidgets('横画面のMLB個人成績をリーグタブで切り替える', (tester) async {
     await tester.binding.setSurfaceSize(const Size(1400, 800));
     addTearDown(() => tester.binding.setSurfaceSize(null));
-    await tester.pumpWidget(const MaterialApp(home: Scaffold(body:
-      DualBandBothLeaguePersonalStats(org: OrgConfig.mlb, stats: [
-        {'id_league': 3, 'title': '打率', 'stats': '.300', 'int_rank': 1,
-          'name_player': 'AL選手', 'name_team': 'AL', 'flg_pitcher': false},
-        {'id_league': 4, 'title': '打率', 'stats': '.310', 'int_rank': 1,
-          'name_player': 'NL選手', 'name_team': 'NL', 'flg_pitcher': false},
-      ]))));
+    await tester.pumpWidget(const MaterialApp(
+        home: Scaffold(
+            body: DualBandBothLeaguePersonalStats(org: OrgConfig.mlb, stats: [
+      {'id_league': 3, 'title': '打率', 'stats': '.300', 'int_rank': 1, 'name_player': 'AL選手', 'name_team': 'AL', 'flg_pitcher': false},
+      {'id_league': 4, 'title': '打率', 'stats': '.310', 'int_rank': 1, 'name_player': 'NL選手', 'name_team': 'NL', 'flg_pitcher': false},
+    ]))));
     expect(find.text('AL選手'), findsOneWidget);
     expect(find.text('NL選手'), findsNothing);
     await tester.tap(find.text('ナ・リーグ'));
@@ -428,30 +426,30 @@ void main() {
       'flg_pitcher': false,
     };
     await expectHeader(
-      BothLeaguePersonalStats(
+      const BothLeaguePersonalStats(
         stats: [
           {...row, 'id_league': 1},
-          {...row, 'id_league': 2, 'name_player': '柳田'},
+          {...row, 'id_league': 2},
         ],
       ),
       'セ',
     );
     await expectHeader(
-      BothLeaguePersonalStats(
+      const BothLeaguePersonalStats(
         layout: PersonalStatsLayout.scroll,
         stats: [
           {...row, 'id_league': 1},
-          {...row, 'id_league': 2, 'name_player': '柳田'},
+          {...row, 'id_league': 2},
         ],
       ),
       'パ',
     );
     await expectHeader(
-      DualBandBothLeaguePersonalStats(
+      const DualBandBothLeaguePersonalStats(
         org: OrgConfig.mlb,
         stats: [
           {...row, 'id_league': 3},
-          {...row, 'id_league': 4, 'name_player': '大谷'},
+          {...row, 'id_league': 4},
         ],
       ),
       'ア',

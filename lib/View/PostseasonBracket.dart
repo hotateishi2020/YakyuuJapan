@@ -212,12 +212,24 @@ class PostseasonBracket extends StatelessWidget {
               ),
               Expanded(
                 child: Stack(
-                  clipBehavior: Clip.none,
+                  key: const Key('postseason-js-content'),
+                  clipBehavior: Clip.hardEdge,
                   children: [
-                    const Positioned.fill(
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(40, 2, 40, 2),
-                        child: Image(image: AssetImage('backend/assets/images/logo_japan_series.png'), fit: BoxFit.contain),
+                    Positioned.fill(
+                      child: Center(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(width: 72, child: central == null ? null : _japanFinalist(central, wins: board.japan.winsHigh, slots: board.japan.slots, alignLeft: true, eliminated: board.eliminated(central.id))),
+                            const SizedBox(width: 8),
+                            const SizedBox(width: 180, child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 2),
+                              child: Image(image: AssetImage('backend/assets/images/logo_japan_series.png'), fit: BoxFit.contain),
+                            )),
+                            const SizedBox(width: 8),
+                            SizedBox(width: 72, child: pacific == null ? null : _japanFinalist(pacific, wins: board.japan.winsLow, slots: board.japan.slots, alignLeft: false, eliminated: board.eliminated(pacific.id))),
+                          ],
+                        ),
                       ),
                     ),
                     if (central != null && pacific != null)
@@ -228,20 +240,6 @@ class PostseasonBracket extends StatelessWidget {
                           key: const Key('postseason-js-score'),
                           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, height: 1, color: Colors.black87),
                         ),
-                      ),
-                    if (central != null)
-                      Positioned(
-                        left: -46,
-                        top: 0,
-                        bottom: 0,
-                        child: _japanFinalist(central, wins: board.japan.winsHigh, slots: board.japan.slots, alignLeft: true, eliminated: board.eliminated(central.id)),
-                      ),
-                    if (pacific != null)
-                      Positioned(
-                        right: -46,
-                        top: 0,
-                        bottom: 0,
-                        child: _japanFinalist(pacific, wins: board.japan.winsLow, slots: board.japan.slots, alignLeft: false, eliminated: board.eliminated(pacific.id)),
                       ),
                   ],
                 ),
@@ -317,15 +315,6 @@ class PostseasonBracket extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  double _starTop(Rect rect, int slots, {double insetTop = 0}) {
-    const pitch = 15.0;
-    final used = (slots <= 0 ? 4 : slots) * pitch;
-    final bodyTop = rect.top + insetTop;
-    final bodyHeight = rect.height - insetTop;
-    final top = bodyTop + (bodyHeight - used) / 2;
-    return top < bodyTop + 4 ? bodyTop + 4 : top;
   }
 
   /// 星は勝ち上がり線の上端から、線の脇に詰めて置く。

@@ -69,10 +69,7 @@ void main() {
     expect(result.length, 3);
     expect(result.last['label'], 'ナ・リーグ サイ・ヤング賞');
     expect(achievementValue({'label': 'サイ・ヤング賞'}), 100);
-    expect(
-        achievementValue({'label': '侍ジャパン招集', 'kind': 'callup'}),
-        lessThan(
-            achievementValue({'label': '侍ジャパン代表選出', 'kind': 'national_team'})));
+    expect(achievementValue({'label': '侍ジャパン招集', 'kind': 'callup'}), lessThan(achievementValue({'label': '侍ジャパン代表選出', 'kind': 'national_team'})));
   });
   for (final width in [375.0, 1200.0]) {
     testWidgets('経歴の切替と根拠表示 幅$width', (t) async {
@@ -80,8 +77,7 @@ void main() {
       t.view.devicePixelRatio = 1;
       addTearDown(t.view.resetPhysicalSize);
       addTearDown(t.view.resetDevicePixelRatio);
-      await t.pumpWidget(
-          MaterialApp(home: Scaffold(body: StrengthCareers(teams: teams))));
+      await t.pumpWidget(MaterialApp(home: Scaffold(body: StrengthCareers(teams: teams))));
       expect(find.text('甲高校  2人'), findsOneWidget);
       await t.tap(find.text('大学'));
       await t.pumpAndSettle();
@@ -95,7 +91,7 @@ void main() {
     });
   }
   testWidgets('追加受賞を功績アイコンと詳細に表示する', (t) async {
-    await t.pumpWidget(MaterialApp(
+    await t.pumpWidget(const MaterialApp(
         home: Scaffold(
             body: StrengthAchievements(year: 2026, team: {
       'roster': [
@@ -103,13 +99,7 @@ void main() {
           'name': '選手',
           'player_key': 'a',
           'additional_achievements': [
-            {
-              'label': '沢村賞',
-              'year': 2025,
-              'kind': 'title',
-              'source': 'https://npb.jp/',
-              'detail': '公式受賞'
-            },
+            {'label': '沢村賞', 'year': 2025, 'kind': 'title', 'source': 'https://npb.jp/', 'detail': '公式受賞'},
           ]
         }
       ],

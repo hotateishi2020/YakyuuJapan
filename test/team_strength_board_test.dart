@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/View/records_board.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -159,6 +160,38 @@ Map<String, dynamic> team(int id, String name) => {
     };
 
 void main() {
+  testWidgets('選手起用と選手一覧はそれぞれ推し球団を初期選択する', (tester) async {
+    final client = MockClient((_) async => http.Response(
+        jsonEncode({
+          'teams': [team(1, '球団1'), team(2, '球団2')]
+        }),
+        200,
+        headers: {'content-type': 'application/json; charset=utf-8'}));
+    await http.runWithClient(() async {
+      await tester.pumpWidget(const MaterialApp(
+          home: Scaffold(
+              body: TeamStrengthBoard(
+                  initialView: 1, org: OrgConfig.npb, year: 2026, favoriteTeamId: 2))));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const PageStorageKey('strength-rows-npb-2026-2-1')),
+          findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('strength-team-1')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('strength-view-3')));
+      await tester.pumpAndSettle();
+      expect(
+          tester
+              .widget<StrengthRosterGrid>(find.byType(StrengthRosterGrid))
+              .team['id_team'],
+          2);
+      await tester.tap(find.byKey(const ValueKey('strength-view-1')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const PageStorageKey('strength-rows-npb-2026-1-1')),
+          findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }, () => client);
+  });
+
   testWidgets('本塁打5本以上は比率が低くても名前を表示し比較ヘッダーは球団色', (tester) async {
     await tester.binding.setSurfaceSize(const Size(390, 900));
     addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -181,7 +214,7 @@ void main() {
     await http.runWithClient(() async {
       await tester.pumpWidget(const MaterialApp(
           home: Scaffold(
-              body: TeamStrengthBoard(org: OrgConfig.npb, year: 2026))));
+              body: TeamStrengthBoard(initialView: 1, org: OrgConfig.npb, year: 2026))));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('strength-view-0')));
       await tester.pumpAndSettle();
@@ -223,7 +256,7 @@ void main() {
   });
 
   for (final org in [OrgConfig.npb, OrgConfig.mlb]) {
-    testWidgets('${org.label}功績の全球団比較は所属を表示して件数順に並べる', (tester) async {
+    testWidgets('${org.label}功績の全球団比較は件数より総合点を優先して並べる', (tester) async {
       final teams = [
         for (var id = 1; id <= 2; id++)
           team(id, '球団$id')
@@ -232,8 +265,12 @@ void main() {
                 'player_key': 'a$id',
                 'name': '功績選手$id',
                 'achievements': [
-                  for (var n = 0; n < id; n++)
-                    {'label': '最多本塁打', 'kind': 'title', 'year': 2025 - n},
+                  for (var n = 0; n < (id == 1 ? 3 : 1); n++)
+                    {
+                      'label': id == 1 ? '月間MVP' : 'MVP',
+                      'kind': 'title',
+                      'year': 2025 - n
+                    },
                 ]
               }
             ]
@@ -243,26 +280,28 @@ void main() {
           headers: {'content-type': 'application/json; charset=utf-8'}));
       await http.runWithClient(() async {
         await tester.pumpWidget(MaterialApp(
-            home: Scaffold(body: TeamStrengthBoard(org: org, year: 2026))));
-        await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const ValueKey('strength-view-6')));
+            home: Scaffold(body: RecordsHonors(org: org, year: 2026))));
         await tester.pumpAndSettle();
         expect(find.text('功績選手1'), findsOneWidget);
-        expect(find.text('功績選手2'), findsNothing);
-        await tester
-            .tap(find.byKey(const ValueKey('strength-comparison-true')));
-        await tester.pumpAndSettle();
+        expect(find.text('功績選手2'), findsOneWidget);
         expect(find.text(org == OrgConfig.npb ? '12球団比較' : '30球団比較'),
             findsOneWidget);
-        expect(find.byKey(const ValueKey('strength-team-1')), findsNothing);
+        expect(find.byType(DropdownButton<int>), findsNothing);
         expect(find.text('球団1'), findsOneWidget);
         expect(find.text('球団2'), findsOneWidget);
         expect(tester.getTopLeft(find.text('功績選手2')).dy,
             lessThan(tester.getTopLeft(find.text('功績選手1')).dy));
         await tester.tap(find.text('各球団'));
         await tester.pumpAndSettle();
-        expect(find.byKey(const ValueKey('strength-team-1')), findsOneWidget);
+        expect(find.byType(DropdownButton<int>), findsOneWidget);
         expect(find.text('功績選手2'), findsNothing);
+        final otherOrg = org == OrgConfig.npb ? OrgConfig.mlb : OrgConfig.npb;
+        await tester.pumpWidget(MaterialApp(
+            home: Scaffold(body: RecordsHonors(org: otherOrg, year: 2026))));
+        await tester.pumpAndSettle();
+        expect(find.text('功績選手1'), findsOneWidget);
+        expect(find.text('功績選手2'), findsOneWidget);
+        expect(find.byType(DropdownButton<int>), findsNothing);
         expect(tester.takeException(), isNull);
       }, () => client);
     });
@@ -293,7 +332,7 @@ void main() {
     await http.runWithClient(() async {
       await tester.pumpWidget(const MaterialApp(
           home: Scaffold(
-              body: TeamStrengthBoard(org: OrgConfig.npb, year: 2026))));
+              body: TeamStrengthBoard(initialView: 1, org: OrgConfig.npb, year: 2026))));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('strength-view-0')));
       await tester.pumpAndSettle();
@@ -348,7 +387,7 @@ void main() {
     await http.runWithClient(() async {
       await tester.pumpWidget(const MaterialApp(
           home: Scaffold(
-              body: TeamStrengthBoard(org: OrgConfig.npb, year: 2026))));
+              body: TeamStrengthBoard(initialView: 1, org: OrgConfig.npb, year: 2026))));
       await tester.pumpAndSettle();
       double y(int id) =>
           tester.getCenter(find.byKey(ValueKey('strength-team-$id'))).dy;
@@ -379,7 +418,9 @@ void main() {
     await http.runWithClient(() async {
       await tester.pumpWidget(const MaterialApp(
           home: Scaffold(
-              body: TeamStrengthBoard(org: OrgConfig.npb, year: 2026))));
+              body: TeamStrengthBoard(initialView: 1, org: OrgConfig.npb, year: 2026))));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('strength-view-0')));
       await tester.pumpAndSettle();
       await tester.ensureVisible(
           find.byKey(const ValueKey('strength-detail-outs-relief')));
@@ -405,6 +446,8 @@ void main() {
       await tester.tap(find.byTooltip('閉じる'));
       await tester.pumpAndSettle();
       expect(find.byType(Dialog), findsNothing);
+      await tester.tap(find.byKey(const ValueKey('strength-view-1')));
+      await tester.pumpAndSettle();
       await tester.ensureVisible(
           find.byKey(const ValueKey('strength-detail-starts-C')));
       await tester.pumpAndSettle();
@@ -443,7 +486,9 @@ void main() {
     await http.runWithClient(() async {
       await tester.pumpWidget(const MaterialApp(
           home: Scaffold(
-              body: TeamStrengthBoard(org: OrgConfig.npb, year: 2026))));
+              body: TeamStrengthBoard(initialView: 1, org: OrgConfig.npb, year: 2026))));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('strength-view-0')));
       await tester.pumpAndSettle();
       expect(
           find.descendant(
@@ -738,7 +783,7 @@ void main() {
 
   testWidgets('スクロール位置の保存値を投手詳細の開閉状態として読み込まない', (tester) async {
     final bucket = PageStorageBucket();
-    const listKey = PageStorageKey('strength-rows-npb-2026-1-1');
+    const listKey = PageStorageKey('strength-rows-npb-2026-1-0');
     await tester.pumpWidget(MaterialApp(
         home: PageStorage(
       bucket: bucket,
@@ -761,8 +806,10 @@ void main() {
           home: Scaffold(
               body: PageStorage(
         bucket: bucket,
-        child: const TeamStrengthBoard(org: OrgConfig.npb, year: 2026),
+        child: const TeamStrengthBoard(initialView: 1, org: OrgConfig.npb, year: 2026),
       ))));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('strength-view-0')));
       await tester.pumpAndSettle();
       final scrollable = tester.state<ScrollableState>(find
           .descendant(
@@ -883,7 +930,9 @@ void main() {
       await tester.pump();
       expect(strengthRequests, hasLength(1));
       expect(strengthRequests.single.queryParameters['org'], 'npb');
-      expect(find.text('先発選手1'), findsOneWidget,
+      await tester.tap(find.byKey(const ValueKey('strength-view-1')));
+      await tester.pump();
+      expect(find.text('投手のスタメン割合'), findsOneWidget,
           reason: tester
               .widgetList<Text>(find.byType(Text))
               .map((text) => text.data)
@@ -896,9 +945,40 @@ void main() {
     }, () => client);
   });
 
+  testWidgets('記録は戦力の右で初期通信を待たずに開く', (tester) async {
+    final pending = Completer<http.Response>();
+    var records = 0;
+    await http.runWithClient(() async {
+      await tester.pumpWidget(
+          const MaterialApp(home: Scaffold(body: PredictionPage())));
+      await tester.pump();
+      expect(records, 0);
+      expect(tester.getTopLeft(find.text('記録')).dx,
+          greaterThan(tester.getTopLeft(find.text('戦力')).dx));
+      await tester.tap(find.text('記録'));
+      await tester.pump();
+      await tester.pump();
+      expect(records, 1);
+      expect(find.text('連続記録'), findsOneWidget);
+      expect(find.text('功績'), findsOneWidget);
+      expect(pending.isCompleted, isFalse);
+      pending.complete(http.Response('{}', 200));
+      await tester.pump();
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump(const Duration(seconds: 31));
+    },
+        () => MockClient((r) async {
+              if (r.url.path == '/records') {
+                records++;
+                return http.Response('{}', 200);
+              }
+              if (r.url.path == '/predictions/part') return pending.future;
+              return http.Response('{}', 401);
+            }));
+  });
+
   for (final width in [390.0, 1200.0]) {
     testWidgets('幅$widthで投手とスタメン比率を表示し、球団変更で通信しない', (tester) async {
-      const vertical = false;
       await tester.binding.setSurfaceSize(Size(width, 1200));
       addTearDown(() => tester.binding.setSurfaceSize(null));
       var requests = 0;
@@ -914,19 +994,18 @@ void main() {
       await http.runWithClient(() async {
         await tester.pumpWidget(const MaterialApp(
             home: Scaffold(
-                body: TeamStrengthBoard(org: OrgConfig.npb, year: 2026))));
+                body: TeamStrengthBoard(initialView: 1, org: OrgConfig.npb, year: 2026))));
         await tester.pumpAndSettle();
         for (final label in ['選手起用', '主力選手', '選手一覧', '経歴']) {
           expect(find.text(label), findsOneWidget);
         }
         expect(find.byType(DropdownButton<int>), findsNothing);
-        expect(find.text('投手の投球回負担率'), findsOneWidget);
-        expect(find.text('先発負担率'), findsOneWidget);
-        expect(find.text('中継負担率'), findsOneWidget);
+        expect(find.text('投手のスタメン割合'), findsOneWidget);
+        expect(find.text('投手の投球回負担率'), findsNothing);
         double bandTop(String key) =>
             tester.getTopLeft(find.byKey(ValueKey(key))).dy;
-        expect(bandTop('strength-band-outs-pitching_hand'),
-            lessThan(bandTop('strength-band-outs-starter')));
+        expect(bandTop('strength-band-starts-pitcher_starts'),
+            lessThan(bandTop('strength-band-outs-pitching_hand')));
         expect(bandTop('strength-band-pa-batting_hand'),
             lessThan(bandTop('strength-band-starts-1')));
         expect(find.text('途中出場の起用割合'), findsOneWidget);
@@ -938,6 +1017,11 @@ void main() {
           expect(find.byKey(ValueKey('strength-detail-starts-$role')),
               findsOneWidget);
         }
+        await tester.tap(find.byKey(const ValueKey('strength-view-0')));
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(
+            find.byKey(const ValueKey('strength-band-outs-starter')));
+        await tester.pumpAndSettle();
         expect(find.text('30回（18.2%）'), findsOneWidget);
         expect(find.text('135回（81.8%）'), findsOneWidget);
         final header = find
@@ -950,9 +1034,7 @@ void main() {
             (tester.widget<Container>(header).decoration as BoxDecoration)
                 .color,
             const Color(0xFFEF5350));
-        if (!vertical) {
-          expect(tester.getSize(header).width, closeTo(105.6, 0.01));
-        }
+        expect(tester.getSize(header).width, closeTo(105.6, 0.01));
         final starter = find.byTooltip('先発選手1（先発）：20回（チーム全体の12.1%）');
         expect(starter, findsOneWidget);
         final starterRect = tester.getRect(starter);
@@ -964,29 +1046,15 @@ void main() {
         expect(headerRect.height, closeTo(band.height, 0.01));
         expect(headerRect.top, closeTo(band.top, 0.01));
         expect(headerRect.bottom, closeTo(band.bottom, 0.01));
-        if (vertical) {
-          final detail = tester.getRect(
-              find.byKey(const ValueKey('strength-detail-outs-starter')));
-          expect(detail.top, greaterThanOrEqualTo(band.bottom));
-          expect(detail.center.dx, closeTo(band.center.dx, 0.01));
-          expect(starterRect.height + secondStarter.height,
-              closeTo(band.height, 0.01));
-        } else {
-          expect(starterRect.width + secondStarter.width,
-              closeTo(band.width, 0.01));
-          expect(secondStarter.right, closeTo(band.right, 0.01));
-          expect(
-              find.descendant(
-                  of: find.byTooltip('少登板1（中継ぎ・抑え）：5回（チーム全体の3.0%）'),
-                  matching: find.text('少登板1')),
-              findsOneWidget);
-        }
+        expect(starterRect.width + secondStarter.width,
+            closeTo(band.width, 0.01));
+        expect(secondStarter.right, closeTo(band.right, 0.01));
+        expect(
+            find.descendant(
+                of: find.byTooltip('少登板1（中継ぎ・抑え）：5回（チーム全体の3.0%）'),
+                matching: find.text('少登板1')),
+            findsOneWidget);
 
-        if (vertical) {
-          expect(tester.getTopLeft(find.text('打順のスタメン比率')).dy,
-              greaterThan(starterRect.bottom));
-          expect(starterRect.height, closeTo(780 * 60 / 90, 0.01));
-        }
         expect(tester.takeException(), isNull);
         await tester.tap(find.byKey(const ValueKey('strength-view-2')));
         await tester.pumpAndSettle();
@@ -1011,7 +1079,8 @@ void main() {
         expect(find.text('育成選手2 【契・FA・退】'), findsOneWidget);
         await tester.tap(find.byKey(const ValueKey('strength-view-1')));
         await tester.pumpAndSettle();
-        expect(find.byTooltip('先発選手2（先発）：20回（チーム全体の12.1%）'), findsOneWidget);
+        expect(find.byKey(const PageStorageKey('strength-rows-npb-2026-1-1')),
+            findsOneWidget);
         expect(requests, 1);
         expect(tester.takeException(), isNull);
         await tester.pumpWidget(const SizedBox.shrink());
@@ -1041,7 +1110,9 @@ void main() {
     await http.runWithClient(() async {
       await tester.pumpWidget(const MaterialApp(
           home: Scaffold(
-              body: TeamStrengthBoard(org: OrgConfig.npb, year: 2026))));
+              body: TeamStrengthBoard(initialView: 1, org: OrgConfig.npb, year: 2026))));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('strength-view-0')));
       await tester.pumpAndSettle();
       final starter = find.byTooltip('先発選手1（先発）：20回（チーム全体の12.1%）');
       final before = tester.getRect(starter);
@@ -1077,7 +1148,7 @@ void main() {
     await http.runWithClient(() async {
       await tester.pumpWidget(const MaterialApp(
           home: Scaffold(
-              body: TeamStrengthBoard(org: OrgConfig.npb, year: 2026))));
+              body: TeamStrengthBoard(initialView: 1, org: OrgConfig.npb, year: 2026))));
       await tester.pumpAndSettle();
       expect(find.text('サーバーが起動されていません'), findsOneWidget);
       expect(find.textContaining('ClientException'), findsNothing);
@@ -1096,7 +1167,7 @@ void main() {
     await http.runWithClient(() async {
       await tester.pumpWidget(const MaterialApp(
           home: Scaffold(
-              body: TeamStrengthBoard(org: OrgConfig.mlb, year: 2025))));
+              body: TeamStrengthBoard(initialView: 1, org: OrgConfig.mlb, year: 2025))));
       await tester.pumpAndSettle();
       expect(find.text('再読み込み'), findsOneWidget);
       await tester.tap(find.text('再読み込み'));

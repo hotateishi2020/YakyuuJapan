@@ -545,6 +545,8 @@ class AppSql {
           CASE WHEN t_game.code_game = 'OP' AND EXTRACT(MONTH FROM t_game.datetime_start) <= 3 AND t_game.id = boundary_away.last_id THEN 'オープン戦最終試合' END
         ) AS milestone_away,
         pitcher_home.name_full AS name_pitcher_home,
+        pitcher_home.pitching AS pitching_hand_home,
+        pitcher_away.pitching AS pitching_hand_away,
         pitcher_away.name_full AS name_pitcher_away,
         COALESCE(pitcher_home.flg_ace, FALSE) AS flg_ace_pitcher_home,
         COALESCE(pitcher_away.flg_ace, FALSE) AS flg_ace_pitcher_away,
@@ -587,6 +589,8 @@ class AppSql {
         id_game_summary,
         id_team_summary,
         name_full_summary,
+        v_game_summary.pitching_hand,
+        v_game_summary.batting_hand,
         txt_batting,
         txt_pitching,
         txt_homerun_total,
@@ -664,6 +668,8 @@ class AppSql {
             t_game_summary.id_game AS id_game,
             m_player.id_team AS id_team_summary,
             name_full AS name_full_summary,
+            m_player.pitching AS pitching_hand,
+            m_player.batting AS batting_hand,
             int_batting::text || '打数' || CASE WHEN int_hit1 = 0 THEN '無' ELSE int_hit1::text END || '安打' || 
             CASE WHEN (int_homerun = 0 AND int_rbi = 0 AND int_fourball = 0 AND int_steal_base = 0 AND int_sacrifice = 0) THEN '' ELSE '(' ||
               CASE WHEN int_homerun = 0 THEN '' ELSE int_homerun::text || 'HR' END || 
@@ -759,7 +765,7 @@ class AppSql {
                   AND mt.id_league IN (3, 4)
               )
             )
-          GROUP BY t_predict_player.id_player, t_game_summary.id_game, m_player.id_team, name_full, m_player.flg_ace, m_player.id_country, int_batting, int_hit1, int_fourball, int_homerun, 
+          GROUP BY t_predict_player.id_player, t_game_summary.id_game, m_player.id_team, name_full, m_player.pitching, m_player.batting, m_player.flg_ace, m_player.id_country, int_batting, int_hit1, int_fourball, int_homerun,
             int_rbi, int_steal_base, int_dead_batting, int_sacrifice, double_inning_pitch, int_runs,
             int_pitch, int_four, int_dead_pitching, int_strike_out, code_result_pitcher, int_hit, int_runs_earned, int_balk, t_game_summary.id, t_game_summary.id_player, t_game_summary.txt_homerun_total
           ORDER BY t_game_summary.id_game, m_player.id_team, flg_pitcher DESC, point_total DESC, t_game_summary.id 
@@ -771,7 +777,7 @@ class AppSql {
                team_home.id_league, team_away.id_league, team_home.color_font, team_home.color_back, team_away.color_font,
                team_away.color_back, team_home.id, team_away.id, pitcher_win.id_team, pitcher_lose.id_team, pitcher_save.name_full, 
                pitcher_save.id_team, t_game.state, t_game.code_game, boundary_home.first_id, boundary_home.last_id,
-               boundary_away.first_id, boundary_away.last_id, v_game_summary.id_game_summary, id_team_summary, name_full_summary,
+               boundary_away.first_id, boundary_away.last_id, v_game_summary.id_game_summary, id_team_summary, name_full_summary, v_game_summary.pitching_hand, v_game_summary.batting_hand,
                txt_batting, txt_pitching, txt_homerun_total, code_result_pitcher, colors_summary, titles_predict, flg_pitcher, v_game_summary.flg_ace, v_game_summary.flg_japan, point_total,
                double_inning_pitch, int_pitch, int_hit_allowed, int_strike_out, int_walk_pitch, int_hbp_pitch, int_runs_pitch, int_runs_earned, int_balk, int_hit_batting,
                txt_scores_home, txt_scores_away, int_runs_home, int_runs_away, int_error_home, int_error_away, int_hit_home, int_hit_away, int_velo_max
@@ -787,6 +793,8 @@ class AppSql {
         s.id_game,
         p.id_team,
         p.name_full,
+        p.pitching AS pitching_hand,
+        p.batting AS batting_hand,
         s.int_batting,
         s.int_hit1,
         s.int_hit2,

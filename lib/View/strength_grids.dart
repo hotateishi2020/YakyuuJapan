@@ -1,3 +1,5 @@
+import '../logic/roster_leadership.dart';
+import 'player_detail_dialog.dart';
 import 'package:flutter/material.dart';
 import '../logic/strength_usage.dart';
 import '../logic/strength_analytics.dart';
@@ -12,6 +14,7 @@ class StrengthRegularGrid extends StatefulWidget {
 }
 
 class _StrengthRegularGridState extends State<StrengthRegularGrid> {
+  bool _battingOrder = false;
   final _horizontal = ScrollController();
   final _header = ScrollController();
   final _vertical = ScrollController();
@@ -38,11 +41,13 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
     super.dispose();
   }
 
-  Iterable<String> get _slots => [
-        ...pitcherAceSlots.keys,
-        ...usagePositions.keys.where((slot) => slot != 'P'),
-        ...benchRegularSlots.keys
-      ];
+  Iterable<String> get _slots => _battingOrder
+      ? [for (var i = 1; i <= 9; i++) '$i']
+      : [
+          ...pitcherAceSlots.keys,
+          ...usagePositions.keys.where((slot) => slot != 'P'),
+          ...benchRegularSlots.keys
+        ];
   Color _positionColor(String slot) => switch (slot) {
         'PH_L' ||
         'PH_R' ||
@@ -67,6 +72,16 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Wrap(spacing: 8, children: [
+              ChoiceChip(
+                  label: const Text('守備位置別'),
+                  selected: !_battingOrder,
+                  onSelected: (_) => setState(() => _battingOrder = false)),
+              ChoiceChip(
+                  label: const Text('打順別'),
+                  selected: _battingOrder,
+                  onSelected: (_) => setState(() => _battingOrder = true)),
+            ]),
             Row(children: [
               _fixedCell('球団', Colors.grey.shade200, Colors.black87,
                   height: 44, width: columnWidth),
@@ -78,9 +93,11 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
                 child: Row(children: [
                   for (final slot in _slots)
                     _fixedCell(
-                        (pitcherAceSlots[slot] ??
-                            usagePositions[slot] ??
-                            benchRegularSlots[slot])!,
+                        (_battingOrder
+                            ? '$slot番'
+                            : pitcherAceSlots[slot] ??
+                                usagePositions[slot] ??
+                                benchRegularSlots[slot])!,
                         _positionColor(slot),
                         ['1B', '2B', '3B', 'SS'].contains(slot)
                             ? Colors.black87
@@ -163,11 +180,18 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
                   style: TextStyle(fontSize: 12, color: foreground))));
 
   TableRow _row(Map<String, dynamic> team) {
-    final selected = {
-      ...selectRegularGroups(listMapFromJson(team['positions'])),
-      ...selectPitcherAces(team)
-    };
-    selected.addAll(selectBenchRegulars(team, selected));
+    final selected = _battingOrder
+        ? {
+            for (final group in listMapFromJson(team['batting_order']))
+              '${group['slot']}':
+                  selectRegularGroups([group])['${group['slot']}'] ??
+                      <Map<String, dynamic>>[]
+          }
+        : {
+            ...selectRegularGroups(listMapFromJson(team['positions'])),
+            ...selectPitcherAces(team)
+          };
+    if (!_battingOrder) selected.addAll(selectBenchRegulars(team, selected));
     final roster = listMapFromJson(team['roster']);
     final teamColor =
         parseColorNameOrNull('${team['color_back']}') ?? Colors.blueGrey;
@@ -200,9 +224,7 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 4, vertical: 8),
                       child: Column(children: [
-                        _regularLine(
-                            regularPlayerName(selected[slot]![i], roster),
-                            bold: true),
+                        Expanded(child:PlayerNameLink(player:{...selected[slot]![i],'name':regularPlayerName(selected[slot]![i],roster),'id_team':team['id_team']},child:Center(child:FittedBox(fit:BoxFit.scaleDown,child:Text(regularPlayerName(selected[slot]![i],roster),style:const TextStyle(fontSize:12,fontWeight:FontWeight.bold)))))),
                         if (pitcherAceSlots.containsKey(slot)) ...[
                           _regularLine(
                               'WHIP ${metricValue(selected[slot]![i]['whip'], 2)}'),
@@ -307,8 +329,8 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
       final pitching = ['先発', '中継ぎ', '抑え', '投手'].contains(pos);
       final field = pitching ? 'throws' : 'bats';
       final hands = [
-        '右',
         '左',
+        '右',
         if ((groups[pos] ?? []).any((p) => p[field] == '両')) '両',
       ];
       for (final hand in hands) {
@@ -435,13 +457,13 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Expanded(child: hand('右')),
+              Expanded(child: hand('左')),
               Expanded(
                   child: Container(
                       decoration: BoxDecoration(
                           border: Border(
                               left: BorderSide(color: Colors.grey.shade300))),
-                      child: hand('左'))),
+                      child: hand('右'))),
             ]),
             if (players.any((p) => _hand(p, position) == '不明')) hand('不明'),
           ])),
@@ -507,6 +529,7 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
 
   Widget _player(Map<String, dynamic> p, String position) {
     final departure = rosterDepartureLabel(p);
+    final leadership = rosterLeadershipRoles(p, team, year);
     final marks = [
       if (usageInt(p['contract_end_year']) == year) '契',
       if (p['fa_eligible'] == true) 'FA',
@@ -536,10 +559,26 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _fitRosterText(
+                    PlayerNameLink(player:{...p,'id_team':team['id_team']},child:_fitRosterText(
                         '${p['name']}${marks.isEmpty ? '' : ' 【${marks.join('・')}】'}',
                         bold: true,
-                        size: 12),
+                        size: 12)),
+                    if (leadership.isNotEmpty)
+                      Wrap(spacing: 4, runSpacing: 3, children: [
+                        for (final role in leadership)
+                          Tooltip(
+                            message: '$year年 ${role.label}${role.detail.isEmpty ? '' : '（${role.detail}）'}\n出典：${role.source}',
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: role.label == 'キャプテン' ? Colors.amber.shade100 : Colors.blue.shade50,
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              child: Text(role.label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold,
+                                color: role.label == 'キャプテン' ? Colors.brown.shade800 : Colors.blue.shade900)),
+                            ),
+                          ),
+                      ]),
                     if (departure != null)
                       _fitRosterText(departure, color: Colors.red, bold: true),
                     if (rosterUsageUnknown(p, team)) _fitRosterText('（起用不明）'),

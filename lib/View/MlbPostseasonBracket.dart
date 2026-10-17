@@ -499,17 +499,17 @@ class _MlbBracketLinePainter extends CustomPainter {
     toSide(MlbBracketGeom.al1, cardTop, alDs1, toLeft: true, win: board.alDs1.decided && board.alDs1.winnerId == al[0].id);
     upToSide(MlbBracketGeom.alWc45Mid, alWc45.top, alDs1, toLeft: false, win: board.alDs1.decided && board.alDs1.winnerId != al[0].id);
     // ALDS → ALCS
-    upToSide(MlbBracketGeom.alDs1X, alDs1.top, alCs, toLeft: true, win: board.alDs1.decided);
+    upToSide(MlbBracketGeom.alDs1X, alDs1.top, alCs, toLeft: true, win: wonNextMlbRound(board.alDs1, board.alCs));
 
     // AL WC 3-6（内側シード2 側）
     toSide(MlbBracketGeom.al3, cardTop, alWc36, toLeft: true, win: al3Won);
     toSide(MlbBracketGeom.al6, cardTop, alWc36, toLeft: false, win: al6Won);
     upToSide(MlbBracketGeom.alWc36Mid, alWc36.top, alDs2, toLeft: true, win: board.alDs2.decided && board.alDs2.winnerId != al[1].id);
     toSide(MlbBracketGeom.al2, cardTop, alDs2, toLeft: false, win: board.alDs2.decided && board.alDs2.winnerId == al[1].id);
-    upToSide(MlbBracketGeom.alDs2X, alDs2.top, alCs, toLeft: false, win: board.alDs2.decided);
+    upToSide(MlbBracketGeom.alDs2X, alDs2.top, alCs, toLeft: false, win: wonNextMlbRound(board.alDs2, board.alCs));
 
     // ALCS → WS
-    upToSide(MlbBracketGeom.alCsX, alCs.top, ws, toLeft: true, win: board.alCs.decided);
+    upToSide(MlbBracketGeom.alCsX, alCs.top, ws, toLeft: true, win: wonNextMlbRound(board.alCs, board.worldSeries));
 
     final nl4Won = board.nlWc45.decided && board.nlWc45.winnerId == nl[3].id;
     final nl5Won = board.nlWc45.decided && board.nlWc45.winnerId == nl[4].id;
@@ -521,17 +521,17 @@ class _MlbBracketLinePainter extends CustomPainter {
     toSide(MlbBracketGeom.nl3, cardTop, nlWc36, toLeft: false, win: nl3Won);
     toSide(MlbBracketGeom.nl2, cardTop, nlDs2, toLeft: true, win: board.nlDs2.decided && board.nlDs2.winnerId == nl[1].id);
     upToSide(MlbBracketGeom.nlWc36Mid, nlWc36.top, nlDs2, toLeft: false, win: board.nlDs2.decided && board.nlDs2.winnerId != nl[1].id);
-    upToSide(MlbBracketGeom.nlDs2X, nlDs2.top, nlCs, toLeft: true, win: board.nlDs2.decided);
+    upToSide(MlbBracketGeom.nlDs2X, nlDs2.top, nlCs, toLeft: true, win: wonNextMlbRound(board.nlDs2, board.nlCs));
 
     // NL WC 4-5 → DS vs 1
     toSide(MlbBracketGeom.nl5, cardTop, nlWc45, toLeft: true, win: nl5Won);
     toSide(MlbBracketGeom.nl4, cardTop, nlWc45, toLeft: false, win: nl4Won);
     toSide(MlbBracketGeom.nl1, cardTop, nlDs1, toLeft: false, win: board.nlDs1.decided && board.nlDs1.winnerId == nl[0].id);
     upToSide(MlbBracketGeom.nlWc45Mid, nlWc45.top, nlDs1, toLeft: true, win: board.nlDs1.decided && board.nlDs1.winnerId != nl[0].id);
-    upToSide(MlbBracketGeom.nlDs1X, nlDs1.top, nlCs, toLeft: false, win: board.nlDs1.decided);
+    upToSide(MlbBracketGeom.nlDs1X, nlDs1.top, nlCs, toLeft: false, win: wonNextMlbRound(board.nlDs1, board.nlCs));
 
     // NLCS → WS
-    upToSide(MlbBracketGeom.nlCsX, nlCs.top, ws, toLeft: false, win: board.nlCs.decided);
+    upToSide(MlbBracketGeom.nlCsX, nlCs.top, ws, toLeft: false, win: wonNextMlbRound(board.nlCs, board.worldSeries));
   }
 
   @override

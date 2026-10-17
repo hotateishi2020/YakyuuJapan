@@ -11,8 +11,8 @@ class UnifiedGrid extends StatelessWidget {
   final String Function(String idUser) userNameFromPredictions;
   final bool compact;
   final int? onlyLeagueId; // 1: セ, 2: パ, null: 両方
-  double? w_col_predictor;
-  double? h_header;
+  final double? w_col_predictor;
+  final double? h_header;
 
   UnifiedGrid({
     super.key,
@@ -106,7 +106,7 @@ class UnifiedGrid extends StatelessWidget {
     return out.isEmpty ? '—' : out.join(', ');
   }
 
-  List<Widget> _buildLeagueColumn(int leagueId, {required double rowHeight}) {
+  List<Widget> _buildLeagueColumn(int leagueId, {required double rowHeight, required double w_col_predictor}) {
     Color? parseColorNameLocal(String? name) => parseColorNameOrNull(name);
 
     // リーグ色（予想ブロック内サイドヘッダー用）
@@ -119,7 +119,6 @@ class UnifiedGrid extends StatelessWidget {
       ..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0).compareTo(int.tryParse('${b['int_rank']}') ?? 0));
 
     // predictionsから対象リーグを抽出
-    final pred0 = predictions.where((e) => '${e['id_user']}' == '0' && (int.tryParse('${e['id_league']}') ?? 0) == leagueId).toList()..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0).compareTo(int.tryParse('${b['int_rank']}') ?? 0));
     final pred1 = predictions.where((e) => '${e['id_user']}' == '1' && (int.tryParse('${e['id_league']}') ?? 0) == leagueId).toList()..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0).compareTo(int.tryParse('${b['int_rank']}') ?? 0));
 
     final pred2 = predictions.where((e) => '${e['id_user']}' == '2' && (int.tryParse('${e['id_league']}') ?? 0) == leagueId).toList()..sort((a, b) => (int.tryParse('${a['int_rank']}') ?? 0).compareTo(int.tryParse('${b['int_rank']}') ?? 0));
@@ -129,10 +128,7 @@ class UnifiedGrid extends StatelessWidget {
     final rankRows = <Widget>[];
 
     // サイドヘッダー(26) + ギャップ(6) + 順位セル(56) と見かけ幅を揃える
-    const double sideHeaderW = 23;
-    const double sideGap = 0; // サイドヘッダーと右列の余白なし
     const double rankCellW = 56;
-    const double rankHeaderW = sideHeaderW + sideGap + rankCellW;
 
     rankHeader.add(Row(children: [
       Expanded(
@@ -201,7 +197,7 @@ class UnifiedGrid extends StatelessWidget {
             children: [
               SizedBox(width: rankCellW, child: rankCell('$rk', bgColor: leagueColor, fgColor: Colors.white)),
               SizedBox(
-                width: w_col_predictor!,
+                width: w_col_predictor,
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 0),
                   padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
@@ -224,11 +220,11 @@ class UnifiedGrid extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                width: w_col_predictor!,
+                width: w_col_predictor,
                 child: cell(txt1, highlight: hi1),
               ),
               SizedBox(
-                width: w_col_predictor!,
+                width: w_col_predictor,
                 child: cell(txt2, highlight: hi2),
               ),
             ],
@@ -319,12 +315,9 @@ class UnifiedGrid extends StatelessWidget {
 
       final txt1 = _joinDedup(user1Rows.map((e) => '${e['player_name'] ?? ''}'));
       // 現在列（id_user==0）は複数選手を同一セルに入れる可能性がある
-      final names0 = user0Rows.map((e) => '${e['player_name'] ?? ''}').where((s) => s.trim().isNotEmpty).toList();
-      final txt0 = _joinDedup(names0);
       final txt2 = _joinDedup(user2Rows.map((e) => '${e['player_name'] ?? ''}'));
 
       final hi1 = user1Rows.any((e) => e['flg_atari'] == true);
-      final hi0 = user0Rows.any((e) => e['flg_atari'] == true);
       final hi2 = user2Rows.any((e) => e['flg_atari'] == true);
 
 // After
@@ -449,15 +442,15 @@ class UnifiedGrid extends StatelessWidget {
                 child: statTitleCell(title, bgColor: titleBg, fgColor: Colors.white),
               ),
               SizedBox(
-                width: w_col_predictor!,
+                width: w_col_predictor,
                 child: c0 != null ? BlinkBorder(color: c0, radius: 3, width: 2, duration: const Duration(milliseconds: 1000), baseBgColor: baseBg0, fillUseColor: true, child: w0) : w0,
               ),
               SizedBox(
-                width: w_col_predictor!,
+                width: w_col_predictor,
                 child: c1 != null ? BlinkBorder(color: c1, radius: 3, width: 2, duration: const Duration(milliseconds: 1000), baseBgColor: Colors.transparent, fillUseColor: true, child: w1) : w1,
               ),
               SizedBox(
-                width: w_col_predictor!,
+                width: w_col_predictor,
                 child: c2 != null ? BlinkBorder(color: c2, radius: 3, width: 2, duration: const Duration(milliseconds: 1000), baseBgColor: Colors.transparent, fillUseColor: true, child: w2) : w2,
               ),
             ],
@@ -508,7 +501,7 @@ class UnifiedGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    w_col_predictor = MediaQuery.of(context).size.width * 0.06;
+    final predictorWidth = MediaQuery.of(context).size.width * 0.06;
     return LayoutBuilder(builder: (context, c) {
       final double totalH = c.maxHeight.isFinite ? c.maxHeight : 360.0;
       final double headerH = h_header ?? 28.0;
@@ -529,20 +522,20 @@ class UnifiedGrid extends StatelessWidget {
                     ? [
                         Column(
                           mainAxisSize: MainAxisSize.min,
-                          children: _buildLeagueColumn(1, rowHeight: rowH),
+                          children: _buildLeagueColumn(1, rowHeight: rowH, w_col_predictor: predictorWidth),
                         ),
                         const SizedBox(height: 12),
                         const Divider(height: 0.5),
                         const SizedBox(height: 12),
                         Column(
                           mainAxisSize: MainAxisSize.min,
-                          children: _buildLeagueColumn(2, rowHeight: rowH),
+                          children: _buildLeagueColumn(2, rowHeight: rowH, w_col_predictor: predictorWidth),
                         ),
                       ]
                     : [
                         Column(
                           mainAxisSize: MainAxisSize.min,
-                          children: _buildLeagueColumn(onlyLeagueId!, rowHeight: rowH),
+                          children: _buildLeagueColumn(onlyLeagueId!, rowHeight: rowH, w_col_predictor: predictorWidth),
                         ),
                       ],
               ),

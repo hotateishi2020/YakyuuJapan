@@ -1,3 +1,6 @@
+import '../View/retained_tab_body.dart';
+import '../View/player_detail_dialog.dart';
+import '../View/records_board.dart';
 import '../tools/network_error.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -16,6 +19,7 @@ import '../tools/date_format.dart';
 import '../logic/auth_session.dart';
 import '../logic/show_user_predictions.dart';
 import '../View/EventCalendar.dart';
+import '../View/season_schedule_board.dart';
 import '../View/Headers.dart';
 import '../View/GamesBoard.dart';
 import '../View/LeagueLogo.dart';
@@ -262,8 +266,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     setState(() => _authEntryReady = false);
     try {
       await Future.wait([
-        for (final part in _partsForItemView(null))
-          _fetchPart(_orgKind, part, _seasonYear, background: false, force: true),
+        for (final part in _partsForItemView(null)) _fetchPart(_orgKind, part, _seasonYear, background: false, force: true),
       ]).timeout(const Duration(seconds: 45));
     } catch (e, st) {
       unawaited(AuthSession.instance.reportTimeout(e, st));
@@ -389,9 +392,15 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       }
     }
     if (parts.isEmpty) {
-      if (standings.isNotEmpty || predictions.isNotEmpty) parts.add(_LoadPart.standings);
-      if (playerStats.isNotEmpty || playerStatsActual.isNotEmpty) parts.add(_LoadPart.players);
-      if (games.isNotEmpty || postseasonGames.isNotEmpty) parts.add(_LoadPart.games);
+      if (standings.isNotEmpty || predictions.isNotEmpty) {
+        parts.add(_LoadPart.standings);
+      }
+      if (playerStats.isNotEmpty || playerStatsActual.isNotEmpty) {
+        parts.add(_LoadPart.players);
+      }
+      if (games.isNotEmpty || postseasonGames.isNotEmpty) {
+        parts.add(_LoadPart.games);
+      }
     }
     return _OrgBundle(
       predictions: predictions,
@@ -575,9 +584,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     final trimmed = query.trim();
     if (trimmed.isEmpty) return const [];
     try {
-      final res = await http
-          .get(Env.api('/predict-names?kind=$kind&league=$leagueId&q=${Uri.encodeQueryComponent(trimmed)}'))
-          .timeout(const Duration(seconds: 15));
+      final res = await http.get(Env.api('/predict-names?kind=$kind&league=$leagueId&q=${Uri.encodeQueryComponent(trimmed)}')).timeout(const Duration(seconds: 15));
       if (res.statusCode != 200) return const [];
       final decoded = jsonDecode(res.body);
       final raw = decoded is Map ? decoded['names'] : null;
@@ -617,9 +624,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       final reloaded = await _fetchPredictGroups();
       final pending = decoded is Map && decoded['setting'] is Map && decoded['setting']['proposal_pending'] == true;
       if (pending) {
-        return reloaded
-            ? 'notice:予想は保存しました。期限とルールの変更は、参加ユーザー全員の賛成後に反映されます'
-            : 'notice:期限とルールの変更案を保存しました。画面を開き直してください';
+        return reloaded ? 'notice:予想は保存しました。期限とルールの変更は、参加ユーザー全員の賛成後に反映されます' : 'notice:期限とルールの変更案を保存しました。画面を開き直してください';
       }
       return reloaded ? null : '保存しました。画面を開き直してください';
     } catch (e) {
@@ -629,7 +634,9 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
 
   Future<String?> _postPredict(String path, Map<String, dynamic> body, String failure) async {
     final token = AuthSession.instance.token;
-    if (!AuthSession.instance.isLoggedIn || token == null || token.isEmpty) return 'ログインしてください';
+    if (!AuthSession.instance.isLoggedIn || token == null || token.isEmpty) {
+      return 'ログインしてください';
+    }
     try {
       final res = await http
           .post(
@@ -675,14 +682,14 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   Future<List<Map<String, dynamic>>> _searchPredictUsers(String query) async {
     final token = AuthSession.instance.token;
     final trimmed = query.trim();
-    if (!AuthSession.instance.isLoggedIn || token == null || token.isEmpty || trimmed.isEmpty) return const [];
+    if (!AuthSession.instance.isLoggedIn || token == null || token.isEmpty || trimmed.isEmpty) {
+      return const [];
+    }
     try {
-      final res = await http
-          .get(
-            Env.api('/predict-users?q=${Uri.encodeQueryComponent(trimmed)}'),
-            headers: {'Authorization': 'Bearer $token'},
-          )
-          .timeout(const Duration(seconds: 15));
+      final res = await http.get(
+        Env.api('/predict-users?q=${Uri.encodeQueryComponent(trimmed)}'),
+        headers: {'Authorization': 'Bearer $token'},
+      ).timeout(const Duration(seconds: 15));
       if (res.statusCode != 200) return const [];
       final decoded = jsonDecode(res.body);
       final raw = decoded is Map ? decoded['users'] : null;
@@ -699,20 +706,20 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   Future<void> _fetchPredictInvites() async {
     final token = AuthSession.instance.token;
     if (!AuthSession.instance.isLoggedIn || token == null || token.isEmpty) {
-      if (mounted && _predictInvites.isNotEmpty) setState(() => _predictInvites = const []);
+      if (mounted && _predictInvites.isNotEmpty) {
+        setState(() => _predictInvites = const []);
+      }
       return;
     }
     try {
-      final res = await http
-          .get(
-            Env.api('/predict-invites'),
-            headers: {'Authorization': 'Bearer $token'},
-          )
-          .timeout(const Duration(seconds: 15));
+      final res = await http.get(
+        Env.api('/predict-invites'),
+        headers: {'Authorization': 'Bearer $token'},
+      ).timeout(const Duration(seconds: 15));
       if (!mounted || res.statusCode != 200) return;
       final decoded = jsonDecode(res.body);
       final raw = decoded is Map ? decoded['invites'] : null;
-        setState(() {
+      setState(() {
         _predictInvites = [
           if (raw is List)
             for (final row in raw)
@@ -765,13 +772,13 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       }
       return true;
     }
-    final res = await http
-        .get(
-          Env.api('/predict-groups'),
-          headers: {'Authorization': 'Bearer $token'},
-        )
-        .timeout(const Duration(seconds: 60));
-    if (!mounted || !AuthSession.instance.isLoggedIn || AuthSession.instance.token != token) return true;
+    final res = await http.get(
+      Env.api('/predict-groups'),
+      headers: {'Authorization': 'Bearer $token'},
+    ).timeout(const Duration(seconds: 60));
+    if (!mounted || !AuthSession.instance.isLoggedIn || AuthSession.instance.token != token) {
+      return true;
+    }
     if (res.statusCode != 200) return false;
     final decoded = jsonDecode(res.body);
     final raw = decoded is Map ? decoded['groups'] : null;
@@ -853,14 +860,14 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     _storeCache(_orgKind, _snapshotCurrent());
     final cached = _orgCache[kind];
     final usable = cached != null && cached.hasContent;
-        setState(() {
+    setState(() {
       _predictGroupsOpen = false;
       _orgKind = kind;
       _itemTab = 0;
       error = null;
       if (usable) {
         _applyBundle(cached, kind: kind);
-          isLoading = false;
+        isLoading = false;
         _shellReady = true;
       } else {
         isLoading = true;
@@ -886,7 +893,9 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     await Future<void>.delayed(const Duration(seconds: 20));
     if (!mounted) return;
     final other = _orgKind == OrgKind.npb ? OrgKind.mlb : OrgKind.npb;
-    if ((_orgCache[other]?.hasContent ?? false) || _orgLoadFutures.containsKey(other)) return;
+    if ((_orgCache[other]?.hasContent ?? false) || _orgLoadFutures.containsKey(other)) {
+      return;
+    }
     await fetchData(kind: other, background: true);
   }
 
@@ -987,10 +996,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     });
   }
 
-  bool get _canWatchGames => mounted && _initialGamesDisplayComplete &&
-      _partLoadedForYear(_orgKind, _LoadPart.games) &&
-      !_orgLoadFutures.containsKey(_orgKind) &&
-      _seasonYear == DateTime.now().year;
+  bool get _canWatchGames => mounted && _initialGamesDisplayComplete && _partLoadedForYear(_orgKind, _LoadPart.games) && !_orgLoadFutures.containsKey(_orgKind) && _seasonYear == DateTime.now().year;
 
   Map<String, String> get _readHeaders {
     final token = AuthSession.instance.token;
@@ -1001,8 +1007,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     if (!_canWatchGames || _gamesWatchNotified || _gamesWatchNotifying) return;
     _gamesWatchNotifying = true;
     try {
-      final response = await http.post(Env.api('/predictions/ready'), headers: _readHeaders)
-          .timeout(const Duration(seconds: 10));
+      final response = await http.post(Env.api('/predictions/ready'), headers: _readHeaders).timeout(const Duration(seconds: 10));
       _gamesWatchNotified = response.statusCode == 204;
     } catch (_) {
       // 通知失敗で表示を止めず、次の定期取得時に再通知する。
@@ -1142,18 +1147,20 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   Future<void> _ensureItemYearLoaded(int item) async {
-    if (item == 3) return; // 戦力はタブを開いたときだけ保存済みデータを取得する。
+    if (item >= 3) return; // 戦力・記録はタブを開いたときだけデータを取得する。
     final kind = _orgKind;
     final year = _seasonYear;
     // 試合画面はトーナメントの順位と先発投手の個人成績も使用する。
-    await _ensureSeasonYearLoaded(only: item == 0
-        ? const [_LoadPart.games, _LoadPart.standings, _LoadPart.players]
-        : [_partForItem(item)]);
-    if (item != 0 || !mounted || _itemTab != item || kind != _orgKind || year != _seasonYear || _initialGamesDisplayComplete) return;
+    await _ensureSeasonYearLoaded(only: item == 0 ? const [_LoadPart.games, _LoadPart.standings, _LoadPart.players] : [_partForItem(item)]);
+    if (item != 0 || !mounted || _itemTab != item || kind != _orgKind || year != _seasonYear || _initialGamesDisplayComplete) {
+      return;
+    }
     // 戦力タブで年度を変更したあとも、試合表示が整ってから定期取得を再開する。
     if (!_partLoadedForYear(kind, _LoadPart.games)) return;
     await WidgetsBinding.instance.endOfFrame;
-    if (!mounted || _itemTab != item || kind != _orgKind || year != _seasonYear) return;
+    if (!mounted || _itemTab != item || kind != _orgKind || year != _seasonYear) {
+      return;
+    }
     _initialGamesDisplayComplete = true;
     await _startGamesWatch();
   }
@@ -1186,7 +1193,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       _seasonYear = year;
       _invalidateYearParts();
     });
-    if (_itemTab == 3) return;
+    if (_itemTab >= 3) return;
     await _ensureSeasonYearLoaded();
     await WidgetsBinding.instance.endOfFrame;
     if (!mounted || year != _seasonYear) return;
@@ -1214,13 +1221,11 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     ];
     // 個人成績を順位待ちにしない。案内情報は順位・成績の後に取得する。
     await Future.wait([
-      if (pending.contains(_LoadPart.games))
-        _fetchPart(target, _LoadPart.games, year, background: background),
+      if (pending.contains(_LoadPart.games)) _fetchPart(target, _LoadPart.games, year, background: background),
       () async {
         await Future.wait([
           for (final part in [_LoadPart.standings, _LoadPart.players])
-            if (pending.contains(part))
-              _fetchPart(target, part, year, background: background),
+            if (pending.contains(part)) _fetchPart(target, part, year, background: background),
         ]);
         if (!mounted || _seasonYear != year) return;
         if (pending.contains(_LoadPart.info)) {
@@ -1234,7 +1239,10 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   List<_LoadPart> _partsForItemView(List<_LoadPart>? requested) {
     const visible = [_LoadPart.games, _LoadPart.info, _LoadPart.standings, _LoadPart.players];
     if (requested == null) return visible;
-    return [for (final part in requested) if (visible.contains(part)) part];
+    return [
+      for (final part in requested)
+        if (visible.contains(part)) part
+    ];
   }
 
   Future<void> _fetchPart(OrgKind target, _LoadPart part, int year, {required bool background, bool force = false}) async {
@@ -1330,7 +1338,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
               showPostseasonBoard = bundle.showPostseasonBoard;
               break;
           }
-        isLoading = false;
+          isLoading = false;
           _shellReady = true;
           if (!background) error = null;
         }
@@ -1353,7 +1361,9 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     for (final game in incoming) {
       if ('${game['name_batter'] ?? ''}'.trim().isNotEmpty) continue;
       final state = '${game['state'] ?? ''}';
-      if (!state.contains('回') || state.contains('試合終了') || state.contains('コールド')) continue;
+      if (!state.contains('回') || state.contains('試合終了') || state.contains('コールド')) {
+        continue;
+      }
       final id = '${game['id_game'] ?? game['id'] ?? ''}'.trim();
       final old = prevById[id];
       if (old == null || '${old['state'] ?? ''}' != state) continue;
@@ -1361,8 +1371,12 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       if (oldName.isEmpty) continue;
       game['name_batter'] = oldName;
       game['id_team_batter'] = old['id_team_batter'];
-      if (old['int_batter_order'] != null) game['int_batter_order'] = old['int_batter_order'];
-      if (game['int_outs'] == null && old['int_outs'] != null) game['int_outs'] = old['int_outs'];
+      if (old['int_batter_order'] != null) {
+        game['int_batter_order'] = old['int_batter_order'];
+      }
+      if (game['int_outs'] == null && old['int_outs'] != null) {
+        game['int_outs'] = old['int_outs'];
+      }
     }
   }
 
@@ -1418,7 +1432,9 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     final kind = _orgKind;
     final ymd = DateFormatUtil.ymd(date);
     final inflightKey = '${kind.name}|$ymd';
-    if (_pastDateInflight.contains(inflightKey) || !_shouldLoadGameDate(date)) return;
+    if (_pastDateInflight.contains(inflightKey) || !_shouldLoadGameDate(date)) {
+      return;
+    }
     _pastDateInflight.add(inflightKey);
     if (mounted) setState(() => _loadingGameDateByOrg[kind] = ymd);
     try {
@@ -1447,7 +1463,9 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       _pastDateInflight.remove(inflightKey);
       if (mounted) {
         setState(() {
-          if (_loadingGameDateByOrg[kind] == ymd) _loadingGameDateByOrg[kind] = null;
+          if (_loadingGameDateByOrg[kind] == ymd) {
+            _loadingGameDateByOrg[kind] = null;
+          }
         });
       }
     }
@@ -1470,11 +1488,10 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     if (hasContent) return;
     setState(() {
       error = message;
-        isLoading = false;
+      isLoading = false;
       _shellReady = true;
     });
   }
-
 
   Widget _portraitTabBar({
     required List<(String label, int index)> tabs,
@@ -1624,13 +1641,13 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                   ),
                   alignment: Alignment.center,
                   child: Align(
-                    widthFactor: 2,
+                    widthFactor: 1.5,
                     alignment: Alignment.center,
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
                         Text(
-                          '予想',
+                          '予想対決',
                           style: TextStyle(
                             fontSize: TAB_BAR_H / 2,
                             fontWeight: _predictGroupsOpen ? FontWeight.bold : FontWeight.w600,
@@ -1725,15 +1742,17 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         Expanded(
           child: _portraitTabBar(
             tabs: const [
+              ('日程', 5),
               ('試合情報', 0),
               ('チーム順位', 1),
               ('個人成績', 2),
               ('戦力', 3),
+              ('記録', 4),
             ],
             selectedIndex: _itemTab,
             onSelected: (i) {
               if (i == _itemTab) return;
-              const actions = ['試合情報タブを開いた', 'チーム順位タブを開いた', '個人成績タブを開いた', '戦力タブを開いた'];
+              const actions = ['試合情報タブを開いた', 'チーム順位タブを開いた', '個人成績タブを開いた', '戦力タブを開いた', '記録タブを開いた', '日程タブを開いた'];
               if (i >= 0 && i < actions.length) {
                 unawaited(AuthSession.instance.reportAction(actions[i]));
               }
@@ -1752,10 +1771,13 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     required int leagueId,
     required SeasonPane pane,
     bool portraitLayout = false,
+    List<Map<String, dynamic>> scheduleGames = const [],
   }) {
     final gamesForLeague = games.where((game) => gameVisibleInLeague(game, leagueId)).toList();
     return SeasonTableBlock(
       standings: standings,
+      scheduleGames: scheduleGames,
+      showScheduleColumns: pane == SeasonPane.standings,
       stats: npbPlayerStatsActual,
       games: gamesForLeague,
       seriesGames: postseasonGames,
@@ -1779,18 +1801,25 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   Widget _itemBoard({bool wideLayout = false}) {
+    if (_itemTab == 5) {
+      return SeasonCalendarBoard(org: _org, year: _seasonYear, events: events);
+    }
+    if (_itemTab == 4) {
+      return RecordsBoard(org: _org, year: _seasonYear);
+    }
     if (_itemTab == 3) {
       return TeamStrengthBoard(
         key: ValueKey('strength-${_orgKind.name}-$_seasonYear'),
         org: _org,
         year: _seasonYear,
+        favoriteTeamId: AuthSession.instance.user?.idTeamFav,
       );
     }
     if (_itemTab == 2) {
       if (!_partReady(_LoadPart.players)) {
         return const Center(child: CircularProgressIndicator());
       }
-      // 横長は打者上段・投手下段の全グリッド。縦長のみセグメント／スクロール切替。
+      // 横長は打者・投手のタブ切り替え。
       if (wideLayout) {
         return DualBandBothLeaguePersonalStats(
           stats: npbPlayerStatsActual,
@@ -1814,7 +1843,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         games: games,
         seriesGames: postseasonGames,
         playerStats: npbPlayerStatsActual,
-      standings: standings,
+        standings: standings,
         initialDate: _gamesInitialDate(),
         leading: showBracket ? [_postseasonBracket(), const SizedBox(height: 6)] : const [],
         leagues: [
@@ -1831,14 +1860,18 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     if (!_partReady(_LoadPart.standings)) {
       return const Center(child: CircularProgressIndicator());
     }
-    return ListView(
-      children: [
-        for (var i = 0; i < _org.leagues.length; i++) ...[
-          if (i > 0) const SizedBox(height: 8),
-          _leaguePane(leagueId: _org.leagues[i].id, pane: SeasonPane.standings, portraitLayout: true),
-        ],
-      ],
-    );
+    return SeasonScheduleLoader(
+        org: _org,
+        year: _seasonYear,
+        builder: (scheduleGames) => ListView(
+              children: [
+                for (var i = 0; i < _org.leagues.length; i++) ...[
+                  if (i > 0) const SizedBox(height: 8),
+                  _leaguePane(leagueId: _org.leagues[i].id, pane: SeasonPane.standings, scheduleGames: scheduleGames, portraitLayout: true),
+                ],
+                if (_org.kind == OrgKind.npb) InterleagueStandings(teams: standings, games: scheduleGames),
+              ],
+            ));
   }
 
   static const _mlbPostseasonCodes = {
@@ -1895,7 +1928,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           children: [
             Material(
               color: Colors.black,
-        borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(4),
               child: InkWell(
                 onTap: () {
                   setState(() => _bracketOpen = !_bracketOpen);
@@ -1944,15 +1977,15 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
-          decoration: BoxDecoration(
-            color: Colors.white,
+      decoration: BoxDecoration(
+        color: Colors.white,
         border: Border.all(color: Colors.black87, width: 1.5),
         borderRadius: BorderRadius.circular(10),
-          ),
+      ),
       clipBehavior: Clip.antiAlias,
       child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
           Material(
             color: Colors.black,
             child: InkWell(
@@ -2035,7 +2068,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       const double tagH = 20.0;
 
       Widget newsTag(String title, Color back, Color font, {double? width}) {
-      return Container(
+        return Container(
           width: width,
           height: tagH,
           constraints: BoxConstraints(minWidth: width ?? tagW, maxHeight: tagH),
@@ -2085,8 +2118,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                   borderRadius: BorderRadius.circular(3),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              child: Row(
-                children: [
+                    child: Row(
+                      children: [
                         const Text('News', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                         if (AuthSession.instance.showNewsNew) ...[
                           const SizedBox(width: 8),
@@ -2095,16 +2128,16 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                       ],
                     ),
                   ),
+                ),
               ),
-            ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(10, 4, 10, 6),
-                  child: Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const Divider(height: 1),
-                      const SizedBox(height: 4),
+                  children: [
+                    const Divider(height: 1),
+                    const SizedBox(height: 4),
                     Expanded(
                       child: infoLoading
                           ? Center(child: miniSpinner(size: 22))
@@ -2120,28 +2153,28 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                      for (final n in notifications)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 2),
-                          child: Row(
+                                          for (final n in notifications)
+                                            Padding(
+                                              padding: const EdgeInsets.only(bottom: 2),
+                                              child: Row(
                                                 mainAxisSize: MainAxisSize.min,
-                            children: [
+                                                children: [
                                                   newsTag(
-                                  (n['tag_main_title'] ?? '').toString(),
+                                                    (n['tag_main_title'] ?? '').toString(),
                                                     parse(n['tag_main_color_back'], Colors.grey.shade300),
                                                     parse(n['tag_main_color_font'], Colors.white),
                                                     width: tagW * 2 / 3,
-                              ),
-                              const SizedBox(width: 6),
+                                                  ),
+                                                  const SizedBox(width: 6),
                                                   newsTag(
-                                  (n['tag_sub_title'] ?? '').toString(),
+                                                    (n['tag_sub_title'] ?? '').toString(),
                                                     parse(n['tag_sub_color_back'], Colors.grey.shade300),
                                                     parse(n['tag_sub_color_font'], Colors.white),
                                                     width: tagW * 2 / 3,
-                              ),
-                              const SizedBox(width: 6),
+                                                  ),
+                                                  const SizedBox(width: 6),
                                                   Text(
-                                  (n['title'] ?? '').toString(),
+                                                    (n['title'] ?? '').toString(),
                                                     maxLines: 1,
                                                     softWrap: false,
                                                     style: const TextStyle(fontSize: 12, height: 1.1, color: Colors.black87),
@@ -2155,9 +2188,9 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                                   ),
                                 );
                               },
-                          ),
-                        ),
-                    ],
+                            ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -2191,15 +2224,15 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (!hideHeader)
-            SizedBox(
-              width: double.infinity,
+              SizedBox(
+                width: double.infinity,
                 child: Material(
                   color: Colors.black,
                   borderRadius: BorderRadius.circular(3),
                   child: InkWell(
                     onTap: AuthSession.instance.showEventNew ? () => unawaited(_markRead('event')) : null,
                     borderRadius: BorderRadius.circular(3),
-              child: Padding(
+                    child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       child: Row(
                         children: [
@@ -2231,14 +2264,19 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-                                Expanded(
+          Expanded(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
               child: newsBox(fill: true),
             ),
           ),
           const SizedBox(height: 8),
-          Expanded(child: eventsBox(fill: true)),
+          TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                setState(() => _itemTab = 5);
+              },
+              child: const Text("イベント・試合日程を開く")),
         ],
       );
     }
@@ -2330,42 +2368,46 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
             ? (!AuthSession.instance.isLoggedIn
                 ? const Center(child: Text('ログインすると予想を見られます'))
                 : PredictGroupBoard(
-                loading: _predictGroupsLoading,
-                error: _predictGroupsError,
-                selectedYear: _seasonYear,
-                groups: _predictGroups,
-                titleCatalog: _predictTitleCatalog,
-                viewerId: AuthSession.instance.user?.id,
-                onSaveSetting: _savePredictSetting,
-                onApproveRule: _votePredictRule,
-                onRenameGroup: _savePredictGroupName,
-                invites: _predictInvites,
-                onSearchNames: _searchPredictNames,
-                onSearchUsers: _searchPredictUsers,
-                onCreateGroup: _createPredictGroup,
-                onAnswerInvite: _answerPredictInvite,
-                onDeleteGroup: _deletePredictGroup,
-                onCreateYear: _createPredictYear,
-              ))
+                    loading: _predictGroupsLoading,
+                    error: _predictGroupsError,
+                    selectedYear: _seasonYear,
+                    groups: _predictGroups,
+                    titleCatalog: _predictTitleCatalog,
+                    viewerId: AuthSession.instance.user?.id,
+                    onSaveSetting: _savePredictSetting,
+                    onApproveRule: _votePredictRule,
+                    onRenameGroup: _savePredictGroupName,
+                    invites: _predictInvites,
+                    onSearchNames: _searchPredictNames,
+                    onSearchUsers: _searchPredictUsers,
+                    onCreateGroup: _createPredictGroup,
+                    onAnswerInvite: _answerPredictInvite,
+                    onDeleteGroup: _deletePredictGroup,
+                    onCreateYear: _createPredictYear,
+                  ))
             : Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const SizedBox(height: 8),
-                      _boardTabBar(),
-                      const SizedBox(height: ALL_SPACE_BLOCK),
-                      Expanded(
-                        flex: isPortrait ? 1 : ALL_RATIO_BLOCK_H[1] * 2,
-                        child: _itemTab == 3
-                            ? _itemBoard(wideLayout: !isPortrait)
-                            : orgContentLoading
-                                ? const Center(child: CircularProgressIndicator())
-                                : error != null && !_boardContentReady
-                                    ? Center(child: Text(error!))
-                                    : _itemBoard(wideLayout: !isPortrait),
-                      ),
-                      if (isPortrait) const SizedBox(height: ALL_SPACE_BLOCK),
-                    ],
-                  );
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 8),
+                  _boardTabBar(),
+                  const SizedBox(height: ALL_SPACE_BLOCK),
+                  Expanded(
+                    flex: isPortrait ? 1 : ALL_RATIO_BLOCK_H[1] * 2,
+                    child: RetainedTabBody(
+                      key: ValueKey('tabs-$_seasonYear'),
+                      selected: '${_orgKind.name}-$_itemTab',
+                      builder: (_) => _itemTab >= 3
+                        ? _itemBoard(wideLayout: !isPortrait)
+                        : orgContentLoading
+                            ? const Center(child: CircularProgressIndicator())
+                            : error != null && !_boardContentReady
+                                ? Center(child: Text(error!))
+                                : _itemBoard(wideLayout: !isPortrait),
+                    ),
+                  ),
+                  if (isPortrait) const SizedBox(height: ALL_SPACE_BLOCK),
+                ],
+              );
 
         final Widget bodyContent = Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2379,12 +2421,12 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         return ShowUserPredictions(
           value: _showUserPredictions,
           child: Container(
-          alignment: Alignment.topCenter,
-          child: Transform.scale(
-            scale: scale,
             alignment: Alignment.topCenter,
-            child: ConstrainedBox(
-              constraints: BoxConstraints.tightFor(width: designWidth),
+            child: Transform.scale(
+              scale: scale,
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: BoxConstraints.tightFor(width: designWidth),
                 child: SizedBox(
                   height: constraints.maxHeight,
                   child: Column(
@@ -2410,7 +2452,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.only(bottom: ALL_SPACE_BLOCK, left: ALL_MARGIN_LEFT, right: ALL_MARGIN_LEFT),
-                          child: bodyContent,
+                          child: PlayerDetailScope(org: _org.kind.name, year: _seasonYear, child: bodyContent),
                         ),
                       ),
                     ],

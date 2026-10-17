@@ -19,34 +19,26 @@ int inningsToOuts(String value) {
   return int.parse(match[1]!) * 3 + int.parse(match[2] ?? '0');
 }
 
-String usageName(String value) => value
-    .replaceAllMapped(RegExp(r'[！-～]'),
-        (match) => String.fromCharCode(match.group(0)!.codeUnitAt(0) - 0xfee0))
-    .replaceAll(RegExp(r'[\s　・.．]+'), '')
-    .replaceAll('髙', '高')
-    .replaceAll('﨑', '崎')
-    .replaceAll('海', '海')
-    .toLowerCase();
+String usageName(String value) => value.replaceAllMapped(RegExp(r'[！-～]'), (match) => String.fromCharCode(match.group(0)!.codeUnitAt(0) - 0xfee0)).replaceAll(RegExp(r'[\s　・.．]+'), '').replaceAll('髙', '高').replaceAll('﨑', '崎').replaceAll('海', '海').toLowerCase();
 
-List<Map<String, dynamic>> usageMaps(dynamic value) => value is List
-    ? value.whereType<Map>().map((r) => Map<String, dynamic>.from(r)).toList()
-    : [];
-Map<String, dynamic> usageMap(dynamic value) =>
-    value is Map ? Map<String, dynamic>.from(value) : {};
+List<Map<String, dynamic>> usageMaps(dynamic value) => value is List ? value.whereType<Map>().map((r) => Map<String, dynamic>.from(r)).toList() : [];
+Map<String, dynamic> usageMap(dynamic value) => value is Map ? Map<String, dynamic>.from(value) : {};
 int usageInt(dynamic value) => int.tryParse('$value') ?? 0;
 
 List<String> npbSeasonGames(String source, int year) {
   final result = <String>{};
   for (final row in html.parse(source).querySelectorAll('tr')) {
-    if (row.querySelector('.team1') == null ||
-        row.querySelector('.score1') == null) continue;
-    if (int.tryParse(row.querySelector('.score1')!.text.trim()) == null ||
-        int.tryParse(row.querySelector('.score2')?.text.trim() ?? '') == null)
+    if (row.querySelector('.team1') == null || row.querySelector('.score1') == null) {
       continue;
+    }
+    if (int.tryParse(row.querySelector('.score1')!.text.trim()) == null || int.tryParse(row.querySelector('.score2')?.text.trim() ?? '') == null) {
+      continue;
+    }
     for (final a in row.querySelectorAll('a[href]')) {
       final href = a.attributes['href']!;
-      if (RegExp('^/scores/$year/[0-9]{4}/[a-z]+-[a-z]+-[0-9]+/\$')
-          .hasMatch(href)) result.add('https://npb.jp${href}box.html');
+      if (RegExp('^/scores/$year/[0-9]{4}/[a-z]+-[a-z]+-[0-9]+/\$').hasMatch(href)) {
+        result.add('https://npb.jp${href}box.html');
+      }
     }
   }
   return result.toList();
@@ -55,15 +47,15 @@ List<String> npbSeasonGames(String source, int year) {
 List<Map<String, dynamic>> parseNpbUsageGame(String source, String url) {
   final doc = html.parse(source);
   final title = doc.querySelector('.game_tit h3')?.text ?? '';
-  if (title.contains('CS ') ||
-      title.contains('日本シリーズ') ||
-      title.contains('オールスター') ||
-      title.contains('オープン戦')) return [];
-  if ((doc.querySelector('.game_info')?.text ?? '').contains('ノーゲーム'))
+  if (title.contains('CS ') || title.contains('日本シリーズ') || title.contains('オールスター') || title.contains('オープン戦')) {
     return [];
-  if (!(RegExp('試合終了|コールドゲーム')
-      .hasMatch(doc.querySelector('.game_info')?.text ?? '')))
+  }
+  if ((doc.querySelector('.game_info')?.text ?? '').contains('ノーゲーム')) {
+    return [];
+  }
+  if (!(RegExp('試合終了|コールドゲーム').hasMatch(doc.querySelector('.game_info')?.text ?? ''))) {
     throw StateError('試合終了を確認できません: $url');
+  }
   final match = RegExp(r'/([a-z]+)-([a-z]+)-\d+/').firstMatch(url)!;
   final rows = <Map<String, dynamic>>[];
   for (final side in ['top', 'bottom']) {
@@ -74,8 +66,7 @@ List<Map<String, dynamic>> parseNpbUsageGame(String source, String url) {
       final cells = tr.children.toList();
       if (cells.length < 5) continue;
       final link = cells[1].querySelector('a');
-      final id = RegExp(r'/players/(\d+)\.html')
-          .firstMatch(link?.attributes['href'] ?? '')?[1];
+      final id = RegExp(r'/players/(\d+)\.html').firstMatch(link?.attributes['href'] ?? '')?[1];
       if (id == null) throw StateError('投手IDがありません: $url');
       rows.add({
         'source_player_id': id,
@@ -90,18 +81,16 @@ List<Map<String, dynamic>> parseNpbUsageGame(String source, String url) {
   return rows;
 }
 
-List<Map<String, dynamic>> aggregateUsageGames(
-    List<Map<String, dynamic>> games, String teamCode) {
+List<Map<String, dynamic>> aggregateUsageGames(List<Map<String, dynamic>> games, String teamCode) {
   final players = <String, Map<String, dynamic>>{};
   final seen = <String>{};
   for (final game in games) {
     if (!seen.add('${game['game_key']}')) continue;
-    final rows = usageMaps(game['players'])
-        .where((row) => '${row['team_code']}' == teamCode)
-        .toList();
+    final rows = usageMaps(game['players']).where((row) => '${row['team_code']}' == teamCode).toList();
     if (rows.isEmpty) continue;
-    if (rows.where((p) => p['starter'] == true).length != 1)
+    if (rows.where((p) => p['starter'] == true).length != 1) {
       throw StateError('先発投手は各球団1人である必要があります');
+    }
     final ids = <String>{};
     for (final row in rows) {
       final id = '${row['source_player_id']}';
@@ -123,8 +112,9 @@ List<Map<String, dynamic>> aggregateUsageGames(
       player[role] = usageInt(player[role]) + outs;
       player['total_outs'] = usageInt(player['total_outs']) + outs;
       player['appearances'] = usageInt(player['appearances']) + 1;
-      if (row['starter'] == true)
+      if (row['starter'] == true) {
         player['starts'] = usageInt(player['starts']) + 1;
+      }
     }
   }
   return players.values.toList();
@@ -132,8 +122,9 @@ List<Map<String, dynamic>> aggregateUsageGames(
 
 List<Map<String, dynamic>> parseUsageRoster(String source, int year) {
   final doc = html.parse(source);
-  if (!doc.querySelectorAll('h2').any((e) => e.text.contains('$year年度')))
+  if (!doc.querySelectorAll('h2').any((e) => e.text.contains('$year年度'))) {
     throw StateError('名簿の年度が一致しません');
+  }
   final result = <String, Map<String, dynamic>>{};
   var registration = '';
   var position = '';
@@ -150,8 +141,7 @@ List<Map<String, dynamic>> parseUsageRoster(String source, int year) {
     if (!{'投手', '捕手', '内野手', '外野手', '指名打者'}.contains(position)) continue;
     final cells = el.children.toList();
     if (cells.length < 7) continue;
-    final id = RegExp(r'/players/(\d+)\.html')
-        .firstMatch(cells[1].querySelector('a')?.attributes['href'] ?? '')?[1];
+    final id = RegExp(r'/players/(\d+)\.html').firstMatch(cells[1].querySelector('a')?.attributes['href'] ?? '')?[1];
     if (id == null) continue;
     result[id] = {
       'source_player_id': id,
@@ -176,17 +166,15 @@ Map<String, int> parseUsageAppearances(String source, {required bool pitcher}) {
     List<String>? headers;
     for (final row in table.querySelectorAll('tr')) {
       final cells = row.children.toList();
-      final texts =
-          cells.map((e) => e.text.replaceAll(RegExp(r'\s+'), '')).toList();
+      final texts = cells.map((e) => e.text.replaceAll(RegExp(r'\s+'), '')).toList();
       final label = pitcher ? '登板' : '試合';
       if (texts.contains('選手') && texts.contains(label)) {
         headers = texts;
         continue;
       }
-      if (headers == null ||
-          cells.length != headers.length ||
-          cells.isEmpty ||
-          cells.first.localName != 'td') continue;
+      if (headers == null || cells.length != headers.length || cells.isEmpty || cells.first.localName != 'td') {
+        continue;
+      }
       final name = usageName(texts.first.replaceFirst(RegExp(r'^[*＊]+'), ''));
       result[name] = usageInt(texts[headers.indexOf(label)]);
     }
@@ -215,25 +203,14 @@ List<Map<String, dynamic>> parseNpbSubstitutions(String source, String url) {
                   ? 'DEF'
                   : null;
       if (role == null) continue;
-      final id = RegExp(r'/players/(\d+)\.html').firstMatch(
-          cells[2].querySelector('a')?.attributes['href'] ?? '')?[1];
+      final id = RegExp(r'/players/(\d+)\.html').firstMatch(cells[2].querySelector('a')?.attributes['href'] ?? '')?[1];
       if (id == null) throw StateError('途中出場選手IDがありません: $url');
       result.add({
         'source_player_id': id,
         'name': cells[2].text.trim(),
         'team_code': side == 'top' ? match[2] : match[1],
         'role': role,
-        if (role == 'DEF')
-          'entry_position': const {
-            '捕': 'C',
-            '一': '1B',
-            '二': '2B',
-            '三': '3B',
-            '遊': 'SS',
-            '左': 'LF',
-            '中': 'CF',
-            '右': 'RF'
-          }[position.substring(0, 1)]
+        if (role == 'DEF') 'entry_position': const {'捕': 'C', '一': '1B', '二': '2B', '三': '3B', '遊': 'SS', '左': 'LF', '中': 'CF', '右': 'RF'}[position.substring(0, 1)]
       });
     }
   }
@@ -253,26 +230,17 @@ List<Map<String, dynamic>> parseMlbSubstitutions(Map<String, dynamic> box) {
       final first = '${positions.first['abbreviation']}';
       final role = first == 'PH' || first == 'PR'
           ? first
-          : const ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF']
-                  .contains(first)
+          : const ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF'].contains(first)
               ? 'DEF'
               : null;
       if (role == null) continue;
-      result.add({
-        'source_player_id': '${usageMap(p['person'])['id']}',
-        'name': usageMap(p['person'])['fullName'],
-        'team_code': '${usageMap(team['team'])['id']}',
-        'role': role,
-        if (role == 'DEF') 'entry_position': first
-      });
+      result.add({'source_player_id': '${usageMap(p['person'])['id']}', 'name': usageMap(p['person'])['fullName'], 'team_code': '${usageMap(team['team'])['id']}', 'role': role, if (role == 'DEF') 'entry_position': first});
     }
   }
   return result;
 }
 
-List<Map<String, dynamic>> substitutionBands(
-    List<Map<String, dynamic>> games, String teamCode,
-    {String org = 'npb'}) {
+List<Map<String, dynamic>> substitutionBands(List<Map<String, dynamic>> games, String teamCode, {String org = 'npb'}) {
   final counts = <String, Map<String, Map<String, dynamic>>>{};
   final seen = <String>{};
   for (final game in games) {
@@ -283,9 +251,7 @@ List<Map<String, dynamic>> substitutionBands(
       final id = '${p['source_player_id']}';
       final role = '${p['role']}';
       if (!seenPlayers.add('$role:$id')) continue;
-      final player = counts
-          .putIfAbsent(role, () => {})
-          .putIfAbsent(id, () => {...p, 'player_key': '$org:$id', 'count': 0});
+      final player = counts.putIfAbsent(role, () => {}).putIfAbsent(id, () => {...p, 'player_key': '$org:$id', 'count': 0});
       player['count'] = usageInt(player['count']) + 1;
       if (role == 'DEF' && p['entry_position'] != null) {
         final counts = usageMap(player['defense_counts']);
@@ -298,31 +264,22 @@ List<Map<String, dynamic>> substitutionBands(
   return [
     for (final role in [('PH', '代打'), ('PR', '代走'), ('DEF', '代守')])
       (() {
-        final players = (counts[role.$1]?.values.toList() ??
-            <Map<String, dynamic>>[])
-          ..sort(
-              (a, b) => usageInt(b['count']).compareTo(usageInt(a['count'])));
+        final players = (counts[role.$1]?.values.toList() ?? <Map<String, dynamic>>[])..sort((a, b) => usageInt(b['count']).compareTo(usageInt(a['count'])));
         final total = players.fold<int>(0, (n, p) => n + usageInt(p['count']));
         return <String, dynamic>{
           'slot': role.$1,
           'label': role.$2,
           'total': total,
           'players': [
-            for (final p in players)
-              {
-                ...p,
-                'usage_rate': total == 0 ? 0 : usageInt(p['count']) / total
-              }
+            for (final p in players) {...p, 'usage_rate': total == 0 ? 0 : usageInt(p['count']) / total}
           ]
         };
       })()
   ];
 }
 
-List<Map<String, dynamic>> defenseSubstitutionBands(
-    List<Map<String, dynamic>> bands) {
-  final defenders =
-      usageMaps(bands.where((b) => b['slot'] == 'DEF').firstOrNull?['players']);
+List<Map<String, dynamic>> defenseSubstitutionBands(List<Map<String, dynamic>> bands) {
+  final defenders = usageMaps(bands.where((b) => b['slot'] == 'DEF').firstOrNull?['players']);
   return [
     for (final role in [
       ('DEF_IF', '内野代守', ['1B', '2B', '3B', 'SS']),
@@ -332,31 +289,22 @@ List<Map<String, dynamic>> defenseSubstitutionBands(
         final players = <Map<String, dynamic>>[];
         for (final p in defenders) {
           final counts = usageMap(p['defense_counts']);
-          final count =
-              role.$3.fold<int>(0, (n, pos) => n + usageInt(counts[pos]));
+          final count = role.$3.fold<int>(0, (n, pos) => n + usageInt(counts[pos]));
           if (count > 0) players.add({...p, 'count': count});
         }
-        players.sort(
-            (a, b) => usageInt(b['count']).compareTo(usageInt(a['count'])));
-        return <String, dynamic>{
-          'slot': role.$1,
-          'label': role.$2,
-          'total': players.fold<int>(0, (n, p) => n + usageInt(p['count'])),
-          'players': players
-        };
+        players.sort((a, b) => usageInt(b['count']).compareTo(usageInt(a['count'])));
+        return <String, dynamic>{'slot': role.$1, 'label': role.$2, 'total': players.fold<int>(0, (n, p) => n + usageInt(p['count'])), 'players': players};
       })()
   ];
 }
 
 class StrengthUsage {
   static Future<void> ensure() => Postgres.withConnection((conn) async {
-        await conn
-            .execute('''CREATE TABLE IF NOT EXISTS t_strength_game_pitching (
+        await conn.execute('''CREATE TABLE IF NOT EXISTS t_strength_game_pitching (
       code_org text NOT NULL, int_year integer NOT NULL, game_key text NOT NULL,
       payload jsonb NOT NULL, updated_at timestamptz NOT NULL DEFAULT NOW(),
       PRIMARY KEY(code_org, int_year, game_key))''');
-        await conn.execute(
-            '''CREATE TABLE IF NOT EXISTS t_strength_game_substitutions (
+        await conn.execute('''CREATE TABLE IF NOT EXISTS t_strength_game_substitutions (
       code_org text NOT NULL, int_year integer NOT NULL, game_key text NOT NULL,
       payload jsonb NOT NULL, updated_at timestamptz NOT NULL DEFAULT NOW(),
       PRIMARY KEY(code_org, int_year, game_key))''');
@@ -367,8 +315,7 @@ class StrengthUsage {
       payload jsonb NOT NULL, updated_at timestamptz NOT NULL DEFAULT NOW(),
       CHECK(total_outs = starter_outs + relief_outs),
       PRIMARY KEY(code_org,int_year,id_team,player_key))''');
-        await conn
-            .execute('''CREATE TABLE IF NOT EXISTS t_strength_player_status (
+        await conn.execute('''CREATE TABLE IF NOT EXISTS t_strength_player_status (
       code_org text NOT NULL, int_year integer NOT NULL, id_team integer NOT NULL,
       player_key text NOT NULL, payload jsonb NOT NULL,
       updated_at timestamptz NOT NULL DEFAULT NOW(),
@@ -378,11 +325,10 @@ class StrengthUsage {
   static Future<String> get(http.Client client, String url) async {
     for (var attempt = 0;; attempt++) {
       try {
-        final response = await client
-            .get(Uri.parse(url))
-            .timeout(const Duration(seconds: 45));
-        if (response.statusCode != 200)
+        final response = await client.get(Uri.parse(url)).timeout(const Duration(seconds: 45));
+        if (response.statusCode != 200) {
           throw StateError('HTTP ${response.statusCode}: $url');
+        }
         return utf8.decode(response.bodyBytes);
       } catch (_) {
         if (attempt >= 2) rethrow;
@@ -391,93 +337,62 @@ class StrengthUsage {
     }
   }
 
-  static Future<List<Map<String, dynamic>>> cachedGames(
-      http.Client client,
-      String org,
-      int year,
-      List<String> keys,
-      Future<List<Map<String, dynamic>>> Function(String key) fetch,
-      {bool substitutions = false}) async {
-    final table = substitutions
-        ? 't_strength_game_substitutions'
-        : 't_strength_game_pitching';
-    final saved = await Postgres.withConnection((conn) async => conn.execute(
-        'SELECT game_key,payload FROM $table WHERE code_org=\$1 AND int_year=\$2',
-        parameters: [org, year]));
+  static Future<List<Map<String, dynamic>>> cachedGames(http.Client client, String org, int year, List<String> keys, Future<List<Map<String, dynamic>>> Function(String key) fetch, {bool substitutions = false}) async {
+    final table = substitutions ? 't_strength_game_substitutions' : 't_strength_game_pitching';
+    final saved = await Postgres.withConnection((conn) async => conn.execute('SELECT game_key,payload FROM $table WHERE code_org=\$1 AND int_year=\$2', parameters: [org, year]));
     final games = <String, Map<String, dynamic>>{};
     for (final row in saved) {
       final value = row[1] is String ? jsonDecode(row[1] as String) : row[1];
       games['${row[0]}'] = usageMap(value);
     }
-    final missing = keys
-        .toSet()
-        .where((key) =>
-            !games.containsKey(key) ||
-            (substitutions &&
-                usageMaps(games[key]?['players']).any(
-                    (p) => p['role'] == 'DEF' && p['entry_position'] == null)))
-        .toList();
+    final missing = keys.toSet().where((key) => !games.containsKey(key) || (substitutions && usageMaps(games[key]?['players']).any((p) => p['role'] == 'DEF' && p['entry_position'] == null))).toList();
     final batchSize = org == 'mlb' ? 12 : 4;
     for (var offset = 0; offset < missing.length; offset += batchSize) {
-      final batch = await Future.wait(missing
-          .skip(offset)
-          .take(batchSize)
-          .map((key) async => {'game_key': key, 'players': await fetch(key)}));
+      final batch = await Future.wait(missing.skip(offset).take(batchSize).map((key) async => {'game_key': key, 'players': await fetch(key)}));
       await Postgres.withConnection((conn) async {
-        await conn.execute(
-            '''INSERT INTO $table(code_org,int_year,game_key,payload)
+        await conn.execute('''INSERT INTO $table(code_org,int_year,game_key,payload)
           SELECT \$1,\$2,(p->>'game_key'),p FROM jsonb_array_elements(\$3::jsonb) p
-          ON CONFLICT(code_org,int_year,game_key) DO UPDATE SET payload=EXCLUDED.payload,updated_at=NOW()''',
-            parameters: [org, year, jsonEncode(batch)]);
+          ON CONFLICT(code_org,int_year,game_key) DO UPDATE SET payload=EXCLUDED.payload,updated_at=NOW()''', parameters: [org, year, jsonEncode(batch)]);
       });
       for (final game in batch) {
         games['${game['game_key']}'] = game;
       }
-      if (offset % (batchSize * 25) == 0 ||
-          offset + batchSize >= missing.length)
-        print(
-            '${substitutions ? '途中出場' : '投球回'}取得 $org/$year ${offset + batch.length}/${missing.length}（保存済み${saved.length}試合）');
+      if (offset % (batchSize * 25) == 0 || offset + batchSize >= missing.length) {
+        print('${substitutions ? '途中出場' : '投球回'}取得 $org/$year ${offset + batch.length}/${missing.length}（保存済み${saved.length}試合）');
+      }
     }
     return [for (final key in keys.toSet()) games[key]!];
   }
 
-  static Future<List<Map<String, dynamic>>> npbGames(
-      http.Client client, int year) async {
+  static Future<List<Map<String, dynamic>>> npbGames(http.Client client, int year) async {
     await ensure();
     final urls = <String>{};
     for (var month = 3; month <= 10; month++) {
-      final url =
-          'https://npb.jp/games/$year/schedule_${month.toString().padLeft(2, '0')}_detail.html';
+      final url = 'https://npb.jp/games/$year/schedule_${month.toString().padLeft(2, '0')}_detail.html';
       urls.addAll(npbSeasonGames(await get(client, url), year));
     }
     if (urls.isEmpty) throw StateError('NPB公式戦の日程がありません');
-    final games = await cachedGames(client, 'npb', year, urls.toList(),
-        (url) async => parseNpbUsageGame(await get(client, url), url));
-    final subs = await cachedGames(client, 'npb', year, urls.toList(),
-        (url) async => parseNpbSubstitutions(await get(client, url), url),
-        substitutions: true);
+    final games = await cachedGames(client, 'npb', year, urls.toList(), (url) async => parseNpbUsageGame(await get(client, url), url));
+    final subs = await cachedGames(client, 'npb', year, urls.toList(), (url) async => parseNpbSubstitutions(await get(client, url), url), substitutions: true);
     final byKey = {for (final game in subs) game['game_key']: game['players']};
     return [
-      for (final game in games)
-        {...game, 'substitutions': byKey[game['game_key']]}
+      for (final game in games) {...game, 'substitutions': byKey[game['game_key']]}
     ];
   }
 
-  static Future<List<Map<String, dynamic>>> mlbGames(
-      http.Client client, int year, Map<String, dynamic> schedule) async {
+  static Future<List<Map<String, dynamic>>> mlbGames(http.Client client, int year, Map<String, dynamic> schedule) async {
     await ensure();
     final keys = <String>[];
     for (final date in usageMaps(schedule['dates'])) {
       for (final game in usageMaps(date['games'])) {
         final status = usageMap(game['status']);
-        if (status['abstractGameState'] == 'Final' &&
-            status['detailedState'] != 'Cancelled')
+        if (status['abstractGameState'] == 'Final' && status['detailedState'] != 'Cancelled') {
           keys.add('${game['gamePk']}');
+        }
       }
     }
     final games = await cachedGames(client, 'mlb', year, keys, (key) async {
-      final box = usageMap(jsonDecode(await get(
-          client, 'https://statsapi.mlb.com/api/v1/game/$key/boxscore')));
+      final box = usageMap(jsonDecode(await get(client, 'https://statsapi.mlb.com/api/v1/game/$key/boxscore')));
       final result = <Map<String, dynamic>>[];
       for (final side in ['home', 'away']) {
         final team = usageMap(usageMap(box['teams'])[side]);
@@ -487,102 +402,57 @@ class StrengthUsage {
         for (var index = 0; index < ids.length; index++) {
           final player = usageMap(players['ID${ids[index]}']);
           final stats = usageMap(usageMap(player['stats'])['pitching']);
-          result.add({
-            'source_player_id': '${ids[index]}',
-            'name': usageMap(player['person'])['fullName'],
-            'team_code': '${usageMap(team['team'])['id']}',
-            'starter': index == 0,
-            'outs': inningsToOuts('${stats['inningsPitched'] ?? '0.0'}')
-          });
+          result.add({'source_player_id': '${ids[index]}', 'name': usageMap(player['person'])['fullName'], 'team_code': '${usageMap(team['team'])['id']}', 'starter': index == 0, 'outs': inningsToOuts('${stats['inningsPitched'] ?? '0.0'}')});
         }
       }
       return result;
     });
-    final subs = await cachedGames(
-        client,
-        'mlb',
-        year,
-        keys,
-        (key) async => parseMlbSubstitutions(usageMap(jsonDecode(await get(
-            client, 'https://statsapi.mlb.com/api/v1/game/$key/boxscore')))),
-        substitutions: true);
+    final subs = await cachedGames(client, 'mlb', year, keys, (key) async => parseMlbSubstitutions(usageMap(jsonDecode(await get(client, 'https://statsapi.mlb.com/api/v1/game/$key/boxscore')))), substitutions: true);
     final byKey = {for (final game in subs) game['game_key']: game['players']};
     return [
-      for (final game in games)
-        {...game, 'substitutions': byKey[game['game_key']]}
+      for (final game in games) {...game, 'substitutions': byKey[game['game_key']]}
     ];
   }
 
-  static Future<void> saveTotals(Session conn, String org, int year,
-      List<Map<String, dynamic>> teams) async {
+  static Future<void> saveTotals(Session conn, String org, int year, List<Map<String, dynamic>> teams) async {
     for (final team in teams) {
       final pitchers = usageMaps(team['pitching_workload']);
       if (pitchers.isEmpty) continue;
-      await conn.execute(
-          'DELETE FROM t_strength_pitching WHERE code_org=\$1 AND int_year=\$2 AND id_team=\$3',
-          parameters: [org, year, team['id_team']]);
-      await conn.execute(
-          '''INSERT INTO t_strength_pitching(code_org,int_year,id_team,player_key,starter_outs,relief_outs,total_outs,payload)
+      await conn.execute('DELETE FROM t_strength_pitching WHERE code_org=\$1 AND int_year=\$2 AND id_team=\$3', parameters: [org, year, team['id_team']]);
+      await conn.execute('''INSERT INTO t_strength_pitching(code_org,int_year,id_team,player_key,starter_outs,relief_outs,total_outs,payload)
           SELECT \$1,\$2,\$3,p->>'player_key',(p->>'starter_outs')::int,(p->>'relief_outs')::int,(p->>'total_outs')::int,p
           FROM jsonb_array_elements(\$4::jsonb) p
           ON CONFLICT(code_org,int_year,id_team,player_key) DO UPDATE SET
-          starter_outs=EXCLUDED.starter_outs,relief_outs=EXCLUDED.relief_outs,total_outs=EXCLUDED.total_outs,payload=EXCLUDED.payload,updated_at=NOW()''',
-          parameters: [org, year, team['id_team'], jsonEncode(pitchers)]);
+          starter_outs=EXCLUDED.starter_outs,relief_outs=EXCLUDED.relief_outs,total_outs=EXCLUDED.total_outs,payload=EXCLUDED.payload,updated_at=NOW()''', parameters: [org, year, team['id_team'], jsonEncode(pitchers)]);
     }
   }
 
-  static Future<void> attachStatuses(
-      String org, int year, List<Map<String, dynamic>> teams) async {
-    final records = await Postgres.withConnection((conn) async => conn.execute(
-        'SELECT id_team,player_key,payload FROM t_strength_player_status WHERE code_org=\$1 AND int_year=\$2',
-        parameters: [org, year]));
+  static Future<void> attachStatuses(String org, int year, List<Map<String, dynamic>> teams) async {
+    final records = await Postgres.withConnection((conn) async => conn.execute('SELECT id_team,player_key,payload FROM t_strength_player_status WHERE code_org=\$1 AND int_year=\$2', parameters: [org, year]));
     for (final team in teams) {
-      final statuses = {
-        for (final row in records.where((r) => r[0] == team['id_team']))
-          '${row[1]}':
-              usageMap(row[2] is String ? jsonDecode(row[2] as String) : row[2])
-      };
+      final statuses = {for (final row in records.where((r) => r[0] == team['id_team'])) '${row[1]}': usageMap(row[2] is String ? jsonDecode(row[2] as String) : row[2])};
       team['roster'] = [
-        for (final player in usageMaps(team['roster']))
-          {...player, ...?statuses['${player['player_key']}']}
+        for (final player in usageMaps(team['roster'])) {...player, ...?statuses['${player['player_key']}']}
       ];
     }
   }
 }
 
-Future<Map<String, dynamic>> enrichNpbUsage(
-    http.Client client,
-    Map<String, dynamic> team,
-    int year,
-    String code,
-    List<Map<String, dynamic>> games,
-    {List<Map<String, dynamic>> announcements = const []}) async {
+Future<Map<String, dynamic>> enrichNpbUsage(http.Client client, Map<String, dynamic> team, int year, String code, List<Map<String, dynamic>> games, {List<Map<String, dynamic>> announcements = const []}) async {
   final workload = aggregateUsageGames(games, code);
-  final rosterUrl = year == DateTime.now().year
-      ? 'https://npb.jp/bis/teams/rst_$code.html'
-      : 'https://npb.jp/bis/$year/teams/rst_$code.html';
+  final rosterUrl = year == DateTime.now().year ? 'https://npb.jp/bis/teams/rst_$code.html' : 'https://npb.jp/bis/$year/teams/rst_$code.html';
   final pages = await Future.wait([
     StrengthUsage.get(client, rosterUrl),
-    for (final kind in ['idb1', 'idb2', 'idp2'])
-      StrengthUsage.get(
-          client, 'https://npb.jp/bis/$year/stats/${kind}_$code.html'),
+    for (final kind in ['idb1', 'idb2', 'idp2']) StrengthUsage.get(client, 'https://npb.jp/bis/$year/stats/${kind}_$code.html'),
   ]);
   final roster = parseUsageRoster(pages[0], year);
   for (final player in roster) {
-    final status = announcements
-        .where((s) =>
-            s['team_code'] == code && s['player_key'] == player['player_key'])
-        .lastOrNull;
-    if (status != null)
+    final status = announcements.where((s) => s['team_code'] == code && s['player_key'] == player['player_key']).lastOrNull;
+    if (status != null) {
       player.addAll({
-        for (final key in [
-          'departure_confirmed',
-          'departure_type',
-          'status_source',
-          'status_as_of'
-        ])
-          key: status[key]
+        for (final key in ['departure_confirmed', 'departure_type', 'status_source', 'status_as_of']) key: status[key]
       });
+    }
   }
   final byId = {for (final p in roster) '${p['source_player_id']}': p};
   for (final player in workload) {
@@ -591,8 +461,7 @@ Future<Map<String, dynamic>> enrichNpbUsage(
     if (byId.containsKey(id)) {
       player['name'] = byId[id]!['name'];
     } else {
-      final profile = html.parse(await StrengthUsage.get(
-          client, 'https://npb.jp/bis/players/$id.html'));
+      final profile = html.parse(await StrengthUsage.get(client, 'https://npb.jp/bis/players/$id.html'));
       final full = profile.querySelector('#pc_v_name')?.text.trim();
       if (full == null || full.isEmpty) throw StateError('投手の正式名を取得できません: $id');
       player['name'] = full.replaceAll(RegExp(r'\s+'), '');
@@ -603,46 +472,32 @@ Future<Map<String, dynamic>> enrichNpbUsage(
   for (final player in workload) {
     final season = byName[usageName('${player['name']}')];
     if (season != null) {
-      if (season['official_outs'] != null &&
-          usageInt(season['official_outs']) != usageInt(player['total_outs']))
-        throw StateError(
-            '公式投球回と試合別合計が一致しません: ${player['name']} ${season['official_outs']}/${player['total_outs']}');
+      if (season['official_outs'] != null && usageInt(season['official_outs']) != usageInt(player['total_outs'])) {
+        throw StateError('公式投球回と試合別合計が一致しません: ${player['name']} ${season['official_outs']}/${player['total_outs']}');
+      }
       player['saves'] = season['saves'];
       player['holds'] = season['holds'];
     }
   }
   for (final p in byName.values) {
-    if (!workload
-        .any((w) => usageName('${w['name']}') == usageName('${p['name']}')))
+    if (!workload.any((w) => usageName('${w['name']}') == usageName('${p['name']}'))) {
       throw StateError('試合別投球回が不足: ${p['name']}');
+    }
   }
   final batting1 = parseUsageAppearances(pages[1], pitcher: false);
   final batting2 = parseUsageAppearances(pages[2], pitcher: false);
   final pitching2 = parseUsageAppearances(pages[3], pitcher: true);
-  final pitching1 = {
-    for (final p in workload)
-      usageName('${p['name']}'): usageInt(p['appearances'])
-  };
+  final pitching1 = {for (final p in workload) usageName('${p['name']}'): usageInt(p['appearances'])};
   final keyedRoster = [
     for (final p in roster)
       {
         ...p,
-        'level_appearances': {
-          '1': (p['position_group'] == '投手'
-                  ? pitching1
-                  : batting1)[usageName('${p['name']}')] ??
-              0,
-          '2': (p['position_group'] == '投手'
-                  ? pitching2
-                  : batting2)[usageName('${p['name']}')] ??
-              0
-        },
+        'level_appearances': {'1': (p['position_group'] == '投手' ? pitching1 : batting1)[usageName('${p['name']}')] ?? 0, '2': (p['position_group'] == '投手' ? pitching2 : batting2)[usageName('${p['name']}')] ?? 0},
         'level_coverage': [1, 2],
       }
   ];
   final idsByName = {
-    for (final p in [...roster, ...workload])
-      usageName('${p['name']}'): '${p['player_key']}'
+    for (final p in [...roster, ...workload]) usageName('${p['name']}'): '${p['player_key']}'
   };
   final oldKeys = <String, String>{};
   for (final p in official) {
@@ -653,30 +508,19 @@ Future<Map<String, dynamic>> enrichNpbUsage(
     final normalized = usageName('${player['name']}');
     final exact = idsByName[normalized] ?? oldKeys['${player['player_key']}'];
     if (exact != null) return exact;
-    var candidates = roster
-        .where((p) => usageName('${p['source_surname']}') == normalized)
-        .toList();
-    if (candidates.isEmpty)
-      candidates = roster
-          .where((p) => usageName('${p['name']}').startsWith(normalized))
-          .toList();
-    return candidates.length == 1
-        ? '${candidates.single['player_key']}'
-        : '${player['player_key']}';
+    var candidates = roster.where((p) => usageName('${p['source_surname']}') == normalized).toList();
+    if (candidates.isEmpty) {
+      candidates = roster.where((p) => usageName('${p['name']}').startsWith(normalized)).toList();
+    }
+    return candidates.length == 1 ? '${candidates.single['player_key']}' : '${player['player_key']}';
   }
 
   return {
     ...team,
     'substitutions': substitutionBands(games, code),
-    'substitution_game_count': games
-        .where(
-            (g) => usageMaps(g['players']).any((p) => p['team_code'] == code))
-        .length,
+    'substitution_game_count': games.where((g) => usageMaps(g['players']).any((p) => p['team_code'] == code)).length,
     'pitching_workload': workload,
-    'pitching_game_count': games
-        .where(
-            (g) => usageMaps(g['players']).any((p) => p['team_code'] == code))
-        .length,
+    'pitching_game_count': games.where((g) => usageMaps(g['players']).any((p) => p['team_code'] == code)).length,
     'roster': keyedRoster,
     for (final field in ['positions', 'batting_order'])
       field: [
@@ -684,57 +528,43 @@ Future<Map<String, dynamic>> enrichNpbUsage(
           {
             ...group,
             'players': [
-              for (final p in usageMaps(group['players']))
-                {...p, 'player_key': playerKey(p)}
+              for (final p in usageMaps(group['players'])) {...p, 'player_key': playerKey(p)}
             ]
           }
       ],
     'notes': [
-      ...((team['notes'] as List?) ?? [])
-          .where((n) => !('$n'.startsWith('先発回数は'))),
+      ...((team['notes'] as List?) ?? []).where((n) => !('$n'.startsWith('先発回数は'))),
       '投手負担率は公式戦の全投球回が分母。先発・中継ぎ（抑えを含む）を登板ごとに区別して集計。',
     ],
   };
 }
 
-List<Map<String, dynamic>> parseNpbStatusAnnouncements(
-    String source, String url) {
+List<Map<String, dynamic>> parseNpbStatusAnnouncements(String source, String url) {
   final result = <Map<String, dynamic>>[];
   for (final row in html.parse(source).querySelectorAll('tr')) {
     final cells = row.children.toList();
     if (cells.length < 3) continue;
-    final date =
-        RegExp(r'20\d{2}/\d{1,2}/\d{1,2}').firstMatch(cells.first.text)?[0];
+    final date = RegExp(r'20\d{2}/\d{1,2}/\d{1,2}').firstMatch(cells.first.text)?[0];
     if (date == null) continue;
     String? teamCode;
     String? playerId;
     for (final a in row.querySelectorAll('a[href]')) {
       final href = a.attributes['href']!;
-      teamCode ??= RegExp(r'(?:index|rst|registered)_([a-z]+)\.html')
-          .firstMatch(href)?[1];
+      teamCode ??= RegExp(r'(?:index|rst|registered)_([a-z]+)\.html').firstMatch(href)?[1];
       playerId ??= RegExp(r'/players/(\d+)\.html').firstMatch(href)?[1];
     }
     if (teamCode == null || playerId == null) continue;
-    result.add({
-      'team_code': teamCode,
-      'player_key': 'npb:$playerId',
-      'departure_confirmed': true,
-      'departure_type': url.contains('pn_retired') ? 'retired' : 'released',
-      'status_source': url,
-      'status_as_of': date
-    });
+    result.add({'team_code': teamCode, 'player_key': 'npb:$playerId', 'departure_confirmed': true, 'departure_type': url.contains('pn_retired') ? 'retired' : 'released', 'status_source': url, 'status_as_of': date});
   }
   return result;
 }
 
-Future<List<Map<String, dynamic>>> fetchNpbStatusAnnouncements(
-    http.Client client, int year) async {
+Future<List<Map<String, dynamic>>> fetchNpbStatusAnnouncements(http.Client client, int year) async {
   final result = <Map<String, dynamic>>[];
   for (final page in ['pn_released', 'pn_retired']) {
     final url = 'https://npb.jp/announcement/$year/$page.html';
     try {
-      result.addAll(parseNpbStatusAnnouncements(
-          await StrengthUsage.get(client, url), url));
+      result.addAll(parseNpbStatusAnnouncements(await StrengthUsage.get(client, url), url));
     } catch (error) {
       print('公示取得を保留（未確認として表示）: $url $error');
     }

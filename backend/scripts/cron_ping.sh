@@ -23,7 +23,7 @@ fi
 call_simple() {
   local path="$1"
   echo "GET ${BASE_URL}${path}"
-  curl -fsS --connect-timeout 30 --max-time 1800 "${BASE_URL}${path}"
+  curl -fsS -H 'X-Koko-Log-Source: scheduler' --connect-timeout 30 --max-time 1800 "${BASE_URL}${path}"
   echo
 }
 
@@ -31,6 +31,7 @@ call_player_stats() {
   local path="$1"
   echo "GET ${BASE_URL}${path}"
   curl --silent --show-error \
+    --header 'X-Koko-Log-Source: scheduler' \
     --fail-with-body \
     --location \
     --retry 10 \

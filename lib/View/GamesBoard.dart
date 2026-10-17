@@ -1,3 +1,6 @@
+import 'player_condition.dart';
+import 'player_detail_dialog.dart';
+import '../tools/json_utils.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
@@ -52,7 +55,7 @@ const _csPacificGradient = [Color(0xFF5AD8EA), Color(0xFF1E6FE0), Color(0xFF1F52
     for (final game in games) '${game['code_game'] ?? ''}'.trim().toUpperCase(),
   ];
   final hasCs1 = codes.contains('CS1');
-  final hasFinal = codes.contains('CS2') || codes.contains('CS');
+  final hasFinal = codes.contains('CSF') || codes.contains('CS2') || codes.contains('CS');
   final hasJs = codes.contains('JS');
   if (!hasCs1 && !hasFinal && !hasJs) {
     return (label: fallbackLabel, logoAsset: null, gradient: null);
@@ -2397,22 +2400,62 @@ class _TableGameCard extends StatelessWidget {
     return false;
   }
 
+  String _playerHand(String name, bool pitching) {
+    String hand = '';
+    for (final row in [
+      ...rows,
+      ...listMapFromJson(game['player_hands']),
+      if (pitching)
+        for (final side in ['home', 'away'])
+          {'name_full_summary': game['name_pitcher_$side'], 'pitching_hand': game['pitching_hand_$side']},
+    ]) {
+      if (!samePlayerStatName(name, '${row['name_full_summary'] ?? ''}')) continue;
+      final value = row[pitching ? 'pitching_hand' : 'batting_hand'];
+      final side = switch ('$value') { '0' => '右', '1' => '左', '2' => '両', _ => '' };
+      if (side.isNotEmpty) {
+        hand = side;
+        break;
+      }
+    }
+    return hand;
+  }
+
+  static const _playerMarkGap = 2.0;
+
+  Widget _playerSignals(_PlayerLine player, double size, {bool pitching = false}) {
+    final hand = _playerHand(player.name, pitching);
+    final form = listMapFromJson(game['postseason_form']).where((r) => r['pitcher'] == pitching && samePlayerStatName(player.name, '${r['name']}')).firstOrNull;
+    final level = int.tryParse('${form?['level']}');
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      const SizedBox(width: _playerMarkGap),
+      Tooltip(message: hand.isEmpty ? '左右未取得' : '$hand${pitching ? '投げ' : '打ち'}', child: PlayerHandBadge(hand: hand, size: size)),
+      const SizedBox(width: _playerMarkGap),
+      Tooltip(message: form == null || level == null ? '普通（仮表示・判定データ不足）\n今季成績または比較期間の記録を確認できないため、黄色で表示しています。' : '${form['label']}（参考）\n${form['note']}\nシーズン ${form['season'] ?? '—'} / 比較期間 ${form['postseason'] ?? '—'}',
+        child: PlayerConditionFace(level: level, size: size)),
+      const SizedBox(width: _playerMarkGap),
+    ]);
+  }
+
   Widget _nameBox(
     _PlayerLine player, {
     required double baseSize,
     required bool alignLeft,
     bool showAce = false,
+    bool pitching = false,
   }) {
-    return _pitcherNameBox(
-      name: player.name,
-      colorsRaw: player.colors,
-      baseSize: baseSize,
-      minSize: _minPlayerNameSize,
-      alignLeft: alignLeft,
-      showAce: showAce,
-      showCrown: _isSeasonStatLeader(player.name),
-      showJapan: _showJapanFlag(player.name),
-    );
+    final identity = rows.where((r)=>samePlayerStatName(player.name,'${r['name_full_summary']??''}')).firstOrNull;
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      PlayerNameLink(player:{'name':player.name,if(identity?['id_team_summary']!=null)'id_team':identity!['id_team_summary'],if(identity?['id_player']!=null)'id_player':identity!['id_player']},child:_pitcherNameBox(
+        name: player.name,
+        colorsRaw: player.colors,
+        baseSize: baseSize,
+        minSize: _minPlayerNameSize,
+        alignLeft: alignLeft,
+        showAce: showAce,
+        showCrown: _isSeasonStatLeader(player.name),
+        showJapan: _showJapanFlag(player.name),
+      )),
+    ]);
   }
 
   Color _pinchMarkColor(int index) => _pinchMarkColors[index % _pinchMarkColors.length];
@@ -3606,7 +3649,7 @@ class _TableGameCard extends StatelessWidget {
     final nameSize = size < _minPlayerNameSize ? _minPlayerNameSize : size;
     final statSize = (nameSize * 0.92).clamp(_minPlayerStatSize, 12.0);
     final badgeWidth = (nameSize + 2).clamp(9.0, 16.0);
-    final leadingW = _statLeadWidth(badgeWidth);
+    final leadingW = _statLeadWidth(badgeWidth) + badgeWidth * 2 + _playerMarkGap * 4;
     return _cell(
       color: color,
       right: right,
@@ -3655,10 +3698,12 @@ class _TableGameCard extends StatelessWidget {
                           style: TextStyle(fontSize: math.min(9, fitRowH * 0.7), fontWeight: FontWeight.bold, color: Colors.black87, height: 1),
                         ),
                       ),
+                      const SizedBox(width: _playerMarkGap),
                       SizedBox(
                         width: badgeWidth,
                         child: player == null || player.pos.isEmpty ? const SizedBox() : _lineupMark(player.pos, nameSize),
                       ),
+                      if (player != null) _playerSignals(player, badgeWidth),
                     ],
                   ),
                 ),
@@ -4667,7 +4712,7 @@ class _TableGameCard extends StatelessWidget {
     const roleMarks = {'先', '中', '抑'};
 
     // 投手(先/中/抑+勝負)と打者で成績ブロックの左端を揃える。
-    final leadingBadgesW = _statLeadWidth(badgeWidth);
+    final leadingBadgesW = _statLeadWidth(badgeWidth) + badgeWidth * 2 + _playerMarkGap * 4;
 
     Widget pitcherBadges(_PlayerLine pitcher) {
       if (notableBatting) {
@@ -4681,10 +4726,12 @@ class _TableGameCard extends StatelessWidget {
                 width: badgeWidth,
                 child: hasHr ? _resultBadge('HR', nameSize) : const SizedBox(),
               ),
+              const SizedBox(width: _playerMarkGap),
               SizedBox(
                 width: badgeWidth,
                 child: pos.isEmpty ? const SizedBox() : _lineupMark(pos, nameSize),
               ),
+              _playerSignals(pitcher, badgeWidth),
             ],
           ),
         );
@@ -4701,10 +4748,12 @@ class _TableGameCard extends StatelessWidget {
               width: badgeWidth,
               child: hasResult ? _resultBadge(pitcher.mark, nameSize) : const SizedBox(),
             ),
+            const SizedBox(width: _playerMarkGap),
             SizedBox(
               width: badgeWidth,
               child: hasRole ? _lineupMark(role, nameSize, pitcherRole: true) : const SizedBox(),
             ),
+            _playerSignals(pitcher, badgeWidth, pitching: true),
           ],
         ),
       );
@@ -4734,14 +4783,15 @@ class _TableGameCard extends StatelessWidget {
                   final role = pitcher.role.trim();
                   final hasRole = roleMarks.contains(role);
                   final hasResult = pitcher.mark.isNotEmpty;
-                  if (!hasRole && !hasResult) return const SizedBox.shrink();
+
                   // 左=勝負HS、右=先/中/抑
                   return Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       if (hasResult) SizedBox(width: badgeWidth, child: _resultBadge(pitcher.mark, nameSize)),
-                      if (hasRole && hasResult) const SizedBox(width: 0.5),
+                      if (hasRole && hasResult) const SizedBox(width: _playerMarkGap),
                       if (hasRole) SizedBox(width: badgeWidth, child: _lineupMark(role, nameSize, pitcherRole: true)),
+                      _playerSignals(pitcher, badgeWidth, pitching: !notableBatting),
                       const SizedBox(width: 0.5),
                     ],
                   );
@@ -4761,6 +4811,7 @@ class _TableGameCard extends StatelessWidget {
                               centerBadges(pitcher),
                               _nameBox(
                                 pitcher,
+                                pitching: !notableBatting,
                                 baseSize: nameSize,
                                 alignLeft: false,
                                 showAce: _isAcePitcher(
@@ -4894,6 +4945,7 @@ class _TableGameCard extends StatelessWidget {
               Widget nameCluster(_PlayerLine pitcher, {required double nameW, bool scaleName = true}) {
                 final nameBox = _nameBox(
                   pitcher,
+                  pitching: !notableBatting,
                   baseSize: nameSize,
                   alignLeft: true,
                   showAce: _isAcePitcher(

@@ -816,10 +816,10 @@ void main() {
 
     final homeName = tester.getCenter(find.text('先発巨人'));
     final homeTeam = tester.getCenter(find.text('巨人').first);
-    expect(homeName.dx, closeTo(homeTeam.dx, 28.0));
+    expect(homeName.dx, closeTo(homeTeam.dx, 48.0));
     final awayName = tester.getCenter(find.text('先発ヤクルト').first);
     final awayTeam = tester.getCenter(find.text('ヤクルト').first);
-    expect(awayName.dx, closeTo(awayTeam.dx, 28.0));
+    expect(awayName.dx, closeTo(awayTeam.dx, 48.0));
   });
 
   testWidgets('short era title 防 colors the era season chip', (tester) async {
@@ -1531,7 +1531,7 @@ void main() {
                   'color_back_away': '#003366',
                   'color_font_home': '#000000',
                   'color_font_away': '#FFFFFF',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 2,
@@ -1629,11 +1629,11 @@ void main() {
                   'int_hit_home': 6,
                   'int_error_away': 0,
                   'int_error_home': 0,
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 7,
                       'order': 5,
-                      'players': const [
+                      'players': [
                         {
                           'name': '柳田悠岐',
                           'pos': '指',
@@ -1645,28 +1645,28 @@ void main() {
                     {
                       'id_team': 7,
                       'order': 6,
-                      'players': const [
+                      'players': [
                         {'name': '周東佑京', 'pos': '遊', 'role': '代打', 'plays': '', 'rbi': 0},
                       ],
                     },
                     {
                       'id_team': 7,
                       'order': 7,
-                      'players': const [
+                      'players': [
                         {'name': '柳町達', 'pos': '中', 'plays': ''},
                       ],
                     },
                     {
                       'id_team': 7,
                       'order': 8,
-                      'players': const [
+                      'players': [
                         {'name': '甲斐拓也', 'pos': '捕', 'plays': ''},
                       ],
                     },
                     {
                       'id_team': 7,
                       'order': 9,
-                      'players': const [
+                      'players': [
                         {'name': '松本晴', 'pos': '投', 'plays': ''},
                       ],
                     },
@@ -2023,7 +2023,7 @@ void main() {
                   'color_back_away': '#003366',
                   'color_font_home': '#000000',
                   'color_font_away': '#FFFFFF',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 2,
@@ -2120,7 +2120,7 @@ void main() {
                   'color_back_away': '#003366',
                   'color_font_home': '#000000',
                   'color_font_away': '#FFFFFF',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 2,
@@ -2210,7 +2210,7 @@ void main() {
                   'color_font_home': '#000000',
                   'color_back_away': '#003366',
                   'color_font_away': '#FFFFFF',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 2,
@@ -2268,7 +2268,7 @@ void main() {
                   'color_font_home': '#000000',
                   'color_back_away': '#003366',
                   'color_font_away': '#FFFFFF',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 2,
@@ -2334,7 +2334,7 @@ void main() {
                   'color_back_away': '#F15A22',
                   'color_font_home': 'white',
                   'color_font_away': 'black',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 4,
@@ -2704,7 +2704,7 @@ void main() {
                   'color_back_away': '#12284B',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 101,
@@ -2776,7 +2776,7 @@ void main() {
                   'color_back_away': '#0C2340',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 201,
@@ -2840,7 +2840,7 @@ void main() {
                   'color_back_away': '#0C2340',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 201,
@@ -2849,11 +2849,11 @@ void main() {
                       'txt_plays': '中安|single 四球|walk 左飛|out 右タイムリー|timely',
                     },
                   ],
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 201,
                       'order': 6,
-                      'players': const [
+                      'players': [
                         {
                           'name': 'A.ベニンテンディ',
                           'pos': '左',
@@ -2923,7 +2923,7 @@ void main() {
                   'color_back_away': '#000000',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 201,
@@ -2932,11 +2932,11 @@ void main() {
                       'txt_plays': '左飛|out 代打同点タイムリー^右|timely',
                     },
                   ],
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 201,
                       'order': 6,
-                      'players': const [
+                      'players': [
                         {'name': 'トリスタン・ピーターズ', 'pos': '右', 'plays': '三振|out 左飛|out'},
                         {'name': 'トミー・ファム', 'pos': '右', 'role': '代打', 'plays': '左飛|out 代打同点タイムリー^右|timely'},
                         {'name': 'ブレンドン・ドイル', 'pos': '中', 'role': '代守', 'plays': '二ゴ|out'},
@@ -2999,7 +2999,7 @@ void main() {
                   'color_back_away': '#2F241D',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 201,
@@ -3008,11 +3008,11 @@ void main() {
                       'txt_plays': '三振|out 遊フライ|out',
                     },
                   ],
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 201,
                       'order': 2,
-                      'players': const [
+                      'players': [
                         {'name': 'ダスティン・ハリス', 'pos': '左', 'plays': '三振|out'},
                         {'name': 'ダスティンハリス', 'pos': '左', 'role': '代守', 'plays': '遊フライ|out'},
                       ],
@@ -3243,18 +3243,18 @@ void main() {
                   'color_back_away': '#000000',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 201,
                       'order': 7,
-                      'players': const [
+                      'players': [
                         {'name': 'ブレーデン・モンゴメリー', 'pos': '右', 'plays': '空三振|out 右２|double'},
                       ],
                     },
                     {
                       'id_team': 201,
                       'order': 9,
-                      'players': const [
+                      'players': [
                         {'name': 'コルソン・モンゴメリー', 'pos': '遊', 'plays': '四球|walk 空三振|out 見三振|out 三邪飛|out'},
                       ],
                     },
@@ -3310,25 +3310,25 @@ void main() {
                   'color_back_away': 'orange',
                   'color_font_home': 'black',
                   'color_font_away': 'black',
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 2,
                       'order': 1,
-                      'players': const [
+                      'players': [
                         {'name': '死球選手', 'pos': '中', 'plays': '死球|dead'},
                       ],
                     },
                     {
                       'id_team': 2,
                       'order': 2,
-                      'players': const [
+                      'players': [
                         {'name': '五凡退', 'pos': '右', 'plays': '一ゴ|out 二ゴ|out 三ゴ|out 遊ゴ|out 中飛|out'},
                       ],
                     },
                     {
                       'id_team': 2,
                       'order': 3,
-                      'players': const [
+                      'players': [
                         {'name': '四球あり', 'pos': '左', 'plays': '一ゴ|out 二ゴ|out 三ゴ|out 遊ゴ|out 四球|walk'},
                       ],
                     },
@@ -3828,7 +3828,7 @@ void main() {
                   'color_back_away': '#FF6600',
                   'color_font_home': '#000000',
                   'color_font_away': '#000000',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 2,
@@ -3845,18 +3845,18 @@ void main() {
                       'txt_plays': '左3点タイムリー|timely',
                     },
                   ],
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 2,
                       'order': 4,
-                      'players': const [
+                      'players': [
                         {'name': '佐藤 輝明', 'pos': '三', 'plays': '中安|single 右2|double 左安|single'},
                       ],
                     },
                     {
                       'id_team': 1,
                       'order': 4,
-                      'players': const [
+                      'players': [
                         {'name': '岡本 和真', 'pos': '一', 'plays': '左3点タイムリー|timely'},
                       ],
                     },
@@ -3905,7 +3905,7 @@ void main() {
                   'color_back_away': '#FF6600',
                   'color_font_home': '#000000',
                   'color_font_away': '#000000',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 2,
@@ -3935,32 +3935,32 @@ void main() {
                       'txt_plays': '犠飛|sacfly',
                     },
                   ],
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 2,
                       'order': 1,
-                      'players': const [
+                      'players': [
                         {'name': '近本 光司', 'pos': '中', 'plays': '中タイムリー|timely'},
                       ],
                     },
                     {
                       'id_team': 2,
                       'order': 4,
-                      'players': const [
+                      'players': [
                         {'name': '佐藤 輝明', 'pos': '三', 'plays': '20号ソロホームラン^左|hr'},
                       ],
                     },
                     {
                       'id_team': 2,
                       'order': 2,
-                      'players': const [
+                      'players': [
                         {'name': '中野 拓夢', 'pos': '遊', 'plays': '四球|walk 三振|out'},
                       ],
                     },
                     {
                       'id_team': 2,
                       'order': 5,
-                      'players': const [
+                      'players': [
                         {'name': '森下 翔太', 'pos': '右', 'plays': '犠飛|sacfly'},
                       ],
                     },
@@ -4016,7 +4016,7 @@ void main() {
                   'color_back_away': '#2F241D',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 301,
@@ -4034,18 +4034,18 @@ void main() {
                       'txt_plays': '四球|walk 三振|out',
                     },
                   ],
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 301,
                       'order': 1,
-                      'players': const [
+                      'players': [
                         {'name': 'S.大谷', 'pos': '指', 'plays': '四球|walk 三振|out'},
                       ],
                     },
                     {
                       'id_team': 301,
                       'order': 2,
-                      'players': const [
+                      'players': [
                         {'name': 'M. Rojas', 'pos': '遊', 'plays': '四球|walk'},
                       ],
                     },
@@ -4093,7 +4093,7 @@ void main() {
                   'color_back_away': '#FF0000',
                   'color_font_home': '#000000',
                   'color_font_away': '#FFFFFF',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 2,
@@ -4102,39 +4102,39 @@ void main() {
                       'txt_pitching': '6回1失点',
                     },
                   ],
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 2,
                       'order': 1,
-                      'players': const [
+                      'players': [
                         {'name': '近本 光司', 'pos': '中', 'plays': '左２|double タイムリー^二|timely 四球|walk'},
                       ],
                     },
                     {
                       'id_team': 2,
                       'order': 4,
-                      'players': const [
+                      'players': [
                         {'name': '佐藤 輝明', 'pos': '三', 'plays': '先制タイムリー^中|timely 二併殺|out'},
                       ],
                     },
                     {
                       'id_team': 2,
                       'order': 6,
-                      'players': const [
+                      'players': [
                         {'name': '髙寺望夢', 'pos': '左', 'plays': '一ライナー|out 三振|out'},
                       ],
                     },
                     {
                       'id_team': 6,
                       'order': 4,
-                      'players': const [
+                      'players': [
                         {'name': '坂倉 将吾', 'pos': '一', 'plays': '中安|single タイムリー^中|timely'},
                       ],
                     },
                     {
                       'id_team': 6,
                       'order': 3,
-                      'players': const [
+                      'players': [
                         {'name': '菊池 涼介', 'pos': '二', 'plays': '三失|error'},
                       ],
                     },
@@ -4186,7 +4186,7 @@ void main() {
                   'color_back_away': '#FF6600',
                   'color_font_home': '#000000',
                   'color_font_away': '#000000',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 2,
@@ -4195,11 +4195,11 @@ void main() {
                       'txt_plays': '四球|walk 中安|single 三振|out 2点犠打|sacbunt 犠飛|sacfly 左タイムリー|timely ソロホームラン|hr',
                     },
                   ],
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 2,
                       'order': 4,
-                      'players': const [
+                      'players': [
                         {
                           'name': '佐藤 輝明',
                           'pos': '三',
@@ -4256,7 +4256,7 @@ void main() {
                   'color_back_away': '#FF6600',
                   'color_font_home': '#000000',
                   'color_font_away': '#000000',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 2,
@@ -4331,7 +4331,7 @@ void main() {
                   'color_back_away': '#E81828',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 301,
@@ -4443,7 +4443,7 @@ void main() {
                   'color_back_away': '#0C2340',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 201,
@@ -4452,18 +4452,18 @@ void main() {
                       'txt_plays': '中安|single 四球|walk 左飛|out 右タイムリー|timely',
                     },
                   ],
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 201,
                       'order': 5,
-                      'players': const [
+                      'players': [
                         {'name': 'L.サラベラ', 'pos': '遊', 'plays': '右安|single'},
                       ],
                     },
                     {
                       'id_team': 201,
                       'order': 6,
-                      'players': const [
+                      'players': [
                         {
                           'name': 'A.ベニンテンディ',
                           'pos': '左',
@@ -4548,11 +4548,11 @@ void main() {
                   'color_back_away': '#000000',
                   'color_font_home': '#000000',
                   'color_font_away': '#FFFFFF',
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 7,
                       'order': 1,
-                      'players': const [
+                      'players': [
                         {
                           'name': '周東佑京',
                           'pos': '遊',
@@ -4674,7 +4674,7 @@ void main() {
                   'color_back_away': '#2F241D',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 301,
@@ -4803,7 +4803,7 @@ void main() {
                     const {
                       'id_team': 28,
                       'order': 1,
-                      'players': const [
+                      'players': [
                         {'name': 'ボールドウィン', 'role': '', 'pos': '捕', 'plays': '三振|out 一ゴロ|out 遊ゴロ|out', 'rbi': 1},
                       ],
                     },
@@ -4863,11 +4863,11 @@ void main() {
                   'color_back_away': '#005A9C',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 28,
                       'order': 3,
-                      'players': const [
+                      'players': [
                         {'name': 'オルソン', 'role': '', 'pos': '一', 'plays': '右安|single', 'rbi': 0},
                       ],
                     },
@@ -4931,18 +4931,18 @@ void main() {
                   'color_back_away': '#005A9C',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 40,
                       'order': 2,
-                      'players': const [
+                      'players': [
                         {'name': '大谷', 'role': '', 'pos': '指', 'plays': '', 'rbi': 0},
                       ],
                     },
                     {
                       'id_team': 28,
                       'order': 1,
-                      'players': const [
+                      'players': [
                         {'name': 'プロファー', 'role': '', 'pos': '左', 'plays': '', 'rbi': 0},
                       ],
                     },
@@ -4996,18 +4996,18 @@ void main() {
                   'color_back_away': '#005A9C',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 40,
                       'order': 1,
-                      'players': const [
+                      'players': [
                         {'name': '大谷', 'role': '', 'pos': '指', 'plays': '三振|out', 'rbi': 0},
                       ],
                     },
                     {
                       'id_team': 28,
                       'order': 1,
-                      'players': const [
+                      'players': [
                         {'name': 'プロファー', 'role': '', 'pos': '左', 'plays': '', 'rbi': 0},
                       ],
                     },
@@ -5058,18 +5058,18 @@ void main() {
                   'color_back_away': '#FFD200',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#000000',
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 12,
                       'order': 1,
-                      'players': const [
+                      'players': [
                         {'name': '佐藤太郎', 'role': '', 'pos': '左', 'plays': '三振|out', 'rbi': 0},
                       ],
                     },
                     {
                       'id_team': 12,
                       'order': 5,
-                      'players': const [
+                      'players': [
                         {'name': '佐藤二郎', 'role': '', 'pos': '遊', 'plays': '', 'rbi': 0},
                       ],
                     },
@@ -5115,11 +5115,11 @@ void main() {
                   'color_back_away': '#12284B',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 41,
                       'order': 3,
-                      'players': const [
+                      'players': [
                         {'name': 'マニー・マチャド', 'pos': '三', 'plays': '中安|single/run', 'rbi': 0},
                       ],
                     },
@@ -5163,7 +5163,7 @@ void main() {
                   'color_back_away': '#2F241D',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 41,
@@ -5181,18 +5181,18 @@ void main() {
                       'txt_batting': '4打数3安打(1本塁打1打点1四球)',
                     },
                   ],
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 41,
                       'order': 3,
-                      'players': const [
+                      'players': [
                         {'name': 'マニー・マチャド', 'pos': '三', 'plays': '四球|walk タイムリー^左|timely 左ライナー|out 投ゴロ|out'},
                       ],
                     },
                     {
                       'id_team': 35,
                       'order': 3,
-                      'players': const [
+                      'players': [
                         {'name': 'ウィリアム・コントレラス', 'pos': '捕', 'plays': '中フライ|out ソロホームラン^左|hr 遊安|single 中安|single 四球|walk'},
                       ],
                     },
@@ -5247,7 +5247,7 @@ void main() {
                   'color_back_away': '#2F241D',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 41,
@@ -5265,18 +5265,18 @@ void main() {
                       'txt_batting': '4打数3安打(1本塁打1打点1四球)',
                     },
                   ],
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 41,
                       'order': 3,
-                      'players': const [
+                      'players': [
                         {'name': 'マニー・マチャド', 'pos': '三', 'plays': '四球|walk タイムリー^左|timely 左ライナー|out 投ゴロ|out', 'rbi': 1},
                       ],
                     },
                     {
                       'id_team': 35,
                       'order': 3,
-                      'players': const [
+                      'players': [
                         {'name': 'ウィリアム・コントレラス', 'pos': '捕', 'plays': '中フライ|out ソロホームラン^左|hr 遊安|single 中安|single 四球|walk', 'rbi': 1},
                       ],
                     },
@@ -5430,11 +5430,11 @@ void main() {
                   'color_back_away': '#2F241D',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 41,
                       'order': 7,
-                      'players': const [
+                      'players': [
                         {'name': 'アンドゥハー', 'pos': '左', 'role': '代打', 'plays': '遊失|error/run', 'rbi': 0},
                       ],
                     },
@@ -5479,11 +5479,11 @@ void main() {
                   'color_back_away': '#2F241D',
                   'color_font_home': '#FFFFFF',
                   'color_font_away': '#FFFFFF',
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 41,
                       'order': 2,
-                      'players': const [
+                      'players': [
                         {
                           'name': 'タティス',
                           'pos': '右',
@@ -5531,6 +5531,12 @@ void main() {
         {'code_game': 'CS2', 'date_game': '2026-10-15', 'id_league_home': 2, 'id_league_away': 2},
       ],
     );
+    for (final league in [1, 2]) {
+      final finalHeader = npbClimaxHeader(leagueId: league, fallbackLabel: 'リーグ', games: [{'code_game': 'CSF'}]);
+      expect(finalHeader.label, 'CS FINAL STAGE');
+      expect(finalHeader.logoAsset, isNotNull);
+      expect(finalHeader.gradient, isNotNull);
+    }
     expect(pacific.label, 'CS FINAL STAGE');
     expect(pacific.logoAsset, 'backend/assets/images/logo_cs_pacific.png');
     final regular = npbClimaxHeader(
@@ -5657,20 +5663,36 @@ void main() {
 
   for (final state in ['8回裏', '試合終了', 'コールド']) {
     testWidgets('守備図の投手は$stateに合わせて切り替わる', (tester) async {
-      await tester.pumpWidget(MaterialApp(home: SizedBox(width: 900, height: 520,
-        child: GamesBoardYahooStyle(initialStatsExpanded: true, horizontal: true,
-          games: [{
-            'date_game': '2026-10-08', 'state': state,
-            'name_team_home': '阪神', 'name_team_away': '西武',
-            'id_team_home': 2, 'id_team_away': 8,
-            'id_league_home': 1, 'id_league_away': 2,
-            'name_pitcher_home': '先発甲', 'name_pitcher_away': '先発乙',
-            'score_home': 2, 'score_away': 1,
-            'lineup': [{'id_team': 8, 'order': 9, 'players': [
-              {'name': '先発乙', 'pos': '投'},
-              {'name': '救援乙', 'pos': '投', 'role': '代守'},
-            ]}]
-          }]))));
+      await tester.pumpWidget(MaterialApp(
+          home: SizedBox(
+              width: 900,
+              height: 520,
+              child: GamesBoardYahooStyle(initialStatsExpanded: true, horizontal: true, games: [
+                {
+                  'date_game': '2026-10-08',
+                  'state': state,
+                  'name_team_home': '阪神',
+                  'name_team_away': '西武',
+                  'id_team_home': 2,
+                  'id_team_away': 8,
+                  'id_league_home': 1,
+                  'id_league_away': 2,
+                  'name_pitcher_home': '先発甲',
+                  'name_pitcher_away': '先発乙',
+                  'score_home': 2,
+                  'score_away': 1,
+                  'lineup': const [
+                    {
+                      'id_team': 8,
+                      'order': 9,
+                      'players': [
+                        {'name': '先発乙', 'pos': '投'},
+                        {'name': '救援乙', 'pos': '投', 'role': '代守'},
+                      ]
+                    }
+                  ]
+                }
+              ]))));
       await tester.pump();
       if (state != '8回裏') {
         await tester.tap(find.text('詳細表示'));
@@ -5715,7 +5737,7 @@ void main() {
                   'color_back_away': '#003399',
                   'color_font_home': '#000000',
                   'color_font_away': '#FFFFFF',
-                  'summaries': const [
+                  'summaries': [
                     {
                       'id_game_summary': 1,
                       'id_team_summary': 8,
@@ -5724,11 +5746,11 @@ void main() {
                       'txt_pitching': '7回1失点',
                     },
                   ],
-                  'lineup': const [
+                  'lineup': [
                     {
                       'id_team': 8,
                       'order': 2,
-                      'players': const [
+                      'players': [
                         {'name': '源田壮亮', 'pos': '遊', 'field_marks': 'E'},
                         {'name': '外崎修汰', 'pos': '遊', 'role': '代守', 'field_marks': 'FP'},
                       ],
@@ -5736,56 +5758,56 @@ void main() {
                     {
                       'id_team': 8,
                       'order': 4,
-                      'players': const [
+                      'players': [
                         {'name': '山川穂高', 'pos': '一'},
                       ],
                     },
                     {
                       'id_team': 8,
                       'order': 5,
-                      'players': const [
+                      'players': [
                         {'name': '渡部健人', 'pos': '三'},
                       ],
                     },
                     {
                       'id_team': 8,
                       'order': 6,
-                      'players': const [
+                      'players': [
                         {'name': '森友哉', 'pos': '捕'},
                       ],
                     },
                     {
                       'id_team': 8,
                       'order': 3,
-                      'players': const [
+                      'players': [
                         {'name': 'コルデロ', 'pos': '指'},
                       ],
                     },
                     {
                       'id_team': 8,
                       'order': 1,
-                      'players': const [
+                      'players': [
                         {'name': '児玉亮涼', 'pos': '二'},
                       ],
                     },
                     {
                       'id_team': 8,
                       'order': 7,
-                      'players': const [
+                      'players': [
                         {'name': '西川愛也', 'pos': '左'},
                       ],
                     },
                     {
                       'id_team': 8,
                       'order': 8,
-                      'players': const [
+                      'players': [
                         {'name': '西川龍馬', 'pos': '中'},
                       ],
                     },
                     {
                       'id_team': 8,
                       'order': 9,
-                      'players': const [
+                      'players': [
                         {'name': '今井達也', 'pos': '投'},
                         {'name': '平良海馬', 'pos': '投', 'role': '代守'},
                       ],

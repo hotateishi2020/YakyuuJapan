@@ -5,8 +5,7 @@ import 'dart:math' as math;
 int achievementPriority(Map<String, dynamic> achievement) {
   final label = '${achievement['label'] ?? ''}'.toLowerCase();
   final kind = achievement['kind'];
-  bool has(String pattern) =>
-      RegExp(pattern, caseSensitive: false).hasMatch(label);
+  bool has(String pattern) => RegExp(pattern, caseSensitive: false).hasMatch(label);
   if (has('史上初|歴代|新記録|年間最多|通算最多|最多.*更新|all.time|historic')) return 100;
   if (has('三冠王|triple crown')) return 96;
   if (has('50-50')) return 94;
@@ -23,14 +22,13 @@ int achievementPriority(Map<String, dynamic> achievement) {
   if (has('月間|of the month')) return 45;
   if (has('cs mvp|クライマックス.*mvp|championship series.*mvp|lcs.*mvp')) return 72;
   if (has('pool.*mvp')) return 65;
-  if (has('world series.*mvp|日本シリーズmvp|world baseball classic.*mvp|wbc.*mvp'))
+  if (has('world series.*mvp|日本シリーズmvp|world baseball classic.*mvp|wbc.*mvp')) {
     return 85;
+  }
   if (has('mvp|最優秀選手|most valuable|cy young|サイ.?ヤング|沢村(?:栄治)?賞')) return 88;
   if (kind == 'milestone') {
-    final n =
-        int.tryParse(RegExp(r'通算\s*(\d+)').firstMatch(label)?.group(1) ?? '') ??
-            0;
-    if (has('本塁打|home run'))
+    final n = int.tryParse(RegExp(r'通算\s*(\d+)').firstMatch(label)?.group(1) ?? '') ?? 0;
+    if (has('本塁打|home run')) {
       return n >= 500
           ? 90
           : n >= 300
@@ -38,25 +36,29 @@ int achievementPriority(Map<String, dynamic> achievement) {
               : n >= 200
                   ? 65
                   : 55;
+    }
     if (has('勝|wins')) return n >= 200 ? 90 : 70;
-    if (has('安打|hits'))
+    if (has('安打|hits')) {
       return n >= 3000
           ? 94
           : n >= 2000
               ? 86
               : 65;
-    if (has('セーブ|saves'))
+    }
+    if (has('セーブ|saves')) {
       return n >= 300
           ? 88
           : n >= 200
               ? 78
               : 60;
-    if (has('奪三振|strikeout'))
+    }
+    if (has('奪三振|strikeout')) {
       return n >= 3000
           ? 92
           : n >= 2000
               ? 82
               : 65;
+    }
     return 50;
   }
   if (kind == 'championship') {
@@ -65,9 +67,9 @@ int achievementPriority(Map<String, dynamic> achievement) {
   }
   if (kind == 'qualification' || has('規定打席|規定投球')) return 20;
   if (has('新人王|最優秀新人|rookie of the year')) return 74;
-  if (has(
-      '首位打者|最多本塁打|最多打点|最多盗塁|最多勝|最多奪三振|最多セーブ|最優秀防御率|最優秀中継ぎ|最高勝率|勝率第一位|hank aaron|batting champion|home run leader'))
+  if (has('首位打者|最多本塁打|最多打点|最多盗塁|最多勝|最多奪三振|最多セーブ|最優秀防御率|最優秀中継ぎ|最高勝率|勝率第一位|hank aaron|batting champion|home run leader')) {
     return 76;
+  }
   if (has('ベストナイン|gold glove|ゴールデングラブ|silver slugger|all.mlb')) return 68;
   if (has('all.star|オールスター')) return 50;
   return kind == 'title' ? 60 : 35;
@@ -84,24 +86,20 @@ int compareAchievementPriority(Map<String, dynamic> a, Map<String, dynamic> b) {
 
 /// Recognize season league MVPs without enlarging monthly/series MVPs.
 bool isLeagueMvp(Map<String, dynamic> achievement) {
-  final label = '${achievement['label'] ?? ''}'
-      .toLowerCase()
-      .replaceAll(RegExp(r'\s+'), '');
-  return RegExp(
-          r'^(?:(?:npb|mlb|al|nl|americanleague|nationalleague|セ[・･]?リーグ|パ[・･]?リーグ)[・･:]?)?(?:mvp|最優秀選手(?:賞)?|mostvaluableplayer(?:award)?)$')
-      .hasMatch(label);
+  final label = '${achievement['label'] ?? ''}'.toLowerCase().replaceAll(RegExp(r'\s+'), '');
+  return RegExp(r'^(?:(?:npb|mlb|al|nl|americanleague|nationalleague|セ[・･]?リーグ|パ[・･]?リーグ)[・･:]?)?(?:mvp|最優秀選手(?:賞)?|mostvaluableplayer(?:award)?)$').hasMatch(label);
 }
 
 /// Use the award's own league/source, never the player's present-day team.
 String leagueMvpCaption(Map<String, dynamic> achievement) {
   final label = '${achievement['label'] ?? ''}'.toLowerCase();
   final source = Uri.tryParse('${achievement['source'] ?? ''}')?.path ?? '';
-  if (RegExp(r'/award/\d+/cl\.html$').hasMatch(source) ||
-      label.contains('セ・リーグ') ||
-      label.contains('セリーグ')) return 'セMVP';
-  if (RegExp(r'/award/\d+/pl\.html$').hasMatch(source) ||
-      label.contains('パ・リーグ') ||
-      label.contains('パリーグ')) return 'パMVP';
+  if (RegExp(r'/award/\d+/cl\.html$').hasMatch(source) || label.contains('セ・リーグ') || label.contains('セリーグ')) {
+    return 'セMVP';
+  }
+  if (RegExp(r'/award/\d+/pl\.html$').hasMatch(source) || label.contains('パ・リーグ') || label.contains('パリーグ')) {
+    return 'パMVP';
+  }
   if (RegExp(r'\bal\b|american league').hasMatch(label)) return 'アMVP';
   if (RegExp(r'\bnl\b|national league').hasMatch(label)) return 'ナMVP';
   return 'MVP';
@@ -110,15 +108,17 @@ String leagueMvpCaption(Map<String, dynamic> achievement) {
 /// Editorial display values, not official rankings. Area, rather than diameter,
 /// is proportional to this value; league MVP is the reference value of 100.
 double achievementValue(Map<String, dynamic> achievement) {
+  final consolidated = achievement['consolidated_value'];
+  if (consolidated is num) return consolidated.toDouble();
   final label = '${achievement['label'] ?? ''}'.toLowerCase();
   final kind = achievement['kind'];
-  bool has(String pattern) =>
-      RegExp(pattern, caseSensitive: false).hasMatch(label);
+  bool has(String pattern) => RegExp(pattern, caseSensitive: false).hasMatch(label);
   if (has('史上初|歴代|新記録|年間最多|通算最多|最多.*更新|all.time|historic')) return 600;
   if (has('50-50|トリプルスリー')) return 400;
   if (has('三冠王|triple crown|40-40')) return 225;
-  if (isLeagueMvp(achievement) || has('cy young|サイ.?ヤング|沢村(?:栄治)?賞'))
+  if (isLeagueMvp(achievement) || has('cy young|サイ.?ヤング|沢村(?:栄治)?賞')) {
     return 100;
+  }
   if (has('正力松太郎')) return has('特別') ? 64 : 100;
   if (has('完全試合')) return 144;
   if (has('ノーヒットノーラン')) return 64;
@@ -129,12 +129,12 @@ double achievementValue(Map<String, dynamic> achievement) {
   if (has('週間|週刊|of the week')) return 4;
   if (kind == 'qualification' || has('規定打席|規定投球')) return 4;
   if (has('cs mvp|クライマックス.*mvp|lcs.*mvp|championship series.*mvp')) return 25;
-  if (has('world series.*mvp|日本シリーズmvp|wbc.*mvp|world baseball classic.*mvp'))
+  if (has('world series.*mvp|日本シリーズmvp|wbc.*mvp|world baseball classic.*mvp')) {
     return 64;
+  }
   if (kind == 'championship') return has('wbc|world series|日本一|金メダル') ? 16 : 9;
   if (kind == 'milestone') {
-    final n =
-        int.tryParse(RegExp(r'通算\s*(\d+)').firstMatch(label)?[1] ?? '') ?? 0;
+    final n = int.tryParse(RegExp(r'通算\s*(\d+)').firstMatch(label)?[1] ?? '') ?? 0;
     if (has('本塁打|home run|勝|wins|安打|hits|セーブ|saves|奪三振|strikeout')) {
       final priority = achievementPriority(achievement);
       return priority >= 90
@@ -157,5 +157,50 @@ double achievementValue(Map<String, dynamic> achievement) {
   return 9;
 }
 
-double achievementBadgeSize(Map<String, dynamic> achievement) =>
-    96 * math.sqrt(achievementValue(achievement) / 100);
+double achievementBadgeSize(Map<String, dynamic> achievement) => 96 * math.sqrt(achievementValue(achievement) / 100);
+
+/// Keep the highest career threshold per scope and metric, retaining evidence.
+List<Map<String, dynamic>> consolidateCareerMilestones(List<Map<String, dynamic>> honors) {
+  final result = <Map<String, dynamic>>[];
+  final groups = <String, List<Map<String, dynamic>>>{};
+  final pattern = RegExp(r'^(.*?)通算\s*(\d+)\s*(.+)$');
+  for (final honor in honors) {
+    final match = pattern.firstMatch('${honor['label']}');
+    if (honor['kind'] != 'milestone' || match == null) {
+      result.add({...honor});
+    } else {
+      groups.putIfAbsent('${match[1]!.trim()}|${match[3]!.trim()}', () => []).add(honor);
+    }
+  }
+  for (final group in groups.values) {
+    group.sort((a, b) => int.parse(pattern.firstMatch('${b['label']}')![2]!).compareTo(int.parse(pattern.firstMatch('${a['label']}')![2]!)));
+    result.add({
+      ...group.first,
+      'consolidated_value': group.fold<double>(0, (sum, a) => sum + achievementValue(a)),
+      'consolidated_achievements': [
+        for (final a in group) {...a}
+      ]
+    });
+  }
+  return result;
+}
+
+/// Keep identically named honors adjacent, ordering groups by their top value.
+List<Map<String, dynamic>> groupAchievementHonors(List<Map<String, dynamic>> honors) {
+  final groups = <String, List<Map<String, dynamic>>>{};
+  for (final honor in honors) {
+    groups.putIfAbsent('${honor['label']}', () => []).add(honor);
+  }
+  final ordered = groups.values.toList();
+  for (final group in ordered) {
+    group.sort((a, b) {
+      final value = achievementValue(b).compareTo(achievementValue(a));
+      return value != 0 ? value : compareAchievementPriority(a, b);
+    });
+  }
+  ordered.sort((a, b) {
+    final value = achievementValue(b.first).compareTo(achievementValue(a.first));
+    return value != 0 ? value : compareAchievementPriority(a.first, b.first);
+  });
+  return ordered.expand((group) => group).toList();
+}

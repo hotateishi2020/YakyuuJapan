@@ -1,0 +1,404 @@
+{
+  "clubs": [
+    {
+      "code": "g",
+      "staff": [
+        {
+          "name": "長野 久義",
+          "role": "編成本部参与",
+          "category": "特殊スタッフ",
+          "source": "https://www.giants.jp/sp/re5pec7/",
+          "as_of": "2026-01-01 就任"
+        },
+        {
+          "name": "国松 徹",
+          "role": "代表取締役社長",
+          "source": "https://www.giants.jp/misc/pps/",
+          "category": "球団社長",
+          "as_of": "2026-10-16 確認"
+        },
+        {
+          "name": "山口 寿一",
+          "role": "オーナー",
+          "category": "オーナー",
+          "source": "https://www.ntvhd.co.jp/ir/holder/meeting/pdf/92_1.pdf",
+          "as_of": "2025年株主総会資料"
+        }
+      ],
+      "sponsors": [
+        {
+          "name": "NIKE",
+          "category": "オフィシャルパートナー",
+          "source": "https://www.giants.jp/sp/FC/course/grandslam/"
+        }
+      ]
+    },
+    {
+      "code": "t",
+      "staff": [
+        {
+          "name": "粟井 一夫",
+          "role": "代表取締役社長",
+          "category": "球団社長",
+          "source": "https://m.hanshintigers.jp/corporate.html",
+          "as_of": "2026-10-16 確認"
+        },
+        {
+          "name": "秦 雅夫",
+          "role": "オーナー",
+          "source": "https://www.hanshintigers.jp/news/topics/info_11263.html",
+          "category": "オーナー",
+          "as_of": "2026年リーグ優勝発表"
+        }
+      ],
+      "sponsors": []
+    },
+    {
+      "code": "db",
+      "staff": [
+        {
+          "name": "南場 智子",
+          "role": "オーナー",
+          "category": "オーナー",
+          "source": "https://www.baystars.co.jp/corporate/",
+          "as_of": "2026-10-16 確認"
+        },
+        {
+          "name": "木村 洋太",
+          "role": "代表取締役社長",
+          "category": "球団社長",
+          "source": "https://www.baystars.co.jp/corporate/",
+          "as_of": "2026-10-16 確認"
+        }
+      ],
+      "sponsors": [
+        {
+          "name": "株式会社ノジマ",
+          "category": "ユニフォーム・バックネット裏LED広告",
+          "source": "https://www.baystars.co.jp/sponsor/"
+        },
+        {
+          "name": "日産自動車",
+          "category": "球場バックスクリーン・照明塔・個室観覧席",
+          "source": "https://www.baystars.co.jp/sponsor/"
+        }
+      ]
+    },
+    {
+      "code": "c",
+      "staff": [
+        {
+          "name": "松田 元",
+          "role": "代表取締役社長",
+          "source": "https://www.premedica.co.jp/info/6683/",
+          "category": "球団社長",
+          "as_of": "2026年共同事業発表"
+        },
+        {
+          "name": "松田 元",
+          "role": "オーナー",
+          "category": "オーナー",
+          "source": "https://www.city.miyoshi.hiroshima.jp/uploaded/attachment/14626.pdf",
+          "as_of": "2022-12-12 発表"
+        }
+      ],
+      "sponsors": [
+        {
+          "name": "マツダ",
+          "category": "球場命名権（2024〜2029年）",
+          "source": "https://newsroom.mazda.com/ja/publicity/release/2024/202403/240301b.html"
+        }
+      ]
+    },
+    {
+      "code": "d",
+      "staff": [
+        {
+          "name": "大島 宇一郎",
+          "role": "代表取締役オーナー",
+          "source": "https://www.dragons.jp/about/company/",
+          "category": "オーナー",
+          "as_of": "2026-10-16 確認"
+        },
+        {
+          "name": "加藤 宏幸",
+          "role": "代表取締役社長オーナー代行",
+          "source": "https://www.dragons.jp/about/company/",
+          "category": "球団社長",
+          "as_of": "2026-10-16 確認"
+        }
+      ],
+      "sponsors": []
+    },
+    {
+      "code": "s",
+      "staff": [
+        {
+          "name": "成田 裕",
+          "role": "取締役オーナー",
+          "source": "https://www.yakult-swallows.co.jp/news/detail/28190",
+          "category": "オーナー",
+          "as_of": "2023-03-15 就任発表"
+        },
+        {
+          "name": "林田 哲哉",
+          "role": "代表取締役社長 COO",
+          "source": "https://www.yakult-swallows.co.jp/news/detail/28190",
+          "category": "球団社長",
+          "as_of": "2023-03-15 就任発表"
+        }
+      ],
+      "sponsors": []
+    },
+    {
+      "code": "h",
+      "staff": [
+        {
+          "name": "後藤 芳光",
+          "role": "代表取締役社長",
+          "category": "球団社長",
+          "source": "https://www.softbankhawks.co.jp/company/company_profile.html",
+          "as_of": "2026-10-16 確認"
+        },
+        {
+          "name": "佐久間 拓斗",
+          "role": "ホークスジュニアアカデミーコーチ",
+          "source": "https://www.softbankhawks.co.jp/news/detail/202600982645.html",
+          "category": "特殊スタッフ",
+          "as_of": "2026-03-30 入団発表"
+        },
+        {
+          "name": "福山 龍太郎",
+          "role": "アマスカウト チーフ（全国担当）",
+          "source": "https://www.softbankhawks.co.jp/team/draft/2025/scout_list.html",
+          "category": "スカウト",
+          "as_of": "2025年名鑑掲載"
+        },
+        {
+          "name": "孫 正義",
+          "role": "オーナー",
+          "category": "オーナー",
+          "source": "https://www.softbank.jp/sbnews/entry/20251226_02",
+          "as_of": "2025-12-25"
+        },
+        {
+          "name": "城島 健司",
+          "role": "CBO（チーフベースボールオフィサー）",
+          "category": "特殊スタッフ",
+          "source": "https://www.softbank.jp/sbnews/entry/20251226_02",
+          "as_of": "2025-12-25"
+        }
+      ],
+      "sponsors": []
+    },
+    {
+      "code": "f",
+      "staff": [
+        {
+          "name": "小村 勝",
+          "role": "代表取締役社長",
+          "category": "球団社長",
+          "source": "https://www.fighters.co.jp/company/profile/",
+          "as_of": "2026-10-16 確認"
+        },
+        {
+          "name": "井川 伸久",
+          "role": "取締役オーナー",
+          "source": "https://www.fighters.co.jp/news/detail/202600850053.html",
+          "category": "オーナー",
+          "as_of": "2026-03-17 役員体制"
+        }
+      ],
+      "sponsors": []
+    },
+    {
+      "code": "m",
+      "staff": [
+        {
+          "name": "重光 昭夫",
+          "role": "オーナー",
+          "category": "オーナー",
+          "source": "https://www.marines.co.jp/company/profile.html",
+          "as_of": "2026-10-16 確認"
+        },
+        {
+          "name": "高坂 俊介",
+          "role": "代表取締役社長",
+          "category": "球団社長",
+          "source": "https://www.marines.co.jp/company/profile.html",
+          "as_of": "2026-10-16 確認"
+        }
+      ],
+      "sponsors": [
+        {
+          "name": "ZOZO",
+          "category": "球場命名権",
+          "source": "https://corp.zozo.com/news/20260630-007597/"
+        }
+      ]
+    },
+    {
+      "code": "l",
+      "staff": [
+        {
+          "name": "奥村 剛",
+          "role": "代表取締役社長",
+          "category": "球団社長",
+          "source": "https://www.seibulions.jp/company/company.html",
+          "as_of": "2026-10-16 確認"
+        },
+        {
+          "name": "後藤 高志",
+          "role": "取締役オーナー",
+          "source": "https://www.seibulions.co.jp/detail/00000668.html",
+          "category": "オーナー",
+          "as_of": "2026-02-01 役員体制"
+        }
+      ],
+      "sponsors": [
+        {
+          "name": "サイボウズ（kintone）",
+          "category": "ユニフォーム右袖広告",
+          "source": "https://www.seibulions.co.jp/detail/00000673.html"
+        }
+      ]
+    },
+    {
+      "code": "e",
+      "staff": [
+        {
+          "name": "三木谷 浩史",
+          "role": "オーナー",
+          "category": "オーナー",
+          "source": "https://www.rakuteneagles.jp/company/about_us/",
+          "as_of": "2026-10-16 確認"
+        },
+        {
+          "name": "森井 誠之",
+          "role": "代表取締役社長",
+          "category": "球団社長",
+          "source": "https://www.rakuteneagles.jp/company/about_us/",
+          "as_of": "2026-10-16 確認"
+        }
+      ],
+      "sponsors": []
+    },
+    {
+      "code": "b",
+      "staff": [
+        {
+          "name": "井上 亮",
+          "role": "オーナー",
+          "category": "オーナー",
+          "source": "https://www.buffaloes.co.jp/company/overview.html",
+          "as_of": "2026-10-16 確認"
+        },
+        {
+          "name": "馬殿 太郎",
+          "role": "代表取締役社長",
+          "category": "球団社長",
+          "source": "https://www.buffaloes.co.jp/company/overview.html",
+          "as_of": "2026-10-16 確認"
+        }
+      ],
+      "sponsors": [
+        {
+          "name": "サムティホールディングス株式会社",
+          "match": "サムティ",
+          "category": "ユニフォーム広告",
+          "source": "https://www.buffaloes.co.jp/news/detail/202600692464.html"
+        }
+      ]
+    }
+  ],
+  "training_groups": [
+    {
+      "name": "今宮・海野自主トレ",
+      "members": [
+        {
+          "name": "今宮健太",
+          "team": "ソフトバンク"
+        },
+        {
+          "name": "海野隆司",
+          "team": "ソフトバンク"
+        }
+      ],
+      "source": "https://www.youtube.com/watch?v=tKuzjLT8zII",
+      "location": "福岡県宮若市",
+      "period": "2026年1月"
+    },
+    {
+      "name": "鴨川合同自主トレ",
+      "members": [
+        {
+          "name": "田村龍弘",
+          "team": "ロッテ"
+        },
+        {
+          "name": "佐藤都志也",
+          "team": "ロッテ"
+        },
+        {
+          "name": "富山紘之進",
+          "team": "ロッテ"
+        },
+        {
+          "name": "平沢大河",
+          "team": "西武"
+        },
+        {
+          "name": "水上桂",
+          "team": "楽天"
+        }
+      ],
+      "source": "https://www.city.kamogawa.lg.jp/site/shisetsu/39343.html",
+      "location": "鴨川市総合運動施設",
+      "period": "2026年1月7日〜25日"
+    },
+    {
+      "name": "千賀・大竹自主トレ",
+      "members": [
+        {
+          "name": "千賀滉大",
+          "team": "メッツ"
+        },
+        {
+          "name": "大竹風雅",
+          "team": "ソフトバンク"
+        }
+      ],
+      "source": "https://www.softbankhawks.co.jp/news/detail/202600995105.html",
+      "location": "",
+      "period": "2026年1月"
+    },
+    {
+      "name": "野村勇自主トレ",
+      "members": [
+        {
+          "name": "野村勇",
+          "team": "ソフトバンク"
+        }
+      ],
+      "source": "https://tv.softbankhawks.co.jp/playlist/1b4a7b65cd4d4d70be2b97fe2ff294ec",
+      "location": "琵琶湖周辺",
+      "period": "2026年1月"
+    },
+    {
+      "name": "柳田自主トレ",
+      "members": [
+        {
+          "name": "柳田悠岐",
+          "team": "ソフトバンク"
+        },
+        {
+          "name": "笹川吉康",
+          "team": "ソフトバンク"
+        }
+      ],
+      "source": "https://www.softbankhawks.co.jp/weeklyhawks/20260123/01.html",
+      "location": "大分県",
+      "period": "2026年1月"
+    }
+  ]
+}

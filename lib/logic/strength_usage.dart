@@ -12,21 +12,14 @@ const usagePositions = <String, String>{
   'RF': '右翼',
   'DH': '指名打者',
 };
-int usageInt(dynamic value) =>
-    value is num ? value.toInt() : int.tryParse('$value') ?? 0;
-String usagePlayerKey(Map<String, dynamic> player) =>
-    '${player['player_key'] ?? player['source_player_id'] ?? player['name']}';
+int usageInt(dynamic value) => value is num ? value.toInt() : int.tryParse('$value') ?? 0;
+String usagePlayerKey(Map<String, dynamic> player) => '${player['player_key'] ?? player['source_player_id'] ?? player['name']}';
 
 /// Resolve abbreviated lineup names using the roster's stable player ID.
-String regularPlayerName(
-    Map<String, dynamic> player, List<Map<String, dynamic>> roster) {
+String regularPlayerName(Map<String, dynamic> player, List<Map<String, dynamic>> roster) {
   final key = '${player['player_key'] ?? ''}'.trim();
   final id = '${player['source_player_id'] ?? ''}'.trim();
-  final matches = roster
-      .where((p) => key.isNotEmpty
-          ? '${p['player_key'] ?? ''}' == key
-          : id.isNotEmpty && '${p['source_player_id'] ?? ''}' == id)
-      .toList();
+  final matches = roster.where((p) => key.isNotEmpty ? '${p['player_key'] ?? ''}' == key : id.isNotEmpty && '${p['source_player_id'] ?? ''}' == id).toList();
   if (matches.length == 1) {
     final name = '${matches.single['name'] ?? ''}'.trim();
     if (name.isNotEmpty) return name;
@@ -38,13 +31,11 @@ String regularPlayerName(
   return '';
 }
 
-String inningsLabel(int outs) =>
-    '${outs ~/ 3}${outs % 3 == 0 ? '' : ' ${outs % 3}/3'}回';
+String inningsLabel(int outs) => '${outs ~/ 3}${outs % 3 == 0 ? '' : ' ${outs % 3}/3'}回';
 
 /// 起用率の高い組み合わせから確定し、確定済み選手・守備位置は再利用しない。
 /// 同率は守備位置の表示順、選手キー順で安定させる。
-Map<String, Map<String, dynamic>> selectRegulars(
-    List<Map<String, dynamic>> positions) {
+Map<String, Map<String, dynamic>> selectRegulars(List<Map<String, dynamic>> positions) {
   final candidates = <Map<String, dynamic>>[];
   for (final group in positions) {
     final total = usageInt(group['total']);
@@ -52,21 +43,13 @@ Map<String, Map<String, dynamic>> selectRegulars(
     final slot = '${group['slot']}';
     for (final player in listMapFromJson(group['players'])) {
       if (usageInt(player['count']) <= 0) continue;
-      candidates.add({
-        ...player,
-        'position': slot,
-        'usage_rate': usageInt(player['count']) / total
-      });
+      candidates.add({...player, 'position': slot, 'usage_rate': usageInt(player['count']) / total});
     }
   }
   candidates.sort((a, b) {
-    final rate =
-        (b['usage_rate'] as double).compareTo(a['usage_rate'] as double);
+    final rate = (b['usage_rate'] as double).compareTo(a['usage_rate'] as double);
     if (rate != 0) return rate;
-    final order = usagePositions.keys
-        .toList()
-        .indexOf('${a['position']}')
-        .compareTo(usagePositions.keys.toList().indexOf('${b['position']}'));
+    final order = usagePositions.keys.toList().indexOf('${a['position']}').compareTo(usagePositions.keys.toList().indexOf('${b['position']}'));
     return order != 0 ? order : usagePlayerKey(a).compareTo(usagePlayerKey(b));
   });
   final result = <String, Map<String, dynamic>>{};
@@ -84,8 +67,7 @@ Map<String, Map<String, dynamic>> selectRegulars(
 
 /// Primary regulars keep priority; additional regulars must reach 70% of
 /// that position's season leader and may only appear at one position.
-Map<String, List<Map<String, dynamic>>> selectRegularGroups(
-    List<Map<String, dynamic>> positions) {
+Map<String, List<Map<String, dynamic>>> selectRegularGroups(List<Map<String, dynamic>> positions) {
   final fielders = positions.where((p) => p['slot'] != 'P').toList();
   final primary = selectRegulars(fielders);
   final result = {
@@ -96,29 +78,18 @@ Map<String, List<Map<String, dynamic>>> selectRegularGroups(
   for (final group in fielders) {
     final players = listMapFromJson(group['players']);
     final total = usageInt(group['total']);
-    final maxStarts = players.fold<int>(
-        0, (max, p) => usageInt(p['count']) > max ? usageInt(p['count']) : max);
+    final maxStarts = players.fold<int>(0, (max, p) => usageInt(p['count']) > max ? usageInt(p['count']) : max);
     if (total <= 0 || maxStarts <= 0) continue;
     for (final player in players) {
       if (usageInt(player['count']) * 10 < maxStarts * 7) continue;
-      candidates.add({
-        ...player,
-        'position': '${group['slot']}',
-        'usage_rate': usageInt(player['count']) / total
-      });
+      candidates.add({...player, 'position': '${group['slot']}', 'usage_rate': usageInt(player['count']) / total});
     }
   }
   candidates.sort((a, b) {
-    final rate =
-        (b['usage_rate'] as double).compareTo(a['usage_rate'] as double);
+    final rate = (b['usage_rate'] as double).compareTo(a['usage_rate'] as double);
     if (rate != 0) return rate;
-    final position = usagePositions.keys
-        .toList()
-        .indexOf('${a['position']}')
-        .compareTo(usagePositions.keys.toList().indexOf('${b['position']}'));
-    return position != 0
-        ? position
-        : usagePlayerKey(a).compareTo(usagePlayerKey(b));
+    final position = usagePositions.keys.toList().indexOf('${a['position']}').compareTo(usagePositions.keys.toList().indexOf('${b['position']}'));
+    return position != 0 ? position : usagePlayerKey(a).compareTo(usagePlayerKey(b));
   });
   for (final player in candidates) {
     if (!used.add(usagePlayerKey(player))) continue;
@@ -127,10 +98,8 @@ Map<String, List<Map<String, dynamic>>> selectRegularGroups(
   return result;
 }
 
-List<Map<String, dynamic>> pitchingWorkloadBands(
-    List<Map<String, dynamic>> pitchers) {
-  final total =
-      pitchers.fold<int>(0, (sum, p) => sum + usageInt(p['total_outs']));
+List<Map<String, dynamic>> pitchingWorkloadBands(List<Map<String, dynamic>> pitchers) {
+  final total = pitchers.fold<int>(0, (sum, p) => sum + usageInt(p['total_outs']));
   if (total == 0) return [];
   final result = <Map<String, dynamic>>[];
   for (final role in ['starter', 'relief']) {
@@ -144,17 +113,9 @@ List<Map<String, dynamic>> pitchingWorkloadBands(
             'unit': 'outs',
           }
     ];
-    players
-        .sort((a, b) => usageInt(b['count']).compareTo(usageInt(a['count'])));
+    players.sort((a, b) => usageInt(b['count']).compareTo(usageInt(a['count'])));
     final outs = players.fold<int>(0, (sum, p) => sum + usageInt(p['count']));
-    result.add({
-      'slot': role,
-      'label': role == 'starter' ? '先発負担率' : '中継負担率',
-      'total': total,
-      'role_outs': outs,
-      'unit': 'outs',
-      'players': players
-    });
+    result.add({'slot': role, 'label': role == 'starter' ? '先発負担率' : '中継負担率', 'total': total, 'role_outs': outs, 'unit': 'outs', 'players': players});
   }
   return result;
 }
@@ -164,37 +125,22 @@ int? rosterAge(Map<String, dynamic> player, int year) {
   if (birth == null) return null;
   final now = DateTime.now();
   final date = year == now.year ? now : DateTime(year, 12, 31);
-  return date.year -
-      birth.year -
-      ((date.month < birth.month ||
-              (date.month == birth.month && date.day < birth.day))
-          ? 1
-          : 0);
+  return date.year - birth.year - ((date.month < birth.month || (date.month == birth.month && date.day < birth.day)) ? 1 : 0);
 }
 
-String? _recordedRosterPosition(
-    Map<String, dynamic> player, Map<String, dynamic> team) {
+String? _recordedRosterPosition(Map<String, dynamic> player, Map<String, dynamic> team) {
   final key = usagePlayerKey(player);
-  final pitching = listMapFromJson(team['pitching_workload'])
-      .where((p) => usagePlayerKey(p) == key)
-      .firstOrNull;
-  if (pitching != null &&
-      player['position_group'] == '投手' &&
-      (usageInt(pitching['appearances']) > 0 ||
-          usageInt(pitching['total_outs']) > 0)) {
+  final pitching = listMapFromJson(team['pitching_workload']).where((p) => usagePlayerKey(p) == key).firstOrNull;
+  if (pitching != null && player['position_group'] == '投手' && (usageInt(pitching['appearances']) > 0 || usageInt(pitching['total_outs']) > 0)) {
     final all = listMapFromJson(team['pitching_workload']);
-    final mostSaves = all.fold<int>(
-        0, (n, p) => usageInt(p['saves']) > n ? usageInt(p['saves']) : n);
+    final mostSaves = all.fold<int>(0, (n, p) => usageInt(p['saves']) > n ? usageInt(p['saves']) : n);
     if (mostSaves > 0 && usageInt(pitching['saves']) == mostSaves) return '抑え';
     final starterOuts = usageInt(pitching['starter_outs']);
     final reliefOuts = usageInt(pitching['relief_outs']);
     if (starterOuts != reliefOuts) {
       return starterOuts > reliefOuts ? '先発' : '中継ぎ';
     }
-    return usageInt(pitching['starts']) >
-            usageInt(pitching['appearances']) - usageInt(pitching['starts'])
-        ? '先発'
-        : '中継ぎ';
+    return usageInt(pitching['starts']) > usageInt(pitching['appearances']) - usageInt(pitching['starts']) ? '先発' : '中継ぎ';
   }
   String? position;
   var most = 0;
@@ -238,14 +184,10 @@ String? _recordedRosterPosition(
     }
   }
   final registered = '${player['position_group'] ?? '不明'}';
-  return ['捕手', '一塁', '二塁', '三塁', '遊撃', '左翼', '中堅', '右翼'].contains(registered)
-      ? registered
-      : null;
+  return ['捕手', '一塁', '二塁', '三塁', '遊撃', '左翼', '中堅', '右翼'].contains(registered) ? registered : null;
 }
 
-bool rosterUsageUnknown(
-        Map<String, dynamic> player, Map<String, dynamic> team) =>
-    _recordedRosterPosition(player, team) == null;
+bool rosterUsageUnknown(Map<String, dynamic> player, Map<String, dynamic> team) => _recordedRosterPosition(player, team) == null;
 
 String rosterPosition(Map<String, dynamic> player, Map<String, dynamic> team) =>
     _recordedRosterPosition(player, team) ??
@@ -257,9 +199,7 @@ String rosterPosition(Map<String, dynamic> player, Map<String, dynamic> team) =>
     };
 
 String rosterLevel(Map<String, dynamic> player) {
-  final values = player['level_appearances'] is Map
-      ? player['level_appearances'] as Map
-      : {};
+  final values = player['level_appearances'] is Map ? player['level_appearances'] as Map : {};
   var most = 0;
   final levels = <String>[];
   for (final entry in values.entries) {
@@ -276,11 +216,8 @@ String rosterLevel(Map<String, dynamic> player) {
 
 /// Stronger position colors indicate the requested registration/usage priority.
 double rosterCardTint(Map<String, dynamic> player) {
-  final appearances = player['level_appearances'] is Map
-      ? player['level_appearances'] as Map
-      : {};
-  final most = appearances.values.fold<int>(
-      0, (max, count) => usageInt(count) > max ? usageInt(count) : max);
+  final appearances = player['level_appearances'] is Map ? player['level_appearances'] as Map : {};
+  final most = appearances.values.fold<int>(0, (max, count) => usageInt(count) > max ? usageInt(count) : max);
   if (most <= 0) return 0.08;
   final first = usageInt(appearances['1']) == most;
   final second = usageInt(appearances['2']) == most;
@@ -315,8 +252,7 @@ int rosterMainLevel(Map<String, dynamic> player) {
   return level;
 }
 
-int? rosterWorkload(
-    Map<String, dynamic> player, Map<String, dynamic> team, int level) {
+int? rosterWorkload(Map<String, dynamic> player, Map<String, dynamic> team, int level) {
   final pitcher = player['position_group'] == '投手';
   final levels = player['level_usage_metrics'];
   if (levels is Map && levels['$level'] is Map) {
@@ -324,8 +260,7 @@ int? rosterWorkload(
     if (value != null) return usageInt(value);
   }
   if (level == 1) {
-    for (final p in listMapFromJson(
-        team[pitcher ? 'pitching_workload' : 'batting_stats'])) {
+    for (final p in listMapFromJson(team[pitcher ? 'pitching_workload' : 'batting_stats'])) {
       if (usagePlayerKey(p) == usagePlayerKey(player)) {
         final value = p[pitcher ? 'total_outs' : 'pa'];
         if (value != null) return usageInt(value);
@@ -335,8 +270,7 @@ int? rosterWorkload(
   return null;
 }
 
-String rosterWorkloadLabel(
-    Map<String, dynamic> p, Map<String, dynamic> team, int level) {
+String rosterWorkloadLabel(Map<String, dynamic> p, Map<String, dynamic> team, int level) {
   final n = rosterWorkload(p, team, level);
   final pitcher = p['position_group'] == '投手';
   if (n == null) return pitcher ? '投球回未取得' : '打席数未取得';
@@ -349,13 +283,14 @@ String? rosterDepartureLabel(Map<String, dynamic> player) {
   if (player['transfer_confirmed'] == true) return '移籍';
   if (player['released_confirmed'] == true) return '戦力外';
   if (player['departure_confirmed'] != true) return null;
-  final reason =
-      '${player['departure_type'] ?? ''} ${player['departure_reason'] ?? ''}';
-  if (RegExp('引退|retired|retirement').hasMatch(reason) ||
-      '${player['status_source']}'.contains('pn_retired')) return '引退';
+  final reason = '${player['departure_type'] ?? ''} ${player['departure_reason'] ?? ''}';
+  if (RegExp('引退|retired|retirement').hasMatch(reason) || '${player['status_source']}'.contains('pn_retired')) {
+    return '引退';
+  }
   if (RegExp('移籍|transfer|trade').hasMatch(reason)) return '移籍';
   if (RegExp('戦力外|non.tender').hasMatch(reason)) return '戦力外';
-  if ('${player['status_source']}'.contains('pn_released') ||
-      reason.contains('released')) return '自由契約';
+  if ('${player['status_source']}'.contains('pn_released') || reason.contains('released')) {
+    return '自由契約';
+  }
   return '退団';
 }

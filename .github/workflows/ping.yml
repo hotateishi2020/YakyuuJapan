@@ -14,12 +14,14 @@ jobs:
     steps:
       - name: Call /fetchStatsTeamNPB
         if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '2 7-15 * * *' }}
-        run: curl -fsS "https://yakyuujapan.onrender.com/fetchStatsTeamNPB"
+        run: |
+          curl -fsS -H 'X-Koko-Log-Source: scheduler' "https://yakyuujapan.onrender.com/fetchStatsTeamNPB"
 
       - name: Call /fetchStatsPlayerNPB
         if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '13,43 7-15 * * *' }}
         run: |
           curl --silent --show-error \
+            --header 'X-Koko-Log-Source: scheduler' \
             --fail-with-body \
             --location \
             --retry 10 \
@@ -32,12 +34,14 @@ jobs:
 
       - name: Call /fetchStatsTeamMLB
         if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '2 7-15 * * *' }}
-        run: curl -fsS "https://yakyuujapan.onrender.com/fetchStatsTeamMLB" || true
+        run: |
+          curl -fsS -H 'X-Koko-Log-Source: scheduler' "https://yakyuujapan.onrender.com/fetchStatsTeamMLB" || true
 
       - name: Call /fetchStatsPlayerMLB
         if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '13,43 7-15 * * *' }}
         run: |
           curl --silent --show-error \
+            --header 'X-Koko-Log-Source: scheduler' \
             --fail-with-body \
             --location \
             --retry 3 \

@@ -7,6 +7,7 @@ import 'package:postgres/postgres.dart';
 import '../tools/Postgres.dart';
 import 'AppSql.dart';
 import 'PlayerDisplay.dart';
+import 'PlayerDetail.dart';
 import 'PredictGroup.dart';
 
 /// 予想の表示結果を登録する。画面の読出しはこのテーブルの SELECT だけ。
@@ -195,6 +196,12 @@ class PredictionSnapshot {
     for (final row in rows) {
       (row[0] == 'stats' ? stats : picks).add(_decode(row[2]));
     }
+    final positions = {for (final r in await conn.execute('SELECT p.id,p.txt_position FROM m_player p JOIN m_team t ON t.id=p.id_team WHERE t.id_league=ANY(\$1::int[])',parameters:[leagueIds])) '${r[0]}': r[1]};
+    for (final row in stats) {
+      if ('${row['txt_position'] ?? ''}'.trim().isEmpty || row['txt_position'] == '不明') row['txt_position'] = positions['${row['id_player']}'];
+    }
+    stats.addAll(await extraStatRows(conn, year, leagueIds));
+    addMissingRequestedMetrics(stats);
     return PlayerDisplay(stats: stats, predictions: picks);
   }
 

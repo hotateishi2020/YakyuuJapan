@@ -20,8 +20,7 @@ void main() {
           'player_key': 'a',
           'name': '選手A',
           'salary_history': [
-            for (var year = 2024; year <= 2027; year++)
-              {'year': year, 'amount': 15000000, 'currency': 'USD'}
+            for (var year = 2024; year <= 2027; year++) {'year': year, 'amount': 15000000, 'currency': 'USD'}
           ]
         }
       ]
@@ -32,8 +31,7 @@ void main() {
     expect(bar.currency, 'USD');
     expect(bar.amount, 45000000);
     expect(bar.wrapAt, 20000000);
-    expect(find.descendant(of: finder, matching: find.byType(CustomPaint)),
-        findsNWidgets(3));
+    expect(find.descendant(of: finder, matching: find.byType(CustomPaint)), findsNWidgets(3));
     expect(tester.takeException(), isNull);
   });
 
@@ -58,8 +56,7 @@ void main() {
     ]))));
     final al = find.byKey(const ValueKey('team-salary-bar-2-USD'));
     final nl = find.byKey(const ValueKey('team-salary-bar-1-USD'));
-    expect(tester.getTopLeft(find.text('ア・リーグ')).dy,
-        lessThan(tester.getTopLeft(find.text('ナ・リーグ')).dy));
+    expect(tester.getTopLeft(find.text('ア・リーグ')).dy, lessThan(tester.getTopLeft(find.text('ナ・リーグ')).dy));
     expect(tester.getTopLeft(al).dy, lessThan(tester.getTopLeft(nl).dy));
     expect(tester.widget<VerticalSalaryMoneyBar>(al).maximum, 40000000);
     expect(tester.widget<VerticalSalaryMoneyBar>(nl).maximum, 40000000);
@@ -68,18 +65,8 @@ void main() {
   });
 
   testWidgets('球団別総年俸図は比較モードのみ表示する', (tester) async {
-    final team = <String, dynamic>{
-      'id_team': 1,
-      'name_team': '球団A',
-      'contracts': []
-    };
-    Widget screen(bool compare) => MaterialApp(
-        home: Scaffold(
-            body: StrengthContracts(
-                team: team,
-                year: 2026,
-                colorTeams: [team],
-                comparisonTeams: compare ? [team] : null)));
+    final team = <String, dynamic>{'id_team': 1, 'name_team': '球団A', 'contracts': []};
+    Widget screen(bool compare) => MaterialApp(home: Scaffold(body: StrengthContracts(team: team, year: 2026, colorTeams: [team], comparisonTeams: compare ? [team] : null)));
     await tester.pumpWidget(screen(false));
     await tester.pumpAndSettle();
     expect(find.byType(TeamSalaryChart), findsNothing);
@@ -101,7 +88,7 @@ void main() {
     expect(salaryBanknoteCurrency({'currency': 'USD'}), 'USD');
   });
   testWidgets('NPB復帰選手の過去MLB年は金額を円のままドル札で描く', (tester) async {
-    await tester.pumpWidget(MaterialApp(
+    await tester.pumpWidget(const MaterialApp(
         home: Scaffold(
             body: StrengthContracts(year: 2026, team: {
       'id_team': 1,
@@ -111,18 +98,8 @@ void main() {
           'player_key': 'a',
           'name': '選手A',
           'salary_history': [
-            {
-              'year': 2024,
-              'team': 'ヤンキース',
-              'amount': 500000000,
-              'currency': 'JPY'
-            },
-            {
-              'year': 2026,
-              'team': '巨人',
-              'amount': 100000000,
-              'currency': 'JPY'
-            },
+            {'year': 2024, 'team': 'ヤンキース', 'amount': 500000000, 'currency': 'JPY'},
+            {'year': 2026, 'team': '巨人', 'amount': 100000000, 'currency': 'JPY'},
           ]
         }
       ]
@@ -158,18 +135,13 @@ void main() {
     ]))));
     final small = find.byKey(const ValueKey('team-salary-bar-1-JPY'));
     final large = find.byKey(const ValueKey('team-salary-bar-2-JPY'));
-    final smallPaint =
-        find.descendant(of: small, matching: find.byType(CustomPaint));
-    final largePaint =
-        find.descendant(of: large, matching: find.byType(CustomPaint));
-    expect(tester.getSize(smallPaint).height * 2,
-        closeTo(tester.getSize(largePaint).height, .01));
+    final smallPaint = find.descendant(of: small, matching: find.byType(CustomPaint));
+    final largePaint = find.descendant(of: large, matching: find.byType(CustomPaint));
+    expect(tester.getSize(smallPaint).height * 2, closeTo(tester.getSize(largePaint).height, .01));
     expect(tester.widget<VerticalSalaryMoneyBar>(small).currency, 'JPY');
     expect(tester.widget<VerticalSalaryMoneyBar>(small).maximum, 200000000);
-    expect(tester.getBottomLeft(smallPaint).dy,
-        tester.getBottomLeft(largePaint).dy);
-    expect(tester.getTopLeft(largePaint).dy,
-        lessThan(tester.getTopLeft(smallPaint).dy));
+    expect(tester.getBottomLeft(smallPaint).dy, tester.getBottomLeft(largePaint).dy);
+    expect(tester.getTopLeft(largePaint).dy, lessThan(tester.getTopLeft(smallPaint).dy));
     expect(find.text('1.0億円'), findsOneWidget);
     expect(find.text('2.0億円'), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -241,24 +213,12 @@ void main() {
     expect(salaryBarRows(500000001, 500000000), 2);
     for (final currency in ['JPY', 'USD']) {
       final limit = salaryWrapAmount(currency);
-      await tester.pumpWidget(MaterialApp(
-          home: Scaffold(
-              body: SizedBox(
-                  width: 200,
-                  child: SalaryMoneyBar(
-                      amount: limit * 2 + limit ~/ 2,
-                      maximum: limit,
-                      wrapAt: limit,
-                      currency: currency)))));
-      final paints = find.descendant(
-          of: find.byType(SalaryMoneyBar), matching: find.byType(CustomPaint));
+      await tester.pumpWidget(MaterialApp(home: Scaffold(body: SizedBox(width: 200, child: SalaryMoneyBar(amount: limit * 2 + limit ~/ 2, maximum: limit, wrapAt: limit, currency: currency)))));
+      final paints = find.descendant(of: find.byType(SalaryMoneyBar), matching: find.byType(CustomPaint));
       expect(paints, findsNWidgets(3));
       expect(tester.getSize(paints.at(0)).width, 200);
       expect(tester.getSize(paints.at(2)).width, 100);
-      expect(
-          tester.getTopLeft(paints.at(1)).dy -
-              tester.getTopLeft(paints.at(0)).dy,
-          32);
+      expect(tester.getTopLeft(paints.at(1)).dy - tester.getTopLeft(paints.at(0)).dy, 32);
       expect(tester.takeException(), isNull);
     }
   });
@@ -285,12 +245,8 @@ void main() {
     expect(salaryAmount(7050000000, 'USD'), '70.5億ドル');
     expect(salaryAmount(14285000, 'USD'), '1428.5万ドル');
     expect(salaryAmount(100000000, 'USD'), '10000.0万ドル');
-    expect(
-        contractSalaryLabel(
-            {'amount': 14285000, 'currency': 'USD', 'usd_jpy_rate': 150}),
-        '1428.5万ドル（約21.4億円）');
-    expect(contractSalaryLabel({'amount': 14285000, 'currency': 'USD'}),
-        '1428.5万ドル（円換算未確認）');
+    expect(contractSalaryLabel({'amount': 14285000, 'currency': 'USD', 'usd_jpy_rate': 150}), '1428.5万ドル（約21.4億円）');
+    expect(contractSalaryLabel({'amount': 14285000, 'currency': 'USD'}), '1428.5万ドル（円換算未確認）');
   });
 
   test('過去年俸の確認年を補い、既知の契約期間や履歴の空白を変更しない', () {
@@ -317,7 +273,7 @@ void main() {
   });
 
   testWidgets('複数年契約のない過去年にも所属球団色の帯と年俸を表示する', (tester) async {
-    await tester.pumpWidget(MaterialApp(
+    await tester.pumpWidget(const MaterialApp(
         home: Scaffold(
             body: StrengthContracts(
       year: 2020,
@@ -383,61 +339,34 @@ void main() {
         home: Scaffold(
             body: StrengthContracts(team: current, year: 2026, colorTeams: [
       current,
-      {'name_team': '前球団', 'color_back': '#123456'}
+      const {'name_team': '前球団', 'color_back': '#123456'}
     ]))));
     await tester.pumpAndSettle();
     expect(find.byIcon(Icons.info_outline), findsNothing);
-    final nameCell = tester
-        .widget<Container>(find.byKey(const ValueKey('contract-name-1-a')));
+    final nameCell = tester.widget<Container>(find.byKey(const ValueKey('contract-name-1-a')));
     expect(nameCell.color, const Color(0xFF654321));
-    final careerCell = tester
-        .widget<Container>(find.byKey(const ValueKey('career-salary-1-a')));
-    expect((careerCell.decoration as BoxDecoration).color,
-        Color.lerp(const Color(0xFF654321), Colors.white, .85));
+    final careerCell = tester.widget<Container>(find.byKey(const ValueKey('career-salary-1-a')));
+    expect((careerCell.decoration as BoxDecoration).color, Color.lerp(const Color(0xFF654321), Colors.white, .85));
 
-    expect(
-        tester.getTopLeft(find.byKey(const ValueKey('career-salary-1-a'))).dx,
-        tester.getTopRight(find.byKey(const ValueKey('contract-name-1-a'))).dx);
-    final careerBar = tester
-        .widget<SalaryMoneyBar>(find.byKey(const ValueKey('career-money-1-a')));
+    expect(tester.getTopLeft(find.byKey(const ValueKey('career-salary-1-a'))).dx, tester.getTopRight(find.byKey(const ValueKey('contract-name-1-a'))).dx);
+    final careerBar = tester.widget<SalaryMoneyBar>(find.byKey(const ValueKey('career-money-1-a')));
     expect(careerBar.wrapAt, 2000000000);
 
     expect(find.text('生涯年俸'), findsOneWidget);
-    expect(
-        find.descendant(
-            of: find.byKey(const ValueKey('career-salary-1-a')),
-            matching: find.text('10.6億円')),
-        findsOneWidget);
-    final amount = tester.getRect(find
-        .descendant(
-            of: find.byKey(const ValueKey('contract-player-1-a')),
-            matching: find.text('10.6億円'))
-        .first);
-    final graph = tester.getRect(find
-        .descendant(
-            of: find.byKey(const ValueKey('contract-player-1-a')),
-            matching: find.byType(SalaryMoneyBar))
-        .first);
+    expect(find.descendant(of: find.byKey(const ValueKey('career-salary-1-a')), matching: find.text('10.6億円')), findsOneWidget);
+    final amount = tester.getRect(find.descendant(of: find.byKey(const ValueKey('contract-player-1-a')), matching: find.text('10.6億円')).first);
+    final graph = tester.getRect(find.descendant(of: find.byKey(const ValueKey('contract-player-1-a')), matching: find.byType(SalaryMoneyBar)).first);
     expect(amount.bottom, lessThanOrEqualTo(graph.top));
-    final band = find
-        .ancestor(
-            of: find.text('2025–2026 前球団'), matching: find.byType(Container))
-        .first;
-    expect((tester.widget<Container>(band).decoration as BoxDecoration).color,
-        const Color(0xFF123456));
-    expect(
-        tester
-            .getSize(find.byKey(const ValueKey('contract-player-1-a')))
-            .height,
-        lessThan(170));
+    final band = find.ancestor(of: find.text('2025–2026 前球団'), matching: find.byType(Container)).first;
+    expect((tester.widget<Container>(band).decoration as BoxDecoration).color, const Color(0xFF123456));
+    expect(tester.getSize(find.byKey(const ValueKey('contract-player-1-a'))).height, lessThan(170));
     expect(tester.takeException(), isNull);
   });
 
   test('途中出場レギュラーは重複を除外し選出首位の70%以上を追加する', () {
     final team = <String, dynamic>{
       'roster': [
-        for (final id in ['regular', 'left', 'extra', 'low'])
-          {'player_key': id, 'name': id, 'bats': '左'},
+        for (final id in ['regular', 'left', 'extra', 'low']) {'player_key': id, 'name': id, 'bats': '左'},
         {'player_key': 'right', 'bats': '右'}
       ],
       'substitutions': [
@@ -516,26 +445,11 @@ void main() {
   test('塁打貢献は打撃結果ごとの塁打数と四球を合計する', () {
     final bands = contributionBands({
       'batting_stats': [
-        {
-          'player_key': 'a',
-          'name': 'A',
-          'home_runs': 2,
-          'triples': 1,
-          'doubles': 3,
-          'singles': 5,
-          'walks': 4,
-          'total_bases_walks': 26,
-          'rbi': 7
-        }
+        {'player_key': 'a', 'name': 'A', 'home_runs': 2, 'triples': 1, 'doubles': 3, 'singles': 5, 'walks': 4, 'total_bases_walks': 26, 'rbi': 7}
       ]
     });
     expect(bands[1]['total'], 26);
-    expect(
-        (bands[1]['players'] as List)
-            .single['parts']
-            .map((p) => p['count'])
-            .toList(),
-        [8, 3, 6, 5, 4]);
+    expect((bands[1]['players'] as List).single['parts'].map((p) => p['count']).toList(), [8, 3, 6, 5, 4]);
   });
   test('左右の投球回・打席は実数で集計し両打と不明を保持する', () {
     final team = {
@@ -553,10 +467,7 @@ void main() {
       ]
     };
     expect(handednessBand(team, pitching: true)['total'], 90);
-    expect(
-        (handednessBand(team, pitching: false)['players'] as List)
-            .first['name'],
-        '両打');
+    expect((handednessBand(team, pitching: false)['players'] as List).first['name'], '両打');
   });
   test('エースは左右と役割を分けて選び守護神をリリーフから除く', () {
     final team = {
@@ -566,13 +477,7 @@ void main() {
       'pitching_workload': [
         {'player_key': 's', 'starter_outs': 300, 'relief_outs': 0},
         {'player_key': 'r', 'starter_outs': 0, 'relief_outs': 120, 'holds': 20},
-        {
-          'player_key': 'c',
-          'starter_outs': 0,
-          'relief_outs': 180,
-          'holds': 22,
-          'saves': 30
-        }
+        {'player_key': 'c', 'starter_outs': 0, 'relief_outs': 180, 'holds': 22, 'saves': 30}
       ]
     };
     final selected = selectPitcherAces(team);
@@ -591,8 +496,7 @@ void main() {
                   SalaryMoneyBar(amount: 25000000, maximum: 25000000),
                   SalaryMoneyBar(amount: 0, maximum: 0),
                 ])))));
-    final graphs = find.descendant(
-        of: find.byType(SalaryMoneyBar), matching: find.byType(CustomPaint));
+    final graphs = find.descendant(of: find.byType(SalaryMoneyBar), matching: find.byType(CustomPaint));
     final first = tester.getRect(graphs.at(0));
     final second = tester.getRect(graphs.at(1));
     expect(first.left, second.left);
@@ -624,7 +528,7 @@ void main() {
         home: Scaffold(
             body: StrengthContracts(team: team, year: 2026, comparisonTeams: [
       team,
-      {
+      const {
         'id_team': 2,
         'name_team': '球団B',
         'roster': [
@@ -652,20 +556,14 @@ void main() {
     final a = <String, dynamic>{
       'id_team': 1,
       'name_team': '球団A',
-      'contracts': [
-        player('未確認', null, 900000000),
-        player('低額', 10000000, 500000000)
-      ]
+      'contracts': [player('未確認', null, 900000000), player('低額', 10000000, 500000000)]
     };
     final b = <String, dynamic>{
       'id_team': 2,
       'name_team': '球団B',
       'contracts': [player('高額', 300000000, 1000000)]
     };
-    await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-            body: StrengthContracts(
-                team: a, comparisonTeams: [a, b], year: 2026))));
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: StrengthContracts(team: a, comparisonTeams: [a, b], year: 2026))));
     double y(String name) => tester.getTopLeft(find.text(name)).dy;
     expect(y('高額'), lessThan(y('低額')));
     expect(y('低額'), lessThan(y('未確認')));
@@ -677,10 +575,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(y('高額'), lessThan(y('低額')));
 
-    await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-            body: StrengthContracts(
-                team: a, comparisonTeams: [a, b], year: 2025))));
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: StrengthContracts(team: a, comparisonTeams: [a, b], year: 2025))));
     expect(y('未確認'), lessThan(y('低額')));
     expect(y('低額'), lessThan(y('高額')));
     expect(tester.takeException(), isNull);
@@ -705,20 +600,12 @@ void main() {
           }
       ]
     };
-    Widget screen(int year) => MaterialApp(
-        home: Scaffold(
-            body: StrengthContracts(
-                team: team, year: year, comparisonTeams: [team])));
+    Widget screen(int year) => MaterialApp(home: Scaffold(body: StrengthContracts(team: team, year: year, comparisonTeams: [team])));
     await tester.pumpWidget(screen(2026));
     await tester.pumpAndSettle();
-    final scroll = tester
-        .widget<SingleChildScrollView>(
-            find.byKey(const ValueKey('contract-horizontal-scroll')))
-        .controller!;
+    final scroll = tester.widget<SingleChildScrollView>(find.byKey(const ValueKey('contract-horizontal-scroll'))).controller!;
     expect(scroll.offset, 16 * 160);
-    expect(
-        tester.getTopLeft(find.byKey(const ValueKey('contract-year-2026'))).dx,
-        340);
+    expect(tester.getTopLeft(find.byKey(const ValueKey('contract-year-2026'))).dx, 340);
     final nameBefore = tester.getTopLeft(find.text('選手0'));
     final headingBefore = tester.getTopLeft(find.text('球団・選手'));
     scroll.jumpTo(0);
@@ -743,22 +630,13 @@ void main() {
     await tester.pumpWidget(screen(2025));
     await tester.pumpAndSettle();
     expect(scroll.offset, 15 * 160);
-    expect(
-        tester.getTopLeft(find.byKey(const ValueKey('contract-year-2025'))).dx,
-        340);
+    expect(tester.getTopLeft(find.byKey(const ValueKey('contract-year-2025'))).dx, 340);
     expect(tester.takeException(), isNull);
   });
 
   testWidgets('表示設定を切り替えると選手マークに即時反映する', (tester) async {
     addTearDown(() => DisplaySettings.instance.value = {});
-    await tester.pumpWidget(const MaterialApp(
-        home: Scaffold(
-            body: PlayerStatCell(row: {
-      'name_player': '選手',
-      'flg_under21': true,
-      'flg_rookie': true,
-      'stats': '.300'
-    }))));
+    await tester.pumpWidget(const MaterialApp(home: Scaffold(body: PlayerStatCell(row: {'name_player': '選手', 'flg_under21': true, 'flg_rookie': true, 'stats': '.300'}))));
     expect(find.textContaining('🌱'), findsOneWidget);
     DisplaySettings.instance.setShown('flg_under21', false);
     await tester.pump();
@@ -766,11 +644,6 @@ void main() {
     expect(find.textContaining('🔰'), findsOneWidget);
     await tester.pumpWidget(const MaterialApp(home: DisplaySettingsPage()));
     expect(find.text('表示設定'), findsOneWidget);
-    expect(
-        tester
-            .widgetList<SwitchListTile>(find.byType(SwitchListTile))
-            .first
-            .value,
-        isFalse);
+    expect(tester.widgetList<SwitchListTile>(find.byType(SwitchListTile)).first.value, isFalse);
   });
 }

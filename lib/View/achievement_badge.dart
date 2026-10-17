@@ -2,162 +2,105 @@ import 'package:flutter/material.dart';
 import '../logic/achievement_priority.dart';
 
 /// Stable designs by achievement: neither the player nor the year changes them.
-({Color color, IconData symbol, bool trophy}) achievementBadgeStyle(
-    Map<String, dynamic> achievement) {
+({Color color, IconData symbol, bool trophy}) achievementBadgeStyle(Map<String, dynamic> achievement) {
   final label = '${achievement['label'] ?? ''}'.toLowerCase();
   final kind = achievement['kind'];
-  bool has(String pattern) =>
-      RegExp(pattern, caseSensitive: false).hasMatch(label);
-  if (has('正力松太郎'))
+  bool has(String pattern) => RegExp(pattern, caseSensitive: false).hasMatch(label);
+  if (has('正力松太郎')) {
     return (color: Colors.brown.shade800, symbol: Icons.diamond, trophy: true);
-  if (has('沢村'))
-    return (
-      color: Colors.indigo.shade800,
-      symbol: Icons.sports_baseball,
-      trophy: true
-    );
-  if (has('cy young|サイ.?ヤング'))
+  }
+  if (has('沢村')) {
+    return (color: Colors.indigo.shade800, symbol: Icons.sports_baseball, trophy: true);
+  }
+  if (has('cy young|サイ.?ヤング')) {
     return (color: Colors.blue.shade800, symbol: Icons.bolt, trophy: true);
-  if (has('五輪|金メダル'))
+  }
+  if (has('五輪|金メダル')) {
     return (color: Colors.amber.shade700, symbol: Icons.stars, trophy: false);
-  if (kind == 'national_team')
+  }
+  if (kind == 'national_team') {
     return (color: Colors.red.shade800, symbol: Icons.flag, trophy: false);
-  if (kind == 'callup')
-    return (
-      color: Colors.red.shade400,
-      symbol: Icons.person_add,
-      trophy: false
-    );
-  if (kind == 'draft')
-    return (
-      color: Colors.deepOrange.shade600,
-      symbol: Icons.looks_one,
-      trophy: false
-    );
-  if (has('完全試合|ノーヒットノーラン'))
-    return (
-      color: Colors.blueGrey.shade800,
-      symbol: Icons.verified,
-      trophy: true
-    );
-  if (has('三冠|triple crown'))
+  }
+  if (kind == 'callup') {
+    return (color: Colors.red.shade400, symbol: Icons.person_add, trophy: false);
+  }
+  if (kind == 'draft') {
+    return (color: Colors.deepOrange.shade600, symbol: Icons.looks_one, trophy: false);
+  }
+  if (has('完全試合|ノーヒットノーラン')) {
+    return (color: Colors.blueGrey.shade800, symbol: Icons.verified, trophy: true);
+  }
+  if (has('三冠|triple crown')) {
     return (color: Colors.amber.shade800, symbol: Icons.diamond, trophy: true);
-  if (has('50-50|40-40|トリプルスリー'))
+  }
+  if (has('50-50|40-40|トリプルスリー')) {
     return (color: Colors.deepPurple, symbol: Icons.bolt, trophy: true);
-  if (kind == 'record' || has('史上|新記録|最多.*更新'))
-    return (
-      color: Colors.blueGrey.shade600,
-      symbol: Icons.auto_awesome,
-      trophy: true
-    );
-  if (has('wbc|world baseball classic'))
-    return (
-      color: Colors.red.shade800,
-      symbol: Icons.public,
-      trophy: kind != 'championship'
-    );
-  if (has('日本一|日本シリーズ|world series'))
-    return (
-      color: Colors.amber.shade800,
-      symbol: Icons.stars,
-      trophy: kind != 'championship'
-    );
-  if (has('リーグ優勝|champion'))
+  }
+  if (kind == 'record' || has('史上|新記録|最多.*更新')) {
+    return (color: Colors.blueGrey.shade600, symbol: Icons.auto_awesome, trophy: true);
+  }
+  if (has('wbc|world baseball classic')) {
+    return (color: Colors.red.shade800, symbol: Icons.public, trophy: kind != 'championship');
+  }
+  if (has('日本一|日本シリーズ|world series')) {
+    return (color: Colors.amber.shade800, symbol: Icons.stars, trophy: kind != 'championship');
+  }
+  if (has('リーグ優勝|champion')) {
     return (color: Colors.orange.shade800, symbol: Icons.flag, trophy: false);
-  if (has('cs mvp|クライマックス|championship series'))
+  }
+  if (has('cs mvp|クライマックス|championship series')) {
     return (color: Colors.deepOrange, symbol: Icons.star, trophy: true);
-  if (has('月間|of the month'))
-    return (
-      color: Colors.purple.shade400,
-      symbol: Icons.calendar_month,
-      trophy: true
-    );
-  if (has('mvp|最優秀選手|most valuable'))
+  }
+  if (has('月間|of the month')) {
+    return (color: Colors.purple.shade400, symbol: Icons.calendar_month, trophy: true);
+  }
+  if (has('mvp|最優秀選手|most valuable')) {
     return (color: Colors.purple.shade800, symbol: Icons.star, trophy: true);
-  if (has('新人|rookie'))
+  }
+  if (has('新人|rookie')) {
     return (color: Colors.lightGreen.shade700, symbol: Icons.eco, trophy: true);
-  if (has('規定打席'))
-    return (
-      color: Colors.green.shade700,
-      symbol: Icons.sports_baseball,
-      trophy: false
-    );
-  if (has('規定投球'))
-    return (
-      color: Colors.teal.shade700,
-      symbol: Icons.sports_baseball,
-      trophy: false
-    );
-  if (has('本塁打|home run|hank aaron|slugger'))
-    return (
-      color: Colors.red.shade700,
-      symbol: Icons.local_fire_department,
-      trophy: kind != 'milestone'
-    );
-  if (has('打点|rbi'))
-    return (
-      color: Colors.orange.shade800,
-      symbol: Icons.adjust,
-      trophy: kind != 'milestone'
-    );
-  if (has('打率|首位打者|安打|hit|batting'))
-    return (
-      color: Colors.green.shade700,
-      symbol: Icons.sports_baseball,
-      trophy: kind != 'milestone'
-    );
-  if (has('盗塁|stolen'))
-    return (
-      color: Colors.cyan.shade800,
-      symbol: Icons.directions_run,
-      trophy: kind != 'milestone'
-    );
-  if (has('防御率|cy young|沢村|earned run'))
+  }
+  if (has('規定打席')) {
+    return (color: Colors.green.shade700, symbol: Icons.sports_baseball, trophy: false);
+  }
+  if (has('規定投球')) {
+    return (color: Colors.teal.shade700, symbol: Icons.sports_baseball, trophy: false);
+  }
+  if (has('本塁打|home run|hank aaron|slugger')) {
+    return (color: Colors.red.shade700, symbol: Icons.local_fire_department, trophy: kind != 'milestone');
+  }
+  if (has('打点|rbi')) {
+    return (color: Colors.orange.shade800, symbol: Icons.adjust, trophy: kind != 'milestone');
+  }
+  if (has('打率|首位打者|安打|hit|batting')) {
+    return (color: Colors.green.shade700, symbol: Icons.sports_baseball, trophy: kind != 'milestone');
+  }
+  if (has('盗塁|stolen')) {
+    return (color: Colors.cyan.shade800, symbol: Icons.directions_run, trophy: kind != 'milestone');
+  }
+  if (has('防御率|cy young|沢村|earned run')) {
     return (color: Colors.indigo, symbol: Icons.shield, trophy: true);
-  if (has('奪三振|strikeout|strike out'))
-    return (
-      color: Colors.blue.shade800,
-      symbol: Icons.bolt,
-      trophy: kind != 'milestone'
-    );
-  if (has('セーブ|ホールド|中継|save|relie'))
-    return (
-      color: Colors.teal.shade700,
-      symbol: Icons.lock,
-      trophy: kind != 'milestone'
-    );
-  if (has('勝|wins'))
-    return (
-      color: Colors.blue.shade700,
-      symbol: Icons.flag,
-      trophy: kind != 'milestone'
-    );
-  if (has('glove|守備|ゴールデン.?グラブ'))
+  }
+  if (has('奪三振|strikeout|strike out')) {
+    return (color: Colors.blue.shade800, symbol: Icons.bolt, trophy: kind != 'milestone');
+  }
+  if (has('セーブ|ホールド|中継|save|relie')) {
+    return (color: Colors.teal.shade700, symbol: Icons.lock, trophy: kind != 'milestone');
+  }
+  if (has('勝|wins')) {
+    return (color: Colors.blue.shade700, symbol: Icons.flag, trophy: kind != 'milestone');
+  }
+  if (has('glove|守備|ゴールデン.?グラブ')) {
     return (color: Colors.amber.shade800, symbol: Icons.shield, trophy: true);
+  }
   // Give other named awards a stable accent rather than one identical generic medal.
   var hash = 0;
   for (final code in label.codeUnits) {
     hash = (hash * 31 + code) & 0x7fffffff;
   }
-  const colors = [
-    Colors.indigo,
-    Colors.brown,
-    Colors.teal,
-    Colors.deepOrange,
-    Colors.purple
-  ];
-  const symbols = [
-    Icons.star,
-    Icons.auto_awesome,
-    Icons.flag,
-    Icons.sports_baseball,
-    Icons.diamond
-  ];
-  return (
-    color: colors[hash % colors.length],
-    symbol: symbols[(hash ~/ colors.length) % symbols.length],
-    trophy: kind == 'title'
-  );
+  const colors = [Colors.indigo, Colors.brown, Colors.teal, Colors.deepOrange, Colors.purple];
+  const symbols = [Icons.star, Icons.auto_awesome, Icons.flag, Icons.sports_baseball, Icons.diamond];
+  return (color: colors[hash % colors.length], symbol: symbols[(hash ~/ colors.length) % symbols.length], trophy: kind == 'title');
 }
 
 class AchievementBadge extends StatelessWidget {
@@ -182,10 +125,7 @@ class AchievementBadge extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      Color.lerp(style.color, Colors.white, .92)!,
-                      Color.lerp(style.color, Colors.white, .65)!
-                    ],
+                    colors: [Color.lerp(style.color, Colors.white, .92)!, Color.lerp(style.color, Colors.white, .65)!],
                   ),
                   border: Border.all(color: style.color.withValues(alpha: .45)),
                 ),
@@ -196,11 +136,7 @@ class AchievementBadge extends StatelessWidget {
                         Positioned(
                           right: size * .04,
                           top: size * .04,
-                          child: Text('${achievement['year']}',
-                              style: TextStyle(
-                                  fontSize: size * .1,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black)),
+                          child: Text('${achievement['year']}', style: TextStyle(fontSize: size * .1, fontWeight: FontWeight.bold, color: Colors.black)),
                         ),
                       if (leagueMvpCaption(achievement) != 'MVP')
                         Positioned(
@@ -214,12 +150,10 @@ class AchievementBadge extends StatelessWidget {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: Colors.white,
-                              border: Border.all(
-                                  color: style.color, width: size / 152),
+                              border: Border.all(color: style.color, width: size / 152),
                             ),
                             child: Text(
-                              leagueMvpCaption(achievement)
-                                  .replaceFirst('MVP', ''),
+                              leagueMvpCaption(achievement).replaceFirst('MVP', ''),
                               style: TextStyle(
                                 color: Colors.black,
                                 height: 1,
@@ -234,14 +168,7 @@ class AchievementBadge extends StatelessWidget {
                         right: size * .25,
                         top: size * .28,
                         height: size * .2,
-                        child: Center(
-                            child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Text('MVP',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: size * .125,
-                                        fontWeight: FontWeight.w900)))),
+                        child: Center(child: FittedBox(fit: BoxFit.scaleDown, child: Text('MVP', style: TextStyle(color: Colors.white, fontSize: size * .125, fontWeight: FontWeight.w900)))),
                       ),
                     ])),
               ))));
@@ -257,31 +184,18 @@ class AchievementBadge extends StatelessWidget {
                     width: size - 2,
                     height: size - 2,
                     decoration: BoxDecoration(
-                      borderRadius:
-                          BorderRadius.circular(size / (style.trophy ? 4 : 2)),
-                      gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Color.lerp(style.color, Colors.white, .92)!,
-                            Color.lerp(style.color, Colors.white, .65)!
-                          ]),
-                      border:
-                          Border.all(color: style.color.withValues(alpha: .45)),
+                      borderRadius: BorderRadius.circular(size / (style.trophy ? 4 : 2)),
+                      gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color.lerp(style.color, Colors.white, .92)!, Color.lerp(style.color, Colors.white, .65)!]),
+                      border: Border.all(color: style.color.withValues(alpha: .45)),
                     )),
-                Icon(
-                    style.trophy ? Icons.emoji_events : Icons.workspace_premium,
-                    color: style.color,
-                    size: size * 27 / 34),
+                Icon(style.trophy ? Icons.emoji_events : Icons.workspace_premium, color: style.color, size: size * 27 / 34),
                 Positioned(
                     right: 0,
                     top: 0,
                     child: Container(
                       padding: const EdgeInsets.all(1),
-                      decoration: const BoxDecoration(
-                          color: Colors.white, shape: BoxShape.circle),
-                      child: Icon(style.symbol,
-                          size: size * 13 / 34, color: style.color),
+                      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                      child: Icon(style.symbol, size: size * 13 / 34, color: style.color),
                     )),
                 if (achievement['year'] != null)
                   Positioned(
@@ -297,12 +211,7 @@ class AchievementBadge extends StatelessWidget {
                       ),
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
-                        child: Text('${achievement['year']}',
-                            style: TextStyle(
-                                fontSize: size * .27,
-                                height: 1,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold)),
+                        child: Text('${achievement['year']}', style: TextStyle(fontSize: size * .27, height: 1, color: Colors.black, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ),
@@ -347,14 +256,8 @@ class LeagueMvpTrophyPainter extends CustomPainter {
           ..close(),
         fill);
     canvas.drawRect(const Rect.fromLTWH(.455, .62, .09, .19), fill);
-    canvas.drawRRect(
-        RRect.fromRectAndRadius(const Rect.fromLTWH(.35, .79, .3, .06),
-            const Radius.circular(.015)),
-        fill);
-    canvas.drawRRect(
-        RRect.fromRectAndRadius(const Rect.fromLTWH(.26, .85, .48, .08),
-            const Radius.circular(.025)),
-        fill);
+    canvas.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTWH(.35, .79, .3, .06), const Radius.circular(.015)), fill);
+    canvas.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTWH(.26, .85, .48, .08), const Radius.circular(.025)), fill);
     canvas.restore();
   }
 

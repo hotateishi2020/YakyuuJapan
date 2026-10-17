@@ -1,40 +1,22 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-/// Place larger badges first. Reuse the earliest available gap in each row
-/// before starting a new row, so small badges can fill space beside tall ones.
+/// Preserve award order so repeated honors remain adjacent across rows.
 List<Rect> packAchievementBadges(List<double> sizes, double width) {
   if (sizes.isEmpty || width <= 0) return [];
   const gap = 2.0;
   final placed = <Rect>[];
+  double x = 0, y = 0, rowHeight = 0;
   for (final requested in sizes) {
     final size = math.min(requested, width);
-    final xs = {0.0, for (final rect in placed) rect.right + gap}.toList()
-      ..sort();
-    final ys = {0.0, for (final rect in placed) rect.bottom + gap}.toList()
-      ..sort();
-    Rect? target;
-    for (final y in ys) {
-      for (final x in xs) {
-        if (x + size > width + .001) continue;
-        final candidate = Rect.fromLTWH(x, y, size, size);
-        if (placed.every((rect) => !candidate.overlaps(Rect.fromLTRB(
-            rect.left - gap + .001,
-            rect.top - gap + .001,
-            rect.right + gap - .001,
-            rect.bottom + gap - .001)))) {
-          target = candidate;
-          break;
-        }
-      }
-      if (target != null) break;
+    if (x > 0 && x + size > width) {
+      x = 0;
+      y += rowHeight + gap;
+      rowHeight = 0;
     }
-    placed.add(target ??
-        Rect.fromLTWH(
-            0,
-            placed.fold<double>(0, (y, r) => math.max(y, r.bottom + gap)),
-            size,
-            size));
+    placed.add(Rect.fromLTWH(x, y, size, size));
+    x += size + gap;
+    rowHeight = math.max(rowHeight, size);
   }
   return placed;
 }

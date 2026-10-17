@@ -630,8 +630,6 @@ class FetchURL {
       try {
         await refreshGameDetails(conn, pageUrl, href, gameId, idHome, idAway, 0, 0, saveMaxVelo: state.contains('試合終了'));
         await GameStatsLoad.markIfComplete(conn, gameId, finished: state.contains('試合終了'));
-      } catch (e) {
-        print('試合詳細の再取得に失敗しました ($awayName vs $homeName): $e');
       } on YahooPageUnavailable {
         rethrow;
       } catch (e) {

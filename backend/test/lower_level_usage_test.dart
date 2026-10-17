@@ -14,7 +14,7 @@ void main() {
   });
   test('farm-only opponent IDs are not required; substitutes and changes count',
       () {
-    final source = '''<p class="game_info">試合終了</p>
+    const source = '''<p class="game_info">試合終了</p>
       <div id="table_top_p"><table><tbody>
       <tr><td></td><td><a href="/bis/players/1.html">先発</a></td><td></td><td></td><td>3</td></tr>
       <tr><td></td><td><a href="/bis/players/2.html">救援</a></td><td></td><td></td><td>1</td></tr>

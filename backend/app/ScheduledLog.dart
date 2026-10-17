@@ -1,3 +1,5 @@
+import 'package:shelf/shelf.dart';
+import 'Auth.dart';
 import '../tools/Postgres.dart';
 import 'DB/t_system_log.dart';
 import 'DB/t_system_log_error.dart';
@@ -6,6 +8,20 @@ import 'LogDetail.dart';
 /// Server timers have no browser session. Use a dedicated system actor.
 class ScheduledLog {
   static const userId = -1;
+
+  /// Log attribution only; this header does not grant API permissions.
+  static bool isScheduledRequest(Request request) =>
+      request.method == 'GET' &&
+      request.headers['x-koko-log-source'] == 'scheduler' &&
+      !Auth.hasSessionToken(request) &&
+      const {
+        '/fetchGamesNPB',
+        '/fetchGamesMLB',
+        '/fetchStatsTeamNPB',
+        '/fetchStatsTeamMLB',
+        '/fetchStatsPlayerNPB',
+        '/fetchStatsPlayerMLB',
+      }.contains(request.requestedUri.path);
 
   static Map<String, dynamic> detail(String action, {Object? error}) => {
         'user_id': userId,

@@ -142,8 +142,6 @@ bool _importSourceMix(Map<String, dynamic> a, Map<String, dynamic> b) {
   return _yahooSource(a) != _yahooSource(b);
 }
 
-bool _unstarted(Map<String, dynamic> game) => !_finished(game) && !_inProgress(game);
-
 bool _nearSameDay(Map<String, dynamic> a, Map<String, dynamic> b) {
   if (_dateOnly(a['date_game']) == _dateOnly(b['date_game'])) return true;
   final left = DateTime.tryParse(gameNightDate(a));

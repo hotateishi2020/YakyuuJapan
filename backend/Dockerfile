@@ -25,6 +25,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 # 実行ファイルと静的ファイルをコピー
 COPY --from=build /app/bin/server /app/bin/server
 COPY --from=build /app/public     /app/public
+COPY --from=build /app/data       /app/data
 
 # Render が渡す PORT を使う
 ENV PORT=10000

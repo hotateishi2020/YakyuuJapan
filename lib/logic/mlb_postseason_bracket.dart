@@ -439,3 +439,8 @@ MlbPostseasonBoard buildMlbPostseasonBoard({
     eliminatedIds: eliminated,
   );
 }
+
+/// The line into a round is highlighted only for that round's winner.
+bool wonNextMlbRound(StageResult previous, StageResult next) =>
+    previous.decided && next.decided && previous.winnerId != null &&
+    previous.winnerId! > 0 && previous.winnerId == next.winnerId;

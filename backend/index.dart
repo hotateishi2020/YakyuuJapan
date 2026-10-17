@@ -1,4 +1,4 @@
-import 'app/MlbScheduleWatch.dart';
+import 'app/GameScheduleWatch.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
@@ -1576,6 +1576,7 @@ void main() async {
         log.updpgm = 'CLIENT';
         log.crtenv = LogDetail.clip('${body['environment'] ?? 'web'}', 20);
         log.txt_detail = LogDetail.encode({
+        ...LogDetail.clientInfo(request),
           'log_type': '操作',
           'level': 'INFO',
           'user_id': reporter.id,
@@ -1622,6 +1623,7 @@ void main() async {
           stack,
           reporter,
           detail: {
+            ...LogDetail.clientInfo(request),
             'log_type': 'エラー',
             'level': 'ERROR',
             'user_id': reporter.id,
@@ -1708,6 +1710,7 @@ void main() async {
           }
           return {
             'log_id': '${map['id'] ?? ''}',
+            for (final key in ['ip_address', 'browser', 'device_type', 'user_agent']) key: '${detail[key] ?? ''}',
             'timestamp': stamp(map['crtat']),
             'log_type': logType.isEmpty ? fallbackType : logType,
             'level': level.isEmpty ? (isError ? 'ERROR' : 'INFO') : level,
@@ -2142,7 +2145,7 @@ void main() async {
     PlayerDetailSnapshot.start();
     PredictionSnapshotSchedule.start(onUpdated: _clearPredictionsCache);
     // 取得処理だけ登録する。タイマーは /predictions/ready の通知後に開始する。
-    MlbScheduleWatch.start(onUpdated: _clearPredictionsCache);
+    GameScheduleWatch.start(onUpdated: _clearPredictionsCache);
     GameFetchSchedule.armFutureWatch('mlb', FetchMLB.refreshFutureIfChanged);
     GameFetchSchedule.armFutureWatch('npb', FetchURL.refreshFutureIfChanged);
     // 当日の試合も初期表示完了まで定期取得を始めない。
@@ -2197,6 +2200,7 @@ Future<int> _saveErrorLog(
         stacktrace,
         user,
         detail: {
+          ...LogDetail.clientInfo(request),
           'api_path': request.requestedUri.path,
           'http_status': 500,
           'duration_ms': durationMs,
@@ -2266,6 +2270,7 @@ Future<void> _saveAccessLog(
       log.updpgm = _clipDb(user.code_system, 30);
       log.crtenv = 'server';
       log.txt_detail = LogDetail.encode({
+        ...LogDetail.clientInfo(request),
         'log_type': '操作',
         'level': httpStatus >= 500 ? 'ERROR' : (httpStatus >= 400 ? 'WARN' : 'INFO'),
         'user_id': user.id,

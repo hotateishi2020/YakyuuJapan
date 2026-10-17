@@ -25,7 +25,7 @@ List<Map<String, dynamic>> parseNpbRecord(String body, {required bool career}) {
   }
   if (result.isEmpty) throw const FormatException('公式記録表を確認できません');
   return career
-      ? result.where((p) => usageInt(p['rank']) <= 10).toList()
+      ? result.where((p) => usageInt(p['rank']) <= 50).toList()
       : result.where((p) => p['rank'] == 1).toList();
 }
 
@@ -37,7 +37,7 @@ List<Map<String, dynamic>> parseMlbRecord(
   ];
   if (splits.isEmpty) throw const FormatException('MLB公式記録を確認できません');
   final best = usageMap(splits.first['stat'])[metric.mlb];
-  return [
+  final result = [
     for (final split in splits)
       if (career || usageMap(split['stat'])[metric.mlb] == best)
         {
@@ -53,4 +53,13 @@ List<Map<String, dynamic>> parseMlbRecord(
           if (!career) 'team': usageMap(split['team'])['name'],
         }
   ];
+  if (career) {
+    var rank = 1;
+    for (var i = 0; i < result.length; i++) {
+      if (i == 0 || '${result[i]['value']}' != '${result[i - 1]['value']}') rank = i + 1;
+      result[i]['rank'] = rank;
+    }
+    return result.where((p) => usageInt(p['rank']) <= 50).toList();
+  }
+  return result;
 }

@@ -160,6 +160,29 @@ Map<String, dynamic> team(int id, String name) => {
     };
 
 void main() {
+  testWidgets('主力の打順別は全打順を通して同じ選手を一度だけ表示する', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: Scaffold(body: StrengthRegularGrid(teams: [
+      {'name_team': '球団A', 'batting_order': [
+        {'slot': '1', 'total': 100, 'players': [
+          {'player_key': 'a', 'name': '主力A', 'count': 60},
+          {'player_key': 'b', 'name': '主力B', 'count': 42},
+        ]},
+        {'slot': '2', 'total': 100, 'players': [
+          {'player_key': 'a', 'name': '主力A', 'count': 40},
+          {'player_key': 'c', 'name': '主力C', 'count': 35},
+          {'player_key': 'b', 'name': '主力B', 'count': 25},
+        ]},
+      ]},
+    ]))));
+    await tester.tap(find.text('打順別'));
+    await tester.pumpAndSettle();
+    expect(find.text('主力A'), findsOneWidget);
+    expect(find.text('主力B'), findsOneWidget);
+    expect(find.text('主力C'), findsOneWidget);
+    expect(find.text('60試合'), findsOneWidget);
+    expect(find.text('35試合'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
   testWidgets('選手起用と選手一覧はそれぞれ推し球団を初期選択する', (tester) async {
     final client = MockClient((_) async => http.Response(
         jsonEncode({
@@ -190,6 +213,23 @@ void main() {
           findsOneWidget);
       expect(tester.takeException(), isNull);
     }, () => client);
+  });
+
+  testWidgets('貢献度ヘッダーはAPIのチーム背景色と文字色をそのまま使う', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(1200, 900));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final club = team(1, '球団A')
+      ..['color_back'] = '#123456'
+      ..['color_font'] = '#FEDCBA';
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: TeamStrengthBoard(
+      initialView: 0, org: OrgConfig.npb, year: 2026, providedTeams: [club],
+    ))));
+    await tester.pumpAndSettle();
+    final heading = find.text('打撃貢献度');
+    expect(tester.widget<Text>(heading).style!.color, const Color(0xFFFEDCBA));
+    final container = tester.widget<Container>(find.ancestor(of: heading, matching: find.byType(Container)).first);
+    expect((container.decoration as BoxDecoration).color, const Color(0xFF123456));
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('本塁打5本以上は比率が低くても名前を表示し比較ヘッダーは球団色', (tester) async {
@@ -425,6 +465,11 @@ void main() {
       await tester.ensureVisible(
           find.byKey(const ValueKey('strength-detail-outs-relief')));
       await tester.pumpAndSettle();
+      final horizontal = tester.stateList<ScrollableState>(find.byType(Scrollable))
+          .where((s) => s.axisDirection == AxisDirection.right);
+      expect(horizontal.every((s) => s.position.maxScrollExtent == 0), isTrue);
+      expect(tester.getRect(find.byKey(const ValueKey('strength-detail-outs-relief'))).right,
+          lessThanOrEqualTo(1200));
       await tester
           .tap(find.byKey(const ValueKey('strength-detail-outs-relief')));
       await tester.pumpAndSettle();
@@ -781,6 +826,26 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('選手起用では投手のスタメン割合を捕手より上に表示する', (tester) async {
+    final data = team(1, '球団A');
+    (data['positions'] as List).add({
+      'slot': 'P', 'label': '投手', 'total': 100,
+      'players': [{'name': '先発投手', 'count': 25}],
+    });
+    await http.runWithClient(() async {
+      await tester.pumpWidget(const MaterialApp(home: Scaffold(
+        body: TeamStrengthBoard(initialView: 1, org: OrgConfig.npb, year: 2026))));
+      await tester.pumpAndSettle();
+      final pitcher = find.byKey(const ValueKey('strength-band-starts-P'));
+      final catcher = find.byKey(const ValueKey('strength-band-starts-C'));
+      expect(pitcher, findsOneWidget);
+      expect(catcher, findsOneWidget);
+      expect(tester.getTopLeft(pitcher).dy, lessThan(tester.getTopLeft(catcher).dy));
+      expect(find.text('25.0%'), findsWidgets);
+      expect(tester.takeException(), isNull);
+    }, () => MockClient((_) async => http.Response(jsonEncode({'teams': [data]}), 200,
+      headers: {'content-type': 'application/json; charset=utf-8'})));
+  });
   testWidgets('スクロール位置の保存値を投手詳細の開閉状態として読み込まない', (tester) async {
     final bucket = PageStorageBucket();
     const listKey = PageStorageKey('strength-rows-npb-2026-1-0');

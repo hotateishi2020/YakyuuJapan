@@ -444,3 +444,7 @@ MlbPostseasonBoard buildMlbPostseasonBoard({
 bool wonNextMlbRound(StageResult previous, StageResult next) =>
     previous.decided && next.decided && previous.winnerId != null &&
     previous.winnerId! > 0 && previous.winnerId == next.winnerId;
+
+/// A league champion reaches the final before any World Series games are played.
+bool reachesMlbWorldSeries(StageResult leagueSeries) =>
+    leagueSeries.decided && (leagueSeries.winnerId ?? 0) > 0;

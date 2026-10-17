@@ -52,7 +52,7 @@ class BracketGeom {
   static final cs1P = Rect.fromCenter(center: Offset(midP, 276), width: 112, height: 34);
   static final finC = Rect.fromCenter(center: Offset((xs[0] + midC) / 2, 176), width: 156, height: 40);
   static final finP = Rect.fromCenter(center: Offset((xs[5] + midP) / 2, 176), width: 156, height: 40);
-  static final js = Rect.fromLTRB(xs[0] - 8, 20, xs[5] + 8, 132);
+  static final js = Rect.fromLTRB(finC.center.dx - 12, 20, finP.center.dx + 12, 132);
 }
 
 class PostseasonBracket extends StatelessWidget {

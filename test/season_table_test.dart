@@ -7,6 +7,32 @@ import 'package:Yakyuu_Japan/config/org_config.dart';
 import 'package:Yakyuu_Japan/View/SeasonTable.dart';
 
 void main() {
+  for (final org in [OrgConfig.npb, OrgConfig.mlb]) {
+    testWidgets('${org.label}の列は表全体で縦スクロールする', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(1200, 500));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester.pumpWidget(MaterialApp(home: Scaffold(body: DualBandLeaguePersonalStats(
+        org: org, batting: [
+          for (final title in ['打率', '本塁打', 'ボール球見極め率'])
+            for (var i = 0; i < 30; i++)
+              {'title': title, 'int_rank': i + 1, 'name_player': '$title選手$i', 'stats': 30-i},
+        ], pitching: const [],
+      ))));
+      await tester.pumpAndSettle();
+      expect(find.text('ボール球見極め率'), org.kind == OrgKind.npb ? findsNothing : findsOneWidget);
+      final vertical = tester.stateList<ScrollableState>(find.byType(Scrollable))
+        .where((s) => s.axisDirection == AxisDirection.down).toList();
+      expect(vertical, hasLength(1));
+      final first = tester.getTopLeft(find.text('打率選手0')).dy;
+      final second = tester.getTopLeft(find.text('本塁打選手0')).dy;
+      vertical.single.position.jumpTo(200);
+      await tester.pump();
+      expect(tester.getTopLeft(find.text('打率選手0')).dy, first - 200);
+      expect(tester.getTopLeft(find.text('本塁打選手0')).dy, second - 200);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('スターの有無でスタッツヘッダーの高さを変えない', (tester) async {
     Future<double> height(Set<String> stars) async {
       await tester.pumpWidget(MaterialApp(
@@ -42,6 +68,8 @@ void main() {
       expect(find.text(org.leagues[0].name.replaceAll('・リーグ', '')), findsNothing);
       await tester.tap(find.text(org.leagues[1].name));
       await tester.pumpAndSettle();
+      expect(find.text('ボール球見極め率'), findsNothing);
+      expect(find.text('非表示選手'), findsNothing);
       expect(find.text('選手1'), findsOneWidget);
       expect(find.text('選手0'), findsNothing);
       expect(tester.takeException(), isNull);
@@ -54,6 +82,7 @@ void main() {
       await tester.pumpWidget(MaterialApp(
           home: Scaffold(
               body: BothLeaguePersonalStats(layout: layout, stats: [
+        {'id_league': 1, 'title': 'ボール球見極め率', 'stats': '80', 'name_player': '非表示選手', 'flg_pitcher': false},
         for (var i = 1; i <= 2; i++) {'id_league': i, 'title': '打率', 'stats': '.300', 'int_rank': 1, 'name_player': '選手$i', 'name_team': '球団', 'flg_pitcher': false},
       ]))));
       expect(find.text('選手1'), findsOneWidget);
@@ -504,11 +533,11 @@ void main() {
   });
 
   test('個人成績の地色はポジションで分かれる', () {
-    expect(personalStatPositionColor('捕手'), const Color(0xFFB3E5FC));
-    expect(personalStatPositionColor('外野手'), const Color(0xFFA5D6A7));
-    expect(personalStatPositionColor('内野手'), const Color(0xFFFFF59D));
-    expect(personalStatPositionColor('投手'), const Color(0xFFFFCDD2));
-    expect(personalStatPositionColor('左'), const Color(0xFFA5D6A7));
+    expect(personalStatPositionColor('捕手'), const Color(0xFFCEEEFD));
+    expect(personalStatPositionColor('外野手'), const Color(0xFFC4E4C6));
+    expect(personalStatPositionColor('内野手'), const Color(0xFFFFF8BF));
+    expect(personalStatPositionColor('投手'), const Color(0xFFFFDEE2));
+    expect(personalStatPositionColor('左'), const Color(0xFFC4E4C6));
     expect(personalStatPositionColor(''), isNull);
   });
 

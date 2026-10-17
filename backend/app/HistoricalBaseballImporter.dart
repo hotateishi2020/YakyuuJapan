@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 
 import '../tools/Postgres.dart';
+import 'TeamIdentity.dart';
 
 typedef HistoricalHttpGet = Future<http.Response> Function(Uri uri);
 
@@ -1275,6 +1276,7 @@ class HistoricalBaseballImporter {
           ],
         );
       }
+      await TeamIdentity.sync(conn, year: year);
       return teamIds.length;
     });
   }
@@ -1649,6 +1651,7 @@ class HistoricalBaseballImporter {
         );
         count++;
       }
+      await TeamIdentity.sync(conn, year: page.year);
       return count;
     });
   }

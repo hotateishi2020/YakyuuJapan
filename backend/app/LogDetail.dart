@@ -1,7 +1,32 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:shelf/shelf.dart';
 
 /// 操作ログとエラーログの共通項目。画面の列と `txt_detail` の中身を揃える。
 class LogDetail {
+  static Map<String, String> clientInfo(Request request) {
+    final ua = clip(request.headers['user-agent'] ?? '', 1000);
+    final lower = ua.toLowerCase();
+    var browser = '不明';
+    for (final entry in <String, String>{
+      'edg/': 'Edge', 'edgios/': 'Edge', 'edga/': 'Edge',
+      'opr/': 'Opera', 'samsungbrowser/': 'Samsung Internet',
+      'firefox/': 'Firefox', 'fxios/': 'Firefox',
+      'chrome/': 'Chrome', 'crios/': 'Chrome', 'safari/': 'Safari',
+    }.entries) {
+      if (lower.contains(entry.key)) { browser = entry.value; break; }
+    }
+    final device = lower.contains('ipad') || (lower.contains('android') && !lower.contains('mobile'))
+        ? 'タブレット'
+        : lower.contains('mobile') || lower.contains('iphone') || request.headers['sec-ch-ua-mobile'] == '?1'
+            ? '携帯' : RegExp(r'windows|macintosh|x11|cros').hasMatch(lower) ? 'PC' : '不明';
+    final connection = request.context['shelf.io.connection_info'];
+    final forwarded = (request.headers['x-forwarded-for'] ?? '').split(',').first.trim();
+    final ip = InternetAddress.tryParse(forwarded)?.address ??
+        (connection is HttpConnectionInfo ? connection.remoteAddress.address : '');
+    return {'ip_address': ip, 'browser': browser, 'device_type': device, 'user_agent': ua};
+  }
+
   /// ログの発生日時。UTC でもローカルでも、表示は日本時間の壁時計にする。
   static String formatJst(Object? value) {
     final parsed = value is DateTime ? value : DateTime.tryParse('${value ?? ''}'.trim());

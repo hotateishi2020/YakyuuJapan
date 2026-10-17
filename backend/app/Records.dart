@@ -18,8 +18,15 @@ class Records {
     final leagues = org.leagueIds.join(',');
     final standingRows = await conn.execute('''
       SELECT DISTINCT ON (s.year,s.id_team) s.year, s.id_team, s.id_league, s.int_rank, s.int_win, s.int_lose, s.int_draw,
-        COALESCE(NULLIF(s.name_team,''),t.name_short) AS name, s.code_area
+        COALESCE(h.name_full,NULLIF(s.name_team,''),t.name_short) AS name,
+        COALESCE(h.name_short,NULLIF(s.name_team,''),t.name_short) AS short_name,
+        COALESCE(h.name_shortest,s.name_shortest) AS name_shortest,
+        t.color_back AS color_back,
+        t.color_font AS color_font,h.logo_url,
+        COALESCE(h.name_full,s.name_team) IS DISTINCT FROM t.name_short
+          AND COALESCE(h.name_full,s.name_team) IS DISTINCT FROM t.name_full AS historical_identity, s.code_area
       FROM t_stats_team s JOIN m_team t ON t.id=s.id_team
+      LEFT JOIN m_team_season_identity h ON h.id_franchise=s.id_team AND h.int_year=s.year
       WHERE s.id_league IN ($leagues) AND s.year <= \$1 AND NOT COALESCE(s.flg_delete,false)
       ORDER BY s.year DESC,s.id_team,s.crtat DESC,s.id DESC
     ''', parameters: [year]);
@@ -34,7 +41,9 @@ class Records {
     ''', parameters: [year]);
     final titleRows = await conn.execute('''
       SELECT s.int_year AS year,s.id_league,s.id_stats,s.id_player,s.stats AS value,
-        p.name_full AS name,COALESCE(NULLIF(st.name_team,''),t.name_short) AS team,
+        s.id_team,p.name_full AS name,COALESCE(h.name_short,NULLIF(st.name_team,''),t.name_short) AS team,
+        t.color_back AS color_back,
+        t.color_font AS color_font,
         CASE WHEN p.year_retire > 0 THEN 'retired' ELSE 'unknown' END AS status
       FROM (
         SELECT int_year,id_league,id_stats,id_player,id_team,int_rank,stats FROM t_stats_player
@@ -43,6 +52,7 @@ class Records {
         SELECT EXTRACT(YEAR FROM CURRENT_DATE)::int,id_league,id_stats,id_player,id_team,int_rank,stats FROM t_stats_player_latest
       ) s JOIN m_player p ON p.id=s.id_player
       LEFT JOIN m_team t ON t.id=s.id_team
+      LEFT JOIN m_team_season_identity h ON h.id_franchise=s.id_team AND h.int_year=s.int_year
       LEFT JOIN LATERAL (SELECT name_team FROM t_stats_team WHERE year=s.int_year AND id_team=s.id_team AND NOT COALESCE(flg_delete,false) ORDER BY crtat DESC,id DESC LIMIT 1) st ON true
       WHERE s.id_league IN ($leagues) AND s.int_year <= \$1 AND s.int_rank=1
         
@@ -86,7 +96,7 @@ class Records {
       'org': org.code,
       'year': year,
       'standings': buildRecordStandings(standingRows.map((r) => r.toColumnMap()).toList(), playoffs.map((r) => r.toColumnMap()).toList(), org),
-      'titles': mergeRecordAwards(buildRecordTitles(titles, org), usageMaps(baseline['awards']), year),
+      'titles': colorRecordTitles(mergeRecordAwards(buildRecordTitles(titles, org), usageMaps(baseline['awards']), year), standingRows.map((r) => r.toColumnMap()).toList(), titles),
       'season': season,
       'career': usageMaps(baseline['career']),
       'streaks': [
@@ -168,7 +178,8 @@ List<Map<String, dynamic>> buildRecordStandings(List<Map<String, dynamic>> rows,
   for (final r in rows) {
     final year = usageInt(r['year']), team = usageInt(r['id_team']);
     final required = org == OrgKind.mlb && [1903, 1919, 1920, 1921].contains(year) ? 5 : 4;
-    final champion = (wins[year]?[team] ?? 0) >= required;
+    final singleLeague = org == OrgKind.npb && year >= 1936 && year <= 1949;
+    final champion = singleLeague ? usageInt(r['int_rank']) == 1 : (wins[year]?[team] ?? 0) >= required;
     final s = seasons.putIfAbsent(year, () => {'year': year, 'champion': null, 'leagues': <Map<String, dynamic>>[]});
     if (champion) s['champion'] = r['name'];
     final leagueName = _league(org, usageInt(r['id_league']), year);
@@ -177,10 +188,10 @@ List<Map<String, dynamic>> buildRecordStandings(List<Map<String, dynamic>> rows,
     final leagues = s['leagues'] as List<Map<String, dynamic>>;
     var league = leagues.where((l) => l['name'] == label).firstOrNull;
     if (league == null) {
-      league = {'name': label, 'teams': <Map<String, dynamic>>[]};
+      league = {'id_league': r['id_league'], 'name': label, 'teams': <Map<String, dynamic>>[]};
       leagues.add(league);
     }
-    (league['teams'] as List).add({'rank': r['int_rank'], 'name': r['name'], 'wins': r['int_win'], 'losses': r['int_lose'], 'draws': r['int_draw'], 'postseason': entrants[year]?.contains(team) ?? false, 'champion': champion});
+    (league['teams'] as List).add({'id_team': team, 'historical_identity': r['historical_identity'], 'logo_url': r['logo_url'], 'color_back': r['color_back'], 'color_font': r['color_font'], 'name_shortest': r['name_shortest'], 'rank': r['int_rank'], 'name': r['name'], 'short_name': r['short_name'] ?? r['name'], 'wins': r['int_win'], 'losses': r['int_lose'], 'draws': r['int_draw'], 'postseason': entrants[year]?.contains(team) ?? false, 'champion': champion});
   }
   for (final s in seasons.values) {
     for (final l in s['leagues']) {
@@ -191,6 +202,18 @@ List<Map<String, dynamic>> buildRecordStandings(List<Map<String, dynamic>> rows,
 }
 
 List<Map<String, dynamic>> mergeRecordAwards(List<Map<String, dynamic>> statistical, List<Map<String, dynamic>> awards, int throughYear) {
+  String name(Object? value) => '${value ?? ''}'.replaceAll(RegExp(r'[\s　・.]'), '').toLowerCase();
+  bool hasValue(Map<String, dynamic> p) => double.tryParse('${p['value'] ?? ''}') != null;
+  String label(Object? value) {
+    final text = '$value'.replaceAll('賞', '');
+    return const {
+      '最多安打者': '最多安打', '最多本塁打者': '本塁打王', '最多本塁打': '本塁打王',
+      '最多打点者': '打点王', '最多打点': '打点王', '最多盗塁者': '盗塁王', '最多盗塁': '盗塁王',
+      '最高出塁率者': '最高出塁率', '最優秀防御率投手': '最優秀防御率',
+      '最多勝利投手': '最多勝利', '最多セーブ投手': '最多セーブ',
+      '最優秀中継ぎ投手': '最優秀中継ぎ', '最多三振奪取投手': '最多奪三振', '最多奪三振投手': '最多奪三振',
+    }[text] ?? '$value';
+  }
   final bySeason = {for (final s in statistical) '${s['year']}:${s['league']}': s};
   for (final award in awards) {
     if (usageInt(award['year']) > throughYear) continue;
@@ -198,11 +221,75 @@ List<Map<String, dynamic>> mergeRecordAwards(List<Map<String, dynamic>> statisti
     final season = bySeason.putIfAbsent(key, () => {...award, 'categories': <Map<String, dynamic>>[]});
     final categories = usageMaps(season['categories']);
     for (final c in usageMaps(award['categories'])) {
-      categories.removeWhere((old) => old['label'] == c['label']);
-      categories.add(c);
+      final title = label(c['label']);
+      final stats = categories.where((old) => label(old['label']) == title)
+          .expand((old) => usageMaps(old['players'])).toList();
+      final players = usageMaps(c['players']).map((p) {
+        final matches = stats.where((s) =>
+            p['id_player'] != null && s['id_player'] != null
+                ? '${p['id_player']}' == '${s['id_player']}'
+                : name(p['name']).isNotEmpty && name(p['name']) == name(s['name']));
+        final stat = matches.where(hasValue).firstOrNull;
+        return {...p, if (!hasValue(p) && stat != null) ...{
+          'value': stat['value'], 'unit': stat['unit'], 'id_player': stat['id_player'],
+        }};
+      }).toList();
+      categories.removeWhere((old) => label(old['label']) == title);
+      categories.add({...c, 'label': title, 'players': players});
     }
     season['categories'] = categories;
     season['provisional'] = false;
   }
   return bySeason.values.toList()..sort((a, b) => usageInt(b['year']).compareTo(usageInt(a['year'])));
+}
+
+/// Match historical awards to the team in that season, never the player's current team.
+List<Map<String, dynamic>> colorRecordTitles(List<Map<String, dynamic>> seasons,
+    List<Map<String, dynamic>> teams, List<Map<String, dynamic>> stats) {
+  String normalized(Object? value) => '${value ?? ''}'
+      .replaceAll(RegExp(r'[\s　()（）・.]'), '').toLowerCase();
+  String alias(Object? value) {
+    final name = normalized(value);
+    return const {'読売': '巨人', 'イーグルス': '楽天', '東北楽天': '楽天'}[name] ?? name;
+  }
+  for (final season in seasons) {
+    final year = '${season['year']}';
+    final seasonTeams = teams.where((t) => '${t['year']}' == year).toList();
+    final categories = usageMaps(season['categories']);
+    season['categories'] = categories;
+    for (final category in categories) {
+      final players = usageMaps(category['players']);
+      category['players'] = players;
+      for (final player in players) {
+        final teamName = alias(player['team']);
+        final candidates = seasonTeams.where((t) {
+          if (player['id_team'] != null) return t['id_team'] == player['id_team'];
+          if (teamName.isEmpty) return false;
+          return ['name', 'short_name', 'name_shortest'].any((key) {
+            final name = alias(t[key]);
+            return name.isNotEmpty && (name == teamName || name.startsWith(teamName));
+          });
+        }).toList();
+        Map<String, dynamic>? source = candidates.length == 1 ? candidates.single : null;
+        if (source == null) {
+          final matches = stats.where((s) => '${s['year']}' == year &&
+              normalized(s['name']) == normalized(player['name'])).toList();
+          if (matches.isNotEmpty && matches.map((s) => s['id_team']).toSet().length == 1) {
+            source = matches.first;
+          }
+        }
+        if (source != null) {
+          for (final field in ['id_team', 'color_back', 'color_font']) {
+            if (source[field] != null) player[field] = source[field];
+          }
+          // 資料ごとの表記ではなく、受賞年度の球団マスターの略称に統一する。
+          final identity = seasonTeams.where((t) => t['id_team'] == source!['id_team']).firstOrNull;
+          final displayName = [identity?['short_name'], identity?['name'], source['short_name'], source['team']]
+              .map((value) => '${value ?? ''}'.trim()).where((value) => value.isNotEmpty).firstOrNull;
+          if (displayName != null) player['team'] = displayName;
+        }
+      }
+    }
+  }
+  return seasons;
 }

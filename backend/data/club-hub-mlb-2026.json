@@ -1,0 +1,60 @@
+{
+  "year": 2026,
+  "clubs": [],
+  "training_groups": [
+    {
+      "name": "千賀・大竹自主トレ",
+      "members": [
+        {
+          "name": "千賀滉大",
+          "team": "メッツ"
+        },
+        {
+          "name": "大竹風雅",
+          "team": "ソフトバンク"
+        }
+      ],
+      "source": "https://www.softbankhawks.co.jp/news/detail/202600995105.html",
+      "location": "",
+      "period": "2026年1月",
+      "sources": [
+        "https://www.softbankhawks.co.jp/news/detail/202600995105.html"
+      ],
+      "orgs": [
+        "npb",
+        "mlb"
+      ],
+      "checked_at": "2026-10-17"
+    },
+    {
+      "name": "吉田正尚合同自主トレ",
+      "members": [
+        {
+          "name": "吉田正尚",
+          "team": "レッドソックス"
+        },
+        {
+          "name": "藤原恭大",
+          "team": "ロッテ"
+        },
+        {
+          "name": "澤井廉",
+          "team": "ヤクルト"
+        }
+      ],
+      "source": "https://news.mynavi.jp/article/20260129-4045586/",
+      "sources": [
+        "https://news.mynavi.jp/article/20260129-4045586/",
+        "https://cocokara-next.com/athlete_celeb/ren-sawai-determination/"
+      ],
+      "location": "沖縄県",
+      "period": "2026年1月",
+      "orgs": [
+        "npb",
+        "mlb"
+      ],
+      "checked_at": "2026-10-17"
+    }
+  ],
+  "training_checked_at": "2026-10-17"
+}

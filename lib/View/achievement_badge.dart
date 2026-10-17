@@ -103,6 +103,31 @@ import '../logic/achievement_priority.dart';
   return (color: colors[hash % colors.length], symbol: symbols[(hash ~/ colors.length) % symbols.length], trophy: kind == 'title');
 }
 
+/// Keep the achievement distinguishable even without opening its tooltip.
+String achievementBadgeCaption(Map<String, dynamic> achievement) {
+  final label = '${achievement['label'] ?? '功績'}';
+  const captions = {
+    '最優秀選手賞': 'MVP', '最優秀選手': 'MVP', '優秀選手賞': 'MVP',
+    '最多本塁打': '本塁打王', '最多打点': '打点王', '最多盗塁': '盗塁王',
+    '最優秀防御率': '防御率', '最多奪三振': '奪三振王',
+    '最多勝利': '最多勝', '最高勝率': '勝率王', '最高出塁率': '出塁率',
+    '最多セーブ投手': 'セーブ王', '最多セーブ': 'セーブ王',
+    '最優秀中継ぎ投手': '中継ぎ王', '最優秀中継ぎ': '中継ぎ王',
+    '最多盗塁者': '盗塁王', '最多勝利投手': '最多勝',
+    '最多安打者': '最多安打', '最多三振奪取投手': '奪三振王',
+    '最高出塁率者': '出塁率', '最優秀防御率投手': '防御率',
+    'ゴールデン・グラブ賞': 'GG賞', 'サイ・ヤング賞': 'サイ賞',
+    '新人王': '新人王', '正力松太郎賞': '正力賞',
+    'ゴールデングラブ賞': 'GG賞', 'ベストナイン': 'ベスト9',
+    '最優秀新人': '新人王', '規定打席到達': '規定打席', '規定投球回到達': '規定投球回',
+  };
+  if (captions.containsKey(label)) return captions[label]!;
+  for (final key in captions.keys.toList()..sort((a, b) => b.length.compareTo(a.length))) {
+    if (label.contains(key)) return captions[key]!;
+  }
+  return label;
+}
+
 class AchievementBadge extends StatelessWidget {
   const AchievementBadge({super.key, required this.achievement});
   final Map<String, dynamic> achievement;
@@ -110,6 +135,20 @@ class AchievementBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final style = achievementBadgeStyle(achievement);
     final size = achievementBadgeSize(achievement);
+    final caption = achievementBadgeCaption(achievement);
+    final letters = caption.characters.toList();
+    final lines = (letters.length / 4).ceil().clamp(1, 3);
+    final perLine = (letters.length / lines).ceil().clamp(1, 1000);
+    final engraving = [for (var i = 0; i < letters.length; i += perLine)
+      letters.skip(i).take(perLine).join()].join('\n');
+    Widget yearLabel(double fontSize) => Container(
+      key: const ValueKey('achievement-year-label'),
+      color: Colors.white,
+      padding: EdgeInsets.symmetric(horizontal: size * .025, vertical: size * .015),
+      child: Text('${achievement['year']}',
+        style: TextStyle(fontSize: fontSize, height: 1,
+          fontWeight: FontWeight.bold, color: Colors.black)),
+    );
     if (isLeagueMvp(achievement)) {
       return ExcludeSemantics(
           child: SizedBox(
@@ -121,7 +160,7 @@ class AchievementBadge extends StatelessWidget {
                 width: size,
                 height: size,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size * 16 / 152),
+                  borderRadius: BorderRadius.zero,
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -135,8 +174,8 @@ class AchievementBadge extends StatelessWidget {
                       if (achievement['year'] != null)
                         Positioned(
                           right: size * .04,
-                          top: size * .04,
-                          child: Text('${achievement['year']}', style: TextStyle(fontSize: size * .1, fontWeight: FontWeight.bold, color: Colors.black)),
+                          bottom: size * .04,
+                          child: yearLabel(size * .1),
                         ),
                       if (leagueMvpCaption(achievement) != 'MVP')
                         Positioned(
@@ -181,39 +220,38 @@ class AchievementBadge extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 Container(
-                    width: size - 2,
-                    height: size - 2,
+                    key: const ValueKey('achievement-frame'),
+                    width: size,
+                    height: size,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(size / (style.trophy ? 4 : 2)),
+                      borderRadius: BorderRadius.zero,
                       gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color.lerp(style.color, Colors.white, .92)!, Color.lerp(style.color, Colors.white, .65)!]),
                       border: Border.all(color: style.color.withValues(alpha: .45)),
                     )),
-                Icon(style.trophy ? Icons.emoji_events : Icons.workspace_premium, color: style.color, size: size * 27 / 34),
+                if (style.trophy)
+                  SizedBox(width: size, height: size,
+                    child: CustomPaint(painter: LeagueMvpTrophyPainter(color: style.color)))
+                else Icon(Icons.workspace_premium, color: style.color, size: size * 27 / 34),
                 Positioned(
-                    right: 0,
-                    top: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(1),
-                      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                      child: Icon(style.symbol, size: size * 13 / 34, color: style.color),
-                    )),
+                  left: size * .27, right: size * .27,
+                  top: size * .24, height: size * .32,
+                  child: Center(
+                    child: FittedBox(fit: BoxFit.scaleDown,
+                      child: Text(engraving, textAlign: TextAlign.center,
+                        key: const ValueKey('achievement-engraving'),
+                        style: TextStyle(fontSize: size * .14, height: 1.1,
+                          color: const Color(0xFFFFF3CF), fontWeight: FontWeight.w800,
+                          shadows: [
+                            Shadow(color: Colors.black.withValues(alpha: .7), offset: Offset(0, -size * .008)),
+                            Shadow(color: Colors.white.withValues(alpha: .3), offset: Offset(0, size * .008)),
+                          ]))),
+                  ),
+                ),
                 if (achievement['year'] != null)
                   Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    height: size * .3,
-                    child: Container(
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text('${achievement['year']}', style: TextStyle(fontSize: size * .27, height: 1, color: Colors.black, fontWeight: FontWeight.bold)),
-                      ),
-                    ),
+                    right: size * .04,
+                    bottom: size * .04,
+                    child: yearLabel(size * .13),
                   ),
               ],
             )));
@@ -222,14 +260,15 @@ class AchievementBadge extends StatelessWidget {
 
 /// A wide black cup keeps the white league caption entirely inside its bowl.
 class LeagueMvpTrophyPainter extends CustomPainter {
-  const LeagueMvpTrophyPainter();
+  const LeagueMvpTrophyPainter({this.color = Colors.black});
+  final Color color;
   @override
   void paint(Canvas canvas, Size size) {
     canvas.save();
     canvas.scale(size.width, size.height);
-    final fill = Paint()..color = Colors.black;
+    final fill = Paint()..color = color;
     final handles = Paint()
-      ..color = Colors.black
+      ..color = color
       ..style = PaintingStyle.stroke
       ..strokeWidth = .065;
     canvas.drawPath(
@@ -262,5 +301,5 @@ class LeagueMvpTrophyPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant LeagueMvpTrophyPainter oldDelegate) => false;
+  bool shouldRepaint(covariant LeagueMvpTrophyPainter oldDelegate) => oldDelegate.color != color;
 }

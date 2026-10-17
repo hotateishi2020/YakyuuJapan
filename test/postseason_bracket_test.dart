@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/View/PostseasonBracket.dart';
+import 'package:Yakyuu_Japan/View/MlbPostseasonBracket.dart';
 import 'package:Yakyuu_Japan/logic/game_dedupe.dart';
 import 'package:Yakyuu_Japan/logic/mlb_postseason_bracket.dart';
 import 'package:Yakyuu_Japan/logic/postseason_bracket.dart';
@@ -710,7 +711,49 @@ void main() {
     expect(wonNextMlbRound(board.nlDs2, board.nlCs), isFalse);
     expect(wonNextMlbRound(board.nlDs1, board.nlCs), isTrue);
     expect(wonNextMlbRound(board.nlCs, board.worldSeries), isFalse);
+    expect(reachesMlbWorldSeries(board.nlCs), isTrue);
+    expect(reachesMlbWorldSeries(StageResult.empty), isFalse);
     expect(wonNextMlbRound(StageResult.empty, StageResult.empty), isFalse);
   });
+
+  for (final width in [390.0, 1200.0]) {
+    testWidgets('WS進出チームのロゴと星が決勝枠内に収まる $width', (tester) async {
+      await tester.binding.setSurfaceSize(Size(width, 700));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      final standings = [
+        for (final league in [3, 4])
+          for (var rank = 1; rank <= 6; rank++)
+            {'id_team': league * 100 + rank, 'id_league': league, 'int_rank': rank,
+             'name_team': 'Team$league-$rank', 'int_win': 100 - rank, 'int_lose': 60 + rank},
+      ];
+      final games = [
+        for (final league in [3, 4]) ...[
+          for (var i = 1; i <= 3; i++) ...[
+            game(code: 'DS', home: league * 100 + 1, away: league * 100 + 4, scoreHome: 3, scoreAway: 0, date: '2026-10-0$i'),
+            game(code: 'DS', home: league * 100 + 2, away: league * 100 + 3, scoreHome: 3, scoreAway: 0, date: '2026-10-0$i'),
+          ],
+          for (var i = 1; i <= 4; i++)
+            game(code: league == 3 ? 'ALCS' : 'NLCS', home: league * 100 + 1, away: league * 100 + 2,
+              scoreHome: 3, scoreAway: 0, date: '2026-10-1$i'),
+        ],
+      ];
+      await tester.pumpWidget(MaterialApp(home: Scaffold(body:
+        MlbPostseasonBracket(standings: standings, games: games))));
+      await tester.pumpAndSettle();
+      expect(find.text('ワールドシリーズ'), findsOneWidget);
+      expect(find.byWidgetPredicate((w) => w is Image && w.image is AssetImage &&
+          (w.image as AssetImage).assetName.endsWith('logo_world_series_2026.png')), findsOneWidget);
+      final bounds = tester.getRect(find.byKey(const Key('postseason-ws-content')));
+      for (final id in [301, 401]) {
+        for (final part in ['team', 'stars']) {
+          final rect = tester.getRect(find.byKey(Key('postseason-ws-$part-$id')));
+          expect(bounds.contains(rect.topLeft), isTrue);
+          expect(bounds.contains(rect.bottomRight), isTrue);
+        }
+      }
+      expect(find.text('0 - 0'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  }
 
 }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'app/AwardValues.dart';
 import 'package:html/parser.dart' as html;
 import 'package:http/http.dart' as http;
 import 'app/StrengthUsage.dart';
@@ -33,7 +34,7 @@ Future<void> main(List<String> args) async {
           for (final a in doc.querySelectorAll('a[href*="/players/"]')) {
             final label = a.querySelector('h6')?.text.trim(), name = a.querySelector('.name')?.text.trim();
             if (label == null || name == null || name.isEmpty) continue;
-            categories.putIfAbsent(aliases[label] ?? label, () => []).add({'name': name, 'team': a.querySelector('.team')?.text.trim(), 'value': '受賞', 'status': 'unknown', 'source': url});
+            categories.putIfAbsent(aliases[label] ?? label, () => []).add({'name': name, 'team': a.querySelector('.team')?.text.trim(), 'value': '受賞', ...npbAwardValue(label, a.text), 'status': 'unknown', 'source': url});
           }
           if (categories.isEmpty) {
             throw const FormatException('No award recipients');

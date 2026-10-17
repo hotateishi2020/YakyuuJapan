@@ -1,3 +1,5 @@
+import '../tools/tab_preferences.dart';
+import 'team_section_layout.dart';
 import 'retained_tab_body.dart';
 import 'club_hub_board.dart';
 import 'strength_research.dart';
@@ -58,7 +60,17 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
   @override
   void initState() {
     super.initState();
-    _selectedView = widget.initialView;
+    // 廃止したタブの番号は残し、首脳の指定はチームタブに移す。
+    _selectedView = switch (widget.initialView) {
+      6 => 3,
+      9 => 8,
+      final view => view,
+    };
+    if (widget.providedTeams == null) {
+      _selectedView = readSavedTab('strength_${widget.org.kind.name}',
+          const [11, 8, 3, 2, 0, 1, 4, 5, 7, 10], fallback: _selectedView);
+      if (_selectedView == 1) _selectedView = 8;
+    }
     _load();
   }
 
@@ -106,7 +118,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
   }
 
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) => TeamSectionLayout.embedded(context) ? _content(context) : Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _viewTabs(),
@@ -122,8 +134,8 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
   Widget _viewTabs() => SizedBox(
         height: TAB_BAR_H,
         child: Row(children: [
-          for (final index in [3, 2, 0, 1, 4, 5, 6, 7, 8, 9, 10, 11]) ...[
-            if (index != 3) const SizedBox(width: ALL_SPACE_BLOCK),
+          for (final index in [11, 8, 3, 2, 0, 4, 5, 7, 10]) ...[
+            if (index != 11) const SizedBox(width: ALL_SPACE_BLOCK),
             Expanded(
               child: Semantics(
                 selected: _selectedView == index,
@@ -132,7 +144,10 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                   borderRadius: BorderRadius.circular(TAB_RADIUS),
                   child: InkWell(
                     key: ValueKey('strength-view-$index'),
-                    onTap: () => setState(() => _selectedView = index),
+                    onTap: () {
+                      if (widget.providedTeams == null) saveTab('strength_${widget.org.kind.name}', index);
+                      setState(() => _selectedView = index);
+                    },
                     borderRadius: BorderRadius.circular(TAB_RADIUS),
                     child: Center(
                       child: FittedBox(
@@ -172,31 +187,32 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
           year: widget.year,
           teams: _teams,
           view: _selectedView - 1,
-          teamSection: (section, team) => SizedBox(
-              height: 600,
-              child: switch (section) {
+          teamSection: (section, team) => switch (section) {
                 2 => StrengthRegularGrid(teams: [team]),
                 3 => StrengthRosterGrid(team: team, year: widget.year),
-                4 => StrengthContracts(colorTeams: _teams, team: team, year: widget.year),
-                5 => StrengthDraft(year: widget.year),
                 6 => StrengthCareers(teams: [team]),
                 _ => TeamStrengthBoard(org: widget.org, year: widget.year, providedTeams: [team], initialView: section),
-              }));
+              });
     }
     final team = _teams.firstWhere((row) => _int(row['id_team']) == _selectedTeam, orElse: () => _teams.first);
     final background = parseColorNameOrNull('${team['color_back'] ?? ''}') ?? widget.org.tabColor;
-    final headerBackground = Color.lerp(background, Colors.white, 0.22)!;
-    final foreground = headerBackground.computeLuminance() > 0.179 ? Colors.black : Colors.white;
+    final headerBackground = background;
+    final foreground = parseColorNameOrNull('${team['color_font'] ?? ''}') ??
+        (headerBackground.computeLuminance() > 0.179 ? Colors.black : Colors.white);
     final pitchingRates = enrichStrengthBands(team, pitchingWorkloadBands(listMapFromJson(team['pitching_workload'])), 'pitching');
     final lineupGames = _int(team['lineup_game_count']);
     final battingOrder = enrichStrengthBands(team, listMapFromJson(team['batting_order']), 'batting');
-    final positions = enrichStrengthBands(team, listMapFromJson(team['positions']).where((row) => row['slot'] != 'P').toList(), 'fielding');
+    final positionRows = listMapFromJson(team['positions']);
+    final positions = [
+      ...enrichStrengthBands(team, positionRows.where((row) => row['slot'] == 'P').toList(), 'pitching'),
+      ...enrichStrengthBands(team, positionRows.where((row) => row['slot'] != 'P').toList(), 'fielding'),
+    ];
     final substitutions = listMapFromJson(team['substitutions']);
-    final pitchingHand = handednessBand(team, pitching: true);
+    final pitchingRole = pitchingRoleBand(team);
     final battingHand = handednessBand(team, pitching: false);
     final performance = contributionBands(team);
     final playerColors = <String, Color>{};
-    for (final row in [...battingOrder, ...positions, ...pitchingRates, ...substitutions, pitchingHand, battingHand, ...performance]) {
+    for (final row in [...battingOrder, ...positions, ...pitchingRates, ...substitutions, pitchingRole, battingHand, ...performance]) {
       for (final player in listMapFromJson(row['players'])) {
         playerColors.putIfAbsent(_playerKey(player), () {
           // Keep team-derived RGB variations, softened with white.
@@ -225,7 +241,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
     }
     final notes = team['notes'] is List ? (team['notes'] as List).map((note) => '$note').where((note) => note.isNotEmpty) : const <String>[];
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      if (_selectedView == 0 || _selectedView == 4 || _selectedView == 6)
+      if (!TeamSectionLayout.embedded(context) && (_selectedView == 0 || _selectedView == 4))
         Padding(
             padding: const EdgeInsets.only(bottom: 6),
             child: Row(children: [
@@ -254,35 +270,36 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(color: _comparisonViews.contains(_selectedView) == compare ? Colors.white : Colors.black87))))))))),
             ])),
-      if (_selectedView != 2 &&
+      if (!TeamSectionLayout.embedded(context) && _selectedView != 2 &&
           _selectedView != 5 &&
           _selectedView != 7 &&
-          !((_selectedView == 0 || _selectedView == 4 || _selectedView == 6) && _comparisonViews.contains(_selectedView)))
+          !((_selectedView == 0 || _selectedView == 4) && _comparisonViews.contains(_selectedView)))
         _teamSegments(),
       const SizedBox(height: 6),
-      Expanded(
+      SectionExpanded(
           child: _selectedView == 0 && _comparisonViews.contains(0)
               ? _performanceComparison()
               : _selectedView == 0 || _selectedView == 1
                   ? LayoutBuilder(builder: (context, constraints) {
-                      final bands = _selectedView == 0 ? performance : [...pitchingRates, pitchingHand, ...positions, ...battingOrder, battingHand, ...substitutions];
+                      final bands = _selectedView == 0 ? [...performance, pitchingRole, ...pitchingRates] : [...positions, ...battingOrder, battingHand, ...substitutions];
                       final width = _bandsWidth(bands, constraints.maxWidth);
-                      return SingleChildScrollView(
+                      return sectionScrollView(context, 
                         key: const ValueKey('strength-horizontal-scroll'),
                         scrollDirection: Axis.horizontal,
                         child: SizedBox(
                             width: width,
-                            child: ListView(
+                            child: SectionList(
                               key: PageStorageKey('strength-rows-${widget.org.kind.name}-${widget.year}-$_selectedTeam-$_selectedView'),
                               padding: const EdgeInsets.only(bottom: 16),
                               children: [
                                 if (_selectedView == 0) ...[
-                                  _heading('チーム成績への貢献割合', headerBackground, foreground),
+                                  _heading('投手貢献度', headerBackground, foreground, detail: 'チーム全投球回が分母／WHIPはシーズン通算'),
+                                  _rates([pitchingRole, ...pitchingRates], headerBackground, foreground, playerColors, totalUnit: '回'),
+                                  if (pitchingRates.isNotEmpty && !TeamSectionLayout.embedded(context)) _pitchingDetails(team),
+                                  _heading('打撃貢献度', headerBackground, foreground),
                                   _rates(performance, headerBackground, foreground, playerColors, totalUnit: '個'),
                                   const Text('塁打の内訳：本塁打×4・三塁打×3・二塁打×2・単打・四球。死球は含みません。'),
                                 ] else ...[
-                                  _heading('投手の投球回負担率', headerBackground, foreground, detail: 'チーム全投球回が分母／WHIPはシーズン通算'),
-                                  _rates([pitchingHand, ...pitchingRates], headerBackground, foreground, playerColors, totalUnit: '回'),
                                   _heading('守備位置のスタメン比率', headerBackground, foreground, detail: '途中出場は含みません／UZR未取得は —'),
                                   _rates(positions, headerBackground, foreground, playerColors),
                                   _heading('打順のスタメン比率', headerBackground, foreground, detail: '$lineupGames試合の先発起用／OPS・本塁打はシーズン通算'),
@@ -291,7 +308,6 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                                   _rates(battingOrder, headerBackground, foreground, playerColors),
                                   _heading('途中出場の起用割合', headerBackground, foreground, detail: '各役割の起用総数が分母／途中出場時の役割で集計'),
                                   _rates(substitutions, headerBackground, foreground, playerColors, totalUnit: '回'),
-                                  if (pitchingRates.isNotEmpty) _pitchingDetails(team),
                                 ],
                                 const SizedBox(height: 12),
                                 for (final note in notes) Text(note, style: const TextStyle(fontSize: 11, color: Colors.black54)),
@@ -307,11 +323,9 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                           ? StrengthRosterGrid(team: team, year: widget.year)
                           : _selectedView == 5
                               ? StrengthDraft(year: widget.year)
-                              : _selectedView == 6
-                                  ? StrengthAchievements(team: team, year: widget.year, comparisonTeams: _comparisonViews.contains(6) ? _teams : null)
-                                  : _selectedView == 7
-                                      ? StrengthCareers(teams: _teams)
-                                      : StrengthContracts(colorTeams: _teams, team: team, year: widget.year, comparisonTeams: _comparisonViews.contains(4) ? _teams : null)),
+                              : _selectedView == 7
+                                  ? StrengthCareers(teams: _teams)
+                                  : StrengthContracts(colorTeams: _teams, team: team, year: widget.year, comparisonTeams: _comparisonViews.contains(4) ? _teams : null)),
     ]);
   }
 
@@ -320,7 +334,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
         final maxima = [for (var i = 0; i < 3; i++) all.fold<int>(0, (n, bands) => math.max(n, _int(bands[i]['total'])))];
         final width = _bandsWidth([
           for (final bands in all) {...bands[0], 'total': maxima[0]}
-        ], math.max(1000.0, constraints.maxWidth));
+        ], _fitContributionToViewport ? constraints.maxWidth : math.max(1000.0, constraints.maxWidth));
         return SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: SizedBox(
@@ -482,12 +496,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
   Widget _pitchingDetails(Map<String, dynamic> team) {
     final players = listMapFromJson(team['pitching_workload'])..sort((a, b) => _int(b['total_outs']).compareTo(_int(a['total_outs'])));
     final total = players.fold<int>(0, (n, p) => n + _int(p['total_outs']));
-    return ExpansionTile(
-      // Keep expansion state separate from the parent ListView's scroll offset.
-      key: PageStorageKey('strength-pitching-details-${widget.org.kind.name}-${widget.year}-${team['id_team']}'),
-      title: const Text('各投手の投球回・負担率', style: TextStyle(fontSize: 13)),
-      subtitle: const Text('帯の細い投手もすべて確認できます', style: TextStyle(fontSize: 11)),
-      children: [
+    final rows = <Widget>[
         for (final player in players)
           ListTile(
             dense: true,
@@ -495,7 +504,19 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
             subtitle: Text('先発 ${inningsLabel(_int(player['starter_outs']))}／中継ぎ・抑え ${inningsLabel(_int(player['relief_outs']))}', style: const TextStyle(fontSize: 11)),
             trailing: Text('${(total > 0 ? _int(player['total_outs']) * 100 / total : 0).toStringAsFixed(1)}%'),
           ),
-      ],
+      ];
+    if (TeamSectionLayout.embedded(context)) {
+      return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        const Padding(padding: EdgeInsets.all(12), child: Text('各投手の投球回・負担率', style: TextStyle(fontWeight: FontWeight.bold))),
+        ...rows,
+      ]);
+    }
+    return ExpansionTile(
+      // Keep expansion state separate from the parent ListView's scroll offset.
+      key: PageStorageKey('strength-pitching-details-${widget.org.kind.name}-${widget.year}-${team['id_team']}'),
+      title: const Text('各投手の投球回・負担率', style: TextStyle(fontSize: 13)),
+      subtitle: const Text('帯の細い投手もすべて確認できます', style: TextStyle(fontSize: 11)),
+      children: rows,
     );
   }
 
@@ -517,7 +538,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
         'C' => const Color(0xFF2196F3),
         'LF' || 'CF' || 'RF' || 'OF' => const Color(0xFF43A047),
         'DH' => const Color(0xFF9C27B0),
-        'pitching_hand' => const Color(0xFFEF5350),
+        'pitching_role' => const Color(0xFFEF5350),
         _ => const Color(0xFFFFD54F),
       };
   Color _rateHeaderTextColor(Map<String, dynamic> row) => _rateHeaderColor(row).computeLuminance() > 0.179 ? Colors.black : Colors.white;
@@ -739,7 +760,15 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
       );
 
   static const _baseColors = [Color(0xFFE86680), Color(0xFFF8B6CC), Color(0xFFFFBC59), Color(0xFFFFF280), Color(0xFF8BCB8D)];
+  bool get _fitContributionToViewport {
+    final size = MediaQuery.sizeOf(context);
+    return _selectedView == 0 && size.width > size.height;
+  }
+
   double _bandsWidth(List<Map<String, dynamic>> bands, double viewport) {
+    if (_fitContributionToViewport && viewport.isFinite && viewport > _bandSideWidth) {
+      return viewport;
+    }
     var body = math.max(800.0, viewport - _bandSideWidth);
     for (final band in bands) {
       final total = _int(band['total']);

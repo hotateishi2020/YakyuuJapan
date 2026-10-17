@@ -16,14 +16,19 @@
         "https://www.japan-baseball.jp/jp/news/press/20260912_1.html",
         "https://www.japan-baseball.jp/jp/news/press/20260822_1.html",
         "https://baseball.omyutech.com/draftplayer.action?year=2026",
-        "https://sp.baseball.findfriends.jp/player/20080002/"
+        "https://sp.baseball.findfriends.jp/player/20080002/",
+        "https://www.japan-baseball.jp/jp/team/18u/2026/asianchampionship/player.html",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2026.php"
       ],
       "date_birth": "2008-06-03",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080002/",
-      "attention_grade": "D",
-      "attention_reason": "米球界挑戦を表明。NPB指名は不確実なため暫定D。国内志望なら競合級との評価とは区別しています。",
+      "attention_grade": "S",
+      "attention_reason": "アプリの手動評価としてSに設定。進路やNPBへの指名可能性とは分けて評価しています。",
       "attention_source": "https://www.nikkansports.com/baseball/news/202610150001384.html",
-      "attention_as_of": "2026-10-15",
+      "attention_as_of": "2026-10-17",
       "predictions": [
         {
           "team": "西武",
@@ -37,6 +42,68 @@
           "verification_url": "https://dnomotoke.com/archives/20260928001000/",
           "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
           "checked_at": "2026-10-15"
+        }
+      ],
+      "attention_override": true,
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2026年高校日本代表（U-18アジア選手権）",
+          "source": "https://www.japan-baseball.jp/jp/team/18u/2026/asianchampionship/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2026
+        },
+        {
+          "kind": "koshien",
+          "year": 2025,
+          "season": "春",
+          "result": "優勝",
+          "label": "2025年春の甲子園：優勝",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
+            "https://sp.baseball.findfriends.jp/player/20080002/"
+          ],
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2025,
+          "season": "夏",
+          "result": "ベスト8",
+          "label": "2025年夏の甲子園：ベスト8",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
+            "https://sp.baseball.findfriends.jp/player/20080002/"
+          ],
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2026,
+          "season": "春",
+          "result": "1回戦敗退",
+          "label": "2026年春の甲子園：1回戦敗退",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+            "https://sp.baseball.findfriends.jp/player/20080002/"
+          ],
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2026,
+          "season": "夏",
+          "result": "ベスト4",
+          "label": "2026年夏の甲子園：ベスト4",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2026.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2026.php",
+            "https://sp.baseball.findfriends.jp/player/20080002/"
+          ],
+          "checked_at": "2026-10-17"
         }
       ]
     },
@@ -54,14 +121,52 @@
         "https://www.japan-baseball.jp/jp/news/press/20260331_2.html",
         "https://www.japan-baseball.jp/jp/news/press/20260822_1.html",
         "https://baseball.omyutech.com/draftplayer.action?year=2026",
-        "https://sp.baseball.findfriends.jp/player/20080014/"
+        "https://sp.baseball.findfriends.jp/player/20080014/",
+        "https://www.japan-baseball.jp/jp/team/18u/2026/asianchampionship/player.html",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2024.php",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2026.php"
       ],
       "date_birth": "2008-07-08",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080014/",
       "attention_grade": "B",
       "attention_reason": "掲載の総合評価Sを基に、アプリ基準でBに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2026年高校日本代表（U-18アジア選手権）",
+          "source": "https://www.japan-baseball.jp/jp/team/18u/2026/asianchampionship/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2026
+        },
+        {
+          "kind": "koshien",
+          "year": 2024,
+          "season": "夏",
+          "result": "ベスト8",
+          "label": "2024年夏の甲子園：ベスト8",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2024.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2024.php",
+            "https://sp.baseball.findfriends.jp/player/20080014/"
+          ],
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2026,
+          "season": "春",
+          "result": "準優勝",
+          "label": "2026年春の甲子園：準優勝",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+            "https://sp.baseball.findfriends.jp/player/20080014/"
+          ],
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "高校生",
@@ -71,11 +176,15 @@
       "height": 194,
       "weight": 101,
       "hand": "右投右打",
-      "achievement": "甲子園出場経験。山梨学院高",
+      "achievement": "山梨学院高",
       "features": "最速152km/h。先発型の投手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
-        "https://sp.baseball.findfriends.jp/player/20080007/"
+        "https://sp.baseball.findfriends.jp/player/20080007/",
+        "https://www.nikkansports.com/baseball/highschool/news/202607060000296.html",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2026.php"
       ],
       "date_birth": "2008-12-21",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080007/",
@@ -170,7 +279,54 @@
       "attention_grade": "S",
       "attention_reason": "アプリ予想：長打力不足を補い、将来の中心選手に育てる筆頭候補。",
       "attention_source": "https://www.hb-nippon.com/articles/18340",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "high_school_home_runs",
+          "label": "高校通算39本塁打（2026年7月6日時点）",
+          "source": "https://www.nikkansports.com/baseball/highschool/news/202607060000296.html",
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2025,
+          "season": "春",
+          "result": "ベスト16（2回戦敗退）",
+          "label": "2025年春の甲子園：ベスト16（2回戦敗退）",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
+            "https://sp.baseball.findfriends.jp/player/20080007/"
+          ],
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2025,
+          "season": "夏",
+          "result": "ベスト4",
+          "label": "2025年夏の甲子園：ベスト4",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
+            "https://sp.baseball.findfriends.jp/player/20080007/"
+          ],
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2026,
+          "season": "春",
+          "result": "ベスト8",
+          "label": "2026年春の甲子園：ベスト8",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+            "https://sp.baseball.findfriends.jp/player/20080007/"
+          ],
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "高校生",
@@ -180,11 +336,17 @@
       "height": 175,
       "weight": 91,
       "hand": "左投左打",
-      "achievement": "甲子園出場経験。沖縄尚学高",
+      "achievement": "沖縄尚学高",
       "features": "最速150km/h。先発型の投手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
-        "https://sp.baseball.findfriends.jp/player/20080003/"
+        "https://sp.baseball.findfriends.jp/player/20080003/",
+        "https://www.japan-baseball.jp/jp/team/18u/2026/asianchampionship/player.html",
+        "https://www.japan-baseball.jp/jp/team/18u/2025/worldcup/player.html",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2026.php"
       ],
       "date_birth": "2008-11-18",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080003/",
@@ -206,6 +368,74 @@
           "evidence_scope": "動画の指名一覧画面・公開チャプターを確認。個別の選考理由は動画の該当箇所を参照。",
           "checked_at": "2026-10-15"
         }
+      ],
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2026年高校日本代表（U-18アジア選手権）",
+          "source": "https://www.japan-baseball.jp/jp/team/18u/2026/asianchampionship/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2026
+        },
+        {
+          "kind": "national_team",
+          "label": "2025年高校日本代表（U-18W杯）",
+          "source": "https://www.japan-baseball.jp/jp/team/18u/2025/worldcup/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2025
+        },
+        {
+          "kind": "koshien",
+          "year": 2025,
+          "season": "春",
+          "result": "ベスト16（2回戦敗退）",
+          "label": "2025年春の甲子園：ベスト16（2回戦敗退）",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
+            "https://sp.baseball.findfriends.jp/player/20080003/"
+          ],
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2025,
+          "season": "夏",
+          "result": "優勝",
+          "label": "2025年夏の甲子園：優勝",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
+            "https://sp.baseball.findfriends.jp/player/20080003/"
+          ],
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2026,
+          "season": "春",
+          "result": "1回戦敗退",
+          "label": "2026年春の甲子園：1回戦敗退",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+            "https://sp.baseball.findfriends.jp/player/20080003/"
+          ],
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2026,
+          "season": "夏",
+          "result": "1回戦敗退",
+          "label": "2026年夏の甲子園：1回戦敗退",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2026.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2026.php",
+            "https://sp.baseball.findfriends.jp/player/20080003/"
+          ],
+          "checked_at": "2026-10-17"
+        }
       ]
     },
     {
@@ -216,18 +446,48 @@
       "height": 174,
       "weight": 71,
       "hand": "左投左打",
-      "achievement": "甲子園出場経験。聖隷クリストファー高",
+      "achievement": "聖隷クリストファー高",
       "features": "最速150km/h。先発型の投手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
-        "https://sp.baseball.findfriends.jp/player/20090001/"
+        "https://sp.baseball.findfriends.jp/player/20090001/",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2026.php"
       ],
       "date_birth": "2009-01-05",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20090001/",
       "attention_grade": "C",
       "attention_reason": "掲載の総合評価Aを基に、アプリ基準でCに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "koshien",
+          "year": 2025,
+          "season": "夏",
+          "result": "2回戦敗退",
+          "label": "2025年夏の甲子園：2回戦敗退",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
+            "https://sp.baseball.findfriends.jp/player/20090001/"
+          ],
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2026,
+          "season": "夏",
+          "result": "1回戦敗退",
+          "label": "2026年夏の甲子園：1回戦敗退",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2026.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2026.php",
+            "https://sp.baseball.findfriends.jp/player/20090001/"
+          ],
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "高校生",
@@ -241,7 +501,8 @@
       "features": "最速150km/h。先発型の投手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
-        "https://sp.baseball.findfriends.jp/player/20090004/"
+        "https://sp.baseball.findfriends.jp/player/20090004/",
+        "https://www.japan-baseball.jp/jp/team/18u/2026/asianchampionship/player.html"
       ],
       "date_birth": "2009-01-23",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20090004/",
@@ -344,6 +605,15 @@
           "reason": "外れ1位で4球団競合の予想があるためA。初回入札での競合確定を意味しません。",
           "status": "注目度の参考評価"
         }
+      ],
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2026年高校日本代表（U-18アジア選手権）",
+          "source": "https://www.japan-baseball.jp/jp/team/18u/2026/asianchampionship/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2026
+        }
       ]
     },
     {
@@ -358,14 +628,24 @@
       "features": "最速147km/h。先発型の投手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
-        "https://sp.baseball.findfriends.jp/player/20080025/"
+        "https://sp.baseball.findfriends.jp/player/20080025/",
+        "https://www.japan-baseball.jp/jp/team/18u/2026/asianchampionship/player.html"
       ],
       "date_birth": "2008-07-16",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080025/",
       "attention_grade": "D",
       "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2026年高校日本代表（U-18アジア選手権）",
+          "source": "https://www.japan-baseball.jp/jp/team/18u/2026/asianchampionship/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2026
+        }
+      ]
     },
     {
       "category": "高校生",
@@ -375,18 +655,35 @@
       "height": 182,
       "weight": 80,
       "hand": "右投右打",
-      "achievement": "甲子園出場経験。近江高",
+      "achievement": "近江高",
       "features": "最速148km/h。先発型の投手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
-        "https://sp.baseball.findfriends.jp/player/20080015/"
+        "https://sp.baseball.findfriends.jp/player/20080015/",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+        "https://www.nikkansports.com/baseball/highschool/news/202603220001769.html"
       ],
       "date_birth": "2008-11-15",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080015/",
       "attention_grade": "D",
       "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "koshien",
+          "year": 2026,
+          "season": "春",
+          "result": "1回戦敗退",
+          "label": "2026年春の甲子園：1回戦敗退",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+            "https://www.nikkansports.com/baseball/highschool/news/202603220001769.html"
+          ],
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "高校生",
@@ -396,18 +693,34 @@
       "height": 185,
       "weight": 77,
       "hand": "右投右打",
-      "achievement": "甲子園出場経験。市和歌山高",
+      "achievement": "市和歌山高",
       "features": "最速151km/h。先発型の投手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
-        "https://sp.baseball.findfriends.jp/player/20090002/"
+        "https://sp.baseball.findfriends.jp/player/20090002/",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2025.php"
       ],
       "date_birth": "2009-02-10",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20090002/",
       "attention_grade": "D",
       "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "koshien",
+          "year": 2025,
+          "season": "春",
+          "result": "1回戦敗退",
+          "label": "2025年春の甲子園：1回戦敗退",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
+            "https://sp.baseball.findfriends.jp/player/20090002/"
+          ],
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "高校生",
@@ -417,18 +730,34 @@
       "height": 174,
       "weight": 73,
       "hand": "右投右打",
-      "achievement": "甲子園出場経験。大阪桐蔭高",
+      "achievement": "大阪桐蔭高",
       "features": "最速153km/h。先発型の投手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
-        "https://sp.baseball.findfriends.jp/player/20080012/"
+        "https://sp.baseball.findfriends.jp/player/20080012/",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2026.php"
       ],
       "date_birth": "2008-10-20",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080012/",
       "attention_grade": "D",
       "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "koshien",
+          "year": 2026,
+          "season": "春",
+          "result": "優勝",
+          "label": "2026年春の甲子園：優勝",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+            "https://sp.baseball.findfriends.jp/player/20080012/"
+          ],
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "高校生",
@@ -438,18 +767,62 @@
       "height": 177,
       "weight": 80,
       "hand": "右投右打",
-      "achievement": "甲子園出場経験。高川学園高",
+      "achievement": "高川学園高",
       "features": "最速146km/h。先発型の投手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
-        "https://sp.baseball.findfriends.jp/player/20080023/"
+        "https://sp.baseball.findfriends.jp/player/20080023/",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2026.php"
       ],
       "date_birth": "2008-05-20",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080023/",
       "attention_grade": "D",
       "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "koshien",
+          "year": 2025,
+          "season": "夏",
+          "result": "2回戦敗退",
+          "label": "2025年夏の甲子園：2回戦敗退",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
+            "https://sp.baseball.findfriends.jp/player/20080023/"
+          ],
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2026,
+          "season": "春",
+          "result": "1回戦敗退",
+          "label": "2026年春の甲子園：1回戦敗退",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+            "https://sp.baseball.findfriends.jp/player/20080023/"
+          ],
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2026,
+          "season": "夏",
+          "result": "ベスト16（3回戦敗退）",
+          "label": "2026年夏の甲子園：ベスト16（3回戦敗退）",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2026.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2026.php",
+            "https://sp.baseball.findfriends.jp/player/20080023/"
+          ],
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "高校生",
@@ -470,7 +843,15 @@
       "attention_grade": "E",
       "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "representative_camp",
+          "label": "2026年高校日本代表候補合宿に参加",
+          "source": "https://sp.baseball.findfriends.jp/player/20080019/",
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "高校生",
@@ -648,7 +1029,15 @@
       "attention_grade": "E",
       "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "high_school_home_runs",
+          "label": "高校通算6本塁打（選手紹介掲載値）",
+          "source": "https://sp.baseball.findfriends.jp/player/20080022/",
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "高校生",
@@ -658,18 +1047,41 @@
       "height": 180,
       "weight": 90,
       "hand": "右投左打",
-      "achievement": "甲子園出場経験。専大松戸高",
+      "achievement": "専大松戸高",
       "features": "長打力が注目される捕手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8725",
-        "https://sp.baseball.findfriends.jp/player/20090009/"
+        "https://sp.baseball.findfriends.jp/player/20090009/",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+        "https://www.hb-nippon.com/articles/11927"
       ],
       "date_birth": "2009-02-11",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20090009/",
       "attention_grade": "D",
       "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8725",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "high_school_home_runs",
+          "label": "高校通算10本塁打以上（選手紹介掲載値）",
+          "source": "https://sp.baseball.findfriends.jp/player/20090009/",
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2026,
+          "season": "春",
+          "result": "ベスト4",
+          "label": "2026年春の甲子園：ベスト4",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+            "https://www.hb-nippon.com/articles/11927"
+          ],
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "高校生",
@@ -700,11 +1112,16 @@
       "height": 175,
       "weight": 78,
       "hand": "右投左打",
-      "achievement": "甲子園出場経験。横浜高",
+      "achievement": "横浜高",
       "features": "守備力が注目される内野手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8725",
-        "https://sp.baseball.findfriends.jp/player/20080013/"
+        "https://sp.baseball.findfriends.jp/player/20080013/",
+        "https://www.japan-baseball.jp/jp/team/18u/2026/asianchampionship/player.html",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2026.php"
       ],
       "date_birth": "2008-06-26",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080013/",
@@ -726,6 +1143,67 @@
           "evidence_scope": "動画作者の同テーマ解説記事で指名案・理由を確認。",
           "checked_at": "2026-10-15"
         }
+      ],
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2026年高校日本代表（U-18アジア選手権）",
+          "source": "https://www.japan-baseball.jp/jp/team/18u/2026/asianchampionship/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2026
+        },
+        {
+          "kind": "koshien",
+          "year": 2025,
+          "season": "春",
+          "result": "優勝",
+          "label": "2025年春の甲子園：優勝",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
+            "https://sp.baseball.findfriends.jp/player/20080013/"
+          ],
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2025,
+          "season": "夏",
+          "result": "ベスト8",
+          "label": "2025年夏の甲子園：ベスト8",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
+            "https://sp.baseball.findfriends.jp/player/20080013/"
+          ],
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2026,
+          "season": "春",
+          "result": "1回戦敗退",
+          "label": "2026年春の甲子園：1回戦敗退",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+            "https://sp.baseball.findfriends.jp/player/20080013/"
+          ],
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2026,
+          "season": "夏",
+          "result": "ベスト4",
+          "label": "2026年夏の甲子園：ベスト4",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2026.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2026.php",
+            "https://sp.baseball.findfriends.jp/player/20080013/"
+          ],
+          "checked_at": "2026-10-17"
+        }
       ]
     },
     {
@@ -740,7 +1218,8 @@
       "features": "長打力が注目される外野手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8725",
-        "https://sp.baseball.findfriends.jp/player/20080011/"
+        "https://sp.baseball.findfriends.jp/player/20080011/",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2026.php"
       ],
       "date_birth": "2008-07-14",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080011/",
@@ -777,6 +1256,21 @@
           "status": "注目度の参考評価",
           "verification_url": "https://dnomotoke.com/archives/20260928001000/"
         }
+      ],
+      "career_facts": [
+        {
+          "kind": "koshien",
+          "year": 2026,
+          "season": "春",
+          "result": "ベスト16（2回戦敗退）",
+          "label": "2026年春の甲子園：ベスト16（2回戦敗退）",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+            "https://sp.baseball.findfriends.jp/player/20080011/"
+          ],
+          "checked_at": "2026-10-17"
+        }
       ]
     },
     {
@@ -794,7 +1288,11 @@
         "https://www.univbbl.com/alljapan/samuraijapan/2026.html",
         "https://www.aoyama.ac.jp/sports_info/2026/news_20261008_01",
         "https://baseball.omyutech.com/draftplayer.action?year=2026",
-        "https://sp.baseball.findfriends.jp/player/20040035/"
+        "https://sp.baseball.findfriends.jp/player/20040035/",
+        "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+        "https://www.japan-baseball.jp/jp/team/univ/2025/univ_us_japan/player.html",
+        "https://www.nikkansports.com/baseball/news/202605230001084.html",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2021.php"
       ],
       "date_birth": "2004-05-28",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040035/",
@@ -863,6 +1361,41 @@
           "reason": "西尾典文の初回入札候補評価と、フェードローの夏時点の1位12人予想を参考にAを維持。",
           "status": "注目度の参考評価"
         }
+      ],
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2026年大学日本代表（WCBC）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2026
+        },
+        {
+          "kind": "national_team",
+          "label": "2025年大学日本代表（日米大学野球選手権）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2025/univ_us_japan/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2025
+        },
+        {
+          "kind": "university_award",
+          "label": "2026年春・東都大学リーグベストナイン（投手）",
+          "source": "https://www.nikkansports.com/baseball/news/202605230001084.html",
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2021,
+          "season": "春",
+          "result": "ベスト8",
+          "label": "2021年春の甲子園：ベスト8",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2021.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2021.php",
+            "https://sp.baseball.findfriends.jp/player/20040035/"
+          ],
+          "checked_at": "2026-10-17"
+        }
       ]
     },
     {
@@ -879,7 +1412,14 @@
         "https://www.univbbl.com/alljapan/samuraijapan/2026.html",
         "https://www.aoyama.ac.jp/sports_info/2026/news_20261008_01",
         "https://baseball.omyutech.com/draftplayer.action?year=2026",
-        "https://sp.baseball.findfriends.jp/player/20040068/"
+        "https://sp.baseball.findfriends.jp/player/20040068/",
+        "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+        "https://www.japan-baseball.jp/jp/team/univ/2025/univ_us_japan/player.html",
+        "https://www.japan-baseball.jp/jp/team/18u/2022/worldcup/player.html",
+        "https://www.nikkansports.com/baseball/news/202605230001084.html",
+        "https://omyutech.com/playerTop.action?playerId=2516327",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2021.php",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2022.php"
       ],
       "date_birth": "2004-08-20",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040068/",
@@ -971,7 +1511,80 @@
       "attention_grade": "S",
       "attention_reason": "アプリ予想：捕手陣の世代交代と将来の正捕手確保を理由に、1位入札を予想。",
       "attention_source": "https://www.hb-nippon.com/articles/18304",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2026年大学日本代表（WCBC）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2026
+        },
+        {
+          "kind": "national_team",
+          "label": "2025年大学日本代表（日米大学野球選手権）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2025/univ_us_japan/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2025
+        },
+        {
+          "kind": "national_team",
+          "label": "2022年高校日本代表（U-18W杯）",
+          "source": "https://www.japan-baseball.jp/jp/team/18u/2022/worldcup/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2022
+        },
+        {
+          "kind": "high_school_home_runs",
+          "label": "高校通算38本塁打",
+          "source": "https://sp.baseball.findfriends.jp/player/20040068/",
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "university_award",
+          "label": "東都大学リーグ・ベストナイン：2023年春、2024年春・秋、2025年春",
+          "source": "https://sp.baseball.findfriends.jp/player/20040068/",
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "university_award",
+          "label": "2026年春・東都大学リーグベストナイン（捕手）",
+          "source": "https://www.nikkansports.com/baseball/news/202605230001084.html",
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "university_award",
+          "label": "2024年秋・東都大学リーグ最高殊勲選手／2023年春・新人賞",
+          "source": "https://omyutech.com/playerTop.action?playerId=2516327",
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2021,
+          "season": "夏",
+          "result": "優勝",
+          "label": "2021年夏の甲子園：優勝",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2021.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2021.php",
+            "https://sp.baseball.findfriends.jp/player/20040068/"
+          ],
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2022,
+          "season": "夏",
+          "result": "2回戦敗退（初戦）",
+          "label": "2022年夏の甲子園：2回戦敗退（初戦）",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+            "https://sp.baseball.findfriends.jp/player/20040068/"
+          ],
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "大学生",
@@ -981,11 +1594,13 @@
       "height": 175,
       "weight": 77,
       "hand": "左投左打",
-      "achievement": "甲子園出場経験。愛工大名電高 → 立命大",
+      "achievement": "愛工大名電高 → 立命大",
       "features": "最速151km/h。先発型の投手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
-        "https://sp.baseball.findfriends.jp/player/20040137/"
+        "https://sp.baseball.findfriends.jp/player/20040137/",
+        "https://www.japan-baseball.jp/jp/team/univ/2025/univ_us_japan/player.html",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2022.php"
       ],
       "date_birth": "2004-07-29",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040137/",
@@ -1023,7 +1638,35 @@
       "attention_grade": "B",
       "attention_reason": "掲載の総合評価Sを基に、アプリ基準でBに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2025年大学日本代表（日米大学野球選手権）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2025/univ_us_japan/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2025
+        },
+        {
+          "kind": "university_award",
+          "label": "2025年春・関西学生リーグ最優秀投手",
+          "source": "https://sp.baseball.findfriends.jp/player/20040137/",
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2022,
+          "season": "夏",
+          "result": "ベスト8",
+          "label": "2022年夏の甲子園：ベスト8",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+            "https://sp.baseball.findfriends.jp/player/20040137/"
+          ],
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "大学生",
@@ -1033,11 +1676,13 @@
       "height": 189,
       "weight": 93,
       "hand": "右投左打",
-      "achievement": "甲子園出場経験。高岡商高 → 亜大",
+      "achievement": "高岡商高 → 亜大",
       "features": "最速156km/h。リリーフ型の投手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
-        "https://sp.baseball.findfriends.jp/player/20040156/"
+        "https://sp.baseball.findfriends.jp/player/20040156/",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+        "https://blog.livedoor.jp/augustoparty/archives/52130270.html"
       ],
       "date_birth": "2004-10-23",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040156/",
@@ -1095,6 +1740,21 @@
           "reason": "西尾典文の1位候補12人に含まれ、単独1位・外れ1位の候補として紹介。Bを維持。",
           "status": "注目度の参考評価"
         }
+      ],
+      "career_facts": [
+        {
+          "kind": "koshien",
+          "year": 2022,
+          "season": "夏",
+          "result": "1回戦敗退",
+          "label": "2022年夏の甲子園：1回戦敗退",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+            "https://blog.livedoor.jp/augustoparty/archives/52130270.html"
+          ],
+          "checked_at": "2026-10-17"
+        }
       ]
     },
     {
@@ -1105,11 +1765,14 @@
       "height": 177,
       "weight": 83,
       "hand": "右投右打",
-      "achievement": "甲子園出場経験。下関国際高 → 駒大",
+      "achievement": "下関国際高 → 駒大",
       "features": "最速158km/h。複数の役割を担える投手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
-        "https://sp.baseball.findfriends.jp/player/20040099/"
+        "https://sp.baseball.findfriends.jp/player/20040099/",
+        "https://www.japan-baseball.jp/jp/team/18u/2022/worldcup/player.html",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2021.php",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2022.php"
       ],
       "date_birth": "2004-04-22",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040099/",
@@ -1153,7 +1816,42 @@
       "attention_grade": "C",
       "attention_reason": "掲載の総合評価Aを基に、アプリ基準でCに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2022年高校日本代表（U-18W杯）",
+          "source": "https://www.japan-baseball.jp/jp/team/18u/2022/worldcup/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2022
+        },
+        {
+          "kind": "koshien",
+          "year": 2021,
+          "season": "春",
+          "result": "1回戦敗退",
+          "label": "2021年春の甲子園：1回戦敗退",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2021.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2021.php",
+            "https://sp.baseball.findfriends.jp/player/20040099/"
+          ],
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2022,
+          "season": "夏",
+          "result": "準優勝",
+          "label": "2022年夏の甲子園：準優勝",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+            "https://sp.baseball.findfriends.jp/player/20040099/"
+          ],
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "大学生",
@@ -1167,7 +1865,8 @@
       "features": "最速149km/h。先発型の投手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
-        "https://sp.baseball.findfriends.jp/player/20040161/"
+        "https://sp.baseball.findfriends.jp/player/20040161/",
+        "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html"
       ],
       "date_birth": "2004-06-01",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040161/",
@@ -1264,6 +1963,21 @@
           "reason": "夏時点の1位12人予想に含まれる左腕。既存の競合可能性の評価Aを維持。",
           "status": "注目度の参考評価"
         }
+      ],
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2026年大学日本代表（WCBC）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2026
+        },
+        {
+          "kind": "university_award",
+          "label": "2026年春・関西学生リーグ最優秀選手",
+          "source": "https://sp.baseball.findfriends.jp/player/20040161/",
+          "checked_at": "2026-10-17"
+        }
       ]
     },
     {
@@ -1316,7 +2030,15 @@
       "attention_grade": "D",
       "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "representative_camp",
+          "label": "大学日本代表候補合宿に選出",
+          "source": "https://sp.baseball.findfriends.jp/player/20040159/",
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "大学生",
@@ -1326,11 +2048,14 @@
       "height": 180,
       "weight": 78,
       "hand": "左投左打",
-      "achievement": "甲子園出場経験。高松商高 → 慶大",
+      "achievement": "高松商高 → 慶大",
       "features": "最速151km/h。先発型の投手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
-        "https://sp.baseball.findfriends.jp/player/20040138/"
+        "https://sp.baseball.findfriends.jp/player/20040138/",
+        "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2021.php",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2022.php"
       ],
       "date_birth": "2004-05-28",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040138/",
@@ -1401,6 +2126,53 @@
           "reason": "ヤクルトの外れ1位予想を確認し、ドラ1候補のBへ更新。",
           "status": "注目度の参考評価"
         }
+      ],
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2026年大学日本代表（WCBC）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2026
+        },
+        {
+          "kind": "university_award",
+          "label": "2024年秋・東京六大学リーグ最優秀防御率（1.17）",
+          "source": "https://sp.baseball.findfriends.jp/player/20040138/",
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "university_award",
+          "label": "2026年春・東京六大学リーグ最優秀防御率（1.28）・ベストナイン",
+          "source": "https://sp.baseball.findfriends.jp/player/20040138/",
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2021,
+          "season": "夏",
+          "result": "ベスト16（3回戦敗退）",
+          "label": "2021年夏の甲子園：ベスト16（3回戦敗退）",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2021.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2021.php",
+            "https://sp.baseball.findfriends.jp/player/20040138/"
+          ],
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2022,
+          "season": "夏",
+          "result": "ベスト8",
+          "label": "2022年夏の甲子園：ベスト8",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+            "https://sp.baseball.findfriends.jp/player/20040138/"
+          ],
+          "checked_at": "2026-10-17"
+        }
       ]
     },
     {
@@ -1448,11 +2220,13 @@
       "height": 184,
       "weight": 88,
       "hand": "右投右打",
-      "achievement": "甲子園出場経験。福岡大大濠高 → 日体大",
+      "achievement": "福岡大大濠高 → 日体大",
       "features": "最速154km/h。複数の役割を担える投手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
-        "https://sp.baseball.findfriends.jp/player/20040160/"
+        "https://sp.baseball.findfriends.jp/player/20040160/",
+        "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2021.php"
       ],
       "date_birth": "2004-12-20",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040160/",
@@ -1518,6 +2292,34 @@
           "reason": "西尾典文の1位候補12人で11番目。単独1位・外れ1位の候補として紹介されているためB。",
           "status": "注目度の参考評価"
         }
+      ],
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2026年大学日本代表（WCBC）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2026
+        },
+        {
+          "kind": "university_award",
+          "label": "2025年秋・首都大学リーグ最優秀投手",
+          "source": "https://sp.baseball.findfriends.jp/player/20040160/",
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2021,
+          "season": "春",
+          "result": "ベスト8",
+          "label": "2021年春の甲子園：ベスト8",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2021.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2021.php",
+            "https://sp.baseball.findfriends.jp/player/20040160/"
+          ],
+          "checked_at": "2026-10-17"
+        }
       ]
     },
     {
@@ -1560,7 +2362,15 @@
       "attention_grade": "E",
       "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "representative_camp",
+          "label": "大学日本代表候補合宿に2年連続参加",
+          "source": "https://sp.baseball.findfriends.jp/player/20040149/",
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "大学生",
@@ -1574,7 +2384,9 @@
       "features": "守備力が注目される捕手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
-        "https://sp.baseball.findfriends.jp/player/20040030/"
+        "https://sp.baseball.findfriends.jp/player/20040030/",
+        "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+        "https://www.japan-baseball.jp/jp/team/univ/2025/univ_us_japan/player.html"
       ],
       "date_birth": "2004-11-20",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040030/",
@@ -1612,7 +2424,23 @@
       "attention_grade": "B",
       "attention_reason": "アプリ予想：渡部の抽選を外した場合の即戦力捕手候補。",
       "attention_source": "https://www.hb-nippon.com/articles/18304",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2026年大学日本代表（WCBC）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2026
+        },
+        {
+          "kind": "national_team",
+          "label": "2025年大学日本代表（日米大学野球選手権）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2025/univ_us_japan/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2025
+        }
+      ]
     },
     {
       "category": "大学生",
@@ -1622,11 +2450,13 @@
       "height": 167,
       "weight": 74,
       "hand": "右投右打",
-      "achievement": "甲子園出場経験。東海大菅生高 → 明大",
+      "achievement": "東海大菅生高 → 明大",
       "features": "ミート力が注目される打者。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
-        "https://sp.baseball.findfriends.jp/player/20040145/"
+        "https://sp.baseball.findfriends.jp/player/20040145/",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2021.php",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2021.php"
       ],
       "date_birth": "2004-07-30",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040145/",
@@ -1643,7 +2473,35 @@
       "attention_grade": "D",
       "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "koshien",
+          "year": 2021,
+          "season": "春",
+          "result": "ベスト8",
+          "label": "2021年春の甲子園：ベスト8",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2021.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2021.php",
+            "https://sp.baseball.findfriends.jp/player/20040145/"
+          ],
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2021,
+          "season": "夏",
+          "result": "1回戦敗退",
+          "label": "2021年夏の甲子園：1回戦敗退",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2021.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2021.php",
+            "https://sp.baseball.findfriends.jp/player/20040145/"
+          ],
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "大学生",
@@ -1653,11 +2511,15 @@
       "height": 180,
       "weight": 78,
       "hand": "右投右打",
-      "achievement": "甲子園出場経験。高知高 → 立命大",
+      "achievement": "高知高 → 立命大",
       "features": "長打力が注目される捕手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
-        "https://sp.baseball.findfriends.jp/player/20040154/"
+        "https://sp.baseball.findfriends.jp/player/20040154/",
+        "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+        "https://kansaibig6.jp/mvp/",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2022.php",
+        "https://baseball.omyutech.com/CupHomePageHistory.action?gameId=20221152057"
       ],
       "date_birth": "2004-07-15",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040154/",
@@ -1710,6 +2572,40 @@
           "status": "注目度の参考評価",
           "verification_url": "https://dnomotoke.com/archives/20260928001000/"
         }
+      ],
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2026年大学日本代表（WCBC）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2026
+        },
+        {
+          "kind": "university_award",
+          "label": "2025年春・秋・関西学生リーグベストナイン（捕手）",
+          "source": "https://sp.baseball.findfriends.jp/player/20040154/",
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "university_award",
+          "label": "2026年春・関西学生リーグ首位打者（.348）",
+          "source": "https://kansaibig6.jp/mvp/",
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2022,
+          "season": "春",
+          "result": "ベスト16（2回戦敗退）",
+          "label": "2022年春の甲子園：ベスト16（2回戦敗退）",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2022.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2022.php",
+            "https://baseball.omyutech.com/CupHomePageHistory.action?gameId=20221152057"
+          ],
+          "checked_at": "2026-10-17"
+        }
       ]
     },
     {
@@ -1720,11 +2616,13 @@
       "height": 176,
       "weight": 79,
       "hand": "右投左打",
-      "achievement": "甲子園出場経験。前橋育英高 → 明大",
+      "achievement": "前橋育英高 → 明大",
       "features": "走力が注目される選手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
-        "https://sp.baseball.findfriends.jp/player/20040148/"
+        "https://sp.baseball.findfriends.jp/player/20040148/",
+        "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2021.php"
       ],
       "date_birth": "2004-05-07",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040148/",
@@ -1769,6 +2667,34 @@
           "status": "注目度の参考評価",
           "verification_url": "https://dnomotoke.com/archives/20260928001000/"
         }
+      ],
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2026年大学日本代表（WCBC）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2026
+        },
+        {
+          "kind": "university_award",
+          "label": "2025年秋・東京六大学リーグベストナイン（二塁手）",
+          "source": "https://sp.baseball.findfriends.jp/player/20040148/",
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2021,
+          "season": "夏",
+          "result": "2回戦敗退（初戦）",
+          "label": "2021年夏の甲子園：2回戦敗退（初戦）",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2021.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2021.php",
+            "https://sp.baseball.findfriends.jp/player/20040148/"
+          ],
+          "checked_at": "2026-10-17"
+        }
       ]
     },
     {
@@ -1783,14 +2709,30 @@
       "features": "守備力が注目される内野手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
-        "https://sp.baseball.findfriends.jp/player/20040050/"
+        "https://sp.baseball.findfriends.jp/player/20040050/",
+        "https://www.japan-baseball.jp/jp/team/18u/2022/worldcup/player.html"
       ],
       "date_birth": "2004-04-23",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040050/",
       "attention_grade": "D",
       "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2022年高校日本代表（U-18W杯）",
+          "source": "https://www.japan-baseball.jp/jp/team/18u/2022/worldcup/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2022
+        },
+        {
+          "kind": "university_award",
+          "label": "2025年秋・東京六大学リーグベストナイン（遊撃手）",
+          "source": "https://sp.baseball.findfriends.jp/player/20040050/",
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "大学生",
@@ -1804,7 +2746,9 @@
       "features": "ミート力が注目される打者。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
-        "https://sp.baseball.findfriends.jp/player/20040135/"
+        "https://sp.baseball.findfriends.jp/player/20040135/",
+        "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+        "https://www.japan-baseball.jp/jp/team/univ/2025/univ_us_japan/player.html"
       ],
       "date_birth": "2004-07-15",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040135/",
@@ -1875,7 +2819,29 @@
       "attention_grade": "B",
       "attention_reason": "アプリ予想：中堅守備の強化を目的とした1位単独指名案。",
       "attention_source": "https://www.hb-nippon.com/articles/18336",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2026年大学日本代表（WCBC）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2026
+        },
+        {
+          "kind": "national_team",
+          "label": "2025年大学日本代表（日米大学野球選手権）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2025/univ_us_japan/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2025
+        },
+        {
+          "kind": "university_award",
+          "label": "2025年秋・東京六大学リーグベストナイン",
+          "source": "https://sp.baseball.findfriends.jp/player/20040135/",
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "大学生",
@@ -1885,11 +2851,16 @@
       "height": 180,
       "weight": 84,
       "hand": "右投左打",
-      "achievement": "甲子園出場経験。九州国際大付高 → 東日本国際大",
+      "achievement": "九州国際大付高 → 東日本国際大",
       "features": "走力が注目される選手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
-        "https://sp.baseball.findfriends.jp/player/20040075/"
+        "https://sp.baseball.findfriends.jp/player/20040075/",
+        "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+        "https://www.japan-baseball.jp/jp/team/18u/2022/worldcup/player.html",
+        "https://column.sp.baseball.findfriends.jp/?id=002-20260824-42&pid=column_detail",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2022.php",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2022.php"
       ],
       "date_birth": "2004-05-26",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040075/",
@@ -1947,6 +2918,66 @@
           "status": "注目度の参考評価",
           "verification_url": "https://dnomotoke.com/archives/20260928001000/"
         }
+      ],
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2026年大学日本代表（WCBC）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2026
+        },
+        {
+          "kind": "national_team",
+          "label": "2022年高校日本代表（U-18W杯）",
+          "source": "https://www.japan-baseball.jp/jp/team/18u/2022/worldcup/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2022
+        },
+        {
+          "kind": "university_award",
+          "label": "2024年春・南東北大学リーグ首位打者・盗塁王・ベストナイン（三塁手）",
+          "source": "https://sp.baseball.findfriends.jp/player/20040075/",
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "university_award",
+          "label": "2025年秋・南東北大学リーグ打点王／2026年春・ベストナイン（外野手）・優秀選手賞",
+          "source": "https://sp.baseball.findfriends.jp/player/20040075/",
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "high_school_home_runs",
+          "label": "高校通算43本塁打",
+          "source": "https://column.sp.baseball.findfriends.jp/?id=002-20260824-42&pid=column_detail",
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2022,
+          "season": "春",
+          "result": "ベスト8",
+          "label": "2022年春の甲子園：ベスト8",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2022.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2022.php",
+            "https://sp.baseball.findfriends.jp/player/20040075/"
+          ],
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2022,
+          "season": "夏",
+          "result": "ベスト16（3回戦敗退）",
+          "label": "2022年夏の甲子園：ベスト16（3回戦敗退）",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+            "https://sp.baseball.findfriends.jp/player/20040075/"
+          ],
+          "checked_at": "2026-10-17"
+        }
       ]
     },
     {
@@ -1983,6 +3014,14 @@
           "evidence_scope": "動画作者の同テーマ解説記事で指名案・理由を確認。",
           "checked_at": "2026-10-15"
         }
+      ],
+      "career_facts": [
+        {
+          "kind": "university_award",
+          "label": "2025年春・秋・仙台六大学リーグベストナイン",
+          "source": "https://sp.baseball.findfriends.jp/player/20040147/",
+          "checked_at": "2026-10-17"
+        }
       ]
     },
     {
@@ -1993,11 +3032,16 @@
       "height": 177,
       "weight": 85,
       "hand": "右投右打",
-      "achievement": "甲子園出場経験。敦賀気比高 → 大商大",
+      "achievement": "敦賀気比高 → 大商大",
       "features": "長打力が注目される外野手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
-        "https://sp.baseball.findfriends.jp/player/20040146/"
+        "https://sp.baseball.findfriends.jp/player/20040146/",
+        "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+        "https://sports.yahoo.co.jp/official/detail/2026101400043-spnaviow",
+        "https://www.kan6bb.jp/rekidai_bestnine/",
+        "https://smart.asahi.com/v/koshien/stats/spring/y2022.php",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2022.php"
       ],
       "date_birth": "2004-12-10",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040146/",
@@ -2047,6 +3091,59 @@
           "status": "注目度の参考評価",
           "verification_url": "https://dnomotoke.com/archives/20260928001000/"
         }
+      ],
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2026年大学日本代表（WCBC）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2026
+        },
+        {
+          "kind": "university_award",
+          "label": "2024年秋・関西六大学リーグ平古場賞／ベストナイン：2024年秋、2025年秋、2026年春",
+          "source": "https://sp.baseball.findfriends.jp/player/20040146/",
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "high_school_home_runs",
+          "label": "高校通算17本塁打",
+          "source": "https://sports.yahoo.co.jp/official/detail/2026101400043-spnaviow",
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "university_award",
+          "label": "2024年秋・関西六大学リーグ担当記者クラブ賞",
+          "source": "https://www.kan6bb.jp/rekidai_bestnine/",
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2022,
+          "season": "春",
+          "result": "1回戦敗退",
+          "label": "2022年春の甲子園：1回戦敗退",
+          "source": "https://smart.asahi.com/v/koshien/stats/spring/y2022.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/spring/y2022.php",
+            "https://sp.baseball.findfriends.jp/player/20040146/"
+          ],
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "koshien",
+          "year": 2022,
+          "season": "夏",
+          "result": "ベスト16（3回戦敗退）",
+          "label": "2022年夏の甲子園：ベスト16（3回戦敗退）",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+            "https://sp.baseball.findfriends.jp/player/20040146/"
+          ],
+          "checked_at": "2026-10-17"
+        }
       ]
     },
     {
@@ -2057,18 +3154,35 @@
       "height": 178,
       "weight": 85,
       "hand": "右投右打",
-      "achievement": "甲子園出場経験。佐久長聖高 → 早大",
+      "achievement": "佐久長聖高 → 早大",
       "features": "長打力が注目される外野手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
-        "https://sp.baseball.findfriends.jp/player/20040153/"
+        "https://sp.baseball.findfriends.jp/player/20040153/",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+        "https://www.kyureki.com/player/235195/tyugaku/"
       ],
       "date_birth": "2004-04-23",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040153/",
       "attention_grade": "E",
       "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "koshien",
+          "year": 2022,
+          "season": "夏",
+          "result": "2回戦敗退（初戦）",
+          "label": "2022年夏の甲子園：2回戦敗退（初戦）",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+            "https://www.kyureki.com/player/235195/tyugaku/"
+          ],
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "社会人",
@@ -2084,14 +3198,38 @@
         "https://www.ntt-east.co.jp/symbol/baseball/contents/mori.html",
         "https://www.sponichi.co.jp/baseball/news/2026/03/03/kiji/20260303s00001003009000c.html",
         "https://baseball.omyutech.com/draftplayer.action?year=2026",
-        "https://sp.baseball.findfriends.jp/player/20050057/"
+        "https://sp.baseball.findfriends.jp/player/20050057/",
+        "https://www.japan-baseball.jp/jp/team/18u/2023/worldcup/player.html",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2023.php"
       ],
       "date_birth": "2005-10-01",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20050057/",
       "attention_grade": "E",
       "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2023年高校日本代表（U-18W杯）",
+          "source": "https://www.japan-baseball.jp/jp/team/18u/2023/worldcup/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2023
+        },
+        {
+          "kind": "koshien",
+          "year": 2023,
+          "season": "夏",
+          "result": "2回戦敗退",
+          "label": "2023年夏の甲子園：2回戦敗退",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2023.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2023.php",
+            "https://sp.baseball.findfriends.jp/player/20050057/"
+          ],
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "社会人",
@@ -2106,14 +3244,40 @@
       "sources": [
         "https://sp.baseball.findfriends.jp/player/20020050/",
         "https://www.mhi.com/jp/company/sports/baseball/east/member",
-        "https://baseball.omyutech.com/draftplayer.action?year=2026"
+        "https://baseball.omyutech.com/draftplayer.action?year=2026",
+        "https://www.japan-baseball.jp/jp/team/univ/2024/haarlem/player.html",
+        "https://www.japan-baseball.jp/jp/team/univ/2024/prague/player.html",
+        "https://omyutech.com/CupHomePageTeamPerson.action?cupId=20200025898&teamId=13031&tpFlag=p"
       ],
       "date_birth": "2002-05-15",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20020050/",
       "attention_grade": "E",
       "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2024年大学日本代表（ハーレム大会）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2024/haarlem/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2024
+        },
+        {
+          "kind": "national_team",
+          "label": "2024年大学日本代表（プラハ大会）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2024/prague/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2024
+        },
+        {
+          "kind": "koshien_exchange",
+          "year": 2020,
+          "label": "2020年甲子園交流試合：出場（トーナメント順位なし）",
+          "source": "https://omyutech.com/CupHomePageTeamPerson.action?cupId=20200025898&teamId=13031&tpFlag=p",
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "社会人",
@@ -2271,14 +3435,23 @@
       "features": "ミート力が注目される打者。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
-        "https://sp.baseball.findfriends.jp/player/20020239/"
+        "https://sp.baseball.findfriends.jp/player/20020239/",
+        "https://meisupo.net/special/22978/"
       ],
       "date_birth": "2002-10-09",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20020239/",
       "attention_grade": "E",
       "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "high_school_home_runs",
+          "label": "高校通算52本塁打",
+          "source": "https://meisupo.net/special/22978/",
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "社会人",
@@ -2385,6 +3558,20 @@
           "reason": "10月の動画でも1位指名候補の章で長打力を紹介。外れ1位予想・仮想2位の両方があるためBを維持。",
           "status": "注目度の参考評価"
         }
+      ],
+      "career_facts": [
+        {
+          "kind": "university_award",
+          "label": "2023年秋・神奈川大学リーグ最多打点・ベストナイン",
+          "source": "https://sp.baseball.findfriends.jp/player/20020174/",
+          "checked_at": "2026-10-17"
+        },
+        {
+          "kind": "representative_camp",
+          "label": "大学日本代表候補合宿に外野手として選出",
+          "source": "https://sp.baseball.findfriends.jp/player/20020174/",
+          "checked_at": "2026-10-17"
+        }
       ]
     },
     {
@@ -2429,7 +3616,15 @@
       "attention_grade": "D",
       "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "university_award",
+          "label": "関西六大学リーグベストナイン（外野手）3回",
+          "source": "https://sp.baseball.findfriends.jp/player/20020196/",
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "社会人",
@@ -2443,14 +3638,38 @@
       "features": "走力が注目される選手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
-        "https://sp.baseball.findfriends.jp/player/20030126/"
+        "https://sp.baseball.findfriends.jp/player/20030126/",
+        "https://www.japan-baseball.jp/jp/team/univ/2024/haarlem/player.html",
+        "https://www.japan-baseball.jp/jp/team/univ/2024/prague/player.html"
       ],
       "date_birth": "2003-02-13",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20030126/",
       "attention_grade": "E",
       "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "label": "2024年大学日本代表（ハーレム大会）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2024/haarlem/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2024
+        },
+        {
+          "kind": "national_team",
+          "label": "2024年大学日本代表（プラハ大会）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2024/prague/player.html",
+          "checked_at": "2026-10-17",
+          "year": 2024
+        },
+        {
+          "kind": "university_award",
+          "label": "立正大学時代にリーグ首位打者・ベストナイン受賞",
+          "source": "https://sp.baseball.findfriends.jp/player/20030126/",
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "社会人",
@@ -2503,7 +3722,16 @@
       "attention_grade": "D",
       "attention_reason": "掲載の総合評価Bを基に、アプリ基準でDに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8729",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "koshien_exchange",
+          "year": 2020,
+          "label": "2020年甲子園交流試合：出場（トーナメント順位なし）",
+          "source": "https://sp.baseball.findfriends.jp/player/20020250/",
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "独立リーグ",
@@ -2639,7 +3867,15 @@
       "attention_grade": "E",
       "attention_reason": "掲載の総合評価Cを基に、アプリ基準でEに分類。媒体の記号とは基準が異なります。",
       "attention_source": "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8729",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "university_award",
+          "label": "2024年秋・関甲新学生リーグ最多安打・最多盗塁・ベストナイン（外野手）",
+          "source": "https://sp.baseball.findfriends.jp/player/20020236/",
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "独立リーグ",
@@ -2675,14 +3911,31 @@
       "sources": [
         "https://musashibears.com/player/tsuboi-sohji",
         "https://bc-l.jp/news.php?keyno=1717",
-        "https://sp.baseball.findfriends.jp/player/20000294/"
+        "https://sp.baseball.findfriends.jp/player/20000294/",
+        "https://smart.asahi.com/v/koshien/stats/summer/y2018.php",
+        "https://ug-baseball.com/senseki/koshien/koshien100/"
       ],
       "date_birth": "2000-12-10",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20000294/",
       "attention_grade": "E",
       "attention_reason": "候補掲載と公開プロフィールを基にした暫定E。指名順位の評価資料は不足しています。",
       "attention_source": "https://musashibears.com/player/tsuboi-sohji",
-      "attention_as_of": "2026-10-15"
+      "attention_as_of": "2026-10-15",
+      "career_facts": [
+        {
+          "kind": "koshien",
+          "year": 2018,
+          "season": "夏",
+          "result": "ベスト8",
+          "label": "2018年夏の甲子園：ベスト8",
+          "source": "https://smart.asahi.com/v/koshien/stats/summer/y2018.php",
+          "sources": [
+            "https://smart.asahi.com/v/koshien/stats/summer/y2018.php",
+            "https://ug-baseball.com/senseki/koshien/koshien100/"
+          ],
+          "checked_at": "2026-10-17"
+        }
+      ]
     },
     {
       "category": "独立リーグ",
@@ -2866,5 +4119,8 @@
       ],
       "used_for_count": 1
     }
-  ]
+  ],
+  "career_checked_at": "2026-10-17",
+  "career_audit_scope": "全67候補を2016〜2026年の侍ジャパン高校・大学代表名簿および登録済み選手紹介と照合。大学タイトル・高校通算本塁打は確認できた公開情報を追加。未掲載情報は未確認。",
+  "koshien_checked_at": "2026-10-17"
 }

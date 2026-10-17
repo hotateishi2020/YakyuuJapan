@@ -89,6 +89,21 @@
       overscroll-behavior-x: none;
     }
     body { margin: 0; }
+    #startup-shell { position: fixed; inset: 0; z-index: 1000; background: white;
+      color: #444; font: 14px Arial, sans-serif; padding-top: env(safe-area-inset-top); }
+    #startup-header { height: 50px; padding: 0 12px; display: flex; align-items: center;
+      justify-content: space-between; background: linear-gradient(100deg,#e10600,#ff9800); color: white; }
+    #startup-brand { font-size: 26px; font-weight: 900; font-style: italic; }
+    #startup-year { background: black; border-radius: 16px; padding: 5px 10px; font-size: 12px; }
+    .startup-tabs { display: flex; gap: 5px; padding: 6px 8px 0; }
+    #startup-board-tabs[hidden] { display: none; }
+    .startup-tab { flex: 1; min-width: 0; text-align: center; border-radius: 18px;
+      background: #e8e8ed; padding: 6px 2px; white-space: nowrap; font-size: clamp(10px,2.4vw,14px); }
+    .startup-tab[data-org="predict"] { flex: 0 0 100px; }
+    .startup-tab.selected { color: white; background: #cb0115; font-weight: bold; }
+    #startup-shell[data-org="mlb"] .selected { background: #002d72; }
+    #startup-status { text-align: center; padding: 40px 12px; color: #666; }
+
     main {
       position: absolute;
       width: 1px;
@@ -103,6 +118,36 @@
   </style>
 </head>
 <body>
+  <div id="startup-shell" aria-busy="true">
+    <header id="startup-header"><span id="startup-brand">Yakyuu! JAPAN</span><span id="startup-year"></span></header>
+    <div class="startup-tabs" aria-label="団体タブ（起動中）">
+      <span class="startup-tab" data-org="predict">予想対決</span>
+      <span class="startup-tab selected" data-org="npb">NPB</span>
+      <span class="startup-tab" data-org="mlb">MLB</span>
+    </div>
+    <div class="startup-tabs" id="startup-board-tabs" aria-label="情報タブ（起動中）">
+      <span class="startup-tab">日程</span><span class="startup-tab selected">試合情報</span>
+      <span class="startup-tab">チーム順位</span><span class="startup-tab">個人成績</span>
+      <span class="startup-tab">戦力</span><span class="startup-tab">記録</span>
+    </div>
+    <div id="startup-status" role="status">読み込んでいます…</div>
+  </div>
+  <script>
+    (() => {
+      const shell = document.getElementById('startup-shell');
+      document.getElementById('startup-year').textContent = new Date().getFullYear();
+      let org = 'npb';
+      try {
+        const cookie = document.cookie.split(';').map(v => v.trim()).find(v => v.startsWith('koko_org='));
+        const saved = cookie ? decodeURIComponent(cookie.slice('koko_org='.length)) : localStorage.getItem('koko_cookie_koko_org');
+        if (['npb', 'mlb', 'predict'].includes(saved)) org = saved;
+      } catch (_) {}
+      shell.dataset.org = org;
+      shell.querySelectorAll('[data-org]').forEach(tab => tab.classList.toggle('selected', tab.dataset.org === org));
+      if (org === 'predict') document.getElementById('startup-board-tabs').hidden = true;
+      window.addEventListener('flutter-first-frame', () => shell.remove(), {once: true});
+    })();
+  </script>
   <main>
     <h1>Yakyuu! Japan — プロ野球とMLBの試合結果・順位表・個人成績</h1>
     <p>セ・リーグとパ・リーグ、メジャーリーグの試合日程、結果、予告先発を掲載しています。順位表では勝敗、ゲーム差、打率、本塁打、防御率まで並べ、ポストシーズンはクライマックスシリーズ、日本シリーズ、ワイルドカード、地区シリーズ、リーグ優勝決定シリーズ、ワールドシリーズの勝ち上がりを追えます。</p>

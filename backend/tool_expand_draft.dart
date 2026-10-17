@@ -58,7 +58,9 @@ Future<void> main() async {
           'height': int.parse(size[1]!),
           'weight': int.parse(size[2]!),
           'hand': fields['投打'],
-          'achievement': '${fields['経歴']?.contains('[甲]') == true ? '甲子園出場経験。' : ''}$career',
+          // School attendance alone does not establish a player's tournament participation.
+          // Verified year/season/results are added as career_facts of kind koshien.
+          'achievement': career,
           'features': '${traits.join('。')}。',
           'sources': [if (profile != null) profile.split('?').first, url]
         });

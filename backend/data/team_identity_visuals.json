@@ -1,0 +1,468 @@
+[
+  {
+    "name": "南海ホークス",
+    "short_name": "南海",
+    "color_back": "#006B3F",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_nankai.jpg",
+    "source": "https://flytoazuresky.tistory.com/759"
+  },
+  {
+    "name": "福岡ダイエーホークス",
+    "short_name": "ダイエー",
+    "color_back": "#F58220",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_daiei.jpg",
+    "source": "https://flytoazuresky.tistory.com/764"
+  },
+  {
+    "name": "阪急ブレーブス",
+    "short_name": "阪急",
+    "color_back": "#B5121B",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_hankyu.jpg",
+    "source": "https://flytoazuresky.tistory.com/796"
+  },
+  {
+    "name": "西鉄ライオンズ",
+    "short_name": "西鉄",
+    "color_back": "#14213D",
+    "color_font": "#FFFFFF",
+    "logo_url": "asset:backend/assets/images/history_nishitetsu.jpg",
+    "source": "https://flytoazuresky.tistory.com/1488"
+  },
+  {
+    "name": "西武ライオンズ",
+    "short_name": "西武",
+    "color_back": "#42A5DB",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_seibu.jpg",
+    "source": "https://flytoazuresky.tistory.com/1488"
+  },
+  {
+    "name": "毎日オリオンズ",
+    "short_name": "毎日",
+    "color_back": "#17427A",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_mainichi.jpg",
+    "source": "https://flytoazuresky.tistory.com/1124"
+  },
+  {
+    "name": "毎日大映オリオンズ",
+    "short_name": "大毎",
+    "color_back": "#17427A",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_daimai.jpg",
+    "source": "https://flytoazuresky.tistory.com/1124"
+  },
+  {
+    "name": "東京オリオンズ",
+    "short_name": "東京",
+    "color_back": "#15366F",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_tokyo_orions.jpg",
+    "source": "https://flytoazuresky.tistory.com/1124"
+  },
+  {
+    "name": "ロッテ・オリオンズ",
+    "short_name": "ロッテ",
+    "color_back": "#2855A1",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_lotte_orions.jpg",
+    "source": "https://flytoazuresky.tistory.com/1124"
+  },
+  {
+    "name": "大洋ホエールズ",
+    "short_name": "大洋",
+    "color_back": "#E57423",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_taiyo.jpg",
+    "source": "https://flytoazuresky.tistory.com/974"
+  },
+  {
+    "name": "横浜ベイスターズ",
+    "short_name": "横浜",
+    "color_back": "#0065AE",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_yokohama.jpg",
+    "source": "https://flytoazuresky.tistory.com/847"
+  },
+  {
+    "name": "オリックス・ブルーウェーブ",
+    "short_name": "オリックス",
+    "color_back": "#253D78",
+    "color_font": "#FFFFFF",
+    "logo_url": "asset:backend/assets/images/history_bluewave.jpg",
+    "source": "https://flytoazuresky.tistory.com/1066"
+  },
+  {
+    "name": "日本ハム・ファイターズ",
+    "short_name": "日本ハム",
+    "color_back": "#E87524",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_nipponham.jpg",
+    "source": "https://flytoazuresky.tistory.com/768"
+  },
+  {
+    "name": "読売ジャイアンツ",
+    "short_name": "巨人",
+    "color_back": "#F58220",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/team_g.png",
+    "source": "既存球団アセット（同名球団の代表ロゴ）"
+  },
+  {
+    "name": "阪神タイガース",
+    "short_name": "阪神",
+    "color_back": "#FFE100",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/team_t.png",
+    "source": "既存球団アセット（同名球団の代表ロゴ）"
+  },
+  {
+    "name": "大阪タイガース",
+    "short_name": "大阪",
+    "color_back": "#FFE100",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/team_t.png",
+    "source": "既存球団アセット（同名球団の代表ロゴ）"
+  },
+  {
+    "name": "中日ドラゴンズ",
+    "short_name": "中日",
+    "color_back": "#005BAC",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/team_d.png",
+    "source": "既存球団アセット（同名球団の代表ロゴ）"
+  },
+  {
+    "name": "名古屋ドラゴンズ",
+    "short_name": "名古屋",
+    "color_back": "#005BAC",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/team_d.png",
+    "source": "既存球団アセット（同名球団の代表ロゴ）"
+  },
+  {
+    "name": "東京ヤクルトスワローズ",
+    "short_name": "ヤクルト",
+    "color_back": "#006837",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/team_s.png",
+    "source": "既存球団アセット（同名球団の代表ロゴ）"
+  },
+  {
+    "name": "ヤクルトスワローズ",
+    "short_name": "ヤクルト",
+    "color_back": "#006837",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/team_s.png",
+    "source": "既存球団アセット（同名球団の代表ロゴ）"
+  },
+  {
+    "name": "横浜DeNAベイスターズ",
+    "short_name": "DeNA",
+    "color_back": "#0079C2",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/team_db.png",
+    "source": "既存球団アセット（同名球団の代表ロゴ）"
+  },
+  {
+    "name": "広島東洋カープ",
+    "short_name": "広島",
+    "color_back": "#C91427",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/team_c.png",
+    "source": "既存球団アセット（同名球団の代表ロゴ）"
+  },
+  {
+    "name": "広島カープ",
+    "short_name": "広島",
+    "color_back": "#C91427",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/team_c.png",
+    "source": "既存球団アセット（同名球団の代表ロゴ）"
+  },
+  {
+    "name": "福岡ソフトバンクホークス",
+    "short_name": "ソフトバンク",
+    "color_back": "#F8C800",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/team_h.png",
+    "source": "既存球団アセット（同名球団の代表ロゴ）"
+  },
+  {
+    "name": "埼玉西武ライオンズ",
+    "short_name": "西武",
+    "color_back": "#17345B",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/team_l.png",
+    "source": "既存球団アセット（同名球団の代表ロゴ）"
+  },
+  {
+    "name": "北海道日本ハムファイターズ",
+    "short_name": "日本ハム",
+    "color_back": "#008ACB",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/team_f.png",
+    "source": "既存球団アセット（同名球団の代表ロゴ）"
+  },
+  {
+    "name": "オリックス・バファローズ",
+    "short_name": "オリックス",
+    "color_back": "#12234A",
+    "color_font": "#FFFFFF",
+    "logo_url": "asset:backend/assets/images/team_bs.png",
+    "source": "既存球団アセット（同名球団の代表ロゴ）"
+  },
+  {
+    "name": "東北楽天ゴールデンイーグルス",
+    "short_name": "楽天",
+    "color_back": "#870010",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/team_e.png",
+    "source": "既存球団アセット（同名球団の代表ロゴ）"
+  },
+  {
+    "name": "千葉ロッテマリーンズ",
+    "short_name": "ロッテ",
+    "color_back": "#333333",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/team_m.png",
+    "source": "既存球団アセット（同名球団の代表ロゴ）"
+  },
+  {
+    "name": "東京巨人",
+    "short_name": "東京巨人",
+    "color_back": "#EA6B20",
+    "color_font": "#111111"
+  },
+  {
+    "name": "阪神",
+    "short_name": "阪神",
+    "color_back": "#FFE100",
+    "color_font": "#111111"
+  },
+  {
+    "name": "名古屋",
+    "short_name": "名古屋",
+    "color_back": "#15366F",
+    "color_font": "#111111"
+  },
+  {
+    "name": "中部日本",
+    "short_name": "名古屋",
+    "color_back": "#15366F",
+    "color_font": "#111111"
+  },
+  {
+    "name": "産業",
+    "short_name": "名古屋",
+    "color_back": "#15366F",
+    "color_font": "#111111"
+  },
+  {
+    "name": "国鉄スワローズ",
+    "short_name": "国鉄",
+    "color_back": "#16365B",
+    "color_font": "#111111"
+  },
+  {
+    "name": "サンケイスワローズ",
+    "short_name": "サンケイ",
+    "color_back": "#CA3038",
+    "color_font": "#111111"
+  },
+  {
+    "name": "サンケイアトムズ",
+    "short_name": "サンケイ",
+    "color_back": "#CA3038",
+    "color_font": "#111111"
+  },
+  {
+    "name": "アトムズ",
+    "short_name": "アトムズ",
+    "color_back": "#C8393F",
+    "color_font": "#111111"
+  },
+  {
+    "name": "ヤクルトアトムズ",
+    "short_name": "アトムズ",
+    "color_back": "#C8393F",
+    "color_font": "#111111"
+  },
+  {
+    "name": "大洋松竹ロビンス",
+    "short_name": "洋松",
+    "color_back": "#214D3A",
+    "color_font": "#111111"
+  },
+  {
+    "name": "横浜大洋ホエールズ",
+    "short_name": "横浜大洋",
+    "color_back": "#124F88",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_yokohama_whales.jpg",
+    "source": "https://www.flickr.com/photos/28475240@N08/3501236000/"
+  },
+  {
+    "name": "南海",
+    "short_name": "南海",
+    "color_back": "#006B3F",
+    "color_font": "#111111"
+  },
+  {
+    "name": "近畿日本",
+    "short_name": "南海",
+    "color_back": "#006B3F",
+    "color_font": "#111111"
+  },
+  {
+    "name": "近畿グレートリング",
+    "short_name": "南海",
+    "color_back": "#006B3F",
+    "color_font": "#111111"
+  },
+  {
+    "name": "西鉄",
+    "short_name": "西鉄",
+    "color_back": "#14213D",
+    "color_font": "#111111"
+  },
+  {
+    "name": "西鉄クリッパース",
+    "short_name": "西鉄",
+    "color_back": "#14213D",
+    "color_font": "#111111"
+  },
+  {
+    "name": "太平洋クラブ・ライオンズ",
+    "short_name": "太平洋",
+    "color_back": "#CF263E",
+    "color_font": "#111111"
+  },
+  {
+    "name": "クラウンライター・ライオンズ",
+    "short_name": "クラウン",
+    "color_back": "#C82735",
+    "color_font": "#111111"
+  },
+  {
+    "name": "東急フライヤーズ",
+    "short_name": "東急",
+    "color_back": "#184C42",
+    "color_font": "#111111"
+  },
+  {
+    "name": "急映フライヤーズ",
+    "short_name": "急映",
+    "color_back": "#C5472B",
+    "color_font": "#111111"
+  },
+  {
+    "name": "東映フライヤーズ",
+    "short_name": "東映",
+    "color_back": "#D25829",
+    "color_font": "#111111"
+  },
+  {
+    "name": "日拓ホーム・フライヤーズ",
+    "short_name": "日拓",
+    "color_back": "#E15E28",
+    "color_font": "#111111"
+  },
+  {
+    "name": "阪急",
+    "short_name": "阪急",
+    "color_back": "#B5121B",
+    "color_font": "#111111"
+  },
+  {
+    "name": "オリックス・ブレーブス",
+    "short_name": "オリックス",
+    "color_back": "#253D78",
+    "color_font": "#111111"
+  },
+  {
+    "name": "近鉄パールス",
+    "short_name": "近鉄",
+    "color_back": "#D72236",
+    "color_font": "#111111"
+  },
+  {
+    "name": "近鉄バファロー",
+    "short_name": "近鉄",
+    "color_back": "#D72236",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_kintetsu.jpg",
+    "source": "https://flytoazuresky.tistory.com/1067"
+  },
+  {
+    "name": "近鉄バファローズ",
+    "short_name": "近鉄",
+    "color_back": "#D72236",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_kintetsu.jpg",
+    "source": "https://flytoazuresky.tistory.com/1067"
+  },
+  {
+    "name": "大阪近鉄バファローズ",
+    "short_name": "近鉄",
+    "color_back": "#D72236",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_kintetsu.jpg",
+    "source": "https://flytoazuresky.tistory.com/1067"
+  },
+  {
+    "name": "松竹ロビンス",
+    "short_name": "松竹",
+    "color_back": "#973847",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_shochiku.png",
+    "source": "https://commons.wikimedia.org/wiki/File:Shochiku_Robins_insignia.png"
+  },
+  {
+    "name": "太陽ロビンス",
+    "short_name": "松竹",
+    "color_back": "#973847",
+    "color_font": "#111111"
+  },
+  {
+    "name": "大陽ロビンス",
+    "short_name": "松竹",
+    "color_back": "#973847",
+    "color_font": "#111111"
+  },
+  {
+    "name": "大映スターズ",
+    "short_name": "大映",
+    "color_back": "#29456D",
+    "color_font": "#111111"
+  },
+  {
+    "name": "大映ユニオンズ",
+    "short_name": "大映",
+    "color_back": "#29456D",
+    "color_font": "#111111"
+  },
+  {
+    "name": "高橋ユニオンズ",
+    "short_name": "高橋",
+    "color_back": "#1D6356",
+    "color_font": "#111111"
+  },
+  {
+    "name": "トンボユニオンズ",
+    "short_name": "トンボ",
+    "color_back": "#235C95",
+    "color_font": "#111111"
+  },
+  {
+    "name": "西日本パイレーツ",
+    "short_name": "西日本",
+    "color_back": "#192E4F",
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_nishinippon.png",
+    "source": "https://commons.wikimedia.org/wiki/File:Nishi_Nippon_Pirates_insignia.png"
+  }
+]

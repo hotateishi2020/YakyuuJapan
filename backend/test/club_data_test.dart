@@ -21,6 +21,15 @@ void main() {
     expect(clubKey({'name_short': '福岡ソフトバンクホークス'}), 'h');
     expect(clubKey({'name_shortest': 'NYM'}), 'NYM');
   });
+  test('削除済み予定を保存日程から復活させず、有効な重複行は残す', () {
+    final deleted = <String,dynamic>{'datetime_start': '2026-10-16 18:00:00',
+      'id_team_home': 1, 'id_team_away': 2, 'state': '試合前', 'flg_delete': true};
+    expect(mergeSeasonSchedule(teams, [fixture], [deleted]), isEmpty);
+    final kept = mergeSeasonSchedule(teams, [fixture], [deleted, {...deleted, 'flg_delete': false}]);
+    expect(kept, hasLength(1));
+    expect(kept.single['name_home_logo'], '巨人');
+    expect(mergeSeasonSchedule(teams, [{...fixture, 'finished': true}], [deleted]), hasLength(1));
+  });
   test('終了と雨天中止を反映し、未開始データで確定結果を消さない', () {
     var games = mergeSeasonSchedule(teams, [
       fixture

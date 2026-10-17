@@ -8791,7 +8791,14 @@
       ],
       "source": "https://www.youtube.com/watch?v=tKuzjLT8zII",
       "location": "福岡県宮若市",
-      "period": "2026年1月"
+      "period": "2026年1月",
+      "sources": [
+        "https://www.youtube.com/watch?v=tKuzjLT8zII"
+      ],
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17"
     },
     {
       "name": "鴨川合同自主トレ",
@@ -8819,7 +8826,14 @@
       ],
       "source": "https://www.city.kamogawa.lg.jp/site/shisetsu/39343.html",
       "location": "鴨川市総合運動施設",
-      "period": "2026年1月7日〜25日"
+      "period": "2026年1月7日〜25日",
+      "sources": [
+        "https://www.city.kamogawa.lg.jp/site/shisetsu/39343.html"
+      ],
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17"
     },
     {
       "name": "千賀・大竹自主トレ",
@@ -8835,7 +8849,15 @@
       ],
       "source": "https://www.softbankhawks.co.jp/news/detail/202600995105.html",
       "location": "",
-      "period": "2026年1月"
+      "period": "2026年1月",
+      "sources": [
+        "https://www.softbankhawks.co.jp/news/detail/202600995105.html"
+      ],
+      "orgs": [
+        "npb",
+        "mlb"
+      ],
+      "checked_at": "2026-10-17"
     },
     {
       "name": "野村勇自主トレ",
@@ -8847,7 +8869,14 @@
       ],
       "source": "https://tv.softbankhawks.co.jp/playlist/1b4a7b65cd4d4d70be2b97fe2ff294ec",
       "location": "琵琶湖周辺",
-      "period": "2026年1月"
+      "period": "2026年1月",
+      "sources": [
+        "https://tv.softbankhawks.co.jp/playlist/1b4a7b65cd4d4d70be2b97fe2ff294ec"
+      ],
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17"
     },
     {
       "name": "柳田自主トレ",
@@ -8859,11 +8888,686 @@
         {
           "name": "笹川吉康",
           "team": "ソフトバンク"
+        },
+        {
+          "name": "清宮幸太郎",
+          "team": "日本ハム"
+        },
+        {
+          "name": "安田尚憲",
+          "team": "ロッテ"
+        },
+        {
+          "name": "梶原昂希",
+          "team": "DeNA"
         }
       ],
       "source": "https://www.softbankhawks.co.jp/weeklyhawks/20260123/01.html",
-      "location": "大分県",
-      "period": "2026年1月"
+      "location": "大分県佐伯市",
+      "period": "2026年1月",
+      "sources": [
+        "https://www.softbankhawks.co.jp/weeklyhawks/20260123/01.html",
+        "https://pacificleague.com/news/2026/1/10046237"
+      ],
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17"
+    },
+    {
+      "name": "近藤健介・チーム天城",
+      "members": [
+        {
+          "name": "近藤健介",
+          "team": "ソフトバンク"
+        },
+        {
+          "name": "藤岡裕大",
+          "team": "ロッテ"
+        },
+        {
+          "name": "西川龍馬",
+          "team": "オリックス"
+        },
+        {
+          "name": "石川亮",
+          "team": "オリックス"
+        },
+        {
+          "name": "平沼翔太",
+          "team": "オリックス"
+        },
+        {
+          "name": "渡邉諒",
+          "team": "オイシックス"
+        },
+        {
+          "name": "大盛穂",
+          "team": "広島"
+        },
+        {
+          "name": "武岡龍世",
+          "team": "ヤクルト"
+        }
+      ],
+      "source": "https://teamamagi.bitfan.id/",
+      "sources": [
+        "https://teamamagi.bitfan.id/",
+        "https://www.nikkansports.com/baseball/photonews/photonews_nsInc_202601150000147-3.html"
+      ],
+      "location": "鹿児島県天城町・天城町総合運動公園",
+      "period": "2026年1月6日〜21日",
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17"
+    },
+    {
+      "name": "坂本勇人合同自主トレ",
+      "members": [
+        {
+          "name": "坂本勇人",
+          "team": "巨人"
+        },
+        {
+          "name": "石塚裕惺",
+          "team": "巨人"
+        },
+        {
+          "name": "湯浅大",
+          "team": "巨人"
+        },
+        {
+          "name": "増田陸",
+          "team": "巨人"
+        },
+        {
+          "name": "廣岡大志",
+          "team": "オリックス"
+        },
+        {
+          "name": "秋広優人",
+          "team": "ソフトバンク"
+        },
+        {
+          "name": "平良竜哉",
+          "team": "楽天"
+        }
+      ],
+      "source": "https://www.nikkansports.com/baseball/news/202601200000805.html?mode=all",
+      "sources": [
+        "https://www.nikkansports.com/baseball/news/202601200000805.html?mode=all"
+      ],
+      "location": "沖縄県那覇市",
+      "period": "2026年1月",
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17"
+    },
+    {
+      "name": "源田壮亮合同自主トレ",
+      "members": [
+        {
+          "name": "源田壮亮",
+          "team": "西武"
+        },
+        {
+          "name": "滝澤夏央",
+          "team": "西武"
+        },
+        {
+          "name": "金子功児",
+          "team": "西武"
+        }
+      ],
+      "source": "https://www.nikkansports.com/baseball/news/202601230000977.html?mode=all",
+      "sources": [
+        "https://www.nikkansports.com/baseball/news/202601230000977.html?mode=all"
+      ],
+      "location": "群馬県前橋市",
+      "period": "2026年1月",
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17"
+    },
+    {
+      "name": "牧原大成合同自主トレ",
+      "members": [
+        {
+          "name": "牧原大成",
+          "team": "ソフトバンク"
+        },
+        {
+          "name": "西尾歩真",
+          "team": "ソフトバンク"
+        },
+        {
+          "name": "藤野恵音",
+          "team": "ソフトバンク"
+        }
+      ],
+      "source": "https://www.nikkansports.com/baseball/news/202601230001119.html",
+      "sources": [
+        "https://www.nikkansports.com/baseball/news/202601230001119.html"
+      ],
+      "location": "",
+      "period": "2026年1月",
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17"
+    },
+    {
+      "name": "吉田正尚合同自主トレ",
+      "members": [
+        {
+          "name": "吉田正尚",
+          "team": "レッドソックス"
+        },
+        {
+          "name": "藤原恭大",
+          "team": "ロッテ"
+        },
+        {
+          "name": "澤井廉",
+          "team": "ヤクルト"
+        }
+      ],
+      "source": "https://news.mynavi.jp/article/20260129-4045586/",
+      "sources": [
+        "https://news.mynavi.jp/article/20260129-4045586/",
+        "https://cocokara-next.com/athlete_celeb/ren-sawai-determination/"
+      ],
+      "location": "沖縄県",
+      "period": "2026年1月",
+      "orgs": [
+        "npb",
+        "mlb"
+      ],
+      "checked_at": "2026-10-17"
+    },
+    {
+      "name": "大島洋平合同自主トレ",
+      "members": [
+        {
+          "name": "大島洋平",
+          "team": "中日"
+        },
+        {
+          "name": "加藤匠馬",
+          "team": "中日"
+        },
+        {
+          "name": "石伊雄太",
+          "team": "中日"
+        },
+        {
+          "name": "尾田剛樹",
+          "team": "中日"
+        },
+        {
+          "name": "味谷大誠",
+          "team": "中日"
+        }
+      ],
+      "source": "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all",
+      "sources": [
+        "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all"
+      ],
+      "location": "",
+      "period": "2026年1月",
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17",
+      "as_of": "2026-01-08"
+    },
+    {
+      "name": "秋山翔吾合同自主トレ",
+      "members": [
+        {
+          "name": "秋山翔吾",
+          "team": "広島"
+        },
+        {
+          "name": "板山祐太郎",
+          "team": "中日"
+        },
+        {
+          "name": "五十幡亮汰",
+          "team": "日本ハム"
+        },
+        {
+          "name": "鈴木将平",
+          "team": "くふうハヤテ"
+        }
+      ],
+      "source": "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all",
+      "sources": [
+        "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all"
+      ],
+      "location": "",
+      "period": "2026年1月",
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17",
+      "as_of": "2026-01-08"
+    },
+    {
+      "name": "大野雄大合同自主トレ",
+      "members": [
+        {
+          "name": "大野雄大",
+          "team": "中日"
+        },
+        {
+          "name": "橋本侑樹",
+          "team": "中日"
+        },
+        {
+          "name": "梅野雄吾",
+          "team": "中日"
+        }
+      ],
+      "source": "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all",
+      "sources": [
+        "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all"
+      ],
+      "location": "",
+      "period": "2026年1月",
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17",
+      "as_of": "2026-01-08"
+    },
+    {
+      "name": "岩嵜翔合同自主トレ",
+      "members": [
+        {
+          "name": "岩嵜翔",
+          "team": "オリックス"
+        },
+        {
+          "name": "松山晋也",
+          "team": "中日"
+        },
+        {
+          "name": "土生翔太",
+          "team": "中日"
+        },
+        {
+          "name": "福田幸之介",
+          "team": "中日"
+        },
+        {
+          "name": "内野海斗",
+          "team": "ソフトバンク"
+        }
+      ],
+      "source": "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all",
+      "sources": [
+        "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all"
+      ],
+      "location": "",
+      "period": "2026年1月",
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17",
+      "as_of": "2026-01-08"
+    },
+    {
+      "name": "岩崎優・TEAM ZAKI",
+      "members": [
+        {
+          "name": "岩崎優",
+          "team": "阪神"
+        },
+        {
+          "name": "髙橋遥人",
+          "team": "阪神"
+        },
+        {
+          "name": "桐敷拓馬",
+          "team": "阪神"
+        },
+        {
+          "name": "及川雅貴",
+          "team": "阪神"
+        }
+      ],
+      "source": "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all",
+      "sources": [
+        "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all"
+      ],
+      "location": "",
+      "period": "2026年1月",
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17",
+      "as_of": "2026-01-08"
+    },
+    {
+      "name": "岩貞祐太合同自主トレ",
+      "members": [
+        {
+          "name": "岩貞祐太",
+          "team": "阪神"
+        },
+        {
+          "name": "坂本誠志郎",
+          "team": "阪神"
+        },
+        {
+          "name": "伊藤将司",
+          "team": "阪神"
+        }
+      ],
+      "source": "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all",
+      "sources": [
+        "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all"
+      ],
+      "location": "",
+      "period": "2026年1月",
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17",
+      "as_of": "2026-01-08"
+    },
+    {
+      "name": "甲斐拓也合同自主トレ",
+      "members": [
+        {
+          "name": "甲斐拓也",
+          "team": "巨人"
+        },
+        {
+          "name": "山瀬慎之助",
+          "team": "巨人"
+        },
+        {
+          "name": "石原貴規",
+          "team": "広島"
+        },
+        {
+          "name": "大友宗",
+          "team": "ソフトバンク"
+        },
+        {
+          "name": "石塚綜一郎",
+          "team": "ソフトバンク"
+        },
+        {
+          "name": "牧原巧汰",
+          "team": "ソフトバンク"
+        },
+        {
+          "name": "盛島稜大",
+          "team": "ソフトバンク"
+        },
+        {
+          "name": "藤田健斗",
+          "team": "阪神"
+        },
+        {
+          "name": "東妻純平",
+          "team": "DeNA"
+        },
+        {
+          "name": "鈴木叶",
+          "team": "ヤクルト"
+        }
+      ],
+      "source": "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all",
+      "sources": [
+        "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all"
+      ],
+      "location": "",
+      "period": "2026年1月",
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17",
+      "as_of": "2026-01-08"
+    },
+    {
+      "name": "青柳晃洋合同自主トレ",
+      "members": [
+        {
+          "name": "青柳晃洋",
+          "team": "ヤクルト"
+        },
+        {
+          "name": "下川隼佑",
+          "team": "ヤクルト"
+        },
+        {
+          "name": "生田目翼",
+          "team": "日本ハム"
+        },
+        {
+          "name": "廣畑敦也",
+          "team": "ロッテ"
+        },
+        {
+          "name": "村上頌樹",
+          "team": "阪神"
+        },
+        {
+          "name": "深沢鳳介",
+          "team": "DeNA"
+        }
+      ],
+      "source": "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all",
+      "sources": [
+        "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all"
+      ],
+      "location": "静岡県沼津市",
+      "period": "2026年1月",
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17",
+      "as_of": "2026-01-08"
+    },
+    {
+      "name": "大竹耕太郎合同自主トレ",
+      "members": [
+        {
+          "name": "大竹耕太郎",
+          "team": "阪神"
+        },
+        {
+          "name": "板東湧梧",
+          "team": "巨人"
+        },
+        {
+          "name": "小島和哉",
+          "team": "ロッテ"
+        },
+        {
+          "name": "高野脩汰",
+          "team": "ロッテ"
+        },
+        {
+          "name": "早川隆久",
+          "team": "楽天"
+        },
+        {
+          "name": "佐々木明都",
+          "team": "ソフトバンク"
+        }
+      ],
+      "source": "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all",
+      "sources": [
+        "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all"
+      ],
+      "location": "",
+      "period": "2026年1月",
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17",
+      "as_of": "2026-01-08"
+    },
+    {
+      "name": "上林誠知合同自主トレ",
+      "members": [
+        {
+          "name": "上林誠知",
+          "team": "中日"
+        },
+        {
+          "name": "森下翔太",
+          "team": "阪神"
+        },
+        {
+          "name": "西川史礁",
+          "team": "ロッテ"
+        }
+      ],
+      "source": "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all",
+      "sources": [
+        "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all"
+      ],
+      "location": "",
+      "period": "2026年1月",
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17",
+      "as_of": "2026-01-08"
+    },
+    {
+      "name": "大西広樹合同自主トレ",
+      "members": [
+        {
+          "name": "大西広樹",
+          "team": "ヤクルト"
+        },
+        {
+          "name": "伊原陵人",
+          "team": "阪神"
+        }
+      ],
+      "source": "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all",
+      "sources": [
+        "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all"
+      ],
+      "location": "",
+      "period": "2026年1月",
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17",
+      "as_of": "2026-01-08"
+    },
+    {
+      "name": "牧秀悟合同自主トレ",
+      "members": [
+        {
+          "name": "牧秀悟",
+          "team": "DeNA"
+        },
+        {
+          "name": "田内真翔",
+          "team": "DeNA"
+        }
+      ],
+      "source": "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all",
+      "sources": [
+        "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all"
+      ],
+      "location": "",
+      "period": "2026年1月",
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17",
+      "as_of": "2026-01-08"
+    },
+    {
+      "name": "山﨑伊織合同自主トレ",
+      "members": [
+        {
+          "name": "山﨑伊織",
+          "team": "巨人"
+        },
+        {
+          "name": "赤星優志",
+          "team": "巨人"
+        },
+        {
+          "name": "園田純規",
+          "team": "巨人"
+        }
+      ],
+      "source": "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all",
+      "sources": [
+        "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all"
+      ],
+      "location": "",
+      "period": "2026年1月",
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17",
+      "as_of": "2026-01-08"
+    },
+    {
+      "name": "大勢合同自主トレ",
+      "members": [
+        {
+          "name": "大勢",
+          "team": "巨人"
+        },
+        {
+          "name": "堀田賢慎",
+          "team": "巨人"
+        }
+      ],
+      "source": "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all",
+      "sources": [
+        "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all"
+      ],
+      "location": "",
+      "period": "2026年1月",
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17",
+      "as_of": "2026-01-08"
+    },
+    {
+      "name": "岡林勇希合同自主トレ",
+      "members": [
+        {
+          "name": "岡林勇希",
+          "team": "中日"
+        },
+        {
+          "name": "前川右京",
+          "team": "阪神"
+        }
+      ],
+      "source": "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all",
+      "sources": [
+        "https://www.nikkansports.com/baseball/news/202601080000951.html?mode=all"
+      ],
+      "location": "",
+      "period": "2026年1月",
+      "orgs": [
+        "npb"
+      ],
+      "checked_at": "2026-10-17",
+      "as_of": "2026-01-08"
     }
-  ]
+  ],
+  "training_checked_at": "2026-10-17"
 }

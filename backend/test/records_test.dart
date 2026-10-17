@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:test/test.dart';
 import '../app/Records.dart';
+import '../app/AwardValues.dart';
 import '../app/MlbRecordStreaks.dart';
 import '../app/RecordCatalog.dart';
 import '../app/RecordSources.dart';
@@ -12,6 +13,71 @@ Map<String, dynamic> team(int year, int id, int rank) => {'year': year, 'id_team
 Map<String, dynamic> game(int id, {bool loaded = true}) => {'id': id, 'id_team_home': 1, 'id_team_away': 2, 'flg_stats_loaded': loaded};
 Map<String, dynamic> box(int game, int player, {String decision = '', int runs = 0, int hits = 0, int walks = 0, int ab = 1}) => {'id_game': game, 'id_player': player, 'name': '選手$player', 'int_batting': ab, 'int_hit1': hits, 'int_fourball': walks, 'int_pitch': decision.isEmpty ? 0 : 20, 'int_runs': runs, 'code_result_pitcher': decision};
 void main() {
+  test('表彰カードから受賞回数ではなく成績を取り出す', () {
+    expect(npbAwardValue('首位打者賞', '首位打者賞 選手 打率 .316 初受賞'), {'value': '0.316', 'unit': ''});
+    expect(npbAwardValue('最優秀中継ぎ投手賞', 'ホールドポイント 43 2年ぶり3度目'), {'value': '43', 'unit': 'HP'});
+    expect(npbAwardValue('最優秀防御率', '防御率 1.38 初受賞')['value'], '1.38');
+    expect(npbAwardValue('MVP', '4年ぶり3度目'), isEmpty);
+    expect(npbAwardValue('最多勝利', '初受賞'), isEmpty);
+  });
+  test('受賞者に同年度・同リーグ・同タイトルの記録値を引き継ぐ', () {
+    final statistical = [
+      {'year': 2025, 'league': 'セ・リーグ', 'categories': [
+        {'label': '本塁打王', 'players': [
+          {'id_player': 1, 'name': '選手太郎', 'value': '40', 'unit': '本'},
+          {'id_player': 2, 'name': '選手次郎', 'value': '40', 'unit': '本'},
+        ]},
+        {'label': '首位打者', 'players': [
+          {'name': '別人', 'value': '0.350', 'unit': ''},
+        ]},
+      ]},
+    ];
+    final awards = [
+      {'year': 2025, 'league': 'セ・リーグ', 'categories': [
+        {'label': '最多本塁打者賞', 'players': [
+          {'name': '選手 太郎', 'value': '受賞'},
+          {'id_player': 2, 'name': '登録名変更', 'value': ''},
+        ]},
+        {'label': '首位打者', 'players': [{'name': '公式選手', 'value': '受賞'}]},
+        {'label': 'MVP', 'players': [{'name': '選手太郎', 'value': '受賞'}]},
+      ]},
+      {'year': 2024, 'league': 'セ・リーグ', 'categories': [
+        {'label': '本塁打王', 'players': [{'name': '選手太郎', 'value': '受賞'}]},
+      ]},
+    ];
+    final result = mergeRecordAwards(statistical, awards, 2025);
+    final categories = result.first['categories'] as List;
+    expect(categories[0]['players'].map((p) => p['value']), ['40', '40']);
+    expect(categories[0]['players'].map((p) => p['unit']), ['本', '本']);
+    expect(categories[1]['players'][0]['value'], '受賞');
+    expect(categories[2]['players'][0]['value'], '受賞');
+    expect(result.last['categories'][0]['players'][0]['value'], '受賞');
+  });
+  test('MLB career includes ties at rank 50 and excludes rank 52', () {
+    final metric = recordMetrics.firstWhere((m) => m.key == 'hr');
+    final result = parseMlbRecord({'stats': [{'splits': [
+      for (var i = 0; i < 52; i++) {'player': {'fullName': 'Player $i'}, 'stat': {metric.mlb: i == 50 ? 951 : 1000 - i}}
+    ]}]}, metric, career: true);
+    expect(result.length, 51);
+    expect(result.last['rank'], 50);
+  });
+  test('award colors use the award year and spaced historical team names', () {
+    final result = colorRecordTitles([{'year': 1988, 'categories': [{'players': [
+      {'name': '選手', 'team': '(南　海)'}, {'name': '別選手', 'team': ''},
+      {'name': '第三選手', 'team': '南海ホークス', 'id_team': 1}
+    ]}]}], [
+      {'year': 1988, 'id_team': 1, 'short_name': '南海', 'color_back': '#006600', 'color_font': '#ffffff'},
+      {'year': 2026, 'id_team': 1, 'short_name': 'ソフトバンク', 'color_back': '#ffff00'},
+      {'year': 1988, 'id_team': 2, 'short_name': '阪急'}
+    ], [{'year': 1988, 'name': '別選手', 'id_team': 2, 'color_back': '#000033', 'color_font': '#eeeeee'}]);
+    final players = result.first['categories'][0]['players'];
+    expect(players[0]['color_back'], '#006600');
+    expect(players[0]['color_font'], '#ffffff');
+    expect(players[1]['color_back'], '#000033');
+    expect(players[0]['team'], '南海');
+    expect(players[1]['team'], '阪急');
+    expect(players[2]['team'], '南海');
+  });
   test('official game logs exclude postseason and distinguish sacrifice fly from bunt', () {
     final result = mlbGameLogStreaks([
       {
@@ -101,6 +167,29 @@ void main() {
     expect(result.single['categories'][0]['players'][0]['name'], '公式');
   });
 
+  test('同じ球団IDでも年度別の旧名称を保持する', () {
+    final result = buildRecordStandings([
+      {...team(1988, 7, 1), 'name': '南海ホークス', 'short_name': '南海', 'historical_identity': true},
+      {...team(2004, 7, 1), 'name': '福岡ダイエーホークス', 'short_name': 'ダイエー', 'historical_identity': true},
+      {...team(2005, 7, 1), 'name': '福岡ソフトバンクホークス', 'short_name': 'ソフトバンク', 'historical_identity': false},
+    ], [], OrgKind.npb);
+    final teams = result.map((s) => (s['leagues'] as List).first['teams'][0]).toList();
+    expect(teams.map((t) => t['short_name']), ['ソフトバンク', 'ダイエー', '南海']);
+    expect(teams.last['name'], '南海ホークス');
+    expect(teams.last['historical_identity'], true);
+  });
+
+  test('1936〜1949年のNPBは1位を日本一とし1950年以降とMLBには適用しない', () {
+    final rows = [for (final year in [1935,1936,1949,1950])
+      for (final rank in [1,2]) {'year':year,'id_team':rank,'id_league':1,
+        'int_rank':rank,'name':'球団$rank'}];
+    final npb = buildRecordStandings(rows, [], OrgKind.npb);
+    for (final season in npb) {
+      expect(season['champion'], [1936,1949].contains(season['year']) ? '球団1' : null);
+    }
+    final mlb = buildRecordStandings([for (final r in rows) {...r,'id_league':3}], [], OrgKind.mlb);
+    expect(mlb.every((s) => s['champion'] == null), isTrue);
+  });
   test('standings are newest first and champions need the series winning threshold', () {
     final playoffs = [
       for (var i = 0; i < 3; i++) {'year': 2025, 'id_team_home': 1, 'id_team_away': 2, 'score_home': 3, 'score_away': 0, 'code_game': 'JS', 'state': '試合終了'}

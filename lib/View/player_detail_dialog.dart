@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../tools/Env.dart';
 import '../tools/json_utils.dart';
-import '../tools/external_link.dart';
 import '../logic/player_honors.dart';
 import 'strength_contracts.dart' show contractSalaryLabel;
 
@@ -105,11 +104,7 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
       padding: const EdgeInsets.only(top: 20, bottom: 8),
       child: Text(s,
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)));
-  Widget source(dynamic url) => url == null || '$url'.isEmpty
-      ? const SizedBox.shrink()
-      : TextButton(
-          onPressed: () => openExternalLink('$url'),
-          child: const Text('出典', style: TextStyle(fontSize: 11)));
+  Widget source(dynamic url) => const SizedBox.shrink();
   Widget facts(Map<String, dynamic> values) =>
       Wrap(spacing: 10, runSpacing: 8, children: [
         for (final e in values.entries)
@@ -169,8 +164,7 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
             '奪三振',
             '自責点',
             '打席結果',
-            '出典'
-          ])
+            ])
             DataColumn(label: Text(label))
         ],
         rows: [
@@ -200,7 +194,6 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
                 DataCell(Text(listMapFromJson(game['plays'])
                     .map((r) => '${r['inning']}回 ${r['result']}')
                     .join(' / '))),
-                DataCell(source(game['source'])),
               ]);
             })()
         ],

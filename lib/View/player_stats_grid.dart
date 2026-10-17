@@ -29,9 +29,10 @@ num? statNumeric(Map<String, dynamic> r) {
 }
 
 class PlayerStatsGrid extends StatefulWidget {
-  const PlayerStatsGrid({super.key, required this.rows, required this.batting});
+  const PlayerStatsGrid({super.key, required this.rows, required this.batting, this.showBallSelection = true});
   final List<Map<String, dynamic>> rows;
   final bool batting;
+  final bool showBallSelection;
   @override
   State<PlayerStatsGrid> createState() => _PlayerStatsGridState();
 }
@@ -45,7 +46,7 @@ class _PlayerStatsGridState extends State<PlayerStatsGrid> {
       for (final r in widget.rows)
         if ('${r['title'] ?? ''}'.isNotEmpty) '${r['title']}',
       ...(widget.batting ? extraBattingTitles : extraPitchingTitles)
-    }.toList();
+    }.where((title) => widget.showBallSelection || title != 'ボール球見極め率').toList();
     final people = <String, Map<String, dynamic>>{};
     final values = <String, Map<String, Map<String, dynamic>>>{};
     for (final r in widget.rows) {

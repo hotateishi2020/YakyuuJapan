@@ -1,3 +1,4 @@
+import 'team_section_layout.dart';
 import '../logic/roster_leadership.dart';
 import 'player_detail_dialog.dart';
 import 'package:flutter/material.dart';
@@ -72,7 +73,7 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Wrap(spacing: 8, children: [
+            if (!TeamSectionLayout.embedded(context)) Wrap(spacing: 8, children: [
               ChoiceChip(
                   label: const Text('守備位置別'),
                   selected: !_battingOrder,
@@ -86,7 +87,7 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
               _fixedCell('球団', Colors.grey.shade200, Colors.black87,
                   height: 44, width: columnWidth),
               Expanded(
-                  child: SingleChildScrollView(
+                  child: sectionScrollView(context, 
                 controller: _header,
                 physics: const NeverScrollableScrollPhysics(),
                 scrollDirection: Axis.horizontal,
@@ -107,13 +108,13 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
                 ]),
               )),
             ]),
-            Expanded(
-                child: Scrollbar(
+            SectionExpanded(
+                child: SectionScrollbar(
               controller: _horizontal,
               thumbVisibility: true,
               notificationPredicate: (notification) =>
                   notification.metrics.axis == Axis.horizontal,
-              child: SingleChildScrollView(
+              child: sectionScrollView(context, 
                 key: const ValueKey('regular-vertical-scroll'),
                 controller: _vertical,
                 child: Column(
@@ -136,7 +137,7 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
                                   width: columnWidth),
                           ]),
                           Expanded(
-                              child: SingleChildScrollView(
+                              child: sectionScrollView(context, 
                             key: const ValueKey('regular-horizontal-scroll'),
                             controller: _horizontal,
                             scrollDirection: Axis.horizontal,
@@ -181,12 +182,7 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
 
   TableRow _row(Map<String, dynamic> team) {
     final selected = _battingOrder
-        ? {
-            for (final group in listMapFromJson(team['batting_order']))
-              '${group['slot']}':
-                  selectRegularGroups([group])['${group['slot']}'] ??
-                      <Map<String, dynamic>>[]
-          }
+        ? selectRegularGroups(listMapFromJson(team['batting_order']))
         : {
             ...selectRegularGroups(listMapFromJson(team['positions'])),
             ...selectPitcherAces(team)
@@ -283,7 +279,7 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
   bool _usageOrder = true;
   @override
   Widget build(BuildContext context) => Column(children: [
-        Row(children: [
+        if (!TeamSectionLayout.embedded(context)) Row(children: [
           for (final usage in [false, true])
             Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -292,7 +288,7 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
                     selected: _usageOrder == usage,
                     onSelected: (_) => setState(() => _usageOrder = usage))),
         ]),
-        Expanded(child: _grid(context)),
+        SectionExpanded(child: _grid(context)),
       ]);
   static const _minColumnWidth = 104.0 * 0.7;
   Widget _grid(BuildContext context) {
@@ -360,7 +356,7 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
           child: Column(children: [
             Row(children: [
               _rosterHeader(_usageOrder ? '起用' : '年齢', columnWidth,
-                  Colors.grey.shade200, Colors.black87),
+                  _usageOrder ? Colors.black : Colors.grey.shade200, _usageOrder ? Colors.white : Colors.black87),
               for (final position in positions)
                 _rosterHeader(
                     position,
@@ -371,7 +367,7 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
             ]),
             Row(children: [
               _rosterHeader(
-                  '', columnWidth, Colors.grey.shade200, Colors.black87),
+                  '', columnWidth, _usageOrder ? Colors.black : Colors.grey.shade200, _usageOrder ? Colors.white : Colors.black87),
               for (final col in columns)
                 _rosterHeader(
                     '${col.hand}${_pitching(col.position) ? '投げ' : '打ち'}',
@@ -379,8 +375,8 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
                     _positionColor(col.position),
                     _positionForeground(col.position)),
             ]),
-            Expanded(
-                child: SingleChildScrollView(
+            SectionExpanded(
+                child: sectionScrollView(context, 
               key: const ValueKey('roster-vertical-scroll'),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -402,10 +398,11 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
                         for (final age in ages)
                           TableRow(children: [
                             ColoredBox(
-                                color: Colors.grey.shade100,
+                                color: _usageOrder ? Colors.black : Colors.grey.shade100,
                                 child: _cell(_usageOrder
                                     ? (age == 0 ? '起用未確認' : '$age軍')
-                                    : (age == null ? '不明' : '$age歳'))),
+                                    : (age == null ? '不明' : '$age歳'),
+                                    color: _usageOrder ? Colors.white : Colors.black87)),
                             for (final position in positions)
                               Container(
                                 color: Color.lerp(Colors.white,
@@ -529,6 +526,7 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
 
   Widget _player(Map<String, dynamic> p, String position) {
     final departure = rosterDepartureLabel(p);
+    final firstTeamRow = _usageOrder && rosterMainLevel(p) == 1;
     final leadership = rosterLeadershipRoles(p, team, year);
     final marks = [
       if (usageInt(p['contract_end_year']) == year) '契',
@@ -539,8 +537,7 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
         message: [
           if (p['lower_level_usage'] is Map)
             for (final entry in (p['lower_level_usage'] as Map).entries)
-              '${entry.key}軍起用：${entry.value['coverage'] == 'verified_partial' ? '公開記録の一部' : '公式戦'} ${entry.value['appearances']}試合\n出典：${entry.value['source']}',
-          if (p['status_source'] != null) '出典：${p['status_source']}',
+              '${entry.key}軍起用：${entry.value['coverage'] == 'verified_partial' ? '公開記録の一部' : '公式戦'} ${entry.value['appearances']}試合',
           if (p['status_as_of'] != null) '確認日：${p['status_as_of']}',
           if (p['level_appearances'] is Map)
             '出場数：${(p['level_appearances'] as Map).entries.map((e) => '${e.key}軍 ${e.value}').join('／')}',
@@ -559,34 +556,36 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    PlayerNameLink(player:{...p,'id_team':team['id_team']},child:_fitRosterText(
-                        '${p['name']}${marks.isEmpty ? '' : ' 【${marks.join('・')}】'}',
-                        bold: true,
-                        size: 12)),
                     if (leadership.isNotEmpty)
                       Wrap(spacing: 4, runSpacing: 3, children: [
                         for (final role in leadership)
                           Tooltip(
-                            message: '$year年 ${role.label}${role.detail.isEmpty ? '' : '（${role.detail}）'}\n出典：${role.source}',
+                            message: '$year年 ${role.label}${role.detail.isEmpty ? '' : '（${role.detail}）'}',
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                               decoration: BoxDecoration(
-                                color: role.label == 'キャプテン' ? Colors.amber.shade100 : Colors.blue.shade50,
+                                color: const Color(0xFFDC143C),
                                 borderRadius: BorderRadius.circular(3),
                               ),
-                              child: Text(role.label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold,
-                                color: role.label == 'キャプテン' ? Colors.brown.shade800 : Colors.blue.shade900)),
+                              child: _fitRosterText(role.label, bold: true, size: 10,
+                                color: Colors.white),
                             ),
                           ),
                       ]),
+                    if (leadership.isNotEmpty) const SizedBox(height: 3),
+                    PlayerNameLink(player:{...p,'id_team':team['id_team']},child:_fitRosterText(
+                        '${p['name']}${marks.isEmpty ? '' : ' 【${marks.join('・')}】'}',
+                        bold: true,
+                        size: 12)),
                     if (departure != null)
                       _fitRosterText(departure, color: Colors.red, bold: true),
                     if (rosterUsageUnknown(p, team)) _fitRosterText('（起用不明）'),
-                    _fitRosterText(rosterLevel(p)),
+                    if (!firstTeamRow) _fitRosterText(rosterLevel(p)),
                     if (_usageOrder)
                       _fitRosterText(
                           rosterWorkloadLabel(p, team, rosterMainLevel(p))),
-                    if (p['registration'] != null)
+                    if (p['registration'] != null &&
+                        !(firstTeamRow && p['registration'] == '支配下'))
                       _fitRosterText('${p['registration']}'),
                   ])),
         ));
@@ -609,11 +608,11 @@ class _WideGridState extends State<_WideGrid> {
   }
 
   @override
-  Widget build(BuildContext context) => Scrollbar(
+  Widget build(BuildContext context) => SectionScrollbar(
         controller: _controller,
         thumbVisibility: true,
         scrollbarOrientation: ScrollbarOrientation.top,
-        child: SingleChildScrollView(
+        child: sectionScrollView(context, 
             controller: _controller,
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.only(top: 12),

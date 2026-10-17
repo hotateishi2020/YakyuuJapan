@@ -131,12 +131,14 @@ String? teamLogoAsset(String name) {
     '日本ハム': 'backend/assets/images/team_f.png',
     'バファローズ': 'backend/assets/images/team_bs.png',
     'オリックス': 'backend/assets/images/team_bs.png',
-    'イーグルス': 'backend/assets/images/team_e.png',
+    // 「イーグルス」だけでは戦前の別球団も一致するため、楽天と特定できる名前のみ。
+    'ゴールデンイーグルス': 'backend/assets/images/team_e.png',
     '楽天': 'backend/assets/images/team_e.png',
     'マリーンズ': 'backend/assets/images/team_m.png',
     'ロッテ': 'backend/assets/images/team_m.png',
   };
-  final trimmed = name.trim();
+  var trimmed = String.fromCharCodes(name.trim().runes.map((c) => c >= 0xFF01 && c <= 0xFF5E ? c - 0xFEE0 : c));
+  if (['de', 'dena', 'デ', 'ディーエヌエー'].contains(trimmed.toLowerCase())) trimmed = 'DeNA';
   if (trimmed.isEmpty) return null;
   final keys = logos.keys.toList()..sort((a, b) => b.length.compareTo(a.length));
   for (final key in keys) {

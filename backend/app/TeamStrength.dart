@@ -173,6 +173,7 @@ class TeamStrength {
     }
     await StrengthUsage.attachStatuses(org, year, teams);
     await Postgres.withConnection((conn) => attachRosterBirthplaces(conn, teams));
+    if (org == 'npb') await fillNpbBirthplaces(teams);
     await Postgres.withConnection((conn) => conn.runTx((tx) async {
           await StrengthUsage.saveTotals(tx, org, year, teams);
           await tx.execute('''

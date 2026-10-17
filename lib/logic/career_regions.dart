@@ -10,9 +10,68 @@ const japanRegions = {
 };
 
 List<String> careerRegionPath(Map<String, dynamic> value) {
-  final place =
-      '${value['birth_place'] ?? value['area'] ?? value['prefecture'] ?? ''}'
-          .trim();
+  final rawPlace = [
+    value['birth_place'],
+    value['birth_state'],
+    value['area'],
+    value['prefecture']
+  ]
+      .map((v) => '${v ?? ''}'.trim())
+      .firstWhere((v) => v.isNotEmpty, orElse: () => '');
+  const englishPrefectures = [
+    'Hokkaido',
+    'Aomori',
+    'Iwate',
+    'Miyagi',
+    'Akita',
+    'Yamagata',
+    'Fukushima',
+    'Ibaraki',
+    'Tochigi',
+    'Gunma',
+    'Saitama',
+    'Chiba',
+    'Tokyo',
+    'Kanagawa',
+    'Niigata',
+    'Toyama',
+    'Ishikawa',
+    'Fukui',
+    'Yamanashi',
+    'Nagano',
+    'Gifu',
+    'Shizuoka',
+    'Aichi',
+    'Mie',
+    'Shiga',
+    'Kyoto',
+    'Osaka',
+    'Hyogo',
+    'Nara',
+    'Wakayama',
+    'Tottori',
+    'Shimane',
+    'Okayama',
+    'Hiroshima',
+    'Yamaguchi',
+    'Tokushima',
+    'Kagawa',
+    'Ehime',
+    'Kochi',
+    'Fukuoka',
+    'Saga',
+    'Nagasaki',
+    'Kumamoto',
+    'Oita',
+    'Miyazaki',
+    'Kagoshima',
+    'Okinawa'
+  ];
+  final englishIndex = englishPrefectures
+      .indexWhere((p) => p.toLowerCase() == rawPlace.toLowerCase());
+  final place = englishIndex < 0
+      ? rawPlace
+      : japanRegions.values.expand((p) => p).elementAt(englishIndex);
   for (final region in japanRegions.entries) {
     for (final prefecture in region.value) {
       final short = prefecture.replaceFirst(RegExp(r'[都府県]$'), '');
@@ -24,7 +83,14 @@ List<String> careerRegionPath(Map<String, dynamic> value) {
       return ['日本', region.key, prefecture, if (rest.isNotEmpty) rest];
     }
   }
-  final country = '${value['birth_country'] ?? value['country'] ?? ''}'.trim();
+  final rawCountry =
+      '${value['birth_country'] ?? value['country'] ?? ''}'.trim();
+  final country = const {
+        'Japan': '日本',
+        'USA': 'アメリカ',
+        'United States': 'アメリカ'
+      }[rawCountry] ??
+      rawCountry;
   return [if (country.isNotEmpty) country, if (place.isNotEmpty) place];
 }
 

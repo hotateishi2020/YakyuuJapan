@@ -278,7 +278,7 @@ class ScheduleGameTile extends StatelessWidget {
   const ScheduleGameTile({super.key, required this.game});
   final Map<String, dynamic> game;
   Widget logo(String side) {
-    final raw = '${game['name_$side'] ?? ''}';
+    final raw = '${game['name_${side}_logo'] ?? game['name_$side'] ?? ''}'.trim();
     const names = {'巨':'巨人','神':'阪神','中':'中日','ヤ':'ヤクルト','広':'広島','De':'DeNA','ソ':'ソフトバンク','日':'日本ハム','ロ':'ロッテ','西':'西武','楽':'楽天','オ':'オリックス'};
     final name = names[raw] ?? raw;
     final visual = teamLogoVisual(name, abbrev: '${game['${side}_code'] ?? ''}');

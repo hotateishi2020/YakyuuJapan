@@ -29,7 +29,7 @@ class MlbBracketGeom {
   static const wcY = 290.0;
   static const dsY = 210.0;
   static const csY = 130.0;
-  static const wsY = 48.0;
+  static const wsY = 59.0;
 
   /// AL 表示スロット（左→右）= シード 1,4,5,3,6,2
   static const alXs = <double>[55, 130, 205, 280, 355, 430];
@@ -66,7 +66,7 @@ class MlbBracketGeom {
   static double get nlCsX => (nlDs2X + nlDs1X) / 2;
 
   /// 枠をチーム列より狭くし、縦線が枠の「少し横」を通ってから左右辺へ直角に入るようにする。
-  static final ws = Rect.fromCenter(center: const Offset(boardW / 2, wsY), width: 200, height: 44);
+  static final ws = Rect.fromCenter(center: const Offset(boardW / 2, wsY), width: 380, height: 110);
   static Rect get alCs => Rect.fromCenter(center: Offset(alCsX, csY), width: 120, height: 34);
   static Rect get nlCs => Rect.fromCenter(center: Offset(nlCsX, csY), width: 120, height: 34);
   static Rect get alDs1 => Rect.fromCenter(center: Offset(alDs1X, dsY), width: 88, height: 30);
@@ -135,7 +135,7 @@ class MlbPostseasonBracket extends StatelessWidget {
               left: MlbBracketGeom.boardW - 10 - 88,
               asset: 'backend/assets/images/logo_nl.png',
             ),
-            _stageBox(MlbBracketGeom.ws, 'WORLD SERIES', fontSize: 14, background: const Color(0xFF111111)),
+            _worldSeriesBox(MlbBracketGeom.ws, board),
             _stageBox(MlbBracketGeom.alCs, 'ALCS', background: _alColor),
             _stageBox(MlbBracketGeom.nlCs, 'NLCS', background: _nlColor),
             _stageBox(MlbBracketGeom.alDs1, 'ALDS', fontSize: 10, background: _alColor),
@@ -167,6 +167,123 @@ class MlbPostseasonBracket extends StatelessWidget {
     );
   }
 
+  BracketTeam? _finalist(StageResult stage, List<BracketTeam> teams) {
+    if (!stage.decided || stage.winnerId == null) return null;
+    for (final team in teams) {
+      if (team.id > 0 && team.id == stage.winnerId) return team;
+    }
+    return null;
+  }
+
+  Widget _worldSeriesBox(Rect rect, MlbPostseasonBoard board) {
+    final central = _finalist(board.alCs, board.american);
+    final pacific = _finalist(board.nlCs, board.national);
+    return Positioned(
+      left: rect.left,
+      top: rect.top,
+      width: rect.width,
+      height: rect.height,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: Colors.black, width: 2),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(2),
+          child: Column(
+            children: [
+              const ColoredBox(
+                color: Color(0xFF061F3F),
+                child: SizedBox(
+                  height: 22,
+                  width: double.infinity,
+                  child: Center(
+                    child: Text('ワールドシリーズ', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, height: 1.05)),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Stack(
+                  key: const Key('postseason-ws-content'),
+                  clipBehavior: Clip.hardEdge,
+                  children: [
+                    Positioned.fill(
+                      child: Center(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(width: 72, child: central == null ? null : _worldSeriesFinalist(central, wins: board.worldSeries.winsHigh, slots: board.worldSeries.slots, alignLeft: true, eliminated: board.eliminated(central.id))),
+                            const SizedBox(width: 8),
+                            const SizedBox(width: 180, child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 2),
+                              child: Image(image: AssetImage('backend/assets/images/logo_world_series_2026.png'), fit: BoxFit.contain),
+                            )),
+                            const SizedBox(width: 8),
+                            SizedBox(width: 72, child: pacific == null ? null : _worldSeriesFinalist(pacific, wins: board.worldSeries.winsLow, slots: board.worldSeries.slots, alignLeft: false, eliminated: board.eliminated(pacific.id))),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (central != null && pacific != null)
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Text(
+                          '${board.worldSeries.winsHigh} - ${board.worldSeries.winsLow}',
+                          key: const Key('postseason-ws-score'),
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, height: 1, color: Colors.black87),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _worldSeriesFinalist(BracketTeam? team, {required int wins, required int slots, required bool alignLeft, required bool eliminated}) {
+    if (team == null || team.id <= 0 || team.name.isEmpty) return const SizedBox(width: 8);
+    final visual = teamLogoVisual(team.name, abbrev: team.nameShortest);
+    final logo = SizedBox(
+      key: Key('postseason-ws-team-${team.id}'),
+      width: 52,
+      height: 52,
+      child: Opacity(opacity: eliminated ? .35 : 1, child: teamLogoImage(asset: visual.asset, networkUrl: visual.networkUrl)),
+    );
+    final stars = Column(
+      key: Key('postseason-ws-stars-${team.id}'),
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var i = 0; i < slots; i++)
+          Text(
+            i < wins ? '★' : '☆',
+            style: TextStyle(
+              fontSize: 11,
+              height: 1,
+              color: i < wins ? _winLine : Colors.black87,
+              shadows: i < wins
+                  ? const [
+                      Shadow(offset: Offset(-0.6, 0), color: Colors.black87),
+                      Shadow(offset: Offset(0.6, 0), color: Colors.black87),
+                      Shadow(offset: Offset(0, -0.6), color: Colors.black87),
+                      Shadow(offset: Offset(0, 0.6), color: Colors.black87),
+                    ]
+                  : null,
+            ),
+          ),
+      ],
+    );
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (alignLeft) ...[SizedBox(width: 16, child: stars), const SizedBox(width: 4), logo],
+        if (!alignLeft) ...[logo, const SizedBox(width: 4), SizedBox(width: 16, child: stars)],
+      ],
+    );
+  }
+
   List<Widget> _stars(MlbPostseasonBoard board) {
     const cardTop = MlbBracketGeom.cardTop;
     final alWc45 = MlbBracketGeom.alWc45Box;
@@ -179,7 +296,6 @@ class MlbPostseasonBracket extends StatelessWidget {
     final nlDs2 = MlbBracketGeom.nlDs2;
     final alCs = MlbBracketGeom.alCs;
     final nlCs = MlbBracketGeom.nlCs;
-    final ws = MlbBracketGeom.ws;
     return [
       // AL WC 4-5
       _starsOnLine(MlbBracketGeom.al4, alWc45.center.dy, cardTop, toLeft: true, wins: board.alWc45.winsHigh, slots: 2),
@@ -195,7 +311,6 @@ class MlbPostseasonBracket extends StatelessWidget {
       // AL LCS / WS
       _starsOnLine(MlbBracketGeom.alDs1X, alCs.center.dy, alDs1.top, toLeft: true, wins: board.alCs.winsHigh, slots: 4),
       _starsOnLine(MlbBracketGeom.alDs2X, alCs.center.dy, alDs2.top, toLeft: false, wins: board.alCs.winsLow, slots: 4),
-      _starsOnLine(MlbBracketGeom.alCsX, ws.center.dy, alCs.top, toLeft: true, wins: board.worldSeries.winsHigh, slots: 4),
       // NL WC
       _starsOnLine(MlbBracketGeom.nl6, nlWc36.center.dy, cardTop, toLeft: true, wins: board.nlWc36.winsLow, slots: 2),
       _starsOnLine(MlbBracketGeom.nl3, nlWc36.center.dy, cardTop, toLeft: false, wins: board.nlWc36.winsHigh, slots: 2),
@@ -209,7 +324,6 @@ class MlbPostseasonBracket extends StatelessWidget {
       // NL LCS / WS
       _starsOnLine(MlbBracketGeom.nlDs2X, nlCs.center.dy, nlDs2.top, toLeft: true, wins: board.nlCs.winsLow, slots: 4),
       _starsOnLine(MlbBracketGeom.nlDs1X, nlCs.center.dy, nlDs1.top, toLeft: false, wins: board.nlCs.winsHigh, slots: 4),
-      _starsOnLine(MlbBracketGeom.nlCsX, ws.center.dy, nlCs.top, toLeft: false, wins: board.worldSeries.winsLow, slots: 4),
     ];
   }
 
@@ -509,7 +623,7 @@ class _MlbBracketLinePainter extends CustomPainter {
     upToSide(MlbBracketGeom.alDs2X, alDs2.top, alCs, toLeft: false, win: wonNextMlbRound(board.alDs2, board.alCs));
 
     // ALCS → WS
-    upToSide(MlbBracketGeom.alCsX, alCs.top, ws, toLeft: true, win: wonNextMlbRound(board.alCs, board.worldSeries));
+    upToSide(MlbBracketGeom.alCsX, alCs.top, ws, toLeft: true, win: reachesMlbWorldSeries(board.alCs));
 
     final nl4Won = board.nlWc45.decided && board.nlWc45.winnerId == nl[3].id;
     final nl5Won = board.nlWc45.decided && board.nlWc45.winnerId == nl[4].id;
@@ -531,7 +645,7 @@ class _MlbBracketLinePainter extends CustomPainter {
     upToSide(MlbBracketGeom.nlDs1X, nlDs1.top, nlCs, toLeft: false, win: wonNextMlbRound(board.nlDs1, board.nlCs));
 
     // NLCS → WS
-    upToSide(MlbBracketGeom.nlCsX, nlCs.top, ws, toLeft: false, win: wonNextMlbRound(board.nlCs, board.worldSeries));
+    upToSide(MlbBracketGeom.nlCsX, nlCs.top, ws, toLeft: false, win: reachesMlbWorldSeries(board.nlCs));
   }
 
   @override

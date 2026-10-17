@@ -6,13 +6,97 @@ import 'package:http/testing.dart';
 import 'package:Yakyuu_Japan/View/club_hub_board.dart';
 import 'package:Yakyuu_Japan/View/team_strength_board.dart';
 import 'package:Yakyuu_Japan/View/EventCalendar.dart';
+import 'package:Yakyuu_Japan/View/GamesBoard.dart' show teamLogoAsset;
 import 'package:Yakyuu_Japan/View/SeasonTable.dart';
 import 'package:Yakyuu_Japan/config/org_config.dart';
 import 'package:Yakyuu_Japan/logic/club_analysis.dart';
 import 'package:Yakyuu_Japan/logic/season_schedule.dart';
 
 void main() {
+  test('戦前のイーグルスに楽天のロゴを割り当てない', () {
+    expect(teamLogoAsset('イーグルス'), isNull);
+    expect(teamLogoAsset('大和軍'), isNull);
+    for (final name in ['楽天', '東北楽天ゴールデンイーグルス', 'ゴールデンイーグルス']) {
+      expect(teamLogoAsset(name), 'backend/assets/images/team_e.png');
+    }
+  });
+  testWidgets('分析の評価色とクリック時のOAA根拠を表示する', (t) async {
+    await t.binding.setSurfaceSize(const Size(1200, 800));
+    addTearDown(() => t.binding.setSurfaceSize(null));
+    await http.runWithClient(() async {
+      await t.pumpWidget(MaterialApp(home: Scaffold(body: ClubHubBoard(
+        org: OrgConfig.mlb, year: 2026, view: 10, teamSection: (_, __) => const SizedBox.shrink(),
+        teams: [for (var i=1; i<=2; i++) {
+          'id_team': i, 'name_team': '球団$i', 'color_back': '#003366', 'color_font': '#ffffff',
+          'defense_analysis': {'infield': {'metric': 'OAA', 'year': 2026, 'value': i == 1 ? 20 : -20,
+            'source_url': 'https://baseballsavant.mlb.com/', 'checked_at': '2026-10-17'}},
+        }],
+      ))));
+      await t.pumpAndSettle();
+      final badge = find.byKey(const ValueKey('analysis-grade-1-内野守備'));
+      expect((t.widget<Container>(badge).decoration as BoxDecoration).color, clubAnalysisGradeColors['S']);
+      await t.tap(badge);
+      await t.pumpAndSettle();
+      expect(find.byType(AlertDialog), findsOneWidget);
+      expect(find.textContaining('OAA：20.0'), findsWidgets);
+      expect(find.text('指標の出典'), findsNothing);
+      await t.tap(find.text('閉じる'));
+      await t.pumpAndSettle();
+      final tableFinder = find.byKey(const ValueKey('analysis-table'));
+      final table = t.widget<DataTable>(tableFinder);
+      expect(table.headingRowColor!.resolve({}), Colors.black);
+      expect(table.headingTextStyle!.color, Colors.white);
+      expect(table.border!.verticalInside.style, BorderStyle.solid);
+      expect(table.border!.horizontalInside.style, BorderStyle.solid);
+      final teamCell = find.byKey(const ValueKey('analysis-team-1'));
+      expect(t.widget<Container>(teamCell).color, const Color(0xFF003366));
+      await t.binding.setSurfaceSize(const Size(1600, 800));
+      await t.pumpAndSettle();
+      expect(t.getSize(tableFinder).width, closeTo(1600, 1));
+      await t.binding.setSurfaceSize(const Size(600, 800));
+      await t.pumpAndSettle();
+      expect(t.getSize(tableFinder).width, 1240);
+      final horizontal = find.descendant(
+        of: find.byKey(const ValueKey('analysis-horizontal-scroll')),
+        matching: find.byType(Scrollable),
+      );
+      expect(t.state<ScrollableState>(horizontal).position.maxScrollExtent, greaterThan(600));
+      await t.drag(horizontal, const Offset(-300, 0));
+      await t.pumpAndSettle();
+      expect(t.state<ScrollableState>(horizontal).position.pixels, greaterThan(0));
+      expect(t.takeException(), isNull);
+    }, () => MockClient((_) async => http.Response('{}', 200)));
+  });
+  test('守備OAAは比較球団すべてが同年度で揃った場合だけ使用する', () {
+    Map<String, dynamic> team(int id, int value, int year) => {
+      'id_team': id,
+      'defense_analysis': {'infield': {'metric': 'OAA', 'year': year, 'value': value}},
+      'fielding_stats': [{'position': 'SS', 'putouts': 99, 'assists': 0, 'errors': 1}],
+    };
+    final complete = analyzeClubs([team(1, 10, 2026), team(2, -10, 2026)], 2026);
+    expect(complete.first['grades']['内野守備'], 'S');
+    expect(complete.last['grades']['内野守備'], 'G');
+    expect(complete.first['defense_methods']['内野守備'], 'OAA');
+    final incomplete = analyzeClubs([team(1, 10, 2026), team(2, -10, 2025)], 2026);
+    expect(incomplete.first['defense_methods']['内野守備'], '失策参考');
+    expect(incomplete.first['metrics']['内野守備'], .99);
+  });
+  test('分析の8段階は指定された色を使用する', () {
+    expect(clubAnalysisGradeColors.values, [
+      const Color(0xFFFFD700), const Color(0xFFFF80AB), const Color(0xFFEF5350),
+      const Color(0xFFFF9800), const Color(0xFFFFEB3B), const Color(0xFFB2DB59),
+      const Color(0xFF81D4FA), const Color(0xFFBDBDBD),
+    ]);
+  });
   final game = <String, dynamic>{'date': '2026-10-16', 'id_team_home': 1, 'id_team_away': 2, 'name_home': '巨', 'name_away': '神', 'score_home': 3, 'score_away': 1, 'finished': true, 'regular': true, 'league_home': 1, 'league_away': 2};
+  testWidgets('CSの横浜の略称デでも球団ロゴを表示する', (t) async {
+    await t.pumpWidget(const MaterialApp(home: Scaffold(body: ScheduleGameTile(game: {
+      'name_away': 'デ', 'name_home': '神', 'finished': false,
+    }))));
+    expect(find.byWidgetPredicate((w) => w is Image && w.image is AssetImage &&
+      (w.image as AssetImage).assetName == 'backend/assets/images/team_db.png'), findsOneWidget);
+    expect(find.byIcon(Icons.sports_baseball), findsNothing);
+  });
   test('21日間は月・年境界を跨ぎ、本日を中央に含む', () {
     final days = scheduleWindow(DateTime(2026, 1, 1));
     expect(days.length, 21);
@@ -50,6 +134,28 @@ void main() {
     expect(relativeGrade(null, [1, 2]), '—');
     expect(relativeGrade(1, [1, 1]), 'C');
     expect(clubMetrics({})['内野守備'], isNull);
+  });
+  test('走力はチーム盗塁と盗塁死を試合数で補正する', () {
+    final team = <String, dynamic>{'game_count': 100, 'batting_stats': [
+      {'stolen_bases': 30, 'caught_stealing': 5},
+      {'stolen_bases': 20, 'caught_stealing': 2},
+    ]};
+    expect(clubMetrics(team)['走力'], closeTo(.36, .00001));
+    expect(clubMetrics({...team, 'game_count': 50})['走力'], closeTo(.72, .00001));
+    expect(clubMetrics({'game_count': 100, 'batting_stats': [{'stolen_bases': 10}]})['走力'], isNull);
+  });
+  test('守備は位置別失策率で評価し、外野合計と個別位置を重複しない', () {
+    Map<String, dynamic> row(String pos, int po, int assists, int errors) =>
+      {'position': pos, 'putouts': po, 'assists': assists, 'errors': errors};
+    final metrics = clubMetrics({'fielding_stats': [
+      row('1B', 80, 10, 10), row('SS', 40, 60, 0),
+      row('LF', 90, 5, 5), row('OF', 90, 5, 5),
+      row('P', 0, 0, 99), row('C', 0, 0, 99),
+    ]});
+    expect(metrics['内野守備'], closeTo(.95, .00001));
+    expect(metrics['外野守備'], closeTo(.95, .00001));
+    expect(clubMetrics({'fielding_stats': [row('OF', 100, 0, 0)]})['外野守備'], 1);
+    expect(clubMetrics({'fielding_stats': [row('OF', 0, 0, 0)]})['外野守備'], isNull);
   });
   test('平均年齢は複数守備の同一選手を重複集計しない', () {
     final rows = analyzeClubs([
@@ -142,7 +248,7 @@ void main() {
               body: TeamStrengthBoard(org: OrgConfig.npb, year: 2026, providedTeams: [
         {'id_team': 1, 'name_team': '巨人'}
       ]))));
-      for (final label in ['チーム', '首脳', '自主トレ', '分析']) {
+      for (final label in ['チーム', '自主トレ', '分析']) {
         expect(find.text(label), findsOneWidget);
       }
       await t.tap(find.text('チーム'));
@@ -168,7 +274,7 @@ void main() {
     }));
     expect(clubRequests, 1);
   });
-  testWidgets('首脳グリッドと自主トレグループを公式出典付きで表示', (t) async {
+  testWidgets('首脳と自主トレは出典リンクなしで内容を表示', (t) async {
     final data = {
       'clubs': [
         {
@@ -186,7 +292,8 @@ void main() {
             {'name': 'A', 'team': '巨人'},
             {'name': 'B', 'team': '阪神'}
           ],
-          'source': 'https://npb.jp/'
+          'source': 'https://npb.jp/',
+          'sources': ['https://npb.jp/', 'https://www.nikkansports.com/baseball/']
         }
       ]
     };
@@ -199,8 +306,10 @@ void main() {
       expect(t.takeException(), isNull);
       await t.pumpWidget(board(9));
       await t.pumpAndSettle();
-      expect(find.text('合同組　2人'), findsOneWidget);
-      expect(find.text('A (巨人)'), findsOneWidget);
+      expect(find.text('合同組  2人'), findsOneWidget);
+      expect(find.text('A'), findsOneWidget);
+      expect(find.text('出典：npb.jp'), findsNothing);
+      expect(find.text('出典：www.nikkansports.com'), findsNothing);
       expect(t.takeException(), isNull);
     }, () => MockClient((r) async => http.Response(jsonEncode(data), 200, headers: {'content-type': 'application/json; charset=utf-8'})));
   });
@@ -219,7 +328,7 @@ void main() {
                     portraitLayout: true,
                     showScheduleColumns: true,
                     scheduleGames: [game])))));
-    expect(find.text('対神\n勝–負–分'), findsOneWidget);
+    expect(find.text('神\n勝–負–分'), findsOneWidget);
     expect(find.text('1–0–0'), findsOneWidget);
     expect(t.takeException(), isNull);
   });

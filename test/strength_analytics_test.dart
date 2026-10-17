@@ -7,6 +7,16 @@ import 'package:Yakyuu_Japan/View/SeasonTable.dart';
 import 'package:Yakyuu_Japan/pages/display_settings_page.dart';
 
 void main() {
+  test('投手の負担割合は左右でなく実投球回を先発と救援に分ける', () {
+    final band = pitchingRoleBand({'pitching_workload': [
+      {'starter_outs': 150, 'relief_outs': 30, 'total_outs': 180},
+      {'starter_outs': 0, 'relief_outs': 120, 'total_outs': 120},
+    ]});
+    expect(band['total'], 300);
+    expect((band['players'] as List).map((p) => p['count']), [150, 150]);
+    expect((band['players'] as List).map((p) => p['name']), ['先発', '中継ぎ・抑え']);
+    expect(pitchingRoleBand({})['players'], isEmpty);
+  });
   testWidgets('MLB生涯年俸は為替未確認でも全ドル年俸をドル札で表示する', (tester) async {
     await tester.pumpWidget(MaterialApp(
         home: Scaffold(

@@ -32,7 +32,7 @@ String contractSalaryLabel(Map<String, dynamic> salary) {
 
 String contractExchangeTooltip(Map<String, dynamic> salary) {
   if (salary['projected'] == true) {
-    return '${contractSalaryLabel(salary)}\n${salary['projection_note']}\n${salary['contract_source_url'] ?? ''}';
+    return '${contractSalaryLabel(salary)}\n${salary['projection_note']}';
   }
   if (salary['usd_jpy_rate'] == null) return contractSalaryLabel(salary);
   return '${contractSalaryLabel(salary)}\n契約日：${salary['signed_date']}\n'
@@ -164,7 +164,7 @@ List<Map<String, dynamic>> contractTimelineBands(List<Map<String, dynamic>> peri
       'team': salary['team'],
       'annual_evidence': true,
       'period': '$year年 所属履歴',
-      'detail': '${salary['detail'] ?? ''}\n${salary['source_url'] ?? ''}',
+      'detail': '${salary['detail'] ?? ''}',
     });
   }
   return bands;
@@ -642,7 +642,7 @@ class _StrengthContractsState extends State<StrengthContracts> {
                                                 width: chartWidth,
                                                 child: Stack(children: [
                                                   for (var y = first; y <= last; y++) Positioned(left: (y - first) * yearWidth, top: 0, bottom: 0, child: Container(width: yearWidth, decoration: BoxDecoration(color: y == year ? Colors.amber.withValues(alpha: .18) : null, border: Border(left: BorderSide(color: Colors.grey.shade300))))),
-                                                  for (var i = 0; i < bands.length; i++) Positioned(left: (usageInt(bands[i]['start_year']) - first) * yearWidth + 2, top: 4, width: (usageInt(bands[i]['end_year']) - usageInt(bands[i]['start_year']) + 1) * yearWidth - 4, height: periodHeight, child: Tooltip(message: '${bands[i]['period'] ?? ''} ${bands[i]['detail'] ?? ''}\n${bands[i]['source_url'] ?? ''}', child: Container(alignment: Alignment.centerLeft, padding: const EdgeInsets.symmetric(horizontal: 6), decoration: BoxDecoration(color: contractTeamColor(bands[i], colorTeams), borderRadius: BorderRadius.circular(4)), child: Text(bands[i]['start_year'] == bands[i]['end_year'] ? '${bands[i]['start_year']} ${bands[i]['team'] ?? ''}' : '${bands[i]['start_year']}–${bands[i]['end_year']} ${bands[i]['team'] ?? ''}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: contractTeamColor(bands[i], colorTeams).computeLuminance() > .179 ? Colors.black : Colors.white))))),
+                                                  for (var i = 0; i < bands.length; i++) Positioned(left: (usageInt(bands[i]['start_year']) - first) * yearWidth + 2, top: 4, width: (usageInt(bands[i]['end_year']) - usageInt(bands[i]['start_year']) + 1) * yearWidth - 4, height: periodHeight, child: Tooltip(message: '${bands[i]['period'] ?? ''} ${bands[i]['detail'] ?? ''}', child: Container(alignment: Alignment.centerLeft, padding: const EdgeInsets.symmetric(horizontal: 6), decoration: BoxDecoration(color: contractTeamColor(bands[i], colorTeams), borderRadius: BorderRadius.circular(4)), child: Text(bands[i]['start_year'] == bands[i]['end_year'] ? '${bands[i]['start_year']} ${bands[i]['team'] ?? ''}' : '${bands[i]['start_year']}–${bands[i]['end_year']} ${bands[i]['team'] ?? ''}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: contractTeamColor(bands[i], colorTeams).computeLuminance() > .179 ? Colors.black : Colors.white))))),
                                                   for (final note in futureNotes.entries)
                                                     Positioned(
                                                       left: (note.key - first) * yearWidth + 4,
@@ -665,7 +665,7 @@ class _StrengthContractsState extends State<StrengthContracts> {
                                                       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                                                         for (final event in entry.value)
                                                           Tooltip(
-                                                            message: '${event['detail']}\n${event['source_url']}',
+                                                            message: '${event['detail']}',
                                                             child: InkWell(
                                                               onTap: () => showStrengthSource(context, '${entry.key}年 ${contractFaLabel(event)}', '${event['detail'] ?? ''}', ['${event['source_url']}']),
                                                               child: Container(

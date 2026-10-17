@@ -1,8 +1,26 @@
 import 'package:test/test.dart';
+import 'package:shelf/shelf.dart';
 
 import '../app/LogDetail.dart';
 
 void main() {
+  test('接続元IPとブラウザ・端末を記録する', () {
+    final info = LogDetail.clientInfo(Request('GET', Uri.parse('https://example.test/'), headers: {
+      'x-forwarded-for': '203.0.113.8, 10.0.0.1',
+      'user-agent': 'Mozilla/5.0 (Windows NT 10.0) Chrome/130.0 Safari/537.36 Edg/130.0',
+    }));
+    expect(info['ip_address'], '203.0.113.8');
+    expect(info['browser'], 'Edge');
+    expect(info['device_type'], 'PC');
+    final mobile = LogDetail.clientInfo(Request('GET', Uri.parse('https://example.test/'), headers: {
+      'user-agent': 'Mozilla/5.0 (iPhone) CriOS/130 Mobile Safari/604',
+    }));
+    expect(mobile['browser'], 'Chrome');
+    expect(mobile['device_type'], '携帯');
+    final unknown = LogDetail.clientInfo(Request('GET', Uri.parse('https://example.test/')));
+    expect(unknown['device_type'], '不明');
+    expect(unknown['ip_address'], '');
+  });
   test('スタックの先頭フレームから関数とファイルと行を取る', () {
     const stack = '''
 #0 updatePrediction (package:Yakyuu_Japan/backend/app/prediction.dart:125:8)

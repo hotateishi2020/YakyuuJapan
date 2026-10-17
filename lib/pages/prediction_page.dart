@@ -1,3 +1,4 @@
+import '../tools/tab_preferences.dart';
 import '../View/retained_tab_body.dart';
 import '../View/player_detail_dialog.dart';
 import '../View/records_board.dart';
@@ -179,14 +180,21 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     } else {
       _orgKind = OrgKind.npb;
     }
+    _itemTab = readSavedTab('main_${_orgKind.name}', const [0, 1, 2, 3, 4, 5], fallback: 0);
     _personalStatsLayout = readPersonalStatsLayout();
     if (readBrowserCookie(_bracketCookie) == '0') _bracketOpen = false;
-    // 前回の初期表示を先に出してから、通信結果で差し替える
-    _restoreBoardSession();
-    if (_predictGroupsOpen) _restorePredictSession(allowCookieUser: true);
-    // ヘッダー〜団体タブはデータ待ちせず先に出す
+    // First paint contains only the header/tabs; cache decoding and requests follow.
     _shellReady = true;
-    _bootstrapWithAuth();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(Future<void>.delayed(Duration.zero, () {
+        if (!mounted) return;
+        setState(() {
+          _restoreBoardSession();
+          if (_predictGroupsOpen) _restorePredictSession(allowCookieUser: true);
+        });
+        unawaited(_bootstrapWithAuth());
+      }));
+    });
   }
 
   bool get _showUserPredictions => AuthSession.instance.isLoggedIn;
@@ -863,7 +871,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     setState(() {
       _predictGroupsOpen = false;
       _orgKind = kind;
-      _itemTab = 0;
+      _itemTab = readSavedTab('main_${kind.name}', const [0, 1, 2, 3, 4, 5], fallback: 0);
       error = null;
       if (usable) {
         _applyBundle(cached, kind: kind);
@@ -1756,6 +1764,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
               if (i >= 0 && i < actions.length) {
                 unawaited(AuthSession.instance.reportAction(actions[i]));
               }
+              saveTab('main_${_orgKind.name}', i);
               setState(() => _itemTab = i);
               unawaited(_ensureItemYearLoaded(i));
             },
@@ -2274,6 +2283,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
+                saveTab('main_${_orgKind.name}', 5);
                 setState(() => _itemTab = 5);
               },
               child: const Text("イベント・試合日程を開く")),

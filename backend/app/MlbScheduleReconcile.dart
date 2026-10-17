@@ -47,15 +47,15 @@ List<int> obsoleteMlbGameIds(
 }
 
 Future<int> reconcileMlbSchedule(
-    Connection conn, String day, Document document) async {
+    Connection conn, String day, Document document, {List<int> leagueIds = const [3,4]}) async {
   final cards = mlbScheduleCards(document);
   if (cards == null) return 0;
   final rows = (await conn.execute(
           '''SELECT g.id,g.state,h.name_short AS home,a.name_short AS away,
     EXISTS(SELECT 1 FROM t_game_summary s WHERE s.id_game=g.id AND NOT COALESCE(s.flg_delete,false) AND (s.int_batting>0 OR s.int_pitch>0 OR s.double_inning_pitch>0)) AS has_records
     FROM t_game g JOIN m_team h ON h.id=g.id_team_home JOIN m_team a ON a.id=g.id_team_away
-    WHERE g.datetime_start::date=\$1::date AND h.id_league IN (3,4) AND a.id_league IN (3,4) AND NOT COALESCE(g.flg_delete,false)''',
-          parameters: [day]))
+    WHERE g.datetime_start::date=\$1::date AND h.id_league=ANY(\$2::int[]) AND a.id_league=ANY(\$2::int[]) AND NOT COALESCE(g.flg_delete,false)''',
+          parameters: [day, leagueIds]))
       .map((r) => r.toColumnMap())
       .toList();
   final ids = obsoleteMlbGameIds(rows, cards);
@@ -63,7 +63,10 @@ Future<int> reconcileMlbSchedule(
     await conn.execute(
         'UPDATE t_game SET flg_delete=true,updat=NOW() WHERE id=ANY(\$1::int[])',
         parameters: [ids]);
-    print('MLB日程再確認 $day: 中止・予定消滅 ${ids.length}件を表示対象から除外 $ids');
+    print('${leagueIds.contains(1) ? 'NPB' : 'MLB'}日程再確認 $day: 中止・予定消滅 ${ids.length}件を表示対象から除外 $ids');
   }
   return ids.length;
 }
+
+Future<int> reconcileNpbSchedule(Connection conn, String day, Document document) =>
+    reconcileMlbSchedule(conn, day, document, leagueIds: const [1,2]);

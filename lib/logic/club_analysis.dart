@@ -27,25 +27,38 @@ Map<String, double?> clubMetrics(Map<String, dynamic> team) {
   }
 
   double? running() {
-    final known = batting.where((p) => p['stolen_bases'] != null && p['caught_stealing'] != null).toList();
-    final pa = known.fold<int>(0, (v, p) => v + usageInt(p['pa']));
-    return pa > 0 ? known.fold<double>(0, (v, p) => v + usageInt(p['stolen_bases']) - 2 * usageInt(p['caught_stealing'])) / pa * 100 : null;
+    if (batting.isEmpty) return null;
+    var steals = 0.0, caught = 0.0;
+    for (final p in batting) {
+      final sb = double.tryParse('${p['stolen_bases']}');
+      final cs = double.tryParse('${p['caught_stealing']}');
+      if (sb == null || cs == null || !sb.isFinite || !cs.isFinite) return null;
+      steals += sb;
+      caught += cs;
+    }
+    final games = double.tryParse('${team['game_count']}');
+    return games != null && games > 0 ? (steals - 2 * caught) / games : null;
   }
 
   double? defense(Set<String> slots) {
-    var sum = 0.0, count = 0;
-    for (final p in listMapFromJson(team['fielding_metrics'])) {
-      final uzr = p['uzr_by_position'];
-      if (uzr is! Map) continue;
-      for (final s in slots) {
-        final n = double.tryParse('${uzr[s]}');
-        if (n != null) {
-          sum += n;
-          count++;
-        }
+    var chances = 0.0, errors = 0.0;
+    final rows = listMapFromJson(team['fielding_stats']);
+    // MLB may supply both OF totals and LF/CF/RF. Use the individual
+    // positions when present, avoiding double counting the OF total.
+    final separateOutfield = rows.any((p) => {'LF', 'CF', 'RF'}.contains(p['position']));
+    for (final p in rows) {
+      if (!slots.contains(p['position']) || separateOutfield && p['position'] == 'OF') continue;
+      final po = double.tryParse('${p['putouts']}');
+      final assists = double.tryParse('${p['assists']}');
+      final e = double.tryParse('${p['errors']}');
+      if (po == null || assists == null || e == null ||
+          !po.isFinite || !assists.isFinite || !e.isFinite) {
+        return null;
       }
+      chances += po + assists + e;
+      errors += e;
     }
-    return count > 0 ? sum : null;
+    return chances > 0 ? 1 - errors / chances : null;
   }
 
   final workload = [for (final p in listMapFromJson(team['pitching_workload'])) strengthPlayerMetrics(team, p)];
@@ -53,14 +66,36 @@ Map<String, double?> clubMetrics(Map<String, dynamic> team) {
     '打撃': weighted(batting, 'ops', 'pa'),
     '走力': running(),
     '内野守備': defense({'1B', '2B', '3B', 'SS'}),
-    '外野守備': defense({'LF', 'CF', 'RF'}),
+    '外野守備': defense({'LF', 'CF', 'RF', 'OF'}),
     '先発': weighted(workload.where((p) => usageInt(p['starter_outs']) >= usageInt(p['relief_outs'])), 'whip', 'total_outs'),
     '中継ぎ': weighted(workload.where((p) => usageInt(p['starter_outs']) < usageInt(p['relief_outs'])), 'whip', 'total_outs')
   };
 }
 
+Map<String, dynamic>? clubDefenseEvidence(Map<String, dynamic> team, String category, int year) {
+  if (!['内野守備', '外野守備'].contains(category)) return null;
+  final data = team['defense_analysis'];
+  if (data is! Map) return null;
+  final entry = data[category == '内野守備' ? 'infield' : 'outfield'];
+  if (entry is! Map || entry['metric'] != 'OAA' || '${entry['year']}' != '$year' ||
+      double.tryParse('${entry['value']}')?.isFinite != true) {
+    return null;
+  }
+  return Map<String, dynamic>.from(entry);
+}
+
 List<Map<String, dynamic>> analyzeClubs(List<Map<String, dynamic>> teams, int year) {
   final metrics = teams.map(clubMetrics).toList();
+  final defenseMethods = <String, bool>{};
+  for (final category in ['内野守備', '外野守備']) {
+    final complete = teams.length >= 2 && teams.every((t) => clubDefenseEvidence(t, category, year) != null);
+    defenseMethods[category] = complete;
+    if (complete) {
+      for (var i = 0; i < teams.length; i++) {
+        metrics[i][category] = double.parse('${clubDefenseEvidence(teams[i], category, year)!['value']}');
+      }
+    }
+  }
   return [
     for (var i = 0; i < teams.length; i++)
       (() {
@@ -73,6 +108,7 @@ List<Map<String, dynamic>> analyzeClubs(List<Map<String, dynamic>> teams, int ye
           ...teams[i],
           'grades': grades,
           'metrics': metrics[i],
+          'defense_methods': {for (final e in defenseMethods.entries) e.key: e.value ? 'OAA' : '失策参考'},
           'regular_age': ages.isEmpty ? null : ages.reduce((a, b) => a + b) / ages.length,
           'age_count': ages.length,
           'regular_count': regulars.length,
@@ -80,12 +116,12 @@ List<Map<String, dynamic>> analyzeClubs(List<Map<String, dynamic>> teams, int ye
               ? '判定データなし'
               : strong.isEmpty
                   ? '突出項目なし'
-                  : strong.join('・'),
+                  : strong.map((c) => defenseMethods[c] == false ? '$c（失策参考）' : c).join('・'),
           'weaknesses': ordered.isEmpty
               ? '判定データなし'
               : weak.isEmpty
                   ? '下位項目なし'
-                  : weak.join('・')
+                  : weak.map((c) => defenseMethods[c] == false ? '$c（失策参考）' : c).join('・')
         };
       })()
   ];

@@ -1,3 +1,4 @@
+import 'dart:ui' show PointerDeviceKind;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,6 +12,17 @@ import 'package:Yakyuu_Japan/View/strength_contracts.dart';
 import 'package:Yakyuu_Japan/logic/strength_usage.dart';
 
 void main() {
+  test('ドラフト経歴は新しい年度と季節から順に並べ年度不明は末尾に表示する', () {
+    expect(draftCareerText({
+      'achievement': '2026年日本代表',
+      'career_facts': [
+        {'year': 2026, 'season': '夏', 'label': '2026年夏ベスト4'},
+        {'label': '高校通算30本'},
+        {'year': 2025, 'season': '夏', 'label': '2025年夏ベスト8'},
+        {'year': 2025, 'season': '春', 'label': '2025年春優勝'},
+      ],
+    }).split('\n'), ['2026年夏ベスト4', '2026年日本代表', '2025年夏ベスト8', '2025年春優勝', '高校通算30本']);
+  });
   test('退団区分は確認済みの情報だけを使用する', () {
     expect(rosterDepartureLabel({'departure_type': 'retired'}), isNull);
     expect(rosterDepartureLabel({'fa_confirmed': true}), isNull);
@@ -104,7 +116,7 @@ void main() {
         2);
   });
 
-  testWidgets('予想ロゴで複数の出典を開き、自動表示せず横幅いっぱいに広がる', (t) async {
+  testWidgets('予想ロゴは根拠を開き出典URLを表示しない', (t) async {
     await t.binding.setSurfaceSize(const Size(1200, 800));
     addTearDown(() => t.binding.setSurfaceSize(null));
     await t.runAsync(() => rootBundle.loadString('backend/assets/data/draft_2026.json'));
@@ -114,9 +126,9 @@ void main() {
     final logo = find.byKey(const ValueKey('draft-prediction-菰田陽生-巨人'));
     await t.tap(logo);
     await t.pumpAndSettle();
-    expect(find.text('https://www.hb-nippon.com/articles/18340'), findsOneWidget);
-    expect(find.text('https://www.youtube.com/watch?v=oOYEfvW9xOk'), findsOneWidget);
-    expect(find.textContaining('予想者：AIデータ二刀流'), findsOneWidget);
+    expect(find.text('https://www.hb-nippon.com/articles/18340'), findsNothing);
+    expect(find.text('https://www.youtube.com/watch?v=oOYEfvW9xOk'), findsNothing);
+    expect(find.textContaining('予想者：AIデータ二刀流'), findsNothing);
     await t.tap(find.text('閉じる'));
     await t.pumpAndSettle();
     expect(t.getBottomRight(find.byKey(const ValueKey('draft-cell-菰田陽生-11'))).dx, closeTo(1200, .1));
@@ -274,6 +286,50 @@ void main() {
     expect(leagueMvpCaption({'label': 'NL MVP'}), 'ナMVP');
   });
 
+  testWidgets('小さい功績はホバーとクリックで正式名と詳細を表示', (t) async {
+    await t.pumpWidget(MaterialApp(home: Scaffold(body: StrengthAchievements(year: 2026, team: {
+      'roster': [{'name': '選手', 'achievements': [
+        {'label': '規定打席到達', 'kind': 'qualification', 'year': 2025, 'detail': '規定443打席に到達'}
+      ]}]
+    }))));
+    final badge = find.byType(AchievementBadge);
+    final mouse = await t.createGesture(kind: PointerDeviceKind.mouse);
+    await mouse.addPointer();
+    await mouse.moveTo(t.getCenter(badge));
+    await t.pump(const Duration(seconds: 1));
+    await t.pumpAndSettle();
+    expect(find.text('2025年 規定打席到達\n規定443打席に到達'), findsOneWidget);
+    await mouse.removePointer();
+    await t.tap(badge);
+    await t.pumpAndSettle();
+    expect(find.text('選手：規定打席到達'), findsOneWidget);
+    expect(find.textContaining('規定443打席に到達'), findsWidgets);
+    expect(t.takeException(), isNull);
+    expect(achievementBadgeCaption({'label': '最多盗塁者'}), '盗塁王');
+    expect(achievementBadgeCaption({'label': '最多勝利投手'}), '最多勝');
+  });
+
+  testWidgets('功績には識別文字と右下の年度、全面の四角い背景を表示', (t) async {
+    for (final label in ['最多本塁打', '最優秀防御率', '月間MVP', '優秀選手賞', '特別功労選手表彰']) {
+      await t.pumpWidget(MaterialApp(home: Scaffold(body: Center(
+        child: AchievementBadge(achievement: {'label':label,'kind':'title','year':2025})))));
+      expect(find.byWidgetPredicate((w) => w is Text && w.data?.replaceAll('\n', '') == achievementBadgeCaption({'label': label})), findsOneWidget);
+      expect(t.widget<Container>(find.byKey(const ValueKey('achievement-year-label'))).color, Colors.white);
+      if (label == '優秀選手賞') expect(find.text('MVP'), findsOneWidget);
+      if (label == '特別功労選手表彰') {
+        expect(t.widget<Text>(find.byKey(const ValueKey('achievement-engraving'))).data, contains('\n'));
+      }
+      final badge = t.getRect(find.byType(AchievementBadge));
+      final year = t.getRect(find.text('2025'));
+      expect(year.center.dx, greaterThan(badge.center.dx));
+      expect(year.center.dy, greaterThan(badge.center.dy));
+      final frame = find.byKey(const ValueKey('achievement-frame'));
+      expect(t.getSize(frame).width, closeTo(badge.width, .001));
+      expect(t.getSize(frame).height, closeTo(badge.height, .001));
+      expect((t.widget<Container>(frame).decoration as BoxDecoration).borderRadius, BorderRadius.zero);
+      expect(t.takeException(),isNull);
+    }
+  });
   test('功績の種類で色と図柄を変え、年度には依存しない', () {
     final hr = achievementBadgeStyle({'label': '最多本塁打', 'kind': 'title'});
     final era = achievementBadgeStyle({'label': '最優秀防御率', 'kind': 'title'});
@@ -358,7 +414,26 @@ void main() {
     expect(find.text('1軍'), findsNothing);
     expect(t.takeException(), isNull);
   });
-  testWidgets('ドラフト全分類を注目度順の固定4列と横スクロール表で表示し出典を確認できる', (t) async {
+  testWidgets('経歴が多い選手も拡大文字ですべてセル内に収める', (t) async {
+    await t.binding.setSurfaceSize(const Size(1200, 800));
+    addTearDown(() => t.binding.setSurfaceSize(null));
+    await t.runAsync(() => rootBundle.loadString('backend/assets/data/draft_2026.json'));
+    await t.pumpWidget(MaterialApp(home: MediaQuery(
+      data: const MediaQueryData(textScaler: TextScaler.linear(1.5)),
+      child: const Scaffold(body: StrengthDraft(year: 2026)))));
+    await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
+    await t.pumpAndSettle();
+    final cell = find.byKey(const ValueKey('draft-cell-織田翔希-9'));
+    final text = find.descendant(of: cell, matching: find.byType(Text));
+    expect(t.widget<Text>(text).data, contains('2025年春'));
+    expect(t.widget<Text>(text).data, contains('2026年夏'));
+    expect(t.getSize(cell).height, greaterThan(150));
+    expect(t.getRect(text).bottom, lessThanOrEqualTo(t.getRect(cell).bottom - 5));
+    expect(t.getRect(text).top, greaterThanOrEqualTo(t.getRect(cell).top + 5));
+    expect(t.getSize(cell).height, t.getSize(find.byKey(const ValueKey('draft-cell-織田翔希-1'))).height);
+    expect(t.takeException(), isNull);
+  });
+  testWidgets('ドラフトは固定4列と横スクロール表で詳細を開き出典URLを表示しない', (t) async {
     await t.binding.setSurfaceSize(const Size(375, 700));
     addTearDown(() => t.binding.setSurfaceSize(null));
     await t.runAsync(() => rootBundle.loadString('backend/assets/data/draft_2026.json'));
@@ -404,7 +479,7 @@ void main() {
     }))));
     await t.tap(find.byTooltip('2023年 WBC優勝\n確認済み'));
     await t.pumpAndSettle();
-    expect(find.text('https://example.com'), findsOneWidget);
+    expect(find.text('https://example.com'), findsNothing);
     expect(t.takeException(), isNull);
   });
   testWidgets('功績は表示年度内の件数順でアイコンのみ表示しホバーで内容を確認', (t) async {

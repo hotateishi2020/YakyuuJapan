@@ -14,6 +14,7 @@ Future<void> main(List<String> args) async {
     for (final org in ['npb', 'mlb']) {
       data.putIfAbsent(org, () => <String, dynamic>{});
       for (final section in ['career', 'season']) {
+        if (args.contains('--career-only') && section != 'career') continue;
         final rows = <Map<String, dynamic>>[];
         for (final metric in recordMetrics) {
           if (org == 'mlb' && metric.mlb.isEmpty) continue;
@@ -33,7 +34,7 @@ Future<void> main(List<String> args) async {
                   'playerPool': metric.unit.isEmpty ? 'QUALIFIED' : 'ALL',
                   'sortStat': metric.mlb,
                   'order': metric.lower ? 'asc' : 'desc',
-                  'limit': career ? '10' : '50',
+                  'limit': career ? '1000' : '50',
                   'hydrate': 'person',
                 }).toString();
           try {

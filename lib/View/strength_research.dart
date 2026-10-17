@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../tools/json_utils.dart';
-import '../tools/external_link.dart';
 import '../logic/strength_usage.dart';
 import '../tools/color_parse.dart';
 import 'achievement_badge.dart';
@@ -17,8 +16,6 @@ void showStrengthSource(BuildContext context, String title, String detail, List<
         content: SingleChildScrollView(
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(detail),
-          const SizedBox(height: 12),
-          for (final url in urls) TextButton(onPressed: () => openExternalLink(url), child: SelectableText(url)),
         ])),
         actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('閉じる'))]));
 
@@ -72,12 +69,7 @@ class _StrengthDraftState extends State<StrengthDraft> {
         '${prediction['player']}・${prediction['team']}',
         '${evidence.map((e) => [
               '${e['status'] ?? '指名予想'}',
-              if (e['publisher'] != null) '予想者：${e['publisher']}',
-              if (e['title'] != null) '出典：${e['title']}',
-              if (e['view_count'] != null) '再生回数：${e['view_count']}回（${e['checked_at']}確認）',
               '${e['reason']}',
-              '公表日：${e['published_at'] ?? '未確認'}',
-              if (e['evidence_scope'] != null) '確認範囲：${e['evidence_scope']}',
             ].join('\n')).join('\n\n')}\n\n各公表時点の予想であり、指名・獲得確定ではありません。',
         <String>{
           for (final e in evidence) ...[if (e['source_url'] != null) '${e['source_url']}', if (e['verification_url'] != null) '${e['verification_url']}']
@@ -106,6 +98,8 @@ class _StrengthDraftState extends State<StrengthDraft> {
         _ => Colors.orange.shade800,
       };
 
+  String _careerText(Map<String, dynamic> player) => draftCareerText(player);
+
   List<String> _values(Map<String, dynamic> p) => [
         '${p['attention_grade'] ?? '—'}',
         '${p['name'] ?? ''}',
@@ -116,7 +110,7 @@ class _StrengthDraftState extends State<StrengthDraft> {
         p['weight'] == null ? '—' : '${p['weight']}kg',
         '${p['hand'] ?? ''}',
         '${p['position'] ?? ''}',
-        '${p['achievement'] ?? ''}',
+        _careerText(p),
         '${p['features'] ?? ''}',
         '',
       ];
@@ -147,20 +141,23 @@ class _StrengthDraftState extends State<StrengthDraft> {
               final scale = constraints.maxWidth > minimumWidth ? constraints.maxWidth / minimumWidth : 1.0;
               final widths = [for (final width in minimumWidths) width * scale];
               final logosPerRow = ((widths.last - 12 + 2) / 38).floor().clamp(1, 12);
-              const style = TextStyle(fontSize: 12, color: Colors.black87);
-              double textHeight(String text, double width) {
-                final painter = TextPainter(text: TextSpan(text: text, style: style), textDirection: TextDirection.ltr, textScaler: MediaQuery.textScalerOf(context))
-                  ..layout(maxWidth: width - 12);
+              const style = TextStyle(inherit: false, fontSize: 12, height: 1.4, color: Colors.black87);
+              double textHeight(String text, double width, int column) {
+                // Match the rendered font and the space inside padding + border.
+                final painter = TextPainter(text: TextSpan(text: text,
+                    style: style.copyWith(fontWeight: column <= 2 ? FontWeight.bold : FontWeight.normal)),
+                    textDirection: Directionality.of(context), textScaler: MediaQuery.textScalerOf(context))
+                  ..layout(maxWidth: width - 13);
                 final height = painter.height;
                 painter.dispose();
-                return height + 12;
+                return height.ceilToDouble() + 14;
               }
 
               final heights = [
                 for (final p in players)
                   [
                     48.0,
-                    for (var i = 0; i < 11; i++) textHeight(_values(p.$2)[i], widths[i]),
+                    for (var i = 0; i < 11; i++) textHeight(_values(p.$2)[i], widths[i], i),
                     ((listMapFromJson(p.$2['predictions']).length / logosPerRow).ceil() * 38 + 12).toDouble(),
                   ].reduce((a, b) => a > b ? a : b)
               ];
@@ -197,7 +194,7 @@ class _StrengthDraftState extends State<StrengthDraft> {
                   if (index == 1) {
                     child = InkWell(
                         onTap: () => showStrengthSource(
-                            context, '${player['name']}', "確認日：${data['checked_at']}\n${player['achievement']}\n${player['features']}", (player['sources'] as List).cast<String>()),
+                            context, '${player['name']}', "確認日：${data['checked_at']}\n${_careerText(player)}\n${player['features']}", (player['sources'] as List).cast<String>()),
                         child: child);
                   }
                 }
@@ -208,7 +205,7 @@ class _StrengthDraftState extends State<StrengthDraft> {
                           onTap: () => showStrengthSource(
                                   context,
                                   '${player['name']} 注目度 ${player['attention_grade']}',
-                                  '${draftAttentionLabels[player['attention_grade']] ?? '未評価'}\nアプリ独自の予想評価（${player['attention_as_of'] ?? ''}）\n${player['attention_reason'] ?? ''}\n\n${listMapFromJson(player['attention_sources']).map((e) => '${e['publisher']}／${e['published_at']}\n${e['reason']}\n${e['view_count']}回再生（${e['checked_at']}確認）').join('\n\n')}',
+                                  '${draftAttentionLabels[player['attention_grade']] ?? '未評価'}\nアプリ独自の予想評価（${player['attention_as_of'] ?? ''}）\n${player['attention_reason'] ?? ''}\n\n${listMapFromJson(player['attention_sources']).map((e) => '${e['reason']}').join('\n\n')}',
                                   [
                                     for (final e in listMapFromJson(player['attention_sources'])) '${e['source_url']}',
                                     if (player['attention_source'] != null) '${player['attention_source']}'
@@ -269,27 +266,41 @@ class _StrengthDraftState extends State<StrengthDraft> {
                         ),
                       )),
                     ]),
-                    if (listMapFromJson(data['reference_videos']).isNotEmpty)
-                      TextButton.icon(
-                        icon: const Icon(Icons.video_library_outlined),
-                        label: Text('参考動画 ${listMapFromJson(data['reference_videos']).length}本（5万再生以上）'),
-                        onPressed: () => showStrengthSource(
-                          context,
-                          'ドラフト予想の参考動画',
-                          '再生回数は確認日時点。公開プレビュー内の予想表・字幕で確認できた内容を反映しています。過去の予想は公表日を併記しています。注目度はアプリ独自の評価で、再生回数による順位付けではありません。\n\n${listMapFromJson(data['reference_videos']).map((e) => '${e['publisher']}\n${e['title']}\n公開：${e['published_at']}／${e['view_count']}回再生（${e['checked_at']}確認）').join('\n\n')}',
-                          [for (final e in listMapFromJson(data['reference_videos'])) '${e['source_url']}'],
-                        ),
-                      ),
                     Padding(
                         padding: const EdgeInsets.all(8),
                         child: Text(
-                            "確認日：${data['checked_at']}。年齢は${widget.year + 1}年3月31日時点（生年月日未確認は—）。所属・体格は出典公表時点。選手名で出典、球団ロゴで指名予想の根拠を表示。注目度は出典を基にしたアプリ予想（タップで基準と根拠）。S競合必至／A競合の可能性／Bドラ1候補／C上位候補／D指名候補／E育成候補。ロゴなしは予想根拠未確認。指名・獲得確定ではありません。",
+                            "確認日：${data['checked_at']}。年齢は${widget.year + 1}年3月31日時点（生年月日未確認は—）。選手名で詳細、球団ロゴで指名予想の根拠を表示。注目度はアプリ予想（タップで基準と根拠）。S競合必至／A競合の可能性／Bドラ1候補／C上位候補／D指名候補／E育成候補。ロゴなしは予想根拠未確認。指名・獲得確定ではありません。",
                             style: const TextStyle(fontSize: 11, color: Colors.black54))),
                   ]),
                 )),
               ]);
             },
           ));
+}
+
+String draftCareerText(Map<String, dynamic> player) {
+  final entries = <Map<String, dynamic>>[
+    if ('${player['achievement'] ?? ''}'.trim().isNotEmpty)
+      {'label': '${player['achievement']}'},
+    ...listMapFromJson(player['career_facts']),
+  ].indexed.toList();
+  int year(Map<String, dynamic> fact) => int.tryParse('${fact['year']}') ??
+      int.tryParse(RegExp(r'(?:19|20)\d{2}').firstMatch('${fact['label']}')?.group(0) ?? '') ?? 0;
+  int season(Map<String, dynamic> fact) {
+    final text = '${fact['season'] ?? fact['label'] ?? ''}';
+    if (text.contains('春')) return 1;
+    if (text.contains('夏')) return 2;
+    if (text.contains('秋')) return 3;
+    if (text.contains('冬')) return 4;
+    return 0;
+  }
+  entries.sort((a, b) {
+    final byYear = year(b.$2).compareTo(year(a.$2));
+    if (byYear != 0) return byYear;
+    final bySeason = season(b.$2).compareTo(season(a.$2));
+    return bySeason != 0 ? bySeason : a.$1.compareTo(b.$1);
+  });
+  return entries.map((entry) => '${entry.$2['label'] ?? ''}').where((label) => label.isNotEmpty).join('\n');
 }
 
 int? draftAgeOnMarch31(dynamic rawBirth, int year) {
@@ -340,7 +351,7 @@ class StrengthAchievements extends StatelessWidget {
       itemCount: roster.length + 2,
       itemBuilder: (context, index) {
         if (index == 0) {
-          return const Padding(padding: EdgeInsets.all(8), child: Text('選手は功績の多い順。評価の高い功績から左に並べ、空きを詰めて表示します。\nホバーで内容、クリックで詳細・出典を表示します。'));
+          return const Padding(padding: EdgeInsets.all(8), child: Text('選手は功績の多い順。評価の高い功績から左に並べ、空きを詰めて表示します。\nホバーで内容、クリックで詳細を表示します。'));
         }
         if (index == roster.length + 1) {
           return const Padding(
@@ -363,7 +374,7 @@ class StrengthAchievements extends StatelessWidget {
                     Container(
                         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
                         color: color,
-                        child: Text('${entry.team['name_team']}', style: TextStyle(fontSize: 11, color: color.computeLuminance() > .45 ? Colors.black : Colors.white))),
+                        child: Text('${entry.team['name_team']}', style: TextStyle(fontSize: 11, color: parseColorNameOrNull('${entry.team['color_font']}') ?? (color.computeLuminance() > .45 ? Colors.black : Colors.white)))),
                   Text('${entry.player['name']}', style: const TextStyle(fontWeight: FontWeight.bold)),
                 ])),
             Expanded(

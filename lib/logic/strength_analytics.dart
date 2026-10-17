@@ -50,6 +50,23 @@ String opsValue(dynamic value) => metricValue(value, 3).replaceFirst(RegExp(r'^0
 
 String battingMetricLabel(Map<String, dynamic> metrics) => 'OPS ${opsValue(metrics['ops'])}  ${metrics['home_runs'] ?? '—'}本';
 
+Map<String, dynamic> pitchingRoleBand(Map<String, dynamic> team) {
+  final rows = pitchingWorkloadBands(listMapFromJson(team['pitching_workload']));
+  final total = rows.isEmpty ? 0 : usageInt(rows.first['total']);
+  return {
+    'slot': 'pitching_role', 'label': '先発・中継ぎ',
+    'unit': 'outs', 'total': total, 'role_outs': total,
+    'players': [
+      for (final row in rows)
+        if (usageInt(row['role_outs']) > 0) {
+          'name': row['slot'] == 'starter' ? '先発' : '中継ぎ・抑え',
+          'player_key': 'pitching_role:${row['slot']}',
+          'count': row['role_outs'], 'unit': 'outs',
+        },
+    ],
+  };
+}
+
 Map<String, dynamic> handednessBand(Map<String, dynamic> team, {required bool pitching}) {
   final counts = <String, int>{};
   for (final raw in listMapFromJson(team[pitching ? 'pitching_workload' : 'batting_stats'])) {

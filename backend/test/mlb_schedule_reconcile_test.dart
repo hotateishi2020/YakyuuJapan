@@ -28,6 +28,14 @@ void main() {
     cards[0]['state'] = '09:00';
     expect(obsoleteMlbGameIds(games, cards), isEmpty);
   });
+  test('NPBも消えた予定だけを除外し、DeNAの表記揺れは同一と扱う', () {
+    final cards = mlbScheduleCards(parse('<div id="gm_card"><li class="bb-score__item"><p class="bb-score__homeLogo">ＤｅＮＡ</p><p class="bb-score__awayLogo">阪神</p></li></div>'))!;
+    expect(obsoleteMlbGameIds([
+      {'id': 1, 'home': 'DeNA', 'away': '阪神', 'state': '予定'},
+      {'id': 2, 'home': 'ソフトバンク', 'away': '日本ハム', 'state': '予定'},
+      {'id': 3, 'home': 'ソフトバンク', 'away': '日本ハム', 'state': '試合終了'},
+    ], cards), [2]);
+  });
   test('米国前日の試合も日本の当日として扱う', () {
     final day = JapanClock.fromUtc(DateTime.parse('2026-10-16T22:00:00Z'));
     expect(day, DateTime(2026, 10, 17, 7));

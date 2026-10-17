@@ -9,6 +9,7 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'AppSql.dart';
 import 'ClinchedGames.dart';
+import 'MlbScheduleReconcile.dart';
 import 'InjuryList.dart';
 import 'RegisteredPosition.dart';
 import '../tools/Postgres.dart';
@@ -154,31 +155,14 @@ class FetchURL {
     }());
   }
 
-  /// 球場画像パスと近鉄のチーム色。初期表示の SELECT を止めない。
+  /// 球場画像パスを補完。チームカラーは管理済みの m_team の値を保持する。
   static Future<void> seedStadiumImagesAndTeamColors() async {
     if (_imageSeedStarted) return;
     _imageSeedStarted = true;
     try {
       await Postgres.withConnection((c) async {
         await StadiumImages.seed(c);
-        await c.execute('''
-          UPDATE m_team
-          SET color_back = 'crimson', color_font = 'white', updat = NOW()
-          WHERE COALESCE(flg_delete, FALSE) = FALSE
-            AND (
-              source_key = 'npb:franchise:kintetsu'
-              OR (
-                (COALESCE(name_full, '') LIKE '%近鉄%'
-                  OR COALESCE(name_short, '') LIKE '%近鉄%'
-                  OR COALESCE(name_shortest, '') LIKE '%近鉄%')
-                AND COALESCE(name_full, '') NOT LIKE '%オリックス%'
-              )
-            )
-            AND (
-              color_back IS DISTINCT FROM 'crimson'
-              OR color_font IS DISTINCT FROM 'white'
-            )
-        ''');
+
       }, urgent: true);
     } catch (e, st) {
       _imageSeedStarted = false;
@@ -986,9 +970,26 @@ class FetchURL {
     });
   }
 
+  /// Same browser-independent preflight as MLB; retain completed game records.
+  static Future<void> refreshNearSchedule() async {
+    await Postgres.withConnection((conn) async {
+      await Postgres.begin(conn);
+      try {
+        await fetchGamesNPB(conn, nearDaysOnly: true);
+        await Postseason.sync(conn);
+        await Postgres.commit(conn);
+      } catch (_) {
+        await Postgres.rollback(conn);
+        rethrow;
+      }
+      await DisplaySnapshot.refreshGames(conn, JapanClock.now().year);
+    });
+  }
+
   static Future<Response> fetchGamesNPB(
     Connection conn, {
     bool todayOnly = false,
+    bool nearDaysOnly = false,
     bool futureOnly = false,
     Set<String>? reloadedDates,
   }) async {
@@ -1000,7 +1001,7 @@ class FetchURL {
       print('NPB明日以降は${GameFetchSchedule.futureInterval.inMinutes}分以内のためスキップ');
     }
     final today = DateTime(now.year, now.month, now.day);
-    final listDate = futureOnly
+    final listDate = nearDaysOnly ? [today, today.add(const Duration(days: 1))] : futureOnly
         ? [for (var i = 1; i <= 10; i++) today.add(Duration(days: i))]
         : todayOnly
             ? [today]
@@ -1049,6 +1050,7 @@ class FetchURL {
 
         try {
           final document = parse(_decodeHtml(res));
+          if (await reconcileNpbSchedule(conn, formatted, document) > 0) reloadedDates?.add(formatted);
           final cardsRoot = document.querySelector('#gm_card');
           if (cardsRoot == null) {
             print('この日の試合カードはありません。');

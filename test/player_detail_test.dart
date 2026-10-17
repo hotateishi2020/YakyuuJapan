@@ -19,6 +19,7 @@ void main() {
       await t.pumpWidget(const MaterialApp(home: PlayerDetailDialog(player: {'id_player': 654}, org: 'npb', year: 2026)));
       await t.pumpAndSettle();
       for (var i = 0; i < 8; i++) {
+        expect(find.text('出典'), findsNothing);
         await t.drag(find.byType(ListView).first, const Offset(0, -650));
         await t.pumpAndSettle();
         expect(t.takeException(), isNull);

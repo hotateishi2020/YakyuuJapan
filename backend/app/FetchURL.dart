@@ -982,7 +982,10 @@ class FetchURL {
         await Postgres.rollback(conn);
         rethrow;
       }
-      await DisplaySnapshot.refreshGames(conn, JapanClock.now().year);
+      for (final day in GameFetchSchedule.recheckDates(JapanClock.now())) {
+        final key = DateFormat('yyyy-MM-dd').format(day);
+        await DisplaySnapshot.refreshGames(conn, day.year, from: key, to: key);
+      }
     });
   }
 
@@ -1001,7 +1004,7 @@ class FetchURL {
       print('NPB明日以降は${GameFetchSchedule.futureInterval.inMinutes}分以内のためスキップ');
     }
     final today = DateTime(now.year, now.month, now.day);
-    final listDate = nearDaysOnly ? [today, today.add(const Duration(days: 1))] : futureOnly
+    final listDate = nearDaysOnly ? GameFetchSchedule.recheckDates(now) : futureOnly
         ? [for (var i = 1; i <= 10; i++) today.add(Duration(days: i))]
         : todayOnly
             ? [today]
@@ -1110,7 +1113,7 @@ class FetchURL {
               final futureDay = GameFetchSchedule.isFutureDay(date, now);
               final cardKey = 'npb|$formatted|$urlHref';
               final fingerprint = GameFetchSchedule.normalizeCard(urlHref, card.text);
-              if (futureDay && GameFetchSchedule.futureCardUnchanged(cardKey, fingerprint)) {
+              if (!nearDaysOnly && futureDay && GameFetchSchedule.futureCardUnchanged(cardKey, fingerprint)) {
                 continue;
               }
 

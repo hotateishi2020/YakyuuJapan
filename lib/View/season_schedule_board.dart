@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'SeasonTable.dart';
 import 'dart:convert';
@@ -22,15 +23,21 @@ class SeasonScheduleLoader extends StatefulWidget {
   State<SeasonScheduleLoader> createState() => _SeasonScheduleLoaderState();
 }
 
-class _SeasonScheduleLoaderState extends State<SeasonScheduleLoader> {
+class _SeasonScheduleLoaderState extends State<SeasonScheduleLoader> with WidgetsBindingObserver {
+  Timer? _refreshTimer;
   List<Map<String, dynamic>> _games = [];
   String? _error;
   bool _loading = true;
+  bool _showLoading = true;
   int _request = 0;
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _load();
+    _refreshTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+      if (!_loading) _load(silent: true);
+    });
   }
 
   @override
@@ -42,12 +49,22 @@ class _SeasonScheduleLoaderState extends State<SeasonScheduleLoader> {
     }
   }
 
-  Future<void> _load() async {
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && !_loading) _load(silent: true);
+  }
+
+  Future<void> _load({bool silent = false}) async {
     final request = ++_request;
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
+    _loading = true;
+    if (!silent) setState(() { _error = null; _showLoading = true; });
     try {
       final response = await http
           .get(Env.api(
@@ -56,20 +73,20 @@ class _SeasonScheduleLoaderState extends State<SeasonScheduleLoader> {
       if (response.statusCode != 200) throw const FormatException('日程取得失敗');
       final data = jsonDecode(utf8.decode(response.bodyBytes));
       if (!mounted || request != _request) return;
-      setState(() => _games = listMapFromJson(data['games']));
+      setState(() { _games = listMapFromJson(data['games']); _error = null; });
     } catch (_) {
       if (mounted && request == _request) {
         setState(() => _error = '日程・対戦結果を取得できませんでした');
       }
     } finally {
-      if (mounted && request == _request) setState(() => _loading = false);
+      if (mounted && request == _request) setState(() { _loading = false; _showLoading = false; });
     }
   }
 
   @override
   Widget build(BuildContext context) =>
       Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        if (_loading) const BaseballLoading(compact: true),
+        if (_showLoading) const BaseballLoading(compact: true),
         if (_error != null)
           Row(children: [
             Expanded(child: Text(_error!)),

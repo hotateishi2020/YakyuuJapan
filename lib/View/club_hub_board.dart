@@ -1,3 +1,4 @@
+import '../logic/favorite_team.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import '../logic/strength_usage.dart';
 import '../logic/strength_analytics.dart';
@@ -208,7 +209,7 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
     final clubs = onlyClub == null ? _clubs : [onlyClub];
     if (clubs.isEmpty) return const SizedBox.shrink();
     String clubKey(Map<String, dynamic> club) => '${club['code'] ?? club['name']}';
-    final selected = clubs.firstWhere((club) => clubKey(club) == _selectedStaff, orElse: () => clubs.first);
+    final selected = clubs.firstWhere((club) => clubKey(club) == _selectedStaff, orElse: () => favoriteTeamRow(clubs) ?? clubs.first);
     final displayedClubs = [selected];
     const roles = ['監督', 'ヘッド・総合', '投手', '打撃', 'バッテリー', '内野守備', '外野守備', '走塁', '育成・その他'];
     int level(Map<String, dynamic> p) {
@@ -309,7 +310,7 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
 
   Widget _team() {
     if (widget.teams.isEmpty) return const Center(child: Text('戦力情報がありません'));
-    final team = widget.teams.firstWhere((t) => '${t['id_team']}' == _selected, orElse: () => widget.teams.first);
+    final team = widget.teams.firstWhere((t) => '${t['id_team']}' == _selected, orElse: () => favoriteTeamRow(widget.teams) ?? widget.teams.first);
     final club = _clubs.where((c) => c['code'] == npbClubKey(team)).firstOrNull;
     final sponsors = listMapFromJson(club?['sponsors']);
     final roster = listMapFromJson(team['roster']);
@@ -364,6 +365,7 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
           usage(0, '貢献度'),
           usage(1, '選手起用'),
           usage(3, '選手一覧', minWidth: rosterColumns * 104 * .7),
+          usage(4, '契約'),
           section('スポンサー・広告', () => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       if (sponsors.isEmpty) const Padding(padding: EdgeInsets.all(12), child: Text('この年度の公式スポンサー情報は未収録です。')),
       Padding(

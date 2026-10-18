@@ -1,3 +1,4 @@
+import '../logic/favorite_team.dart';
 import '../config/org_config.dart';
 import 'compact_card_layout.dart';
 import 'team_section_layout.dart';
@@ -207,9 +208,10 @@ class _StrengthCareersState extends State<StrengthCareers> {
       ]);
     }
     final embedded = TeamSectionLayout.embedded(context);
+    final favorite = favoriteTeamRow(widget.teams);
     final singleTeam = !embedded && _singleTeamCategories.contains(category);
     final selectedTeam = widget.teams.any((t) => '${t['id_team']}' == _selectedTeams[category])
-        ? _selectedTeams[category] : widget.teams.isEmpty ? null : '${widget.teams.first['id_team']}';
+        ? _selectedTeams[category] : widget.teams.isEmpty ? null : '${(favorite ?? widget.teams.first)['id_team']}';
     final visibleTeams = singleTeam ? widget.teams.where((t) => '${t['id_team']}' == selectedTeam).toList() : widget.teams;
     final groups = careerGroups(visibleTeams, category);
     return Column(children: [

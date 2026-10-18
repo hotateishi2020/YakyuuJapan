@@ -1,3 +1,4 @@
+import '../logic/favorite_team.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import '../tools/tab_preferences.dart';
 import 'team_section_layout.dart';
@@ -25,7 +26,7 @@ import 'strength_contracts.dart';
 
 /// 戦力タブを開いたときだけ、登録済みの球団別データを取得する。
 class TeamStrengthBoard extends StatefulWidget {
-  const TeamStrengthBoard({super.key, required this.org, required this.year, this.favoriteTeamId, this.providedTeams, this.initialView = 3});
+  const TeamStrengthBoard({super.key, required this.org, required this.year, this.favoriteTeamId, this.providedTeams, this.initialView = 8});
 
   final OrgConfig org;
   final int year;
@@ -41,7 +42,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
   List<Map<String, dynamic>> _teams = const [];
   final _selectedTeams = <int, int?>{};
   int? get _selectedTeam {
-    final preferred = _selectedTeams[_selectedView] ?? widget.favoriteTeamId;
+    final preferred = _selectedTeams[_selectedView] ?? widget.favoriteTeamId ?? int.tryParse('${favoriteTeamRow(_teams)?['id_team']}');
     return _teams.any((team) => _int(team['id_team']) == preferred)
         ? preferred
         : _teams.isEmpty
@@ -54,23 +55,21 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
   String? _error;
   int _request = 0;
   int _selectedView = 1;
-  final _comparisonViews = <int>{4};
   static const _bandSideWidth = 88 * 1.2 + 8 + 48;
   static const _views = ['貢献度', '選手起用', '主力選手', '選手一覧', '契約', 'ドラフト', '功績', '経歴', 'チーム', '首脳', '自主トレ', '分析'];
 
   @override
   void initState() {
     super.initState();
-    // 廃止したタブの番号は残し、首脳の指定はチームタブに移す。
+    // 旧タブ番号は互換性のため維持し、選手一覧・功績・首脳はチームへ移す。
     _selectedView = switch (widget.initialView) {
-      6 => 3,
-      9 => 8,
+      3 || 6 || 9 => 8,
       final view => view,
     };
     if (widget.providedTeams == null) {
       _selectedView = readSavedTab('strength_${widget.org.kind.name}',
           const [11, 8, 3, 2, 0, 1, 4, 5, 7, 10], fallback: _selectedView);
-      if (_selectedView == 1) _selectedView = 8;
+      if ([1, 3, 6, 9].contains(_selectedView)) _selectedView = 8;
     }
     _load();
   }
@@ -135,7 +134,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
   Widget _viewTabs() => SizedBox(
         height: TAB_BAR_H,
         child: Row(children: [
-          for (final index in [11, 8, 3, 2, 0, 4, 5, 7, 10]) ...[
+          for (final index in [11, 8, 2, 0, 4, 5, 7, 10]) ...[
             if (index != 11) const SizedBox(width: ALL_SPACE_BLOCK),
             Expanded(
               child: Semantics(
@@ -191,6 +190,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
           teamSection: (section, team) => switch (section) {
                 2 => StrengthRegularGrid(teams: [team]),
                 3 => StrengthRosterGrid(team: team, year: widget.year),
+                4 => StrengthContracts(team: team, year: widget.year, colorTeams: _teams),
                 6 => StrengthCareers(teams: [team]),
                 _ => TeamStrengthBoard(org: widget.org, year: widget.year, providedTeams: [team], initialView: section),
               });
@@ -242,39 +242,10 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
     }
     final notes = team['notes'] is List ? (team['notes'] as List).map((note) => '$note').where((note) => note.isNotEmpty) : const <String>[];
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      if (!TeamSectionLayout.embedded(context) && _selectedView == 4)
-        Padding(
-            padding: const EdgeInsets.only(bottom: 6),
-            child: Row(children: [
-              for (final compare in [false, true])
-                Expanded(
-                    child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2),
-                        child: Material(
-                            color: _comparisonViews.contains(_selectedView) == compare ? widget.org.tabColor : Colors.grey.shade200,
-                            borderRadius: BorderRadius.circular(20),
-                            child: InkWell(
-                                key: ValueKey('strength-comparison-$compare'),
-                                onTap: () => setState(() {
-                                      if (compare) {
-                                        _comparisonViews.add(_selectedView);
-                                      } else {
-                                        _comparisonViews.remove(_selectedView);
-                                      }
-                                    }),
-                                child: Padding(
-                                    padding: EdgeInsets.zero,
-                                    child: SizedBox(
-                                        height: TAB_BAR_H,
-                                        child: Center(
-                                            child: Text(compare ? (widget.org.kind.name == 'npb' ? '12球団比較' : '30球団比較') : '各球団',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(color: _comparisonViews.contains(_selectedView) == compare ? Colors.white : Colors.black87))))))))),
-            ])),
       if (!TeamSectionLayout.embedded(context) && _selectedView != 2 &&
           _selectedView != 5 &&
           _selectedView != 7 &&
-          _selectedView != 0 && !(_selectedView == 4 && _comparisonViews.contains(4)))
+          _selectedView != 0 && _selectedView != 4)
         _teamSegments(),
       const SizedBox(height: 6),
       SectionExpanded(
@@ -322,13 +293,11 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                     })
                   : _selectedView == 2
                       ? StrengthRegularGrid(teams: _teams)
-                      : _selectedView == 3
-                          ? StrengthRosterGrid(team: team, year: widget.year)
-                          : _selectedView == 5
+                      : _selectedView == 5
                               ? StrengthDraft(year: widget.year)
                               : _selectedView == 7
                                   ? StrengthCareers(teams: _teams, org: widget.org)
-                                  : StrengthContracts(colorTeams: _teams, team: team, year: widget.year, comparisonTeams: _comparisonViews.contains(4) ? _teams : null)),
+                                  : StrengthContracts(colorTeams: _teams, team: team, year: widget.year, comparisonTeams: _teams)),
     ]);
   }
 

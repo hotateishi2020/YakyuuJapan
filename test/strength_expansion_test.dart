@@ -12,6 +12,21 @@ import 'package:Yakyuu_Japan/View/strength_contracts.dart';
 import 'package:Yakyuu_Japan/logic/strength_usage.dart';
 
 void main() {
+  test('ドラフト動画は再生数最多の通常動画を選び未取得は空欄にする', () {
+    expect(draftTopVideo({}), isNull);
+    expect(draftTopVideo({'feature_videos': [
+      {'video_id': 'aaa00000001', 'view_count': 100},
+      {'video_id': 'aaa00000002', 'view_count': 2000},
+      {'video_id': 'aaa00000003', 'view_count': 99999, 'is_short': true},
+    ]})?['video_id'], 'aaa00000002');
+  });
+  test('社会人と独立リーグの表彰を経歴に時系列で表示する', () {
+    expect(draftCareerText({'career_facts': [
+      {'kind': 'corporate_award', 'year':2025, 'label':'2025年 社会人 最優秀防御率'},
+      {'kind': 'independent_award', 'year':2026, 'label':'2026年 独立リーグ 最多セーブ'},
+    ]}), '2026年 独立リーグ 最多セーブ\n2025年 社会人 最優秀防御率');
+  });
+
   test('ドラフト甲子園経歴は現在の大学でなく当時の高校を表示する', () {
     expect(draftCareerText({'team': '現在の大学', 'career_facts': [
       {'kind': 'koshien', 'year': 2022, 'school': '当時の高校', 'label': '2022年夏の甲子園：優勝'},
@@ -137,7 +152,7 @@ void main() {
     expect(find.textContaining('予想者：AIデータ二刀流'), findsNothing);
     await t.tap(find.text('閉じる'));
     await t.pumpAndSettle();
-    expect(t.getBottomRight(find.byKey(const ValueKey('draft-cell-菰田陽生-11'))).dx, closeTo(1200, .1));
+    expect(t.getBottomRight(find.byKey(const ValueKey('draft-cell-菰田陽生-12'))).dx, closeTo(1232, .1));
     final age = find.byKey(const ValueKey('draft-cell-菰田陽生-4'));
     expect(find.descendant(of: age, matching: find.text('18')), findsOneWidget);
     expect(find.byTooltip('2027年3月31日時点'), findsOneWidget);
@@ -449,7 +464,7 @@ void main() {
     expect(find.text('織田翔希'), findsOneWidget);
     expect(find.byType(ChoiceChip), findsNothing);
     expect(find.byIcon(Icons.info_outline), findsNothing);
-    for (final header in ['注目度', '選手名', '所属', 'チーム', '年齢', '身長', '体重', '投打', 'ポジション', '経歴', '特徴', '獲得予想']) {
+    for (final header in ['注目度', '選手名', '所属', 'チーム', '年齢', '身長', '体重', '投打', 'ポジション', '経歴', '特徴', '獲得予想', '特集動画']) {
       expect(find.text(header), findsOneWidget);
     }
     expect(find.text('高校生'), findsWidgets);

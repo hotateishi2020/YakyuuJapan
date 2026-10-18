@@ -65,3 +65,24 @@ List<Map<String, dynamic>> interleagueStandings(List<Map<String, dynamic>> teams
   result.sort((a, b) => ((b['pct'] as double?) ?? -1).compareTo((a['pct'] as double?) ?? -1));
   return result;
 }
+
+/// 1 = リーグ内最高、-1 = 最低。全チーム同率・勝敗なしは強調しない。
+int scheduleOpponentExtreme(List<Map<String, dynamic>> teams,
+    List<Map<String, dynamic>> games, Map<String, dynamic> team, dynamic opponent) {
+  String league(Map<String, dynamic> row) => '${row['source_league_id'] ?? row['id_league']}';
+  double? rate(Map<String, dynamic> row) {
+    if ('${row['id_team']}' == '$opponent') return null;
+    final record = scheduleRecord(games, row['id_team'], opponent: opponent);
+    return record.wins + record.losses == 0 ? null : record.wins / (record.wins + record.losses);
+  }
+  final value = rate(team);
+  if (value == null) return 0;
+  final rates = teams.where((row) => league(row) == league(team)).map(rate).whereType<double>().toList()..sort();
+  if (rates.length < 2 || rates.first == rates.last) return 0;
+  return value == rates.last ? 1 : value == rates.first ? -1 : 0;
+}
+
+String starterWorkloadLabel(dynamic value) {
+  final rate = num.tryParse('$value');
+  return rate == null || !rate.isFinite || rate < 0 || rate > 1 ? '—' : '${(rate * 100).toStringAsFixed(1)}%';
+}

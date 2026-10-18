@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/logic/auth_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/View/strength_careers.dart';
@@ -48,6 +49,9 @@ final teams = <Map<String, dynamic>>[
 ];
 void main() {
   testWidgets('経歴の各分類で全球団と選択球団を切り替える', (tester) async {
+    AuthSession.instance.user = AuthUser.fromJson({'id': 1, 'id_team_fav': 1});
+    AuthSession.instance.token = 'test';
+    addTearDown(() { AuthSession.instance.user = null; AuthSession.instance.token = null; });
     final fixtures = [for (var id = 1; id <= 2; id++) {
       'id_team': id, 'name_team': '球団$id', 'roster': [{
         'player_key': '$id', 'name': '選手$id', 'birth_country': '日本', 'birth_state': '福岡県',

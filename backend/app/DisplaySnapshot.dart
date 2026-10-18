@@ -116,6 +116,17 @@ class DisplaySnapshot {
   static Future<void> _refreshTeams(Connection conn, int year) async {
     await ensure(conn);
     final rows = Postgres.toJson(await Postgres.execute(conn, AppSql.selectStatsTeam(), data: [year]));
+    // 起用データが未作成の環境でも順位表の更新は継続する。
+    final pitchingTable = await conn.execute("SELECT to_regclass('t_strength_pitching') IS NOT NULL");
+    if (pitchingTable.first.first == true) {
+      final workloads = Postgres.toJson(await conn.execute('''SELECT id_team,
+        SUM(starter_outs)::double precision / NULLIF(SUM(total_outs), 0) AS starter_workload_rate
+        FROM t_strength_pitching WHERE int_year = \$1 GROUP BY id_team''', parameters: [year]));
+      final byTeam = {for (final value in workloads) '${value['id_team']}': value['starter_workload_rate']};
+      for (final row in rows) {
+        row['starter_workload_rate'] = byTeam['${row['id_team']}'];
+      }
+    }
     await _atomic(conn, () async {
       await conn.execute('DELETE FROM v_stats_teams WHERE int_year = \$1', parameters: [year]);
       await _insertPayloads(conn, 'v_stats_teams', year, rows);

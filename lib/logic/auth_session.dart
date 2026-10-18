@@ -1,3 +1,4 @@
+import 'error_snapshot.dart';
 import '../tools/network_error.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -22,7 +23,8 @@ String _clientSessionId() {
   return id;
 }
 
-String _clientRequestId() => 'req_${DateTime.now().microsecondsSinceEpoch.toRadixString(16)}';
+String _clientRequestId() =>
+    'req_${DateTime.now().microsecondsSinceEpoch.toRadixString(16)}';
 
 String _screenOf(String action) {
   if (action.contains('npb')) return 'NPB';
@@ -60,7 +62,8 @@ Map<String, dynamic> _clientLogBody({
     if (details != null && details.isNotEmpty) 'details': details,
     if (error != null) 'error_type': error.runtimeType.toString(),
     if (error != null) 'message': error.toString(),
-    if (frame.isNotEmpty) 'stack': frame.length > 4000 ? frame.substring(0, 4000) : frame,
+    if (frame.isNotEmpty)
+      'stack': frame.length > 4000 ? frame.substring(0, 4000) : frame,
     if (apiPath != null && apiPath.isNotEmpty) 'api_path': apiPath,
     'source': 'client',
   };
@@ -99,8 +102,10 @@ class AuthUser {
   final String namePlayerFav;
   final bool notifyNews;
   final bool notifyEvent;
+
   /// false のとき News に New を出す
   final bool readNews;
+
   /// false のときイベント日程に New を出す
   final bool readEvent;
   final bool admin;
@@ -197,10 +202,18 @@ class AuthSession {
 
   /// ブラウザの TimeoutException をエラーログへ残す。記録そのものの失敗は画面に出さない。
   Future<void> reportTimeout(Object error, [StackTrace? stack]) async {
-    if (!isClientTimeout(error) || _reportingTimeout) return;
+    if (!isClientTimeout(error)) return;
+    await reportError(error, stack);
+  }
+
+  /// Save application errors together with a best-effort screen capture.
+  Future<void> reportError(Object error, [StackTrace? stack]) async {
+    if (_reportingTimeout) return;
     final message = error.toString();
     final now = DateTime.now();
-    if (_lastTimeoutMessage == message && _lastTimeoutAt != null && now.difference(_lastTimeoutAt!) < const Duration(seconds: 5)) {
+    if (_lastTimeoutMessage == message &&
+        _lastTimeoutAt != null &&
+        now.difference(_lastTimeoutAt!) < const Duration(seconds: 5)) {
       return;
     }
     _reportingTimeout = true;
@@ -208,6 +221,8 @@ class AuthSession {
     _lastTimeoutAt = now;
     final requestId = _clientRequestId();
     try {
+      final snapshot = await ErrorSnapshot.capture()
+          .timeout(const Duration(seconds: 2), onTimeout: () => null);
       await http
           .post(
             Env.api('/client/error'),
@@ -215,13 +230,16 @@ class AuthSession {
               ..._authHeaders,
               'x-request-id': requestId,
             },
-            body: jsonEncode(_clientLogBody(
-              action: '通信タイムアウト',
-              status: '失敗',
-              error: error,
-              stack: '${stack ?? ''}',
-              requestId: requestId,
-            )),
+            body: jsonEncode({
+              if (snapshot != null) 'snapshot_png': snapshot,
+              ..._clientLogBody(
+                action: isClientTimeout(error) ? '通信タイムアウト' : 'アプリエラー',
+                status: '失敗',
+                error: error,
+                stack: '${stack ?? ''}',
+                requestId: requestId,
+              ),
+            }),
           )
           .timeout(const Duration(seconds: 8));
     } catch (_) {}
@@ -240,7 +258,8 @@ class AuthSession {
               ..._authHeaders,
               'x-request-id': requestId,
             },
-            body: jsonEncode(_clientLogBody(action: action, year: year, requestId: requestId)),
+            body: jsonEncode(_clientLogBody(
+                action: action, year: year, requestId: requestId)),
           )
           .timeout(const Duration(seconds: 8));
     } catch (e, st) {
@@ -253,7 +272,8 @@ class AuthSession {
   bool get showInfoNew => showNewsNew || showEventNew;
 
   Map<String, String> get _authHeaders => {
-        if (token != null && token!.isNotEmpty) 'Authorization': 'Bearer $token',
+        if (token != null && token!.isNotEmpty)
+          'Authorization': 'Bearer $token',
         'content-type': 'application/json; charset=utf-8',
       };
 
@@ -303,7 +323,8 @@ class AuthSession {
     await login(login: _debugLoginMail, password: _debugLoginPassword);
   }
 
-  Future<String?> login({required String login, required String password}) async {
+  Future<String?> login(
+      {required String login, required String password}) async {
     try {
       final res = await http
           .post(
@@ -362,12 +383,10 @@ class AuthSession {
     writeBrowserCookie(authManualLogoutCookie, '1');
     if (t == null || t.isEmpty) return;
     try {
-      await http
-          .post(
-            Env.api('/auth/logout'),
-            headers: {'Authorization': 'Bearer $t'},
-          )
-          .timeout(const Duration(seconds: 10));
+      await http.post(
+        Env.api('/auth/logout'),
+        headers: {'Authorization': 'Bearer $t'},
+      ).timeout(const Duration(seconds: 10));
     } catch (e, st) {
       unawaited(reportTimeout(e, st));
     }
@@ -397,7 +416,10 @@ class AuthSession {
       if (map['need_code'] == true) return (error: null, codeSent: true);
       return (error: null, codeSent: false);
     } catch (e) {
-      return (error: networkErrorMessage(e, fallback: '通信エラー: $e'), codeSent: false);
+      return (
+        error: networkErrorMessage(e, fallback: '通信エラー: $e'),
+        codeSent: false
+      );
     }
   }
 
@@ -455,7 +477,8 @@ class AuthSession {
     }
   }
 
-  Future<String?> updateNotifications({required bool notifyNews, required bool notifyEvent}) async {
+  Future<String?> updateNotifications(
+      {required bool notifyNews, required bool notifyEvent}) async {
     try {
       final res = await http
           .post(
@@ -481,7 +504,9 @@ class AuthSession {
   }
 
   Future<List<Map<String, dynamic>>> fetchTeams() async {
-    final res = await http.get(Env.api('/auth/teams')).timeout(const Duration(seconds: 20));
+    final res = await http
+        .get(Env.api('/auth/teams'))
+        .timeout(const Duration(seconds: 20));
     final map = jsonDecode(res.body) as Map<String, dynamic>;
     if (res.statusCode != 200 || map['ok'] != true) return const [];
     final list = map['teams'];
@@ -489,7 +514,8 @@ class AuthSession {
     return [for (final e in list) Map<String, dynamic>.from(e as Map)];
   }
 
-  Future<List<Map<String, dynamic>>> fetchPlayers({required int idTeam, String q = ''}) async {
+  Future<List<Map<String, dynamic>>> fetchPlayers(
+      {required int idTeam, String q = ''}) async {
     final uri = Env.api('/auth/players').replace(queryParameters: {
       'id_team': '$idTeam',
       if (q.trim().isNotEmpty) 'q': q.trim(),
@@ -511,10 +537,12 @@ class AuthSession {
 
   void _persistSession() {
     if (token != null && token!.isNotEmpty) {
-      writeBrowserCookie(authTokenCookie, token!, maxAgeSeconds: _sessionMaxAge);
+      writeBrowserCookie(authTokenCookie, token!,
+          maxAgeSeconds: _sessionMaxAge);
     }
     if (user != null) {
-      writeBrowserCookie(authUserCookie, jsonEncode(user!.toJson()), maxAgeSeconds: _sessionMaxAge);
+      writeBrowserCookie(authUserCookie, jsonEncode(user!.toJson()),
+          maxAgeSeconds: _sessionMaxAge);
     }
   }
 

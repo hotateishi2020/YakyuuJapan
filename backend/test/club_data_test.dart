@@ -30,6 +30,18 @@ void main() {
     expect(kept.single['name_home_logo'], '巨人');
     expect(mergeSeasonSchedule(teams, [{...fixture, 'finished': true}], [deleted]), hasLength(1));
   });
+  test('再確認した試合前の開始時刻をカレンダーへ反映する', () {
+    final result = mergeSeasonSchedule(teams, [
+      {...fixture, 'time': '2026-10-16 18:00:00'}
+    ], [
+      {'datetime_start': '2026-10-16 19:00:00', 'id_team_home': 1,
+       'id_team_away': 2, 'state': '試合前', 'flg_delete': false}
+    ]);
+    expect(result, hasLength(1));
+    expect(result.single['time'], '2026-10-16 19:00:00');
+    expect(result.single['state'], '試合前');
+    expect(result.single['regular'], true);
+  });
   test('終了と雨天中止を反映し、未開始データで確定結果を消さない', () {
     var games = mergeSeasonSchedule(teams, [
       fixture

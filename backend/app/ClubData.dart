@@ -79,11 +79,12 @@ List<Map<String, dynamic>> mergeSeasonSchedule(List<Map<String, dynamic>> teams,
     final ended = state.contains('終了') || state.contains('コールド');
     final canceled = state.contains('中止') || state.contains('延期');
     if (existing != null && existing['finished'] == true && !ended) continue;
-    if (existing == null || ended || canceled || state.contains('回') || state == '試合中') {
+    if (existing == null || existing['finished'] != true || ended || canceled || state.contains('回') || state == '試合中') {
       games[key] = {
         ...?existing,
         ...row,
         'date': date,
+        'time': row['datetime_start'],
         'finished': ended,
         'regular': existing?['regular'] ?? ['NM', 'EX'].contains(row['code_game'])
       };

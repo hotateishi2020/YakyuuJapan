@@ -1,6 +1,8 @@
 class VideoChannel {
   const VideoChannel(this.id, this.name, this.category, this.sourceUrl,
       {this.tabLabel,
+      this.contentFilter,
+      this.unknownToNpb = false,
       this.daily = false,
       this.league,
       this.videoOrg,
@@ -10,6 +12,8 @@ class VideoChannel {
       this.includeStreams = false,
       this.lookbackDays = 1,
       this.minimumVideos = 0});
+  final String? contentFilter;
+  final bool unknownToNpb;
   final String id;
   final String name;
   final String category;
@@ -24,16 +28,28 @@ class VideoChannel {
   final int minimumVideos;
   final List<String> teamIds;
   final List<String> keywords;
-  VideoChannel forVideoOrg(String org) => VideoChannel(id, name, category, sourceUrl,
-      videoOrg: org, tabLabel: tabLabel, daily: daily, league: league, color: color,
-      teamIds: teamIds, keywords: keywords, includeStreams: includeStreams,
-      lookbackDays: lookbackDays, minimumVideos: minimumVideos);
-  int get limit =>
-      category == 'teams' || category == 'related' || category == 'broadcast'
-          ? 30
-          : category == 'media'
-              ? 10
-              : 4;
+  VideoChannel forVideoOrg(String org) =>
+      VideoChannel(id, name, category, sourceUrl,
+          videoOrg: org,
+          contentFilter: contentFilter,
+          unknownToNpb: unknownToNpb,
+          tabLabel: tabLabel,
+          daily: daily,
+          league: league,
+          color: color,
+          teamIds: teamIds,
+          keywords: keywords,
+          includeStreams: includeStreams,
+          lookbackDays: lookbackDays,
+          minimumVideos: minimumVideos);
+  int get limit => category == 'tver' ||
+          category == 'teams' ||
+          category == 'related' ||
+          category == 'broadcast'
+      ? 30
+      : ['media', 'program'].contains(category)
+          ? 10
+          : 4;
   Map<String, dynamic> toJson() => {
         'id': id,
         'name': name,
@@ -41,11 +57,18 @@ class VideoChannel {
         if (league != null) 'league': league,
         if (color != null) 'color': color,
         'tab_label': tabLabel ?? name,
-        'display_mode': daily ? 'recent' : 'latest',
+        'display_mode': category == 'tver'
+            ? 'all'
+            : daily
+                ? 'recent'
+                : 'latest',
         'display_limit': limit,
         if (daily) 'lookback_days': lookbackDays,
         if (minimumVideos > 0) 'minimum_videos': minimumVideos,
-        'url': 'https://www.youtube.com/channel/$id',
+        'url': category == 'tver'
+            ? sourceUrl
+            : 'https://www.youtube.com/channel/$id',
+        if (category == 'tver') 'platform': 'tver',
       };
 }
 
@@ -167,6 +190,32 @@ const videoChannels = <VideoChannel>[
   VideoChannel("UCgxdkQmUjKLWjh058Pl4dAQ", "MNsports", "media",
       "https://www.youtube.com/@mnsports",
       videoOrg: 'npb'),
+  VideoChannel('tver', 'TVer', 'tver', 'https://tver.jp/search/野球',
+      videoOrg: 'npb'),
+  VideoChannel('UCKDNkN3a6zF1CyEJHBKmy-w', '野球いっかん！', 'program',
+      'https://www.youtube.com/@yakyuikkan',
+      videoOrg: 'npb', unknownToNpb: true),
+  VideoChannel('UC67Dybo-Sy1jsAWr39RXrBw', 'ダグアウト!!!', 'program',
+      'https://www.youtube.com/channel/UC67Dybo-Sy1jsAWr39RXrBw',
+      videoOrg: 'npb', unknownToNpb: true),
+  VideoChannel('UCSzd2tlFW_DvVPp44JmaUrg', 'プロ野球 ドラフトちゃんねる', 'program',
+      'https://www.youtube.com/channel/UCSzd2tlFW_DvVPp44JmaUrg',
+      videoOrg: 'npb', unknownToNpb: true),
+  VideoChannel('UCQhxtM_x7tu0Nm35zBAaLfA', 'スポーツナビ 野球チャンネル', 'program',
+      'https://www.youtube.com/@sportsnavi_baseball',
+      videoOrg: 'npb', unknownToNpb: true),
+  VideoChannel('UCDLxLZnFeZcu822vGZ43CqQ', '白鶴酒造公式チャンネル【里崎・野球対談】', 'program',
+      'https://www.youtube.com/channel/UCDLxLZnFeZcu822vGZ43CqQ',
+      contentFilter: 'satozaki', videoOrg: 'npb', unknownToNpb: true),
+  VideoChannel('UC8yHePe_RgUBE-waRWy6olw', 'PIVOT【野球関連】', 'program',
+      'https://www.youtube.com/@pivot00',
+      contentFilter: 'baseball', videoOrg: 'npb', unknownToNpb: true),
+  VideoChannel('UCJ_jf8BIsLasf31SxRbQTXQ', '熱闘ベースボールレコード', 'media',
+      'https://www.youtube.com/@user-baseballrecord',
+      videoOrg: 'npb', unknownToNpb: true),
+  VideoChannel('UC3A5dHSeD2Eyvdnn2q2yKzA', '4タコ【野球解説チャンネル】', 'media',
+      'https://www.youtube.com/@tako4baseball',
+      videoOrg: 'npb', unknownToNpb: true),
 ];
 
 // MLB sources plus per-video MLB filtering for the shared MNsports channel.
@@ -180,7 +229,10 @@ final mlbVideoChannels = <VideoChannel>[
   VideoChannel('UCgxdkQmUjKLWjh058Pl4dAQ', 'MNsports', 'media',
       'https://www.youtube.com/@mnsports',
       videoOrg: 'mlb'),
-  ...videoChannels.where((c) => c.category == 'ob').map((c) => c.forVideoOrg('mlb')),
+  ...videoChannels
+      .where(
+          (c) => c.category == 'ob' || c.category == 'tver' || c.unknownToNpb)
+      .map((c) => c.forVideoOrg('mlb')),
 ];
 
 // Shared baseball channels are assigned only when a title explicitly names a team.

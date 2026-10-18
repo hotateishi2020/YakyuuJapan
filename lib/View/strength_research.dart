@@ -1,5 +1,6 @@
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'dart:convert';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../tools/json_utils.dart';
@@ -136,12 +137,12 @@ class _StrengthDraftState extends State<StrengthDraft> {
                   final result = (order[a.$2['category']] ?? 4).compareTo(order[b.$2['category']] ?? 4);
                   return result == 0 ? a.$1.compareTo(b.$1) : result;
                 });
-              const headers = ['注目度', '選手名', '所属', 'チーム', '年齢', '身長', '体重', '投打', 'ポジション', '経歴', '特徴', '獲得予想'];
-              const minimumWidths = [42.0, 72.0, 50.0, 100.0, 42.0, 52.0, 50.0, 76.0, 68.0, 180.0, 180.0, 140.0];
+              const headers = ['注目度', '選手名', '所属', 'チーム', '年齢', '身長', '体重', '投打', 'ポジション', '経歴', '特徴', '獲得予想', '特集動画'];
+              const minimumWidths = [42.0, 72.0, 50.0, 100.0, 42.0, 52.0, 50.0, 76.0, 68.0, 180.0, 180.0, 140.0, 180.0];
               final minimumWidth = minimumWidths.reduce((a, b) => a + b);
               final scale = constraints.maxWidth > minimumWidth ? constraints.maxWidth / minimumWidth : 1.0;
               final widths = [for (final width in minimumWidths) width * scale];
-              final logosPerRow = ((widths.last - 12 + 2) / 38).floor().clamp(1, 12);
+              final logosPerRow = ((widths[11] - 12 + 2) / 38).floor().clamp(1, 12);
               const style = TextStyle(inherit: false, fontSize: 12, height: 1.4, color: Colors.black87);
               double textHeight(String text, double width, int column) {
                 // Match the rendered font and the space inside padding + border.
@@ -157,7 +158,7 @@ class _StrengthDraftState extends State<StrengthDraft> {
               final heights = [
                 for (final p in players)
                   [
-                    48.0,
+                    if (draftTopVideo(p.$2) != null) 94.0 + textHeight('${draftTopVideo(p.$2)!['view_count']}回再生', widths[12], 12) else 48.0,
                     for (var i = 0; i < 11; i++) textHeight(_values(p.$2)[i], widths[i], i),
                     ((listMapFromJson(p.$2['predictions']).length / logosPerRow).ceil() * 38 + 12).toDouble(),
                   ].reduce((a, b) => a > b ? a : b)
@@ -169,6 +170,28 @@ class _StrengthDraftState extends State<StrengthDraft> {
                   if (index == 4) {
                     child = Tooltip(message: '${widget.year + 1}年3月31日時点', child: child);
                   }
+                } else if (index == 12) {
+                  final video = draftTopVideo(player);
+                  child = video == null ? Text(player['feature_video_checked_at'] == null ? '未取得' : '—', style: style) : Tooltip(
+                    message: '${video['title']}\n${video['view_count']}回再生（取得時点）',
+                    child: InkWell(
+                      key: ValueKey('draft-video-${player['name']}'),
+                      onTap: () async {
+                        final uri = Uri.https('www.youtube.com', '/watch', {'v': '${video['video_id']}'});
+                        var opened = false;
+                        try { opened = await launchUrl(uri, mode: LaunchMode.externalApplication, webOnlyWindowName: '_blank'); } catch (_) {}
+                        if (!opened && context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('動画を開けませんでした。')));
+                      },
+                      child: Column(mainAxisSize: MainAxisSize.min, children: [
+                        Flexible(child: SizedBox(height: 94, width: 168, child: Stack(fit: StackFit.expand, children: [
+                          Image.network('https://i.ytimg.com/vi/${video['video_id']}/hqdefault.jpg', fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black12)),
+                          const Center(child: Icon(Icons.play_circle_fill, color: Colors.white, size: 32)),
+                        ]))),
+                        Text('${video['view_count']}回再生', maxLines: 1, style: const TextStyle(inherit: false, color: Colors.black87, height: 1.4, fontSize: 11)),
+                      ]),
+                    ),
+                  );
                 } else if (index == 11) {
                   child = Wrap(spacing: 2, runSpacing: 2, children: [
                     for (final prediction in listMapFromJson(player['predictions']))
@@ -270,13 +293,20 @@ class _StrengthDraftState extends State<StrengthDraft> {
                     Padding(
                         padding: const EdgeInsets.all(8),
                         child: Text(
-                            "確認日：${data['checked_at']}。年齢は${widget.year + 1}年3月31日時点（生年月日未確認は—）。選手名で詳細、球団ロゴで指名予想の根拠を表示。注目度はアプリ予想（タップで基準と根拠）。S競合必至／A競合の可能性／Bドラ1候補／C上位候補／D指名候補／E育成候補。ロゴなしは予想根拠未確認。指名・獲得確定ではありません。",
+                            "確認日：${data['checked_at']}。年齢は${widget.year + 1}年3月31日時点（生年月日未確認は—）。選手名で詳細、球団ロゴで指名予想の根拠を表示。注目度はアプリ予想（タップで基準と根拠）。S競合必至／A競合の可能性／Bドラ1候補／C上位候補／D指名候補／E育成候補。ロゴなしは予想根拠未確認。特集動画は取得した通常動画の中で再生数最多の1件（タップで再生）。指名・獲得確定ではありません。",
                             style: const TextStyle(fontSize: 11, color: Colors.black54))),
                   ]),
                 )),
               ]);
             },
           ));
+}
+
+Map<String, dynamic>? draftTopVideo(Map<String, dynamic> player) {
+  final videos = listMapFromJson(player['feature_videos']).where((v) =>
+    RegExp(r'^[A-Za-z0-9_-]{11}$').hasMatch('${v['video_id']}') && v['view_count'] is num && v['is_short'] != true).toList()
+    ..sort((a,b) => (b['view_count'] as num).compareTo(a['view_count'] as num));
+  return videos.isEmpty ? null : videos.first;
 }
 
 String draftCareerText(Map<String, dynamic> player) {

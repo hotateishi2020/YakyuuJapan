@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'team_section_layout.dart';
 import 'package:flutter/material.dart';
 import '../logic/strength_usage.dart';
 import '../logic/contract_fa.dart';
@@ -571,8 +572,8 @@ class _StrengthContractsState extends State<StrengthContracts> {
           ChoiceChip(label: const Text('生涯年俸順'), selected: _sortByCareer, onSelected: (_) => setState(() => _sortByCareer = true)),
         ]),
       ),
-      Expanded(
-          child: NestedScrollView(
+      SectionExpanded(
+          child: _ContractScroll(
               key: const ValueKey('contract-vertical-scroll'),
               headerSliverBuilder: (context, innerBoxIsScrolled) => [
                     if (widget.comparisonTeams != null) SliverToBoxAdapter(child: TeamSalaryChart(teams: teams, year: year)),
@@ -594,9 +595,11 @@ class _StrengthContractsState extends State<StrengthContracts> {
                               Positioned(left: 160, top: 0, bottom: 0, width: 180, child: _careerCell(Container(color: Colors.grey.shade200, alignment: Alignment.center, child: const Text('生涯年俸')))),
                               Positioned(left: 0, top: 0, bottom: 0, width: 160, child: _pinnedName(const Center(child: Text('球団・選手')))),
                             ])),
-                        Expanded(
+                        SectionExpanded(
                             child: ListView.builder(
-                                primary: true,
+                                primary: !TeamSectionLayout.embedded(context),
+                                shrinkWrap: TeamSectionLayout.embedded(context),
+                                physics: TeamSectionLayout.embedded(context) ? const NeverScrollableScrollPhysics() : null,
                                 key: ValueKey('contract-rows-${teams.map((t) => t['id_team']).join('-')}'),
                                 itemCount: entries.length + 1,
                                 itemBuilder: (context, index) {
@@ -749,4 +752,15 @@ class _StrengthContractsState extends State<StrengthContracts> {
                       ]))))),
     ]);
   }
+}
+
+/// Team pages share one vertical scrollbar; comparison retains its pinned chart.
+class _ContractScroll extends StatelessWidget {
+  const _ContractScroll({super.key, required this.headerSliverBuilder, required this.body});
+  final NestedScrollViewHeaderSliversBuilder headerSliverBuilder;
+  final Widget body;
+  @override
+  Widget build(BuildContext context) => TeamSectionLayout.embedded(context)
+      ? body
+      : NestedScrollView(headerSliverBuilder: headerSliverBuilder, body: body);
 }

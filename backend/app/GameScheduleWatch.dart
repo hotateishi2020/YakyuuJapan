@@ -3,7 +3,7 @@ import 'FetchMLB.dart';
 import 'FetchURL.dart';
 import 'ScheduledLog.dart';
 
-/// Rechecks today and tomorrow in JST even when nobody has opened a browser.
+/// Rechecks today through ten days ahead in JST even when nobody has opened a browser.
 class GameScheduleWatch {
   static Timer? _timer;
   static bool _busy = false;
@@ -26,10 +26,10 @@ class GameScheduleWatch {
           'mlb': FetchMLB.refreshNearSchedule,
         }.entries) {
           try {
-            await ScheduledLog.run('${task.key}_schedule_today_tomorrow', task.value);
+            await ScheduledLog.run('${task.key}_schedule_next_10_days', task.value);
             onUpdated();
           } catch (e) {
-            print('${task.key}当日・翌日日程の再確認失敗（次回再試行）: $e');
+            print('${task.key}当日〜10日後の日程の再確認失敗（次回再試行）: $e');
           }
         }
       } finally {

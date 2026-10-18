@@ -1,3 +1,5 @@
+import 'TverFeed.dart';
+import 'VideoContentFilter.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
@@ -107,12 +109,17 @@ dynamic _channelContent(String html, String channelId,
   if (tabs is! List) throw const FormatException('Missing video tab');
   final selected = tabs
       .whereType<Map>()
-      .map((t) => t['tabRenderer'])
+      .map((t) =>
+          tab == 'search' ? t['expandableTabRenderer'] : t['tabRenderer'])
       .whereType<Map>()
       .where((t) => t['selected'] == true)
       .firstOrNull;
   if (selected == null ||
-      !(tab == 'streams' ? ['ライブ', 'Live'] : ['動画', 'Videos'])
+      !(tab == 'search'
+              ? ['検索', 'Search']
+              : tab == 'streams'
+                  ? ['ライブ', 'Live']
+                  : ['動画', 'Videos'])
           .contains(selected['title'])) {
     throw const FormatException('Not the videos tab');
   }
@@ -277,7 +284,11 @@ List<Map<String, dynamic>> sortVideosByPublishedAt(
 
 List<Map<String, dynamic>> selectChannelVideos(
     VideoChannel channel, List<Map<String, dynamic>> videos, DateTime now) {
-  videos = filterVideoOrganization(channel, videos);
+  videos = filterVideoOrganization(channel, videos).where((v) {
+    final expires = DateTime.tryParse('${v['expires_at']}');
+    return expires == null || expires.isAfter(now);
+  }).toList();
+  if (channel.category == 'tver') return sortVideosByPublishedAt(videos);
   if (!channel.daily)
     return sortVideosByPublishedAt(videos).take(channel.limit).toList();
   final start = videoWindowStart(now, lookbackDays: channel.lookbackDays);
@@ -339,8 +350,13 @@ List<Map<String, dynamic>> filterVideoOrganization(
   final scope = channel.videoOrg ?? (channel.category == 'ob' ? 'npb' : null);
   if (scope == null) return videos;
   return videos.where((video) {
+    if (channel.category == 'tver') {
+      return tverVideoOrganization('${video['title'] ?? ''}') == scope;
+    }
     final organizations = videoOrganizations('${video['title'] ?? ''}');
-    if (organizations.isEmpty && channel.category == 'ob') return scope == 'npb';
+    if (organizations.isEmpty &&
+        (channel.category == 'ob' || channel.unknownToNpb))
+      return scope == 'npb';
     return organizations.contains(scope);
   }).toList();
 }
@@ -364,17 +380,26 @@ List<Map<String, dynamic>> groupVideoChannels(
   for (final source in definitions.where((c) => c.category == 'ob')) {
     final cached = byId[source.id];
     if (cached == null) continue;
-    for (final video in (cached['videos'] as List).cast<Map<String, dynamic>>()) {
+    for (final video
+        in (cached['videos'] as List).cast<Map<String, dynamic>>()) {
       final target = expertVideoTeam('${video['title'] ?? ''}');
       if (target == null) continue;
       final mlb = target.startsWith('mlb-team-');
-      if (mlb ? source.videoOrg != 'mlb' :
-          !definitions.any((c) => c.id == target && c.category == 'teams')) continue;
+      if (mlb
+          ? source.videoOrg != 'mlb'
+          : !definitions.any((c) => c.id == target && c.category == 'teams'))
+        continue;
       if (cached['status'] != 'ok') movedIncomplete.add(target);
-      moved.putIfAbsent(target, () => {}).putIfAbsent('${video['id']}', () => {
-        ...withVideoSortTime(video, DateTime.tryParse('${cached['fetched_at']}') ?? DateTime.now()),
-        'source_name': source.name, 'source_channel_id': source.id,
-      });
+      moved.putIfAbsent(target, () => {}).putIfAbsent(
+          '${video['id']}',
+          () => {
+                ...withVideoSortTime(
+                    video,
+                    DateTime.tryParse('${cached['fetched_at']}') ??
+                        DateTime.now()),
+                'source_name': source.name,
+                'source_channel_id': source.id,
+              });
       movedIds.putIfAbsent(source.id, () => {}).add('${video['id']}');
     }
   }
@@ -383,9 +408,13 @@ List<Map<String, dynamic>> groupVideoChannels(
         .where((c) => !['related', 'broadcast'].contains(c.category)))
       if (byId[team.id] case final Map<String, dynamic> value)
         if (team.category != 'teams')
-          { ...value, if (team.category == 'ob')
-            'videos': (value['videos'] as List).where((v) =>
-                !(movedIds[team.id]?.contains('${v['id']}') ?? false)).toList(),
+          {
+            ...value,
+            if (team.category == 'ob')
+              'videos': (value['videos'] as List)
+                  .where((v) =>
+                      !(movedIds[team.id]?.contains('${v['id']}') ?? false))
+                  .toList(),
           }
         else
           (() {
@@ -397,7 +426,7 @@ List<Map<String, dynamic>> groupVideoChannels(
             for (final source in definitions) {
               final own = source.id == team.id;
               final dedicated = source.teamIds.contains(team.id);
-              final shared = ['league', 'ob', 'media', 'broadcast']
+              final shared = ['league', 'ob', 'media', 'program', 'broadcast']
                   .contains(source.category);
               if (!own && !dedicated && !shared) continue;
               final cached = byId[source.id];
@@ -465,12 +494,14 @@ List<Map<String, dynamic>> groupVideoChannels(
               'videos': visible,
             };
           })(),
-    for (final entry in moved.entries.where((e) => e.key.startsWith('mlb-team-')))
+    for (final entry
+        in moved.entries.where((e) => e.key.startsWith('mlb-team-')))
       {
         'id': entry.key,
         'name': '${mlbVideoTeams[entry.key.substring(9)]!.first}の関連動画',
         'tab_label': mlbVideoTeams[entry.key.substring(9)]!.first,
-        'category': 'mlb_teams', 'display_mode': 'all',
+        'category': 'mlb_teams',
+        'display_mode': 'all',
         'status': movedIncomplete.contains(entry.key) ? 'partial' : 'ok',
         'videos': sortVideosByPublishedAt(entry.value.values.toList()),
       },
@@ -624,9 +655,10 @@ class VideoFeedService {
   }
 
   Future<String> _getResponse(Uri uri) async {
-    final response = await _client
-        .get(uri, headers: _headers)
-        .timeout(const Duration(seconds: 8));
+    final response = await _client.get(uri, headers: {
+      ..._headers,
+      if (uri.host == 'service-api.tver.jp') 'x-tver-platform-type': 'web'
+    }).timeout(const Duration(seconds: 8));
     if (response.statusCode != 200)
       throw const FormatException('YouTube unavailable');
     return utf8.decode(response.bodyBytes);
@@ -762,6 +794,28 @@ class VideoFeedService {
             _now()),
       };
 
+  final _contentMatches = <String, bool>{};
+  Future<bool> _matchesContent(
+      VideoChannel channel, Map<String, dynamic> video) async {
+    final key = '${channel.id}:${video['id']}';
+    if (_contentMatches.containsKey(key)) return _contentMatches[key]!;
+    final title = '${video['title']}';
+    if (matchesVideoContent(channel.contentFilter, title))
+      return _contentMatches[key] = true;
+    if (channel.contentFilter == 'baseball')
+      return _contentMatches[key] = false;
+    if (!RegExp(r'里崎|satozaki', caseSensitive: false).hasMatch(title))
+      return _contentMatches[key] = false;
+    // Mixed channels require the description to identify the guest/topic.
+    final page = await _get(Uri.https(
+        'www.youtube.com', '/watch', {'v': '${video['id']}', 'hl': 'ja'}));
+    final player = _initialData(page, variable: 'ytInitialPlayerResponse');
+    final description = '${player['videoDetails']?['shortDescription'] ?? ''}';
+    return _contentMatches[key] = matchesVideoContent(
+        channel.contentFilter, title,
+        description: description);
+  }
+
   // Scan several regular-video pages: news can bury baseball uploads quickly.
   Future<({List<Map<String, dynamic>> videos, bool complete})> _broadcastVideos(
       VideoChannel channel) async {
@@ -776,8 +830,14 @@ class VideoFeedService {
     var complete = true;
     for (var page = 0; page < 5; page++) {
       for (final video in batch) {
-        if (broadcastVideoTeams(channel, '${video['title']}').isNotEmpty) {
-          videos.putIfAbsent('${video['id']}', () => video);
+        try {
+          if (channel.contentFilter != null
+              ? await _matchesContent(channel, video)
+              : broadcastVideoTeams(channel, '${video['title']}').isNotEmpty) {
+            videos.putIfAbsent('${video['id']}', () => video);
+          }
+        } catch (_) {
+          complete = false;
         }
       }
       if (videos.length >= channel.limit ||
@@ -814,8 +874,25 @@ class VideoFeedService {
         break;
       }
     }
+    if (channel.contentFilter != null && videos.length < channel.limit) {
+      try {
+        final query = channel.contentFilter == 'baseball' ? '野球' : '里崎 野球';
+        final search = await _get(Uri.https('www.youtube.com',
+            '/channel/${channel.id}/search', {'query': query, 'hl': 'ja'}));
+        final candidates =
+            parseRegularVideosPage(search, channel.id, tab: 'search').videos;
+        for (final video in candidates) {
+          if (await _matchesContent(channel, video))
+            videos.putIfAbsent('${video['id']}', () => video);
+        }
+      } catch (_) {
+        complete = false;
+      }
+    }
     return (
-      videos: videos.values.take(channel.limit).toList(),
+      videos: channel.contentFilter != null
+          ? videos.values.toList()
+          : videos.values.take(channel.limit).toList(),
       complete: complete
     );
   }
@@ -833,7 +910,12 @@ class VideoFeedService {
     try {
       List<Map<String, dynamic>> videos;
       var complete = true;
-      if (channel.daily) {
+      if (channel.category == 'tver') {
+        final body = await _get(Uri.https('service-api.tver.jp',
+            '/api/v2/callKeywordSearch', {'keyword': '野球'}));
+        videos = parseTverSearch(
+            Map<String, dynamic>.from(jsonDecode(body)), _now());
+      } else if (channel.daily) {
         final recent = await _recent(channel);
         videos = recent.videos;
         complete = recent.complete;
@@ -850,7 +932,7 @@ class VideoFeedService {
           }
         }
       } else {
-        if (channel.category == 'broadcast') {
+        if (channel.category == 'broadcast' || channel.contentFilter != null) {
           final result = await _broadcastVideos(channel);
           videos = result.videos;
           complete = result.complete;
@@ -860,7 +942,9 @@ class VideoFeedService {
                   '/channel/${channel.id}/videos', {'hl': 'ja'})),
               channel.id);
         }
-        if (videos.isEmpty && channel.category != 'broadcast') {
+        if (videos.isEmpty &&
+            channel.category != 'broadcast' &&
+            channel.contentFilter == null) {
           throw const FormatException('Empty regular videos');
         }
         if (channel.keywords.isNotEmpty) {
@@ -873,7 +957,7 @@ class VideoFeedService {
             .take(channel.limit)
             .toList();
         if (channel.league != null ||
-            ['related', 'ob', 'media', 'broadcast']
+            ['related', 'ob', 'media', 'program', 'broadcast']
                 .contains(channel.category)) {
           await _loadDates(channel);
           final dated = <Map<String, dynamic>>[];
@@ -892,7 +976,9 @@ class VideoFeedService {
         }
       }
       if (!complete &&
-          (channel.daily || channel.category == 'broadcast') &&
+          (channel.daily ||
+              channel.category == 'broadcast' ||
+              channel.contentFilter != null) &&
           previous != null) {
         final merged = {
           for (final v

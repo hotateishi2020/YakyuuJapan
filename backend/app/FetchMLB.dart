@@ -690,7 +690,7 @@ class FetchMLB {
     return keep;
   }
 
-  /// Browser-independent preflight: today's and tomorrow's Japanese dates.
+  /// Browser-independent preflight: today through ten days ahead in Japan.
   static Future<void> refreshNearSchedule() async {
     final changed = <String>{};
     await Postgres.withConnection((conn) async {
@@ -703,8 +703,8 @@ class FetchMLB {
         rethrow;
       }
       final now = JapanClock.now();
-      for (final offset in [0, 1]) {
-        changed.add(DateFormat('yyyy-MM-dd').format(now.add(Duration(days: offset))));
+      for (final day in GameFetchSchedule.recheckDates(now)) {
+        changed.add(DateFormat('yyyy-MM-dd').format(day));
       }
       for (final day in changed) {
         await DisplaySnapshot.refreshGames(conn, int.parse(day.substring(0, 4)), from: day, to: day);
@@ -750,7 +750,7 @@ class FetchMLB {
       print('MLB明日以降は${GameFetchSchedule.futureInterval.inMinutes}分以内のためスキップ');
     }
     final today = DateTime(now.year, now.month, now.day);
-    final dates = nearDaysOnly ? [today, today.add(const Duration(days: 1))] : futureOnly
+    final dates = nearDaysOnly ? GameFetchSchedule.recheckDates(now) : futureOnly
         ? [for (var i = 1; i <= 10; i++) today.add(Duration(days: i))]
         : scheduleDates(now, includeFuture: includeFuture, todayOnly: todayOnly);
     final formatter = DateFormat('yyyy-MM-dd');

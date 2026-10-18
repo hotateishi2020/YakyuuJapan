@@ -697,7 +697,7 @@ void main() {
         mlbVideoChannels.where((c) => videoChannels.any((n) => n.id == c.id));
     expect(shared.where((c) => c.category == 'ob'), hasLength(16));
     expect(shared.every((c) => c.videoOrg == 'mlb'), isTrue);
-    expect(shared.where((c) => c.category == 'media').single.name, 'MNsports');
+    expect(shared.where((c) => c.category == 'media').map((c) => c.name), containsAll(['MNsports', '熱闘ベースボールレコード', '4タコ【野球解説チャンネル】']));
   });
   test(
       'video league classification respects context and does not default to NPB',
@@ -897,9 +897,9 @@ void main() {
     expect(
         (result[2]['videos'] as List).map((v) => v['id']), ['local', 'lions']);
   });
-  test('39チャンネルに指定先と12球団が重複なく含まれる', () {
-    expect(videoChannels, hasLength(39));
-    expect(videoChannels.map((c) => c.id).toSet(), hasLength(39));
+  test('48チャンネルに指定先と12球団が重複なく含まれる', () {
+    expect(videoChannels, hasLength(48));
+    expect(videoChannels.map((c) => c.id).toSet(), hasLength(48));
     expect(videoChannels.where((c) => c.category == 'teams'), hasLength(12));
     for (final label in [
       '近藤健介',

@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import '../tools/network_error.dart';
 import 'dart:convert';
@@ -77,9 +78,11 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
     try {
       final token = AuthSession.instance.token;
       final res = await http.get(
-        Env.api('/admin/logs').replace(queryParameters: {'q': _query.text.trim()}),
+        Env.api('/admin/logs')
+            .replace(queryParameters: {'q': _query.text.trim()}),
         headers: {
-          if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+          if (token != null && token.isNotEmpty)
+            'Authorization': 'Bearer $token',
         },
       ).timeout(const Duration(seconds: 20));
       if (!mounted) return;
@@ -128,7 +131,9 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
             'log_type': '操作',
             'level': 'INFO',
             'user_id': row['id_user'] ?? '',
-            'action': '${row['memo'] ?? ''}'.trim().isEmpty ? '${row['method'] ?? ''} ${row['url'] ?? ''}'.trim() : row['memo'],
+            'action': '${row['memo'] ?? ''}'.trim().isEmpty
+                ? '${row['method'] ?? ''} ${row['url'] ?? ''}'.trim()
+                : row['memo'],
             'status': '成功',
             'api_path': row['url'] ?? '',
           },
@@ -154,7 +159,8 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
   String _japanTime(String raw) {
     final text = raw.trim();
     if (text.isEmpty) return '';
-    final hasZone = text.endsWith('Z') || RegExp(r'[+-]\d{2}:?\d{2}$').hasMatch(text);
+    final hasZone =
+        text.endsWith('Z') || RegExp(r'[+-]\d{2}:?\d{2}$').hasMatch(text);
     if (!hasZone) {
       final shown = text.replaceFirst('T', ' ');
       final dot = shown.indexOf('.');
@@ -187,9 +193,21 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
     return value;
   }
 
+  Future<Uint8List> _loadSnapshot(String id) async {
+    final token = AuthSession.instance.token;
+    final response =
+        await http.get(Env.api('/admin/logs/snapshot/$id'), headers: {
+      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+    }).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) throw StateError('画面画像を取得できませんでした');
+    return response.bodyBytes;
+  }
+
   void _openDetail(Map<String, dynamic> row) {
     final stack = '${row['stack_trace'] ?? ''}'.trim();
     final contextText = '${row['context'] ?? ''}'.trim();
+    final snapshotId = row['snapshot_id'] as String?;
+    final snapshot = snapshotId == null ? null : _loadSnapshot(snapshotId);
     showDialog<void>(
       context: context,
       builder: (context) {
@@ -198,18 +216,43 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
           content: SizedBox(
             width: 640,
             child: SingleChildScrollView(
-              child: SelectableText(
-                [
-                  if (stack.isNotEmpty) 'スタックトレース\n$stack',
-                  if (contextText.isNotEmpty) 'エラー詳細\n$contextText',
-                  if (stack.isEmpty && contextText.isEmpty) _cell(row, 'action'),
-                ].join('\n\n'),
-                style: const TextStyle(fontSize: 12),
-              ),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (snapshot != null)
+                      FutureBuilder<Uint8List>(
+                          future: snapshot,
+                          builder: (context, result) {
+                            if (result.hasError) {
+                              return const Text('画面画像を取得できませんでした');
+                            }
+                            if (!result.hasData) {
+                              return const SizedBox(
+                                  height: 120, child: BaseballLoading());
+                            }
+                            return Image.memory(result.data!,
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, __, ___) =>
+                                    const Text('画面画像を表示できませんでした'));
+                          }),
+                    if (snapshot == null && row['log_type'] == 'エラー')
+                      const Text('画面画像なし'),
+                    SelectableText(
+                      [
+                        if (stack.isNotEmpty) 'スタックトレース\n$stack',
+                        if (contextText.isNotEmpty) 'エラー詳細\n$contextText',
+                        if (stack.isEmpty && contextText.isEmpty)
+                          _cell(row, 'action'),
+                      ].join('\n\n'),
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ]),
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('閉じる')),
+            TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('閉じる')),
           ],
         );
       },
@@ -218,7 +261,8 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final tableWidth = _columns.fold<double>(0, (sum, column) => sum + column.width);
+    final tableWidth =
+        _columns.fold<double>(0, (sum, column) => sum + column.width);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
@@ -243,7 +287,9 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                FilledButton(onPressed: _loading ? null : _load, child: const Text('絞り込み')),
+                FilledButton(
+                    onPressed: _loading ? null : _load,
+                    child: const Text('絞り込み')),
               ],
             ),
           ),
@@ -271,7 +317,8 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
                                     Expanded(
                                       child: ListView.builder(
                                         itemCount: _logs.length,
-                                        itemBuilder: (context, index) => _dataRow(_logs[index]),
+                                        itemBuilder: (context, index) =>
+                                            _dataRow(_logs[index]),
                                       ),
                                     ),
                                   ],
@@ -300,7 +347,13 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text(column.label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                  child: Text(column.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold)),
                 ),
               ),
             ),
@@ -316,7 +369,8 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
       child: InkWell(
         onTap: () => _openDetail(row),
         child: DecoratedBox(
-          decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Color(0xFFE0E0E0)))),
+          decoration: const BoxDecoration(
+              border: Border(bottom: BorderSide(color: Color(0xFFE0E0E0)))),
           child: Row(
             children: [
               for (final column in _columns)

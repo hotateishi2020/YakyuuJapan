@@ -8,7 +8,7 @@ sh tool/build_web.sh
 
 git add . 
 
-git commit -m "表示を修正しました。" 
+git commit -m "動画タブを追加しました。" 
 
 git push 
 

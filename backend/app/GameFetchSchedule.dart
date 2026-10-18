@@ -4,6 +4,12 @@ import 'ScheduledLog.dart';
 /// 昨日以前は一度読み込み済みと判断したら、その日は再取得しない。
 /// 今日は読み込みが終わって 10 秒後に、今日の分だけ取りに行く。
 class GameFetchSchedule {
+  /// 日本時間の当日から10日後まで（両端を含む）。
+  static List<DateTime> recheckDates(DateTime japanNow) {
+    final today = DateTime(japanNow.year, japanNow.month, japanNow.day);
+    return [for (var offset = 0; offset <= 10; offset++) today.add(Duration(days: offset))];
+  }
+
   static const futureInterval = Duration(minutes: 10);
   static const todayInterval = Duration(seconds: 10);
   static final _lastFuture = <String, DateTime>{};

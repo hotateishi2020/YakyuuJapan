@@ -1,3 +1,4 @@
+import 'app/ErrorSnapshot.dart';
 import 'app/GameScheduleWatch.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -1620,20 +1621,26 @@ void main() async {
     });
 
     app.post('/client/error', (Request request) async {
-      return tryCatchAPI(request, 'CLIENT', 'TIMEOUT', (conn) async {
+      return tryCatchAPI(request, 'CLIENT', 'ERROR', (conn) async {
         Map<String, dynamic> body = {};
         try {
-          final decoded = jsonDecode(await request.readAsString());
+          final bytes = <int>[];
+          await for (final chunk in request.read()) {
+            if (bytes.length + chunk.length > 2100000) return Response(413, body: 'payload too large');
+            bytes.addAll(chunk);
+          }
+          final decoded = jsonDecode(utf8.decode(bytes));
           if (decoded is Map) body = Map<String, dynamic>.from(decoded);
         } catch (_) {}
         final message = '${body['message'] ?? ''}'.trim();
-        if (!message.toLowerCase().contains('timeout')) {
-          return Response(400, body: 'timeout only');
+        if (message.isEmpty) {
+          return Response(400, body: 'message required');
         }
         final reporter = m_user();
         await _attachRequestUser(conn, request, reporter);
         reporter.category_system = 'CLIENT';
-        reporter.code_system = 'TIMEOUT';
+        reporter.code_system = message.toLowerCase().contains('timeout') ? 'TIMEOUT' : 'ERROR';
+        final snapshotId = await ErrorSnapshotStore().save(body['snapshot_png']);
         final stack = LogDetail.clip('${body['stack'] ?? ''}', 4000);
         final frame = LogDetail.stackFrame(stack);
         await insertLogError(
@@ -1644,17 +1651,19 @@ void main() async {
           detail: {
             ...LogDetail.clientInfo(request),
             'log_type': 'エラー',
+            'snapshot_id': snapshotId,
+            'snapshot_status': snapshotId != null ? 'saved' : 'unavailable',
             'level': 'ERROR',
             'user_id': reporter.id,
             'session_id': LogDetail.clip('${body['session_id'] ?? ''}', 80),
             'request_id': LogDetail.clip('${body['request_id'] ?? _requestId(request)}', 64),
             'screen_name': LogDetail.clip('${body['screen_name'] ?? ''}', 40),
-            'action': LogDetail.clip('${body['action'] ?? '通信タイムアウト'}', 80),
+            'action': LogDetail.clip('${body['action'] ?? 'アプリエラー'}', 80),
             'status': '失敗',
             'details': LogDetail.clip('${body['details'] ?? ''}', 500),
             'app_version': LogDetail.clip('${body['app_version'] ?? ''}', 20),
             'environment': LogDetail.clip('${body['environment'] ?? 'web'}', 20),
-            'error_type': LogDetail.clip('${body['error_type'] ?? 'TimeoutException'}', 80),
+            'error_type': LogDetail.clip('${body['error_type'] ?? 'Error'}', 80),
             'error_code': LogDetail.clip('${body['error_code'] ?? ''}', 40),
             'error_message': message.length > 2000 ? message.substring(0, 2000) : message,
             'source': LogDetail.clip('${body['source'] ?? 'client'}', 40),
@@ -1669,6 +1678,15 @@ void main() async {
           },
         );
         return Response.ok('ok');
+      });
+    });
+
+    app.get('/admin/logs/snapshot/<id>', (Request request, String id) async {
+      return tryCatchAPI(request, 'ADMIN', 'SNAPSHOT', (conn) async {
+        if (await Auth.adminUserId(conn, request) == null) return Response(403, body: 'forbidden');
+        final bytes = await ErrorSnapshotStore().read(id);
+        if (bytes == null) return Response.notFound('snapshot not found');
+        return Response.ok(bytes, headers: {'content-type': 'image/png', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff'});
       });
     });
 
@@ -1729,6 +1747,8 @@ void main() async {
           }
           return {
             'log_id': '${map['id'] ?? ''}',
+            'snapshot_id': detail['snapshot_id'],
+            'snapshot_status': detail['snapshot_status'],
             for (final key in ['ip_address', 'browser', 'device_type', 'user_agent']) key: '${detail[key] ?? ''}',
             'timestamp': stamp(map['crtat']),
             'log_type': logType.isEmpty ? fallbackType : logType,

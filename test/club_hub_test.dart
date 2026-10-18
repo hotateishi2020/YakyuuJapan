@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:Yakyuu_Japan/View/club_hub_board.dart';
+import 'package:Yakyuu_Japan/View/strength_grids.dart';
+import 'package:Yakyuu_Japan/View/strength_contracts.dart';
 import 'package:Yakyuu_Japan/View/team_strength_board.dart';
 import 'package:Yakyuu_Japan/View/EventCalendar.dart';
 import 'package:Yakyuu_Japan/View/GamesBoard.dart' show teamLogoAsset;
@@ -13,6 +15,62 @@ import 'package:Yakyuu_Japan/logic/club_analysis.dart';
 import 'package:Yakyuu_Japan/logic/season_schedule.dart';
 
 void main() {
+  testWidgets('契約タブは常に比較し球団別契約はチームのスポンサー直前に置く', (t) async {
+    await t.binding.setSurfaceSize(const Size(1200, 900));
+    addTearDown(() => t.binding.setSurfaceSize(null));
+    final teams = <Map<String,dynamic>>[for (var i=1; i<=12; i++) {
+      'id_team':i, 'name_team':'球団$i',
+      'roster':[{'player_key':'npb:$i','name':'選手$i','position':'投手'}],
+      'contracts':[{'player_key':'npb:$i','salary_history':[{'year':2026,'amount':10000000,'currency':'JPY'}]}],
+    }];
+    await http.runWithClient(() async {
+      await t.pumpWidget(MaterialApp(home: Scaffold(body: TeamStrengthBoard(
+        org: OrgConfig.npb, year: 2026, initialView:4, favoriteTeamId:2, providedTeams:teams,
+      ))));
+      await t.pumpAndSettle();
+      expect(find.byKey(const ValueKey('strength-comparison-false')), findsNothing);
+      expect(find.byKey(const ValueKey('strength-team-2')), findsNothing);
+      expect(t.widget<StrengthContracts>(find.byType(StrengthContracts)).comparisonTeams, hasLength(12));
+      await t.tap(find.byKey(const ValueKey('strength-view-8')));
+      await t.pumpAndSettle();
+      final hub = find.byType(ClubHubBoard);
+      final contracts = find.descendant(of:hub, matching:find.byType(StrengthContracts));
+      expect(contracts, findsOneWidget);
+      expect(t.widget<StrengthContracts>(contracts).comparisonTeams, isNull);
+      final sponsors=find.descendant(of:hub, matching:find.text('スポンサー・広告'));
+      expect(t.getBottomLeft(contracts).dy, lessThanOrEqualTo(t.getTopLeft(sponsors).dy));
+      await t.tap(find.byKey(const ValueKey('team-tab-segment-2')));
+      await t.pumpAndSettle();
+      expect(t.widget<StrengthContracts>(contracts).team['id_team'], 2);
+      expect(t.takeException(), isNull);
+      await t.tap(find.byKey(const ValueKey('strength-view-4')));
+      await t.pumpAndSettle();
+      // Comparison stays configured even after browsing a single team.
+      expect(find.byWidgetPredicate((w) => w is StrengthContracts && w.comparisonTeams?.length == 12), findsOneWidget);
+      expect(t.takeException(), isNull);
+      await t.pumpWidget(const SizedBox());
+    }, () => MockClient((_) async => http.Response('{"clubs":[]}',200)));
+  });
+
+  testWidgets('旧選手一覧はチームへ移り独立したタブを表示しない', (t) async {
+    await t.binding.setSurfaceSize(const Size(1200, 900));
+    addTearDown(() => t.binding.setSurfaceSize(null));
+    await http.runWithClient(() async {
+      await t.pumpWidget(const MaterialApp(home: Scaffold(body: TeamStrengthBoard(
+        org: OrgConfig.npb, year: 2026, initialView: 3,
+        providedTeams: [{'id_team':1, 'name_team':'球団A', 'roster':[]}],
+      ))));
+      await t.pumpAndSettle();
+      expect(find.byKey(const ValueKey('strength-view-3')), findsNothing);
+      expect(find.byKey(const ValueKey('strength-view-8')), findsOneWidget);
+      expect(t.widget<ClubHubBoard>(find.byType(ClubHubBoard)).view, 7);
+      expect(find.text('選手一覧'), findsOneWidget); // チーム内の見出し
+      expect(find.byType(StrengthRosterGrid), findsOneWidget);
+      expect(t.takeException(), isNull);
+      await t.pumpWidget(const SizedBox());
+    }, () => MockClient((_) async => http.Response('{"clubs":[]}',200)));
+  });
+
   test('戦前のイーグルスに楽天のロゴを割り当てない', () {
     expect(teamLogoAsset('イーグルス'), isNull);
     expect(teamLogoAsset('大和軍'), isNull);

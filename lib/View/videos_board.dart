@@ -1,3 +1,4 @@
+import '../logic/favorite_team.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -116,6 +117,28 @@ class _VideosBoardState extends State<VideosBoard> {
     }
   }
 
+  Future<void> _openTver(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri == null ||
+        uri.scheme != 'https' ||
+        uri.host != 'tver.jp' ||
+        !(uri.path.startsWith('/episodes/ep') ||
+            uri.path.startsWith('/search/'))) {
+      return;
+    }
+    try {
+      if (await launchUrl(uri,
+          mode: LaunchMode.externalApplication,
+          webOnlyWindowName: '_blank')) {
+        return;
+      }
+    } catch (_) {}
+    if (mounted) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('TVerを開けませんでした。')));
+    }
+  }
+
   Future<void> _open(String id, {bool channel = false}) async {
     if (!(channel
             ? RegExp(r'^UC[A-Za-z0-9_-]{22}$')
@@ -151,7 +174,9 @@ class _VideosBoardState extends State<VideosBoard> {
                             TextStyle(fontSize: 11, color: Colors.black54)))),
             IconButton(
                 tooltip: '動画を再読み込み',
-                onPressed: _loading || _serverLoading ? null : () => _load(refresh: true),
+                onPressed: _loading || _serverLoading
+                    ? null
+                    : () => _load(refresh: true),
                 icon: const Icon(Icons.refresh)),
           ]),
           if ((_loading || _serverLoading) && _channels.isNotEmpty)
@@ -183,7 +208,11 @@ class _VideosBoardState extends State<VideosBoard> {
                         ],
                         if (widget.org == OrgKind.mlb)
                           _switchingSection('mlb_teams', '球団関連動画'),
+                        _switchingSection('program', '野球番組・対談'),
                         _switchingSection('media', '野球系解説チャンネル'),
+                        for (final channel
+                            in _channels.where((c) => c['category'] == 'tver'))
+                          _channelSection(channel),
                       ],
                     )),
         ],
@@ -191,7 +220,9 @@ class _VideosBoardState extends State<VideosBoard> {
 
   double _expertTabWidth(BuildContext context, String label) {
     final painter = TextPainter(
-      text: TextSpan(text: label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+      text: TextSpan(
+          text: label,
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
       textDirection: Directionality.of(context),
       textScaler: MediaQuery.textScalerOf(context),
     )..layout();
@@ -203,7 +234,7 @@ class _VideosBoardState extends State<VideosBoard> {
   Widget _switchingSection(String category, String title) {
     final channels = _channels.where((c) => c['category'] == category).toList();
     if (channels.isEmpty) return const SizedBox.shrink();
-    if (category == 'ob' || category == 'media') {
+    if (category == 'ob' || category == 'media' || category == 'program') {
       final merged = <String, Map<String, dynamic>>{};
       for (final channel in channels) {
         for (final video in _visibleVideos(channel)) {
@@ -219,7 +250,11 @@ class _VideosBoardState extends State<VideosBoard> {
       final videos = _sortVideos(merged.values.toList());
       channels.insert(0, {
         'id': '$category-all',
-        'name': category == 'ob' ? '有識者の動画一覧' : '野球系解説チャンネル',
+        'name': category == 'ob'
+            ? '有識者の動画一覧'
+            : category == 'program'
+                ? '野球番組・対談'
+                : '野球系解説チャンネル',
         'tab_label': 'ALL',
         'category': category,
         'display_mode': 'all',
@@ -231,9 +266,9 @@ class _VideosBoardState extends State<VideosBoard> {
         'videos': videos,
       });
     }
-    if (category == 'media') {
+    if (category == 'media' || category == 'program') {
       return Column(
-        key: const ValueKey('videos-section-media'),
+        key: ValueKey('videos-section-$category'),
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [_channelSection(channels.first)],
       );
@@ -241,6 +276,9 @@ class _VideosBoardState extends State<VideosBoard> {
     final selected = channels
             .where((c) => c['id'] == _selectedChannels[category])
             .firstOrNull ??
+        (['teams', 'mlb_teams'].contains(category)
+            ? favoriteTeamRow(channels)
+            : null) ??
         channels.first;
     return Column(
         key: ValueKey('videos-section-$category'),
@@ -268,7 +306,8 @@ class _VideosBoardState extends State<VideosBoard> {
                         : widget.color;
                     return SizedBox(
                         width: category == 'ob'
-                            ? _expertTabWidth(context, '${channel['tab_label'] ?? channel['name']}')
+                            ? _expertTabWidth(
+                                context, '${channel['tab_label'] ?? channel['name']}')
                             : width,
                         child: Semantics(
                             button: true,
@@ -294,13 +333,7 @@ class _VideosBoardState extends State<VideosBoard> {
                                                 child: FittedBox(
                                                     fit: BoxFit.scaleDown,
                                                     child: Text('${channel['tab_label'] ?? channel['name']}',
-                                                        style: TextStyle(
-                                                            fontSize: 12,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            color: active && color.computeLuminance() <= .179
-                                                                ? Colors.white
-                                                                : Colors.black87))))))))));
+                                                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: active && color.computeLuminance() <= .179 ? Colors.white : Colors.black87))))))))));
                   }),
               ];
               return Row(
@@ -387,7 +420,9 @@ class _VideosBoardState extends State<VideosBoard> {
         .where(
             (v) => v['is_short'] != true && !'${v['url']}'.contains('/shorts/'))
         .toList());
-    if (channel['category'] == 'media') return regular;
+    if (['media', 'program', 'tver'].contains(channel['category'])) {
+      return regular;
+    }
     if (channel['display_mode'] == 'recent' ||
         channel['display_mode'] == 'all') {
       return regular;
@@ -396,6 +431,8 @@ class _VideosBoardState extends State<VideosBoard> {
   }
 
   Widget _channelSection(Map<String, dynamic> channel) {
+    final tver = channel['platform'] == 'tver';
+    final platform = tver ? 'TVer' : 'YouTube';
     final recent = channel['display_mode'] == 'recent';
     final combined = channel['display_mode'] == 'all';
     final limit = channel['category'] == 'teams' ? 30 : 4;
@@ -415,34 +452,38 @@ class _VideosBoardState extends State<VideosBoard> {
                 child: Text('${channel['name']}',
                     style: const TextStyle(
                         fontSize: 14, fontWeight: FontWeight.bold))),
-            if (!combined)
+            if (!combined || tver)
               IconButton(
-                  tooltip: '${channel['name']}をYouTubeで開く',
+                  tooltip: '${channel['name']}を$platformで開く',
                   icon: const Icon(Icons.open_in_new, size: 18),
-                  onPressed: () => _open('${channel['id']}', channel: true)),
+                  onPressed: () => tver
+                      ? _openTver('${channel['url']}')
+                      : _open('${channel['id']}', channel: true)),
           ]),
           Padding(
               padding: const EdgeInsets.only(bottom: 6),
               child: Text(
-                  combined
-                      ? ['teams', 'mlb_teams'].contains(channel['category'])
-                          ? '球団関連動画（新しい順・${videos.length}件）'
-                          : channel['category'] == 'ob'
-                          ? '各有識者の動画をすべて表示（新しい順・${videos.length}件）'
-                          : '各チャンネルの最新動画（新しい順・${videos.length}件）'
-                      : recent
-                          ? channel['lookback_days'] == 2
-                              ? '当日〜2日前の動画（10件未満の場合は最新10件）'
-                              : '当日・前日の動画'
-                          : channel['category'] == 'teams'
-                              ? '各配信元の最新動画を含む$limit件（新しい順）'
-                              : '新しい順に$limit件',
+                  tver
+                      ? '配信中の野球番組（放送日順・${videos.length}件）'
+                      : combined
+                          ? ['teams', 'mlb_teams'].contains(channel['category'])
+                              ? '球団関連動画（新しい順・${videos.length}件）'
+                              : channel['category'] == 'ob'
+                                  ? '各有識者の動画をすべて表示（新しい順・${videos.length}件）'
+                                  : '各チャンネルの最新動画（新しい順・${videos.length}件）'
+                          : recent
+                              ? channel['lookback_days'] == 2
+                                  ? '当日〜2日前の動画（10件未満の場合は最新10件）'
+                                  : '当日・前日の動画'
+                              : channel['category'] == 'teams'
+                                  ? '各配信元の最新動画を含む$limit件（新しい順）'
+                                  : '新しい順に$limit件',
                   style: const TextStyle(fontSize: 11, color: Colors.black54))),
           if (channel['status'] == 'partial')
-            const Padding(
-                padding: EdgeInsets.only(bottom: 6),
-                child: Text('一部の動画を取得できませんでした。再読み込みするか、YouTubeでご確認ください。',
-                    style: TextStyle(fontSize: 11, color: Colors.brown))),
+            Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Text('一部の動画を取得できませんでした。再読み込みするか、$platformでご確認ください。',
+                    style: const TextStyle(fontSize: 11, color: Colors.brown))),
           if (stale)
             Padding(
                 padding: const EdgeInsets.only(bottom: 6),
@@ -455,7 +496,11 @@ class _VideosBoardState extends State<VideosBoard> {
             Padding(
                 padding: const EdgeInsets.all(12),
                 child: Text(
-                    combined
+                    tver
+                        ? channel['status'] == 'ok'
+                            ? '現在配信中の野球番組はありません。'
+                            : 'TVerの番組を取得できませんでした。右上のアイコンからTVerを開けます。'
+                        : combined
                             ? '表示できる動画はありません。'
                             : channel['status'] == 'ok' && recent
                                 ? channel['lookback_days'] == 2
@@ -505,14 +550,17 @@ class _VideosBoardState extends State<VideosBoard> {
         : '${video['published_label'] ?? ''}';
     return Semantics(
         button: true,
-        label: '${video['title']}をYouTubeで開く',
+        label:
+            '${video['title']}を${video['platform'] == 'tver' ? 'TVer' : 'YouTube'}で開く',
         child: Material(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             key: ValueKey('video-${video['id']}'),
-            onTap: () => _open('${video['id']}'),
+            onTap: () => video['platform'] == 'tver'
+                ? _openTver('${video['url']}')
+                : _open('${video['id']}'),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [

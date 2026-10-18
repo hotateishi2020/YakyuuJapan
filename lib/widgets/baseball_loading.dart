@@ -71,12 +71,12 @@ class _BaseballLoadingState extends State<BaseballLoading>
                   width: 280,
                   height: 200,
                   child: Column(children: [
-                    SizedBox(
+                    Flexible(child: SizedBox(
                         width: 280,
                         height: 168,
                         child: CustomPaint(
                             painter: _InfieldPainter(
-                                _motion, widget.color, _reduced))),
+                                _motion, widget.color, _reduced)))),
                     ExcludeSemantics(
                         child: Text('${estimated ? '目安 ' : ''}$percent%',
                             key: const ValueKey('baseball-loading-percent'),

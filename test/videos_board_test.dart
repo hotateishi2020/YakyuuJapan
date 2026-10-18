@@ -215,6 +215,26 @@ void main() {
     launcher = _Launcher();
     UrlLauncherPlatform.instance = launcher;
   });
+  testWidgets('番組とTVerを別欄に表示しTVerの番組ページを開く', (tester) async {
+    final payload = {'channels': [
+      {'id': channelId(90), 'name': '野球いっかん！', 'category': 'program', 'status': 'ok', 'videos': videos(9000, 2, '対談動画')},
+      {'id': 'tver', 'name': 'TVer', 'category': 'tver', 'platform': 'tver', 'status': 'ok', 'display_mode': 'all', 'url': 'https://tver.jp/search/野球', 'videos': [
+        {'id': 'epbaseball', 'title': 'ドラフト特番', 'platform': 'tver', 'url': 'https://tver.jp/episodes/epbaseball', 'thumbnail_url': 'https://statics.tver.jp/baseball.jpg', 'published_label': '10月17日(土) 20:00'}
+      ]}
+    ]};
+    await http.runWithClient(() async {
+      await tester.pumpWidget(const MaterialApp(home: Scaffold(body: VideosBoard())));
+      await tester.pumpAndSettle();
+      expect(find.text('野球番組・対談'), findsOneWidget);
+      await show(tester, find.text('ドラフト特番'));
+      expect(find.text('TVer'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('video-epbaseball')));
+      await tester.pumpAndSettle();
+      expect(launcher.urls.single, 'https://tver.jp/episodes/epbaseball');
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    }, () => MockClient((_) async => jsonResponse(payload)));
+  });
   for (final size in [
     const Size(320, 900),
     const Size(390, 900),

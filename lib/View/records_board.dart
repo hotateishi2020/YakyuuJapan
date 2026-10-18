@@ -1,3 +1,5 @@
+import '../logic/favorite_team.dart';
+import 'draft_history_board.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import '../tools/tab_preferences.dart';
 import 'dart:convert';
@@ -13,7 +15,7 @@ import '../tools/json_utils.dart';
 import '../tools/network_error.dart';
 import 'strength_research.dart';
 
-const recordTabs = ['優勝チーム', '個人タイトル', 'シーズン記録', '通算記録', '連続記録', '功績'];
+const recordTabs = ['優勝チーム', '個人タイトル', 'シーズン記録', '通算記録', '連続記録', '功績', 'ドラフト'];
 
 /// Franchise IDs keep former team names in the same championship history.
 List<Map<String, dynamic>> championshipIntervals(List<Map<String, dynamic>> seasons, int year, {bool mlb = false}) {
@@ -61,7 +63,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
   void initState() {
     super.initState();
     _restoreStandingsLeague();
-    tab = readSavedTab('records_${widget.org.kind.name}', List.generate(recordTabs.length, (i) => i), fallback: 0);
+    tab = readSavedTab('records_${widget.org.kind.name}', List.generate(widget.org.kind == OrgKind.npb ? recordTabs.length : recordTabs.length - 1, (i) => i), fallback: 0);
     load();
   }
 
@@ -71,7 +73,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
     if (oldWidget.org.kind != widget.org.kind || oldWidget.year != widget.year) {
       _selectedTeam = null;
       _restoreStandingsLeague();
-      tab = readSavedTab('records_${widget.org.kind.name}', List.generate(recordTabs.length, (i) => i), fallback: 0);
+      tab = readSavedTab('records_${widget.org.kind.name}', List.generate(widget.org.kind == OrgKind.npb ? recordTabs.length : recordTabs.length - 1, (i) => i), fallback: 0);
       load();
     }
   }
@@ -109,7 +111,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
         SizedBox(
             height: TAB_BAR_H,
             child: Row(children: [
-              for (var i = 0; i < recordTabs.length; i++)
+              for (var i = 0; i < (widget.org.kind == OrgKind.npb ? recordTabs.length : recordTabs.length - 1); i++)
                 Expanded(
                     child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 2),
@@ -136,7 +138,9 @@ class _RecordsBoardState extends State<RecordsBoard> {
             ])),
         const SizedBox(height: 6),
         Expanded(
-            child: tab == 5
+            child: tab == 6
+                ? (widget.org.kind == OrgKind.npb ? DraftHistoryBoard(key: ValueKey(widget.year), year: widget.year) : const SizedBox.shrink())
+                : tab == 5
                 ? RecordsHonors(org: widget.org, year: widget.year)
                 : error != null
                     ? Center(
@@ -676,7 +680,12 @@ class _RecordsHonorsState extends State<RecordsHonors> {
       }
       final result =
           listMapFromJson(jsonDecode(utf8.decode(response.bodyBytes))['teams']);
-      if (mounted && id == request) setState(() => teams = result);
+      if (mounted && id == request) { setState(() {
+        teams = result;
+        final favorite = favoriteTeamRow(result);
+        selected = favorite == null ? 0 : result.indexOf(favorite);
+        comparison = true;
+      }); }
     } catch (e) {
       if (mounted && id == request) {
         setState(

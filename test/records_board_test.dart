@@ -107,6 +107,32 @@ void main() {
     expect(championshipIntervals([season(2026,'現球団',rank:1)],2026,mlb:true).first['league_years'],isNull);
   });
 
+  testWidgets('春季と秋季の順位・優勝球団を別行で表示する', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(1200, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final payload = {'standings': [for (final phase in ['spring', 'fall']) {
+      'year': 1937, 'phase': phase, 'phase_label': phase == 'spring' ? '春季' : '秋季',
+      'leagues': [{'id_league': 1, 'name': '日本野球連盟', 'teams': [
+        {'id_team': 1, 'name': phase == 'spring' ? '春優勝' : '秋優勝', 'rank': 1, 'champion': true},
+        {'id_team': 2, 'name': '二位球団', 'rank': 2},
+      ]}]
+    }]};
+    await http.runWithClient(() async {
+      await tester.pumpWidget(const MaterialApp(home: Scaffold(body: RecordsBoard(org: OrgConfig.npb, year: 1937))));
+      await tester.pumpAndSettle();
+      for (final phase in ['spring', 'fall']) {
+        final row = find.byKey(ValueKey('standings-year-1937-$phase'));
+        expect(row, findsOneWidget);
+        expect(find.descendant(of: row, matching: find.text(phase == 'spring' ? '春季' : '秋季')), findsOneWidget);
+        expect(find.descendant(of: row, matching: find.text(phase == 'spring' ? '春優勝' : '秋優勝')), findsNWidgets(2));
+      }
+      await tester.tap(find.byKey(const ValueKey('standings-league-1')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('standings-year-1937-spring')), findsNothing);
+      expect(find.byKey(const ValueKey('standings-year-1937-fall')), findsNothing);
+      expect(tester.takeException(), isNull);
+    }, () => MockClient((_) async => http.Response(jsonEncode(payload), 200, headers: {'content-type': 'application/json; charset=utf-8'})));
+  });
   for (final org in [OrgConfig.npb, OrgConfig.mlb]) {
     testWidgets('${org.label}優勝表はリーグを切り替えても日本一・WS優勝を維持する', (tester) async {
       final payload = {'standings': [

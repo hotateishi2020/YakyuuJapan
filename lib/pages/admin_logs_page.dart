@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import '../tools/network_error.dart';
 import 'dart:convert';
 
@@ -253,7 +254,7 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
             ),
           Expanded(
             child: _loading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(child: BaseballLoading())
                 : _logs.isEmpty
                     ? const Center(child: Text('ログはありません'))
                     : LayoutBuilder(

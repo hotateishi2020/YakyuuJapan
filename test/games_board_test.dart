@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/View/BlinkBg.dart';
@@ -600,7 +601,7 @@ void main() {
     );
 
     expect(find.text('トーナメント'), findsOneWidget);
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.byType(BaseballLoading), findsOneWidget);
     expect(find.text('この日の試合はありません'), findsNothing);
   });
 

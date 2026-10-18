@@ -14,7 +14,7 @@ Future<void> main(List<String> names) async {
         if (visual['logo_url'] == null) throw StateError('$name のロゴが未登録です');
         final updated = await conn.execute(
           'UPDATE m_team_season_identity SET logo_url=\$1, updated_at=now() '
-          'WHERE name_full=\$2 RETURNING int_year', parameters: [visual['logo_url'], name]);
+          'WHERE name_full=\$2 AND (\$3::integer IS NULL OR int_year<=\$3) RETURNING int_year', parameters: [visual['logo_url'], name, visual['logo_until_year']]);
         print('$name：${updated.length}年度を更新');
       }
       await conn.execute('COMMIT');

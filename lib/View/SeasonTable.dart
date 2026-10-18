@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'personal_stats_style.dart';
 export 'personal_stats_style.dart' show personalStatPositionColor;
 import 'player_detail_dialog.dart';
@@ -603,7 +604,7 @@ class SeasonTableBlock extends StatelessWidget {
   Widget _sectionLoading({double height = 120}) {
     return SizedBox(
       height: height,
-      child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      child: const Center(child: BaseballLoading()),
     );
   }
 

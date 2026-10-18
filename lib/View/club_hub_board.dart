@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import '../logic/strength_usage.dart';
 import '../logic/strength_analytics.dart';
 import 'team_section_layout.dart';
@@ -379,7 +380,7 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
   Widget build(BuildContext context) {
     if (widget.view == 10) return _analysis();
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      if (_loading) const LinearProgressIndicator(),
+      if (_loading) const BaseballLoading(compact: true),
       if (_error != null) Row(children: [Expanded(child: Text(_error!)), TextButton(onPressed: _load, child: const Text('再読み込み'))]),
       if (!_loading && _clubs.isEmpty && widget.view == 8) const Text('この団体・年度の首脳情報は未収録です。'),
       Expanded(

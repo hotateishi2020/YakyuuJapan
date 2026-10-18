@@ -4,8 +4,8 @@
     "short_name": "南海",
     "color_back": "#006B3F",
     "color_font": "#111111",
-    "logo_url": "asset:backend/assets/images/history_nankai.jpg",
-    "source": "https://flytoazuresky.tistory.com/759"
+    "logo_url": "asset:backend/assets/images/history_nankai_hawks.png",
+    "source": "User-provided 緑地に映えるホークスエンブレム.png"
   },
   {
     "name": "福岡ダイエーホークス",
@@ -235,7 +235,9 @@
     "name": "東京巨人",
     "short_name": "東京巨人",
     "color_back": "#EA6B20",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_tokyo_kyojin.png",
+    "source": "User-provided ミニマルな黒い装飾文字Eロゴ.png"
   },
   {
     "name": "阪神",
@@ -247,7 +249,9 @@
     "name": "名古屋",
     "short_name": "名古屋",
     "color_back": "#15366F",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_nagoya.png",
+    "source": "User-provided バーガンディ背景のLBモノグラム紋章.png"
   },
   {
     "name": "中部日本",
@@ -265,7 +269,9 @@
     "name": "国鉄スワローズ",
     "short_name": "国鉄",
     "color_back": "#16365B",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_kokutetsu.png",
+    "source": "User-provided 飛翔するツバメのスポーツロゴ.png"
   },
   {
     "name": "サンケイスワローズ",
@@ -277,25 +283,33 @@
     "name": "サンケイアトムズ",
     "short_name": "サンケイ",
     "color_back": "#CA3038",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_sankei_atoms.png",
+    "source": "User-provided 青地に映える赤いスポーツロゴ「a」.png"
   },
   {
     "name": "アトムズ",
     "short_name": "アトムズ",
     "color_back": "#C8393F",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_yakult_atoms.png",
+    "source": "User-provided 赤と緑のY aスポーツロゴ.png"
   },
   {
     "name": "ヤクルトアトムズ",
     "short_name": "アトムズ",
     "color_back": "#C8393F",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_yakult_atoms.png",
+    "source": "User-provided 赤と緑のY aスポーツロゴ.png"
   },
   {
     "name": "大洋松竹ロビンス",
     "short_name": "洋松",
     "color_back": "#214D3A",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_taiyo_shochiku.png",
+    "source": "User-provided ネイビーと赤の絡み合うモノグラムロゴ.png"
   },
   {
     "name": "横浜大洋ホエールズ",
@@ -309,7 +323,10 @@
     "name": "南海",
     "short_name": "南海",
     "color_back": "#006B3F",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_nankai_prewar.png",
+    "logo_until_year": 1945,
+    "source": "User-provided 南海の紺色印章ロゴ.png"
   },
   {
     "name": "近畿日本",
@@ -321,7 +338,9 @@
     "name": "近畿グレートリング",
     "short_name": "南海",
     "color_back": "#006B3F",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_great_ring.png",
+    "source": "User-provided グレート・リング大阪ロゴ.png"
   },
   {
     "name": "西鉄",
@@ -333,25 +352,33 @@
     "name": "西鉄クリッパース",
     "short_name": "西鉄",
     "color_back": "#14213D",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_nishitetsu_clippers.png",
+    "source": "User-provided 黒と黄色のホイール＆クリッパーズバナー.png"
   },
   {
     "name": "太平洋クラブ・ライオンズ",
     "short_name": "太平洋",
     "color_back": "#CF263E",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_taiheiyo_club.jpg",
+    "source": "User-provided ph_0102 (1).jpg"
   },
   {
     "name": "クラウンライター・ライオンズ",
     "short_name": "クラウン",
     "color_back": "#C82735",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_crown_lighter.jpg",
+    "source": "User-provided ph_0103.jpg"
   },
   {
     "name": "東急フライヤーズ",
     "short_name": "東急",
     "color_back": "#184C42",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_tokyu_flyers.png",
+    "source": "User-provided 跳ねる白縁の黒いクマアイコン.png"
   },
   {
     "name": "急映フライヤーズ",
@@ -363,31 +390,42 @@
     "name": "東映フライヤーズ",
     "short_name": "東映",
     "color_back": "#D25829",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_toei.jpg",
+    "source": "User-provided 60143118.jpg"
   },
   {
     "name": "日拓ホーム・フライヤーズ",
     "short_name": "日拓",
     "color_back": "#E15E28",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_nittaku.png",
+    "source": "User-provided ニッタク・ホーム・フライヤーズのマスコットロゴ.png"
   },
   {
     "name": "阪急",
     "short_name": "阪急",
     "color_back": "#B5121B",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_hankyu_pre1947.png",
+    "logo_until_year": 1946,
+    "source": "User-provided 大阪ハンクユー・ニッポン徽章.png"
   },
   {
     "name": "オリックス・ブレーブス",
     "short_name": "オリックス",
     "color_back": "#253D78",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_orix_braves.webp",
+    "source": "User-provided HBCQaZraMAEDt5a.webp"
   },
   {
     "name": "近鉄パールス",
     "short_name": "近鉄",
     "color_back": "#D72236",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_kintetsu_pearls.png",
+    "source": "User-provided ネイビーのドット柄KPエンブレム.png"
   },
   {
     "name": "近鉄バファロー",
@@ -437,25 +475,33 @@
     "name": "大映スターズ",
     "short_name": "大映",
     "color_back": "#29456D",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_daiei_stars.png",
+    "source": "User-provided 映の円形エンブレムロゴ.png"
   },
   {
     "name": "大映ユニオンズ",
     "short_name": "大映",
     "color_back": "#29456D",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_daiei_unions.png",
+    "source": "User-provided 黒いゴシック体の大文字D.png"
   },
   {
     "name": "高橋ユニオンズ",
     "short_name": "高橋",
     "color_back": "#1D6356",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_takahashi_unions.png",
+    "source": "User-provided オレンジ地に映えるネイビーのユニオンズロゴ.png"
   },
   {
     "name": "トンボユニオンズ",
     "short_name": "トンボ",
     "color_back": "#235C95",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_tombo_unions.png",
+    "source": "User-provided 黒と金のユニオンズ翼章.png"
   },
   {
     "name": "西日本パイレーツ",

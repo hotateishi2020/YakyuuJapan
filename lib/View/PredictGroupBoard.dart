@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -96,7 +97,7 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
   @override
   Widget build(BuildContext context) {
     if (widget.loading && widget.groups.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: BaseballLoading());
     }
     if (widget.error != null && widget.groups.isEmpty) {
       return Center(child: Text(widget.error!));

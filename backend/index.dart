@@ -21,6 +21,8 @@ import 'app/PlayerDisplay.dart';
 import 'app/FieldingErrors.dart';
 import 'app/TeamStrength.dart';
 import 'app/Records.dart';
+import 'app/VideoFeed.dart';
+import 'app/VideoChannels.dart';
 import 'app/ClubData.dart';
 import 'app/PlayerDetailSnapshot.dart';
 import 'app/PostseasonForm.dart';
@@ -1041,6 +1043,10 @@ Future<void> _warmSchemaInBackground() async {
 void main() async {
   try {
     final app = Router();
+    final videoFeed = VideoFeedService();
+    await videoFeed.start(snapshotPath: Platform.environment['VIDEO_CACHE_PATH'] ?? '.dart_tool/video-feed-v2.json');
+    final mlbVideoFeed = VideoFeedService(channels: mlbVideoChannels);
+    await mlbVideoFeed.start(snapshotPath: Platform.environment['MLB_VIDEO_CACHE_PATH'] ?? '.dart_tool/mlb-video-feed-v2.json');
     final log = Value.SystemCode.Log;
 
     // ====== API ======
@@ -1088,6 +1094,19 @@ void main() async {
         _printRequestError(request,error,stack);
         return Response.internalServerError(body:jsonEncode({'error':'日程を取得できませんでした'}),headers:headers);
       }
+    });
+
+    app.get('/videos', (Request request) async {
+      final org = request.url.queryParameters['org'] ?? 'npb';
+      if (org != 'npb' && org != 'mlb') return Response.badRequest(body: 'Unknown organization');
+      final feed = org == 'mlb' ? mlbVideoFeed : videoFeed;
+      final background = request.url.queryParameters['background'] == '1';
+      if (background && request.url.queryParameters['refresh'] == '1') unawaited(feed.refresh());
+      return Response.ok(jsonEncode(!background && request.url.queryParameters['refresh'] == '1'
+          ? await feed.refresh() : feed.cached()), headers: {
+        'content-type': 'application/json; charset=utf-8',
+        'cache-control': 'no-store',
+      });
     });
 
     app.get('/records', (Request request) async {

@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'package:flutter/material.dart';
 
 import '../logic/mlb_postseason_bracket.dart';
@@ -399,7 +400,7 @@ class MlbPostseasonBracket extends StatelessWidget {
       logo = const SizedBox(
         width: 18,
         height: 18,
-        child: CircularProgressIndicator(strokeWidth: 2),
+        child: BaseballLoading(),
       );
     } else if (unknown) {
       logo = const Text('未確定', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold));
@@ -491,7 +492,7 @@ class MlbPostseasonBracket extends StatelessWidget {
                         ? const SizedBox(
                             width: 14,
                             height: 14,
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                            child: BaseballLoading(),
                           )
                         : unknown
                             ? const SizedBox.shrink()

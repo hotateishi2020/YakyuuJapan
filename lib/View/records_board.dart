@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import '../tools/tab_preferences.dart';
 import 'dart:convert';
 import 'dart:math' as math;
@@ -147,7 +148,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
                                 onPressed: load, child: const Text('再読み込み'))
                           ]))
                     : data == null
-                        ? const Center(child: CircularProgressIndicator())
+                        ? const Center(child: BaseballLoading())
                         : switch (tab) {
                             0 => standings(),
                             1 => titles(),
@@ -188,8 +189,8 @@ class _RecordsBoardState extends State<RecordsBoard> {
     List<Map<String, dynamic>> visibleLeagues(Map<String, dynamic> season) {
       final leagues = listMapFromJson(season['leagues']);
       if (_standingsLeague == 0) return leagues;
-      // 1リーグ時代の記録をセ・パいずれかに誤分類しない。
-      if (widget.org.kind == OrgKind.npb && (int.tryParse('${season['year']}') ?? 0) < 1950) return [];
+      // リーグ別表示は1958年以降を対象にする。
+      if ((int.tryParse('${season['year']}') ?? 0) < 1958) return [];
       final selected = widget.org.leagueById(_standingsLeague)!;
       return leagues.where((l) => '${l['id_league']}' == '${selected.id}' || l['name'] == selected.name).toList();
     }
@@ -225,14 +226,14 @@ class _RecordsBoardState extends State<RecordsBoard> {
         padding: const EdgeInsets.symmetric(horizontal: 3),
         child: Text(text, maxLines: 1, overflow: TextOverflow.ellipsis,
           style: TextStyle(fontSize: 11, color: color, fontWeight: bold ? FontWeight.bold : FontWeight.normal)));
-      Widget teamCell(Map<String, dynamic> team, double w, double h, {bool logo = false, Color rankBackground = Colors.white, Object? year}) {
+      Widget teamCell(Map<String, dynamic> team, double w, double h, {bool logo = false, Color rankBackground = Colors.white, Color? backgroundOverride, Object? year}) {
         final name = logo ? '${team['name'] ?? '—'}' : '${team['short_name'] ?? team['name'] ?? '—'}';
         final teamKey = _teamKey(team);
         final highlighted = !logo && _selectedTeam == teamKey;
-        final background = logo || highlighted
+        final background = backgroundOverride ?? (logo || highlighted
             ? parseColorName('${team['color_back'] ?? ''}', Colors.white)
-            : rankBackground;
-        final fg = logo || highlighted
+            : rankBackground);
+        final fg = backgroundOverride != null ? Colors.black : logo || highlighted
             ? parseColorName('${team['color_font'] ?? ''}',
                 background.computeLuminance() > .45 ? Colors.black : Colors.white)
             : Colors.black87;
@@ -280,6 +281,11 @@ class _RecordsBoardState extends State<RecordsBoard> {
             teamWidth, 26, color: Colors.grey.shade200),
       ]);
       final intervals = singleLeague ? <Map<String,dynamic>>[] : championshipIntervals(seasons, widget.year, mlb: widget.org.kind == OrgKind.mlb);
+      final longestIntervals = {
+        for (final field in ['league_years', 'champion_years'])
+          field: intervals.map((team) => team[field]).whereType<int>()
+              .fold<int?>(null, (longest, years) => longest == null ? years : math.max(longest, years)),
+      };
       final summaryHeight = intervals.isEmpty ? 0.0 : (intervals.length + 1) * 32.0 + 22;
       Widget summary(double width) {
         final columnWidth = math.min(width, math.max(constraints.maxWidth, 540.0)) / 3;
@@ -288,12 +294,21 @@ class _RecordsBoardState extends State<RecordsBoard> {
             color: heading ? Colors.black : Colors.white),
         ]);
         String years(Object? value) => value == null ? '—' : '$value年';
+        Color teamBackground(Map<String, dynamic> team) => Color.lerp(
+            parseColorName('${team['color_back'] ?? ''}', Colors.white),
+            Colors.white, .88)!;
+        Widget intervalCell(Map<String, dynamic> team, String field) {
+          final value = team[field];
+          final longest = value != null && value == longestIntervals[field];
+          return cell(label(years(value), color: longest ? Colors.red : Colors.black,
+              bold: longest), columnWidth, 32, color: teamBackground(team));
+        }
         return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           summaryRow(['球団','最後のリーグ優勝から',widget.org.kind == OrgKind.npb ? '最後の日本一から' : '最後のWS優勝から'], heading:true),
           for(final team in intervals) Row(children: [
-            teamCell(team, columnWidth, 32, logo: true),
-            cell(label(years(team['league_years'])), columnWidth, 32),
-            cell(label(years(team['champion_years'])), columnWidth, 32),
+            teamCell(team, columnWidth, 32, logo: true, backgroundOverride: teamBackground(team)),
+            intervalCell(team, 'league_years'),
+            intervalCell(team, 'champion_years'),
           ]),
           const SizedBox(height:22, child: Text('選択年度を基準に算出。— は登録済みの優勝記録なし。', style:TextStyle(fontSize:11))),
         ]);
@@ -317,6 +332,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
             if (summaryHeight > 0 && index == 0) return summary(width);
             final i = index - (summaryHeight > 0 ? 1 : 0);
             final season = seasons[i];
+            final seasonKey = season['phase'] == null ? '${season['year']}' : '${season['year']}-${season['phase']}';
             final count = columnsFor(season);
             final teamWidth = (width - fixedWidth) / math.max(1, count);
             final showHeader = i == 0 || columnsFor(seasons[i - 1]) != count;
@@ -326,8 +342,11 @@ class _RecordsBoardState extends State<RecordsBoard> {
             final height = math.max(1, leagues.length) * 30.0;
             return Column(children: [
               if (showHeader) header(count, teamWidth),
-              Row(key: ValueKey('standings-year-${season['year']}'), children: [
-              cell(label('${season['year']}', bold: true), 48, height),
+              Row(key: ValueKey('standings-year-$seasonKey'), children: [
+              cell(FittedBox(fit: BoxFit.scaleDown, child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  label('${season['year']}', bold: true),
+                  if (season['phase_label'] != null) label('${season['phase_label']}', bold: true),
+                ])), 48, height),
               teamCell(champion ?? {'name': season['champion'] ?? '—'}, championWidth, height, logo: true),
               Column(children: [for (final league in leagues)
                 Row(children: [
@@ -335,7 +354,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
                     color: leagueColor(league)),
                   for (final entry in listMapFromJson(league['teams']).take(count).indexed)
                     teamCell(entry.$2, teamWidth, 30,
-                      rankBackground: leagueBackground(league), year: season['year']),
+                      rankBackground: leagueBackground(league), year: seasonKey),
                   for (var n = listMapFromJson(league['teams']).length; n < count; n++) cell(const SizedBox.shrink(), teamWidth, 30, color: leagueBackground(league)),
                 ])]),
             ]),
@@ -570,7 +589,8 @@ class _RecordsBoardState extends State<RecordsBoard> {
           Widget group(String label, List<Map<String, dynamic>> players, Color color, String kind) =>
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-              if (players.isEmpty) const Padding(padding: EdgeInsets.symmetric(vertical: 6), child: Text('データなし')),
+              if (players.isEmpty) Padding(padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Text(kind == 'current' ? '${record['current_message'] ?? 'データなし'}' : 'データなし')),
               for (var i = 0; i < players.length; i++)
                 Padding(padding: const EdgeInsets.only(top: 3, bottom: 6), child: Column(children: [
                   Row(children: [
@@ -674,7 +694,7 @@ class _RecordsHonorsState extends State<RecordsHonors> {
         OutlinedButton(onPressed: load, child: const Text('再読み込み'))
       ]));
     }
-    if (teams == null) return const Center(child: CircularProgressIndicator());
+    if (teams == null) return const Center(child: BaseballLoading());
     if (teams!.isEmpty) return const Center(child: Text('功績データはまだ登録されていません。'));
     return Column(children: [
       Wrap(spacing: 8, children: [

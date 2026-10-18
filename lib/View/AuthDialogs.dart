@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -118,7 +119,7 @@ class _LoginDialogState extends State<_LoginDialog> {
               FilledButton(
                 onPressed: _busy ? null : _submit,
                 child: _busy
-                    ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                    ? const SizedBox(width: 18, height: 18, child: BaseballLoading())
                     : const Text('ログイン'),
               ),
               const SizedBox(height: 10),
@@ -280,7 +281,7 @@ class _RegisterDialogState extends State<_RegisterDialog> {
         FilledButton(
           onPressed: _busy ? null : _submit,
           child: _busy
-              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+              ? const SizedBox(width: 18, height: 18, child: BaseballLoading())
               : Text(_codeSent ? '認証して登録' : '認証コードを送る'),
         ),
       ],

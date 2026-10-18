@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -184,10 +185,7 @@ class HeaderAuthAction extends StatelessWidget {
         height: 36,
         child: Padding(
           padding: EdgeInsets.all(8),
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: Colors.white,
-          ),
+          child: BaseballLoading(color: Colors.white),
         ),
       );
     }

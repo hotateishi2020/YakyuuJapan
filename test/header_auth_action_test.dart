@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/View/Headers.dart';
@@ -36,7 +37,7 @@ void main() {
       ),
     );
     expect(find.text('Login'), findsNothing);
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.byType(BaseballLoading), findsOneWidget);
   });
 
   testWidgets('logout keeps the spinner until reload finishes', (tester) async {
@@ -48,7 +49,7 @@ void main() {
       ),
     );
     expect(find.text('Login'), findsNothing);
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.byType(BaseballLoading), findsOneWidget);
 
     await tester.pumpWidget(
       const MaterialApp(
@@ -58,7 +59,7 @@ void main() {
       ),
     );
     expect(find.text('Login'), findsOneWidget);
-    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(find.byType(BaseballLoading), findsNothing);
   });
 
   testWidgets('Login appears after the board is ready', (tester) async {
@@ -70,7 +71,7 @@ void main() {
       ),
     );
     expect(find.text('Login'), findsOneWidget);
-    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(find.byType(BaseballLoading), findsNothing);
     expect(tester.getSize(find.widgetWithText(TextButton, 'Login')).height, TAB_BAR_H);
   });
 

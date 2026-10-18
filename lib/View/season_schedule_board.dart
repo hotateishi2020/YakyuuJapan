@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'SeasonTable.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -68,7 +69,7 @@ class _SeasonScheduleLoaderState extends State<SeasonScheduleLoader> {
   @override
   Widget build(BuildContext context) =>
       Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        if (_loading) const LinearProgressIndicator(),
+        if (_loading) const BaseballLoading(compact: true),
         if (_error != null)
           Row(children: [
             Expanded(child: Text(_error!)),

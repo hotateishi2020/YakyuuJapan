@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'package:Yakyuu_Japan/View/records_board.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -8,7 +9,6 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:Yakyuu_Japan/View/team_strength_board.dart';
 import 'package:Yakyuu_Japan/View/strength_grids.dart';
-import 'package:Yakyuu_Japan/View/strength_vertical_label.dart';
 import 'package:Yakyuu_Japan/config/org_config.dart';
 import 'package:Yakyuu_Japan/pages/prediction_page.dart';
 import 'package:Yakyuu_Japan/logic/auth_session.dart';
@@ -947,7 +947,7 @@ void main() {
             .map((uri) => uri.queryParameters['part']),
         containsAll(['games', 'standings', 'players']),
       );
-      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(find.byType(BaseballLoading), findsNothing);
       await tester.pump(const Duration(seconds: 61));
       await tester.pump();
       expect(polls(), before + 1);
@@ -1148,58 +1148,50 @@ void main() {
     });
   }
 
-  testWidgets('縦横どちらの画面でも横向きの帯を横スクロールできる', (tester) async {
+  testWidgets('縦画面は貢献度と起用の帯全体と詳細アイコンが画面内に収まる', (tester) async {
     await tester.binding.setSurfaceSize(const Size(390, 900));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
-    var requests = 0;
-    final payload = team(1, '球団A');
-    final firstOrder = (payload['batting_order'] as List).first as Map;
-    payload['batting_order'] = [
-      for (var slot = 1; slot <= 9; slot++)
-        {...firstOrder, 'slot': slot, 'label': '$slot番'},
-    ];
-    final client = MockClient((request) async {
-      requests++;
-      return http.Response(
-          jsonEncode({
-            'teams': [payload]
-          }),
-          200,
-          headers: {'content-type': 'application/json; charset=utf-8'});
+    tester.view.physicalSize = const Size(390, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.binding.setSurfaceSize(null);
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
     });
-    await http.runWithClient(() async {
-      await tester.pumpWidget(const MaterialApp(
-          home: Scaffold(
-              body: TeamStrengthBoard(initialView: 1, org: OrgConfig.npb, year: 2026))));
+    final payload = team(1, '球団A');
+    payload['batting_stats'] = [
+      {'name': '打者1', 'player_key': 'b1', 'home_runs': 20, 'total_bases_walks': 80, 'rbi': 40},
+      {'name': '少数の選手', 'player_key': 'b2', 'home_runs': 1, 'total_bases_walks': 4, 'rbi': 1},
+    ];
+    for (final view in [0, 1]) {
+      await tester.pumpWidget(MaterialApp(home: Scaffold(body: TeamStrengthBoard(
+        key: ValueKey(view), initialView: view, org: OrgConfig.npb, year: 2026,
+        providedTeams: [payload],
+      ))));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const ValueKey('strength-view-0')));
+      final band = find.byKey(ValueKey(view == 0
+          ? 'strength-band-contribution-total_bases_walks' : 'strength-band-starts-1'));
+      final detail = find.byKey(ValueKey(view == 0
+          ? 'strength-detail-contribution-total_bases_walks' : 'strength-detail-starts-1'));
+      await tester.ensureVisible(detail);
       await tester.pumpAndSettle();
-      final starter = find.byTooltip('先発選手1（先発）：20回（チーム全体の12.1%）');
-      final before = tester.getRect(starter);
-      expect(before.width, greaterThan(before.height));
-      final horizontalScroll = find.byWidgetPredicate((widget) =>
-          widget is SingleChildScrollView &&
-          widget.scrollDirection == Axis.horizontal);
-      expect(horizontalScroll, findsOneWidget);
-      await tester.dragFrom(
-          tester.getTopLeft(horizontalScroll) + const Offset(200, 200),
-          const Offset(-180, 0));
+      for (final finder in [band, detail]) {
+        final rect = tester.getRect(finder);
+        expect(rect.left, greaterThanOrEqualTo(0));
+        expect(rect.right, lessThanOrEqualTo(390));
+      }
+      for (final scroll in tester.stateList<ScrollableState>(find.byType(Scrollable))) {
+        if (scroll.axisDirection == AxisDirection.right) {
+          expect(scroll.position.maxScrollExtent, 0);
+        }
+      }
+      await tester.tap(detail);
       await tester.pumpAndSettle();
-      final after = tester.getRect(starter);
-      expect(after.left, lessThan(before.left));
-      expect(after.top, closeTo(before.top, 0.01));
-      expect(requests, 1);
-
-      await tester.binding.setSurfaceSize(const Size(1200, 900));
+      expect(find.byType(Dialog), findsOneWidget);
+      expect(find.textContaining(view == 0 ? '少数の選手' : '狭い区分に収まらない選手名'), findsOneWidget);
+      await tester.tap(find.byTooltip('閉じる'));
       await tester.pumpAndSettle();
-      final wide = tester.getRect(starter);
-      expect(wide.width, greaterThan(wide.height));
-      expect(find.byType(StrengthVerticalLabel), findsNothing);
-      expect(find.text('先発選手1'), findsOneWidget);
-      expect(requests, 1);
       expect(tester.takeException(), isNull);
-      await tester.pumpWidget(const SizedBox.shrink());
-    }, () => client);
+    }
   });
 
   testWidgets('ClientExceptionはサーバー未起動の案内を表示する', (tester) async {

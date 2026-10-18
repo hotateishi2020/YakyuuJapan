@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -231,10 +232,9 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
                         onPressed: () => Navigator.pop(context),
                         icon: const Icon(Icons.close))
                   ])),
-              if (loading) const LinearProgressIndicator(),
               Expanded(
                   child: loading
-                      ? const Center(child: Text('選手情報を取得しています'))
+                      ? const Center(child: BaseballLoading())
                       : error != null
                           ? Center(
                               child: Column(

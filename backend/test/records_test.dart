@@ -13,6 +13,45 @@ Map<String, dynamic> team(int year, int id, int rank) => {'year': year, 'id_team
 Map<String, dynamic> game(int id, {bool loaded = true}) => {'id': id, 'id_team_home': 1, 'id_team_away': 2, 'flg_stats_loaded': loaded};
 Map<String, dynamic> box(int game, int player, {String decision = '', int runs = 0, int hits = 0, int walks = 0, int ab = 1}) => {'id_game': game, 'id_player': player, 'name': '選手$player', 'int_batting': ab, 'int_hit1': hits, 'int_fourball': walks, 'int_pitch': decision.isEmpty ? 0 : 20, 'int_runs': runs, 'code_result_pitcher': decision};
 void main() {
+  test('partial game streaks must not be presented as season records', () {
+    final result = seasonStreakPresentation(
+      observed: [{'name': '選手', 'value': 4}], official: false,
+      completedGames: 471, loadedGames: 21);
+    expect(result['current'], isEmpty);
+    expect(result['current_status'], 'unverified');
+    expect(result['current_message'], contains('21／471'));
+  });
+  test('verified season snapshots remain visible independently of local coverage', () {
+    final leaders = [{'name': '選手', 'value': 143}];
+    final result = seasonStreakPresentation(observed: leaders, official: true,
+      completedGames: 471, loadedGames: 21);
+    expect(result['current'], leaders);
+    expect(result.containsKey('current_status'), isFalse);
+  });
+
+  test('公式の春秋順位は合算せず優勝・順位・球団IDを季別に保持する', () {
+    final phases = (jsonDecode(File('data/npb_split_standings.json').readAsStringSync()) as List).cast<Map<String, dynamic>>();
+    final annual = [for (final year in [1939, 1938, 1937]) {
+      'year': year, 'champion': '年間合算', 'leagues': [{'teams': [
+        {'id_team': 1, 'name': '東京巨人', 'logo_url': 'giants'},
+        {'id_team': 2, 'name': '大阪タイガース'},
+        {'id_team': 3, 'name': 'ライオン'},
+      ]}]
+    }];
+    final result = applySplitRecordStandings(annual, phases);
+    expect(result.map((s) => '${s['year']}-${s['phase']}'),
+      ['1939-null', '1938-spring', '1938-fall', '1937-spring', '1937-fall']);
+    expect(result.skip(1).map((s) => s['champion']),
+      ['大阪タイガース', '東京巨人', '東京巨人', '大阪タイガース']);
+    final spring = result[3]['leagues'][0]['teams'] as List;
+    expect(spring.first['id_team'], 1);
+    expect(spring.first['logo_url'], 'giants');
+    expect(spring.first['wins'], 41);
+    expect(spring.first['losses'], 13);
+    expect(spring.first['champion'], true);
+    expect(spring.firstWhere((t) => t['name'] == '大東京')['id_team'], 3);
+    expect(result[2]['leagues'][0]['teams'], hasLength(9));
+  });
   test('MLB league champion is the LCS winner, not the standings leader', () {
     final rows = [
       {...team(2026,13,1),'id_league':3},

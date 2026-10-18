@@ -105,10 +105,16 @@ class Records {
     for (final entry in officialStreaks.entries) {
       streaks[entry.key] = usageMaps(entry.value);
     }
+    final splitFile = [File('data/npb_split_standings.json'), File('backend/data/npb_split_standings.json')]
+        .where((f) => f.existsSync()).firstOrNull;
+    final standings = buildRecordStandings(standingRows.map((r) => r.toColumnMap()).toList(),
+        playoffs.map((r) => r.toColumnMap()).toList(), org);
+    final splitStandings = org == OrgKind.npb && splitFile != null
+        ? applySplitRecordStandings(standings, usageMaps(jsonDecode(splitFile.readAsStringSync()))) : standings;
     final data = <String, dynamic>{
       'org': org.code,
       'year': year,
-      'standings': buildRecordStandings(standingRows.map((r) => r.toColumnMap()).toList(), playoffs.map((r) => r.toColumnMap()).toList(), org),
+      'standings': splitStandings,
       'titles': colorRecordTitles(mergeRecordAwards(buildRecordTitles(titles, org), usageMaps(baseline['awards']), year), standingRows.map((r) => r.toColumnMap()).toList(), titles),
       'season': season,
       'career': combined.isEmpty ? usageMaps(baseline['career']) : combined,
@@ -123,7 +129,12 @@ class Records {
             'label': d.$2,
             'unit': d.$3,
             'note': '${d.$4} 歴代は複数シーズンをまたぐ記録を含み、比較欄は選択年度内。${usageMaps(baseline['streaks']).where((r) => r['key'] == d.$1).map((r) => ' ${r['scope_note'] ?? ''}').join()}',
-            'current': streaks[d.$1] ?? [],
+            ...seasonStreakPresentation(
+              observed: streaks[d.$1] ?? [],
+              official: officialStreaks.containsKey(d.$1),
+              completedGames: games.length,
+              loadedGames: games.where((g) => g.toColumnMap()['flg_stats_loaded'] == true).length,
+            ),
             'current_note': officialStreaks.containsKey(d.$1)
                 ? '${currentSnapshot['note']} 確認日：${currentSnapshot['checked_at']}'
                 : streaks.containsKey(d.$1)
@@ -249,6 +260,38 @@ List<Map<String, dynamic>> buildRecordStandings(List<Map<String, dynamic>> rows,
     }
   }
   return seasons.values.toList()..sort((a, b) => usageInt(b['year']).compareTo(usageInt(a['year'])));
+}
+
+/// Replace annual aggregates only when official phase standings are available.
+List<Map<String, dynamic>> applySplitRecordStandings(
+    List<Map<String, dynamic>> annual, List<Map<String, dynamic>> phases) {
+  String identity(dynamic name) {
+    final normalized = '$name'.replaceAll(RegExp(r'[\s・･]'), '');
+    return ['大東京', 'ライオン'].contains(normalized) ? '大東京/ライオン' : normalized;
+  }
+  return [for (final season in annual) ...(() {
+    final parts = phases.where((p) => p['year'] == season['year']).toList()
+      ..sort((a, b) => (a['phase'] == 'spring' ? 0 : 1).compareTo(b['phase'] == 'spring' ? 0 : 1));
+    if (parts.isEmpty) return [season];
+    final previous = usageMaps(season['leagues']).expand((l) => usageMaps(l['teams'])).toList();
+    return parts.map((part) {
+      final teams = usageMaps(part['teams']).map((team) {
+        final old = previous.where((t) => identity(t['name']) == identity(team['name'])).firstOrNull;
+        return <String, dynamic>{
+          if (old != null) ...old,
+          ...team, 'short_name': team['name'], 'historical_identity': true,
+          if (old != null && old['name'] != team['name']) 'logo_url': null,
+          'champion': team['rank'] == 1, 'league_champion': team['rank'] == 1,
+        };
+      }).toList()..sort((a, b) => usageInt(a['rank']).compareTo(usageInt(b['rank'])));
+      return <String, dynamic>{
+        ...season, 'phase': part['phase'],
+        'phase_label': part['phase'] == 'spring' ? '春季' : '秋季',
+        'source': part['source'], 'champion': teams.where((t) => t['champion'] == true).firstOrNull?['name'],
+        'leagues': [{'id_league': 1, 'name': '日本野球連盟', 'teams': teams}],
+      };
+    }).toList();
+  })()];
 }
 
 List<Map<String, dynamic>> mergeRecordAwards(List<Map<String, dynamic>> statistical, List<Map<String, dynamic>> awards, int throughYear) {

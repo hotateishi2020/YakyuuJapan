@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import '../tools/network_error.dart';
 import 'dart:async';
 
@@ -212,7 +213,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
         FilledButton(
           onPressed: _busy ? null : _submit,
           child: _busy
-              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+              ? const SizedBox(width: 18, height: 18, child: BaseballLoading())
               : Text(_codeSent ? '認証して変更' : '認証コードを送る'),
         ),
       ],
@@ -290,7 +291,7 @@ class _NotificationSettingsDialogState extends State<_NotificationSettingsDialog
         TextButton(onPressed: _busy ? null : () => Navigator.pop(context), child: const Text('キャンセル')),
         FilledButton(
           onPressed: _busy ? null : _submit,
-          child: _busy ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('保存'),
+          child: _busy ? const SizedBox(width: 18, height: 18, child: BaseballLoading()) : const Text('保存'),
         ),
       ],
     );
@@ -406,7 +407,7 @@ class _BasicSettingsDialogState extends State<_BasicSettingsDialog> {
       content: SizedBox(
         width: 400,
         child: _loading
-            ? const SizedBox(height: 120, child: Center(child: CircularProgressIndicator()))
+            ? const SizedBox(height: 120, child: Center(child: BaseballLoading()))
             : SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -486,7 +487,7 @@ class _BasicSettingsDialogState extends State<_BasicSettingsDialog> {
         TextButton(onPressed: _busy ? null : () => Navigator.pop(context), child: const Text('キャンセル')),
         FilledButton(
           onPressed: _busy || _loading ? null : _submit,
-          child: _busy ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('保存'),
+          child: _busy ? const SizedBox(width: 18, height: 18, child: BaseballLoading()) : const Text('保存'),
         ),
       ],
     );

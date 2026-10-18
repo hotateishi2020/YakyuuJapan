@@ -1,3 +1,5 @@
+import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
+import '../View/videos_board.dart';
 import '../tools/tab_preferences.dart';
 import '../View/retained_tab_body.dart';
 import '../View/player_detail_dialog.dart';
@@ -180,7 +182,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     } else {
       _orgKind = OrgKind.npb;
     }
-    _itemTab = readSavedTab('main_${_orgKind.name}', const [0, 1, 2, 3, 4, 5], fallback: 0);
+    _itemTab = readSavedTab('main_${_orgKind.name}', const [0, 1, 2, 3, 4, 5, 6], fallback: 0);
     _personalStatsLayout = readPersonalStatsLayout();
     if (readBrowserCookie(_bracketCookie) == '0') _bracketOpen = false;
     // First paint contains only the header/tabs; cache decoding and requests follow.
@@ -871,7 +873,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     setState(() {
       _predictGroupsOpen = false;
       _orgKind = kind;
-      _itemTab = readSavedTab('main_${kind.name}', const [0, 1, 2, 3, 4, 5], fallback: 0);
+      _itemTab = readSavedTab('main_${kind.name}', const [0, 1, 2, 3, 4, 5, 6], fallback: 0);
       error = null;
       if (usable) {
         _applyBundle(cached, kind: kind);
@@ -1155,7 +1157,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   Future<void> _ensureItemYearLoaded(int item) async {
-    if (item >= 3) return; // 戦力・記録はタブを開いたときだけデータを取得する。
+    if (item >= 3) return; // 戦力・記録・動画はタブを開いたときだけデータを取得する。
     final kind = _orgKind;
     final year = _seasonYear;
     // 試合画面はトーナメントの順位と先発投手の個人成績も使用する。
@@ -1756,11 +1758,12 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
               ('個人成績', 2),
               ('戦力', 3),
               ('記録', 4),
+              ('動画', 6),
             ],
             selectedIndex: _itemTab,
             onSelected: (i) {
               if (i == _itemTab) return;
-              const actions = ['試合情報タブを開いた', 'チーム順位タブを開いた', '個人成績タブを開いた', '戦力タブを開いた', '記録タブを開いた', '日程タブを開いた'];
+              const actions = ['試合情報タブを開いた', 'チーム順位タブを開いた', '個人成績タブを開いた', '戦力タブを開いた', '記録タブを開いた', '日程タブを開いた', '動画タブを開いた'];
               if (i >= 0 && i < actions.length) {
                 unawaited(AuthSession.instance.reportAction(actions[i]));
               }
@@ -1810,6 +1813,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   Widget _itemBoard({bool wideLayout = false}) {
+    if (_itemTab == 6) return VideosBoard(key: ValueKey(_orgKind), org: _orgKind, color: _org.tabColor);
     if (_itemTab == 5) {
       return SeasonCalendarBoard(org: _org, year: _seasonYear, events: events);
     }
@@ -1826,7 +1830,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     }
     if (_itemTab == 2) {
       if (!_partReady(_LoadPart.players)) {
-        return const Center(child: CircularProgressIndicator());
+        return const Center(child: BaseballLoading());
       }
       // 横長は打者・投手のタブ切り替え。
       if (wideLayout) {
@@ -1845,7 +1849,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     if (_itemTab == 0) {
       final showBracket = _showPostseasonNow;
       if (!_partReady(_LoadPart.games) && !showBracket) {
-        return const Center(child: CircularProgressIndicator());
+        return const Center(child: BaseballLoading());
       }
       return BothLeagueGameDay(
         key: ValueKey('both-${_orgKind.name}-$_seasonYear-${_gamesInitialDate()}'),
@@ -1867,7 +1871,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       );
     }
     if (!_partReady(_LoadPart.standings)) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: BaseballLoading());
     }
     return SeasonScheduleLoader(
         org: _org,
@@ -2046,7 +2050,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     Widget miniSpinner({double size = 18}) => SizedBox(
           width: size,
           height: size,
-          child: const CircularProgressIndicator(strokeWidth: 2),
+          child: const BaseballLoading(),
         );
 
     Widget newsBox({bool hideHeader = false, double? boxHeight, bool fill = false}) {
@@ -2350,7 +2354,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   Widget build(BuildContext context) {
     // 初回のみ全画面グルグル。エラー時もヘッダー〜団体タブは出す。
     if (isLoading && !_shellReady) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: BaseballLoading());
     }
 
     return LayoutBuilder(
@@ -2409,7 +2413,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                       builder: (_) => _itemTab >= 3
                         ? _itemBoard(wideLayout: !isPortrait)
                         : orgContentLoading
-                            ? const Center(child: CircularProgressIndicator())
+                            ? const Center(child: BaseballLoading())
                             : error != null && !_boardContentReady
                                 ? Center(child: Text(error!))
                                 : _itemBoard(wideLayout: !isPortrait),

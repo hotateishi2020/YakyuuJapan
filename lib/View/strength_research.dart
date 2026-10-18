@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -124,7 +125,7 @@ class _StrengthDraftState extends State<StrengthDraft> {
                 return Center(child: Text('${widget.year}年のドラフト候補はまだ登録されていません。'));
               }
               if (!snapshot.hasData) {
-                return const Center(child: CircularProgressIndicator());
+                return const Center(child: BaseballLoading());
               }
               final data = snapshot.data!;
               final players = listMapFromJson(data['players']).indexed.toList()

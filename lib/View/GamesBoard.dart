@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'player_condition.dart';
 import 'player_detail_dialog.dart';
 import '../tools/json_utils.dart';
@@ -1070,7 +1071,7 @@ class _GameDateSwitcherState extends State<GameDateSwitcher> {
     final board = loading
         ? const SizedBox(
             height: 120,
-            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            child: Center(child: BaseballLoading()),
           )
         : GamesBoardYahooStyle(
             key: ValueKey('games-$date'),
@@ -1334,7 +1335,7 @@ class _BothLeagueGameDayState extends State<BothLeagueGameDay> {
               if (widget.loadingGames || widget.loadingGameDate == date)
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 24),
-                  child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                  child: Center(child: BaseballLoading()),
                 )
               else if (leagueBlocks.isEmpty)
                 const Padding(

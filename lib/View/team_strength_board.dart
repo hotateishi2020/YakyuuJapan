@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import '../tools/tab_preferences.dart';
 import 'team_section_layout.dart';
 import 'retained_tab_body.dart';
@@ -169,7 +170,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
       );
 
   Widget _content(BuildContext context) {
-    if (_loading) return const Center(child: CircularProgressIndicator());
+    if (_loading) return const Center(child: BaseballLoading());
     if (_error != null) {
       return Center(
           child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -336,7 +337,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
         final maxima = [for (var i = 0; i < 3; i++) all.fold<int>(0, (n, bands) => math.max(n, _int(bands[i]['total'])))];
         final width = _bandsWidth([
           for (final bands in all) {...bands[0], 'total': maxima[0]}
-        ], _fitContributionToViewport ? constraints.maxWidth : math.max(1000.0, constraints.maxWidth));
+        ], _fitBandsToViewport ? constraints.maxWidth : math.max(1000.0, constraints.maxWidth));
         return SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: SizedBox(
@@ -762,14 +763,15 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
       );
 
   static const _baseColors = [Color(0xFFE86680), Color(0xFFF8B6CC), Color(0xFFFFBC59), Color(0xFFFFF280), Color(0xFF8BCB8D)];
-  bool get _fitContributionToViewport {
+  bool get _fitBandsToViewport {
     final size = MediaQuery.sizeOf(context);
-    return _selectedView == 0 && size.width > size.height;
+    // 縦画面は細い区分も含めて帯全体と詳細アイコンを画面内に収める。
+    return _selectedView == 0 || size.width <= size.height;
   }
 
   double _bandsWidth(List<Map<String, dynamic>> bands, double viewport) {
     if (TeamSectionLayout.embedded(context)) return viewport;
-    if (_fitContributionToViewport && viewport.isFinite && viewport > _bandSideWidth) {
+    if (_fitBandsToViewport && viewport.isFinite && viewport > _bandSideWidth) {
       return viewport;
     }
     var body = math.max(800.0, viewport - _bandSideWidth);

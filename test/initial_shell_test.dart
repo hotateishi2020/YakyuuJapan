@@ -11,7 +11,7 @@ void main() {
     await http.runWithClient(() async {
       await tester.pumpWidget(const MaterialApp(home: Scaffold(body: PredictionPage())));
       await tester.pump(const Duration(milliseconds: 1));
-      for (final label in ['予想対決', 'NPB', 'MLB', '日程', '試合情報', 'チーム順位', '個人成績', '戦力', '記録']) {
+      for (final label in ['予想対決', 'NPB', 'MLB', '日程', '試合情報', 'チーム順位', '個人成績', '戦力', '記録', '動画']) {
         expect(find.text(label), findsWidgets);
       }
       expect(pending.isCompleted, isFalse);

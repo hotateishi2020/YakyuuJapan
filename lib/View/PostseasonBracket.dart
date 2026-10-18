@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'package:flutter/material.dart';
 
 import '../logic/postseason_bracket.dart';
@@ -393,7 +394,7 @@ class PostseasonBracket extends StatelessWidget {
                       ? const SizedBox(
                           width: 22,
                           height: 22,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                          child: BaseballLoading(),
                         )
                       : unknown
                           ? const Text(
@@ -416,7 +417,7 @@ class PostseasonBracket extends StatelessWidget {
                         ? const SizedBox(
                             width: 16,
                             height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                            child: BaseballLoading(),
                           )
                         : unknown
                             ? const SizedBox.shrink()

@@ -4316,6 +4316,38 @@
         ],
         "checked_at": "2026-10-16",
         "scope_note": ""
+      },
+      {
+        "key": "hr_pa",
+        "leaders": [
+          {
+            "name": "村上宗隆",
+            "value": 5,
+            "year": 2022,
+            "status": "active"
+          }
+        ],
+        "sources": [
+          "https://npb.jp/history/2022/review_rec_b.html"
+        ],
+        "checked_at": "2026-10-18",
+        "scope_note": ""
+      },
+      {
+        "key": "saves",
+        "leaders": [
+          {
+            "name": "佐々木主浩",
+            "value": 22,
+            "year": 1998,
+            "status": "retired"
+          }
+        ],
+        "sources": [
+          "https://bis.npb.or.jp/news/detail/20181003_02.html"
+        ],
+        "checked_at": "2026-10-18",
+        "scope_note": ""
       }
     ],
     "awards": [
@@ -20978,7 +21010,26 @@
           }
         ]
       }
-    ]
+    ],
+    "current_streaks": {
+      "2026": {
+        "checked_at": "2026-10-18",
+        "note": "NPB公式の2026年シーズン記録回顧（10月12日現在）と照合。",
+        "records": {
+          "holds": [
+            {
+              "name": "ウィンゲンター",
+              "team": "西武",
+              "value": 20,
+              "year": 2026,
+              "status": "active",
+              "period": "2026-06-11〜2026-08-12",
+              "source_url": "https://npb.jp/history/2026/review_rec_p.html"
+            }
+          ]
+        }
+      }
+    }
   },
   "mlb": {
     "career": [
@@ -32320,7 +32371,7 @@
     ],
     "current_streaks": {
       "2026": {
-        "checked_at": "2026-10-16T01:43:41.224059Z",
+        "checked_at": "2026-10-17T22:42:54.484992Z",
         "sources": [
           "https://statsapi.mlb.com/api/v1/people"
         ],
@@ -32332,6 +32383,16 @@
               "value": 12,
               "year": 2026,
               "source": "https://statsapi.mlb.com/api/v1/people/695505/stats?stats=gameLog&group=hitting,pitching&season=2026",
+              "status": "active"
+            }
+          ],
+          "saves": [
+            {
+              "name": "Cade Smith",
+              "player_id": 671922,
+              "value": 16,
+              "year": 2026,
+              "source": "https://statsapi.mlb.com/api/v1/people/671922/stats?stats=gameLog&group=hitting,pitching&season=2026",
               "status": "active"
             }
           ],

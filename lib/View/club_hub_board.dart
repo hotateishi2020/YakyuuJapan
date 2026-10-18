@@ -111,7 +111,7 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
 
   Widget _analysis({Map<String, dynamic>? team, BuildContext? sectionContext}) {
     final rows = analyzeClubs(widget.teams, widget.year).where((row) => team == null || row['id_team'] == team['id_team']);
-    return SectionList(children: [
+    final children = <Widget>[
       const Padding(padding: EdgeInsets.all(8), child: Text('取得済み成績による団体内の相対評価（S → A → B → C → D → E → F → G）。打撃：打席加重OPS／走力：チームの(盗塁−2×盗塁死)÷消化試合数／守備：全比較球団の当年OAAが揃えばOAA。未取得の場合は内野・外野別の守備率を「失策参考」として表示／投手：主な起用が先発・救援の投手別WHIPを投球回で加重。中継ぎには抑えを含みます。走力は盗塁の参考評価で、進塁・走塁全体を網羅しません。守備機会は刺殺＋補殺＋失策。投手・捕手は内野守備に含めません。失策参考には守備範囲・ファインプレーを含めません。評価をクリックすると算出根拠を表示します。未計測は —。平均年齢は守備位置ごとの最多起用野手（重複除外）、当年は本日時点。')),
       Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: Wrap(spacing: 6, runSpacing: 4, children: [
         for (final entry in clubAnalysisGradeColors.entries)
@@ -121,18 +121,19 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
       ])),
       LayoutBuilder(builder: (context, constraints) {
         final rowHeight = 88 * MediaQuery.textScalerOf(context).scale(12) / 12;
-        return sectionScrollView(context,
-          key: const ValueKey('analysis-horizontal-scroll'),
-          scrollDirection: Axis.horizontal,
-          child: SizedBox(width: math.max(1240, constraints.maxWidth), child: DataTable(
+        Widget fitTable(Widget child) => team == null ? child : FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.topLeft, child: child);
+        final columns = ['球団', ...analysisCategories, 'レギュラー平均年齢', '強み', '弱み'];
+        double weight(String c) => c == '球団' ? 2 : c == '強み' || c == '弱み' ? 2.4 : c == 'レギュラー平均年齢' ? 1.8 : 1;
+        final table = DataTable(
             key: const ValueKey('analysis-table'),
             horizontalMargin: 0, columnSpacing: 0,
+            headingRowHeight: team == null ? 0 : 56,
             headingRowColor: const WidgetStatePropertyAll(Colors.black),
             headingTextStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             border: TableBorder.all(color: Colors.grey, width: .5),
             dataRowMinHeight: rowHeight, dataRowMaxHeight: rowHeight,
             columns: [
-            for (final c in ['球団', ...analysisCategories, 'レギュラー平均年齢', '強み', '弱み']) DataColumn(columnWidth: FlexColumnWidth(c == '球団' ? 2 : c == '強み' || c == '弱み' ? 2.4 : c == 'レギュラー平均年齢' ? 1.8 : 1), label: Expanded(child: Text(c, textAlign: TextAlign.center)))
+            for (final c in columns) DataColumn(columnWidth: FlexColumnWidth(weight(c)), label: team == null ? const SizedBox.shrink() : Expanded(child: Text(c, textAlign: TextAlign.center)))
           ], rows: [
             for (final row in rows)
               DataRow(cells: [
@@ -150,17 +151,42 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
                       )),
                       child: Column(mainAxisSize: MainAxisSize.min, children: [
                         Container(key: ValueKey('analysis-grade-${row['id_team']}-$c'), padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
-                          decoration: BoxDecoration(color: clubAnalysisGradeColors[row['grades'][c]] ?? Colors.grey.shade200, borderRadius: BorderRadius.circular(4)),
+                          decoration: BoxDecoration(
+                            color: clubAnalysisGradeColors[row['grades'][c]] ?? Colors.grey.shade200,
+                            image: row['grades'][c] == 'S' ? const DecorationImage(
+                              image: AssetImage('backend/assets/images/analysis_grade_gold.jpg'),
+                              fit: BoxFit.cover,
+                            ) : null,
+                            border: Border.all(color: row['grades'][c] == 'S' ? const Color(0xFFAA791B) : Colors.transparent),
+                            borderRadius: BorderRadius.circular(4)),
                           child: Text('${row['grades'][c]}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black))),
-                        if (row['defense_methods'][c] != null)
-                          Text('${row['defense_methods'][c]}', style: const TextStyle(fontSize: 10)),
+                        // Reserve the same caption line for every grade.
+                        Text('${row['defense_methods'][c] ?? ' '}', maxLines: 1,
+                          style: const TextStyle(fontSize: 10, height: 1.2)),
                       ]),
                     )))),
                 DataCell(Center(child: Text(row['regular_age'] == null ? '—' : '${(row['regular_age'] as double).toStringAsFixed(1)}歳 (${row['age_count']}/${row['regular_count']}人)'))),
                 DataCell(Padding(padding: const EdgeInsets.all(8), child: Text('${row['strengths']}'))),
                 DataCell(Padding(padding: const EdgeInsets.all(8), child: Text('${row['weaknesses']}')))
               ])
-          ])));
+          ]);
+        final width = math.max(1240.0, constraints.maxWidth);
+        return sectionScrollView(context,
+          key: const ValueKey('analysis-horizontal-scroll'),
+          scrollDirection: Axis.horizontal,
+          child: fitTable(SizedBox(width: width,
+            height: team == null ? constraints.maxHeight : null,
+            child: team != null ? table : Column(children: [
+              Table(key: const ValueKey('analysis-fixed-header'),
+                border: TableBorder.all(color: Colors.grey, width: .5),
+                columnWidths: {for(final entry in columns.indexed) entry.$1: FlexColumnWidth(weight(entry.$2))},
+                children: [TableRow(decoration: const BoxDecoration(color: Colors.black), children: [
+                  for(final c in columns) SizedBox(height: 56, child: Center(child: Text(c,
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)))),
+                ])]),
+              Expanded(child: SingleChildScrollView(
+                key: const ValueKey('analysis-vertical-scroll'), child: table)),
+            ]))));
       }),
       for (final row in rows)
         if (row['defense_note'] is Map && '${row['defense_note']['year']}' == '${widget.year}')
@@ -168,6 +194,12 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
             Text('${row['name_team']}・守備評価の補足', style: const TextStyle(fontWeight: FontWeight.bold)),
             Text('${row['defense_note']['summary']}'),
           ])),
+    ];
+    if (team != null) return SectionList(children: children);
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      ...children.take(2),
+      Expanded(child: children[2]),
+      ...children.skip(3),
     ]);
   }
 
@@ -220,7 +252,7 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
       ),
       const Padding(padding: EdgeInsets.all(8), child: Text('公式登録の軍・担当別。兼任は各担当列に表示。— は未収録。')),
       sectionScrollView(sectionContext ?? context, scrollDirection: Axis.horizontal, child: Table(
-        defaultColumnWidth: const FixedColumnWidth(150), border: TableBorder.all(color: Colors.black26),
+        defaultColumnWidth: onlyClub == null ? const FixedColumnWidth(150) : const FlexColumnWidth(), border: TableBorder.all(color: Colors.black26),
         children: [
           TableRow(decoration: BoxDecoration(color: widget.org.tabColor.withValues(alpha: .15)), children: [
             for (final title in ['球団・軍', ...roles]) Padding(padding: const EdgeInsets.all(8), child: Text(title)),
@@ -285,29 +317,62 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
     final rosterColumns = positions.fold<int>(1, (count, position) => count + 2 +
       (roster.any((p) => rosterPosition(p, team) == position && p[['先発', '中継ぎ', '投手'].contains(position) ? 'throws' : 'bats'] == '両') ? 1 : 0));
     final regularWidth = (1 + pitcherAceSlots.length + usagePositions.length - 1 + benchRegularSlots.length) * 128.0;
-    final contentWidth = math.max(regularWidth, rosterColumns * 104 * .7);
-
-    return LayoutBuilder(builder: (context, constraints) => SingleChildScrollView(
-      key: const ValueKey('team-page-vertical-scroll'),
-      child: SingleChildScrollView(
-        key: const ValueKey('team-page-horizontal-scroll'),
-        scrollDirection: Axis.horizontal,
-        child: SizedBox(width: math.max(constraints.maxWidth, contentWidth), child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Padding(padding: const EdgeInsets.all(8), child: DropdownButton<String>(isExpanded: true, value: '${team['id_team']}', items: [for (final t in widget.teams) DropdownMenuItem(value: '${t['id_team']}', child: Text('${t['name_team']}'))], onChanged: (v) => setState(() => _selected = v))),
-      for (final e in const <int, String>{0: '貢献度', 1: '選手起用', 2: '主力選手', 3: '選手一覧'}.entries) _TeamSection(key: ValueKey('${team['id_team']}-${e.key}'), title: e.value, builder: () => widget.teamSection(e.key, team)),
-      _TeamSection(title: 'チーム分析', builder: () => Builder(builder: (sectionContext) => _analysis(team: team, sectionContext: sectionContext))),
-      if (club != null) _TeamSection(title: '首脳・スタッフ', builder: () => Builder(builder: (sectionContext) => _staff(onlyClub: club, sectionContext: sectionContext))),
-      const Padding(padding: EdgeInsets.all(12), child: Text('スポンサー・広告', style: TextStyle(fontWeight: FontWeight.bold))),
-      const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Text('公式サイトで確認できた協賛先を掲載しています。広告の全件網羅を示すものではありません。', style: TextStyle(fontSize: 11))),
+    final background = parseColorNameOrNull('${team['color_back']}') ?? widget.org.tabColor;
+    final foreground = parseColorNameOrNull('${team['color_font']}') ?? Colors.white;
+    return LayoutBuilder(builder: (context, constraints) {
+      Widget section(String title, Widget Function() builder, {double? minWidth, Key? key}) => _TeamSection(
+        key: key, title: title, background: background, foreground: foreground,
+        builder: () => minWidth == null ? builder() : SingleChildScrollView(
+          key: ValueKey('team-section-horizontal-$title'), scrollDirection: Axis.horizontal,
+          child: SizedBox(width: math.max(constraints.maxWidth, minWidth), child: builder())),
+      );
+      Widget usage(int index, String title, {double? minWidth}) => section(title,
+        () => widget.teamSection(index, team), minWidth: minWidth, key: ValueKey('${team['id_team']}-$index'));
+      return SingleChildScrollView(key: const ValueKey('team-page-vertical-scroll'),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Padding(padding: const EdgeInsets.all(8), child: LayoutBuilder(builder: (context, constraints) {
+            final columns = (constraints.maxWidth / 100).floor().clamp(1, widget.teams.length);
+            final segmentWidth = (constraints.maxWidth - (columns - 1) * 4) / columns;
+            return Wrap(spacing: 4, runSpacing: 4, children: [
+              for (final option in widget.teams) SizedBox(width: segmentWidth,
+                child: Semantics(button: true, selected: option['id_team'] == team['id_team'],
+                  child: Material(
+                    color: option['id_team'] == team['id_team']
+                        ? parseColorNameOrNull('${option['color_back']}') ?? widget.org.tabColor : Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(20),
+                    child: InkWell(
+                      key: ValueKey('team-tab-segment-${option['id_team']}'),
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () => setState(() => _selected = '${option['id_team']}'),
+                      child: SizedBox(height: 36, child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Center(child: FittedBox(fit: BoxFit.scaleDown,
+                          child: Text('${option['name_team']}', style: TextStyle(fontWeight: FontWeight.bold,
+                            color: option['id_team'] == team['id_team']
+                                ? parseColorNameOrNull('${option['color_font']}') ?? Colors.white : Colors.black87)))),
+                      )),
+                    ),
+                  ),
+                ),
+              ),
+            ]);
+          })),
+          section('チーム分析', () => Builder(builder: (sectionContext) => _analysis(team: team, sectionContext: sectionContext))),
+          section('首脳・スタッフ', () => club == null ? const Padding(padding: EdgeInsets.all(12), child: Text('この年度の首脳情報は未収録です。')) : Builder(builder: (sectionContext) => _staff(onlyClub: club, sectionContext: sectionContext))),
+          usage(2, '主力選手', minWidth: regularWidth),
+          usage(0, '貢献度'),
+          usage(1, '選手起用'),
+          usage(3, '選手一覧', minWidth: rosterColumns * 104 * .7),
+          section('スポンサー・広告', () => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       if (sponsors.isEmpty) const Padding(padding: EdgeInsets.all(12), child: Text('この年度の公式スポンサー情報は未収録です。')),
       Padding(
           padding: const EdgeInsets.all(8),
           child: Wrap(spacing: 8, runSpacing: 8, children: [
             for (final sponsor in sponsors) SizedBox(width: 170, child: Card(child: Padding(padding: const EdgeInsets.all(8), child: Column(children: [if (sponsor['logo'] != null) Image.network('${sponsor['logo']}'.startsWith('/') ? Env.api('${sponsor['logo']}').toString() : '${sponsor['logo']}', height: 55, width: 150, fit: BoxFit.contain, errorBuilder: (context, error, stack) => const SizedBox(height: 55, child: Icon(Icons.business))), Text('${sponsor['name']}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 12)), Text('${sponsor['category'] ?? '公式スポンサー'}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 10))]))))
           ]))
-    ])),
-    )));
+          ])),
+        ]));
+    });
   }
 
   @override
@@ -328,17 +393,18 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
 }
 
 class _TeamSection extends StatelessWidget {
-  const _TeamSection({super.key, required this.title, required this.builder});
+  const _TeamSection({super.key, required this.title, required this.builder, required this.background, required this.foreground});
   final String title;
+  final Color background, foreground;
   final Widget Function() builder;
 
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      Semantics(header: true, child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+      Semantics(header: true, child: Container(
+        width: double.infinity, color: background, padding: const EdgeInsets.all(10),
+        child: Text(title, textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, color: foreground)),
       )),
       TeamSectionLayout(child: builder()),
     ],

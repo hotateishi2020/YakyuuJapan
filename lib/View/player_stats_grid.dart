@@ -1,13 +1,15 @@
+import 'personal_stats_style.dart';
+import '../tools/color_parse.dart';
 import 'package:flutter/material.dart';
 import 'player_detail_dialog.dart';
 
-const extraBattingTitles = ['ボール球見極め率', '代打起用数', '代打打率', '盗塁阻止率', '打席数'];
+const extraBattingTitles = ['ボール球見極め率', '代打起用数', '代打打率', '盗塁阻止数', '打席数'];
 const extraPitchingTitles = ['BB/9', '四死球/9', '平均投球回', '投球回数', '登板回数'];
 const metricNotes = {
   'ボール球見極め率': 'ストライクゾーン外の投球のうち、スイングしなかった割合（1 − O-Swing%）。投球位置・スイング判定が必要。',
   '代打起用数': '代打として起用された回数。代打打数とは異なり、四死球等も含む。',
   '代打打率': '代打安打÷代打打数。四死球・犠打・犠飛等を打数に含めない。',
-  '盗塁阻止率': '盗塁阻止÷盗塁企図。捕手の成績。',
+  '盗塁阻止数': '捕手が盗塁を阻止した回数。規定打席の条件なし。',
   'BB/9': '規定投球回到達投手のみ。四球×9÷投球回。死球を含まない。',
   '四死球/9': '規定投球回到達投手のみ。（四球＋死球）×9÷投球回。',
   '平均投球回': '全登板（先発・救援）における投球回÷登板数。小数表記。',
@@ -16,6 +18,23 @@ const metricNotes = {
 String statPlayerKey(Map<String, dynamic> r) => r['id_player'] != null
     ? 'id:${r['id_player']}'
     : '${r['id_team']}:${r['name_player'] ?? r['player_name']}';
+
+/// Combine steals with the same player's success percentage for display only.
+String personalStatDisplay(Map<String, dynamic> row,
+    Iterable<Map<String, dynamic>> rows) {
+  final raw = '${row['stats'] ?? ''}'.trim();
+  final value = raw.isEmpty ? '—' : raw;
+  if (row['title'] != '盗塁') return value;
+  final key = statPlayerKey(row);
+  final rateRow = rows.where((r) =>
+      r['title'] == '盗塁成功率' &&
+      statPlayerKey(r) == key &&
+      r['id_league'] == row['id_league']).firstOrNull;
+  final numeric = rateRow == null ? null : statNumeric(rateRow);
+  final percent = numeric == null ? '—' : '${numeric.toStringAsFixed(1)}%';
+  return '$value（$percent）';
+}
+
 num? statNumeric(Map<String, dynamic> r) {
   final explicit = num.tryParse('${r['numeric_value']}');
   if (explicit != null) return explicit;
@@ -44,7 +63,7 @@ class _PlayerStatsGridState extends State<PlayerStatsGrid> {
   Widget build(BuildContext context) {
     final columns = <String>{
       for (final r in widget.rows)
-        if ('${r['title'] ?? ''}'.isNotEmpty) '${r['title']}',
+        if ('${r['title'] ?? ''}'.isNotEmpty && r['title'] != '盗塁成功率') '${r['title']}',
       ...(widget.batting ? extraBattingTitles : extraPitchingTitles)
     }.where((title) => widget.showBallSelection || title != 'ボール球見極め率').toList();
     final people = <String, Map<String, dynamic>>{};
@@ -75,11 +94,18 @@ class _PlayerStatsGridState extends State<PlayerStatsGrid> {
           child: SingleChildScrollView(
               child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                      columnSpacing: 22,
-                      headingRowHeight: 54,
-                      dataRowMinHeight: 36,
-                      dataRowMaxHeight: 42,
+                  child: DecoratedBox(
+                    decoration: widget.batting ? statsBattingGradDecoration : statsPitchingGradDecoration,
+                    child: DataTable(
+                      border: TableBorder.all(color: Colors.black26, width: .5),
+                      headingRowColor: const WidgetStatePropertyAll(Colors.transparent),
+                      headingTextStyle: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                      dataTextStyle: const TextStyle(color: Colors.black, fontSize: 12),
+                      horizontalMargin: 6,
+                      columnSpacing: 12,
+                      headingRowHeight: 40,
+                      dataRowMinHeight: 32,
+                      dataRowMaxHeight: 32,
                       sortColumnIndex: sort == null || !columns.contains(sort)
                           ? null
                           : columns.indexOf(sort!) + 2,
@@ -110,22 +136,23 @@ class _PlayerStatsGridState extends State<PlayerStatsGrid> {
                       ],
                       rows: [
                         for (final key in keys)
-                          DataRow(cells: [
+                          DataRow(color: WidgetStatePropertyAll(personalStatPositionColor('${people[key]!['txt_position'] ?? ''}') ?? Colors.white), cells: [
                             DataCell(PlayerNameLink(
                                 player: people[key]!,
                                 child: Text(
                                     '${people[key]!['name_player'] ?? people[key]!['player_name'] ?? ''}'
                                         .replaceAll(RegExp(r'\(.*\)$'), '')))),
-                            DataCell(
-                                Text('${people[key]!['name_team'] ?? ''}')),
+                            DataCell(Container(alignment: Alignment.center, padding: const EdgeInsets.symmetric(horizontal: 4),
+                                color: parseColorNameOrNull('${people[key]!['color_back'] ?? ''}'),
+                                child: Text('${people[key]!['name_team'] ?? ''}', style: TextStyle(color: parseColorNameOrNull('${people[key]!['color_font'] ?? ''}'))))),
                             for (final title in columns)
                               DataCell(Tooltip(
                                   message:
-                                      '${values[key]?[title]?['note'] ?? metricNotes[title] ?? title}\n${values[key]?[title]?['source'] ?? ''}',
+                                      '${values[key]?[title]?['note'] ?? metricNotes[title] ?? title}',
                                   child: Text(
-                                      '${values[key]?[title]?['stats'] ?? '—'}')))
+                                      personalStatDisplay(values[key]?[title] ?? {}, values[key]!.values))))
                           ])
-                      ]))))
+                      ])))))
     ]);
   }
 }

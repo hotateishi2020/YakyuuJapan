@@ -440,10 +440,10 @@ MlbPostseasonBoard buildMlbPostseasonBoard({
   );
 }
 
-/// The line into a round is highlighted only for that round's winner.
+/// Show both qualifiers until the next round is decided, then retract the loser.
 bool wonNextMlbRound(StageResult previous, StageResult next) =>
-    previous.decided && next.decided && previous.winnerId != null &&
-    previous.winnerId! > 0 && previous.winnerId == next.winnerId;
+    previous.decided && (previous.winnerId ?? 0) > 0 &&
+    (!next.decided || previous.winnerId == next.winnerId);
 
 /// A league champion reaches the final before any World Series games are played.
 bool reachesMlbWorldSeries(StageResult leagueSeries) =>

@@ -258,11 +258,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('strength-view-0')));
       await tester.pumpAndSettle();
-      for (final comparison in [false, true]) {
-        if (comparison) {
-          await tester.tap(find.text('12球団比較'));
-          await tester.pumpAndSettle();
-        }
+      for (final comparison in [true]) {
         expect(
             find.byKey(const ValueKey('total-bases-legend')), findsOneWidget);
         final band = find
@@ -346,7 +342,7 @@ void main() {
       }, () => client);
     });
   }
-  testWidgets('成績と契約は各球団・全球団比較を切り替える', (tester) async {
+  testWidgets('貢献度は常に全球団比較、契約は表示を切り替える', (tester) async {
     await tester.binding.setSurfaceSize(const Size(1200, 1000));
     addTearDown(() => tester.binding.setSurfaceSize(null));
     final teams = [
@@ -377,9 +373,8 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('strength-view-0')));
       await tester.pumpAndSettle();
       expect(find.text('10本'), findsWidgets);
-      expect(find.text('30'), findsOneWidget);
-      await tester.tap(find.text('12球団比較'));
-      await tester.pumpAndSettle();
+      expect(find.text('各球団'), findsNothing);
+      expect(find.text('12球団比較'), findsNothing);
       expect(find.byKey(const ValueKey('strength-team-1')), findsNothing);
       expect(find.text('60'), findsOneWidget);
       final bands = tester.getRect(find

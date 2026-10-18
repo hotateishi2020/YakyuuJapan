@@ -1,3 +1,4 @@
+import 'app/CatcherCounts.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -17,7 +18,7 @@ Future<void> main(List<String> args) async {
       final previous = list.where((v) => v['title'] == m['title']).firstOrNull;
       if (previous != null && p['org'] == 'npb') {
         final a = previous['numeric_value'] as num?, b = m['numeric_value'] as num?;
-        if (['打席数', '登板回数', '投球回数'].contains(m['title']) && a != null && b != null) {
+        if (['打席数', '登板回数', '投球回数', '盗塁阻止数'].contains(m['title']) && a != null && b != null) {
           m['numeric_value'] = a + b;
           m['stats'] = m['title'] == '投球回数' ? '${((a + b) * 3).round() ~/ 3}${((a + b) * 3).round() % 3 == 0 ? '' : ' ${((a + b) * 3).round() % 3}/3'}' : '${(a + b).round()}';
         } else if (['BB/9', '四死球/9', '平均投球回'].contains(m['title']) && a != null && b != null) {
@@ -75,14 +76,15 @@ Future<void> main(List<String> args) async {
             metrics.addAll([metric('登板回数', games, pitcher: true), metric('投球回数', outs / 3, pitcher: true, display: '${outs ~/ 3}${outs % 3 == 0 ? '' : ' ${outs % 3}/3'}'), metric('平均投球回', games != null && games > 0 ? outs / 3 / games : null, pitcher: true, digits: 2, note: '全登板の平均・小数表記'), metric('BB/9', outs > 0 && bb != null ? bb * 27 / outs : null, pitcher: true, digits: 2), metric('四死球/9', outs > 0 && bb != null && hbp != null ? (bb + hbp) * 27 / outs : null, pitcher: true, digits: 2)]);
           }
           if (group == 'fielding' && usageMap(split['position'])['abbreviation'] == 'C') {
-            final cs = n('caughtStealing'), sb = n('stolenBases');
-            metrics.add(metric('盗塁阻止率', cs != null && sb != null && cs + sb > 0 ? cs / (cs + sb) : null, digits: 3));
+            final cs = n('caughtStealing');
+            metrics.add(metric('盗塁阻止数', cs));
           }
           if (metrics.isNotEmpty) {
             add({'org': 'mlb', 'source_player_id': '${p['id']}', 'name': p['fullName'], 'source': url, 'metrics': metrics});
           }
         }
     }
+    await refreshNpbCatcherCounts(year, players.values.toList(), get);
     final profiles = await fetchStatcastProfiles(year, get, add);
     final profileFile = File('data/player-profiles-$year.json');
     final old = readClubFile('player-profiles-$year.json');

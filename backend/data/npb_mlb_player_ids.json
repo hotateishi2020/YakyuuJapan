@@ -1,0 +1,3820 @@
+{
+  "source": "https://github.com/chadwickbureau/register",
+  "players": [
+    {
+      "npb_id": "81183889",
+      "mlb_id": 219594,
+      "name_en": "Tomo Ohka",
+      "birth_date": "1976-03-18"
+    },
+    {
+      "npb_id": "43145118",
+      "mlb_id": 457826,
+      "name_en": "Tom Mastny",
+      "birth_date": "1981-02-04"
+    },
+    {
+      "npb_id": "73375114",
+      "mlb_id": 285064,
+      "name_en": "Ryan Vogelsong",
+      "birth_date": "1977-07-22"
+    },
+    {
+      "npb_id": "43945150",
+      "mlb_id": 658668,
+      "name_en": "Edward Olivares",
+      "birth_date": "1996-03-06"
+    },
+    {
+      "npb_id": "03905157",
+      "mlb_id": 676886,
+      "name_en": "Jeremy Beasley",
+      "birth_date": "1995-11-20"
+    },
+    {
+      "npb_id": "33935153",
+      "mlb_id": 613317,
+      "name_en": "Kyle Bird",
+      "birth_date": "1993-04-12"
+    },
+    {
+      "npb_id": "43545130",
+      "mlb_id": 506648,
+      "name_en": "Yoslán Herrera",
+      "birth_date": "1981-04-28"
+    },
+    {
+      "npb_id": "41945131",
+      "mlb_id": 660294,
+      "name_en": "Yoshi Tsutsugo",
+      "birth_date": "1991-11-26"
+    },
+    {
+      "npb_id": "03105131",
+      "mlb_id": 434623,
+      "name_en": "Juan Morillo",
+      "birth_date": "1983-11-05"
+    },
+    {
+      "npb_id": "53155116",
+      "mlb_id": 425513,
+      "name_en": "Craig Brazell",
+      "birth_date": "1980-05-10"
+    },
+    {
+      "npb_id": "53955157",
+      "mlb_id": 571602,
+      "name_en": "Matt Davidson",
+      "birth_date": "1991-03-26"
+    },
+    {
+      "npb_id": "83085132",
+      "mlb_id": 451713,
+      "name_en": "Carlos Peguero",
+      "birth_date": "1987-02-22"
+    },
+    {
+      "npb_id": "03905155",
+      "mlb_id": 595918,
+      "name_en": "A. J. Cole",
+      "birth_date": "1992-01-05"
+    },
+    {
+      "npb_id": "01605113",
+      "mlb_id": 123568,
+      "name_en": "Tim Unroe",
+      "birth_date": "1970-10-07"
+    },
+    {
+      "npb_id": "83385152",
+      "mlb_id": 680735,
+      "name_en": "Austin Cox",
+      "birth_date": "1997-03-28"
+    },
+    {
+      "npb_id": "13015136",
+      "mlb_id": 573016,
+      "name_en": "Kyle Martin",
+      "birth_date": "1991-01-18"
+    },
+    {
+      "npb_id": "31035151",
+      "mlb_id": 808963,
+      "name_en": "Roki Sasaki",
+      "birth_date": "2001-11-03"
+    },
+    {
+      "npb_id": "73375138",
+      "mlb_id": 606995,
+      "name_en": "Justin Hancock",
+      "birth_date": "1990-10-28"
+    },
+    {
+      "npb_id": "13315135",
+      "mlb_id": 451186,
+      "name_en": "Lastings Milledge",
+      "birth_date": "1985-04-05"
+    },
+    {
+      "npb_id": "11215114",
+      "mlb_id": 547888,
+      "name_en": "Masahiro Tanaka",
+      "birth_date": "1988-11-01"
+    },
+    {
+      "npb_id": "53555159",
+      "mlb_id": 542583,
+      "name_en": "Jesús Aguilar",
+      "birth_date": "1990-06-30"
+    },
+    {
+      "npb_id": "13315138",
+      "mlb_id": 594943,
+      "name_en": "Zach Neal",
+      "birth_date": "1988-11-09"
+    },
+    {
+      "npb_id": "03305152",
+      "mlb_id": 620454,
+      "name_en": "José Castillo",
+      "birth_date": "1996-01-10"
+    },
+    {
+      "npb_id": "33735136",
+      "mlb_id": 607259,
+      "name_en": "Nick Martínez",
+      "birth_date": "1990-08-05"
+    },
+    {
+      "npb_id": "13515132",
+      "mlb_id": 543351,
+      "name_en": "Jay Jackson",
+      "birth_date": "1987-10-27"
+    },
+    {
+      "npb_id": "73375137",
+      "mlb_id": 150208,
+      "name_en": "Ken Ray",
+      "birth_date": "1974-11-27"
+    },
+    {
+      "npb_id": "93795138",
+      "mlb_id": 523989,
+      "name_en": "Rubby De La Rosa",
+      "birth_date": "1989-03-04"
+    },
+    {
+      "npb_id": "93095153",
+      "mlb_id": 592660,
+      "name_en": "Rangel Ravelo",
+      "birth_date": "1992-04-24"
+    },
+    {
+      "npb_id": "41845117",
+      "mlb_id": 430907,
+      "name_en": "Rick Short",
+      "birth_date": "1972-12-06"
+    },
+    {
+      "npb_id": "81285139",
+      "mlb_id": 673513,
+      "name_en": "Yuki Matsui",
+      "birth_date": "1995-10-30"
+    },
+    {
+      "npb_id": "53355135",
+      "mlb_id": 502162,
+      "name_en": "Ángel Castro",
+      "birth_date": "1982-11-14"
+    },
+    {
+      "npb_id": "53955155",
+      "mlb_id": 621139,
+      "name_en": "Brooks Kriske",
+      "birth_date": "1994-02-03"
+    },
+    {
+      "npb_id": "83385133",
+      "mlb_id": 449774,
+      "name_en": "Evan MacLane",
+      "birth_date": "1982-11-04"
+    },
+    {
+      "npb_id": "23325138",
+      "mlb_id": 518466,
+      "name_en": "Jabari Blash",
+      "birth_date": "1989-07-04"
+    },
+    {
+      "npb_id": "23725133",
+      "mlb_id": 435222,
+      "name_en": "Josh Fields",
+      "birth_date": "1982-12-14"
+    },
+    {
+      "npb_id": "53355117",
+      "mlb_id": 119913,
+      "name_en": "Alex Ochoa",
+      "birth_date": "1972-03-29"
+    },
+    {
+      "npb_id": "43345132",
+      "mlb_id": 434540,
+      "name_en": "Garrett Jones",
+      "birth_date": "1981-06-21"
+    },
+    {
+      "npb_id": "93795155",
+      "mlb_id": 658792,
+      "name_en": "Aaron Wilkerson",
+      "birth_date": "1989-05-24"
+    },
+    {
+      "npb_id": "11413889",
+      "mlb_id": 110012,
+      "name_en": "Kyle Abbott",
+      "birth_date": "1968-02-18"
+    },
+    {
+      "npb_id": "41343886",
+      "mlb_id": 499877,
+      "name_en": "Kenshin Kawakami",
+      "birth_date": "1975-06-22"
+    },
+    {
+      "npb_id": "93795136",
+      "mlb_id": 543380,
+      "name_en": "Taylor Jungmann",
+      "birth_date": "1989-12-18"
+    },
+    {
+      "npb_id": "33035132",
+      "mlb_id": 666969,
+      "name_en": "Adolis García",
+      "birth_date": "1993-03-02"
+    },
+    {
+      "npb_id": "51355135",
+      "mlb_id": 683822,
+      "name_en": "Naoyuki Uwasawa",
+      "birth_date": "1994-02-06"
+    },
+    {
+      "npb_id": "13715136",
+      "mlb_id": 502211,
+      "name_en": "Mike Bolsinger",
+      "birth_date": "1988-01-29"
+    },
+    {
+      "npb_id": "73375151",
+      "mlb_id": 592122,
+      "name_en": "Tyler Austin",
+      "birth_date": "1991-09-06"
+    },
+    {
+      "npb_id": "33335131",
+      "mlb_id": 457859,
+      "name_en": "Randy Ruiz",
+      "birth_date": "1977-10-19"
+    },
+    {
+      "npb_id": "63365134",
+      "mlb_id": 546276,
+      "name_en": "Edwin Escobar",
+      "birth_date": "1992-04-22"
+    },
+    {
+      "npb_id": "71675137",
+      "mlb_id": 407924,
+      "name_en": "Manny Acosta",
+      "birth_date": "1981-05-01"
+    },
+    {
+      "npb_id": "21625137",
+      "mlb_id": 518558,
+      "name_en": "Matt Clark",
+      "birth_date": "1986-12-10"
+    },
+    {
+      "npb_id": "73175116",
+      "mlb_id": 150375,
+      "name_en": "Hiram Bocachica",
+      "birth_date": "1976-03-04"
+    },
+    {
+      "npb_id": "03305117",
+      "mlb_id": 150403,
+      "name_en": "José Fernández",
+      "birth_date": "1974-11-02"
+    },
+    {
+      "npb_id": "63765153",
+      "mlb_id": 641525,
+      "name_en": "Brandon Dixon",
+      "birth_date": "1992-01-29"
+    },
+    {
+      "npb_id": "33035134",
+      "mlb_id": 502029,
+      "name_en": "Chris Marrero",
+      "birth_date": "1988-07-02"
+    },
+    {
+      "npb_id": "31835117",
+      "mlb_id": 237796,
+      "name_en": "Jeff Williams",
+      "birth_date": "1972-06-06"
+    },
+    {
+      "npb_id": "31835139",
+      "mlb_id": 435038,
+      "name_en": "Anderson Hernández",
+      "birth_date": "1982-10-30"
+    },
+    {
+      "npb_id": "41845136",
+      "mlb_id": 808959,
+      "name_en": "Munetaka Murakami",
+      "birth_date": "2000-02-02"
+    },
+    {
+      "npb_id": "33735153",
+      "mlb_id": 605482,
+      "name_en": "Cy Sneed",
+      "birth_date": "1992-10-01"
+    },
+    {
+      "npb_id": "93595134",
+      "mlb_id": 543258,
+      "name_en": "Preston Guilmet",
+      "birth_date": "1987-07-27"
+    },
+    {
+      "npb_id": "63365136",
+      "mlb_id": 543607,
+      "name_en": "Edgar Olmos",
+      "birth_date": "1990-04-12"
+    },
+    {
+      "npb_id": "71575132",
+      "mlb_id": 829272,
+      "name_en": "Shinnosuke Ogasawara",
+      "birth_date": "1997-10-08"
+    },
+    {
+      "npb_id": "63165139",
+      "mlb_id": 446861,
+      "name_en": "Guillermo Moscoso",
+      "birth_date": "1983-11-14"
+    },
+    {
+      "npb_id": "83385138",
+      "mlb_id": 608841,
+      "name_en": "Joey Meneses",
+      "birth_date": "1992-05-06"
+    },
+    {
+      "npb_id": "73275155",
+      "mlb_id": 621097,
+      "name_en": "Jacob Waguespack",
+      "birth_date": "1993-11-05"
+    },
+    {
+      "npb_id": "83185118",
+      "mlb_id": 434480,
+      "name_en": "Darrell Rasner",
+      "birth_date": "1981-01-13"
+    },
+    {
+      "npb_id": "53355138",
+      "mlb_id": 573627,
+      "name_en": "Kennys Vargas",
+      "birth_date": "1990-08-01"
+    },
+    {
+      "npb_id": "63165113",
+      "mlb_id": 150352,
+      "name_en": "Alex Ramírez",
+      "birth_date": "1974-10-03"
+    },
+    {
+      "npb_id": "73375135",
+      "mlb_id": 430594,
+      "name_en": "Renyel Pinto",
+      "birth_date": "1982-07-08"
+    },
+    {
+      "npb_id": "73775134",
+      "mlb_id": 592274,
+      "name_en": "Matt Duffy",
+      "birth_date": "1989-02-06"
+    },
+    {
+      "npb_id": "61865135",
+      "mlb_id": 493193,
+      "name_en": "Dae-ho Lee",
+      "birth_date": "1982-06-21"
+    },
+    {
+      "npb_id": "13515134",
+      "mlb_id": 491708,
+      "name_en": "Arquimedes Caminero",
+      "birth_date": "1987-06-16"
+    },
+    {
+      "npb_id": "61563888",
+      "mlb_id": 493131,
+      "name_en": "Masahide Kobayashi",
+      "birth_date": "1974-05-24"
+    },
+    {
+      "npb_id": "51755131",
+      "mlb_id": 579328,
+      "name_en": "Yusei Kikuchi",
+      "birth_date": "1991-06-17"
+    },
+    {
+      "npb_id": "83385132",
+      "mlb_id": 547348,
+      "name_en": "C. C. Lee",
+      "birth_date": "1986-10-21"
+    },
+    {
+      "npb_id": "63265159",
+      "mlb_id": 572971,
+      "name_en": "Dallas Keuchel",
+      "birth_date": "1988-01-01"
+    },
+    {
+      "npb_id": "83585133",
+      "mlb_id": 454972,
+      "name_en": "Rómulo Sánchez",
+      "birth_date": "1984-04-28"
+    },
+    {
+      "npb_id": "63165137",
+      "mlb_id": 460092,
+      "name_en": "Chris Leroux",
+      "birth_date": "1984-04-14"
+    },
+    {
+      "npb_id": "23525118",
+      "mlb_id": 150159,
+      "name_en": "Steve Randolph",
+      "birth_date": "1974-05-01"
+    },
+    {
+      "npb_id": "33135137",
+      "mlb_id": 430930,
+      "name_en": "Fred Lewis",
+      "birth_date": "1980-12-09"
+    },
+    {
+      "npb_id": "33935155",
+      "mlb_id": 656467,
+      "name_en": "Chris Gittens",
+      "birth_date": "1994-02-04"
+    },
+    {
+      "npb_id": "61665137",
+      "mlb_id": 218894,
+      "name_en": "Vicente Padilla",
+      "birth_date": "1977-09-27"
+    },
+    {
+      "npb_id": "53955159",
+      "mlb_id": 642137,
+      "name_en": "Cody Thomas",
+      "birth_date": "1994-10-08"
+    },
+    {
+      "npb_id": "43745153",
+      "mlb_id": 571616,
+      "name_en": "Matt Dermody",
+      "birth_date": "1990-07-04"
+    },
+    {
+      "npb_id": "13015132",
+      "mlb_id": 467070,
+      "name_en": "Elián Herrera",
+      "birth_date": "1985-02-01"
+    },
+    {
+      "npb_id": "23025152",
+      "mlb_id": 671131,
+      "name_en": "Jackson Rutledge",
+      "birth_date": "1999-04-01"
+    },
+    {
+      "npb_id": "83185131",
+      "mlb_id": 445590,
+      "name_en": "Eric Stults",
+      "birth_date": "1979-12-09"
+    },
+    {
+      "npb_id": "17313868",
+      "mlb_id": 113779,
+      "name_en": "Juan Eichelberger",
+      "birth_date": "1953-10-21"
+    },
+    {
+      "npb_id": "43345138",
+      "mlb_id": 543518,
+      "name_en": "Scott McGough",
+      "birth_date": "1989-10-31"
+    },
+    {
+      "npb_id": "83785151",
+      "mlb_id": 519043,
+      "name_en": "Matt Moore",
+      "birth_date": "1989-06-18"
+    },
+    {
+      "npb_id": "01903885",
+      "mlb_id": 408039,
+      "name_en": "So Taguchi",
+      "birth_date": "1969-07-02"
+    },
+    {
+      "npb_id": "01305137",
+      "mlb_id": 660271,
+      "name_en": "Shohei Ohtani",
+      "birth_date": "1994-07-05"
+    },
+    {
+      "npb_id": "51855119",
+      "mlb_id": 132241,
+      "name_en": "Bryan Corey",
+      "birth_date": "1973-10-21"
+    },
+    {
+      "npb_id": "91895116",
+      "mlb_id": 420684,
+      "name_en": "Ben Kozlowski",
+      "birth_date": "1980-08-16"
+    },
+    {
+      "npb_id": "33535139",
+      "mlb_id": 462480,
+      "name_en": "Rhiner Cruz",
+      "birth_date": "1986-11-01"
+    },
+    {
+      "npb_id": "63765159",
+      "mlb_id": 664057,
+      "name_en": "Andrew Stevenson",
+      "birth_date": "1994-06-01"
+    },
+    {
+      "npb_id": "53355152",
+      "mlb_id": 666215,
+      "name_en": "Forrest Whitley",
+      "birth_date": "1997-09-15"
+    },
+    {
+      "npb_id": "73175131",
+      "mlb_id": 430889,
+      "name_en": "Bill Murphy",
+      "birth_date": "1981-05-09"
+    },
+    {
+      "npb_id": "81885118",
+      "mlb_id": 400002,
+      "name_en": "Matt Childers",
+      "birth_date": "1978-12-03"
+    },
+    {
+      "npb_id": "73175135",
+      "mlb_id": 458036,
+      "name_en": "Nick Stavinoha",
+      "birth_date": "1982-05-03"
+    },
+    {
+      "npb_id": "43145116",
+      "mlb_id": 434885,
+      "name_en": "D. J. Houlton",
+      "birth_date": "1979-08-12"
+    },
+    {
+      "npb_id": "73775150",
+      "mlb_id": 656793,
+      "name_en": "Nick Nelson",
+      "birth_date": "1995-12-05"
+    },
+    {
+      "npb_id": "01305132",
+      "mlb_id": 684007,
+      "name_en": "Shota Imanaga",
+      "birth_date": "1993-09-01"
+    },
+    {
+      "npb_id": "23725136",
+      "mlb_id": 501647,
+      "name_en": "Wilin Rosario",
+      "birth_date": "1989-02-23"
+    },
+    {
+      "npb_id": "83785155",
+      "mlb_id": 520471,
+      "name_en": "Freddy Galvis",
+      "birth_date": "1989-11-14"
+    },
+    {
+      "npb_id": "71675131",
+      "mlb_id": 430582,
+      "name_en": "Brian Wolfe",
+      "birth_date": "1980-11-29"
+    },
+    {
+      "npb_id": "01103886",
+      "mlb_id": 506432,
+      "name_en": "Kei Igawa",
+      "birth_date": "1979-07-13"
+    },
+    {
+      "npb_id": "01805139",
+      "mlb_id": 458501,
+      "name_en": "Luis Cruz",
+      "birth_date": "1984-02-10"
+    },
+    {
+      "npb_id": "63365151",
+      "mlb_id": 543742,
+      "name_en": "Jerry Sands",
+      "birth_date": "1987-09-28"
+    },
+    {
+      "npb_id": "41943880",
+      "mlb_id": 506429,
+      "name_en": "Kazuo Fukumori",
+      "birth_date": "1976-08-04"
+    },
+    {
+      "npb_id": "43545135",
+      "mlb_id": 346855,
+      "name_en": "Brandon Duckworth",
+      "birth_date": "1976-01-23"
+    },
+    {
+      "npb_id": "83785150",
+      "mlb_id": 613564,
+      "name_en": "Jason Vosler",
+      "birth_date": "1993-09-06"
+    },
+    {
+      "npb_id": "41045137",
+      "mlb_id": 660261,
+      "name_en": "Shintaro Fujinami",
+      "birth_date": "1994-04-12"
+    },
+    {
+      "npb_id": "03905152",
+      "mlb_id": 669674,
+      "name_en": "Sam Long",
+      "birth_date": "1995-07-08"
+    },
+    {
+      "npb_id": "93495155",
+      "mlb_id": 607229,
+      "name_en": "Robert Gsellman",
+      "birth_date": "1993-07-18"
+    },
+    {
+      "npb_id": "93995155",
+      "mlb_id": 594027,
+      "name_en": "Tyron Guerrero",
+      "birth_date": "1991-01-09"
+    },
+    {
+      "npb_id": "71173862",
+      "mlb_id": 117711,
+      "name_en": "Brad Lesley",
+      "birth_date": "1958-09-11"
+    },
+    {
+      "npb_id": "03505151",
+      "mlb_id": 605463,
+      "name_en": "Tayler Scott",
+      "birth_date": "1992-06-01"
+    },
+    {
+      "npb_id": "81985116",
+      "mlb_id": 430954,
+      "name_en": "Kazuhito Tadano",
+      "birth_date": "1980-04-25"
+    },
+    {
+      "npb_id": "23025134",
+      "mlb_id": 595386,
+      "name_en": "Jason Rogers",
+      "birth_date": "1988-03-13"
+    },
+    {
+      "npb_id": "13315130",
+      "mlb_id": 489448,
+      "name_en": "Mike Zagurski",
+      "birth_date": "1983-01-27"
+    },
+    {
+      "npb_id": "53055152",
+      "mlb_id": 644429,
+      "name_en": "Anderson Severino",
+      "birth_date": "1994-09-17"
+    },
+    {
+      "npb_id": "01605131",
+      "mlb_id": 425489,
+      "name_en": "José Castillo",
+      "birth_date": "1981-03-19"
+    },
+    {
+      "npb_id": "01005133",
+      "mlb_id": 673540,
+      "name_en": "Kodai Senga",
+      "birth_date": "1993-01-30"
+    },
+    {
+      "npb_id": "43545133",
+      "mlb_id": 434627,
+      "name_en": "Ryan Speier",
+      "birth_date": "1979-07-24"
+    },
+    {
+      "npb_id": "03305133",
+      "mlb_id": 448167,
+      "name_en": "Brandon Mann",
+      "birth_date": "1984-05-16"
+    },
+    {
+      "npb_id": "13715150",
+      "mlb_id": 641541,
+      "name_en": "Jon Duplantier",
+      "birth_date": "1994-07-11"
+    },
+    {
+      "npb_id": "53055159",
+      "mlb_id": 642376,
+      "name_en": "Jefry Yan",
+      "birth_date": "1996-08-17"
+    },
+    {
+      "npb_id": "93295157",
+      "mlb_id": 650668,
+      "name_en": "Humberto Mejía",
+      "birth_date": "1997-03-03"
+    },
+    {
+      "npb_id": "33335133",
+      "mlb_id": 120221,
+      "name_en": "Chan Ho Park",
+      "birth_date": "1973-06-30"
+    },
+    {
+      "npb_id": "83185138",
+      "mlb_id": 544150,
+      "name_en": "Albert Suárez",
+      "birth_date": "1989-10-08"
+    },
+    {
+      "npb_id": "53755150",
+      "mlb_id": 663527,
+      "name_en": "Tyler Nevin",
+      "birth_date": "1997-05-29"
+    },
+    {
+      "npb_id": "91895115",
+      "mlb_id": 136663,
+      "name_en": "Fernando Seguignol",
+      "birth_date": "1975-01-19"
+    },
+    {
+      "npb_id": "33135139",
+      "mlb_id": 502151,
+      "name_en": "Chad Huffman",
+      "birth_date": "1985-04-29"
+    },
+    {
+      "npb_id": "13315116",
+      "mlb_id": 275700,
+      "name_en": "Winston Abreu",
+      "birth_date": "1977-04-05"
+    },
+    {
+      "npb_id": "81885131",
+      "mlb_id": 150202,
+      "name_en": "Dee Brown",
+      "birth_date": "1978-03-27"
+    },
+    {
+      "npb_id": "43045132",
+      "mlb_id": 447755,
+      "name_en": "Steve Delabar",
+      "birth_date": "1983-07-17"
+    },
+    {
+      "npb_id": "03105115",
+      "mlb_id": 123955,
+      "name_en": "John Wasdin",
+      "birth_date": "1972-08-05"
+    },
+    {
+      "npb_id": "13715132",
+      "mlb_id": 493364,
+      "name_en": "Dayán Viciedo",
+      "birth_date": "1989-03-10"
+    },
+    {
+      "npb_id": "73975152",
+      "mlb_id": 687922,
+      "name_en": "Easton Lucas",
+      "birth_date": "1996-09-23"
+    },
+    {
+      "npb_id": "83985157",
+      "mlb_id": 621446,
+      "name_en": "Lewis Brinson",
+      "birth_date": "1994-05-08"
+    },
+    {
+      "npb_id": "23525136",
+      "mlb_id": 607297,
+      "name_en": "O'Koyea Dickson",
+      "birth_date": "1990-02-09"
+    },
+    {
+      "npb_id": "23925152",
+      "mlb_id": 642216,
+      "name_en": "Allan Winans",
+      "birth_date": "1995-08-10"
+    },
+    {
+      "npb_id": "33135118",
+      "mlb_id": 430617,
+      "name_en": "Scott Dohmann",
+      "birth_date": "1978-02-13"
+    },
+    {
+      "npb_id": "31733880",
+      "mlb_id": 492706,
+      "name_en": "Kenji Johjima",
+      "birth_date": "1976-06-08"
+    },
+    {
+      "npb_id": "93595151",
+      "mlb_id": 597113,
+      "name_en": "DJ Johnson",
+      "birth_date": "1989-08-30"
+    },
+    {
+      "npb_id": "53755159",
+      "mlb_id": 614173,
+      "name_en": "Franchy Cordero",
+      "birth_date": "1994-09-02"
+    },
+    {
+      "npb_id": "73775132",
+      "mlb_id": 518755,
+      "name_en": "Matt Hague",
+      "birth_date": "1985-08-20"
+    },
+    {
+      "npb_id": "31433868",
+      "mlb_id": 150196,
+      "name_en": "Masao Kida",
+      "birth_date": "1968-09-12"
+    },
+    {
+      "npb_id": "63365118",
+      "mlb_id": 455921,
+      "name_en": "Luis Jiménez",
+      "birth_date": "1982-05-07"
+    },
+    {
+      "npb_id": "03305136",
+      "mlb_id": 542455,
+      "name_en": "Oswaldo Arcia",
+      "birth_date": "1991-05-09"
+    },
+    {
+      "npb_id": "03105133",
+      "mlb_id": 448614,
+      "name_en": "Carlos Torres",
+      "birth_date": "1982-10-22"
+    },
+    {
+      "npb_id": "01805116",
+      "mlb_id": 346867,
+      "name_en": "Scott Seabol",
+      "birth_date": "1975-05-17"
+    },
+    {
+      "npb_id": "03905150",
+      "mlb_id": 676614,
+      "name_en": "Bryan Sammons",
+      "birth_date": "1995-04-27"
+    },
+    {
+      "npb_id": "93195113",
+      "mlb_id": 133140,
+      "name_en": "Scott McClain",
+      "birth_date": "1972-05-19"
+    },
+    {
+      "npb_id": "03705133",
+      "mlb_id": 457384,
+      "name_en": "Bobby Scales",
+      "birth_date": "1977-10-04"
+    },
+    {
+      "npb_id": "21625119",
+      "mlb_id": 612672,
+      "name_en": "Wei-Yin Chen",
+      "birth_date": "1985-07-21"
+    },
+    {
+      "npb_id": "13315137",
+      "mlb_id": 451500,
+      "name_en": "Kila Ka'aihue",
+      "birth_date": "1984-03-29"
+    },
+    {
+      "npb_id": "03505130",
+      "mlb_id": 453281,
+      "name_en": "Wade LeBlanc",
+      "birth_date": "1984-08-07"
+    },
+    {
+      "npb_id": "21825131",
+      "mlb_id": 452225,
+      "name_en": "Jeff Fiorentino",
+      "birth_date": "1983-04-14"
+    },
+    {
+      "npb_id": "31133867",
+      "mlb_id": 116402,
+      "name_en": "Tim Ireland",
+      "birth_date": "1953-03-14"
+    },
+    {
+      "npb_id": "03305138",
+      "mlb_id": 641427,
+      "name_en": "Alan Busenitz",
+      "birth_date": "1990-08-22"
+    },
+    {
+      "npb_id": "13715134",
+      "mlb_id": 489295,
+      "name_en": "Brian Schlitter",
+      "birth_date": "1985-12-21"
+    },
+    {
+      "npb_id": "31133865",
+      "mlb_id": 110153,
+      "name_en": "Kim Allen",
+      "birth_date": "1953-04-05"
+    },
+    {
+      "npb_id": "93395139",
+      "mlb_id": 435358,
+      "name_en": "Yuniesky Betancourt",
+      "birth_date": "1982-01-31"
+    },
+    {
+      "npb_id": "71073888",
+      "mlb_id": 493117,
+      "name_en": "Kyuji Fujikawa",
+      "birth_date": "1980-07-21"
+    },
+    {
+      "npb_id": "73775155",
+      "mlb_id": 542882,
+      "name_en": "Matt Andriese",
+      "birth_date": "1989-08-28"
+    },
+    {
+      "npb_id": "93395137",
+      "mlb_id": 476206,
+      "name_en": "Justin Thomas",
+      "birth_date": "1984-01-18"
+    },
+    {
+      "npb_id": "01805131",
+      "mlb_id": 408311,
+      "name_en": "Justin Huber",
+      "birth_date": "1982-07-01"
+    },
+    {
+      "npb_id": "23525153",
+      "mlb_id": 591741,
+      "name_en": "José Osuna",
+      "birth_date": "1992-12-12"
+    },
+    {
+      "npb_id": "43245157",
+      "mlb_id": 660730,
+      "name_en": "Elvin Rodríguez",
+      "birth_date": "1998-03-31"
+    },
+    {
+      "npb_id": "03105114",
+      "mlb_id": 133960,
+      "name_en": "Seth Greisinger",
+      "birth_date": "1975-07-29"
+    },
+    {
+      "npb_id": "13415155",
+      "mlb_id": 532077,
+      "name_en": "Roberto Osuna",
+      "birth_date": "1995-02-07"
+    },
+    {
+      "npb_id": "73575159",
+      "mlb_id": 656061,
+      "name_en": "Albert Abreu",
+      "birth_date": "1995-09-26"
+    },
+    {
+      "npb_id": "73775157",
+      "mlb_id": 622379,
+      "name_en": "Luis Castillo",
+      "birth_date": "1995-03-10"
+    },
+    {
+      "npb_id": "71875131",
+      "mlb_id": 501817,
+      "name_en": "Tony Barnette",
+      "birth_date": "1983-11-09"
+    },
+    {
+      "npb_id": "43745132",
+      "mlb_id": 460131,
+      "name_en": "Brian Bogusevic",
+      "birth_date": "1984-02-18"
+    },
+    {
+      "npb_id": "23325136",
+      "mlb_id": 452027,
+      "name_en": "Andrew Albers",
+      "birth_date": "1985-10-06"
+    },
+    {
+      "npb_id": "31135119",
+      "mlb_id": 493114,
+      "name_en": "Nori Aoki",
+      "birth_date": "1982-01-05"
+    },
+    {
+      "npb_id": "23325131",
+      "mlb_id": 435140,
+      "name_en": "Hayden Penn",
+      "birth_date": "1984-10-13"
+    },
+    {
+      "npb_id": "83183886",
+      "mlb_id": 110285,
+      "name_en": "Eric Anthony",
+      "birth_date": "1967-11-08"
+    },
+    {
+      "npb_id": "53555151",
+      "mlb_id": 608638,
+      "name_en": "J. T. Chargois",
+      "birth_date": "1990-12-03"
+    },
+    {
+      "npb_id": "51855137",
+      "mlb_id": 505447,
+      "name_en": "Brandon Dickson",
+      "birth_date": "1984-11-03"
+    },
+    {
+      "npb_id": "93095159",
+      "mlb_id": 608703,
+      "name_en": "Matt Reynolds",
+      "birth_date": "1990-12-03"
+    },
+    {
+      "npb_id": "51153884",
+      "mlb_id": 435338,
+      "name_en": "Tadahito Iguchi",
+      "birth_date": "1974-12-04"
+    },
+    {
+      "npb_id": "53555118",
+      "mlb_id": 425429,
+      "name_en": "Andy Phillips",
+      "birth_date": "1977-04-06"
+    },
+    {
+      "npb_id": "31233888",
+      "mlb_id": 493137,
+      "name_en": "Daisuke Matsuzaka",
+      "birth_date": "1980-09-13"
+    },
+    {
+      "npb_id": "53155131",
+      "mlb_id": 444875,
+      "name_en": "Matt Murton",
+      "birth_date": "1981-10-03"
+    },
+    {
+      "npb_id": "53555112",
+      "mlb_id": 150281,
+      "name_en": "Ryan Glynn",
+      "birth_date": "1974-11-01"
+    },
+    {
+      "npb_id": "11915111",
+      "mlb_id": 547887,
+      "name_en": "Kensuke Tanaka",
+      "birth_date": "1981-05-20"
+    },
+    {
+      "npb_id": "63165132",
+      "mlb_id": 807799,
+      "name_en": "Masataka Yoshida",
+      "birth_date": "1993-07-15"
+    },
+    {
+      "npb_id": "33535133",
+      "mlb_id": 489052,
+      "name_en": "Brent Leach",
+      "birth_date": "1982-11-18"
+    },
+    {
+      "npb_id": "81785137",
+      "mlb_id": 673548,
+      "name_en": "Seiya Suzuki",
+      "birth_date": "1994-08-18"
+    },
+    {
+      "npb_id": "33035150",
+      "mlb_id": 608723,
+      "name_en": "Austin Voth",
+      "birth_date": "1992-06-26"
+    },
+    {
+      "npb_id": "61965110",
+      "mlb_id": 506433,
+      "name_en": "Yu Darvish",
+      "birth_date": "1986-08-16"
+    },
+    {
+      "npb_id": "93095150",
+      "mlb_id": 660757,
+      "name_en": "Oscar González",
+      "birth_date": "1998-01-10"
+    },
+    {
+      "npb_id": "13715159",
+      "mlb_id": 641743,
+      "name_en": "Anthony Kay",
+      "birth_date": "1995-03-21"
+    },
+    {
+      "npb_id": "71875139",
+      "mlb_id": 452764,
+      "name_en": "Chris Carpenter",
+      "birth_date": "1985-12-26"
+    },
+    {
+      "npb_id": "33035152",
+      "mlb_id": 666464,
+      "name_en": "Jerar Encarnacion",
+      "birth_date": "1997-10-22"
+    },
+    {
+      "npb_id": "61865137",
+      "mlb_id": 460579,
+      "name_en": "Nyjer Morgan",
+      "birth_date": "1980-07-02"
+    },
+    {
+      "npb_id": "31135133",
+      "mlb_id": 673451,
+      "name_en": "Shogo Akiyama",
+      "birth_date": "1988-04-16"
+    },
+    {
+      "npb_id": "33035153",
+      "mlb_id": 588751,
+      "name_en": "Adeiny Hechavarría",
+      "birth_date": "1989-04-15"
+    },
+    {
+      "npb_id": "21625110",
+      "mlb_id": 117327,
+      "name_en": "Marc Kroon",
+      "birth_date": "1973-04-02"
+    },
+    {
+      "npb_id": "63265155",
+      "mlb_id": 623182,
+      "name_en": "Patrick Kivlehan",
+      "birth_date": "1989-12-22"
+    },
+    {
+      "npb_id": "03705152",
+      "mlb_id": 664294,
+      "name_en": "Dauri Moreta",
+      "birth_date": "1996-04-15"
+    },
+    {
+      "npb_id": "01105111",
+      "mlb_id": 547874,
+      "name_en": "Hisashi Iwakuma",
+      "birth_date": "1981-04-12"
+    },
+    {
+      "npb_id": "03505136",
+      "mlb_id": 519304,
+      "name_en": "Neftali Soto",
+      "birth_date": "1989-02-28"
+    },
+    {
+      "npb_id": "43745155",
+      "mlb_id": 657434,
+      "name_en": "Brian O'Grady",
+      "birth_date": "1992-05-17"
+    },
+    {
+      "npb_id": "31133826",
+      "mlb_id": 110199,
+      "name_en": "George Altman",
+      "birth_date": "1933-03-20"
+    },
+    {
+      "npb_id": "81983889",
+      "mlb_id": 430565,
+      "name_en": "Kazuo Matsui",
+      "birth_date": "1975-10-23"
+    },
+    {
+      "npb_id": "91895118",
+      "mlb_id": 430894,
+      "name_en": "Chris Aguila",
+      "birth_date": "1979-02-23"
+    },
+    {
+      "npb_id": "61963888",
+      "mlb_id": 493120,
+      "name_en": "Kosuke Fukudome",
+      "birth_date": "1977-04-26"
+    },
+    {
+      "npb_id": "63765136",
+      "mlb_id": 474599,
+      "name_en": "Neil Wagner",
+      "birth_date": "1984-01-01"
+    },
+    {
+      "npb_id": "21825137",
+      "mlb_id": 431171,
+      "name_en": "Casey McGehee",
+      "birth_date": "1982-10-12"
+    },
+    {
+      "npb_id": "23925159",
+      "mlb_id": 641907,
+      "name_en": "Patrick Murphy",
+      "birth_date": "1995-06-10"
+    },
+    {
+      "npb_id": "63765152",
+      "mlb_id": 685068,
+      "name_en": "Carson Ragsdale",
+      "birth_date": "1998-05-25"
+    },
+    {
+      "npb_id": "13715151",
+      "mlb_id": 543594,
+      "name_en": "Sean Nolin",
+      "birth_date": "1989-12-26"
+    },
+    {
+      "npb_id": "13015157",
+      "mlb_id": 592622,
+      "name_en": "Mark Payton",
+      "birth_date": "1991-12-07"
+    },
+    {
+      "npb_id": "73375152",
+      "mlb_id": 570632,
+      "name_en": "José Ureña",
+      "birth_date": "1991-09-12"
+    },
+    {
+      "npb_id": "93995136",
+      "mlb_id": 519068,
+      "name_en": "Efren Navarro",
+      "birth_date": "1986-05-14"
+    },
+    {
+      "npb_id": "31733881",
+      "mlb_id": 407894,
+      "name_en": "Satoru Komiyama",
+      "birth_date": "1965-09-15"
+    },
+    {
+      "npb_id": "21825116",
+      "mlb_id": 449128,
+      "name_en": "Mike Schultz",
+      "birth_date": "1979-11-28"
+    },
+    {
+      "npb_id": "63765157",
+      "mlb_id": 605194,
+      "name_en": "Jharel Cotton",
+      "birth_date": "1992-01-19"
+    },
+    {
+      "npb_id": "33535132",
+      "mlb_id": 467099,
+      "name_en": "Jordan Norberto",
+      "birth_date": "1986-12-08"
+    },
+    {
+      "npb_id": "03305151",
+      "mlb_id": 657585,
+      "name_en": "Reed Garrett",
+      "birth_date": "1993-01-02"
+    },
+    {
+      "npb_id": "13215157",
+      "mlb_id": 606131,
+      "name_en": "Luis Perdomo",
+      "birth_date": "1993-05-09"
+    },
+    {
+      "npb_id": "83285157",
+      "mlb_id": 593140,
+      "name_en": "Michael Feliz",
+      "birth_date": "1993-06-28"
+    },
+    {
+      "npb_id": "73475155",
+      "mlb_id": 669214,
+      "name_en": "Conner Menez",
+      "birth_date": "1995-05-29"
+    },
+    {
+      "npb_id": "23325134",
+      "mlb_id": 543921,
+      "name_en": "Joe Wieland",
+      "birth_date": "1990-01-21"
+    },
+    {
+      "npb_id": "83185151",
+      "mlb_id": 593679,
+      "name_en": "Gabriel Ynoa",
+      "birth_date": "1993-05-26"
+    },
+    {
+      "npb_id": "73575151",
+      "mlb_id": 430945,
+      "name_en": "Adam Jones",
+      "birth_date": "1985-08-01"
+    },
+    {
+      "npb_id": "63065150",
+      "mlb_id": 656308,
+      "name_en": "Michael Chavis",
+      "birth_date": "1995-08-11"
+    },
+    {
+      "npb_id": "43945159",
+      "mlb_id": 600921,
+      "name_en": "Andrés Machado",
+      "birth_date": "1993-04-22"
+    },
+    {
+      "npb_id": "81385157",
+      "mlb_id": 641741,
+      "name_en": "Gosuke Katoh",
+      "birth_date": "1994-10-08"
+    },
+    {
+      "npb_id": "43545157",
+      "mlb_id": 606157,
+      "name_en": "Aristides Aquino",
+      "birth_date": "1994-04-22"
+    },
+    {
+      "npb_id": "53455155",
+      "mlb_id": 571871,
+      "name_en": "Ian Krol",
+      "birth_date": "1991-05-09"
+    },
+    {
+      "npb_id": "73575135",
+      "mlb_id": 451783,
+      "name_en": "Dustin Molleken",
+      "birth_date": "1984-08-21"
+    },
+    {
+      "npb_id": "43345134",
+      "mlb_id": 519411,
+      "name_en": "Matt West",
+      "birth_date": "1988-11-21"
+    },
+    {
+      "npb_id": "93595138",
+      "mlb_id": 596271,
+      "name_en": "Casey Lawrence",
+      "birth_date": "1987-10-28"
+    },
+    {
+      "npb_id": "51353883",
+      "mlb_id": 110254,
+      "name_en": "Scott Anderson",
+      "birth_date": "1962-08-01"
+    },
+    {
+      "npb_id": "43545139",
+      "mlb_id": 452783,
+      "name_en": "Nick Evans",
+      "birth_date": "1986-01-30"
+    },
+    {
+      "npb_id": "73575136",
+      "mlb_id": 518716,
+      "name_en": "Dillon Gee",
+      "birth_date": "1986-04-28"
+    },
+    {
+      "npb_id": "93095132",
+      "mlb_id": 465015,
+      "name_en": "Leyson Séptimo",
+      "birth_date": "1985-07-07"
+    },
+    {
+      "npb_id": "53555133",
+      "mlb_id": 434679,
+      "name_en": "Anthony Lerew",
+      "birth_date": "1982-10-28"
+    },
+    {
+      "npb_id": "03505138",
+      "mlb_id": 544836,
+      "name_en": "Enny Romero",
+      "birth_date": "1991-01-24"
+    },
+    {
+      "npb_id": "03305135",
+      "mlb_id": 429806,
+      "name_en": "Víctor Díaz",
+      "birth_date": "1981-12-10"
+    },
+    {
+      "npb_id": "93995150",
+      "mlb_id": 663567,
+      "name_en": "Peter Lambert",
+      "birth_date": "1997-04-18"
+    },
+    {
+      "npb_id": "63165135",
+      "mlb_id": 455949,
+      "name_en": "Scott Mathieson",
+      "birth_date": "1984-02-27"
+    },
+    {
+      "npb_id": "13315131",
+      "mlb_id": 429716,
+      "name_en": "J. D. Durbin",
+      "birth_date": "1982-02-24"
+    },
+    {
+      "npb_id": "43545132",
+      "mlb_id": 542914,
+      "name_en": "Anthony Bass",
+      "birth_date": "1987-11-01"
+    },
+    {
+      "npb_id": "73075132",
+      "mlb_id": 462956,
+      "name_en": "Felipe Paulino",
+      "birth_date": "1983-10-05"
+    },
+    {
+      "npb_id": "23525130",
+      "mlb_id": 477186,
+      "name_en": "Brandon Laird",
+      "birth_date": "1987-09-11"
+    },
+    {
+      "npb_id": "33735159",
+      "mlb_id": 642770,
+      "name_en": "Javy Guerra",
+      "birth_date": "1995-09-25"
+    },
+    {
+      "npb_id": "91895139",
+      "mlb_id": 498568,
+      "name_en": "Bárbaro Cañizares",
+      "birth_date": "1979-11-21"
+    },
+    {
+      "npb_id": "81885139",
+      "mlb_id": 434629,
+      "name_en": "Chris Seddon",
+      "birth_date": "1983-10-13"
+    },
+    {
+      "npb_id": "63765133",
+      "mlb_id": 449471,
+      "name_en": "Brian Barden",
+      "birth_date": "1981-04-02"
+    },
+    {
+      "npb_id": "31435117",
+      "mlb_id": 457292,
+      "name_en": "Tsuyoshi Nishioka",
+      "birth_date": "1984-07-27"
+    },
+    {
+      "npb_id": "51855131",
+      "mlb_id": 448842,
+      "name_en": "Frankie De La Cruz",
+      "birth_date": "1984-03-12"
+    },
+    {
+      "npb_id": "83585155",
+      "mlb_id": 570489,
+      "name_en": "Arismendy Alcántara",
+      "birth_date": "1991-10-29"
+    },
+    {
+      "npb_id": "73075155",
+      "mlb_id": 591971,
+      "name_en": "Breyvic Valera",
+      "birth_date": "1992-01-08"
+    },
+    {
+      "npb_id": "03305134",
+      "mlb_id": 542587,
+      "name_en": "Elvis Araújo",
+      "birth_date": "1991-07-15"
+    },
+    {
+      "npb_id": "23325118",
+      "mlb_id": 110135,
+      "name_en": "Edgardo Alfonzo",
+      "birth_date": "1973-11-08"
+    },
+    {
+      "npb_id": "23725153",
+      "mlb_id": 475253,
+      "name_en": "Justin Smoak",
+      "birth_date": "1986-12-05"
+    },
+    {
+      "npb_id": "83085157",
+      "mlb_id": 503556,
+      "name_en": "Marwin González",
+      "birth_date": "1989-03-14"
+    },
+    {
+      "npb_id": "43145130",
+      "mlb_id": 466339,
+      "name_en": "Víctor Gárate",
+      "birth_date": "1984-09-25"
+    },
+    {
+      "npb_id": "03505134",
+      "mlb_id": 607309,
+      "name_en": "Phil Klein",
+      "birth_date": "1989-04-30"
+    },
+    {
+      "npb_id": "23725151",
+      "mlb_id": 517369,
+      "name_en": "José Pirela",
+      "birth_date": "1989-11-21"
+    },
+    {
+      "npb_id": "53055155",
+      "mlb_id": 600524,
+      "name_en": "Renato Núñez",
+      "birth_date": "1994-04-04"
+    },
+    {
+      "npb_id": "93095157",
+      "mlb_id": 622795,
+      "name_en": "Yohander Méndez",
+      "birth_date": "1995-01-17"
+    },
+    {
+      "npb_id": "13915132",
+      "mlb_id": 543569,
+      "name_en": "Brent Morel",
+      "birth_date": "1987-04-21"
+    },
+    {
+      "npb_id": "33535136",
+      "mlb_id": 607162,
+      "name_en": "Onelki García",
+      "birth_date": "1989-08-02"
+    },
+    {
+      "npb_id": "93995152",
+      "mlb_id": 669308,
+      "name_en": "Sean Reynolds",
+      "birth_date": "1998-04-19"
+    },
+    {
+      "npb_id": "21825118",
+      "mlb_id": 400113,
+      "name_en": "Les Walrond",
+      "birth_date": "1976-11-07"
+    },
+    {
+      "npb_id": "03205155",
+      "mlb_id": 663411,
+      "name_en": "Joe McCarthy",
+      "birth_date": "1994-02-23"
+    },
+    {
+      "npb_id": "53555136",
+      "mlb_id": 599998,
+      "name_en": "Leonel Campos",
+      "birth_date": "1987-07-17"
+    },
+    {
+      "npb_id": "31133840",
+      "mlb_id": 110270,
+      "name_en": "Mike Andrews",
+      "birth_date": "1943-07-09"
+    },
+    {
+      "npb_id": "93795157",
+      "mlb_id": 593525,
+      "name_en": "Orlando Calixte",
+      "birth_date": "1992-02-03"
+    },
+    {
+      "npb_id": "63565157",
+      "mlb_id": 553902,
+      "name_en": "Willians Astudillo",
+      "birth_date": "1991-10-14"
+    },
+    {
+      "npb_id": "91693882",
+      "mlb_id": 121129,
+      "name_en": "Karl Rhodes",
+      "birth_date": "1968-08-21"
+    },
+    {
+      "npb_id": "03505132",
+      "mlb_id": 503569,
+      "name_en": "Rafael Dolis",
+      "birth_date": "1988-01-10"
+    },
+    {
+      "npb_id": "33535151",
+      "mlb_id": 501213,
+      "name_en": "Moisés Sierra",
+      "birth_date": "1988-09-24"
+    },
+    {
+      "npb_id": "23725150",
+      "mlb_id": 675921,
+      "name_en": "Spencer Howard",
+      "birth_date": "1996-07-28"
+    },
+    {
+      "npb_id": "43545136",
+      "mlb_id": 518625,
+      "name_en": "Matt Dominguez",
+      "birth_date": "1989-08-28"
+    },
+    {
+      "npb_id": "53955134",
+      "mlb_id": 542669,
+      "name_en": "Román Méndez",
+      "birth_date": "1990-07-25"
+    },
+    {
+      "npb_id": "11415110",
+      "mlb_id": 425781,
+      "name_en": "Micheal Nakamura",
+      "birth_date": "1976-09-06"
+    },
+    {
+      "npb_id": "83385151",
+      "mlb_id": 605795,
+      "name_en": "Ángel Sánchez",
+      "birth_date": "1989-11-28"
+    },
+    {
+      "npb_id": "53555132",
+      "mlb_id": 663158,
+      "name_en": "Robert Suarez",
+      "birth_date": "1991-03-01"
+    },
+    {
+      "npb_id": "63065153",
+      "mlb_id": 570714,
+      "name_en": "César Vargas",
+      "birth_date": "1991-12-30"
+    },
+    {
+      "npb_id": "31335134",
+      "mlb_id": 837227,
+      "name_en": "Tatsuya Imai",
+      "birth_date": "1998-05-09"
+    },
+    {
+      "npb_id": "53155135",
+      "mlb_id": 407880,
+      "name_en": "Luis Terrero",
+      "birth_date": "1980-05-18"
+    },
+    {
+      "npb_id": "73775138",
+      "mlb_id": 519301,
+      "name_en": "Sammy Solís",
+      "birth_date": "1988-08-10"
+    },
+    {
+      "npb_id": "53755132",
+      "mlb_id": 502010,
+      "name_en": "Jake Brigham",
+      "birth_date": "1988-02-10"
+    },
+    {
+      "npb_id": "73575152",
+      "mlb_id": 593934,
+      "name_en": "Miguel Sanó",
+      "birth_date": "1993-05-11"
+    },
+    {
+      "npb_id": "13115135",
+      "mlb_id": 452080,
+      "name_en": "Chris Carter",
+      "birth_date": "1982-09-16"
+    },
+    {
+      "npb_id": "81885135",
+      "mlb_id": 430942,
+      "name_en": "Randy Williams",
+      "birth_date": "1975-09-18"
+    },
+    {
+      "npb_id": "81885137",
+      "mlb_id": 445933,
+      "name_en": "Bryan LaHair",
+      "birth_date": "1982-11-05"
+    },
+    {
+      "npb_id": "53355133",
+      "mlb_id": 459376,
+      "name_en": "Kelvin Jiménez",
+      "birth_date": "1980-10-27"
+    },
+    {
+      "npb_id": "53355137",
+      "mlb_id": 434898,
+      "name_en": "Tim Corcoran",
+      "birth_date": "1978-04-15"
+    },
+    {
+      "npb_id": "13515136",
+      "mlb_id": 571539,
+      "name_en": "Matt Carasiti",
+      "birth_date": "1991-07-23"
+    },
+    {
+      "npb_id": "51855112",
+      "mlb_id": 685493,
+      "name_en": "Shun Yamaguchi",
+      "birth_date": "1987-07-11"
+    },
+    {
+      "npb_id": "73975159",
+      "mlb_id": 621368,
+      "name_en": "Taylor Hearn",
+      "birth_date": "1994-08-30"
+    },
+    {
+      "npb_id": "41445133",
+      "mlb_id": 628318,
+      "name_en": "Kazuhisa Makita",
+      "birth_date": "1984-11-10"
+    },
+    {
+      "npb_id": "23125138",
+      "mlb_id": 475857,
+      "name_en": "Ryan Cook",
+      "birth_date": "1987-06-30"
+    },
+    {
+      "npb_id": "31133885",
+      "mlb_id": 408193,
+      "name_en": "Kazuhisa Ishii",
+      "birth_date": "1973-09-09"
+    },
+    {
+      "npb_id": "91695119",
+      "mlb_id": 342992,
+      "name_en": "Greg LaRocca",
+      "birth_date": "1972-11-10"
+    },
+    {
+      "npb_id": "93595135",
+      "mlb_id": 450545,
+      "name_en": "Doug Mathis",
+      "birth_date": "1983-06-07"
+    },
+    {
+      "npb_id": "83585157",
+      "mlb_id": 664011,
+      "name_en": "Trey Amburgey",
+      "birth_date": "1994-10-24"
+    },
+    {
+      "npb_id": "63965157",
+      "mlb_id": 596748,
+      "name_en": "Maikel Franco",
+      "birth_date": "1992-08-26"
+    },
+    {
+      "npb_id": "33935157",
+      "mlb_id": 622786,
+      "name_en": "Jesús Tinoco",
+      "birth_date": "1995-04-30"
+    },
+    {
+      "npb_id": "23525151",
+      "mlb_id": 605486,
+      "name_en": "Cory Spangenberg",
+      "birth_date": "1991-03-16"
+    },
+    {
+      "npb_id": "73175137",
+      "mlb_id": 457130,
+      "name_en": "Vinny Rottino",
+      "birth_date": "1980-04-07"
+    },
+    {
+      "npb_id": "43745150",
+      "mlb_id": 660758,
+      "name_en": "Sandro Fabian",
+      "birth_date": "1998-03-06"
+    },
+    {
+      "npb_id": "53955150",
+      "mlb_id": 660707,
+      "name_en": "Elehuris Montero",
+      "birth_date": "1998-08-17"
+    },
+    {
+      "npb_id": "41445119",
+      "mlb_id": 150469,
+      "name_en": "John Bale",
+      "birth_date": "1974-05-22"
+    },
+    {
+      "npb_id": "03705134",
+      "mlb_id": 607359,
+      "name_en": "Spencer Patton",
+      "birth_date": "1988-02-20"
+    },
+    {
+      "npb_id": "73775136",
+      "mlb_id": 514981,
+      "name_en": "Diego Moreno",
+      "birth_date": "1987-07-21"
+    },
+    {
+      "npb_id": "31133864",
+      "mlb_id": 110073,
+      "name_en": "Jim Adduci",
+      "birth_date": "1959-08-09"
+    },
+    {
+      "npb_id": "23925136",
+      "mlb_id": 518782,
+      "name_en": "Johnny Hellweg",
+      "birth_date": "1988-10-29"
+    },
+    {
+      "npb_id": "71773880",
+      "mlb_id": 548092,
+      "name_en": "Ken Takahashi",
+      "birth_date": "1969-04-16"
+    },
+    {
+      "npb_id": "83785157",
+      "mlb_id": 643524,
+      "name_en": "Frank Schwindel",
+      "birth_date": "1992-06-29"
+    },
+    {
+      "npb_id": "33535134",
+      "mlb_id": 571057,
+      "name_en": "Frank Garcés",
+      "birth_date": "1990-01-17"
+    },
+    {
+      "npb_id": "73575134",
+      "mlb_id": 493472,
+      "name_en": "Eric Campbell",
+      "birth_date": "1987-04-09"
+    },
+    {
+      "npb_id": "83185135",
+      "mlb_id": 501874,
+      "name_en": "Kam Mickolio",
+      "birth_date": "1984-05-10"
+    },
+    {
+      "npb_id": "11815117",
+      "mlb_id": 493159,
+      "name_en": "Tsuyoshi Wada",
+      "birth_date": "1981-02-21"
+    },
+    {
+      "npb_id": "93095152",
+      "mlb_id": 664192,
+      "name_en": "Joey Lucchesi",
+      "birth_date": "1993-06-06"
+    },
+    {
+      "npb_id": "93995134",
+      "mlb_id": 504083,
+      "name_en": "Jorge Rondon",
+      "birth_date": "1988-02-16"
+    },
+    {
+      "npb_id": "01605137",
+      "mlb_id": 425555,
+      "name_en": "Daniel Cabrera",
+      "birth_date": "1981-05-28"
+    },
+    {
+      "npb_id": "63365130",
+      "mlb_id": 458220,
+      "name_en": "Esmerling Vásquez",
+      "birth_date": "1983-11-07"
+    },
+    {
+      "npb_id": "41745137",
+      "mlb_id": 608372,
+      "name_en": "Tomoyuki Sugano",
+      "birth_date": "1989-10-11"
+    },
+    {
+      "npb_id": "63565133",
+      "mlb_id": 460349,
+      "name_en": "Carlos Rosa",
+      "birth_date": "1984-09-21"
+    },
+    {
+      "npb_id": "43345131",
+      "mlb_id": 425562,
+      "name_en": "Vinnie Chulk",
+      "birth_date": "1978-12-19"
+    },
+    {
+      "npb_id": "21523884",
+      "mlb_id": 493133,
+      "name_en": "Hiroki Kuroda",
+      "birth_date": "1975-02-10"
+    },
+    {
+      "npb_id": "53155137",
+      "mlb_id": 425659,
+      "name_en": "Héctor Luna",
+      "birth_date": "1980-02-01"
+    },
+    {
+      "npb_id": "51855139",
+      "mlb_id": 493200,
+      "name_en": "Seunghwan Oh",
+      "birth_date": "1982-07-15"
+    },
+    {
+      "npb_id": "21625113",
+      "mlb_id": 234194,
+      "name_en": "Buddy Carlyle",
+      "birth_date": "1977-12-21"
+    },
+    {
+      "npb_id": "73575139",
+      "mlb_id": 518963,
+      "name_en": "Zach Lutz",
+      "birth_date": "1986-06-03"
+    },
+    {
+      "npb_id": "63365152",
+      "mlb_id": 650671,
+      "name_en": "José Quijada",
+      "birth_date": "1995-11-09"
+    },
+    {
+      "npb_id": "13115118",
+      "mlb_id": 452202,
+      "name_en": "Jamie D'Antona",
+      "birth_date": "1982-05-12"
+    },
+    {
+      "npb_id": "53955153",
+      "mlb_id": 607067,
+      "name_en": "Colin Rea",
+      "birth_date": "1990-07-01"
+    },
+    {
+      "npb_id": "61865133",
+      "mlb_id": 452293,
+      "name_en": "Jonathan Albaladejo",
+      "birth_date": "1982-10-30"
+    },
+    {
+      "npb_id": "73075134",
+      "mlb_id": 543155,
+      "name_en": "Stephen Fife",
+      "birth_date": "1986-10-04"
+    },
+    {
+      "npb_id": "93595136",
+      "mlb_id": 489294,
+      "name_en": "Tanner Scheppers",
+      "birth_date": "1987-01-17"
+    },
+    {
+      "npb_id": "73175139",
+      "mlb_id": 429715,
+      "name_en": "Travis Blackley",
+      "birth_date": "1982-11-04"
+    },
+    {
+      "npb_id": "23525139",
+      "mlb_id": 445177,
+      "name_en": "Deunte Heath",
+      "birth_date": "1985-08-08"
+    },
+    {
+      "npb_id": "61465119",
+      "mlb_id": 133742,
+      "name_en": "Benny Agbayani",
+      "birth_date": "1971-12-28"
+    },
+    {
+      "npb_id": "81285112",
+      "mlb_id": 673633,
+      "name_en": "Yoshihisa Hirano",
+      "birth_date": "1984-03-08"
+    },
+    {
+      "npb_id": "93595153",
+      "mlb_id": 572362,
+      "name_en": "Robbie Erlin",
+      "birth_date": "1990-10-08"
+    },
+    {
+      "npb_id": "73975155",
+      "mlb_id": 664918,
+      "name_en": "Kyle Keller",
+      "birth_date": "1993-04-28"
+    },
+    {
+      "npb_id": "41645137",
+      "mlb_id": 462405,
+      "name_en": "Brooks Conrad",
+      "birth_date": "1980-01-16"
+    },
+    {
+      "npb_id": "43545159",
+      "mlb_id": 659262,
+      "name_en": "Anderson Espinoza",
+      "birth_date": "1998-03-09"
+    },
+    {
+      "npb_id": "53955132",
+      "mlb_id": 518961,
+      "name_en": "Josh Lueke",
+      "birth_date": "1984-12-05"
+    },
+    {
+      "npb_id": "93295155",
+      "mlb_id": 533167,
+      "name_en": "Matt Shoemaker",
+      "birth_date": "1986-09-27"
+    },
+    {
+      "npb_id": "73075150",
+      "mlb_id": 658648,
+      "name_en": "Pedro Avila",
+      "birth_date": "1997-01-14"
+    },
+    {
+      "npb_id": "53055153",
+      "mlb_id": 642098,
+      "name_en": "Glenn Sparkman",
+      "birth_date": "1992-05-11"
+    },
+    {
+      "npb_id": "83785134",
+      "mlb_id": 542674,
+      "name_en": "Gonzalez Germen",
+      "birth_date": "1987-09-23"
+    },
+    {
+      "npb_id": "91895137",
+      "mlb_id": 448269,
+      "name_en": "Brad Bergesen",
+      "birth_date": "1985-09-25"
+    },
+    {
+      "npb_id": "73375131",
+      "mlb_id": 444882,
+      "name_en": "Josh Whitesell",
+      "birth_date": "1982-04-14"
+    },
+    {
+      "npb_id": "33135133",
+      "mlb_id": 430610,
+      "name_en": "Dennis Sarfate",
+      "birth_date": "1981-04-09"
+    },
+    {
+      "npb_id": "73975153",
+      "mlb_id": 600968,
+      "name_en": "Randy Rosario",
+      "birth_date": "1994-05-18"
+    },
+    {
+      "npb_id": "33135135",
+      "mlb_id": 434619,
+      "name_en": "Enrique González",
+      "birth_date": "1982-07-14"
+    },
+    {
+      "npb_id": "03105139",
+      "mlb_id": 506673,
+      "name_en": "Juan Miranda",
+      "birth_date": "1983-04-25"
+    },
+    {
+      "npb_id": "41645131",
+      "mlb_id": 430670,
+      "name_en": "Bobby Keppel",
+      "birth_date": "1982-06-11"
+    },
+    {
+      "npb_id": "83385136",
+      "mlb_id": 503566,
+      "name_en": "Fabio Castillo",
+      "birth_date": "1989-02-19"
+    },
+    {
+      "npb_id": "83385134",
+      "mlb_id": 456027,
+      "name_en": "Ross Ohlendorf",
+      "birth_date": "1982-08-08"
+    },
+    {
+      "npb_id": "43545134",
+      "mlb_id": 648717,
+      "name_en": "Alex Guerrero",
+      "birth_date": "1986-11-20"
+    },
+    {
+      "npb_id": "51353889",
+      "mlb_id": 506606,
+      "name_en": "Hideki Okajima",
+      "birth_date": "1975-12-25"
+    },
+    {
+      "npb_id": "53555135",
+      "mlb_id": 450864,
+      "name_en": "Bobby Cramer",
+      "birth_date": "1979-10-28"
+    },
+    {
+      "npb_id": "63065157",
+      "mlb_id": 656798,
+      "name_en": "Jacob Nix",
+      "birth_date": "1996-01-09"
+    },
+    {
+      "npb_id": "93795153",
+      "mlb_id": 594992,
+      "name_en": "Kevin Shackelford",
+      "birth_date": "1989-04-07"
+    },
+    {
+      "npb_id": "53155139",
+      "mlb_id": 452061,
+      "name_en": "Zach Phillips",
+      "birth_date": "1986-09-21"
+    },
+    {
+      "npb_id": "23325152",
+      "mlb_id": 672744,
+      "name_en": "Alexander Canario",
+      "birth_date": "2000-05-07"
+    },
+    {
+      "npb_id": "03505135",
+      "mlb_id": 425656,
+      "name_en": "Wil Ledezma",
+      "birth_date": "1981-01-21"
+    },
+    {
+      "npb_id": "23325137",
+      "mlb_id": 502166,
+      "name_en": "Brad Mills",
+      "birth_date": "1985-03-05"
+    },
+    {
+      "npb_id": "61865139",
+      "mlb_id": 346796,
+      "name_en": "Alexis Gómez",
+      "birth_date": "1978-08-08"
+    },
+    {
+      "npb_id": "93795159",
+      "mlb_id": 656008,
+      "name_en": "Aneurys Zabala",
+      "birth_date": "1996-12-21"
+    },
+    {
+      "npb_id": "13215132",
+      "mlb_id": 458678,
+      "name_en": "Mike Broadway",
+      "birth_date": "1987-03-30"
+    },
+    {
+      "npb_id": "31133846",
+      "mlb_id": 110331,
+      "name_en": "Chris Arnold",
+      "birth_date": "1947-11-06"
+    },
+    {
+      "npb_id": "13315139",
+      "mlb_id": 285068,
+      "name_en": "Cody Ransom",
+      "birth_date": "1976-02-17"
+    },
+    {
+      "npb_id": "93195114",
+      "mlb_id": 408224,
+      "name_en": "Aaron Guiel",
+      "birth_date": "1972-10-05"
+    },
+    {
+      "npb_id": "93595132",
+      "mlb_id": 434678,
+      "name_en": "Kyle Davies",
+      "birth_date": "1983-09-09"
+    },
+    {
+      "npb_id": "31133808",
+      "mlb_id": 110131,
+      "name_en": "Bob Alexander",
+      "birth_date": "1922-08-07"
+    },
+    {
+      "npb_id": "03905153",
+      "mlb_id": 500135,
+      "name_en": "Ronny Rodríguez",
+      "birth_date": "1992-04-17"
+    },
+    {
+      "npb_id": "33135114",
+      "mlb_id": 150210,
+      "name_en": "Chad Allen",
+      "birth_date": "1975-02-06"
+    },
+    {
+      "npb_id": "11815116",
+      "mlb_id": 547939,
+      "name_en": "Chang-Yong Lim",
+      "birth_date": "1976-06-04"
+    },
+    {
+      "npb_id": "93795150",
+      "mlb_id": 657508,
+      "name_en": "Mike Baumann",
+      "birth_date": "1995-09-10"
+    },
+    {
+      "npb_id": "53355151",
+      "mlb_id": 457754,
+      "name_en": "Jon Edwards",
+      "birth_date": "1988-01-08"
+    },
+    {
+      "npb_id": "63165138",
+      "mlb_id": 572955,
+      "name_en": "Pierce Johnson",
+      "birth_date": "1991-05-10"
+    },
+    {
+      "npb_id": "53355130",
+      "mlb_id": 453241,
+      "name_en": "Kris Johnson",
+      "birth_date": "1984-10-14"
+    },
+    {
+      "npb_id": "53555130",
+      "mlb_id": 571945,
+      "name_en": "Miles Mikolas",
+      "birth_date": "1988-08-23"
+    },
+    {
+      "npb_id": "63965136",
+      "mlb_id": 664641,
+      "name_en": "Aríel Miranda",
+      "birth_date": "1989-01-10"
+    },
+    {
+      "npb_id": "31133829",
+      "mlb_id": 110355,
+      "name_en": "Ken Aspromonte",
+      "birth_date": "1931-09-22"
+    },
+    {
+      "npb_id": "13915150",
+      "mlb_id": 666205,
+      "name_en": "Kyle Muller",
+      "birth_date": "1997-10-07"
+    },
+    {
+      "npb_id": "33535116",
+      "mlb_id": 461880,
+      "name_en": "Marcus Gwyn",
+      "birth_date": "1977-11-04"
+    },
+    {
+      "npb_id": "53255155",
+      "mlb_id": 592530,
+      "name_en": "José Marmolejos",
+      "birth_date": "1993-01-02"
+    },
+    {
+      "npb_id": "63565153",
+      "mlb_id": 628329,
+      "name_en": "Rusney Castillo",
+      "birth_date": "1987-07-09"
+    },
+    {
+      "npb_id": "03905132",
+      "mlb_id": 430404,
+      "name_en": "Jonny Gomes",
+      "birth_date": "1980-11-22"
+    },
+    {
+      "npb_id": "83785153",
+      "mlb_id": 519346,
+      "name_en": "Eric Thames",
+      "birth_date": "1986-11-10"
+    },
+    {
+      "npb_id": "43745134",
+      "mlb_id": 571527,
+      "name_en": "David Buchanan",
+      "birth_date": "1989-05-11"
+    },
+    {
+      "npb_id": "43245159",
+      "mlb_id": 669023,
+      "name_en": "Jeter Downs",
+      "birth_date": "1998-07-27"
+    },
+    {
+      "npb_id": "73575150",
+      "mlb_id": 663550,
+      "name_en": "Trey Cabbage",
+      "birth_date": "1997-05-03"
+    },
+    {
+      "npb_id": "13515139",
+      "mlb_id": 493329,
+      "name_en": "Yuli Gurriel",
+      "birth_date": "1984-06-09"
+    },
+    {
+      "npb_id": "53355118",
+      "mlb_id": 434180,
+      "name_en": "Kameron Loe",
+      "birth_date": "1981-09-10"
+    },
+    {
+      "npb_id": "43345116",
+      "mlb_id": 434664,
+      "name_en": "Jason Botts",
+      "birth_date": "1980-07-26"
+    },
+    {
+      "npb_id": "83785130",
+      "mlb_id": 543008,
+      "name_en": "Alex Castellanos",
+      "birth_date": "1986-08-04"
+    },
+    {
+      "npb_id": "81685137",
+      "mlb_id": 116662,
+      "name_en": "Andruw Jones",
+      "birth_date": "1977-04-23"
+    },
+    {
+      "npb_id": "73975157",
+      "mlb_id": 641914,
+      "name_en": "Sheldon Neuse",
+      "birth_date": "1994-12-10"
+    },
+    {
+      "npb_id": "73275157",
+      "mlb_id": 593700,
+      "name_en": "Alen Hanson",
+      "birth_date": "1992-10-22"
+    },
+    {
+      "npb_id": "11815137",
+      "mlb_id": 448676,
+      "name_en": "Ryan Spilborghs",
+      "birth_date": "1979-09-05"
+    },
+    {
+      "npb_id": "63765151",
+      "mlb_id": 571506,
+      "name_en": "Justin Bour",
+      "birth_date": "1988-05-28"
+    },
+    {
+      "npb_id": "03005150",
+      "mlb_id": 572228,
+      "name_en": "Luke Voit",
+      "birth_date": "1991-02-13"
+    },
+    {
+      "npb_id": "93195137",
+      "mlb_id": 430946,
+      "name_en": "José López",
+      "birth_date": "1983-11-24"
+    },
+    {
+      "npb_id": "23125133",
+      "mlb_id": 429710,
+      "name_en": "Chad Tracy",
+      "birth_date": "1980-05-22"
+    },
+    {
+      "npb_id": "23525159",
+      "mlb_id": 664744,
+      "name_en": "Jose Espada",
+      "birth_date": "1997-02-22"
+    },
+    {
+      "npb_id": "23725132",
+      "mlb_id": 469802,
+      "name_en": "Luis Pérez",
+      "birth_date": "1985-01-20"
+    },
+    {
+      "npb_id": "73075159",
+      "mlb_id": 614177,
+      "name_en": "Franmil Reyes",
+      "birth_date": "1995-07-07"
+    },
+    {
+      "npb_id": "73975134",
+      "mlb_id": 552662,
+      "name_en": "Stefen Romero",
+      "birth_date": "1988-10-17"
+    },
+    {
+      "npb_id": "13515114",
+      "mlb_id": 425789,
+      "name_en": "Brian Sweeney",
+      "birth_date": "1974-06-13"
+    },
+    {
+      "npb_id": "03005134",
+      "mlb_id": 491640,
+      "name_en": "Carlos Rivero",
+      "birth_date": "1988-05-20"
+    },
+    {
+      "npb_id": "03505159",
+      "mlb_id": 592858,
+      "name_en": "Rowan Wick",
+      "birth_date": "1992-11-09"
+    },
+    {
+      "npb_id": "93195135",
+      "mlb_id": 276377,
+      "name_en": "Wily Mo Peña",
+      "birth_date": "1982-01-23"
+    },
+    {
+      "npb_id": "43945136",
+      "mlb_id": 543698,
+      "name_en": "Donn Roach",
+      "birth_date": "1989-12-14"
+    },
+    {
+      "npb_id": "13115133",
+      "mlb_id": 433591,
+      "name_en": "Joel Guzmán",
+      "birth_date": "1984-11-24"
+    },
+    {
+      "npb_id": "33335137",
+      "mlb_id": 444127,
+      "name_en": "Warner Madrigal",
+      "birth_date": "1984-03-21"
+    },
+    {
+      "npb_id": "93795151",
+      "mlb_id": 600986,
+      "name_en": "Thyago Vieira",
+      "birth_date": "1993-01-07"
+    },
+    {
+      "npb_id": "91695131",
+      "mlb_id": 452989,
+      "name_en": "Edgar Gonzalez",
+      "birth_date": "1978-06-14"
+    },
+    {
+      "npb_id": "33435157",
+      "mlb_id": 650382,
+      "name_en": "Darwinzon Hernández",
+      "birth_date": "1996-12-17"
+    },
+    {
+      "npb_id": "43345130",
+      "mlb_id": 435181,
+      "name_en": "Jeremy Hermida",
+      "birth_date": "1984-01-30"
+    },
+    {
+      "npb_id": "81985133",
+      "mlb_id": 617228,
+      "name_en": "Hirokazu Sawamura",
+      "birth_date": "1988-04-03"
+    },
+    {
+      "npb_id": "33535130",
+      "mlb_id": 519145,
+      "name_en": "Aaron Poreda",
+      "birth_date": "1986-10-01"
+    },
+    {
+      "npb_id": "13715152",
+      "mlb_id": 669450,
+      "name_en": "Cooper Hummel",
+      "birth_date": "1994-11-28"
+    },
+    {
+      "npb_id": "53355134",
+      "mlb_id": 808967,
+      "name_en": "Yoshinobu Yamamoto",
+      "birth_date": "1998-08-17"
+    },
+    {
+      "npb_id": "51155130",
+      "mlb_id": 685503,
+      "name_en": "Kohei Arihara",
+      "birth_date": "1992-08-11"
+    },
+    {
+      "npb_id": "43945157",
+      "mlb_id": 595881,
+      "name_en": "Tyler Beede",
+      "birth_date": "1993-05-23"
+    },
+    {
+      "npb_id": "23325135",
+      "mlb_id": 207267,
+      "name_en": "Brad Penny",
+      "birth_date": "1978-05-24"
+    },
+    {
+      "npb_id": "73975150",
+      "mlb_id": 642629,
+      "name_en": "Emmanuel Ramirez",
+      "birth_date": "1994-07-15"
+    },
+    {
+      "npb_id": "83785132",
+      "mlb_id": 456496,
+      "name_en": "Marcos Mateo",
+      "birth_date": "1984-04-18"
+    },
+    {
+      "npb_id": "43545153",
+      "mlb_id": 595222,
+      "name_en": "Mike Gerber",
+      "birth_date": "1992-07-08"
+    },
+    {
+      "npb_id": "63365138",
+      "mlb_id": 527043,
+      "name_en": "Jefry Marte",
+      "birth_date": "1991-06-21"
+    },
+    {
+      "npb_id": "93995157",
+      "mlb_id": 544365,
+      "name_en": "Manny Banuelos",
+      "birth_date": "1991-03-13"
+    },
+    {
+      "npb_id": "03705157",
+      "mlb_id": 656492,
+      "name_en": "Foster Griffin",
+      "birth_date": "1995-07-27"
+    },
+    {
+      "npb_id": "13715157",
+      "mlb_id": 605525,
+      "name_en": "J. B. Wendelken",
+      "birth_date": "1993-03-24"
+    },
+    {
+      "npb_id": "91895117",
+      "mlb_id": 276515,
+      "name_en": "José Ortiz",
+      "birth_date": "1977-06-13"
+    },
+    {
+      "npb_id": "53755153",
+      "mlb_id": 570267,
+      "name_en": "Domingo Santana",
+      "birth_date": "1992-08-05"
+    },
+    {
+      "npb_id": "93395135",
+      "mlb_id": 407901,
+      "name_en": "Jorge Sosa",
+      "birth_date": "1978-04-28"
+    },
+    {
+      "npb_id": "61865131",
+      "mlb_id": 407154,
+      "name_en": "Casey Fossum",
+      "birth_date": "1978-01-06"
+    },
+    {
+      "npb_id": "33735130",
+      "mlb_id": 464433,
+      "name_en": "Juan Francisco",
+      "birth_date": "1987-06-24"
+    },
+    {
+      "npb_id": "23025153",
+      "mlb_id": 595981,
+      "name_en": "Scott Heineman",
+      "birth_date": "1992-12-04"
+    },
+    {
+      "npb_id": "83985134",
+      "mlb_id": 693049,
+      "name_en": "Oscar Colás",
+      "birth_date": "1998-09-17"
+    },
+    {
+      "npb_id": "43345133",
+      "mlb_id": 425634,
+      "name_en": "Mike Hessman",
+      "birth_date": "1978-03-05"
+    },
+    {
+      "npb_id": "13515135",
+      "mlb_id": 434660,
+      "name_en": "Brad Eldred",
+      "birth_date": "1980-07-12"
+    },
+    {
+      "npb_id": "83185133",
+      "mlb_id": 425860,
+      "name_en": "Bryan Bullington",
+      "birth_date": "1980-09-30"
+    },
+    {
+      "npb_id": "23225157",
+      "mlb_id": 593604,
+      "name_en": "Alberto Baldonado",
+      "birth_date": "1993-02-01"
+    },
+    {
+      "npb_id": "83385130",
+      "mlb_id": 447744,
+      "name_en": "Raúl Valdés",
+      "birth_date": "1977-11-27"
+    },
+    {
+      "npb_id": "63763868",
+      "mlb_id": 123577,
+      "name_en": "Willie Upshaw",
+      "birth_date": "1957-04-27"
+    },
+    {
+      "npb_id": "43345135",
+      "mlb_id": 400073,
+      "name_en": "Oscar Salazar",
+      "birth_date": "1978-06-27"
+    },
+    {
+      "npb_id": "73375133",
+      "mlb_id": 451628,
+      "name_en": "Alfredo Fígaro",
+      "birth_date": "1984-07-07"
+    },
+    {
+      "npb_id": "41845139",
+      "mlb_id": 450855,
+      "name_en": "Mauro Gómez",
+      "birth_date": "1984-09-07"
+    },
+    {
+      "npb_id": "03105118",
+      "mlb_id": 237346,
+      "name_en": "Brian Falkenborg",
+      "birth_date": "1978-01-18"
+    },
+    {
+      "npb_id": "53955152",
+      "mlb_id": 614179,
+      "name_en": "José Ruiz",
+      "birth_date": "1994-10-21"
+    },
+    {
+      "npb_id": "11515130",
+      "mlb_id": 672960,
+      "name_en": "Kazuma Okamoto",
+      "birth_date": "1996-06-30"
+    },
+    {
+      "npb_id": "73075153",
+      "mlb_id": 645848,
+      "name_en": "Dariel Álvarez",
+      "birth_date": "1988-11-07"
+    },
+    {
+      "npb_id": "13915133",
+      "mlb_id": 430674,
+      "name_en": "Yhency Brazobán",
+      "birth_date": "1980-06-11"
+    },
+    {
+      "npb_id": "31635116",
+      "mlb_id": 538506,
+      "name_en": "Toru Murata",
+      "birth_date": "1985-05-20"
+    },
+    {
+      "npb_id": "23925157",
+      "mlb_id": 596071,
+      "name_en": "Dillon Peters",
+      "birth_date": "1992-08-31"
+    },
+    {
+      "npb_id": "41845118",
+      "mlb_id": 430683,
+      "name_en": "Justin Germano",
+      "birth_date": "1982-08-06"
+    },
+    {
+      "npb_id": "41845131",
+      "mlb_id": 408052,
+      "name_en": "Chris Bootcheck",
+      "birth_date": "1978-10-24"
+    },
+    {
+      "npb_id": "21023885",
+      "mlb_id": 435518,
+      "name_en": "Norihiro Nakamura",
+      "birth_date": "1973-07-24"
+    },
+    {
+      "npb_id": "53555152",
+      "mlb_id": 672710,
+      "name_en": "Roansy Contreras",
+      "birth_date": "1999-11-07"
+    },
+    {
+      "npb_id": "93795134",
+      "mlb_id": 497807,
+      "name_en": "Frank Herrmann",
+      "birth_date": "1984-05-30"
+    },
+    {
+      "npb_id": "23025157",
+      "mlb_id": 661255,
+      "name_en": "Yoan López",
+      "birth_date": "1993-01-02"
+    },
+    {
+      "npb_id": "13315133",
+      "mlb_id": 434605,
+      "name_en": "Wladimir Balentien",
+      "birth_date": "1984-07-02"
+    },
+    {
+      "npb_id": "13015152",
+      "mlb_id": 674370,
+      "name_en": "Osvaldo Bido",
+      "birth_date": "1995-10-18"
+    },
+    {
+      "npb_id": "43345136",
+      "mlb_id": 501660,
+      "name_en": "Zoilo Almonte",
+      "birth_date": "1989-06-10"
+    },
+    {
+      "npb_id": "91193886",
+      "mlb_id": 579799,
+      "name_en": "Ryota Igarashi",
+      "birth_date": "1979-05-28"
+    },
+    {
+      "npb_id": "23725138",
+      "mlb_id": 547982,
+      "name_en": "Leonys Martín",
+      "birth_date": "1988-03-06"
+    },
+    {
+      "npb_id": "43145135",
+      "mlb_id": 435624,
+      "name_en": "John Bowker",
+      "birth_date": "1983-07-08"
+    },
+    {
+      "npb_id": "03105112",
+      "mlb_id": 407800,
+      "name_en": "Alex Graman",
+      "birth_date": "1977-11-17"
+    },
+    {
+      "npb_id": "33335151",
+      "mlb_id": 444876,
+      "name_en": "Alcides Escobar",
+      "birth_date": "1986-12-16"
+    },
+    {
+      "npb_id": "83385113",
+      "mlb_id": 136920,
+      "name_en": "Brian Sikorski",
+      "birth_date": "1974-07-27"
+    },
+    {
+      "npb_id": "83185137",
+      "mlb_id": 430641,
+      "name_en": "Blaine Boyer",
+      "birth_date": "1981-07-11"
+    },
+    {
+      "npb_id": "03105116",
+      "mlb_id": 407890,
+      "name_en": "Colby Lewis",
+      "birth_date": "1979-08-02"
+    },
+    {
+      "npb_id": "63765132",
+      "mlb_id": 455119,
+      "name_en": "Chris Martin",
+      "birth_date": "1986-06-02"
+    },
+    {
+      "npb_id": "23025150",
+      "mlb_id": 605204,
+      "name_en": "J. D. Davis",
+      "birth_date": "1993-04-27"
+    },
+    {
+      "npb_id": "73775152",
+      "mlb_id": 676812,
+      "name_en": "Carson McCusker",
+      "birth_date": "1998-05-22"
+    },
+    {
+      "npb_id": "53555138",
+      "mlb_id": 502051,
+      "name_en": "Josh Ravin",
+      "birth_date": "1988-01-21"
+    },
+    {
+      "npb_id": "63565152",
+      "mlb_id": 666915,
+      "name_en": "Bobby Dalbec",
+      "birth_date": "1995-06-29"
+    },
+    {
+      "npb_id": "83585150",
+      "mlb_id": 672478,
+      "name_en": "Jordan Diaz",
+      "birth_date": "2000-08-13"
+    },
+    {
+      "npb_id": "11313884",
+      "mlb_id": 493127,
+      "name_en": "Akinori Iwamura",
+      "birth_date": "1979-02-09"
+    },
+    {
+      "npb_id": "33235159",
+      "mlb_id": 609274,
+      "name_en": "Elier Hernandez",
+      "birth_date": "1994-11-21"
+    },
+    {
+      "npb_id": "33735151",
+      "mlb_id": 572403,
+      "name_en": "Drew VerHagen",
+      "birth_date": "1990-10-22"
+    },
+    {
+      "npb_id": "63165131",
+      "mlb_id": 425503,
+      "name_en": "Freddie Bynum",
+      "birth_date": "1980-03-15"
+    },
+    {
+      "npb_id": "23725134",
+      "mlb_id": 517370,
+      "name_en": "Jimmy Paredes",
+      "birth_date": "1988-11-25"
+    },
+    {
+      "npb_id": "13515133",
+      "mlb_id": 489277,
+      "name_en": "Rusty Ryal",
+      "birth_date": "1983-03-16"
+    },
+    {
+      "npb_id": "13215155",
+      "mlb_id": 643436,
+      "name_en": "Ryan McBroom",
+      "birth_date": "1992-04-09"
+    },
+    {
+      "npb_id": "93095155",
+      "mlb_id": 592145,
+      "name_en": "Jesse Biddle",
+      "birth_date": "1991-10-22"
+    },
+    {
+      "npb_id": "41645113",
+      "mlb_id": 294697,
+      "name_en": "Alex Cabrera",
+      "birth_date": "1971-12-24"
+    },
+    {
+      "npb_id": "33035159",
+      "mlb_id": 664337,
+      "name_en": "Miguel Yajure",
+      "birth_date": "1998-05-01"
+    },
+    {
+      "npb_id": "03105135",
+      "mlb_id": 407397,
+      "name_en": "Esteban Germán",
+      "birth_date": "1978-01-26"
+    },
+    {
+      "npb_id": "03705138",
+      "mlb_id": 500208,
+      "name_en": "Yangervis Solarte",
+      "birth_date": "1987-07-03"
+    },
+    {
+      "npb_id": "73775159",
+      "mlb_id": 622772,
+      "name_en": "Jimmy Cordero",
+      "birth_date": "1991-10-19"
+    },
+    {
+      "npb_id": "53755151",
+      "mlb_id": 467827,
+      "name_en": "Gerardo Parra",
+      "birth_date": "1987-05-06"
+    },
+    {
+      "npb_id": "33235157",
+      "mlb_id": 545333,
+      "name_en": "Trevor Bauer",
+      "birth_date": "1991-01-17"
+    },
+    {
+      "npb_id": "93395138",
+      "mlb_id": 570799,
+      "name_en": "Christian Villanueva",
+      "birth_date": "1991-06-19"
+    },
+    {
+      "npb_id": "03403868",
+      "mlb_id": 110162,
+      "name_en": "Rod Allen",
+      "birth_date": "1959-10-05"
+    },
+    {
+      "npb_id": "33735157",
+      "mlb_id": 642659,
+      "name_en": "Raynel Espinal",
+      "birth_date": "1991-10-06"
+    },
+    {
+      "npb_id": "83085155",
+      "mlb_id": 664074,
+      "name_en": "Cody Ponce",
+      "birth_date": "1994-04-25"
+    },
+    {
+      "npb_id": "33335138",
+      "mlb_id": 592127,
+      "name_en": "Johnny Barbato",
+      "birth_date": "1992-07-11"
+    },
+    {
+      "npb_id": "93595152",
+      "mlb_id": 676044,
+      "name_en": "Bob Seymour",
+      "birth_date": "1998-10-07"
+    },
+    {
+      "npb_id": "21023889",
+      "mlb_id": 435158,
+      "name_en": "Keiichi Yabu",
+      "birth_date": "1968-09-28"
+    },
+    {
+      "npb_id": "63265157",
+      "mlb_id": 605155,
+      "name_en": "Colten Brewer",
+      "birth_date": "1992-10-29"
+    },
+    {
+      "npb_id": "53755155",
+      "mlb_id": 623454,
+      "name_en": "Drew Anderson",
+      "birth_date": "1994-03-22"
+    },
+    {
+      "npb_id": "63165118",
+      "mlb_id": 407891,
+      "name_en": "Kevin Mench",
+      "birth_date": "1978-01-07"
+    },
+    {
+      "npb_id": "83985155",
+      "mlb_id": 572143,
+      "name_en": "Burch Smith",
+      "birth_date": "1990-04-12"
+    },
+    {
+      "npb_id": "43345114",
+      "mlb_id": 283210,
+      "name_en": "Adam Hyzdu",
+      "birth_date": "1971-12-06"
+    },
+    {
+      "npb_id": "03205157",
+      "mlb_id": 621086,
+      "name_en": "James Marvel",
+      "birth_date": "1993-09-17"
+    },
+    {
+      "npb_id": "21825139",
+      "mlb_id": 453273,
+      "name_en": "Michael Crotta",
+      "birth_date": "1984-09-25"
+    },
+    {
+      "npb_id": "73075152",
+      "mlb_id": 660650,
+      "name_en": "Dérmis García",
+      "birth_date": "1998-01-07"
+    },
+    {
+      "npb_id": "31835137",
+      "mlb_id": 462515,
+      "name_en": "Miguel Socolovich",
+      "birth_date": "1986-07-24"
+    },
+    {
+      "npb_id": "93195139",
+      "mlb_id": 476601,
+      "name_en": "Michael Bowden",
+      "birth_date": "1986-09-09"
+    },
+    {
+      "npb_id": "23525135",
+      "mlb_id": 450315,
+      "name_en": "Brandon Allen",
+      "birth_date": "1986-02-12"
+    },
+    {
+      "npb_id": "41345111",
+      "mlb_id": 493128,
+      "name_en": "Munenori Kawasaki",
+      "birth_date": "1981-06-03"
+    },
+    {
+      "npb_id": "83585136",
+      "mlb_id": 453307,
+      "name_en": "David Huff",
+      "birth_date": "1984-08-22"
+    },
+    {
+      "npb_id": "83585153",
+      "mlb_id": 605196,
+      "name_en": "Kevin Cron",
+      "birth_date": "1993-02-17"
+    },
+    {
+      "npb_id": "83585114",
+      "mlb_id": 285075,
+      "name_en": "Jason Standridge",
+      "birth_date": "1978-11-09"
+    },
+    {
+      "npb_id": "03005157",
+      "mlb_id": 672773,
+      "name_en": "Elvis Luciano",
+      "birth_date": "2000-02-15"
+    },
+    {
+      "npb_id": "63765134",
+      "mlb_id": 518489,
+      "name_en": "Ryan Brasier",
+      "birth_date": "1987-08-26"
+    },
+    {
+      "npb_id": "63065155",
+      "mlb_id": 570256,
+      "name_en": "Gregory Polanco",
+      "birth_date": "1991-09-14"
+    },
+    {
+      "npb_id": "83985136",
+      "mlb_id": 570257,
+      "name_en": "Joely Rodríguez",
+      "birth_date": "1991-11-14"
+    },
+    {
+      "npb_id": "53555139",
+      "mlb_id": 542994,
+      "name_en": "Joey Butler",
+      "birth_date": "1986-03-12"
+    },
+    {
+      "npb_id": "71273882",
+      "mlb_id": 493161,
+      "name_en": "Yasuhiko Yabuta",
+      "birth_date": "1973-06-19"
+    },
+    {
+      "npb_id": "63965155",
+      "mlb_id": 605498,
+      "name_en": "Andrew Suárez",
+      "birth_date": "1992-09-11"
+    },
+    {
+      "npb_id": "43745152",
+      "mlb_id": 666659,
+      "name_en": "Sauryn Lao",
+      "birth_date": "1999-08-14"
+    },
+    {
+      "npb_id": "23725155",
+      "mlb_id": 608650,
+      "name_en": "Dietrich Enns",
+      "birth_date": "1991-05-16"
+    },
+    {
+      "npb_id": "43745159",
+      "mlb_id": 656578,
+      "name_en": "Andre Jackson",
+      "birth_date": "1996-05-01"
+    },
+    {
+      "npb_id": "63165116",
+      "mlb_id": 212356,
+      "name_en": "Terrmel Sledge",
+      "birth_date": "1977-03-18"
+    },
+    {
+      "npb_id": "63365113",
+      "mlb_id": 150356,
+      "name_en": "Héctor Almonte",
+      "birth_date": "1975-10-17"
+    },
+    {
+      "npb_id": "33935151",
+      "mlb_id": 684320,
+      "name_en": "Yariel Rodríguez",
+      "birth_date": "1997-03-10"
+    },
+    {
+      "npb_id": "23225159",
+      "mlb_id": 663796,
+      "name_en": "Coco Montes",
+      "birth_date": "1996-10-07"
+    },
+    {
+      "npb_id": "93995159",
+      "mlb_id": 641672,
+      "name_en": "Thomas Hatch",
+      "birth_date": "1994-09-29"
+    },
+    {
+      "npb_id": "21725111",
+      "mlb_id": 538227,
+      "name_en": "Hisanori Takahashi",
+      "birth_date": "1975-04-02"
+    },
+    {
+      "npb_id": "61563885",
+      "mlb_id": 493416,
+      "name_en": "Takashi Saito",
+      "birth_date": "1970-02-14"
+    },
+    {
+      "npb_id": "43545152",
+      "mlb_id": 676206,
+      "name_en": "Freddy Tarnok",
+      "birth_date": "1998-11-24"
+    },
+    {
+      "npb_id": "13515130",
+      "mlb_id": 462995,
+      "name_en": "Rick van den Hurk",
+      "birth_date": "1985-05-22"
+    },
+    {
+      "npb_id": "23125130",
+      "mlb_id": 446185,
+      "name_en": "Logan Ondrusek",
+      "birth_date": "1985-02-13"
+    },
+    {
+      "npb_id": "83185130",
+      "mlb_id": 461882,
+      "name_en": "Jesús Guzmán",
+      "birth_date": "1984-06-14"
+    },
+    {
+      "npb_id": "43945153",
+      "mlb_id": 622864,
+      "name_en": "Fernando Romero",
+      "birth_date": "1994-12-24"
+    },
+    {
+      "npb_id": "41445111",
+      "mlb_id": 110313,
+      "name_en": "George Arias",
+      "birth_date": "1972-03-12"
+    },
+    {
+      "npb_id": "63365133",
+      "mlb_id": 451687,
+      "name_en": "Micah Hoffpauir",
+      "birth_date": "1980-03-01"
+    },
+    {
+      "npb_id": "33935159",
+      "mlb_id": 543105,
+      "name_en": "Alex Dickerson",
+      "birth_date": "1990-05-26"
+    },
+    {
+      "npb_id": "61763888",
+      "mlb_id": 599899,
+      "name_en": "Yoshinori Tateyama",
+      "birth_date": "1975-12-26"
+    },
+    {
+      "npb_id": "33535118",
+      "mlb_id": 425821,
+      "name_en": "Todd Linden",
+      "birth_date": "1980-06-30"
+    },
+    {
+      "npb_id": "93595118",
+      "mlb_id": 435058,
+      "name_en": "Jonah Bayliss",
+      "birth_date": "1980-08-13"
+    },
+    {
+      "npb_id": "43145139",
+      "mlb_id": 434669,
+      "name_en": "Luis Mendoza",
+      "birth_date": "1983-10-31"
+    },
+    {
+      "npb_id": "83585152",
+      "mlb_id": 687478,
+      "name_en": "Cam Devanney",
+      "birth_date": "1997-04-13"
+    },
+    {
+      "npb_id": "83185139",
+      "mlb_id": 425903,
+      "name_en": "Kevin Youkilis",
+      "birth_date": "1979-03-15"
+    },
+    {
+      "npb_id": "93795132",
+      "mlb_id": 543266,
+      "name_en": "Bradin Hagens",
+      "birth_date": "1989-05-12"
+    },
+    {
+      "npb_id": "63365132",
+      "mlb_id": 449170,
+      "name_en": "Erik Cordier",
+      "birth_date": "1986-02-25"
+    },
+    {
+      "npb_id": "03205159",
+      "mlb_id": 645801,
+      "name_en": "Mike Ford",
+      "birth_date": "1992-07-04"
+    },
+    {
+      "npb_id": "83585134",
+      "mlb_id": 571812,
+      "name_en": "Kyle Jensen",
+      "birth_date": "1988-05-20"
+    },
+    {
+      "npb_id": "23325151",
+      "mlb_id": 571863,
+      "name_en": "Matt Koch",
+      "birth_date": "1990-11-02"
+    },
+    {
+      "npb_id": "13915153",
+      "mlb_id": 596720,
+      "name_en": "Dovydas Neverauskas",
+      "birth_date": "1993-01-14"
+    },
+    {
+      "npb_id": "23725130",
+      "mlb_id": 502102,
+      "name_en": "Duane Below",
+      "birth_date": "1985-11-15"
+    },
+    {
+      "npb_id": "13415157",
+      "mlb_id": 670712,
+      "name_en": "Mike Brosseau",
+      "birth_date": "1994-03-15"
+    },
+    {
+      "npb_id": "53055157",
+      "mlb_id": 676950,
+      "name_en": "David MacKinnon",
+      "birth_date": "1994-12-15"
+    },
+    {
+      "npb_id": "43045150",
+      "mlb_id": 701643,
+      "name_en": "Grant Hartwig",
+      "birth_date": "1997-12-18"
+    },
+    {
+      "npb_id": "61865118",
+      "mlb_id": 430681,
+      "name_en": "Dan Johnson",
+      "birth_date": "1979-08-10"
+    },
+    {
+      "npb_id": "33335130",
+      "mlb_id": 459991,
+      "name_en": "Gaby Sánchez",
+      "birth_date": "1983-09-02"
+    },
+    {
+      "npb_id": "03505152",
+      "mlb_id": 663546,
+      "name_en": "Sean Hjelle",
+      "birth_date": "1997-05-07"
+    },
+    {
+      "npb_id": "13115139",
+      "mlb_id": 429780,
+      "name_en": "Chris Narveson",
+      "birth_date": "1981-12-20"
+    },
+    {
+      "npb_id": "03505153",
+      "mlb_id": 593417,
+      "name_en": "Raúl Alcántara",
+      "birth_date": "1992-12-04"
+    },
+    {
+      "npb_id": "51655114",
+      "mlb_id": 628317,
+      "name_en": "Kenta Maeda",
+      "birth_date": "1988-04-11"
+    },
+    {
+      "npb_id": "03105130",
+      "mlb_id": 519412,
+      "name_en": "Zelous Wheeler",
+      "birth_date": "1987-01-16"
+    },
+    {
+      "npb_id": "53755136",
+      "mlb_id": 570615,
+      "name_en": "Steven Moya",
+      "birth_date": "1991-08-09"
+    },
+    {
+      "npb_id": "33335118",
+      "mlb_id": 425484,
+      "name_en": "Jon Leicester",
+      "birth_date": "1979-02-07"
+    },
+    {
+      "npb_id": "63965150",
+      "mlb_id": 663534,
+      "name_en": "Nash Walters",
+      "birth_date": "1997-05-18"
+    },
+    {
+      "npb_id": "63565136",
+      "mlb_id": 543859,
+      "name_en": "Michael Tonkin",
+      "birth_date": "1989-11-19"
+    },
+    {
+      "npb_id": "33335139",
+      "mlb_id": 453353,
+      "name_en": "Greg Reynolds",
+      "birth_date": "1985-07-03"
+    },
+    {
+      "npb_id": "93195131",
+      "mlb_id": 434591,
+      "name_en": "Randy Messenger",
+      "birth_date": "1981-08-13"
+    },
+    {
+      "npb_id": "73975132",
+      "mlb_id": 457449,
+      "name_en": "Jamie Romak",
+      "birth_date": "1985-09-30"
+    },
+    {
+      "npb_id": "03905134",
+      "mlb_id": 455369,
+      "name_en": "Ramiro Peña",
+      "birth_date": "1985-07-18"
+    },
+    {
+      "npb_id": "13015150",
+      "mlb_id": 628708,
+      "name_en": "Yunior Marte",
+      "birth_date": "1995-02-02"
+    },
+    {
+      "npb_id": "13015155",
+      "mlb_id": 543867,
+      "name_en": "Nik Turley",
+      "birth_date": "1989-09-11"
+    },
+    {
+      "npb_id": "53555150",
+      "mlb_id": 622259,
+      "name_en": "Trey Wingenter",
+      "birth_date": "1994-04-15"
+    },
+    {
+      "npb_id": "11913885",
+      "mlb_id": 400085,
+      "name_en": "Ichiro Suzuki",
+      "birth_date": "1973-10-22",
+      "mapping_source": "https://npb.jp/bis/players/search/result"
+    },
+    {
+      "npb_id": "51253887",
+      "mlb_id": 425686,
+      "name_en": "Hideki Matsui",
+      "birth_date": "1974-06-12",
+      "mapping_source": "https://npb.jp/bis/players/search/result"
+    },
+    {
+      "npb_id": "21223881",
+      "mlb_id": 119827,
+      "name_en": "Hideo Nomo",
+      "birth_date": "1968-08-31",
+      "mapping_source": "https://npb.jp/bis/players/search/result"
+    },
+    {
+      "npb_id": "61763881",
+      "mlb_id": 277408,
+      "name_en": "Kazuhiro Sasaki",
+      "birth_date": "1968-02-22",
+      "mapping_source": "https://npb.jp/bis/players/search/result"
+    },
+    {
+      "npb_id": "51553883",
+      "mlb_id": 430968,
+      "name_en": "Shingo Takatsu",
+      "birth_date": "1968-11-25",
+      "mapping_source": "https://npb.jp/bis/players/search/result"
+    },
+    {
+      "npb_id": "11313888",
+      "mlb_id": 493157,
+      "name_en": "Koji Uehara",
+      "birth_date": "1975-04-03",
+      "mapping_source": "https://npb.jp/bis/players/search/result"
+    },
+    {
+      "npb_id": "91393884",
+      "mlb_id": 430788,
+      "name_en": "Akinori Otsuka",
+      "birth_date": "1972-01-13",
+      "mapping_source": "https://npb.jp/bis/players/search/result"
+    },
+    {
+      "npb_id": "81783883",
+      "mlb_id": 115586,
+      "name_en": "Shigetoshi Hasegawa",
+      "birth_date": "1968-08-01",
+      "mapping_source": "https://npb.jp/bis/players/search/result"
+    },
+    {
+      "npb_id": "41043827",
+      "mlb_id": 119534,
+      "name_en": "Masanori Murakami",
+      "birth_date": "1944-05-06",
+      "mapping_source": "https://npb.jp/bis/players/search/result"
+    },
+    {
+      "npb_id": "21223866",
+      "mlb_id": 116400,
+      "name_en": "Hideki Irabu",
+      "birth_date": "1969-05-05",
+      "mapping_source": "https://npb.jp/bis/players/search/result"
+    },
+    {
+      "npb_id": "71573881",
+      "mlb_id": 116855,
+      "name_en": "Takashi Kashiwada",
+      "birth_date": "1971-05-14",
+      "mapping_source": "https://npb.jp/bis/players/search/result"
+    },
+    {
+      "npb_id": "81283882",
+      "mlb_id": 150093,
+      "name_en": "Alfonso Soriano",
+      "birth_date": "1976-01-07",
+      "mapping_source": "https://npb.jp/bis/players/search/result"
+    },
+    {
+      "npb_id": "71473880",
+      "mlb_id": 212297,
+      "name_en": "Julio Franco",
+      "birth_date": "1958-08-23",
+      "mapping_source": "https://npb.jp/bis/players/search/result"
+    },
+    {
+      "npb_id": "63165113",
+      "mlb_id": 150352,
+      "name_en": "Alex Ramirez",
+      "mapping_source": "https://www.mlb.com/player/alex-ramirez-150352"
+    }
+  ],
+  "excluded_candidates": [
+    {
+      "npb_id": "13915136",
+      "mlb_id": 501317,
+      "name_en": "Francisco Peguero",
+      "birth_date": "1988-06-01"
+    },
+    {
+      "npb_id": "43745157",
+      "mlb_id": 662144,
+      "name_en": "Brian Keller",
+      "birth_date": "1994-06-21"
+    },
+    {
+      "npb_id": "33035155",
+      "mlb_id": 543022,
+      "name_en": "Tyler Chatwood",
+      "birth_date": "1989-12-16"
+    },
+    {
+      "npb_id": "03905159",
+      "mlb_id": 658551,
+      "name_en": "Junior Fernández",
+      "birth_date": "1997-03-02"
+    },
+    {
+      "npb_id": "31833888",
+      "mlb_id": 120451,
+      "name_en": "Roberto Petagine",
+      "birth_date": "1971-06-07"
+    },
+    {
+      "npb_id": "43945152",
+      "mlb_id": 666801,
+      "name_en": "Rodolfo Castro",
+      "birth_date": "1999-05-21"
+    },
+    {
+      "npb_id": "01685116",
+      "mlb_id": 425786,
+      "name_en": "Scott Atchison",
+      "birth_date": "1976-03-29"
+    },
+    {
+      "npb_id": "93595133",
+      "mlb_id": 455970,
+      "name_en": "Bob McCrory",
+      "birth_date": "1982-05-03"
+    },
+    {
+      "npb_id": "51153849",
+      "mlb_id": 110188,
+      "name_en": "Matty Alou",
+      "birth_date": "1938-12-22"
+    },
+    {
+      "npb_id": "13915155",
+      "mlb_id": 607231,
+      "name_en": "John Gant",
+      "birth_date": "1992-08-06"
+    },
+    {
+      "npb_id": "71875119",
+      "mlb_id": 276508,
+      "name_en": "Dicky Gonzalez",
+      "birth_date": "1978-12-21"
+    },
+    {
+      "npb_id": "83185116",
+      "mlb_id": 150401,
+      "name_en": "Tomás de la Rosa",
+      "birth_date": "1978-01-28"
+    },
+    {
+      "npb_id": "23125135",
+      "mlb_id": 430657,
+      "name_en": "Cha-Seung Baek",
+      "birth_date": "1980-05-29"
+    },
+    {
+      "npb_id": "23125118",
+      "mlb_id": 433592,
+      "name_en": "Tony Blanco",
+      "birth_date": "1981-11-10"
+    },
+    {
+      "npb_id": "43545138",
+      "mlb_id": 499864,
+      "name_en": "Luis Jiménez",
+      "birth_date": "1988-01-18"
+    },
+    {
+      "npb_id": "73575133",
+      "mlb_id": 218294,
+      "name_en": "Byung-Hyun Kim",
+      "birth_date": "1979-01-19"
+    },
+    {
+      "npb_id": "53255157",
+      "mlb_id": 665947,
+      "name_en": "Sherten Apostel",
+      "birth_date": "1999-03-11"
+    },
+    {
+      "npb_id": "23725157",
+      "mlb_id": 605309,
+      "name_en": "Keone Kela",
+      "birth_date": "1993-04-16"
+    },
+    {
+      "npb_id": "63565139",
+      "mlb_id": 502130,
+      "name_en": "Dan Runzler",
+      "birth_date": "1985-03-30"
+    },
+    {
+      "npb_id": "51653882",
+      "mlb_id": 110298,
+      "name_en": "Luis Aquino",
+      "birth_date": "1964-05-19"
+    },
+    {
+      "npb_id": "63665134",
+      "mlb_id": 457435,
+      "name_en": "Phil Coke",
+      "birth_date": "1982-07-19"
+    },
+    {
+      "npb_id": "63565130",
+      "mlb_id": 666971,
+      "name_en": "Lourdes Gurriel",
+      "birth_date": "1993-10-10"
+    },
+    {
+      "npb_id": "67450",
+      "mlb_id": 573131,
+      "name_en": "Darin Ruf",
+      "birth_date": "1986-07-28"
+    },
+    {
+      "npb_id": "43145133",
+      "mlb_id": 446454,
+      "name_en": "Brian Bannister",
+      "birth_date": "1981-02-28"
+    },
+    {
+      "npb_id": "03305139",
+      "mlb_id": 429901,
+      "name_en": "Sergio Mitre",
+      "birth_date": "1981-02-16"
+    },
+    {
+      "npb_id": "03505118",
+      "mlb_id": 150093,
+      "name_en": "Alfonso Soriano",
+      "birth_date": "1976-01-07",
+      "mapping_source": "https://npb.jp/bis/players/search/result"
+    },
+    {
+      "npb_id": "21425119",
+      "mlb_id": 212297,
+      "name_en": "Julio Franco",
+      "birth_date": "1958-08-23",
+      "mapping_source": "https://npb.jp/bis/players/search/result"
+    },
+    {
+      "npb_id": "63165110",
+      "mlb_id": 212297,
+      "name_en": "Julio Franco",
+      "birth_date": "1958-08-23",
+      "mapping_source": "https://npb.jp/bis/players/search/result"
+    },
+    {
+      "npb_id": "63965157",
+      "mlb_id": 212297,
+      "name_en": "Julio Franco",
+      "birth_date": "1958-08-23",
+      "mapping_source": "https://npb.jp/bis/players/search/result"
+    },
+    {
+      "npb_id": "73575114",
+      "mlb_id": 150352,
+      "name_en": "Alex Ramirez",
+      "mapping_source": "https://www.mlb.com/player/alex-ramirez-150352"
+    },
+    {
+      "npb_id": "43045159",
+      "mlb_id": 150352,
+      "name_en": "Alex Ramirez",
+      "mapping_source": "https://www.mlb.com/player/alex-ramirez-150352"
+    },
+    {
+      "npb_id": "73975150",
+      "mlb_id": 150352,
+      "name_en": "Alex Ramirez",
+      "mapping_source": "https://www.mlb.com/player/alex-ramirez-150352"
+    }
+  ],
+  "exclusion_notes": [
+    "13915136 Francisco Peguero: HttpException: HTTP 404",
+    "43745157 Brian Keller: HttpException: HTTP 404",
+    "33035155 Tyler Chatwood: HttpException: HTTP 404",
+    "03905159 Junior Fernández: HttpException: HTTP 404",
+    "31833888 Roberto Petagine: Bad state: Birth dates differ",
+    "43945152 Rodolfo Castro: Bad state: Birth dates differ",
+    "01685116 Scott Atchison: HttpException: HTTP 404",
+    "93595133 Bob McCrory: HttpException: HTTP 404",
+    "51153849 Matty Alou: Bad state: Birth dates differ",
+    "13915155 John Gant: HttpException: HTTP 404",
+    "71875119 Dicky Gonzalez: Bad state: Birth dates differ",
+    "83185116 Tomás de la Rosa: Bad state: Birth dates differ",
+    "23125135 Cha-Seung Baek: HttpException: HTTP 404",
+    "23125118 Tony Blanco: Bad state: Birth dates differ",
+    "43545138 Luis Jiménez: HttpException: HTTP 404",
+    "73575133 Byung-Hyun Kim: HttpException: HTTP 404",
+    "53255157 Sherten Apostel: HttpException: HTTP 404",
+    "23725157 Keone Kela: HttpException: HTTP 404",
+    "63565139 Dan Runzler: HttpException: HTTP 404",
+    "51653882 Luis Aquino: Bad state: Birth dates differ",
+    "63665134 Phil Coke: HttpException: HTTP 404",
+    "63565130 Lourdes Gurriel: HttpException: HTTP 404",
+    "67450 Darin Ruf: HttpException: HTTP 404",
+    "03305139 Sergio Mitre: HttpException: HTTP 404",
+    "43145133 Brian Bannister: HttpException: HTTP 404",
+    "63165110 Julio Franco: Bad state: Birth dates differ",
+    "03505118 Alfonso Soriano: Bad state: Birth dates differ",
+    "21425119 Julio Franco: Bad state: Birth dates differ",
+    "63965157 Julio Franco: Bad state: Birth dates differ",
+    "73575114 Alex Ramirez: Bad state: Birth dates differ",
+    "73975150 Alex Ramirez: Bad state: Birth dates differ",
+    "43045159 Alex Ramirez: Bad state: Birth dates differ"
+  ]
+}

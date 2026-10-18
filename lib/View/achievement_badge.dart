@@ -128,6 +128,30 @@ String achievementBadgeCaption(Map<String, dynamic> achievement) {
   return label;
 }
 
+/// Keep numeric milestones (including grouped/decimal values) on one line.
+String achievementBadgeEngraving(String caption) {
+  final tokens = <String>[];
+  final number = RegExp(r'[0-9０-９]+(?:[,，.．][0-9０-９]+)*');
+  var offset = 0;
+  for (final match in number.allMatches(caption)) {
+    tokens.addAll(caption.substring(offset, match.start).characters);
+    tokens.add(match.group(0)!);
+    offset = match.end;
+  }
+  tokens.addAll(caption.substring(offset).characters);
+  final lineCount = (caption.characters.length / 4).ceil().clamp(1, 3);
+  final target = (caption.characters.length / lineCount).ceil();
+  final lines = <String>[''];
+  for (final token in tokens) {
+    if (lines.last.isNotEmpty && lines.length < lineCount &&
+        lines.last.characters.length + token.characters.length > target) {
+      lines.add('');
+    }
+    lines[lines.length - 1] += token;
+  }
+  return lines.join('\n');
+}
+
 class AchievementBadge extends StatelessWidget {
   const AchievementBadge({super.key, required this.achievement});
   final Map<String, dynamic> achievement;
@@ -136,11 +160,7 @@ class AchievementBadge extends StatelessWidget {
     final style = achievementBadgeStyle(achievement);
     final size = achievementBadgeSize(achievement);
     final caption = achievementBadgeCaption(achievement);
-    final letters = caption.characters.toList();
-    final lines = (letters.length / 4).ceil().clamp(1, 3);
-    final perLine = (letters.length / lines).ceil().clamp(1, 1000);
-    final engraving = [for (var i = 0; i < letters.length; i += perLine)
-      letters.skip(i).take(perLine).join()].join('\n');
+    final engraving = achievementBadgeEngraving(caption);
     Widget yearLabel(double fontSize) => Container(
       key: const ValueKey('achievement-year-label'),
       color: Colors.white,
@@ -231,13 +251,29 @@ class AchievementBadge extends StatelessWidget {
                 if (style.trophy)
                   SizedBox(width: size, height: size,
                     child: CustomPaint(painter: LeagueMvpTrophyPainter(color: style.color)))
-                else Icon(Icons.workspace_premium, color: style.color, size: size * 27 / 34),
+                else ...[
+                  // The medal glyph has a transparent center. Fill it so the
+                  // engraving sits on a solid dark face, not the pale frame.
+                  Positioned(
+                    left: size * .265, top: size * .16,
+                    width: size * .47, height: size * .47,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color.lerp(style.color, Colors.black, .35)!,
+                      ),
+                    ),
+                  ),
+                  Icon(Icons.workspace_premium,
+                    color: Color.lerp(style.color, Colors.black, .35)!,
+                    size: size * 27 / 34),
+                ],
                 Positioned(
                   left: size * .27, right: size * .27,
                   top: size * .24, height: size * .32,
                   child: Center(
                     child: FittedBox(fit: BoxFit.scaleDown,
-                      child: Text(engraving, textAlign: TextAlign.center,
+                      child: Text(engraving, textAlign: TextAlign.center, softWrap: false,
                         key: const ValueKey('achievement-engraving'),
                         style: TextStyle(fontSize: size * .14, height: 1.1,
                           color: const Color(0xFFFFF3CF), fontWeight: FontWeight.w800,

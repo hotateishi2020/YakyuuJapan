@@ -64,7 +64,8 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
             "https://sp.baseball.findfriends.jp/player/20080002/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "横浜高校"
         },
         {
           "kind": "koshien",
@@ -77,7 +78,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
             "https://sp.baseball.findfriends.jp/player/20080002/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "横浜高校"
         },
         {
           "kind": "koshien",
@@ -90,7 +92,8 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
             "https://sp.baseball.findfriends.jp/player/20080002/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "横浜高校"
         },
         {
           "kind": "koshien",
@@ -103,7 +106,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2026.php",
             "https://sp.baseball.findfriends.jp/player/20080002/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "横浜高校"
         }
       ]
     },
@@ -151,7 +155,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2024.php",
             "https://sp.baseball.findfriends.jp/player/20080014/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "智辯学園高校"
         },
         {
           "kind": "koshien",
@@ -164,7 +169,8 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
             "https://sp.baseball.findfriends.jp/player/20080014/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "智辯学園高校"
         }
       ]
     },
@@ -298,7 +304,8 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
             "https://sp.baseball.findfriends.jp/player/20080007/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "山梨学院高校"
         },
         {
           "kind": "koshien",
@@ -311,7 +318,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
             "https://sp.baseball.findfriends.jp/player/20080007/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "山梨学院高校"
         },
         {
           "kind": "koshien",
@@ -324,7 +332,8 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
             "https://sp.baseball.findfriends.jp/player/20080007/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "山梨学院高校"
         }
       ]
     },
@@ -395,7 +404,8 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
             "https://sp.baseball.findfriends.jp/player/20080003/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "沖縄尚学高校"
         },
         {
           "kind": "koshien",
@@ -408,7 +418,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
             "https://sp.baseball.findfriends.jp/player/20080003/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "沖縄尚学高校"
         },
         {
           "kind": "koshien",
@@ -421,7 +432,8 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
             "https://sp.baseball.findfriends.jp/player/20080003/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "沖縄尚学高校"
         },
         {
           "kind": "koshien",
@@ -434,7 +446,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2026.php",
             "https://sp.baseball.findfriends.jp/player/20080003/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "沖縄尚学高校"
         }
       ]
     },
@@ -472,7 +485,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
             "https://sp.baseball.findfriends.jp/player/20090001/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "聖隷クリストファー高校"
         },
         {
           "kind": "koshien",
@@ -485,7 +499,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2026.php",
             "https://sp.baseball.findfriends.jp/player/20090001/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "聖隷クリストファー高校"
         }
       ]
     },
@@ -681,7 +696,8 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
             "https://www.nikkansports.com/baseball/highschool/news/202603220001769.html"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "近江高校"
         }
       ]
     },
@@ -718,7 +734,8 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
             "https://sp.baseball.findfriends.jp/player/20090002/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "市和歌山高校"
         }
       ]
     },
@@ -755,7 +772,8 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
             "https://sp.baseball.findfriends.jp/player/20080012/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "大阪桐蔭高校"
         }
       ]
     },
@@ -794,7 +812,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
             "https://sp.baseball.findfriends.jp/player/20080023/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "高川学園高校"
         },
         {
           "kind": "koshien",
@@ -807,7 +826,8 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
             "https://sp.baseball.findfriends.jp/player/20080023/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "高川学園高校"
         },
         {
           "kind": "koshien",
@@ -820,7 +840,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2026.php",
             "https://sp.baseball.findfriends.jp/player/20080023/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "高川学園高校"
         }
       ]
     },
@@ -1079,7 +1100,8 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
             "https://www.hb-nippon.com/articles/11927"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "専大松戸高校"
         }
       ]
     },
@@ -1163,7 +1185,8 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
             "https://sp.baseball.findfriends.jp/player/20080013/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "横浜高校"
         },
         {
           "kind": "koshien",
@@ -1176,7 +1199,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
             "https://sp.baseball.findfriends.jp/player/20080013/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "横浜高校"
         },
         {
           "kind": "koshien",
@@ -1189,7 +1213,8 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
             "https://sp.baseball.findfriends.jp/player/20080013/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "横浜高校"
         },
         {
           "kind": "koshien",
@@ -1202,7 +1227,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2026.php",
             "https://sp.baseball.findfriends.jp/player/20080013/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "横浜高校"
         }
       ]
     },
@@ -1269,7 +1295,8 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
             "https://sp.baseball.findfriends.jp/player/20080011/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "九州国際大付高校"
         }
       ]
     },
@@ -1394,7 +1421,8 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2021.php",
             "https://sp.baseball.findfriends.jp/player/20040035/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "東海大菅生高校"
         }
       ]
     },
@@ -1569,7 +1597,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2021.php",
             "https://sp.baseball.findfriends.jp/player/20040068/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "智弁和歌山高校"
         },
         {
           "kind": "koshien",
@@ -1582,7 +1611,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
             "https://sp.baseball.findfriends.jp/player/20040068/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "智弁和歌山高校"
         }
       ]
     },
@@ -1664,7 +1694,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
             "https://sp.baseball.findfriends.jp/player/20040137/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "愛工大名電高校"
         }
       ]
     },
@@ -1753,7 +1784,9 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
             "https://blog.livedoor.jp/augustoparty/archives/52130270.html"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "高岡商業高校",
+          "school_source": "https://baseball.yahoo.co.jp/npb/draft/players/467/kawajiri_keito"
         }
       ]
     },
@@ -1836,7 +1869,8 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2021.php",
             "https://sp.baseball.findfriends.jp/player/20040099/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "下関国際高校"
         },
         {
           "kind": "koshien",
@@ -1849,7 +1883,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
             "https://sp.baseball.findfriends.jp/player/20040099/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "下関国際高校"
         }
       ]
     },
@@ -2158,7 +2193,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2021.php",
             "https://sp.baseball.findfriends.jp/player/20040138/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "高松商業高校"
         },
         {
           "kind": "koshien",
@@ -2171,7 +2207,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
             "https://sp.baseball.findfriends.jp/player/20040138/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "高松商業高校"
         }
       ]
     },
@@ -2318,7 +2355,8 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2021.php",
             "https://sp.baseball.findfriends.jp/player/20040160/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "福岡大大濠高校"
         }
       ]
     },
@@ -2486,7 +2524,8 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2021.php",
             "https://sp.baseball.findfriends.jp/player/20040145/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "東海大菅生高校"
         },
         {
           "kind": "koshien",
@@ -2499,7 +2538,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2021.php",
             "https://sp.baseball.findfriends.jp/player/20040145/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "東海大菅生高校"
         }
       ]
     },
@@ -2604,7 +2644,9 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2022.php",
             "https://baseball.omyutech.com/CupHomePageHistory.action?gameId=20221152057"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "高知高校",
+          "school_source": "https://www.ritsumei.ac.jp/sports-culture/sports/topics/detail/?id=1012"
         }
       ]
     },
@@ -2693,7 +2735,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2021.php",
             "https://sp.baseball.findfriends.jp/player/20040148/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "前橋育英高校"
         }
       ]
     },
@@ -2963,7 +3006,8 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2022.php",
             "https://sp.baseball.findfriends.jp/player/20040075/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "九州国際大付属高校"
         },
         {
           "kind": "koshien",
@@ -2976,7 +3020,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
             "https://sp.baseball.findfriends.jp/player/20040075/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "九州国際大付属高校"
         }
       ]
     },
@@ -3129,7 +3174,8 @@
             "https://smart.asahi.com/v/koshien/stats/spring/y2022.php",
             "https://sp.baseball.findfriends.jp/player/20040146/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "敦賀気比高校"
         },
         {
           "kind": "koshien",
@@ -3142,7 +3188,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
             "https://sp.baseball.findfriends.jp/player/20040146/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "敦賀気比高校"
         }
       ]
     },
@@ -3180,7 +3227,9 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
             "https://www.kyureki.com/player/235195/tyugaku/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "佐久長聖高校",
+          "school_source": "https://wasedasports-sousupo.com/baseball-directory/terao/"
         }
       ]
     },
@@ -3227,7 +3276,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2023.php",
             "https://sp.baseball.findfriends.jp/player/20050057/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "徳島商業高校"
         }
       ]
     },
@@ -3933,7 +3983,8 @@
             "https://smart.asahi.com/v/koshien/stats/summer/y2018.php",
             "https://ug-baseball.com/senseki/koshien/koshien100/"
           ],
-          "checked_at": "2026-10-17"
+          "checked_at": "2026-10-17",
+          "school": "浦和学院高校"
         }
       ]
     },

@@ -13,6 +13,50 @@ Map<String, dynamic> team(int year, int id, int rank) => {'year': year, 'id_team
 Map<String, dynamic> game(int id, {bool loaded = true}) => {'id': id, 'id_team_home': 1, 'id_team_away': 2, 'flg_stats_loaded': loaded};
 Map<String, dynamic> box(int game, int player, {String decision = '', int runs = 0, int hits = 0, int walks = 0, int ab = 1}) => {'id_game': game, 'id_player': player, 'name': '選手$player', 'int_batting': ab, 'int_hit1': hits, 'int_fourball': walks, 'int_pitch': decision.isEmpty ? 0 : 20, 'int_runs': runs, 'code_result_pitcher': decision};
 void main() {
+  test('MLB league champion is the LCS winner, not the standings leader', () {
+    final rows = [
+      {...team(2026,13,1),'id_league':3},
+      {...team(2026,14,2),'id_league':3},
+    ];
+    final result=buildRecordStandings(rows,[
+      for(var i=0;i<4;i++) {'year':2026,'id_team_home':14,'id_team_away':13,'score_home':2,'score_away':1,'state':'終了','code_game':'LCS'}
+    ],OrgKind.mlb);
+    final teams=(result.single['leagues'] as List).single['teams'] as List;
+    expect(teams[0]['league_champion'],false);
+    expect(teams[1]['league_champion'],true);
+    expect(teams[1]['champion'],false);
+  });
+
+  test('season holds use stored totals, include ties and combine traded players once per team', () {
+    Map<String,dynamic> snapshot(int team, List<Map<String,dynamic>> pitchers) => {
+      'id_team':team,'team':'T$team','payload':{'pitchers':{'relievers':pitchers,'closers':pitchers}}
+    };
+    Map<String,dynamic> pitcher(String id,int holds) => {'player_key':id,'name':id,'holds':holds,'saves':99};
+    final result = seasonHoldLeaders([
+      snapshot(1,[pitcher('a',20),pitcher('b',33)]),
+      snapshot(2,[pitcher('a',13),pitcher('c',30)]),
+    ],2026);
+    expect(result.map((p)=>p['name']), ['a','b']);
+    expect(result.map((p)=>p['value']), ['33','33']);
+    expect(result.first['unit'],'ホールド');
+    expect(result.first['year'],2026);
+    expect(seasonHoldLeaders([],2026),isEmpty);
+  });
+
+  test('save streak ends at a non-save appearance', () {
+    final decisions = ['SAVE','SAVE','HOLD','SAVE'];
+    final r = buildSummaryStreaks([for(var i=1;i<=4;i++) game(i)],
+      [for(var i=1;i<=4;i++) box(i,1,decision:decisions[i-1])],2026);
+    expect(r['saves']!.single['value'],2);
+  });
+  test('home-run PA streak crosses games and a walk interrupts it', () {
+    final codes = ['HOMERUN','HOMERUN','WALK','HOMERUN'];
+    final r = buildEventStreaks([for(var i=1;i<=4;i++) game(i)],
+      [for(var i=1;i<=4;i++) box(i,1,ab:i==3?0:1,walks:i==3?1:0)],
+      [for(var i=1;i<=4;i++) {'id_game':i,'id_batter':1,'code_result':codes[i-1]}],2026);
+    expect(r['hr_pa']!.single['value'],2);
+  });
+
   test('表彰カードから受賞回数ではなく成績を取り出す', () {
     expect(npbAwardValue('首位打者賞', '首位打者賞 選手 打率 .316 初受賞'), {'value': '0.316', 'unit': ''});
     expect(npbAwardValue('最優秀中継ぎ投手賞', 'ホールドポイント 43 2年ぶり3度目'), {'value': '43', 'unit': 'HP'});
@@ -238,6 +282,17 @@ void main() {
     final result = buildSummaryStreaks([game(1), game(2, loaded: false), game(3)], [box(1, 1, decision: 'HOLD'), box(3, 1, decision: 'HOLD', runs: 1)], 2026);
     expect(result['holds']!.single['value'], 1);
     expect(result['scoreless_games']!.single['value'], 1);
+  });
+  test('unrelated missing games preserve streaks but same-team gaps break them', () {
+    Map<String, dynamic> fixture(int id, int home, int away, {bool loaded = true}) => {...game(id, loaded: loaded), 'id_team_home': home, 'id_team_away': away};
+    final boxes = [box(1, 1, hits: 1), box(3, 1, hits: 1)];
+    final events = [for (final id in [1, 3]) {'id_game': id, 'id_batter': 1, 'id_pitcher': 2, 'flg_bottom': true, 'code_result': 'HIT1'}];
+    for (final sameTeam in [false, true]) {
+      final games = [fixture(1, 10, 20), fixture(2, sameTeam ? 10 : 30, 40, loaded: false), fixture(3, 10, 20)];
+      final expected = sameTeam ? 1 : 2;
+      expect(buildSummaryStreaks(games, boxes, 2026)['hit_games']!.single['value'], expected);
+      expect(buildEventStreaks(games, boxes, events, 2026)['hit_pa']!.single['value'], expected);
+    }
   });
   test('game hit streak continues through walk-only games; PA streak does not', () {
     final boxes = [box(1, 1, hits: 1), box(2, 1, walks: 1, ab: 0), box(3, 1, hits: 1)];

@@ -66,7 +66,7 @@ class MlbBracketGeom {
   static double get nlCsX => (nlDs2X + nlDs1X) / 2;
 
   /// 枠をチーム列より狭くし、縦線が枠の「少し横」を通ってから左右辺へ直角に入るようにする。
-  static final ws = Rect.fromCenter(center: const Offset(boardW / 2, wsY), width: 380, height: 110);
+  static final ws = Rect.fromCenter(center: const Offset(boardW / 2, wsY), width: 340, height: 110);
   static Rect get alCs => Rect.fromCenter(center: Offset(alCsX, csY), width: 120, height: 34);
   static Rect get nlCs => Rect.fromCenter(center: Offset(nlCsX, csY), width: 120, height: 34);
   static Rect get alDs1 => Rect.fromCenter(center: Offset(alDs1X, dsY), width: 88, height: 30);
@@ -198,7 +198,7 @@ class MlbPostseasonBracket extends StatelessWidget {
                   height: 22,
                   width: double.infinity,
                   child: Center(
-                    child: Text('ワールドシリーズ', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, height: 1.05)),
+                    child: Text('WORLD SERIES', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, height: 1.05)),
                   ),
                 ),
               ),
@@ -214,7 +214,7 @@ class MlbPostseasonBracket extends StatelessWidget {
                           children: [
                             SizedBox(width: 72, child: central == null ? null : _worldSeriesFinalist(central, wins: board.worldSeries.winsHigh, slots: board.worldSeries.slots, alignLeft: true, eliminated: board.eliminated(central.id))),
                             const SizedBox(width: 8),
-                            const SizedBox(width: 180, child: Padding(
+                            const SizedBox(width: 140, child: Padding(
                               padding: EdgeInsets.symmetric(vertical: 2),
                               child: Image(image: AssetImage('backend/assets/images/logo_world_series_2026.png'), fit: BoxFit.contain),
                             )),
@@ -224,15 +224,6 @@ class MlbPostseasonBracket extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (central != null && pacific != null)
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Text(
-                          '${board.worldSeries.winsHigh} - ${board.worldSeries.winsLow}',
-                          key: const Key('postseason-ws-score'),
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, height: 1, color: Colors.black87),
-                        ),
-                      ),
                   ],
                 ),
               ),

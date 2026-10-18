@@ -1,12 +1,13 @@
 import 'StrengthUsage.dart';
 
 /// Box-score streaks in verified contiguous game coverage. Missing games reset
-/// all runs conservatively: they must never silently join two observed runs.
+/// affected runs conservatively: never join two observed runs across a gap.
 Map<String, List<Map<String, dynamic>>> buildSummaryStreaks(List<Map<String, dynamic>> games, List<Map<String, dynamic>> summaries, int year) {
-  const supported = ['wins', 'holds', 'scoreless_games', 'hit_games', 'onbase_games', 'hr_games'];
+  const supported = ['wins', 'saves', 'holds', 'scoreless_games', 'hit_games', 'onbase_games', 'hr_games'];
   final runs = {for (final k in supported) k: <int, int>{}};
   final best = {for (final k in supported) k: <int, int>{}};
   final names = <int, String>{};
+  final possibleTeams = <int, Set<int>>{};
   final byGame = <int, List<Map<String, dynamic>>>{};
   for (final row in summaries) {
     byGame.putIfAbsent(usageInt(row['id_game']), () => []).add(row);
@@ -22,7 +23,8 @@ Map<String, List<Map<String, dynamic>>> buildSummaryStreaks(List<Map<String, dyn
     final rows = byGame[usageInt(game['id'])];
     if (game['flg_stats_loaded'] != true || rows == null || rows.isEmpty) {
       for (final run in runs.values) {
-        run.clear();
+        final affected = {usageInt(game['id_team_home']), usageInt(game['id_team_away'])};
+        run.removeWhere((id, _) => affected.contains(0) || possibleTeams[id] == null || possibleTeams[id]!.any(affected.contains));
       }
       continue;
     }
@@ -30,10 +32,14 @@ Map<String, List<Map<String, dynamic>>> buildSummaryStreaks(List<Map<String, dyn
       final id = usageInt(row['id_player']);
       if (id <= 0) continue;
       names[id] = '${row['name'] ?? ''}';
+      // Summary rows lack historical team IDs. Retain both possible teams
+      // rather than assuming a player's current club also applies here.
+      possibleTeams[id] = {usageInt(game['id_team_home']), usageInt(game['id_team_away'])};
       final decision = '${row['code_result_pitcher'] ?? ''}';
       final pitched = usageInt(row['int_pitch']) > 0 || (double.tryParse('${row['double_inning_pitch']}') ?? 0) > 0 || decision.isNotEmpty;
       if (pitched) {
         add('wins', id, decision == 'WIN', skip: !['WIN', 'LOSE'].contains(decision));
+        add('saves', id, decision == 'SAVE');
         add('holds', id, decision == 'HOLD');
         add('scoreless_games', id, usageInt(row['int_runs']) == 0);
       }
@@ -62,7 +68,7 @@ Map<String, List<Map<String, dynamic>>> buildSummaryStreaks(List<Map<String, dyn
 /// Plate-appearance streaks use the event's actual batter / stealing runner,
 /// not the batter who happened to be at the plate during a steal.
 Map<String, List<Map<String, dynamic>>> buildEventStreaks(List<Map<String, dynamic>> games, List<Map<String, dynamic>> summaries, List<Map<String, dynamic>> events, int year) {
-  const keys = ['hit_pa', 'onbase_pa', 'outs', 'strikeouts', 'steals', 'appearances'];
+  const keys = ['hit_pa', 'hr_pa', 'onbase_pa', 'outs', 'strikeouts', 'steals', 'appearances'];
   const hits = {'HIT1', 'HIT2', 'HIT3', 'HOMERUN'};
   const reach = {...hits, 'WALK', 'WALK_DEAD'};
   const retired = {'OUT_FLY', 'OUT_GROUND', 'OUT_POP_UP', 'OUT_LINE_DRIVE', 'OUT_DOUBLE_PLAY', 'SACRIFICE_BUNT', 'SACRIFICE_FLY', 'SQUEEZE', 'STRIKE_OUT'};
@@ -92,7 +98,7 @@ Map<String, List<Map<String, dynamic>>> buildEventStreaks(List<Map<String, dynam
     final actual = rows.where((e) => plate.contains(e['code_result'])).length;
     if (game['flg_stats_loaded'] != true || expected == 0 || actual != expected) {
       for (final run in runs.values) {
-        run.clear();
+        run.removeWhere((player, _) => home <= 0 || away <= 0 || teams[player] == null || teams[player] == home || teams[player] == away);
       }
       continue;
     }
@@ -108,10 +114,11 @@ Map<String, List<Map<String, dynamic>>> buildEventStreaks(List<Map<String, dynam
           observedTeams[runner] = batting;
           add('steals', runner, code == 'STEAL_BASE_SAFE');
         } else {
-          runs['steals']!.clear();
+          runs['steals']!.removeWhere((player, _) => (observedTeams[player] ?? teams[player]) == null || (observedTeams[player] ?? teams[player]) == batting);
         }
       }
       if (!plate.contains(code)) continue;
+      add('hr_pa', batter, code == 'HOMERUN');
       add('hit_pa', batter, hits.contains(code));
       add('onbase_pa', batter, reach.contains(code));
       add('outs', pitcher, retired.contains(code));

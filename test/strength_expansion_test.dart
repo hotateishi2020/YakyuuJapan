@@ -12,6 +12,12 @@ import 'package:Yakyuu_Japan/View/strength_contracts.dart';
 import 'package:Yakyuu_Japan/logic/strength_usage.dart';
 
 void main() {
+  test('ドラフト甲子園経歴は現在の大学でなく当時の高校を表示する', () {
+    expect(draftCareerText({'team': '現在の大学', 'career_facts': [
+      {'kind': 'koshien', 'year': 2022, 'school': '当時の高校', 'label': '2022年夏の甲子園：優勝'},
+    ]}), '2022年夏の甲子園（当時の高校）：優勝');
+  });
+
   test('ドラフト経歴は新しい年度と季節から順に並べ年度不明は末尾に表示する', () {
     expect(draftCareerText({
       'achievement': '2026年日本代表',
@@ -287,8 +293,8 @@ void main() {
   });
 
   testWidgets('小さい功績はホバーとクリックで正式名と詳細を表示', (t) async {
-    await t.pumpWidget(MaterialApp(home: Scaffold(body: StrengthAchievements(year: 2026, team: {
-      'roster': [{'name': '選手', 'achievements': [
+    await t.pumpWidget(const MaterialApp(home: Scaffold(body: StrengthAchievements(year: 2026, team: {
+      'roster': const [{'name': '選手', 'achievements': const [
         {'label': '規定打席到達', 'kind': 'qualification', 'year': 2025, 'detail': '規定443打席に到達'}
       ]}]
     }))));
@@ -418,9 +424,9 @@ void main() {
     await t.binding.setSurfaceSize(const Size(1200, 800));
     addTearDown(() => t.binding.setSurfaceSize(null));
     await t.runAsync(() => rootBundle.loadString('backend/assets/data/draft_2026.json'));
-    await t.pumpWidget(MaterialApp(home: MediaQuery(
-      data: const MediaQueryData(textScaler: TextScaler.linear(1.5)),
-      child: const Scaffold(body: StrengthDraft(year: 2026)))));
+    await t.pumpWidget(const MaterialApp(home: MediaQuery(
+      data: MediaQueryData(textScaler: TextScaler.linear(1.5)),
+      child: Scaffold(body: StrengthDraft(year: 2026)))));
     await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
     await t.pumpAndSettle();
     final cell = find.byKey(const ValueKey('draft-cell-織田翔希-9'));

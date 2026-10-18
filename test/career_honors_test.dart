@@ -47,6 +47,36 @@ final teams = <Map<String, dynamic>>[
   }
 ];
 void main() {
+  testWidgets('経歴の各分類で全球団と選択球団を切り替える', (tester) async {
+    final fixtures = [for (var id = 1; id <= 2; id++) {
+      'id_team': id, 'name_team': '球団$id', 'roster': [{
+        'player_key': '$id', 'name': '選手$id', 'birth_country': '日本', 'birth_state': '福岡県',
+        'career_history': [for (final category in careerCategories) {'category': category, 'team': '所属$category'}],
+      }],
+    }];
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: StrengthCareers(teams: fixtures))));
+    for (final category in careerCategories) {
+      await tester.tap(find.text(category).first);
+      await tester.pumpAndSettle();
+      expect(find.text('選手1'), findsOneWidget);
+      expect(find.text('選手2'), findsOneWidget);
+      await tester.tap(find.text('各球団'));
+      await tester.pumpAndSettle();
+      expect(find.text('選手2'), findsNothing);
+      await tester.tap(find.byKey(ValueKey('career-team-$category')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('球団2').last);
+      await tester.pumpAndSettle();
+      expect(find.text('選手1'), findsNothing);
+      expect(find.text('選手2'), findsOneWidget);
+      await tester.tap(find.text('12球団表示'));
+      await tester.pumpAndSettle();
+      expect(find.text('選手1'), findsOneWidget);
+      expect(find.text('選手2'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }
+  });
+
   test('経歴は現役・カテゴリ別で重複を除き人数順', () {
     final grouped = careerGroups(teams, '高校');
     expect(grouped.map((g) => g['name']), ['甲高校', '丙高校']);

@@ -14,6 +14,16 @@ Map<String, dynamic> milestone(int count,
     };
 
 void main() {
+  test('功績の数字は途中で改行せず3行以内に収める', () {
+    for (final number in ['300', '2000', '1,000', '３００', '0.300']) {
+      final caption = 'NPB 通算$number本塁打';
+      final text = achievementBadgeEngraving(caption);
+      expect(text, contains(number));
+      expect(text.replaceAll('\n', ''), caption);
+      expect(text.split('\n').length, lessThanOrEqualTo(3));
+    }
+  });
+
   test('最上位の通算功績に下位の評価を集約し、出典を維持する', () {
     final original = [
       for (final n in [100, 200, 300, 400]) milestone(n)

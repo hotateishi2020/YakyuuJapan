@@ -33,23 +33,23 @@ void main() {
               'name_full_summary': '好調選手',
               'flg_pitcher': false,
               'txt_plays': '中安|hit',
-              'lineup': [
+              'lineup': const [
                 {
                   'id_team': 1,
                   'order': 1,
-                  'players': [
+                  'players': const [
                     {'name': '好調選手', 'pos': '中', 'plays': '中安|hit'}
                   ]
                 }
               ],
-              'player_hands': [
+              'player_hands': const [
                 {
                   'name_full_summary': '好調選手',
                   'batting_hand': 1,
                   'pitching_hand': 0
                 }
               ],
-              'postseason_form': [
+              'postseason_form': const [
                 {
                   'id_player': 1,
                   'name': '好調選手',

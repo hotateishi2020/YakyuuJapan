@@ -279,7 +279,7 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
   bool _usageOrder = true;
   @override
   Widget build(BuildContext context) => Column(children: [
-        if (!TeamSectionLayout.embedded(context)) Row(children: [
+        Row(children: [
           for (final usage in [false, true])
             Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),

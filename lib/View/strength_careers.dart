@@ -1,3 +1,4 @@
+import '../config/org_config.dart';
 import 'compact_card_layout.dart';
 import 'team_section_layout.dart';
 import '../logic/career_regions.dart';
@@ -135,15 +136,18 @@ Widget careerGroupCard(BuildContext context, Map<String, dynamic> group, double 
       ]));
 
 class StrengthCareers extends StatefulWidget {
-  const StrengthCareers({super.key, required this.teams, this.initialCategory});
+  const StrengthCareers({super.key, required this.teams, this.initialCategory, this.org = OrgConfig.npb});
   final List<Map<String, dynamic>> teams;
   final String? initialCategory;
+  final OrgConfig org;
   @override
   State<StrengthCareers> createState() => _StrengthCareersState();
 }
 
 class _StrengthCareersState extends State<StrengthCareers> {
   String category = '高校';
+  final _singleTeamCategories = <String>{};
+  final _selectedTeams = <String, String>{};
   @override
   void initState() {
     super.initState();
@@ -198,11 +202,16 @@ class _StrengthCareersState extends State<StrengthCareers> {
       return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         for (final value in careerCategories) ...[
           Padding(padding: const EdgeInsets.all(8), child: Text(value, style: const TextStyle(fontWeight: FontWeight.bold))),
-          StrengthCareers(teams: widget.teams, initialCategory: value),
+          StrengthCareers(teams: widget.teams, initialCategory: value, org: widget.org),
         ],
       ]);
     }
-    final groups = careerGroups(widget.teams, category);
+    final embedded = TeamSectionLayout.embedded(context);
+    final singleTeam = !embedded && _singleTeamCategories.contains(category);
+    final selectedTeam = widget.teams.any((t) => '${t['id_team']}' == _selectedTeams[category])
+        ? _selectedTeams[category] : widget.teams.isEmpty ? null : '${widget.teams.first['id_team']}';
+    final visibleTeams = singleTeam ? widget.teams.where((t) => '${t['id_team']}' == selectedTeam).toList() : widget.teams;
+    final groups = careerGroups(visibleTeams, category);
     return Column(children: [
       if (!TeamSectionLayout.embedded(context)) Row(children: [
         for (final value in careerCategories)
@@ -226,12 +235,32 @@ class _StrengthCareersState extends State<StrengthCareers> {
                                               ? Colors.white
                                               : Colors.black87)))))))),
       ]),
+      if (!embedded) ...[
+        const SizedBox(height: 8),
+        SizedBox(width: double.infinity, child: SegmentedButton<bool>(
+          segments: [
+            ButtonSegment(value: false, label: Text(widget.org.kind == OrgKind.npb ? '12球団表示' : '30球団表示')),
+            const ButtonSegment(value: true, label: Text('各球団')),
+          ],
+          selected: {singleTeam},
+          onSelectionChanged: (values) => setState(() {
+            if (values.single) { _singleTeamCategories.add(category); }
+            else { _singleTeamCategories.remove(category); }
+          }),
+        )),
+        if (singleTeam && selectedTeam != null) DropdownButton<String>(
+          key: ValueKey('career-team-$category'), isExpanded: true, value: selectedTeam,
+          items: [for (final team in widget.teams) DropdownMenuItem(
+            value: '${team['id_team']}', child: Text('${team['name_team']}'))],
+          onChanged: (value) => setState(() { if (value != null) _selectedTeams[category] = value; }),
+        ),
+      ],
       const SizedBox(height: 8),
       SectionExpanded(child: LayoutBuilder(builder: (context, constraints) {
         final columns = (constraints.maxWidth / 320).floor().clamp(1, 6);
         final width = (constraints.maxWidth - (columns - 1) * 8) / columns;
         return sectionScrollView(context, 
-            key: PageStorageKey('career-$category'),
+            key: PageStorageKey('career-$category-${singleTeam ? selectedTeam : 'all'}'),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [

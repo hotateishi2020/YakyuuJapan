@@ -11,17 +11,19 @@ void main() {
     testWidgets('${org.label}の列は表全体で縦スクロールする', (tester) async {
       await tester.binding.setSurfaceSize(const Size(1200, 500));
       addTearDown(() => tester.binding.setSurfaceSize(null));
-      await tester.pumpWidget(MaterialApp(home: Scaffold(body: DualBandLeaguePersonalStats(
-        org: org, batting: [
+      await tester.pumpWidget(MaterialApp(
+          home: Scaffold(
+              body: DualBandLeaguePersonalStats(
+        org: org,
+        batting: [
           for (final title in ['打率', '本塁打', 'ボール球見極め率'])
-            for (var i = 0; i < 30; i++)
-              {'title': title, 'int_rank': i + 1, 'name_player': '$title選手$i', 'stats': 30-i},
-        ], pitching: const [],
+            for (var i = 0; i < 30; i++) {'title': title, 'int_rank': i + 1, 'name_player': '$title選手$i', 'stats': 30 - i},
+        ],
+        pitching: const [],
       ))));
       await tester.pumpAndSettle();
       expect(find.text('ボール球見極め率'), org.kind == OrgKind.npb ? findsNothing : findsOneWidget);
-      final vertical = tester.stateList<ScrollableState>(find.byType(Scrollable))
-        .where((s) => s.axisDirection == AxisDirection.down).toList();
+      final vertical = tester.stateList<ScrollableState>(find.byType(Scrollable)).where((s) => s.axisDirection == AxisDirection.down).toList();
       expect(vertical, hasLength(1));
       final first = tester.getTopLeft(find.text('打率選手0')).dy;
       final second = tester.getTopLeft(find.text('本塁打選手0')).dy;
@@ -82,7 +84,7 @@ void main() {
       await tester.pumpWidget(MaterialApp(
           home: Scaffold(
               body: BothLeaguePersonalStats(layout: layout, stats: [
-        {'id_league': 1, 'title': 'ボール球見極め率', 'stats': '80', 'name_player': '非表示選手', 'flg_pitcher': false},
+        const {'id_league': 1, 'title': 'ボール球見極め率', 'stats': '80', 'name_player': '非表示選手', 'flg_pitcher': false},
         for (var i = 1; i <= 2; i++) {'id_league': i, 'title': '打率', 'stats': '.300', 'int_rank': 1, 'name_player': '選手$i', 'name_team': '球団', 'flg_pitcher': false},
       ]))));
       expect(find.text('選手1'), findsOneWidget);

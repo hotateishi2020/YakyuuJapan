@@ -74,7 +74,7 @@ final fixture = {
       'label': '安打',
       'unit': '安打',
       'leaders': [
-        {'name': '引退選手', 'value': 3000, 'status': 'retired'},
+        {'name': '引退選手', 'value': 3000, 'status': 'retired', 'combined': true},
         {'name': '現役選手', 'value': 2000, 'status': 'active'}
       ]
     }
@@ -94,6 +94,19 @@ final fixture = {
   ],
 };
 void main() {
+  test('championship intervals follow franchise IDs and selected year', () {
+    Map<String,dynamic> season(int year,String name,{bool champion=false,int rank=2}) => {
+      'year':year,'leagues':[{'teams':[{'id_team':1,'name':name,'rank':rank,'champion':champion}, {'id_team':2,'name':'未優勝','rank':3}]}]
+    };
+    final result=championshipIntervals([season(2026,'現球団'),season(2020,'前身球団',champion:true,rank:1),season(2028,'未来',champion:true,rank:1)],2026);
+    expect(result.first['name'],'現球団');
+    expect(result.first['league_years'],6);
+    expect(result.first['champion_years'],6);
+    expect(result.last['league_years'],isNull);
+    expect(championshipIntervals([season(2026,'現球団',champion:true,rank:1)],2026).first['champion_years'],0);
+    expect(championshipIntervals([season(2026,'現球団',rank:1)],2026,mlb:true).first['league_years'],isNull);
+  });
+
   for (final org in [OrgConfig.npb, OrgConfig.mlb]) {
     testWidgets('${org.label}優勝表はリーグを切り替えても日本一・WS優勝を維持する', (tester) async {
       final payload = {'standings': [
@@ -115,19 +128,20 @@ void main() {
         await tester.tap(find.byKey(ValueKey('standings-league-${org.leagues.first.id}')));
         await tester.pumpAndSettle();
         expect(find.text('リーグ'), findsNothing);
-        expect(find.text('1位'), findsNothing);
-        expect(find.text('リーグ優勝'), findsOneWidget);
-        expect(find.text('球団0'), findsOneWidget);
-        expect(tester.widget<Text>(find.text('球団0')).style!.color, Colors.white);
-        expect(tester.widgetList<Container>(find.ancestor(of: find.text('球団0'), matching: find.byType(Container)))
-            .any((c) => c.decoration is BoxDecoration && (c.decoration as BoxDecoration).color == const Color(0xFF003366)), isTrue);
+        expect(find.text('1位'), findsOneWidget);
+        expect(find.text('リーグ優勝'), findsNothing);
+        expect(find.text('略称0'), findsOneWidget);
+        expect(tester.widget<Text>(find.text('略称0')).style!.color, Colors.black87);
+        expect(tester.widgetList<Container>(find.ancestor(of: find.text('略称0'), matching: find.byType(Container)))
+            .any((c) => c.decoration is BoxDecoration && (c.decoration as BoxDecoration).color == Color.lerp(org.leagues.first.color, Colors.white, .88)), isTrue);
         expect(find.text('略称1'), findsNothing);
         expect(find.text('球団1'), findsOneWidget);
         expect(find.text('1949'), findsNothing);
         await tester.tap(find.byKey(ValueKey('standings-league-${org.leagues.last.id}')));
         await tester.pumpAndSettle();
         expect(find.text('略称0'), findsNothing);
-        expect(find.text('球団1'), findsNWidgets(2));
+        expect(find.text('球団1'), findsOneWidget);
+        expect(find.text('略称1'), findsOneWidget);
         await tester.tap(find.byKey(const ValueKey('standings-league-0')));
         await tester.pumpAndSettle();
         expect(find.text('略称0'), findsOneWidget);
@@ -195,7 +209,10 @@ void main() {
         expect(find.text('日本一'), findsOneWidget);
         expect(find.text('1位'), findsOneWidget);
         expect(find.text('優勝略称'), findsOneWidget);
-        expect(find.text('優勝球団'), findsOneWidget);
+        expect(find.text('優勝球団'), findsNWidgets(2));
+        expect(find.text('最後のリーグ優勝から'), findsOneWidget);
+        expect(find.text('最後の日本一から'), findsOneWidget);
+        expect(find.text('1年'), findsNWidgets(2));
         final horizontal = tester.stateList<ScrollableState>(find.byType(Scrollable))
             .where((state) => state.axisDirection == AxisDirection.right).first;
         expect(horizontal.position.maxScrollExtent, width < 600 ? greaterThan(0) : 0);
@@ -207,8 +224,8 @@ void main() {
           c.decoration is BoxDecoration && (c.decoration as BoxDecoration).color == leagueBackground);
         expect(rankCells.length, 6);
         expect(championCell.single.constraints!.minWidth, greaterThanOrEqualTo(240));
-        expect(tester.widget<Text>(find.text('優勝球団')).maxLines, 1);
-        expect(tester.widget<Text>(find.text('優勝球団')).style!.color, Colors.white);
+        expect(tester.widget<Text>(find.descendant(of: find.byKey(const ValueKey('standings-year-2025')), matching: find.text('優勝球団'))).maxLines, 1);
+        expect(tester.widget<Text>(find.descendant(of: find.byKey(const ValueKey('standings-year-2025')), matching: find.text('優勝球団'))).style!.color, Colors.white);
         expect(find.textContaining('90勝'), findsNothing);
         expect(find.textContaining('PS進出'), findsNothing);
         await tester.tap(find.byKey(const ValueKey('records-tab-1')));
@@ -243,8 +260,9 @@ void main() {
             tester.getTopLeft(find.byKey(const ValueKey('season-bar-本塁打-current-0'))).dx);
         await tester.tap(find.byKey(const ValueKey('records-tab-3')));
         await tester.pumpAndSettle();
-        expect(find.text('現役'), findsOneWidget);
-        expect(find.text('引退'), findsOneWidget);
+        expect(find.text('日米通算'), findsOneWidget);
+        expect(find.text('現役'), findsNothing);
+        expect(find.text('引退'), findsNothing);
         final active = find
             .ancestor(of: find.text('現役選手'), matching: find.byType(Container))
             .first;

@@ -8,6 +8,7 @@ import '../tools/Postgres.dart';
 import 'AppSql.dart';
 import 'PlayerDisplay.dart';
 import 'PlayerDetail.dart';
+import 'QualifiedPitchingMetrics.dart';
 import 'PredictGroup.dart';
 
 /// 予想の表示結果を登録する。画面の読出しはこのテーブルの SELECT だけ。
@@ -200,7 +201,9 @@ class PredictionSnapshot {
     for (final row in stats) {
       if ('${row['txt_position'] ?? ''}'.trim().isEmpty || row['txt_position'] == '不明') row['txt_position'] = positions['${row['id_player']}'];
     }
+    stats.removeWhere((r) => r['title'] == '盗塁阻止率');
     stats.addAll(await extraStatRows(conn, year, leagueIds));
+    retainCatcherCounts(stats);
     addMissingRequestedMetrics(stats);
     return PlayerDisplay(stats: stats, predictions: picks);
   }

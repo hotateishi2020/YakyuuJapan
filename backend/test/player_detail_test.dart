@@ -1,4 +1,5 @@
 import 'package:test/test.dart';
+import '../app/CatcherCounts.dart';
 import '../app/ExtendedPlayerMetrics.dart';
 import '../app/QualifiedPitchingMetrics.dart';
 import '../app/MlbSeasonPositions.dart';
@@ -9,6 +10,34 @@ import '../app/PinchMetrics.dart';
 import '../app/RecentPlayerGames.dart';
 
 void main() {
+  test('捕手の盗塁阻止数は守備記録の当年一軍Cだけから取得する', () {
+    String row(int year,String league,String position,String count,String rate) {
+      final cells=List.filled(26,'0');
+      cells[0]='$year';cells[2]='T';cells[3]=league;cells[4]=position;cells[21]=count;cells[22]=rate;
+      return '<tr>${cells.map((v)=>'<td>$v</td>').join()}</tr>';
+    }
+    expect(parseCatcherCount('<table>${row(2026,'１軍','C','19','.328')}${row(2025,'１軍','C','90','.9')}${row(2026,'２軍','C','99','.9')}</table>',2026),19);
+    expect(parseCatcherCount('<table>${row(2026,'１軍','C','0','.000')}</table>',2026),0);
+    expect(parseCatcherCount('<table>${row(2026,'１軍','C','-','-')}</table>',2026),isNull);
+  });
+
+  test('盗塁阻止数は規定未達・打席不明・ゼロ件の捕手も表示する', () {
+    for(final games in [143,162,70]) {
+      final minimum = (games * 3.1).round();
+      final rows = <Map<String,dynamic>>[
+        for(var id=1;id<=4;id++) ...[
+          {'id_player':id,'id_team':1,'title':'打席数','numeric_value':id==1 ? minimum-1 : minimum},
+          {'id_player':id,'id_team':1,'title':'盗塁阻止数','numeric_value':14,'txt_position':id==3 ? '外野手' : id==4 ? null : '捕手'},
+        ],
+        {'id_player':5,'id_team':1,'title':'盗塁阻止数','catcher_metric':true,'numeric_value':0},
+      ];
+      retainCatcherCounts(rows);
+      expect(rows.where((r)=>r['title']=='盗塁阻止数').map((r)=>r['id_player']),[1,2,5]);
+      addMissingRequestedMetrics(rows);
+      expect(rows.where((r)=>r['title']=='盗塁阻止数'),hasLength(3));
+    }
+  });
+
   test('NPBとMLBの四球系率は規定到達投手だけを残す', () {
     for (final limit in [143, 162, 70]) {
       final rows = <Map<String, dynamic>>[
@@ -65,7 +94,8 @@ void main() {
       }
     ];
     addMissingRequestedMetrics(rows);
-    for (final title in ['ボール球見極め率', '盗塁阻止率']) {
+    expect(rows.where((r) => r['title'] == '盗塁阻止数'), isEmpty);
+    for (final title in ['ボール球見極め率', '代打打率']) {
       final row = rows.singleWhere((r) => r['title'] == title);
       expect(row['id_users'], isNull);
       expect(row['colors'], isNull);

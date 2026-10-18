@@ -27,11 +27,11 @@ String clubKey(Map<String, dynamic> team) {
 }
 
 Future<Map<String, dynamic>> readSeasonSchedule(Connection conn, OrgKind org, int year) async {
-  final teams = (await conn.execute('SELECT id,name_short,name_shortest,url_npb_players,id_league FROM m_team WHERE id_league IN (${org.leagueIds.join(',')}) AND NOT COALESCE(flg_delete,false)')).map((r) => r.toColumnMap()).toList();
+  final teams = (await conn.execute('SELECT id,color_back,color_font,name_short,name_shortest,url_npb_players,id_league FROM m_team WHERE id_league IN (${org.leagueIds.join(',')}) AND NOT COALESCE(flg_delete,false)')).map((r) => r.toColumnMap()).toList();
   final snapshot = readClubFile('schedule-$year.json');
   final rows = await conn.execute('''
  SELECT g.id,g.datetime_start::text AS datetime_start,g.id_team_home,g.id_team_away,g.score_home,g.score_away,g.state,g.code_game,g.flg_delete,
- h.name_shortest AS name_home,a.name_shortest AS name_away,h.name_short AS name_home_logo,a.name_short AS name_away_logo,h.id_league AS league_home,a.id_league AS league_away
+ h.color_back AS color_back_home,h.color_font AS color_font_home,h.name_shortest AS name_home,a.name_shortest AS name_away,h.name_short AS name_home_logo,a.name_short AS name_away_logo,h.id_league AS league_home,a.id_league AS league_away
  FROM t_game g JOIN m_team h ON h.id=g.id_team_home JOIN m_team a ON a.id=g.id_team_away
  WHERE h.id_league IN (${org.leagueIds.join(',')}) AND g.datetime_start >= make_date(\$1,1,1) AND g.datetime_start < make_date(\$1+1,1,1)
  ORDER BY g.datetime_start,g.id
@@ -47,7 +47,7 @@ List<Map<String, dynamic>> mergeSeasonSchedule(List<Map<String, dynamic>> teams,
   for (final raw in snapshot) {
     final h = byKey['${raw['home_code']}'], a = byKey['${raw['away_code']}'];
     if (h == null || a == null) continue;
-    final row = {...raw, 'id_team_home': h['id'], 'id_team_away': a['id'], 'name_home': h['name_shortest'], 'name_away': a['name_shortest'], 'name_home_logo': h['name_short'], 'name_away_logo': a['name_short'], 'league_home': h['id_league'], 'league_away': a['id_league']};
+    final row = {...raw, 'id_team_home': h['id'], 'id_team_away': a['id'], 'color_back_home': h['color_back'], 'color_font_home': h['color_font'], 'name_home': h['name_shortest'], 'name_away': a['name_shortest'], 'name_home_logo': h['name_short'], 'name_away_logo': a['name_short'], 'league_home': h['id_league'], 'league_away': a['id_league']};
     games['${raw['date']}:${h['id']}:${a['id']}:${raw['game_number'] ?? 1}'] = row;
   }
 

@@ -300,7 +300,15 @@ String draftCareerText(Map<String, dynamic> player) {
     final bySeason = season(b.$2).compareTo(season(a.$2));
     return bySeason != 0 ? bySeason : a.$1.compareTo(b.$1);
   });
-  return entries.map((entry) => '${entry.$2['label'] ?? ''}').where((label) => label.isNotEmpty).join('\n');
+  return entries.map((entry) {
+    final fact = entry.$2;
+    final label = '${fact['label'] ?? ''}';
+    final school = '${fact['school'] ?? ''}'.trim();
+    if (fact['kind'] == 'koshien' && school.isNotEmpty && !label.contains(school)) {
+      return label.replaceFirst('甲子園', '甲子園（$school）');
+    }
+    return label;
+  }).where((label) => label.isNotEmpty).join('\n');
 }
 
 int? draftAgeOnMarch31(dynamic rawBirth, int year) {

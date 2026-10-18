@@ -62,9 +62,22 @@ class Records {
     final baselineFile = [File('data/records.json'), File('backend/data/records.json')].firstWhere((f) => f.existsSync());
     final baseline = usageMap(usageMap(jsonDecode(baselineFile.readAsStringSync()))[org.code]);
     final season = usageMaps(baseline['season']);
+    final combinedFile = [File('data/combined_career_records.json'), File('backend/data/combined_career_records.json')].where((f) => f.existsSync()).firstOrNull;
+    final combined = combinedFile == null ? <Map<String,dynamic>>[] : usageMaps(usageMap(usageMap(jsonDecode(combinedFile.readAsStringSync()))['career'])[org.code]);
+    // Holds are not a title ranking in t_stats_player_latest. Reuse the
+    // official regular-season pitching snapshots refreshed by TeamStrength.
+    final pitchingSnapshots = await conn.execute('''
+      SELECT s.id_team,s.payload,t.name_short AS team,t.color_back,t.color_font
+      FROM t_team_strength s JOIN m_team t ON t.id=s.id_team
+      WHERE s.int_year = \$1 AND s.code_org = \$2
+    ''', parameters: [year, org.code]);
+    final holdLeaders = seasonHoldLeaders(pitchingSnapshots.map((r) => r.toColumnMap()).toList(), year);
     for (final record in season) {
       final metric = recordMetrics.firstWhere((m) => m.key == record['key']);
       record['current'] = currentLeaders(titles, metric, year);
+      if (metric.key == 'holds' && (record['current'] as List).isEmpty) {
+        record['current'] = holdLeaders;
+      }
       record['current_note'] = '規定条件を満たす登録済み首位成績がありません。';
     }
     final games = await conn.execute('''
@@ -98,7 +111,7 @@ class Records {
       'standings': buildRecordStandings(standingRows.map((r) => r.toColumnMap()).toList(), playoffs.map((r) => r.toColumnMap()).toList(), org),
       'titles': colorRecordTitles(mergeRecordAwards(buildRecordTitles(titles, org), usageMaps(baseline['awards']), year), standingRows.map((r) => r.toColumnMap()).toList(), titles),
       'season': season,
-      'career': usageMaps(baseline['career']),
+      'career': combined.isEmpty ? usageMaps(baseline['career']) : combined,
       'streaks': [
         for (final d in streakDefinitions)
           {
@@ -122,6 +135,34 @@ class Records {
     _cache[key] = (at: DateTime.now(), data: data);
     return data;
   }
+}
+
+/// Combine team-specific regular-season totals, including traded pitchers.
+List<Map<String, dynamic>> seasonHoldLeaders(List<Map<String, dynamic>> teams, int year) {
+  final players = <String, Map<String, dynamic>>{};
+  final seen = <String>{};
+  for (final team in teams) {
+    final pitchers = usageMap(usageMap(team['payload'])['pitchers']);
+    for (final role in ['starters', 'relievers', 'closers']) {
+      for (final pitcher in usageMaps(pitchers[role])) {
+        final name = '${pitcher['name'] ?? ''}';
+        final key = '${pitcher['player_key'] ?? name}';
+        final holds = usageInt(pitcher['holds']);
+        if (key.isEmpty || holds <= 0 || !seen.add('${team['id_team']}:$key')) continue;
+        final entry = players.putIfAbsent(key, () => {
+          'name': name, 'player_key': key, 'year': year, 'value': 0,
+          'unit': 'ホールド', 'team': team['team'],
+          'color_back': team['color_back'], 'color_font': team['color_font'],
+          'status': 'active',
+        });
+        entry['value'] = usageInt(entry['value']) + holds;
+      }
+    }
+  }
+  final rows = players.values.toList()..sort((a,b) => usageInt(b['value']).compareTo(usageInt(a['value'])));
+  if (rows.isEmpty) return [];
+  final best = rows.first['value'];
+  return [for (final row in rows) if (row['value'] == best) {...row, 'value': '$best'}];
 }
 
 double _number(dynamic v) => double.tryParse('$v') ?? 0;
@@ -174,6 +215,15 @@ List<Map<String, dynamic>> buildRecordStandings(List<Map<String, dynamic>> rows,
     final tally = wins.putIfAbsent(year, () => {}), winner = h > a ? home : away;
     tally[winner] = (tally[winner] ?? 0) + 1;
   }
+  final leagueWinners = <int, Map<int,int>>{};
+  for(final g in games) {
+    if (!['LCS','ALCS','NLCS'].contains(g['code_game']) || !'${g['state']}'.contains('終了')) continue;
+    final h = usageInt(g['score_home']), a = usageInt(g['score_away']);
+    if(h == a) continue;
+    final tally = leagueWinners.putIfAbsent(usageInt(g['year']), () => {});
+    final winner = usageInt(g[h > a ? 'id_team_home' : 'id_team_away']);
+    tally[winner] = (tally[winner] ?? 0) + 1;
+  }
   final seasons = <int, Map<String, dynamic>>{};
   for (final r in rows) {
     final year = usageInt(r['year']), team = usageInt(r['id_team']);
@@ -191,7 +241,7 @@ List<Map<String, dynamic>> buildRecordStandings(List<Map<String, dynamic>> rows,
       league = {'id_league': r['id_league'], 'name': label, 'teams': <Map<String, dynamic>>[]};
       leagues.add(league);
     }
-    (league['teams'] as List).add({'id_team': team, 'historical_identity': r['historical_identity'], 'logo_url': r['logo_url'], 'color_back': r['color_back'], 'color_font': r['color_font'], 'name_shortest': r['name_shortest'], 'rank': r['int_rank'], 'name': r['name'], 'short_name': r['short_name'] ?? r['name'], 'wins': r['int_win'], 'losses': r['int_lose'], 'draws': r['int_draw'], 'postseason': entrants[year]?.contains(team) ?? false, 'champion': champion});
+    (league['teams'] as List).add({'id_team': team, 'historical_identity': r['historical_identity'], 'logo_url': r['logo_url'], 'color_back': r['color_back'], 'color_font': r['color_font'], 'name_shortest': r['name_shortest'], 'league_champion': org == OrgKind.npb || year < 1969 ? usageInt(r['int_rank']) == 1 : (leagueWinners[year]?[team] ?? 0) >= (year < 1985 ? 3 : 4), 'rank': r['int_rank'], 'name': r['name'], 'short_name': r['short_name'] ?? r['name'], 'wins': r['int_win'], 'losses': r['int_lose'], 'draws': r['int_draw'], 'postseason': entrants[year]?.contains(team) ?? false, 'champion': champion});
   }
   for (final s in seasons.values) {
     for (final l in s['leagues']) {

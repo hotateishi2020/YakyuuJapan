@@ -55,10 +55,10 @@ void main() {
       expect(t.getSize(tableFinder).width, closeTo(1600, 1));
       await t.binding.setSurfaceSize(const Size(600, 800));
       await t.pumpAndSettle();
-      expect(t.getSize(tableFinder).width, 1240);
+      expect(t.getSize(tableFinder).width, closeTo(1240, .01));
       final horizontal = find.descendant(
         of: find.byKey(const ValueKey('analysis-horizontal-scroll')),
-        matching: find.byType(Scrollable),
+        matching: find.byWidgetPredicate((w) => w is Scrollable && w.axisDirection == AxisDirection.right),
       );
       expect(t.state<ScrollableState>(horizontal).position.maxScrollExtent, greaterThan(600));
       await t.drag(horizontal, const Offset(-300, 0));
@@ -66,6 +66,27 @@ void main() {
       expect(t.state<ScrollableState>(horizontal).position.pixels, greaterThan(0));
       expect(t.takeException(), isNull);
     }, () => MockClient((_) async => http.Response('{}', 200)));
+  });
+  testWidgets('分析表のヘッダーは縦スクロールしても同じ位置に残る', (t) async {
+    await t.binding.setSurfaceSize(const Size(1200, 700));
+    addTearDown(() => t.binding.setSurfaceSize(null));
+    await http.runWithClient(() async {
+      await t.pumpWidget(MaterialApp(home: Scaffold(body: ClubHubBoard(
+        org: OrgConfig.npb, year: 2026, view: 10,
+        teamSection: (_, __) => const SizedBox.shrink(),
+        teams: [for(var i=1;i<=12;i++) {'id_team':i,'name_team':'球団$i'}],
+      ))));
+      await t.pumpAndSettle();
+      final header = find.byKey(const ValueKey('analysis-fixed-header'));
+      final before = t.getTopLeft(header);
+      final row = find.byKey(const ValueKey('analysis-team-1'));
+      final rowBefore = t.getTopLeft(row);
+      await t.drag(find.byKey(const ValueKey('analysis-vertical-scroll')), const Offset(0,-300));
+      await t.pumpAndSettle();
+      expect(t.getTopLeft(header), before);
+      expect(t.getTopLeft(row).dy, lessThan(rowBefore.dy));
+      expect(t.takeException(),isNull);
+    }, () => MockClient((_) async => http.Response('{}',200)));
   });
   test('守備OAAは比較球団すべてが同年度で揃った場合だけ使用する', () {
     Map<String, dynamic> team(int id, int value, int year) => {

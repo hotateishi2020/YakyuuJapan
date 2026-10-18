@@ -297,7 +297,7 @@ void main() {
     expect(npbLineReachesFinal(StageResult.empty, StageResult.empty), isFalse);
   });
 
-  testWidgets('日本シリーズ欄に決勝進出チームのロゴと星取と勝敗差を出す', (tester) async {
+  testWidgets('日本シリーズ欄はロゴと星取を表示し勝敗文字列を出さない', (tester) async {
     await tester.pumpWidget(MaterialApp(
       home: Scaffold(
         body: SizedBox(
@@ -339,8 +339,9 @@ void main() {
     expect(find.byKey(const Key('postseason-js-team-7')), findsOneWidget);
     expect(find.text('1勝'), findsNothing);
     expect(find.text('3差'), findsNothing);
-    expect(tester.widget<Text>(find.byKey(const Key('postseason-js-score'))).data, '1 - 4');
-    final japan = tester.getRect(find.byKey(const Key('postseason-js-score')));
+    expect(find.byKey(const Key('postseason-js-score')), findsNothing);
+    expect(find.text('1 - 4'), findsNothing);
+    final japan = tester.getRect(find.byKey(const Key('postseason-js-content')));
     final central = tester.getRect(find.byKey(const Key('postseason-js-team-1')));
     final pacific = tester.getRect(find.byKey(const Key('postseason-js-team-7')));
     expect(central.center.dx, lessThan(japan.center.dx));
@@ -356,8 +357,10 @@ void main() {
       expect(mark.top, greaterThanOrEqualTo(bounds.top));
       expect(mark.bottom, lessThanOrEqualTo(bounds.bottom));
     }
-    expect(central.left, greaterThan(bounds.left + bounds.width * .2));
-    expect(pacific.right, lessThan(bounds.right - bounds.width * .2));
+    expect(centralStars.left - bounds.left, lessThan(bounds.width * .05));
+    expect(bounds.right - pacificStars.right, lessThan(bounds.width * .05));
+    expect(BracketGeom.finC.center.dx, lessThan(BracketGeom.js.left));
+    expect(BracketGeom.finP.center.dx, greaterThan(BracketGeom.js.right));
     expect(centralStars.height, greaterThan(centralStars.width));
     expect(pacificStars.height, greaterThan(pacificStars.width));
     expect(
@@ -573,6 +576,19 @@ void main() {
     expect(result.winsLow, 4);
   });
 
+  test('未決着のALCSには両DS勝者の線を伸ばし決着後は敗者を戻す', () {
+    const rays = StageResult(slots: 3, advantage: 0, winsHigh: 3, winsLow: 1, decided: true, winnerId: 13, loserId: 14);
+    const guardians = StageResult(slots: 3, advantage: 0, winsHigh: 3, winsLow: 2, decided: true, winnerId: 17, loserId: 18);
+    const pending = StageResult(slots: 4, advantage: 0, winsHigh: 2, winsLow: 3, decided: false, winnerId: null, loserId: null);
+    const decided = StageResult(slots: 4, advantage: 0, winsHigh: 2, winsLow: 4, decided: true, winnerId: 17, loserId: 13);
+    expect(wonNextMlbRound(rays, pending), isTrue);
+    expect(wonNextMlbRound(guardians, pending), isTrue);
+    expect(reachesMlbWorldSeries(pending), isFalse);
+    expect(wonNextMlbRound(rays, decided), isFalse);
+    expect(wonNextMlbRound(guardians, decided), isTrue);
+    expect(reachesMlbWorldSeries(decided), isTrue);
+  });
+
   test('ファイナル敗退の黄線は1stで止まり、勝ち上がりはファイナルまで伸びる', () {
     const wonFirst = StageResult(slots: 2, advantage: 0, winsHigh: 2, winsLow: 0, decided: true, winnerId: 2, loserId: 3);
     const lostFinal = StageResult(slots: 4, advantage: 1, winsHigh: 4, winsLow: 2, decided: true, winnerId: 1, loserId: 2);
@@ -582,6 +598,11 @@ void main() {
     expect(npbLineReachesFinal(wonFirst, wonFinal), isTrue);
     expect(npbLineReachesFinal(wonFirst, openFinal), isTrue);
     expect(npbSeedReachesFinal(team(id: 1, league: 1, rank: 1)), isTrue);
+    expect(npbSeedReachesFinal(team(id: 1, league: 1, rank: 1), finalStage: wonFinal), isFalse);
+    expect(npbSeedReachesFinal(team(id: 1, league: 1, rank: 1), finalStage: lostFinal), isTrue);
+    expect(npbSeedReachesFinal(team(id: 1, league: 1, rank: 1), finalStage: openFinal), isTrue);
+    const pacificLost = StageResult(slots: 4, advantage: 1, winsHigh: 1, winsLow: 4, decided: true, winnerId: 8, loserId: 7);
+    expect(npbSeedReachesFinal(team(id: 7, league: 2, rank: 1), finalStage: pacificLost), isFalse);
     expect(npbSeedReachesFinal(team(id: 7, league: 2, rank: 1)), isTrue);
     expect(npbSeedReachesFinal(const BracketTeam(id: 0, leagueId: 1, rank: 1, name: '', colorBack: '', colorFont: '', wins: 0, losses: 0, gamesBehind: null)), isFalse);
   });
@@ -710,7 +731,7 @@ void main() {
     expect(board.eliminated(40), isTrue);
     expect(wonNextMlbRound(board.nlDs2, board.nlCs), isFalse);
     expect(wonNextMlbRound(board.nlDs1, board.nlCs), isTrue);
-    expect(wonNextMlbRound(board.nlCs, board.worldSeries), isFalse);
+    expect(wonNextMlbRound(board.nlCs, board.worldSeries), isTrue);
     expect(reachesMlbWorldSeries(board.nlCs), isTrue);
     expect(reachesMlbWorldSeries(StageResult.empty), isFalse);
     expect(wonNextMlbRound(StageResult.empty, StageResult.empty), isFalse);
@@ -740,7 +761,8 @@ void main() {
       await tester.pumpWidget(MaterialApp(home: Scaffold(body:
         MlbPostseasonBracket(standings: standings, games: games))));
       await tester.pumpAndSettle();
-      expect(find.text('ワールドシリーズ'), findsOneWidget);
+      expect(find.text('WORLD SERIES'), findsOneWidget);
+      expect(find.text('ワールドシリーズ'), findsNothing);
       expect(find.byWidgetPredicate((w) => w is Image && w.image is AssetImage &&
           (w.image as AssetImage).assetName.endsWith('logo_world_series_2026.png')), findsOneWidget);
       final bounds = tester.getRect(find.byKey(const Key('postseason-ws-content')));
@@ -751,7 +773,8 @@ void main() {
           expect(bounds.contains(rect.bottomRight), isTrue);
         }
       }
-      expect(find.text('0 - 0'), findsOneWidget);
+      expect(find.text('0 - 0'), findsNothing);
+      expect(find.byKey(const Key('postseason-ws-score')), findsNothing);
       expect(tester.takeException(), isNull);
     });
   }

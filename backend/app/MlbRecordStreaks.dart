@@ -4,6 +4,7 @@ Map<String, List<Map<String, dynamic>>> mlbGameLogStreaks(
     List<Map<String, dynamic>> people, int year) {
   const keys = [
     'wins',
+    'saves',
     'holds',
     'scoreless_games',
     'hit_games',
@@ -68,6 +69,7 @@ Map<String, List<Map<String, dynamic>>> mlbGameLogStreaks(
         if (pitching) {
           add('wins', usageInt(s['wins']) > 0,
               skip: usageInt(s['wins']) + usageInt(s['losses']) == 0);
+          add('saves', usageInt(s['saves']) > 0);
           add('holds', usageInt(s['holds']) > 0);
           add('scoreless_games', usageInt(s['runs']) == 0);
         } else {

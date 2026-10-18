@@ -14,7 +14,7 @@ class UnifiedGrid extends StatelessWidget {
   final double? w_col_predictor;
   final double? h_header;
 
-  UnifiedGrid({
+  const UnifiedGrid({
     super.key,
     required this.predictions,
     required this.standings,

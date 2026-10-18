@@ -14,6 +14,30 @@ import 'strength_research.dart';
 
 const recordTabs = ['優勝チーム', '個人タイトル', 'シーズン記録', '通算記録', '連続記録', '功績'];
 
+/// Franchise IDs keep former team names in the same championship history.
+List<Map<String, dynamic>> championshipIntervals(List<Map<String, dynamic>> seasons, int year, {bool mlb = false}) {
+  final history = seasons.where((s) => (int.tryParse('${s['year']}') ?? 0) <= year).toList()
+    ..sort((a,b) => (int.tryParse('${b['year']}') ?? 0).compareTo(int.tryParse('${a['year']}') ?? 0));
+  if (history.isEmpty) return [];
+  String key(Map<String,dynamic> t) => '${t['id_team'] ?? t['name']}';
+  final current = [for(final l in listMapFromJson(history.first['leagues'])) ...listMapFromJson(l['teams'])];
+  return [for(final team in current) (() {
+    int? leagueYear, championYear;
+    for(final season in history) {
+      final y = int.tryParse('${season['year']}') ?? 0;
+      for(final league in listMapFromJson(season['leagues'])) {
+        for(final t in listMapFromJson(league['teams'])) {
+          if(key(t) != key(team)) continue;
+          if(t['league_champion'] == true || (!mlb && '${t['rank']}' == '1')) leagueYear ??= y;
+          if(t['champion'] == true) championYear ??= y;
+        }
+      }
+    }
+    return {...team, 'league_years':leagueYear == null ? null : year-leagueYear,
+      'champion_years':championYear == null ? null : year-championYear};
+  })()];
+}
+
 class RecordsBoard extends StatefulWidget {
   const RecordsBoard({super.key, required this.org, required this.year});
   final OrgConfig org;
@@ -177,21 +201,19 @@ class _RecordsBoardState extends State<RecordsBoard> {
         ? ((int.tryParse('${season['year']}') ?? 0) < 1958 ? 9 : 6) : mlbCount;
     final singleLeague = _standingsLeague != 0;
     var championWidth = 240.0;
-    var leagueChampionWidth = 240.0;
     for (final season in seasons) {
       for (final league in listMapFromJson(season['leagues'])) {
         final teams = listMapFromJson(league['teams']);
-        for (final team in teams.where((t) => t['champion'] == true || (singleLeague && identical(t, teams.first)))) {
+        for (final team in teams.where((t) => t['champion'] == true)) {
           final painter = TextPainter(text: TextSpan(text: '${team['name'] ?? '—'}',
             style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
             textScaler: MediaQuery.textScalerOf(context), textDirection: Directionality.of(context))..layout();
           if (team['champion'] == true) championWidth = math.max(championWidth, painter.width + 42);
-          if (singleLeague && identical(team, teams.first)) leagueChampionWidth = math.max(leagueChampionWidth, painter.width + 42);
           painter.dispose();
         }
       }
     }
-    final fixedWidth = 48 + championWidth + (singleLeague ? leagueChampionWidth : 80);
+    final fixedWidth = 48 + championWidth + (singleLeague ? 0 : 80);
     return LayoutBuilder(builder: (context, constraints) {
       Widget cell(Widget child, double w, double h, {Color color = Colors.white}) => Container(
         width: w, height: h, alignment: Alignment.center,
@@ -254,26 +276,49 @@ class _RecordsBoardState extends State<RecordsBoard> {
         cell(label(widget.org.kind == OrgKind.npb ? '日本一' : 'WS優勝', bold: true), championWidth, 26, color: const Color(0xFFFFF0BF)),
         if (!singleLeague) cell(label('リーグ', bold: true), 80, 26, color: Colors.grey.shade200),
         for (var rank = 1; rank <= count; rank++)
-          cell(label(singleLeague && rank == 1 ? 'リーグ優勝' : '$rank位', bold: true),
-            singleLeague && rank == 1 ? leagueChampionWidth : teamWidth, 26, color: Colors.grey.shade200),
+          cell(label('$rank位', bold: true),
+            teamWidth, 26, color: Colors.grey.shade200),
       ]);
+      final intervals = singleLeague ? <Map<String,dynamic>>[] : championshipIntervals(seasons, widget.year, mlb: widget.org.kind == OrgKind.mlb);
+      final summaryHeight = intervals.isEmpty ? 0.0 : (intervals.length + 1) * 32.0 + 22;
+      Widget summary(double width) {
+        final columnWidth = math.min(width, math.max(constraints.maxWidth, 540.0)) / 3;
+        Widget summaryRow(List<String> texts, {bool heading = false}) => Row(children: [
+          for(final text in texts) cell(label(text, color: heading ? Colors.white : Colors.black, bold: heading), columnWidth, 32,
+            color: heading ? Colors.black : Colors.white),
+        ]);
+        String years(Object? value) => value == null ? '—' : '$value年';
+        return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          summaryRow(['球団','最後のリーグ優勝から',widget.org.kind == OrgKind.npb ? '最後の日本一から' : '最後のWS優勝から'], heading:true),
+          for(final team in intervals) Row(children: [
+            teamCell(team, columnWidth, 32, logo: true),
+            cell(label(years(team['league_years'])), columnWidth, 32),
+            cell(label(years(team['champion_years'])), columnWidth, 32),
+          ]),
+          const SizedBox(height:22, child: Text('選択年度を基準に算出。— は登録済みの優勝記録なし。', style:TextStyle(fontSize:11))),
+        ]);
+      }
       final maxColumns = seasons.map(columnsFor).fold<int>(1, math.max);
-      final width = math.max(constraints.maxWidth, fixedWidth + (maxColumns - (singleLeague ? 1 : 0)) * 68.0);
+      final width = math.max(constraints.maxWidth, fixedWidth + maxColumns * 68.0);
       return SingleChildScrollView(
         key: const ValueKey('standings-horizontal-scroll'),
         scrollDirection: Axis.horizontal,
         child: SizedBox(width: width, height: constraints.maxHeight,
           child: ListView.builder(
             key: PageStorageKey('standings-vertical-scroll-${widget.org.kind.name}-$_standingsLeague'),
-            itemExtentBuilder: (i, _) {
+            itemExtentBuilder: (index, _) {
+              if (summaryHeight > 0 && index == 0) return summaryHeight;
+              final i = index - (summaryHeight > 0 ? 1 : 0);
               final count = columnsFor(seasons[i]);
               final headerHeight = i == 0 || columnsFor(seasons[i - 1]) != count ? 26.0 : 0.0;
               return math.max(1, visibleLeagues(seasons[i]).length) * 30.0 + headerHeight;
             },
-            itemCount: seasons.length, itemBuilder: (context, i) {
+            itemCount: seasons.length + (summaryHeight > 0 ? 1 : 0), itemBuilder: (context, index) {
+            if (summaryHeight > 0 && index == 0) return summary(width);
+            final i = index - (summaryHeight > 0 ? 1 : 0);
             final season = seasons[i];
             final count = columnsFor(season);
-            final teamWidth = (width - fixedWidth) / math.max(1, count - (singleLeague ? 1 : 0));
+            final teamWidth = (width - fixedWidth) / math.max(1, count);
             final showHeader = i == 0 || columnsFor(seasons[i - 1]) != count;
             final leagues = visibleLeagues(season);
             final champion = listMapFromJson(season['leagues']).expand((l) => listMapFromJson(l['teams']))
@@ -289,9 +334,9 @@ class _RecordsBoardState extends State<RecordsBoard> {
                   if (!singleLeague) cell(label('${league['name']}', color: Colors.white, bold: true), 80, 30,
                     color: leagueColor(league)),
                   for (final entry in listMapFromJson(league['teams']).take(count).indexed)
-                    teamCell(entry.$2, singleLeague && entry.$1 == 0 ? leagueChampionWidth : teamWidth, 30,
-                      logo: singleLeague && entry.$1 == 0, rankBackground: leagueBackground(league), year: season['year']),
-                  for (var n = listMapFromJson(league['teams']).length; n < count; n++) cell(const SizedBox.shrink(), singleLeague && n == 0 ? leagueChampionWidth : teamWidth, 30, color: leagueBackground(league)),
+                    teamCell(entry.$2, teamWidth, 30,
+                      rankBackground: leagueBackground(league), year: season['year']),
+                  for (var n = listMapFromJson(league['teams']).length; n < count; n++) cell(const SizedBox.shrink(), teamWidth, 30, color: leagueBackground(league)),
                 ])]),
             ]),
             ]);
@@ -443,7 +488,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
       }
       columns.add(ranks);
     }
-    final rowHeight = math.max(92.0, 76 * MediaQuery.textScalerOf(context).scale(12) / 12);
+    final rowHeight = math.max(66.0, 54 * MediaQuery.textScalerOf(context).scale(12) / 12);
     final rowCount = columns.expand((c) => c.entries).fold<int>(50, (n, e) => math.max(n, e.key + e.value.length - 1));
     void source(Map<String, dynamic> record) => showStrengthSource(context,
       '${record['label']}', '${record['note'] ?? ''}\n確認日：${record['checked_at'] ?? '—'}',
@@ -459,8 +504,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
       child: child);
     Widget entry(Map<String, dynamic> p, Map<String, dynamic> record) {
       final status = p['status'];
-      final statusText = status == 'active' ? '現役' : status == 'retired' ? '引退' : '現役区分未確認';
-      final detail = [if ('${p['team'] ?? ''}'.isNotEmpty) '${p['team']}',
+      final detail = [if (p['combined'] == true) '日米通算', if ('${p['team'] ?? ''}'.isNotEmpty) '${p['team']}',
         if ('${p['period'] ?? ''}'.isNotEmpty) '${p['period']}',
         if (p['year'] != null) '${p['year']}年'].join(' ');
       return Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
@@ -470,7 +514,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
           mainAxisAlignment: MainAxisAlignment.center, children: [
             text('${p['name'] ?? '—'}', bold: true),
             text('${p['value'] ?? '—'}${record['unit'] ?? ''}', bold: true),
-            if (detail.isNotEmpty) text(detail), text(statusText),
+            if (detail.isNotEmpty) text(detail),
           ]));
     }
     return LayoutBuilder(builder: (context, constraints) {
@@ -480,7 +524,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
       const columnWidth = 128.0;
       return Column(children: [
         const Padding(padding: EdgeInsets.all(8),
-          child: Text('薄黄色：現役　白：引退　薄橙色：区分未確認。記録名・セルを押すと集計条件を表示します。')),
+          child: Text('日米通算を含む比較順位。薄黄色：現役　白：引退　薄橙色：区分未確認。記録名・セルを押すと集計条件を表示します。')),
         Expanded(child: SingleChildScrollView(scrollDirection: Axis.horizontal,
           child: SizedBox(width: rankWidth + columnWidth * records.length,
             child: Column(children: [

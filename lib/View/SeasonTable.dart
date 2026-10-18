@@ -1,3 +1,5 @@
+import 'personal_stats_style.dart';
+export 'personal_stats_style.dart' show personalStatPositionColor;
 import 'player_detail_dialog.dart';
 import 'player_stats_grid.dart';
 import '../logic/season_schedule.dart';
@@ -818,7 +820,7 @@ class SeasonTableBlock extends StatelessWidget {
           final opponents = showScheduleColumns ? {for (final r in standings) '${r['id_team']}': r}.values.toList() : <Map<String, dynamic>>[];
           final dates = showScheduleColumns ? scheduleWindow(DateTime.now()) : <DateTime>[];
           const opponentColumnWidth = 48.0;
-          final extraWidth = opponents.length * opponentColumnWidth + dates.length * 98.0;
+          final extraWidth = opponents.length * opponentColumnWidth + dates.length * 44.0;
           final double scrollColsW = extraWidth +
               wChar2 + // 試合
               wChar1 * 3 + // 勝・負・分
@@ -899,7 +901,12 @@ class SeasonTableBlock extends StatelessWidget {
                 ]),
               ),
               for (final opponent in opponents) SizedBox(width: opponentColumnWidth * cols.game / wChar2, child: gridCell('${opponent['name_shortest'] ?? opponent['name_team']}\n勝–負–分', h: ALL_HEADER_H, bg: leagueColor, fg: leagueForeground)),
-              for (final date in dates) SizedBox(width: 98 * cols.game / wChar2, child: gridCell('${date.month}/${date.day}${scheduleDate(date) == scheduleDate(DateTime.now()) ? ' 今日' : ''}', h: ALL_HEADER_H, bg: leagueColor, fg: leagueForeground)),
+              for (final date in dates) Container(width: 44 * cols.game / wChar2, height: ALL_HEADER_H,
+                alignment: Alignment.center, color: leagueColor,
+                child: Container(padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 2),
+                  color: scheduleDate(date) == scheduleDate(DateTime.now()) ? Colors.yellow : Colors.transparent,
+                  child: Text('${date.month}/${date.day}', style: TextStyle(fontSize: 10,
+                    color: scheduleDate(date) == scheduleDate(DateTime.now()) ? Colors.black : leagueForeground)))),
             ]);
           }
 
@@ -1036,10 +1043,27 @@ class SeasonTableBlock extends StatelessWidget {
                     })),
               for (final date in dates)
                 SizedBox(
-                    width: 98 * cols.game / wChar2,
+                    width: 44 * cols.game / wChar2,
                     child: Builder(builder: (context) {
                       final day = scheduleGames.where((g) => g['date'] == scheduleDate(date) && scheduleHasTeam(g, row['id_team'])).toList();
-                      return Container(height: gridBodyH, alignment: Alignment.center, decoration: BoxDecoration(color: scheduleDate(date) == scheduleDate(DateTime.now()) ? const Color(0xfffff9c4) : paleBg, border: Border.all(color: Colors.white, width: .5)), child: Text(day.isEmpty ? '—' : day.map((g) => scheduleMatchup(g, teamId: row['id_team'])).join('\n'), textAlign: TextAlign.center, style: const TextStyle(fontSize: 10), maxLines: 2));
+                      return Container(height: gridBodyH, alignment: Alignment.center,
+                        decoration: BoxDecoration(color: paleBg, border: Border.all(color: Colors.white, width: .5)),
+                        child: day.isEmpty ? const Text('—', style: TextStyle(fontSize: 10)) : Column(children: [
+                          for (final g in day) Expanded(child: Builder(builder: (_) {
+                            final home = '${g['id_team_home']}' == '${row['id_team']}';
+                            final opponent = '${g[home ? 'name_away' : 'name_home'] ?? ''}';
+                            final result = scheduleOutcome(g, row['id_team']);
+                            final mark = result == '●' ? '×' : result;
+                            final color = result == '○' ? Colors.red : result == '●' ? Colors.blue : Colors.amber;
+                            return Column(children: [
+                              Expanded(child: Center(child: FittedBox(fit: BoxFit.scaleDown, child: Row(mainAxisSize: MainAxisSize.min, children: [
+                                if (mark.isNotEmpty) Text(mark, style: TextStyle(color: color, fontSize: 14, fontWeight: FontWeight.bold)),
+                                Text(opponent, style: const TextStyle(fontSize: 10)),
+                              ])))),
+                              Container(height: 3, color: parseColorNameOrNull('${g['color_back_home'] ?? ''}') ?? Colors.grey),
+                            ]);
+                          })),
+                        ]));
                     })),
             ]);
           }
@@ -1118,8 +1142,8 @@ class SeasonTableBlock extends StatelessWidget {
             final tableH = ALL_HEADER_H + section.rows.length * gridBodyH;
             const chartGap = 8.0;
             final roomForChart = parentW - naturalTable - chartGap;
-            final beside = showGamesBehind && roomForChart >= 200;
-            final chartW = beside ? math.min(340.0, roomForChart) : 0.0;
+            final beside = showGamesBehind && (roomForChart >= 200 || (MediaQuery.sizeOf(context).width > MediaQuery.sizeOf(context).height && parentW >= 600));
+            final chartW = beside ? math.min(340.0, math.max(200.0, parentW * .23)) : 0.0;
             final areaW = beside ? parentW - chartW - chartGap : parentW;
             final cols = statCols(areaW);
             if (beside) {
@@ -1367,20 +1391,6 @@ double _standingsTeamNameWidth(List<({String label, List<Map<String, dynamic>> r
 }
 
 /// パワプロのポジション色を薄くした個人成績の地色。
-Color? personalStatPositionColor(String raw) {
-  final text = raw.trim();
-  if (text.isEmpty) return null;
-  if (text.contains('指') || text == 'DH') return const Color(0xFFECD5EF);
-  if (text.contains('投')) return const Color(0xFFFFDEE2);
-  if (text.contains('捕')) return const Color(0xFFCEEEFD);
-  if (text.contains('外') || text == '左' || text == '中' || text == '右') {
-    return const Color(0xFFC4E4C6);
-  }
-  if (text.contains('内') || text == '一' || text == '二' || text == '三' || text == '遊') {
-    return const Color(0xFFFFF8BF);
-  }
-  return null;
-}
 
 List<Color> personalStatPositionColors(Map<String, dynamic> row) {
   final colors = <Color>[];
@@ -1396,6 +1406,7 @@ LinearGradient? personalStatPositionGradient(Map<String, dynamic> row) => null;
 
 class PlayerStatCell extends StatelessWidget {
   final Map<String, dynamic> row;
+  final List<Map<String, dynamic>> allRows;
   final double? width;
   final bool showRank;
   final bool showJapanFlag;
@@ -1403,6 +1414,7 @@ class PlayerStatCell extends StatelessWidget {
   const PlayerStatCell({
     super.key,
     required this.row,
+    this.allRows = const [],
     this.width,
     this.showRank = true,
     this.showJapanFlag = false,
@@ -1424,8 +1436,7 @@ class PlayerStatCell extends StatelessWidget {
             : num.tryParse(rankText.trim())?.round() ?? -1;
     final team = '${row['name_team'] ?? ''}';
     final name = '${row['player_name'] ?? row['name_player'] ?? ''}';
-    final statRaw = row['stats'];
-    final stat = (statRaw == null || '$statRaw'.isEmpty) ? '—' : '$statRaw';
+    final stat = personalStatDisplay(row, allRows);
     final isNoRank = rankNum == 1000;
     const noRankBg = Color(0xFFC8C8C8);
     bool isTrue(dynamic value) {
@@ -1570,7 +1581,7 @@ class PlayerStatCell extends StatelessWidget {
               ),
             Expanded(flex: 10, child: PlayerNameLink(player: row, child: nameWidget)),
             Expanded(
-              flex: 4,
+              flex: row['title'] == '盗塁' ? 8 : 4,
               child: cellBg(
                 child: Align(
                   alignment: Alignment.center,
@@ -1590,38 +1601,10 @@ const _statsBattingFallback = Color(0xFFF12C51);
 const _statsPitchingFallback = Color(0xFF1A1AFF);
 
 /// 打撃：左の黄→橙→右の赤ピンク（横方向）
-const _statsBattingGradDecoration = BoxDecoration(
-  gradient: LinearGradient(
-    begin: Alignment.centerLeft,
-    end: Alignment.centerRight,
-    colors: [
-      Color(0xFFEBF100),
-      Color(0xFFF8941D),
-      Color(0xFFF12C51),
-    ],
-    stops: [0.0, 0.5, 1.0],
-  ),
-);
-
-/// 投手：左上の深い青→右下のシアン（添付イメージ）
-const _statsPitchingGradDecoration = BoxDecoration(
-  gradient: LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [
-      Color(0xFF1A1AFF),
-      Color(0xFF2E31FF),
-      Color(0xFF0090FF),
-      Color(0xFF00E5FF),
-    ],
-    stops: [0.0, 0.32, 0.68, 1.0],
-  ),
-);
-
 /// 打撃／投手グラデ背景（タブ・タイトルヘッダー・Segment 共通）。
 Widget _statsGradBackground({required bool batting, double opacity = 1.0}) {
   final fill = DecoratedBox(
-    decoration: batting ? _statsBattingGradDecoration : _statsPitchingGradDecoration,
+    decoration: batting ? statsBattingGradDecoration : statsPitchingGradDecoration,
   );
   return Stack(
     fit: StackFit.expand,
@@ -1862,7 +1845,7 @@ class _DualStatsSegmentBars extends StatelessWidget {
             labels: battingTitles,
             starredTitles: starredTitles,
             selectedIndex: battingSelected ? titleIndex : null,
-            backgroundDecoration: _statsBattingGradDecoration,
+            backgroundDecoration: statsBattingGradDecoration,
             fallbackColor: _statsBattingFallback,
             height: sharedH,
             onSelected: (i) => onSelected((batting: true, index: i)),
@@ -1873,7 +1856,7 @@ class _DualStatsSegmentBars extends StatelessWidget {
             labels: pitchingTitles,
             starredTitles: starredTitles,
             selectedIndex: battingSelected ? null : titleIndex,
-            backgroundDecoration: _statsPitchingGradDecoration,
+            backgroundDecoration: statsPitchingGradDecoration,
             fallbackColor: _statsPitchingFallback,
             height: sharedH,
             onSelected: (i) => onSelected((batting: false, index: i)),
@@ -2129,6 +2112,7 @@ class ScrollLeaguePersonalStats extends StatelessWidget {
                   for (final row in matched)
                     PlayerStatCell(
                       row: row,
+                      allRows: rows,
                       showJapanFlag: showJapanFlag,
                     ),
                 ],
@@ -2232,7 +2216,7 @@ class _FillScrollLeaguePersonalStats extends StatelessWidget {
                   child: _statsGradHeader(batting: batting, height: 40,
                     child: _horizontalTitleLabel(titles[i], starred: _loggedInPredictedTitle(rows, titles[i]),
                       child: OneLineShrinkText(titles[i], baseSize: 12, minSize: 6, weight: FontWeight.bold, color: Colors.white)))),
-                for (final row in grouped[i]) PlayerStatCell(row: row, width: colW, showJapanFlag: showJapanFlag),
+                for (final row in grouped[i]) PlayerStatCell(row: row, allRows: rows, width: colW, showJapanFlag: showJapanFlag),
                 Expanded(child: Container(decoration: BoxDecoration(border: Border.all(color: Colors.black26)))),
               ])),
           ]))),
@@ -2395,6 +2379,7 @@ class ScrollBothLeaguePersonalStats extends StatelessWidget {
                             child: i < left.length
                                 ? PlayerStatCell(
                                     row: left[i],
+                                    allRows: rows,
                                     showRank: true,
                                     showJapanFlag: org.kind == OrgKind.mlb,
                                   )
@@ -2405,6 +2390,7 @@ class ScrollBothLeaguePersonalStats extends StatelessWidget {
                             child: i < right.length
                                 ? PlayerStatCell(
                                     row: right[i],
+                                    allRows: rows,
                                     showRank: true,
                                     showJapanFlag: org.kind == OrgKind.mlb,
                                   )
@@ -2497,6 +2483,7 @@ class _SegmentedLeaguePersonalStatsState extends State<SegmentedLeaguePersonalSt
             itemCount: rows.length,
             itemBuilder: (context, i) => PlayerStatCell(
               row: rows[i],
+              allRows: src,
               showRank: true,
               showJapanFlag: widget.showJapanFlag,
             ),
@@ -2638,6 +2625,7 @@ class _BothLeaguePersonalStatsState extends State<BothLeaguePersonalStats> {
                   child: i < left.length
                       ? PlayerStatCell(
                           row: left[i],
+                          allRows: rows,
                           showRank: true,
                           showJapanFlag: org.kind == OrgKind.mlb,
                         )
@@ -2648,6 +2636,7 @@ class _BothLeaguePersonalStatsState extends State<BothLeaguePersonalStats> {
                   child: i < right.length
                       ? PlayerStatCell(
                           row: right[i],
+                          allRows: rows,
                           showRank: true,
                           showJapanFlag: org.kind == OrgKind.mlb,
                         )

@@ -241,7 +241,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
     }
     final notes = team['notes'] is List ? (team['notes'] as List).map((note) => '$note').where((note) => note.isNotEmpty) : const <String>[];
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      if (!TeamSectionLayout.embedded(context) && (_selectedView == 0 || _selectedView == 4))
+      if (!TeamSectionLayout.embedded(context) && _selectedView == 4)
         Padding(
             padding: const EdgeInsets.only(bottom: 6),
             child: Row(children: [
@@ -273,11 +273,11 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
       if (!TeamSectionLayout.embedded(context) && _selectedView != 2 &&
           _selectedView != 5 &&
           _selectedView != 7 &&
-          !((_selectedView == 0 || _selectedView == 4) && _comparisonViews.contains(_selectedView)))
+          _selectedView != 0 && !(_selectedView == 4 && _comparisonViews.contains(4)))
         _teamSegments(),
       const SizedBox(height: 6),
       SectionExpanded(
-          child: _selectedView == 0 && _comparisonViews.contains(0)
+          child: _selectedView == 0 && !TeamSectionLayout.embedded(context)
               ? _performanceComparison()
               : _selectedView == 0 || _selectedView == 1
                   ? LayoutBuilder(builder: (context, constraints) {
@@ -300,8 +300,10 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                                   _rates(performance, headerBackground, foreground, playerColors, totalUnit: '個'),
                                   const Text('塁打の内訳：本塁打×4・三塁打×3・二塁打×2・単打・四球。死球は含みません。'),
                                 ] else ...[
+                                  _heading('投手のスタメン比率', headerBackground, foreground),
+                                  _rates(positions.where((r) => r['slot'] == 'P').toList(), headerBackground, foreground, playerColors),
                                   _heading('守備位置のスタメン比率', headerBackground, foreground, detail: '途中出場は含みません／UZR未取得は —'),
-                                  _rates(positions, headerBackground, foreground, playerColors),
+                                  _rates(positions.where((r) => r['slot'] != 'P').toList(), headerBackground, foreground, playerColors),
                                   _heading('打順のスタメン比率', headerBackground, foreground, detail: '$lineupGames試合の先発起用／OPS・本塁打はシーズン通算'),
                                   _rates([battingHand], headerBackground, foreground, playerColors, totalUnit: '打席'),
                                   const Text('両打ちは打席の左右内訳を推測せず、両打として表示します。'),
@@ -324,7 +326,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                           : _selectedView == 5
                               ? StrengthDraft(year: widget.year)
                               : _selectedView == 7
-                                  ? StrengthCareers(teams: _teams)
+                                  ? StrengthCareers(teams: _teams, org: widget.org)
                                   : StrengthContracts(colorTeams: _teams, team: team, year: widget.year, comparisonTeams: _comparisonViews.contains(4) ? _teams : null)),
     ]);
   }
@@ -766,6 +768,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
   }
 
   double _bandsWidth(List<Map<String, dynamic>> bands, double viewport) {
+    if (TeamSectionLayout.embedded(context)) return viewport;
     if (_fitContributionToViewport && viewport.isFinite && viewport > _bandSideWidth) {
       return viewport;
     }

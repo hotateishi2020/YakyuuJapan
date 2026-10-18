@@ -406,12 +406,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_g.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.319,
-          "stats": "0.319",
+          "title": "盗塁阻止数",
+          "numeric_value": 15,
+          "stats": "15",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_g.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201800016",
+          "catcher_metric": true
         }
       ]
     },
@@ -507,12 +507,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_g.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_g.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=999900884",
+          "catcher_metric": true
         }
       ]
     },
@@ -560,12 +560,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_g.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.273,
-          "stats": "0.273",
+          "title": "盗塁阻止数",
+          "numeric_value": 6,
+          "stats": "6",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_g.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201800024",
+          "catcher_metric": true
         }
       ]
     },
@@ -661,12 +661,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_g.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_g.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201400001",
+          "catcher_metric": true
         }
       ]
     },
@@ -2367,12 +2367,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_g.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.5,
-          "stats": "0.500",
+          "title": "盗塁阻止数",
+          "numeric_value": 2,
+          "stats": "2",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_g.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202000105",
+          "catcher_metric": true
         }
       ]
     },
@@ -3063,12 +3063,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_t.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.167,
-          "stats": "0.167",
+          "title": "盗塁阻止数",
+          "numeric_value": 3,
+          "stats": "3",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_t.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201400027",
+          "catcher_metric": true
         }
       ]
     },
@@ -3695,12 +3695,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_t.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_t.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202100052",
+          "catcher_metric": true
         }
       ]
     },
@@ -3718,12 +3718,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_t.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.328,
-          "stats": "0.328",
+          "title": "盗塁阻止数",
+          "numeric_value": 19,
+          "stats": "19",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_t.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201600040",
+          "catcher_metric": true
         }
       ]
     },
@@ -3834,12 +3834,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_t.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_t.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=772300127",
+          "catcher_metric": true
         }
       ]
     },
@@ -4637,12 +4637,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_t.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.5,
-          "stats": "0.500",
+          "title": "盗塁阻止数",
+          "numeric_value": 4,
+          "stats": "4",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_t.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201300058",
+          "catcher_metric": true
         }
       ]
     },
@@ -6475,12 +6475,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_db.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.143,
-          "stats": "0.143",
+          "title": "盗塁阻止数",
+          "numeric_value": 3,
+          "stats": "3",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_db.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201600066",
+          "catcher_metric": true
         }
       ]
     },
@@ -7062,12 +7062,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_db.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.133,
-          "stats": "0.133",
+          "title": "盗塁阻止数",
+          "numeric_value": 2,
+          "stats": "2",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_db.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202200094",
+          "catcher_metric": true
         }
       ]
     },
@@ -7226,12 +7226,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_db.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_db.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201900084",
+          "catcher_metric": true
         }
       ]
     },
@@ -7249,12 +7249,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_db.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.234,
-          "stats": "0.234",
+          "title": "盗塁阻止数",
+          "numeric_value": 15,
+          "stats": "15",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_db.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202300098",
+          "catcher_metric": true
         }
       ]
     },
@@ -7522,12 +7522,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_h.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": null,
-          "stats": "—",
+          "title": "盗塁阻止数",
+          "numeric_value": 9,
+          "stats": "9",
           "flg_pitcher": false,
-          "note": "複数球団の分母を確認できないため未計算 複数球団の公式値を合算。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_h.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201800106",
+          "catcher_metric": true
         }
       ]
     },
@@ -7953,12 +7953,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_c.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.227,
-          "stats": "0.227",
+          "title": "盗塁阻止数",
+          "numeric_value": 5,
+          "stats": "5",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_c.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202000005",
+          "catcher_metric": true
         }
       ]
     },
@@ -8618,12 +8618,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_c.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_c.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201700040",
+          "catcher_metric": true
         }
       ]
     },
@@ -8797,12 +8797,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_c.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_c.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202300044",
+          "catcher_metric": true
         }
       ]
     },
@@ -9834,12 +9834,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_c.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.21,
-          "stats": "0.210",
+          "title": "盗塁阻止数",
+          "numeric_value": 13,
+          "stats": "13",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_c.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202000099",
+          "catcher_metric": true
         }
       ]
     },
@@ -10154,12 +10154,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_d.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.283,
-          "stats": "0.283",
+          "title": "盗塁阻止数",
+          "numeric_value": 17,
+          "stats": "17",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_d.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202500016",
+          "catcher_metric": true
         }
       ]
     },
@@ -10192,12 +10192,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_d.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_d.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201900004",
+          "catcher_metric": true
         }
       ]
     },
@@ -10572,12 +10572,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_d.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.375,
-          "stats": "0.375",
+          "title": "盗塁阻止数",
+          "numeric_value": 3,
+          "stats": "3",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_d.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201500025",
+          "catcher_metric": true
         }
       ]
     },
@@ -10673,12 +10673,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_d.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.25,
-          "stats": "0.250",
+          "title": "盗塁阻止数",
+          "numeric_value": 4,
+          "stats": "4",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_d.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201600031",
+          "catcher_metric": true
         }
       ]
     },
@@ -12088,12 +12088,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_d.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_d.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202200109",
+          "catcher_metric": true
         }
       ]
     },
@@ -13194,12 +13194,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_s.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_s.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201600026",
+          "catcher_metric": true
         }
       ]
     },
@@ -13358,12 +13358,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_s.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.325,
-          "stats": "0.325",
+          "title": "盗塁阻止数",
+          "numeric_value": 13,
+          "stats": "13",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_s.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201700035",
+          "catcher_metric": true
         }
       ]
     },
@@ -13741,12 +13741,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_s.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.25,
-          "stats": "0.250",
+          "title": "盗塁阻止数",
+          "numeric_value": 11,
+          "stats": "11",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_s.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202400068",
+          "catcher_metric": true
         }
       ]
     },
@@ -14124,12 +14124,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_s.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.182,
-          "stats": "0.182",
+          "title": "盗塁阻止数",
+          "numeric_value": 2,
+          "stats": "2",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_s.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=999900372",
+          "catcher_metric": true
         }
       ]
     },
@@ -14615,12 +14615,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_s.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.167,
-          "stats": "0.167",
+          "title": "盗塁阻止数",
+          "numeric_value": 1,
+          "stats": "1",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_s.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201800092",
+          "catcher_metric": true
         }
       ]
     },
@@ -14776,12 +14776,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_s.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.5,
-          "stats": "0.500",
+          "title": "盗塁阻止数",
+          "numeric_value": 1,
+          "stats": "1",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_s.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=772300092",
+          "catcher_metric": true
         }
       ]
     },
@@ -15315,12 +15315,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_h.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.467,
-          "stats": "0.467",
+          "title": "盗塁阻止数",
+          "numeric_value": 14,
+          "stats": "14",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_h.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202000019",
+          "catcher_metric": true
         }
       ]
     },
@@ -16370,12 +16370,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_h.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.273,
-          "stats": "0.273",
+          "title": "盗塁阻止数",
+          "numeric_value": 3,
+          "stats": "3",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_h.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201600059",
+          "catcher_metric": true
         }
       ]
     },
@@ -16564,12 +16564,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_h.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_h.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202400122",
+          "catcher_metric": true
         }
       ]
     },
@@ -17307,12 +17307,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_h.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.167,
-          "stats": "0.167",
+          "title": "盗塁阻止数",
+          "numeric_value": 1,
+          "stats": "1",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_h.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201900104",
+          "catcher_metric": true
         }
       ]
     },
@@ -17642,12 +17642,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_f.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_f.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202000020",
+          "catcher_metric": true
         }
       ]
     },
@@ -18244,12 +18244,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_f.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.333,
-          "stats": "0.333",
+          "title": "盗塁阻止数",
+          "numeric_value": 2,
+          "stats": "2",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_f.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202000046",
+          "catcher_metric": true
         }
       ]
     },
@@ -18519,12 +18519,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_f.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 1.0,
-          "stats": "1.000",
+          "title": "盗塁阻止数",
+          "numeric_value": 1,
+          "stats": "1",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_f.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201500036",
+          "catcher_metric": true
         }
       ]
     },
@@ -18590,12 +18590,12 @@
           "source": "https://npb.jp/bis/2026/stats/idp1_f.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.357,
-          "stats": "0.357",
+          "title": "盗塁阻止数",
+          "numeric_value": 10,
+          "stats": "10",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_f.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202400063",
+          "catcher_metric": true
         }
       ]
     },
@@ -18928,12 +18928,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_f.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.31,
-          "stats": "0.310",
+          "title": "盗塁阻止数",
+          "numeric_value": 13,
+          "stats": "13",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_f.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201900052",
+          "catcher_metric": true
         }
       ]
     },
@@ -19809,12 +19809,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_f.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_f.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202300121",
+          "catcher_metric": true
         }
       ]
     },
@@ -20204,12 +20204,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_m.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_m.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202600036",
+          "catcher_metric": true
         }
       ]
     },
@@ -20776,12 +20776,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_m.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.319,
-          "stats": "0.319",
+          "title": "盗塁阻止数",
+          "numeric_value": 23,
+          "stats": "23",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_m.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202000053",
+          "catcher_metric": true
         }
       ]
     },
@@ -21285,12 +21285,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_m.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.5,
-          "stats": "0.500",
+          "title": "盗塁阻止数",
+          "numeric_value": 2,
+          "stats": "2",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_m.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201300035",
+          "catcher_metric": true
         }
       ]
     },
@@ -21323,12 +21323,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_m.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_m.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202400091",
+          "catcher_metric": true
         }
       ]
     },
@@ -21799,12 +21799,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_m.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.333,
-          "stats": "0.333",
+          "title": "盗塁阻止数",
+          "numeric_value": 9,
+          "stats": "9",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_m.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202200102",
+          "catcher_metric": true
         }
       ]
     },
@@ -23088,12 +23088,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_l.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.5,
-          "stats": "0.500",
+          "title": "盗塁阻止数",
+          "numeric_value": 14,
+          "stats": "14",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_l.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202200039",
+          "catcher_metric": true
         }
       ]
     },
@@ -23111,12 +23111,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_l.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.208,
-          "stats": "0.208",
+          "title": "盗塁阻止数",
+          "numeric_value": 11,
+          "stats": "11",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_l.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202600090",
+          "catcher_metric": true
         }
       ]
     },
@@ -23791,12 +23791,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_l.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_l.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202000068",
+          "catcher_metric": true
         }
       ]
     },
@@ -24843,12 +24843,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_e.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.5,
-          "stats": "0.500",
+          "title": "盗塁阻止数",
+          "numeric_value": 1,
+          "stats": "1",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_e.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201700008",
+          "catcher_metric": true
         }
       ]
     },
@@ -24929,12 +24929,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_e.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.1,
-          "stats": "0.100",
+          "title": "盗塁阻止数",
+          "numeric_value": 1,
+          "stats": "1",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_e.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=999900629",
+          "catcher_metric": true
         }
       ]
     },
@@ -25171,12 +25171,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_e.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.24,
-          "stats": "0.240",
+          "title": "盗塁阻止数",
+          "numeric_value": 12,
+          "stats": "12",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_e.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201900013",
+          "catcher_metric": true
         }
       ]
     },
@@ -26193,12 +26193,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_e.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_e.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201500095",
+          "catcher_metric": true
         }
       ]
     },
@@ -26876,12 +26876,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_e.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.25,
-          "stats": "0.250",
+          "title": "盗塁阻止数",
+          "numeric_value": 6,
+          "stats": "6",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_e.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201600090",
+          "catcher_metric": true
         }
       ]
     },
@@ -27130,12 +27130,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_e.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_e.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202200117",
+          "catcher_metric": true
         }
       ]
     },
@@ -27324,12 +27324,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_b.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_b.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201400042",
+          "catcher_metric": true
         }
       ]
     },
@@ -29036,12 +29036,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_b.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.667,
-          "stats": "0.667",
+          "title": "盗塁阻止数",
+          "numeric_value": 4,
+          "stats": "4",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_b.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202200090",
+          "catcher_metric": true
         }
       ]
     },
@@ -29122,12 +29122,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_b.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_b.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=202400129",
+          "catcher_metric": true
         }
       ]
     },
@@ -29490,12 +29490,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_b.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.273,
-          "stats": "0.273",
+          "title": "盗塁阻止数",
+          "numeric_value": 3,
+          "stats": "3",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_b.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201400052",
+          "catcher_metric": true
         }
       ]
     },
@@ -29921,12 +29921,12 @@
           "source": "https://npb.jp/bis/2026/stats/idb1_b.html"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.254,
-          "stats": "0.254",
+          "title": "盗塁阻止数",
+          "numeric_value": 16,
+          "stats": "16",
           "flg_pitcher": false,
-          "note": "公式公表値。盗塁阻止÷盗塁企図。",
-          "source": "https://npb.jp/bis/2026/stats/idf1_b.html"
+          "source": "https://1point02.jp/op/gnav/player/stats/player_stats_fs.aspx?pl=201400067",
+          "catcher_metric": true
         }
       ]
     },
@@ -30033,13 +30033,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 66.7,
           "stats": "66.7%",
@@ -30062,6 +30055,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 1打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -30359,13 +30360,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.17391304347826086,
-          "stats": "0.174",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 64.7,
           "stats": "64.7%",
@@ -30388,6 +30382,14 @@
           "flg_pitcher": false,
           "note": "代打 4安打 / 11打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 4,
+          "stats": "4",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -30444,13 +30446,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": null,
-          "stats": "—",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 71.4,
           "stats": "71.4%",
@@ -30473,6 +30468,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 1打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -30630,13 +30633,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.25,
-          "stats": "0.250",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 71.3,
           "stats": "71.3%",
@@ -30659,6 +30655,14 @@
           "flg_pitcher": false,
           "note": "代打 2安打 / 6打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 14,
+          "stats": "14",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -30943,13 +30947,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.125,
-          "stats": "0.125",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 59,
           "stats": "59.0%",
@@ -30972,6 +30969,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 2打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 2,
+          "stats": "2",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -31142,19 +31147,20 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.2857142857142857,
-          "stats": "0.286",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 75.8,
           "stats": "75.8%",
           "flg_pitcher": false,
           "note": "100 − Statcast O-Swing%。ゾーン外の投球を振らなかった割合。",
           "source": "https://baseballsavant.mlb.com/leaderboard/custom?year=2026&type=batter&filter=&sort=4&sortDir=desc&min=1&selections=player_id,oz_swing_percent,exit_velocity_avg,hp_to_1b&chart=false&csv=true"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 6,
+          "stats": "6",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -31937,13 +31943,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.2345679012345679,
-          "stats": "0.235",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 57.9,
           "stats": "57.9%",
@@ -31966,6 +31965,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 5打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 19,
+          "stats": "19",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -32097,19 +32104,20 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.24,
-          "stats": "0.240",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 70.8,
           "stats": "70.8%",
           "flg_pitcher": false,
           "note": "100 − Statcast O-Swing%。ゾーン外の投球を振らなかった割合。",
           "source": "https://baseballsavant.mlb.com/leaderboard/custom?year=2026&type=batter&filter=&sort=4&sortDir=desc&min=1&selections=player_id,oz_swing_percent,exit_velocity_avg,hp_to_1b&chart=false&csv=true"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 6,
+          "stats": "6",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -32125,13 +32133,6 @@
           "stats": "615",
           "flg_pitcher": false,
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.1509433962264151,
-          "stats": "0.151",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
           "title": "ボール球見極め率",
@@ -32156,6 +32157,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 1打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 8,
+          "stats": "8",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -32171,13 +32180,6 @@
           "stats": "554",
           "flg_pitcher": false,
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.15942028985507245,
-          "stats": "0.159",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
           "title": "ボール球見極め率",
@@ -32202,6 +32204,14 @@
           "flg_pitcher": false,
           "note": "代打 2安打 / 14打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 11,
+          "stats": "11",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -32395,13 +32405,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.14583333333333334,
-          "stats": "0.146",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 60.1,
           "stats": "60.1%",
@@ -32424,6 +32427,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 1打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 7,
+          "stats": "7",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -32604,13 +32615,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.21428571428571427,
-          "stats": "0.214",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 61.3,
           "stats": "61.3%",
@@ -32633,6 +32637,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 3打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 18,
+          "stats": "18",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -33063,13 +33075,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.15789473684210525,
-          "stats": "0.158",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 70.9,
           "stats": "70.9%",
@@ -33092,6 +33097,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 6打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 15,
+          "stats": "15",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -34408,13 +34421,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.3424657534246575,
-          "stats": "0.342",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 71.7,
           "stats": "71.7%",
@@ -34437,6 +34443,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 5打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 25,
+          "stats": "25",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -34965,13 +34979,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.14285714285714285,
-          "stats": "0.143",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 73.9,
           "stats": "73.9%",
@@ -34994,6 +35001,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 9打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 5,
+          "stats": "5",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -35304,13 +35319,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.35555555555555557,
-          "stats": "0.356",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 70.8,
           "stats": "70.8%",
@@ -35333,6 +35341,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 5打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 16,
+          "stats": "16",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -35737,13 +35753,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.17073170731707318,
-          "stats": "0.171",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 72.3,
           "stats": "72.3%",
@@ -35766,6 +35775,14 @@
           "flg_pitcher": false,
           "note": "代打 2安打 / 3打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 7,
+          "stats": "7",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -35939,13 +35956,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.32075471698113206,
-          "stats": "0.321",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 66.9,
           "stats": "66.9%",
@@ -35968,6 +35978,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 1打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 17,
+          "stats": "17",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -36632,13 +36650,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.20408163265306123,
-          "stats": "0.204",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 79.1,
           "stats": "79.1%",
@@ -36661,6 +36672,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 8打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 10,
+          "stats": "10",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -36873,13 +36892,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.1797752808988764,
-          "stats": "0.180",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 62.7,
           "stats": "62.7%",
@@ -36902,6 +36914,14 @@
           "flg_pitcher": false,
           "note": "代打 3安打 / 22打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 16,
+          "stats": "16",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -37017,13 +37037,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.24096385542168675,
-          "stats": "0.241",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 74.8,
           "stats": "74.8%",
@@ -37046,6 +37059,14 @@
           "flg_pitcher": false,
           "note": "代打 3安打 / 11打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 20,
+          "stats": "20",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -37304,13 +37325,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 68.5,
           "stats": "68.5%",
@@ -37333,6 +37347,14 @@
           "flg_pitcher": false,
           "note": "代打 2安打 / 6打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -37620,13 +37642,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.10606060606060606,
-          "stats": "0.106",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 73.8,
           "stats": "73.8%",
@@ -37649,6 +37664,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 3打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 7,
+          "stats": "7",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -38622,13 +38645,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.17647058823529413,
-          "stats": "0.176",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 79,
           "stats": "79.0%",
@@ -38651,6 +38667,14 @@
           "flg_pitcher": false,
           "note": "代打 5安打 / 14打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 3,
+          "stats": "3",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -38968,19 +38992,20 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 81.2,
           "stats": "81.2%",
           "flg_pitcher": false,
           "note": "100 − Statcast O-Swing%。ゾーン外の投球を振らなかった割合。",
           "source": "https://baseballsavant.mlb.com/leaderboard/custom?year=2026&type=batter&filter=&sort=4&sortDir=desc&min=1&selections=player_id,oz_swing_percent,exit_velocity_avg,hp_to_1b&chart=false&csv=true"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -38996,13 +39021,6 @@
           "stats": "62",
           "flg_pitcher": false,
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.3076923076923077,
-          "stats": "0.308",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
           "title": "ボール球見極め率",
@@ -39027,6 +39045,14 @@
           "flg_pitcher": false,
           "note": "代打 2安打 / 10打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 4,
+          "stats": "4",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -39766,13 +39792,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.06666666666666667,
-          "stats": "0.067",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 74.6,
           "stats": "74.6%",
@@ -39795,6 +39814,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 3打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 3,
+          "stats": "3",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -39968,13 +39995,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.25,
-          "stats": "0.250",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 69.6,
           "stats": "69.6%",
@@ -39997,6 +40017,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 10打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 10,
+          "stats": "10",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -40115,13 +40143,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0625,
-          "stats": "0.063",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 55.3,
           "stats": "55.3%",
@@ -40144,6 +40165,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 1打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 1,
+          "stats": "1",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -40200,13 +40229,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.18681318681318682,
-          "stats": "0.187",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 59.6,
           "stats": "59.6%",
@@ -40229,6 +40251,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 7打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 17,
+          "stats": "17",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -40441,13 +40471,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.1875,
-          "stats": "0.188",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 65.4,
           "stats": "65.4%",
@@ -40470,6 +40493,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 1打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 3,
+          "stats": "3",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -40604,13 +40635,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.273972602739726,
-          "stats": "0.274",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 66.6,
           "stats": "66.6%",
@@ -40633,6 +40657,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 9打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 20,
+          "stats": "20",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -40689,13 +40721,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.3333333333333333,
-          "stats": "0.333",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 58.2,
           "stats": "58.2%",
@@ -40718,6 +40743,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 8打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 13,
+          "stats": "13",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -40930,13 +40963,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.3387096774193548,
-          "stats": "0.339",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 74.3,
           "stats": "74.3%",
@@ -40959,6 +40985,14 @@
           "flg_pitcher": false,
           "note": "代打 2安打 / 4打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 21,
+          "stats": "21",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -41116,13 +41150,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0425531914893617,
-          "stats": "0.043",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 71.6,
           "stats": "71.6%",
@@ -41145,6 +41172,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 0打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 2,
+          "stats": "2",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -41279,13 +41314,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.1896551724137931,
-          "stats": "0.190",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 77.7,
           "stats": "77.7%",
@@ -41308,6 +41336,14 @@
           "flg_pitcher": false,
           "note": "代打 4安打 / 10打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 22,
+          "stats": "22",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -41927,13 +41963,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.3333333333333333,
-          "stats": "0.333",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 75.9,
           "stats": "75.9%",
@@ -41956,6 +41985,14 @@
           "flg_pitcher": false,
           "note": "代打 2安打 / 9打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 19,
+          "stats": "19",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -42591,13 +42628,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.2894736842105263,
-          "stats": "0.289",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 68,
           "stats": "68.0%",
@@ -42620,6 +42650,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 2打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 11,
+          "stats": "11",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -42738,13 +42776,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 65.2,
           "stats": "65.2%",
@@ -42767,6 +42798,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 5打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -42820,13 +42859,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.38636363636363635,
-          "stats": "0.386",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 67.6,
           "stats": "67.6%",
@@ -42849,6 +42881,14 @@
           "flg_pitcher": false,
           "note": "代打 3安打 / 7打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 17,
+          "stats": "17",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -43107,13 +43147,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.11538461538461539,
-          "stats": "0.115",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 70.2,
           "stats": "70.2%",
@@ -43136,6 +43169,14 @@
           "flg_pitcher": false,
           "note": "代打 2安打 / 9打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 3,
+          "stats": "3",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -43151,13 +43192,6 @@
           "stats": "330",
           "flg_pitcher": false,
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.29545454545454547,
-          "stats": "0.295",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
           "title": "ボール球見極め率",
@@ -43182,6 +43216,14 @@
           "flg_pitcher": false,
           "note": "代打 2安打 / 7打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 26,
+          "stats": "26",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -43197,13 +43239,6 @@
           "stats": "237",
           "flg_pitcher": false,
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.36363636363636365,
-          "stats": "0.364",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
           "title": "ボール球見極め率",
@@ -43228,6 +43263,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 7打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 12,
+          "stats": "12",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -43401,13 +43444,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.14545454545454545,
-          "stats": "0.145",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 68,
           "stats": "68.0%",
@@ -43430,6 +43466,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 1打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 8,
+          "stats": "8",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -43445,13 +43489,6 @@
           "stats": "420",
           "flg_pitcher": false,
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.26785714285714285,
-          "stats": "0.268",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
           "title": "ボール球見極め率",
@@ -43476,6 +43513,14 @@
           "flg_pitcher": false,
           "note": "代打 2安打 / 6打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 15,
+          "stats": "15",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -44001,19 +44046,20 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.13333333333333333,
-          "stats": "0.133",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 82,
           "stats": "82.0%",
           "flg_pitcher": false,
           "note": "100 − Statcast O-Swing%。ゾーン外の投球を振らなかった割合。",
           "source": "https://baseballsavant.mlb.com/leaderboard/custom?year=2026&type=batter&filter=&sort=4&sortDir=desc&min=1&selections=player_id,oz_swing_percent,exit_velocity_avg,hp_to_1b&chart=false&csv=true"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 2,
+          "stats": "2",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -44288,13 +44334,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.35294117647058826,
-          "stats": "0.353",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 55.4,
           "stats": "55.4%",
@@ -44317,6 +44356,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 2打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 12,
+          "stats": "12",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -44332,13 +44379,6 @@
           "stats": "166",
           "flg_pitcher": false,
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.20833333333333334,
-          "stats": "0.208",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
           "title": "ボール球見極め率",
@@ -44363,6 +44403,14 @@
           "flg_pitcher": false,
           "note": "代打 3安打 / 13打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 10,
+          "stats": "10",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -45389,13 +45437,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.2033898305084746,
-          "stats": "0.203",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 66.7,
           "stats": "66.7%",
@@ -45418,6 +45459,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 7打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 12,
+          "stats": "12",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -45692,13 +45741,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.2608695652173913,
-          "stats": "0.261",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 60.1,
           "stats": "60.1%",
@@ -45721,6 +45763,14 @@
           "flg_pitcher": false,
           "note": "代打 4安打 / 16打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 12,
+          "stats": "12",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -45891,19 +45941,20 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 1.0,
-          "stats": "1.000",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 85.7,
           "stats": "85.7%",
           "flg_pitcher": false,
           "note": "100 − Statcast O-Swing%。ゾーン外の投球を振らなかった割合。",
           "source": "https://baseballsavant.mlb.com/leaderboard/custom?year=2026&type=batter&filter=&sort=4&sortDir=desc&min=1&selections=player_id,oz_swing_percent,exit_velocity_avg,hp_to_1b&chart=false&csv=true"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 1,
+          "stats": "1",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -46035,13 +46086,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.30158730158730157,
-          "stats": "0.302",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 71.5,
           "stats": "71.5%",
@@ -46064,6 +46108,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 3打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 19,
+          "stats": "19",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -46079,13 +46131,6 @@
           "stats": "251",
           "flg_pitcher": false,
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.18421052631578946,
-          "stats": "0.184",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
           "title": "ボール球見極め率",
@@ -46110,6 +46155,14 @@
           "flg_pitcher": false,
           "note": "代打 2安打 / 3打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 14,
+          "stats": "14",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -46283,13 +46336,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.16883116883116883,
-          "stats": "0.169",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 74.1,
           "stats": "74.1%",
@@ -46312,6 +46358,14 @@
           "flg_pitcher": false,
           "note": "代打 3安打 / 11打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 13,
+          "stats": "13",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -46524,13 +46578,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.05555555555555555,
-          "stats": "0.056",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 60.6,
           "stats": "60.6%",
@@ -46553,6 +46600,14 @@
           "flg_pitcher": false,
           "note": "代打 2安打 / 7打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 1,
+          "stats": "1",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -46568,13 +46623,6 @@
           "stats": "274",
           "flg_pitcher": false,
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.21875,
-          "stats": "0.219",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
           "title": "ボール球見極め率",
@@ -46599,6 +46647,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 3打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 14,
+          "stats": "14",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -46808,13 +46864,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.1794871794871795,
-          "stats": "0.179",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 68.9,
           "stats": "68.9%",
@@ -46837,6 +46886,14 @@
           "flg_pitcher": false,
           "note": "代打 4安打 / 5打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 7,
+          "stats": "7",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -47092,13 +47149,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.23404255319148937,
-          "stats": "0.234",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 62.4,
           "stats": "62.4%",
@@ -47121,6 +47171,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 2打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 11,
+          "stats": "11",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -47213,13 +47271,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.31666666666666665,
-          "stats": "0.317",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 65.1,
           "stats": "65.1%",
@@ -47242,6 +47293,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 1打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 19,
+          "stats": "19",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -47607,13 +47666,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.17391304347826086,
-          "stats": "0.174",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 62.9,
           "stats": "62.9%",
@@ -47636,6 +47688,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 13打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 4,
+          "stats": "4",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -47651,13 +47711,6 @@
           "stats": "128",
           "flg_pitcher": false,
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.2,
-          "stats": "0.200",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
           "title": "ボール球見極め率",
@@ -47682,6 +47735,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 4打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 9,
+          "stats": "9",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -48574,13 +48635,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.2903225806451613,
-          "stats": "0.290",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 68.7,
           "stats": "68.7%",
@@ -48603,6 +48657,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 6打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 9,
+          "stats": "9",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -48851,13 +48913,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.24,
-          "stats": "0.240",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 77,
           "stats": "77.0%",
@@ -48880,6 +48935,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 17打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 6,
+          "stats": "6",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -49310,13 +49373,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.22972972972972974,
-          "stats": "0.230",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 63.5,
           "stats": "63.5%",
@@ -49339,6 +49395,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 6打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 17,
+          "stats": "17",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -49354,13 +49418,6 @@
           "stats": "345",
           "flg_pitcher": false,
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.2962962962962963,
-          "stats": "0.296",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
           "title": "ボール球見極め率",
@@ -49385,6 +49442,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 8打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 24,
+          "stats": "24",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -49441,19 +49506,20 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.2441860465116279,
-          "stats": "0.244",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 70.1,
           "stats": "70.1%",
           "flg_pitcher": false,
           "note": "100 − Statcast O-Swing%。ゾーン外の投球を振らなかった割合。",
           "source": "https://baseballsavant.mlb.com/leaderboard/custom?year=2026&type=batter&filter=&sort=4&sortDir=desc&min=1&selections=player_id,oz_swing_percent,exit_velocity_avg,hp_to_1b&chart=false&csv=true"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 21,
+          "stats": "21",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -49624,13 +49690,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.22972972972972974,
-          "stats": "0.230",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 66.4,
           "stats": "66.4%",
@@ -49653,6 +49712,14 @@
           "flg_pitcher": false,
           "note": "代打 2安打 / 11打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 17,
+          "stats": "17",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -49709,13 +49776,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.2619047619047619,
-          "stats": "0.262",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 74.3,
           "stats": "74.3%",
@@ -49738,6 +49798,14 @@
           "flg_pitcher": false,
           "note": "代打 2安打 / 12打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 11,
+          "stats": "11",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -49794,13 +49862,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.16666666666666666,
-          "stats": "0.167",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 77.5,
           "stats": "77.5%",
@@ -49823,6 +49884,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 5打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 8,
+          "stats": "8",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -49954,13 +50023,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.3037974683544304,
-          "stats": "0.304",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 66,
           "stats": "66.0%",
@@ -49983,6 +50045,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 2打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 24,
+          "stats": "24",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -50192,13 +50262,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 72.5,
           "stats": "72.5%",
@@ -50221,6 +50284,14 @@
           "flg_pitcher": false,
           "note": "代打 2安打 / 25打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -50495,19 +50566,20 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": null,
-          "stats": "—",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 72.7,
           "stats": "72.7%",
           "flg_pitcher": false,
           "note": "100 − Statcast O-Swing%。ゾーン外の投球を振らなかった割合。",
           "source": "https://baseballsavant.mlb.com/leaderboard/custom?year=2026&type=batter&filter=&sort=4&sortDir=desc&min=1&selections=player_id,oz_swing_percent,exit_velocity_avg,hp_to_1b&chart=false&csv=true"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -51085,13 +51157,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.125,
-          "stats": "0.125",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 70.2,
           "stats": "70.2%",
@@ -51114,6 +51179,14 @@
           "flg_pitcher": false,
           "note": "代打 2安打 / 10打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 1,
+          "stats": "1",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -51583,13 +51656,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.1935483870967742,
-          "stats": "0.194",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 81.3,
           "stats": "81.3%",
@@ -51612,6 +51678,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 1打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 6,
+          "stats": "6",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -51707,13 +51781,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.2777777777777778,
-          "stats": "0.278",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 75.3,
           "stats": "75.3%",
@@ -51736,6 +51803,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 1打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 5,
+          "stats": "5",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -51932,13 +52007,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.21875,
-          "stats": "0.219",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 72,
           "stats": "72.0%",
@@ -51961,6 +52029,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 7打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 14,
+          "stats": "14",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -52017,13 +52093,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.25,
-          "stats": "0.250",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 63.8,
           "stats": "63.8%",
@@ -52046,6 +52115,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 1打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 3,
+          "stats": "3",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -52102,19 +52179,20 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.2727272727272727,
-          "stats": "0.273",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 71.2,
           "stats": "71.2%",
           "flg_pitcher": false,
           "note": "100 − Statcast O-Swing%。ゾーン外の投球を振らなかった割合。",
           "source": "https://baseballsavant.mlb.com/leaderboard/custom?year=2026&type=batter&filter=&sort=4&sortDir=desc&min=1&selections=player_id,oz_swing_percent,exit_velocity_avg,hp_to_1b&chart=false&csv=true"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 9,
+          "stats": "9",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -52272,19 +52350,20 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.21052631578947367,
-          "stats": "0.211",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 65.7,
           "stats": "65.7%",
           "flg_pitcher": false,
           "note": "100 − Statcast O-Swing%。ゾーン外の投球を振らなかった割合。",
           "source": "https://baseballsavant.mlb.com/leaderboard/custom?year=2026&type=batter&filter=&sort=4&sortDir=desc&min=1&selections=player_id,oz_swing_percent,exit_velocity_avg,hp_to_1b&chart=false&csv=true"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 4,
+          "stats": "4",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -52300,13 +52379,6 @@
           "stats": "530",
           "flg_pitcher": false,
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.21649484536082475,
-          "stats": "0.216",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
           "title": "ボール球見極め率",
@@ -52331,6 +52403,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 1打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 21,
+          "stats": "21",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -52504,13 +52584,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.125,
-          "stats": "0.125",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 63.7,
           "stats": "63.7%",
@@ -52533,6 +52606,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 3打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 2,
+          "stats": "2",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -52589,13 +52670,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.16666666666666666,
-          "stats": "0.167",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 66,
           "stats": "66.0%",
@@ -52618,6 +52692,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 1打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 1,
+          "stats": "1",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -52791,13 +52873,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.1,
-          "stats": "0.100",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 71.4,
           "stats": "71.4%",
@@ -52820,6 +52895,14 @@
           "flg_pitcher": false,
           "note": "代打 3安打 / 15打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 1,
+          "stats": "1",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -52873,13 +52956,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.3114754098360656,
-          "stats": "0.311",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 57.1,
           "stats": "57.1%",
@@ -52902,6 +52978,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 2打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 19,
+          "stats": "19",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -52917,13 +53001,6 @@
           "stats": "85",
           "flg_pitcher": false,
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.2,
-          "stats": "0.200",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
           "title": "ボール球見極め率",
@@ -52948,6 +53025,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 2打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 5,
+          "stats": "5",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -52963,13 +53048,6 @@
           "stats": "149",
           "flg_pitcher": false,
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.16216216216216217,
-          "stats": "0.162",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
           "title": "ボール球見極め率",
@@ -52994,6 +53072,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 11打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 6,
+          "stats": "6",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -53086,13 +53172,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 62.5,
           "stats": "62.5%",
@@ -53115,6 +53194,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 1打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -53171,19 +53258,20 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.4594594594594595,
-          "stats": "0.459",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 67.7,
           "stats": "67.7%",
           "flg_pitcher": false,
           "note": "100 − Statcast O-Swing%。ゾーン外の投球を振らなかった割合。",
           "source": "https://baseballsavant.mlb.com/leaderboard/custom?year=2026&type=batter&filter=&sort=4&sortDir=desc&min=1&selections=player_id,oz_swing_percent,exit_velocity_avg,hp_to_1b&chart=false&csv=true"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 17,
+          "stats": "17",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -53504,13 +53592,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.3333333333333333,
-          "stats": "0.333",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 67.9,
           "stats": "67.9%",
@@ -53533,6 +53614,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 2打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 2,
+          "stats": "2",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -53664,19 +53753,20 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.14285714285714285,
-          "stats": "0.143",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 54.4,
           "stats": "54.4%",
           "flg_pitcher": false,
           "note": "100 − Statcast O-Swing%。ゾーン外の投球を振らなかった割合。",
           "source": "https://baseballsavant.mlb.com/leaderboard/custom?year=2026&type=batter&filter=&sort=4&sortDir=desc&min=1&selections=player_id,oz_swing_percent,exit_velocity_avg,hp_to_1b&chart=false&csv=true"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 1,
+          "stats": "1",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -53692,13 +53782,6 @@
           "stats": "84",
           "flg_pitcher": false,
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.21428571428571427,
-          "stats": "0.214",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
           "title": "ボール球見極め率",
@@ -53723,6 +53806,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 2打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 6,
+          "stats": "6",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -53763,13 +53854,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.1864406779661017,
-          "stats": "0.186",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 67.7,
           "stats": "67.7%",
@@ -53792,6 +53876,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 1打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 11,
+          "stats": "11",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -53845,13 +53937,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.25,
-          "stats": "0.250",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 74.4,
           "stats": "74.4%",
@@ -53874,6 +53959,14 @@
           "flg_pitcher": false,
           "note": "代打 1安打 / 3打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 11,
+          "stats": "11",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -54041,13 +54134,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.2,
-          "stats": "0.200",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 69.6,
           "stats": "69.6%",
@@ -54070,6 +54156,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 1打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 3,
+          "stats": "3",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -54165,19 +54259,20 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 60.6,
           "stats": "60.6%",
           "flg_pitcher": false,
           "note": "100 − Statcast O-Swing%。ゾーン外の投球を振らなかった割合。",
           "source": "https://baseballsavant.mlb.com/leaderboard/custom?year=2026&type=batter&filter=&sort=4&sortDir=desc&min=1&selections=player_id,oz_swing_percent,exit_velocity_avg,hp_to_1b&chart=false&csv=true"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -54273,13 +54368,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.2727272727272727,
-          "stats": "0.273",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 66.7,
           "stats": "66.7%",
@@ -54302,6 +54390,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 2打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 6,
+          "stats": "6",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -54397,13 +54493,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.08333333333333333,
-          "stats": "0.083",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 73.3,
           "stats": "73.3%",
@@ -54426,6 +54515,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 3打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 2,
+          "stats": "2",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -54538,19 +54635,20 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.36363636363636365,
-          "stats": "0.364",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 62,
           "stats": "62.0%",
           "flg_pitcher": false,
           "note": "100 − Statcast O-Swing%。ゾーン外の投球を振らなかった割合。",
           "source": "https://baseballsavant.mlb.com/leaderboard/custom?year=2026&type=batter&filter=&sort=4&sortDir=desc&min=1&selections=player_id,oz_swing_percent,exit_velocity_avg,hp_to_1b&chart=false&csv=true"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 8,
+          "stats": "8",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -54607,19 +54705,20 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 48.8,
           "stats": "48.8%",
           "flg_pitcher": false,
           "note": "100 − Statcast O-Swing%。ゾーン外の投球を振らなかった割合。",
           "source": "https://baseballsavant.mlb.com/leaderboard/custom?year=2026&type=batter&filter=&sort=4&sortDir=desc&min=1&selections=player_id,oz_swing_percent,exit_velocity_avg,hp_to_1b&chart=false&csv=true"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -54751,13 +54850,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.4074074074074074,
-          "stats": "0.407",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 68.1,
           "stats": "68.1%",
@@ -54780,6 +54872,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 1打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 11,
+          "stats": "11",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -54795,13 +54895,6 @@
           "stats": "89",
           "flg_pitcher": false,
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.14285714285714285,
-          "stats": "0.143",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
           "title": "ボール球見極め率",
@@ -54826,6 +54919,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 2打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 4,
+          "stats": "4",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -54921,19 +55022,20 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.2833333333333333,
-          "stats": "0.283",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 65.6,
           "stats": "65.6%",
           "flg_pitcher": false,
           "note": "100 − Statcast O-Swing%。ゾーン外の投球を振らなかった割合。",
           "source": "https://baseballsavant.mlb.com/leaderboard/custom?year=2026&type=batter&filter=&sort=4&sortDir=desc&min=1&selections=player_id,oz_swing_percent,exit_velocity_avg,hp_to_1b&chart=false&csv=true"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 17,
+          "stats": "17",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -55407,13 +55509,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.34782608695652173,
-          "stats": "0.348",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 60.6,
           "stats": "60.6%",
@@ -55436,6 +55531,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 1打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 8,
+          "stats": "8",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -55453,19 +55556,20 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.5,
-          "stats": "0.500",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 53.3,
           "stats": "53.3%",
           "flg_pitcher": false,
           "note": "100 − Statcast O-Swing%。ゾーン外の投球を振らなかった割合。",
           "source": "https://baseballsavant.mlb.com/leaderboard/custom?year=2026&type=batter&filter=&sort=4&sortDir=desc&min=1&selections=player_id,oz_swing_percent,exit_velocity_avg,hp_to_1b&chart=false&csv=true"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 1,
+          "stats": "1",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -55623,13 +55727,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.5,
-          "stats": "0.500",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 55.2,
           "stats": "55.2%",
@@ -55652,6 +55749,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 1打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 2,
+          "stats": "2",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -55978,13 +56083,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.42105263157894735,
-          "stats": "0.421",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 66.7,
           "stats": "66.7%",
@@ -56007,6 +56105,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 2打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 8,
+          "stats": "8",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -56109,19 +56215,20 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.29411764705882354,
-          "stats": "0.294",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 60,
           "stats": "60.0%",
           "flg_pitcher": false,
           "note": "100 − Statcast O-Swing%。ゾーン外の投球を振らなかった割合。",
           "source": "https://baseballsavant.mlb.com/leaderboard/custom?year=2026&type=batter&filter=&sort=4&sortDir=desc&min=1&selections=player_id,oz_swing_percent,exit_velocity_avg,hp_to_1b&chart=false&csv=true"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 5,
+          "stats": "5",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -56295,13 +56402,6 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.25,
-          "stats": "0.250",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 72.7,
           "stats": "72.7%",
@@ -56324,6 +56424,14 @@
           "flg_pitcher": false,
           "note": "代打 0安打 / 1打数",
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=statSplits&group=hitting&sitCodes=pH&season=2026&sportIds=1&playerPool=ALL&limit=5000"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 1,
+          "stats": "1",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -56540,19 +56648,20 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=pitching&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.5,
-          "stats": "0.500",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 72.2,
           "stats": "72.2%",
           "flg_pitcher": false,
           "note": "100 − Statcast O-Swing%。ゾーン外の投球を振らなかった割合。",
           "source": "https://baseballsavant.mlb.com/leaderboard/custom?year=2026&type=batter&filter=&sort=4&sortDir=desc&min=1&selections=player_id,oz_swing_percent,exit_velocity_avg,hp_to_1b&chart=false&csv=true"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 3,
+          "stats": "3",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -58510,19 +58619,20 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": null,
-          "stats": "—",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 55.6,
           "stats": "55.6%",
           "flg_pitcher": false,
           "note": "100 − Statcast O-Swing%。ゾーン外の投球を振らなかった割合。",
           "source": "https://baseballsavant.mlb.com/leaderboard/custom?year=2026&type=batter&filter=&sort=4&sortDir=desc&min=1&selections=player_id,oz_swing_percent,exit_velocity_avg,hp_to_1b&chart=false&csv=true"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -59889,19 +59999,20 @@
           "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting&season=2026&sportIds=1&playerPool=ALL&limit=5000"
         },
         {
-          "title": "盗塁阻止率",
-          "numeric_value": 0.0,
-          "stats": "0.000",
-          "flg_pitcher": false,
-          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000"
-        },
-        {
           "title": "ボール球見極め率",
           "numeric_value": 71.4,
           "stats": "71.4%",
           "flg_pitcher": false,
           "note": "100 − Statcast O-Swing%。ゾーン外の投球を振らなかった割合。",
           "source": "https://baseballsavant.mlb.com/leaderboard/custom?year=2026&type=batter&filter=&sort=4&sortDir=desc&min=1&selections=player_id,oz_swing_percent,exit_velocity_avg,hp_to_1b&chart=false&csv=true"
+        },
+        {
+          "title": "盗塁阻止数",
+          "numeric_value": 0,
+          "stats": "0",
+          "flg_pitcher": false,
+          "source": "https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season=2026&sportIds=1&playerPool=ALL&limit=5000",
+          "catcher_metric": true
         }
       ]
     },
@@ -100604,5 +100715,6 @@
         }
       ]
     }
-  ]
+  ],
+  "catcher_counts_checked_at": "2026-10-18T01:53:32.192838Z"
 }

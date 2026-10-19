@@ -416,10 +416,12 @@ class TeamSalaryChart extends StatelessWidget {
       }
     }
     final isMlb = teams.isNotEmpty && teams.every((t) => [3, 4].contains(usageInt(t['id_league'])));
+    final compactNpb = !isMlb && compactBaseballLayout(context);
     Widget graphRow(List<Map<String, dynamic>> group) => SizedBox(
         height: 128,
         child: LayoutBuilder(builder: (context, constraints) {
-          final width = (constraints.maxWidth / (group.isEmpty ? 1 : group.length)).clamp(94.0, 180.0);
+          final availableWidth = constraints.maxWidth / (group.isEmpty ? 1 : group.length);
+          final width = compactNpb ? availableWidth : availableWidth.clamp(94.0, 180.0);
           return SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
@@ -432,7 +434,7 @@ class TeamSalaryChart extends StatelessWidget {
                             for (final entry in (row['totals'] as Map<String, int>).entries)
                               Expanded(
                                   child: Column(children: [
-                                Text(salaryAmount(entry.value, entry.key), maxLines: 1, style: const TextStyle(fontSize: 11)),
+                                FittedBox(fit: BoxFit.scaleDown, child: Text(salaryAmount(entry.value, entry.key), maxLines: 1, style: const TextStyle(fontSize: 11))),
                                 const SizedBox(height: 6),
                                 Expanded(
                                   child: Padding(
@@ -442,7 +444,7 @@ class TeamSalaryChart extends StatelessWidget {
                                 ),
                               ])),
                             if ((row['totals'] as Map).isEmpty) const Expanded(child: Center(child: Text('未確認', style: TextStyle(fontSize: 11)))),
-                            Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Text('${row['team']['name_team']}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11))),
+                            Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Text('${compactNpb ? row['team']['name_shortest'] ?? row['team']['name_team'] : row['team']['name_team']}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11))),
                           ]))),
               ]));
         }));
@@ -451,9 +453,9 @@ class TeamSalaryChart extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: Text('$year年度 球団別総年俸（取得済み・推定額を含む）', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold))),
-        if (isMlb)
-          for (final league in [3, 4]) ...[
-            Padding(padding: const EdgeInsets.fromLTRB(8, 4, 8, 4), child: Text(league == 3 ? 'ア・リーグ' : 'ナ・リーグ', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold))),
+        if (isMlb || compactNpb)
+          for (final league in isMlb ? [3, 4] : [1, 2]) ...[
+            Padding(padding: const EdgeInsets.fromLTRB(8, 4, 8, 4), child: Text(const {1: 'セ・リーグ', 2: 'パ・リーグ', 3: 'ア・リーグ', 4: 'ナ・リーグ'}[league]!, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold))),
             graphRow(rows.where((row) => usageInt(row['team']['id_league']) == league).toList()),
           ]
         else

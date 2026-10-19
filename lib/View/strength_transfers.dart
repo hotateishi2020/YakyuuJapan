@@ -57,9 +57,13 @@ class _StrengthTransfersState extends State<StrengthTransfers> {
                       border: TableBorder.all(color: Colors.grey.shade300),
                       defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                       children: [for (final row in rows) TableRow(children: [
-                        Container(padding: const EdgeInsets.all(10),
-                          color: (parseColorNameOrNull('${row['team']['color_back']}') ?? Colors.blueGrey).withValues(alpha: .15),
-                          child: Text('${row['team']['name_team']}', style: const TextStyle(fontWeight: FontWeight.bold))),
+                        TableCell(verticalAlignment: TableCellVerticalAlignment.fill,
+                          child: Container(padding: const EdgeInsets.all(10),
+                            alignment: Alignment.centerLeft,
+                            color: parseColorNameOrNull('${row['team']['color_back']}') ?? Colors.blueGrey,
+                            child: Text('${row['team']['name_team']}', style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: parseColorNameOrNull('${row['team']['color_font']}') ?? Colors.white)))),
                         cell(Text('${row['player']['name']}', style: const TextStyle(fontWeight: FontWeight.bold))),
                         cell(Text((row['labels'] as List).join('・'))),
                         cell(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

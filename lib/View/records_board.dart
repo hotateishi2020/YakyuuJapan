@@ -192,6 +192,10 @@ class _RecordsBoardState extends State<RecordsBoard> {
           ),
         )),
     ])),
+    const Padding(
+      padding: EdgeInsets.fromLTRB(8, 2, 8, 8),
+      child: Text('気になる球団のロゴを押してみてください！', style: TextStyle(fontSize: 12)),
+    ),
     Expanded(child: _standingsTable()),
   ]);
 

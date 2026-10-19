@@ -124,6 +124,33 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('スマホの総年俸グラフはセパ二段で12球団が横幅内に収まる', (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(390, 844);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: TeamSalaryChart(
+      year: 2026, teams: [for (var id = 1; id <= 12; id++) {
+        'id_team': id, 'id_league': id <= 6 ? 1 : 2,
+        'name_team': '球団$id', 'name_shortest': '短$id',
+        'contracts': [{'player_key': '$id', 'salary_history': [
+          {'year': 2026, 'amount': id * 100000000}
+        ]}],
+      }],
+    ))));
+    expect(find.text('セ・リーグ'), findsOneWidget);
+    expect(find.text('パ・リーグ'), findsOneWidget);
+    for (var id = 1; id <= 12; id++) {
+      final bar = find.byKey(ValueKey('team-salary-bar-$id-JPY'));
+      expect(tester.getTopLeft(bar).dx, greaterThanOrEqualTo(0));
+      expect(tester.getBottomRight(bar).dx, lessThanOrEqualTo(390));
+      final first = find.text(id <= 6 ? '短1' : '短7');
+      expect(tester.getTopLeft(find.text('短$id')).dy, tester.getTopLeft(first).dy);
+    }
+    expect(tester.getTopLeft(find.text('短7')).dy, greaterThan(tester.getTopLeft(find.text('短1')).dy));
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('総年俸は共通尺度の札束グラフで金額に比例する', (tester) async {
     await tester.pumpWidget(MaterialApp(
         home: Scaffold(

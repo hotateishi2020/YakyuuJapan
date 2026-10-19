@@ -104,12 +104,12 @@
       white-space: nowrap; font-size: 12px; color: #222; box-sizing: border-box; }
     #startup-org-tabs .startup-tab { margin: 2px; border: .5px solid #d0d0d6;
       border-radius: 14px; background: #e8e8ed; font-size: 13px; font-weight: 600; color: #666; }
-    #startup-org-tabs [data-org="predict"] { flex: 0 0 118px; }
+    #startup-org-tabs .startup-tab { flex: 1 1 0; min-width: 0; }
     #startup-org-tabs img { width: 18px; height: 18px; object-fit: contain; margin-right: 4px; }
     #startup-org-tabs [data-org="npb"] img { width: 22px; }
     .startup-tab.selected, #startup-org-tabs .selected { color: white; background: #cb0115; font-weight: bold; }
     #startup-shell[data-org="mlb"] .selected { background: #002d72; }
-    #startup-shell[data-org="predict"] #startup-org-tabs .selected { background: black; }
+    #startup-shell[data-org="predict"] #startup-org-tabs .selected, #startup-shell[data-org="other"] #startup-org-tabs .selected { background: black; }
     #startup-status { text-align: center; padding: 40px 12px; color: #666; }
 
     main {
@@ -132,6 +132,7 @@
       <span class="startup-tab" data-org="predict">予想対決</span>
       <span class="startup-tab selected" data-org="npb"><img src="assets/backend/assets/images/logo_npb.png" alt="">NPB</span>
       <span class="startup-tab" data-org="mlb"><img src="assets/backend/assets/images/logo_mlb.webp" alt="">MLB</span>
+      <span class="startup-tab" data-org="other">その他</span>
     </div>
     <div class="startup-tabs" id="startup-board-tabs" aria-label="情報タブ（起動中）">
       <span class="startup-tab" data-board="5">日程</span><span class="startup-tab selected" data-board="0">試合情報</span>
@@ -151,9 +152,10 @@
       };
       let org = 'npb';
       const saved = readSaved('koko_org');
-      if (['npb', 'mlb', 'predict'].includes(saved)) org = saved;
+      if (['npb', 'mlb', 'predict', 'other'].includes(saved)) org = saved;
       shell.dataset.org = org;
       shell.querySelectorAll('[data-org]').forEach(tab => tab.classList.toggle('selected', tab.dataset.org === org));
+      if (org === 'other') document.getElementById('startup-board-tabs').innerHTML = '<span class="startup-tab selected">高校野球</span><span class="startup-tab">国際シリーズ</span>';
       if (org === 'predict') document.getElementById('startup-board-tabs').hidden = true;
       const savedBoard = readSaved('koko_tab_main_' + org);
       const board = /^[0-6]$/.test(savedBoard || '') ? savedBoard : '0';

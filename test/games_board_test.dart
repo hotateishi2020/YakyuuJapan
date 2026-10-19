@@ -1695,14 +1695,12 @@ void main() {
     expect(find.text('詳細表示'), findsOneWidget);
     expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isFalse);
     final roster = tester.getRect(find.text('詳細表示'));
-    final statsHeader = tester.getRect(find.text('選手成績'));
     final venue = tester.getRect(find.textContaining('ZOZOマリン'));
     final board = tester.getRect(find.byType(GamesBoardYahooStyle));
     final timeRect = tester.getRect(find.textContaining('🌙 18:00').first);
     expect(timeRect.left, lessThan(venue.left));
     expect(timeRect.left, closeTo(board.left + 4, 12));
-    expect(roster.top, greaterThan(statsHeader.bottom - 1));
-    expect(roster.top, lessThan(statsHeader.bottom + 36));
+    expect(find.text('選手成績'), findsNothing);
     expect(roster.left, lessThan(board.center.dx));
 
     await tester.tap(find.text('詳細表示'));
@@ -5865,7 +5863,7 @@ void main() {
     expect(find.byKey(const ValueKey('defense-name-平良海馬')), findsNothing);
   });
 
-  testWidgets('選手成績は初期表示では畳まれていて開閉できる', (tester) async {
+  testWidgets('試合中の選手成績は折りたたみヘッダーなしで初期表示される', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Center(
@@ -5900,48 +5898,12 @@ void main() {
       ),
     );
     await tester.pump();
-    expect(find.text('選手成績'), findsOneWidget);
-    expect(find.text('詳細表示'), findsNothing);
-    expect(find.text('投手'), findsNothing);
-    expect(find.text('村上頌樹'), findsNothing);
-    expect(find.text('5回裏'), findsOneWidget);
-
-    final shell = find.byKey(const ValueKey('game-card-shell-2026-10-08|阪神|巨人'));
-    final collapsedCard = tester.getSize(shell);
-    await tester.tap(find.text('選手成績'));
-    await tester.pump();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 120));
-    final openingCard = tester.getSize(shell);
-    expect(openingCard.height, greaterThan(collapsedCard.height + 8));
-    expect(openingCard.height, lessThan(collapsedCard.height + 420));
-
-    await tester.pump(const Duration(milliseconds: 320));
+    expect(find.text('選手成績'), findsNothing);
+    expect(find.text('詳細表示'), findsOneWidget);
     expect(find.text('投手'), findsOneWidget);
     expect(find.text('村上頌樹'), findsWidgets);
-    final roster = tester.getRect(find.text('詳細表示'));
-    final statsHeader = tester.getRect(find.text('選手成績'));
-    expect(roster.top, greaterThan(statsHeader.bottom - 1));
-    expect(roster.top, lessThan(statsHeader.bottom + 36));
-    final toggle = tester.widget<SizedBox>(
-      find.ancestor(of: find.text('選手成績'), matching: find.byWidgetPredicate((widget) => widget is SizedBox && widget.height == 32)).first,
-    );
-    expect(toggle.height, 32);
-    final openedCard = tester.getSize(shell);
-    expect(openedCard.height, greaterThan(openingCard.height));
-
-    await tester.tap(find.text('選手成績'));
-    await tester.pump();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 120));
-    final closingCard = tester.getSize(shell);
-    expect(closingCard.height, lessThan(openedCard.height));
-    expect(closingCard.height, greaterThan(120));
-
-    await tester.pump(const Duration(milliseconds: 320));
-    expect(find.text('投手'), findsNothing);
-    expect(find.text('村上頌樹'), findsNothing);
-    expect(find.text('詳細表示'), findsNothing);
+    expect(find.text('5回裏'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('選手成績はスクロールでは閉じない', (tester) async {
@@ -5981,18 +5943,17 @@ void main() {
       ),
     );
     await tester.pump();
-    await tester.tap(find.text('選手成績'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
     expect(find.text('投手'), findsOneWidget);
 
-    final gesture = await tester.startGesture(tester.getCenter(find.text('選手成績')));
+    final gesture = await tester.startGesture(tester.getCenter(find.text('詳細表示')));
     await gesture.moveBy(const Offset(0, -160));
     await gesture.up();
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
     expect(find.text('投手'), findsOneWidget);
-    expect(find.text('選手成績'), findsOneWidget);
+    expect(find.text('選手成績'), findsNothing);
   });
 
   testWidgets('選手成績はリストから外れても戻すと開いたまま', (tester) async {
@@ -6006,7 +5967,7 @@ void main() {
       'name_pitcher_away': '戸郷翔征',
       'score_home': 1,
       'score_away': 0,
-      'state': '5回裏',
+      'state': '試合終了',
       'id_team_home': 2,
       'id_team_away': 1,
       'id_league_home': 1,
@@ -6030,9 +5991,8 @@ void main() {
       ),
     );
     await tester.pump();
-    await tester.scrollUntilVisible(find.text('選手成績'), 500);
+    await tester.scrollUntilVisible(find.text('詳細表示'), 500);
     await tester.pump();
-    await tester.tap(find.text('選手成績'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
     expect(find.text('投手'), findsOneWidget);
@@ -6041,7 +6001,7 @@ void main() {
     final scrollable = tester.state<ScrollableState>(find.byType(Scrollable).first);
     scrollable.position.jumpTo(0);
     await tester.pump();
-    await tester.scrollUntilVisible(find.text('選手成績'), 500);
+    await tester.scrollUntilVisible(find.text('詳細表示'), 500);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 

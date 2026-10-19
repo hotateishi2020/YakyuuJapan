@@ -1,3 +1,4 @@
+import '../View/other_baseball_board.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import '../View/videos_board.dart';
 import '../tools/tab_preferences.dart';
@@ -132,6 +133,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   static const _bracketCookie = 'koko_bracket_open';
   bool _bracketOpen = true;
   static const _orgCookie = 'koko_org';
+  bool _otherOpen = false;
   OrgKind _orgKind = OrgKind.npb;
   final Map<OrgKind, _OrgBundle> _orgCache = {};
   final Map<OrgKind, Future<void>> _orgLoadFutures = {};
@@ -173,6 +175,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     bindPageVisibility(_onPageBecameVisible);
     // cookie のタブをそのまま初回表示（predict / npb / mlb）
     final savedTab = readBrowserCookie(_orgCookie);
+    _otherOpen = savedTab == 'other';
     if (savedTab == 'mlb') {
       _orgKind = OrgKind.mlb;
     } else if (savedTab == 'predict') {
@@ -832,6 +835,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   Future<void> _openPredictGroups() async {
+    setState(() => _otherOpen = false);
     writeBrowserCookie(_orgCookie, 'predict');
     if (_predictGroupsOpen && _predictGroups.isNotEmpty) return;
     setState(() {
@@ -857,6 +861,10 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   Future<void> _changeOrg(OrgKind kind) async {
+    if (_otherOpen) {
+      writeBrowserCookie(_orgCookie, kind.name);
+      setState(() => _otherOpen = false);
+    }
     if (kind == _orgKind && !_predictGroupsOpen) return;
     if (_predictGroupsOpen && kind == _orgKind) {
       writeBrowserCookie(_orgCookie, OrgConfig.of(kind).label.toLowerCase());
@@ -1449,7 +1457,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     if (mounted) setState(() => _loadingGameDateByOrg[kind] = ymd);
     try {
       final org = OrgConfig.of(kind);
-      final res = await http.get(Env.api(_partPath(kind, 'games', _seasonYear, date: ymd, fresh: true)), headers: _readHeaders).timeout(const Duration(seconds: 60));
+      final res = await http.get(Env.api(_partPath(kind, 'games', _seasonYear, date: ymd)), headers: _readHeaders).timeout(const Duration(seconds: 60));
       if (!mounted) return;
       if (res.statusCode != 200) {
         logger.w('past games $ymd HTTP ${res.statusCode}');
@@ -1629,130 +1637,39 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   /// Info と項目タブのあいだ。選択時は団体色＋ロゴ、非選択は薄いグレー。
-  Widget _orgTabBar() {
-    return SizedBox(
-      height: TAB_BAR_H + 4,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: OrgConfig.tabIdleColor,
-          borderRadius: BorderRadius.circular(TAB_RADIUS),
-          border: Border.all(color: const Color(0xFFD0D0D6), width: 0.5),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(2),
-              child: GestureDetector(
-                onTap: () => unawaited(_openPredictGroups()),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  curve: Curves.easeOut,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: _predictGroupsOpen ? Colors.black : OrgConfig.tabIdleColor,
-                    borderRadius: BorderRadius.circular(TAB_RADIUS - 2),
-                    border: Border.all(
-                      color: _predictGroupsOpen ? Colors.black54 : const Color(0xFFD0D0D6),
-                      width: _predictGroupsOpen ? 1.2 : 0.5,
-                    ),
-                  ),
-                  alignment: Alignment.center,
-                  child: Align(
-                    widthFactor: 1.5,
-                    alignment: Alignment.center,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Text(
-                          '予想対決',
-                          style: TextStyle(
-                            fontSize: TAB_BAR_H / 2,
-                            fontWeight: _predictGroupsOpen ? FontWeight.bold : FontWeight.w600,
-                            color: _predictGroupsOpen ? Colors.white : Colors.black54,
-                          ),
-                        ),
-                        if (_predictInvites.isNotEmpty)
-                          const Positioned(
-                            right: -6,
-                            top: -2,
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(color: Color(0xFFC62828), shape: BoxShape.circle),
-                              child: SizedBox(width: 8, height: 8),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            for (final kind in OrgKind.values)
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(2),
-                  child: Builder(
-                    builder: (context) {
-                      final org = OrgConfig.of(kind);
-                      final selected = !_predictGroupsOpen && _orgKind == kind;
-                      final bg = selected ? org.tabColor : OrgConfig.tabIdleColor;
-                      final fg = selected ? org.tabForeground : Colors.black54;
-                      return GestureDetector(
-                        onTap: () => _changeOrg(kind),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 180),
-                          curve: Curves.easeOut,
-                          decoration: BoxDecoration(
-                            color: bg,
-                            borderRadius: BorderRadius.circular(TAB_RADIUS - 2),
-                            border: Border.all(
-                              color: selected ? Colors.black54 : const Color(0xFFD0D0D6),
-                              width: selected ? 1.2 : 0.5,
-                            ),
-                            boxShadow: selected
-                                ? const [
-                                    BoxShadow(
-                                      color: Color(0x1A000000),
-                                      blurRadius: 2,
-                                      offset: Offset(0, 1),
-                                    ),
-                                  ]
-                                : null,
-                          ),
-                          alignment: Alignment.center,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Image.asset(
-                                org.logoAsset,
-                                width: kind == OrgKind.npb ? 22 : 18,
-                                height: kind == OrgKind.npb ? 18 : 18,
-                                fit: BoxFit.contain,
-                                errorBuilder: (_, __, ___) => const SizedBox(width: 18, height: 18),
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                org.label,
-                                style: TextStyle(
-                                  fontSize: TAB_BAR_H / 2,
-                                  fontWeight: selected ? FontWeight.bold : FontWeight.w600,
-                                  color: fg,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
+  Widget _orgTabBar() => SizedBox(
+    height: TAB_BAR_H + 4,
+    child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      for (final entry in [('predict', '予想対決'), ('npb', 'NPB'), ('mlb', 'MLB'), ('other', 'その他')])
+        Expanded(child: Padding(padding: const EdgeInsets.all(2), child: Builder(builder: (context) {
+          final selected = entry.$1 == 'other' ? _otherOpen : !_otherOpen &&
+            (entry.$1 == 'predict' ? _predictGroupsOpen : !_predictGroupsOpen && entry.$1 == _orgKind.name);
+          final org = entry.$1 == 'npb' ? OrgConfig.npb : entry.$1 == 'mlb' ? OrgConfig.mlb : null;
+          return Material(color: selected ? org?.tabColor ?? Colors.black : OrgConfig.tabIdleColor,
+            borderRadius: BorderRadius.circular(TAB_RADIUS),
+            child: InkWell(key: ValueKey('org-tab-${entry.$1}'),
+              onTap: () {
+                if (entry.$1 == 'other') {
+                  writeBrowserCookie(_orgCookie, 'other');
+                  setState(() { _otherOpen = true; _predictGroupsOpen = false; });
+                } else if (entry.$1 == 'predict') {
+                  unawaited(_openPredictGroups());
+                } else { _changeOrg(org!.kind); }
+              },
+              child: Center(child: FittedBox(fit: BoxFit.scaleDown, child: Row(mainAxisSize: MainAxisSize.min, children: [
+                if (org != null) ...[
+                  Image.asset(org.logoAsset, width: 18, height: 18, errorBuilder: (_, __, ___) => const SizedBox(width: 18)),
+                  const SizedBox(width: 4),
+                ],
+                Text(entry.$2, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600,
+                  color: selected ? org?.tabForeground ?? Colors.white : Colors.black54)),
+                if (entry.$1 == 'predict' && _predictInvites.isNotEmpty)
+                  const Icon(Icons.circle, size: 6, color: Colors.red),
+              ]))),
+            ));
+        }))),
+    ]),
+  );
 
   Widget _boardTabBar() {
     return Row(
@@ -2369,12 +2286,12 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           child: Column(children: [
             const SizedBox(height: ALL_SPACE_BLOCK),
             _orgTabBar(),
-            if (!_predictGroupsOpen) ...[
+            if (!_predictGroupsOpen && !_otherOpen) ...[
               const SizedBox(height: 8),
               _boardTabBar(),
             ],
           ])),
-        const Expanded(child: Center(child: BaseballLoading())),
+        Expanded(child: _otherOpen ? OtherBaseballBoard(year: _seasonYear) : const Center(child: BaseballLoading())),
       ]);
     }
 
@@ -2399,7 +2316,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         );
 
         // 取れたデータがあるときはエラー表示で消さない
-        final Widget orgBody = _predictGroupsOpen
+        final Widget orgBody = _otherOpen ? OtherBaseballBoard(year: _seasonYear) : _predictGroupsOpen
             ? (!AuthSession.instance.isLoggedIn
                 ? const Center(child: Text('ログインすると予想を見られます'))
                 : PredictGroupBoard(

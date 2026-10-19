@@ -1,3 +1,4 @@
+import 'baseball_catalog_boards.dart';
 import 'compact_layout.dart';
 import '../logic/favorite_team.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
@@ -15,7 +16,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-import '../config/app_design.dart';
 import '../config/org_config.dart';
 import '../tools/Env.dart';
 import '../tools/color_parse.dart';
@@ -58,7 +58,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
   int _request = 0;
   int _selectedView = 1;
   static const _bandSideWidth = 88 * 1.2 + 8 + 48;
-  static const _views = ['貢献度', '選手起用', '主力選手', '選手一覧', '契約', 'ドラフト', '功績', '経歴', 'チーム', '首脳', '自主トレ', '分析', '移籍'];
+  static const _views = ['貢献度', '選手起用', '主力選手', '選手一覧', '契約', 'ドラフト', '功績', '経歴', 'チーム', '首脳', '自主トレ', '分析', '移籍', '球場'];
 
   @override
   void initState() {
@@ -70,7 +70,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
     };
     if (widget.providedTeams == null) {
       _selectedView = readSavedTab('strength_${widget.org.kind.name}',
-          const [11, 8, 3, 2, 0, 1, 4, 5, 12, 7, 10], fallback: _selectedView);
+          const [11, 8, 3, 2, 0, 1, 4, 5, 12, 7, 10, 13], fallback: _selectedView);
       if ([1, 3, 6, 9].contains(_selectedView)) _selectedView = 8;
     }
     _load();
@@ -133,44 +133,22 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
         ],
       );
 
-  Widget _viewTabs() => SizedBox(
-        height: TAB_BAR_H,
-        child: Row(children: [
-          for (final index in [11, 8, 2, 0, 4, 5, 12, 7, 10]) ...[
-            if (index != 11) const SizedBox(width: ALL_SPACE_BLOCK),
-            Expanded(
-              child: Semantics(
-                selected: _selectedView == index,
-                child: Material(
-                  color: _selectedView == index ? widget.org.tabColor : Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(TAB_RADIUS),
-                  child: InkWell(
-                    key: ValueKey('strength-view-$index'),
-                    onTap: () {
-                      if (widget.providedTeams == null) saveTab('strength_${widget.org.kind.name}', index);
-                      setState(() => _selectedView = index);
-                    },
-                    borderRadius: BorderRadius.circular(TAB_RADIUS),
-                    child: Center(
-                      child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(index == 2 && compactBaseballLayout(context) ? '主力' : _views[index],
-                              style: TextStyle(
-                                fontSize: 12,
-                                height: 1,
-                                fontWeight: _selectedView == index ? FontWeight.bold : FontWeight.normal,
-                                color: _selectedView == index ? TAB_COLOR_FONT : Colors.black87,
-                              ))),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ]),
-      );
+  Widget _viewTabs() => DropdownButtonFormField<int>(
+    key: const ValueKey('strength-picker'),
+    initialValue: _selectedView,
+    isExpanded: true,
+    decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8), border: OutlineInputBorder()),
+    items: [for (final index in [if (_selectedView == 1) 1, 11, 8, 2, 0, 4, 5, 12, 7, 10, 13])
+      DropdownMenuItem(value: index, child: Text(_views[index], key: ValueKey('strength-view-$index')))],
+    onChanged: (index) {
+      if (index == null) return;
+      if (widget.providedTeams == null) saveTab('strength_${widget.org.kind.name}', index);
+      setState(() => _selectedView = index);
+    },
+  );
 
   Widget _content(BuildContext context) {
+    if (_selectedView == 13) return StadiumsBoard(org: widget.org.kind.name);
     if (_loading) return const Center(child: BaseballLoading());
     if (_error != null) {
       return Center(

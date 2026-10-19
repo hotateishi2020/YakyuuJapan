@@ -1552,21 +1552,6 @@ class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> with Automa
   final Map<String, bool> _allBattersByGame = {};
   final Map<String, GlobalKey> _statsAnchors = {};
 
-  Future<void> _revealStats(String gameKey) async {
-    // Wait for the card's 200 ms expansion before measuring its final position.
-    await Future<void>.delayed(const Duration(milliseconds: 240));
-    if (!mounted || _statsStore[gameKey] != true) return;
-    final target = _statsAnchors[gameKey]?.currentContext;
-    if (target == null || !target.mounted) return;
-    await Scrollable.ensureVisible(target,
-        alignment: 0.12, duration: const Duration(milliseconds: 250),
-        curve: Curves.easeOutCubic);
-  }
-
-  final Map<String, bool> _statsExpandedByGame = {};
-
-  Map<String, bool> get _statsStore => widget.statsExpandedByGame ?? _statsExpandedByGame;
-
   @override
   bool get wantKeepAlive => true;
 
@@ -1574,12 +1559,7 @@ class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> with Automa
   String? get dateFilter => widget.dateFilter;
   bool get horizontal => widget.horizontal;
 
-  bool _statsOpen(Map<String, dynamic> game) {
-    final stored = _statsStore[gameMatchupKey(game)];
-    if (stored != null) return stored;
-    if (widget.initialStatsExpanded) return true;
-    return gameIsPregameState('${game['state'] ?? ''}');
-  }
+  bool _statsOpen(Map<String, dynamic> game) => true;
 
   bool _allBattersOf(Map<String, dynamic> game) {
     final key = gameMatchupKey(game);
@@ -1610,11 +1590,7 @@ class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> with Automa
       statsExpanded: statsExpanded,
       statsReveal: reveal,
       statsLayoutHeight: layoutHeight,
-      onStatsExpandedChanged: (value) {
-        if (value == statsExpanded) return;
-        setState(() => _statsStore[key] = value);
-        if (value) unawaited(_revealStats(key));
-      },
+      onStatsExpandedChanged: (_) {},
     );
   }
 
@@ -4017,7 +3993,7 @@ class _TableGameCard extends StatelessWidget {
     final batterAwayH = _showBatterStats ? math.max(1, batterAway) * _playerRowH : 0.0;
     final defenseH = _showDefense ? _defenseRowH : 0.0;
     final showPitchers = _showPitcherStats;
-    final toggleH = _hasCollapsibleStats ? _statsToggleH : 0.0;
+    const toggleH = 0.0;
     final rosterBarH = statsExpanded && _showRosterPicker ? _statsToggleH : 0.0;
     // カード枠と、試合中の点滅枠の分だけ足す。
     final frame = 2.0 + (inProgress ? 6.0 : 0.0);
@@ -4057,37 +4033,6 @@ class _TableGameCard extends StatelessWidget {
   bool get _showDefense => allBatters && _gameHasLineup(game);
 
   bool get _hasCollapsibleStats => _showPitcherStats || _showBatterStats;
-
-  Widget _playerStatsToggle() {
-    return _ScrollSafeTap(
-      onTap: () => onStatsExpandedChanged(!statsExpanded),
-      child: SizedBox(
-        height: _statsToggleH,
-        child: Material(
-          color: _labelColor,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            child: Row(
-              children: [
-                const Text(
-                  '選手成績',
-                  maxLines: 1,
-                  style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, height: 1),
-                ),
-                const Spacer(),
-                AnimatedRotation(
-                  turns: statsExpanded ? 0.5 : 0,
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeOutCubic,
-                  child: const Icon(Icons.expand_more, color: Colors.white, size: 18),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   bool get _showRosterPicker => _showBatterStats;
 
@@ -6073,8 +6018,7 @@ class _TableGameCard extends StatelessWidget {
                 );
               }),
             ),
-            if (_hasCollapsibleStats) KeyedSubtree(key: statsAnchor, child: _playerStatsToggle()),
-            if (showStats && _showRosterPicker) _allBattersBar(),
+            if (showStats && _showRosterPicker) KeyedSubtree(key: statsAnchor, child: _allBattersBar()),
             if (showStats && stackedTeams) ...[
               teamStats(
                 pitchers: homePitchers,

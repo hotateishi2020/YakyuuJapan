@@ -1,3 +1,4 @@
+import 'app/BaseballCatalog.dart';
 import 'app/ErrorSnapshot.dart';
 import 'app/GameScheduleWatch.dart';
 import 'dart:convert';
@@ -1124,6 +1125,21 @@ void main() async {
       });
     });
 
+    app.get('/baseball-catalog', (Request request) async {
+      const headers = {'content-type': 'application/json; charset=utf-8'};
+      final section = request.url.queryParameters['section'];
+      if (!['stadiums','uniforms','hall'].contains(section)) return Response.badRequest(body: '{}', headers: headers);
+      try {
+        final org = OrgKind.parse(request.url.queryParameters['org']);
+        final year = _seasonYear(request, org);
+        final data = await Postgres.withConnection((conn) => BaseballCatalog.read(conn, org: org, year: year, section: section!));
+        return Response.ok(jsonEncode(data), headers: headers);
+      } catch (error, stack) {
+        _printRequestError(request, error, stack);
+        return Response.internalServerError(body: jsonEncode({'error': '情報を取得できませんでした'}), headers: headers);
+      }
+    });
+
     app.get('/records', (Request request) async {
       const headers = {'content-type': 'application/json; charset=utf-8'};
       try {
@@ -1958,19 +1974,10 @@ void main() async {
         }
         final window = part == 'games' ? _gamesQueryWindow(request, year) : (from: null, to: null);
         final cacheKey = window.from != null ? '${org.code}|$part|$year|${window.from}|${window.to}' : '${org.code}|$part|$year';
-        if (part == 'games') {
-          final unchanged = await _unchangedGamesResponse(
-            org,
-            year,
-            cacheKey,
-            window.from,
-            window.to,
-            clientHasGames: request.url.queryParameters['have'] == '1',
-          );
-          if (unchanged != null) return unchanged;
-        }
+        // 完成済みの試合本文も短時間再利用し、再表示のたびのDB往復を省く。
+        // 取得処理による更新時は _clearPredictionsCache で破棄する。
         final now = DateTime.now();
-        if (part != 'games' && request.url.queryParameters['fresh'] != '1') {
+        if (request.url.queryParameters['fresh'] != '1') {
           final cachedBody = _predictionsPartCacheBody[cacheKey];
           final cachedAt = _predictionsPartCacheAt[cacheKey];
           if (cachedBody != null && cachedAt != null && now.difference(cachedAt) < _predictionsCacheTtl) {
@@ -1984,6 +1991,17 @@ void main() async {
               },
             );
           }
+        }
+        if (part == 'games' && request.url.queryParameters['fresh'] != '1') {
+          final unchanged = await _unchangedGamesResponse(
+            org,
+            year,
+            cacheKey,
+            window.from,
+            window.to,
+            clientHasGames: request.url.queryParameters['have'] == '1',
+          );
+          if (unchanged != null) return unchanged;
         }
         final cacheGeneration = _predictionsCacheGeneration;
         final inflight = _partBuildInflight[cacheKey];

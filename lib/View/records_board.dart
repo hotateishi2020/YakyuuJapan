@@ -1,3 +1,4 @@
+import 'baseball_catalog_boards.dart';
 import 'compact_layout.dart';
 import 'club_records_board.dart';
 import '../logic/favorite_team.dart';
@@ -17,7 +18,7 @@ import '../tools/json_utils.dart';
 import '../tools/network_error.dart';
 import 'strength_research.dart';
 
-const recordTabs = ['優勝チーム', '個人タイトル', 'シーズン記録', '通算記録', '連続記録', '功績', '新人ドラフト', '球団記録', '現役ドラフト'];
+const recordTabs = ['優勝チーム', '個人タイトル', 'シーズン記録', '通算記録', '連続記録', '功績', '新人ドラフト', '球団記録', '現役ドラフト', '背番号', '殿堂'];
 
 /// Franchise IDs keep former team names in the same championship history.
 List<Map<String, dynamic>> championshipIntervals(List<Map<String, dynamic>> seasons, int year, {bool mlb = false}) {
@@ -53,7 +54,7 @@ class RecordsBoard extends StatefulWidget {
 
 class _RecordsBoardState extends State<RecordsBoard> {
   int tab = 0;
-  List<int> get _tabs => widget.org.kind == OrgKind.npb ? [0, 1, 2, 3, 4, 7, 5, 6, 8] : [0, 1, 2, 3, 4, 5];
+  List<int> get _tabs => widget.org.kind == OrgKind.npb ? [0, 1, 2, 3, 4, 7, 5, 6, 8, 9, 10] : [0, 1, 2, 3, 4, 5, 9, 10];
   int _standingsLeague = 0;
   int _titlesLeague = 0;
   String? _selectedTeam;
@@ -111,37 +112,22 @@ class _RecordsBoardState extends State<RecordsBoard> {
   @override
   Widget build(BuildContext context) =>
       Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        SizedBox(
-            height: TAB_BAR_H,
-            child: Row(children: [
-              for (final i in _tabs)
-                Expanded(
-                    child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  child: Material(
-                    color:
-                        tab == i ? widget.org.tabColor : Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(TAB_RADIUS),
-                    child: InkWell(
-                      key: ValueKey('records-tab-$i'),
-                      onTap: () {
-                        saveTab('records_${widget.org.kind.name}', i);
-                        setState(() => tab = i);
-                      },
-                      child: Center(
-                          child: FittedBox(
-                              child: Text(compactBaseballLayout(context) ? (const {0: '優勝', 1: '個人', 2: 'シーズン', 3: '通算', 4: '連続', 6: '新人ドラ', 7: '球団', 8: '現役ドラ'}[i] ?? recordTabs[i]) : recordTabs[i],
-                                  style: TextStyle(
-                                      color: tab == i
-                                          ? widget.org.tabForeground
-                                          : Colors.black87)))),
-                    ),
-                  ),
-                ))
-            ])),
+        DropdownButtonFormField<int>(
+          key: ValueKey('records-picker-${widget.org.kind.name}'),
+          initialValue: tab, isExpanded: true,
+          decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8), border: OutlineInputBorder()),
+          items: [for (final i in _tabs) DropdownMenuItem(value: i, child: Text(recordTabs[i], key: ValueKey('records-tab-$i')))],
+          onChanged: (i) {
+            if (i == null) return;
+            saveTab('records_${widget.org.kind.name}', i);
+            setState(() => tab = i);
+          },
+        ),
         const SizedBox(height: 6),
         Expanded(
-            child: tab == 8
+            child: tab == 9 ? UniformHistoryBoard(org: widget.org.kind.name, year: widget.year)
+                : tab == 10 ? HallOfFameBoard(org: widget.org.kind.name, year: widget.year)
+                : tab == 8
                 ? DraftHistoryBoard(key: ValueKey('active-${widget.year}'), year: widget.year, activeDraft: true)
                 : tab == 6
                 ? (widget.org.kind == OrgKind.npb ? DraftHistoryBoard(key: ValueKey(widget.year), year: widget.year) : const SizedBox.shrink())

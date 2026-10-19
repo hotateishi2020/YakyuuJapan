@@ -180,7 +180,6 @@ class _EventCalendarState extends State<EventCalendar> {
                     final date = _cellDate(row * 7 + c, lead, days);
                     final isToday = date != null && date.year == today.year && date.month == today.month && date.day == today.day;
                     return Container(
-                      margin: const EdgeInsets.all(1),
                       padding: const EdgeInsets.only(top: 1, left: 2),
                       decoration: BoxDecoration(
                         color: isToday ? const Color(0xFFFFF59D) : Colors.white,

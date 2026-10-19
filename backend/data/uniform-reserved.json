@@ -1,0 +1,213 @@
+{
+  "numbers": [
+    {
+      "org": "npb",
+      "team": "巨人",
+      "number": "1",
+      "name": "王貞治",
+      "since": 1989,
+      "status": "permanent"
+    },
+    {
+      "org": "npb",
+      "team": "巨人",
+      "number": "3",
+      "name": "長嶋茂雄",
+      "since": 1974,
+      "status": "permanent"
+    },
+    {
+      "org": "npb",
+      "team": "巨人",
+      "number": "4",
+      "name": "黒沢俊夫",
+      "since": 1947,
+      "status": "permanent"
+    },
+    {
+      "org": "npb",
+      "team": "巨人",
+      "number": "14",
+      "name": "沢村栄治",
+      "since": 1947,
+      "status": "permanent"
+    },
+    {
+      "org": "npb",
+      "team": "巨人",
+      "number": "16",
+      "name": "川上哲治",
+      "since": 1965,
+      "status": "permanent"
+    },
+    {
+      "org": "npb",
+      "team": "巨人",
+      "number": "34",
+      "name": "金田正一",
+      "since": 1970,
+      "status": "permanent"
+    },
+    {
+      "org": "npb",
+      "team": "阪神",
+      "number": "10",
+      "name": "藤村富美男",
+      "since": 1959,
+      "status": "permanent"
+    },
+    {
+      "org": "npb",
+      "team": "阪神",
+      "number": "11",
+      "name": "村山実",
+      "since": 1973,
+      "status": "permanent"
+    },
+    {
+      "org": "npb",
+      "team": "阪神",
+      "number": "23",
+      "name": "吉田義男",
+      "since": 1987,
+      "status": "permanent"
+    },
+    {
+      "org": "npb",
+      "team": "中日",
+      "number": "10",
+      "name": "服部受弘",
+      "since": 1960,
+      "status": "permanent"
+    },
+    {
+      "org": "npb",
+      "team": "中日",
+      "number": "15",
+      "name": "西沢道夫",
+      "since": 1959,
+      "status": "permanent"
+    },
+    {
+      "org": "npb",
+      "team": "広島",
+      "number": "3",
+      "name": "衣笠祥雄",
+      "since": 1988,
+      "status": "permanent"
+    },
+    {
+      "org": "npb",
+      "team": "広島",
+      "number": "8",
+      "name": "山本浩二",
+      "since": 1987,
+      "status": "permanent"
+    },
+    {
+      "org": "npb",
+      "team": "広島",
+      "number": "15",
+      "name": "黒田博樹",
+      "since": 2017,
+      "status": "permanent"
+    },
+    {
+      "org": "npb",
+      "team": "日本ハム",
+      "number": "100",
+      "name": "大社義規",
+      "since": 2009,
+      "status": "permanent"
+    },
+    {
+      "org": "npb",
+      "team": "ロッテ",
+      "number": "26",
+      "name": "マリーンズファン",
+      "since": 2005,
+      "status": "permanent"
+    },
+    {
+      "org": "npb",
+      "team": "西武",
+      "number": "24",
+      "name": "稲尾和久",
+      "since": 1973,
+      "status": "permanent"
+    },
+    {
+      "org": "npb",
+      "team": "楽天",
+      "number": "10",
+      "name": "楽天ファン",
+      "since": 2004,
+      "status": "permanent"
+    },
+    {
+      "org": "npb",
+      "team": "楽天",
+      "number": "77",
+      "name": "星野仙一",
+      "since": 2018,
+      "status": "permanent"
+    },
+    {
+      "org": "npb",
+      "team": "阪神",
+      "number": "6",
+      "name": "金本知憲",
+      "since": 2013,
+      "status": "honored"
+    },
+    {
+      "org": "npb",
+      "team": "オリックス",
+      "number": "51",
+      "name": "イチロー",
+      "since": 2001,
+      "status": "honored"
+    },
+    {
+      "org": "npb",
+      "team": "ソフトバンク",
+      "number": "15",
+      "name": "藤井将雄",
+      "since": 2001,
+      "status": "honored"
+    },
+    {
+      "org": "npb",
+      "team": "ソフトバンク",
+      "number": "89",
+      "name": "王貞治",
+      "since": 2009,
+      "status": "honored"
+    },
+    {
+      "org": "npb",
+      "team": "日本ハム",
+      "number": "11",
+      "name": "ダルビッシュ有",
+      "since": 2018,
+      "status": "honored"
+    },
+    {
+      "org": "npb",
+      "team": "日本ハム",
+      "number": "86",
+      "name": "大沢啓二",
+      "since": 1995,
+      "status": "honored"
+    },
+    {
+      "org": "npb",
+      "team": "ロッテ",
+      "number": "9",
+      "name": "福浦和也",
+      "since": 2020,
+      "status": "honored"
+    }
+  ],
+  "source": "https://data-man.com/proyakyu/player/retired-number/"
+}

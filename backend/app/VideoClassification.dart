@@ -5,6 +5,9 @@ Set<String> videoOrganizations(String title) {
       title.toLowerCase().replaceAll('ｍｌｂ', 'mlb').replaceAll('ｎｐｂ', 'npb');
   // WBC belongs to the NPB tab even when MLB clubs/players are named.
   if (isWbcVideo(title)) return {'npb'};
+  // Draft coverage belongs in NPB even when MLB players or comparisons appear.
+  if (text.contains('ドラフト')) return {'npb'};
+  if (RegExp(r'(メジャー|mlb|大リーグ)(への?|に)?(流出|移籍|挑戦)').hasMatch(text)) return {'npb'};
   final explicit = <String>{
     if (RegExp(r'\bmlb\b|メジャーリーグ|メジャー挑戦|メジャー移籍|大リーグ|ワールドシリーズ').hasMatch(text))
       'mlb',

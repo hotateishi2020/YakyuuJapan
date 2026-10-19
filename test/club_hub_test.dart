@@ -15,7 +15,7 @@ import 'package:Yakyuu_Japan/logic/club_analysis.dart';
 import 'package:Yakyuu_Japan/logic/season_schedule.dart';
 
 void main() {
-  testWidgets('契約タブは常に比較し球団別契約はチームのスポンサー直前に置く', (t) async {
+  testWidgets('契約タブは常に比較し球団別契約はチームのセグメントで開く', (t) async {
     await t.binding.setSurfaceSize(const Size(1200, 900));
     addTearDown(() => t.binding.setSurfaceSize(null));
     final teams = <Map<String,dynamic>>[for (var i=1; i<=12; i++) {
@@ -34,11 +34,12 @@ void main() {
       await t.tap(find.byKey(const ValueKey('strength-view-8')));
       await t.pumpAndSettle();
       final hub = find.byType(ClubHubBoard);
+      await t.tap(find.byKey(const ValueKey('team-section-segment-6')));
+      await t.pumpAndSettle();
       final contracts = find.descendant(of:hub, matching:find.byType(StrengthContracts));
       expect(contracts, findsOneWidget);
       expect(t.widget<StrengthContracts>(contracts).comparisonTeams, isNull);
-      final sponsors=find.descendant(of:hub, matching:find.text('スポンサー・広告'));
-      expect(t.getBottomLeft(contracts).dy, lessThanOrEqualTo(t.getTopLeft(sponsors).dy));
+      expect(find.text('この年度の公式スポンサー情報は未収録です。'), findsNothing);
       await t.tap(find.byKey(const ValueKey('team-tab-segment-2')));
       await t.pumpAndSettle();
       expect(t.widget<StrengthContracts>(contracts).team['id_team'], 2);
@@ -80,6 +81,10 @@ void main() {
   });
   testWidgets('分析の評価色とクリック時のOAA根拠を表示する', (t) async {
     await t.binding.setSurfaceSize(const Size(1200, 800));
+      t.view.devicePixelRatio = 1;
+      t.view.physicalSize = const Size(1200, 800);
+      addTearDown(t.view.resetPhysicalSize);
+      addTearDown(t.view.resetDevicePixelRatio);
     addTearDown(() => t.binding.setSurfaceSize(null));
     await http.runWithClient(() async {
       await t.pumpWidget(MaterialApp(home: Scaffold(body: ClubHubBoard(
@@ -109,11 +114,23 @@ void main() {
       final teamCell = find.byKey(const ValueKey('analysis-team-1'));
       expect(t.widget<Container>(teamCell).color, const Color(0xFF003366));
       await t.binding.setSurfaceSize(const Size(1600, 800));
+      t.view.devicePixelRatio = 1;
+      t.view.physicalSize = const Size(1600, 800);
+      addTearDown(t.view.resetPhysicalSize);
+      addTearDown(t.view.resetDevicePixelRatio);
       await t.pumpAndSettle();
       expect(t.getSize(tableFinder).width, closeTo(1600, 1));
       await t.binding.setSurfaceSize(const Size(600, 800));
+      t.view.devicePixelRatio = 1;
+      t.view.physicalSize = const Size(600, 800);
+      addTearDown(t.view.resetPhysicalSize);
+      addTearDown(t.view.resetDevicePixelRatio);
       await t.pumpAndSettle();
       expect(t.getSize(tableFinder).width, closeTo(1240, .01));
+      expect(t.getSize(teamCell).width, closeTo(46, 1));
+      expect(find.descendant(of: teamCell, matching: find.byType(Text)), findsNothing);
+      expect(find.descendant(of: find.byKey(const ValueKey('analysis-vertical-scroll')), matching: find.textContaining('取得済み成績による団体内')), findsOneWidget);
+      expect(find.byKey(const ValueKey('analysis-grade-legend')), findsNothing);
       final horizontal = find.descendant(
         of: find.byKey(const ValueKey('analysis-horizontal-scroll')),
         matching: find.byWidgetPredicate((w) => w is Scrollable && w.axisDirection == AxisDirection.right),

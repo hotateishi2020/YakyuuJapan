@@ -163,8 +163,28 @@ void main() {
       {'id': 'a', 'title': '野球の未来'},
       {'id': 'b', 'title': '大谷翔平 ドジャースの優勝'},
       {'id': 'c', 'title': 'WBCの大谷翔平'},
+      {'id': 'draft', 'title': '【ドラフト戦略】大谷翔平・山本由伸 MLBとの育成の違い'},
+      {'id': 'draft2', 'title': 'ドラフト会議を解説'},
     ];
-    expect(filterVideoOrganization(npb, input).map((v) => v['id']), ['a', 'c']);
+    expect(filterVideoOrganization(npb, input).map((v) => v['id']), ['a', 'c', 'draft', 'draft2']);
     expect(filterVideoOrganization(mlb, input).map((v) => v['id']), ['b']);
   });
+  test('メジャー流出・移籍はNPB、新チャンネルは対象動画だけを表示', () {
+    final pivot = videoChannels.singleWhere((c)=>c.name=='PIVOT【野球関連】');
+    final mlb = mlbVideoChannels.singleWhere((c)=>c.id==pivot.id);
+    final videos = [
+      {'id':'out','title':'メジャー流出が止まらない MLBへの移籍'},
+      {'id':'move','title':'山本由伸のメジャー移籍を振り返る'},
+      {'id':'game','title':'MLB ドジャースの試合'},
+    ];
+    expect(filterVideoOrganization(pivot,videos).map((v)=>v['id']),['out','move']);
+    expect(filterVideoOrganization(mlb,videos).map((v)=>v['id']),['game']);
+    final news = videoChannels.singleWhere((c)=>c.id=='UCUQ0AtI3k10_CyLYcu4WRVA');
+    expect(broadcastVideoTeams(news,'中日ドラゴンズ 新入団選手会見'),{'UC57LcTUKgjDg_K_VJXnmCTg'});
+    expect(broadcastVideoTeams(news,'名古屋市の交通ニュース'),isEmpty);
+    final play = videoChannels.singleWhere((c)=>c.id=='UCfjDQXxizH9OOdGGJcZ9uEQ');
+    expect(matchesVideoContent(play.contentFilter,'古田敦也がプロ野球を語る'),isTrue);
+    expect(matchesVideoContent(play.contentFilter,'前園真聖のサッカー対談'),isFalse);
+  });
+
 }

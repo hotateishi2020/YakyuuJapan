@@ -247,11 +247,14 @@ String? mlbTeamLogoUrl({String? abbrev, String? name}) {
 
 /// NPB はアセット画像、MLB はロゴ URL。略称テキストは出さない。
 /// `abbrev` が MLB 略称のときだけネットワークロゴを優先（巨人など NPB と名前が被る球団対策）。
-({String? asset, String? networkUrl}) teamLogoVisual(String name, {String? abbrev}) {
+({String? asset, String? networkUrl}) teamLogoVisual(String name, {String? abbrev, bool mlb = false}) {
   final code = (abbrev ?? '').trim().toUpperCase();
   if (code.isNotEmpty && _mlbAbbrevCodes.contains(code)) {
     final url = mlbTeamLogoUrl(abbrev: code);
     if (url != null) return (asset: null, networkUrl: url);
+  }
+  if (mlb || RegExp(r'デトロイト|サンフランシスコ|Detroit|San Francisco', caseSensitive: false).hasMatch(name)) {
+    return (asset: null, networkUrl: mlbTeamLogoUrl(name: name, abbrev: code));
   }
   final asset = teamLogoAsset(name);
   if (asset != null) return (asset: asset, networkUrl: null);
@@ -4146,8 +4149,8 @@ class _TableGameCard extends StatelessWidget {
       return index < values.length ? values[index] : '';
     }
 
-    final homeLogo = teamLogoVisual(_text('name_team_home'), abbrev: _text('name_shortest_home'));
-    final awayLogo = teamLogoVisual(_text('name_team_away'), abbrev: _text('name_shortest_away'));
+    final homeLogo = teamLogoVisual(_text('name_team_home'), abbrev: _text('name_shortest_home'), mlb: _isMlbGame);
+    final awayLogo = teamLogoVisual(_text('name_team_away'), abbrev: _text('name_shortest_away'), mlb: _isMlbGame);
 
     Widget row({
       required bool header,
@@ -4336,8 +4339,8 @@ class _TableGameCard extends StatelessWidget {
     final logoSide = height * 0.8;
     const sidePad = 4.0;
     final shownState = state.trim();
-    final homeLogo = teamLogoVisual(homeName, abbrev: homeAbbrev);
-    final awayLogo = teamLogoVisual(awayName, abbrev: awayAbbrev);
+    final homeLogo = teamLogoVisual(homeName, abbrev: homeAbbrev, mlb: _isMlbGame);
+    final awayLogo = teamLogoVisual(awayName, abbrev: awayAbbrev, mlb: _isMlbGame);
     final labels = Column(
       mainAxisSize: MainAxisSize.min,
       children: [

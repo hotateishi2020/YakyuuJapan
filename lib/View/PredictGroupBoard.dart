@@ -487,7 +487,7 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
               resultHeader: resultHeader,
               titleOf: (row) => '${row['title'] ?? ''}',
               centerOf: (row) => '${row['current'] ?? ''}'.trim().isEmpty ? '—' : '${row['current']}',
-              titleColor: (row) => row['pitcher'] == true ? const Color(0xFF1E88E5) : const Color(0xFFDC143C),
+              titleColor: (row) => row['title'] == 'MVP' ? Colors.black : row['pitcher'] == true ? const Color(0xFF1E88E5) : const Color(0xFFDC143C),
             ),
           ),
       ],
@@ -1996,6 +1996,7 @@ Widget predictLeagueBanner(String name) {
 }
 
 Color? predictStatsColor({required String title, bool? pitcher}) {
+  if (title == 'MVP') return Colors.black;
   if (_specialPredictTitles.contains(title)) return null;
   final pitching = pitcher ?? _pitchingTitles.contains(title);
   if (pitching) return const Color(0xFF1565C0);

@@ -1,6 +1,8 @@
+import '../logic/draft_video_priority.dart';
+import 'compact_layout.dart';
+import '../tools/open_youtube.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'dart:convert';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../tools/json_utils.dart';
@@ -137,8 +139,10 @@ class _StrengthDraftState extends State<StrengthDraft> {
                   final result = (order[a.$2['category']] ?? 4).compareTo(order[b.$2['category']] ?? 4);
                   return result == 0 ? a.$1.compareTo(b.$1) : result;
                 });
+              final frozenColumns = compactBaseballLayout(context) ? 3 : 4;
               const headers = ['注目度', '選手名', '所属', 'チーム', '年齢', '身長', '体重', '投打', 'ポジション', '経歴', '特徴', '獲得予想', '特集動画'];
-              const minimumWidths = [42.0, 72.0, 50.0, 100.0, 42.0, 52.0, 50.0, 76.0, 68.0, 180.0, 180.0, 140.0, 180.0];
+              final videoCount = players.fold<int>(1, (max, p) => draftRelatedVideos(p.$2).length > max ? draftRelatedVideos(p.$2).length : max);
+              final minimumWidths = [42.0, 72.0, 50.0, 100.0, 42.0, 52.0, 50.0, 76.0, 68.0, 180.0, 180.0, 140.0, videoCount * 168.0 + (videoCount - 1) * 8 + 16];
               final minimumWidth = minimumWidths.reduce((a, b) => a + b);
               final scale = constraints.maxWidth > minimumWidth ? constraints.maxWidth / minimumWidth : 1.0;
               final widths = [for (final width in minimumWidths) width * scale];
@@ -171,15 +175,16 @@ class _StrengthDraftState extends State<StrengthDraft> {
                     child = Tooltip(message: '${widget.year + 1}年3月31日時点', child: child);
                   }
                 } else if (index == 12) {
-                  final video = draftTopVideo(player);
-                  child = video == null ? Text(player['feature_video_checked_at'] == null ? '未取得' : '—', style: style) : Tooltip(
+                  final videos = draftRelatedVideos(player);
+                  child = videos.isEmpty ? Text(player['feature_video_checked_at'] == null ? '未取得' : '—', style: style) : Row(mainAxisSize: MainAxisSize.min, children: [
+                    for (final entry in videos.indexed) Padding(padding: EdgeInsets.only(right: entry.$1 == videos.length - 1 ? 0 : 8), child: SizedBox(width: 168, child: Builder(builder: (context) {
+                    final video = entry.$2;
+                    return Tooltip(
                     message: '${video['title']}\n${video['view_count']}回再生（取得時点）',
                     child: InkWell(
-                      key: ValueKey('draft-video-${player['name']}'),
+                      key: ValueKey(entry.$1 == 0 ? 'draft-video-${player['name']}' : 'draft-video-${player['name']}-${video['video_id']}'),
                       onTap: () async {
-                        final uri = Uri.https('www.youtube.com', '/watch', {'v': '${video['video_id']}'});
-                        var opened = false;
-                        try { opened = await launchUrl(uri, mode: LaunchMode.externalApplication, webOnlyWindowName: '_blank'); } catch (_) {}
+                        final opened = await openYoutube('${video['video_id']}');
                         if (!opened && context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('動画を開けませんでした。')));
                       },
                       child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -192,6 +197,8 @@ class _StrengthDraftState extends State<StrengthDraft> {
                       ]),
                     ),
                   );
+                  }))),
+                  ]);
                 } else if (index == 11) {
                   child = Wrap(spacing: 2, runSpacing: 2, children: [
                     for (final prediction in listMapFromJson(player['predictions']))
@@ -258,13 +265,13 @@ class _StrengthDraftState extends State<StrengthDraft> {
                           padding: const EdgeInsets.all(8), child: Text('${widget.year}年 NPBドラフト注目選手（計${players.length}人）', style: const TextStyle(fontWeight: FontWeight.bold)))),
                 ]),
                 Row(children: [
-                  for (var i = 0; i < 4; i++) cell(i, 40),
+                  for (var i = 0; i < frozenColumns; i++) cell(i, 40),
                   Expanded(
                       child: SingleChildScrollView(
                           controller: _header,
                           physics: const NeverScrollableScrollPhysics(),
                           scrollDirection: Axis.horizontal,
-                          child: Row(children: [for (var i = 4; i < headers.length; i++) cell(i, 40)]))),
+                          child: Row(children: [for (var i = frozenColumns; i < headers.length; i++) cell(i, 40)]))),
                 ]),
                 Expanded(
                     child: SingleChildScrollView(
@@ -273,7 +280,7 @@ class _StrengthDraftState extends State<StrengthDraft> {
                   child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                     Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Column(children: [
-                        for (var row = 0; row < players.length; row++) Row(children: [for (var col = 0; col < 4; col++) cell(col, heights[row], player: players[row].$2)])
+                        for (var row = 0; row < players.length; row++) Row(children: [for (var col = 0; col < frozenColumns; col++) cell(col, heights[row], player: players[row].$2)])
                       ]),
                       Expanded(
                           child: Scrollbar(
@@ -285,7 +292,7 @@ class _StrengthDraftState extends State<StrengthDraft> {
                           scrollDirection: Axis.horizontal,
                           child: Column(children: [
                             for (var row = 0; row < players.length; row++)
-                              Row(children: [for (var col = 4; col < headers.length; col++) cell(col, heights[row], player: players[row].$2)])
+                              Row(children: [for (var col = frozenColumns; col < headers.length; col++) cell(col, heights[row], player: players[row].$2)])
                           ]),
                         ),
                       )),
@@ -293,7 +300,7 @@ class _StrengthDraftState extends State<StrengthDraft> {
                     Padding(
                         padding: const EdgeInsets.all(8),
                         child: Text(
-                            "確認日：${data['checked_at']}。年齢は${widget.year + 1}年3月31日時点（生年月日未確認は—）。選手名で詳細、球団ロゴで指名予想の根拠を表示。注目度はアプリ予想（タップで基準と根拠）。S競合必至／A競合の可能性／Bドラ1候補／C上位候補／D指名候補／E育成候補。ロゴなしは予想根拠未確認。特集動画は取得した通常動画の中で再生数最多の1件（タップで再生）。指名・獲得確定ではありません。",
+                            "確認日：${data['checked_at']}。年齢は${widget.year + 1}年3月31日時点（生年月日未確認は—）。選手名で詳細、球団ロゴで指名予想の根拠を表示。注目度はアプリ予想（タップで基準と根拠）。S競合必至／A競合の可能性／Bドラ1候補／C上位候補／D指名候補／E育成候補。ロゴなしは予想根拠未確認。特集動画は能力・試合のプレー・プレイスタイル・私生活に焦点を当てた内容をタイトルから優先し、同程度なら再生数順に最大4件（表全体の横スクロール・タップで再生）。指名・獲得確定ではありません。",
                             style: const TextStyle(fontSize: 11, color: Colors.black54))),
                   ]),
                 )),
@@ -302,10 +309,16 @@ class _StrengthDraftState extends State<StrengthDraft> {
           ));
 }
 
-Map<String, dynamic>? draftTopVideo(Map<String, dynamic> player) {
+List<Map<String, dynamic>> draftRelatedVideos(Map<String, dynamic> player) {
   final videos = listMapFromJson(player['feature_videos']).where((v) =>
     RegExp(r'^[A-Za-z0-9_-]{11}$').hasMatch('${v['video_id']}') && v['view_count'] is num && v['is_short'] != true).toList()
-    ..sort((a,b) => (b['view_count'] as num).compareTo(a['view_count'] as num));
+    ..sort(compareDraftVideos);
+  final seen = <String>{};
+  return videos.where((video) => seen.add('${video['video_id']}')).take(4).toList();
+}
+
+Map<String, dynamic>? draftTopVideo(Map<String, dynamic> player) {
+  final videos = draftRelatedVideos(player);
   return videos.isEmpty ? null : videos.first;
 }
 

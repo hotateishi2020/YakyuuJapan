@@ -86,3 +86,17 @@ String starterWorkloadLabel(dynamic value) {
   final rate = num.tryParse('$value');
   return rate == null || !rate.isFinite || rate < 0 || rate > 1 ? '—' : '${(rate * 100).toStringAsFixed(1)}%';
 }
+
+/// 1: league maximum, -1: minimum; missing or all-equal values stay neutral.
+int starterWorkloadExtreme(List<Map<String, dynamic>> teams, Map<String, dynamic> team) {
+  double? rate(Map<String, dynamic> row) {
+    final value = double.tryParse('${row['starter_workload_rate']}');
+    return value != null && value.isFinite && value >= 0 && value <= 1 ? value : null;
+  }
+  final value = rate(team);
+  if (value == null || team['id_league'] == null) return 0;
+  final values = teams.where((row) => '${row['id_league']}' == '${team['id_league']}')
+      .map(rate).whereType<double>().toList()..sort();
+  if (values.length < 2 || values.first == values.last) return 0;
+  return value == values.last ? 1 : value == values.first ? -1 : 0;
+}

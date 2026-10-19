@@ -46,6 +46,7 @@ class _GamesConnection implements Connection {
       values = [
         ['batting', {'id_game': 1, 'hits': 2}],
         ['board', {'show': true}],
+        ['form', {'id_game': 1, 'postseason_form': [{'id_player': 7}], 'player_hands': []}],
         ['game', {'id_game': 1}],
         ['game', {'id_game': 2}],
         ['play', '{"id_game":1,"inning":1}'],
@@ -76,6 +77,7 @@ void main() {
     expect(result.games.map((row) => row['id_game']), [1, 2]);
     expect(result.plays.map((row) => row['inning']), [1, 2]);
     expect(result.batting.single['hits'], 2);
+    expect((result.forms.single['postseason_form'] as List).single['id_player'], 7);
     expect(result.postseason.single['id_game'], 3);
     expect(result.board.single['show'], true);
     expect(result.from, '2026-10-10');

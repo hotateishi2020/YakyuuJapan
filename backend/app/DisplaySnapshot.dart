@@ -5,6 +5,7 @@ import 'package:postgres/postgres.dart';
 import '../tools/Postgres.dart';
 import 'AppSql.dart';
 import 'PlayerDisplay.dart';
+import 'PostseasonForm.dart';
 import 'PredictionSnapshot.dart';
 import 'Value.dart';
 
@@ -156,6 +157,15 @@ class DisplaySnapshot {
         Value.SystemCode.Key.DATE_OPEN_GAME,
       ],
     ));
+    final forms = <int, Map<String, dynamic>>{
+      for (final game in games) _asInt(game['id_game']): Map<String, dynamic>.from(game),
+    }.values.toList();
+    await attachPostseasonForm(conn, forms, year);
+    final formRows = [for (final game in forms) {
+      'id_game': game['id_game'], 'date_game': game['date_game'],
+      'postseason_form': game['postseason_form'] ?? [],
+      'player_hands': game['player_hands'] ?? [],
+    }];
     final dates = <int, String>{
       for (final game in games) _asInt(game['id_game']): _ymd('${game['date_game'] ?? ''}'),
     };
@@ -167,11 +177,12 @@ class DisplaySnapshot {
         '''
           DELETE FROM v_games_details
           WHERE int_year = \$1
-            AND code IN ('game', 'play', 'batting')
+            AND code IN ('game', 'play', 'batting', 'form')
             AND date_game BETWEEN \$2::date AND \$3::date
         ''',
         parameters: [year, window.from, window.to],
       );
+      await _insertGameRows(conn, year, 'form', formRows, (row) => (_ymd('${row['date_game'] ?? window.from}'), _asInt(row['id_game'])));
       await _insertGameRows(conn, year, 'game', games, (row) => (_ymd('${row['date_game'] ?? window.from}'), _asInt(row['id_game'])));
       await _insertGameRows(conn, year, 'play', plays, (row) {
         final id = _asInt(row['id_game']);
@@ -201,8 +212,22 @@ class DisplaySnapshot {
     return PredictionSnapshot.players(conn, year, leagueIds);
   }
 
-  static Future<List<Map<String, dynamic>>> teams(Connection conn, int year) {
-    return _readYear(conn, 'v_stats_teams', year);
+  static Future<List<Map<String, dynamic>>> teams(Connection conn, int year) async {
+    // Workload and standings refresh independently. Join the saved pitching totals
+    // on every read so an older standings snapshot does not hide newer workload.
+    final available = await conn.execute("SELECT to_regclass('public.t_strength_pitching') IS NOT NULL");
+    if (available.first.first != true) return _readYear(conn, 'v_stats_teams', year);
+    final rows = await conn.execute('''
+      WITH workload AS (
+        SELECT id_team, SUM(starter_outs)::double precision / NULLIF(SUM(total_outs), 0) AS rate
+        FROM t_strength_pitching WHERE int_year = \$1 GROUP BY id_team
+      )
+      SELECT s.payload || CASE WHEN w.id_team IS NULL THEN '{}'::jsonb
+        ELSE jsonb_build_object('starter_workload_rate', w.rate) END
+      FROM v_stats_teams s LEFT JOIN workload w ON w.id_team = (s.payload->>'id_team')::integer
+      WHERE s.int_year = \$1 ORDER BY s.row_no
+    ''', parameters: [year]);
+    return [for (final row in rows) _decode(row[0])];
   }
 
   static Future<DisplayGames> games(Connection conn, int year, {String? from, String? to}) async {
@@ -217,7 +242,7 @@ class DisplaySnapshot {
       """
         SELECT code, payload FROM v_games_details
         WHERE int_year = \$1 AND (
-          (code IN ('game', 'play', 'batting')
+          (code IN ('game', 'play', 'batting', 'form')
             AND date_game BETWEEN \$2::date AND \$3::date)
           OR code IN ('postseason', 'board')
         )
@@ -231,6 +256,7 @@ class DisplaySnapshot {
     }
     return DisplayGames(
       games: grouped['game'] ?? [],
+      forms: grouped['form'] ?? [],
       plays: grouped['play'] ?? [],
       batting: grouped['batting'] ?? [],
       postseason: grouped['postseason'] ?? [],
@@ -404,6 +430,7 @@ class DisplaySnapshot {
 
 class DisplayGames {
   final List<Map<String, dynamic>> games;
+  final List<Map<String, dynamic>> forms;
   final List<Map<String, dynamic>> plays;
   final List<Map<String, dynamic>> batting;
   final List<Map<String, dynamic>> postseason;
@@ -413,6 +440,7 @@ class DisplayGames {
 
   const DisplayGames({
     required this.games,
+    this.forms = const [],
     required this.plays,
     required this.batting,
     required this.postseason,

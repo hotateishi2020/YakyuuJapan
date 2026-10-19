@@ -1528,28 +1528,36 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                 child: InkWell(
                   onTap: () => onSelected(tabs[i].$2),
                   borderRadius: BorderRadius.circular(TAB_RADIUS),
-                  child: Center(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        if (assets[tabs[i].$2] case final asset?) ...[
-                          LeagueLogo(asset: asset, height: height * 0.72),
-                          const SizedBox(width: 6),
-                        ],
-                        Text(
-                          tabs[i].$1,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 12,
-                            height: 1.0,
-                            leadingDistribution: TextLeadingDistribution.even,
-                            fontWeight: selectedIndex == tabs[i].$2 ? FontWeight.bold : FontWeight.normal,
-                            color: selectedIndex == tabs[i].$2 ? activeFg : Colors.black87,
-                          ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    child: Center(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            if (assets[tabs[i].$2] case final asset?) ...[
+                              LeagueLogo(asset: asset, height: height * 0.72),
+                              const SizedBox(width: 6),
+                            ],
+                            Text(
+                              tabs[i].$1,
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              softWrap: false,
+                              style: TextStyle(
+                                fontSize: 12,
+                                height: 1.0,
+                                leadingDistribution: TextLeadingDistribution.even,
+                                fontWeight: selectedIndex == tabs[i].$2 ? FontWeight.bold : FontWeight.normal,
+                                color: selectedIndex == tabs[i].$2 ? activeFg : Colors.black87,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
@@ -2354,7 +2362,20 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   Widget build(BuildContext context) {
     // 初回のみ全画面グルグル。エラー時もヘッダー〜団体タブは出す。
     if (isLoading && !_shellReady) {
-      return const Center(child: BaseballLoading());
+      return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Headers.globalHeader(context, HEADER_GLOBAL_H, ALL_COLOR_APP, HEADER_TITLE,
+          HEADER_PAD_VERTICAL, ALL_MARGIN_LEFT, showRightActions: false),
+        Padding(padding: const EdgeInsets.symmetric(horizontal: ALL_MARGIN_LEFT),
+          child: Column(children: [
+            const SizedBox(height: ALL_SPACE_BLOCK),
+            _orgTabBar(),
+            if (!_predictGroupsOpen) ...[
+              const SizedBox(height: 8),
+              _boardTabBar(),
+            ],
+          ])),
+        const Expanded(child: Center(child: BaseballLoading())),
+      ]);
     }
 
     return LayoutBuilder(
@@ -2455,6 +2476,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                         ALL_MARGIN_LEFT,
                         onAuthChanged: _onAuthChanged,
                         authReady: _authEntryReady,
+                        showRightActions: _authEntryReady,
                         actions: [
                           const SizedBox(width: 4),
                           _yearPicker(),

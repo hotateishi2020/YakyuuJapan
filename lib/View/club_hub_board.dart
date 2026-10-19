@@ -1,3 +1,4 @@
+import 'compact_layout.dart';
 import '../logic/favorite_team.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import '../logic/strength_usage.dart';
@@ -39,6 +40,8 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
   String? _error;
   String? _selected;
   String? _selectedStaff;
+  int _teamSection = 0;
+  static const _teamSections = ['分析', '首脳陣', '主力選手', '貢献度', '選手起用', '選手一覧', '契約'];
   int _request = 0;
   @override
   void initState() {
@@ -101,10 +104,10 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
     final background = parseColorNameOrNull('${team['color_back']}') ?? widget.org.tabColor;
     final foreground = parseColorNameOrNull('${team['color_font']}') ??
         (background.computeLuminance() > .45 ? Colors.black : Colors.white);
-    final logo = teamLogoVisual('${team['name_team']}', abbrev: '${team['name_shortest'] ?? ''}');
+    final logo = teamLogoVisual('${team['name_team']}', abbrev: '${team['name_shortest'] ?? ''}', mlb: widget.org.kind == OrgKind.mlb);
     return Container(key: ValueKey('analysis-team-${team['id_team']}'),
       height: height, width: double.infinity, padding: const EdgeInsets.symmetric(horizontal: 8),
-      color: background, child: Row(children: [
+      color: background, child: compactBaseballLayout(context) ? Center(child: SizedBox(width: 30, height: 30, child: teamLogoImage(asset: logo.asset, networkUrl: logo.networkUrl))) : Row(children: [
         SizedBox(width: 30, height: 30, child: teamLogoImage(asset: logo.asset, networkUrl: logo.networkUrl)),
         const SizedBox(width: 6),
         Expanded(child: Text('${team['name_team']}', style: TextStyle(color: foreground, fontWeight: FontWeight.bold))),
@@ -113,9 +116,19 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
 
   Widget _analysis({Map<String, dynamic>? team, BuildContext? sectionContext}) {
     final rows = analyzeClubs(widget.teams, widget.year).where((row) => team == null || row['id_team'] == team['id_team']);
+    final compact = compactBaseballLayout(context);
+    const explanation = Padding(padding: EdgeInsets.all(8), child: Text('取得済み成績による団体内の相対評価（S → A → B → C → D → E → F → G）。打撃：打席加重OPS／走力：チームの(盗塁−2×盗塁死)÷消化試合数／守備：全比較球団の当年OAAが揃えばOAA。未取得の場合は内野・外野別の守備率を「失策参考」として表示／投手：主な起用が先発・救援の投手別WHIPを投球回で加重。中継ぎには抑えを含みます。走力は盗塁の参考評価で、進塁・走塁全体を網羅しません。守備機会は刺殺＋補殺＋失策。投手・捕手は内野守備に含めません。失策参考には守備範囲・ファインプレーを含めません。評価をクリックすると算出根拠を表示します。未計測は —。平均年齢は守備位置ごとの最多起用野手（重複除外）、当年は本日時点。'));
+    final notes = <Widget>[
+      for (final row in rows)
+        if (row['defense_note'] is Map && '${row['defense_note']['year']}' == '${widget.year}')
+          Padding(padding: const EdgeInsets.all(8), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('${row['name_team']}・守備評価の補足', style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text('${row['defense_note']['summary']}'),
+          ])),
+    ];
     final children = <Widget>[
-      const Padding(padding: EdgeInsets.all(8), child: Text('取得済み成績による団体内の相対評価（S → A → B → C → D → E → F → G）。打撃：打席加重OPS／走力：チームの(盗塁−2×盗塁死)÷消化試合数／守備：全比較球団の当年OAAが揃えばOAA。未取得の場合は内野・外野別の守備率を「失策参考」として表示／投手：主な起用が先発・救援の投手別WHIPを投球回で加重。中継ぎには抑えを含みます。走力は盗塁の参考評価で、進塁・走塁全体を網羅しません。守備機会は刺殺＋補殺＋失策。投手・捕手は内野守備に含めません。失策参考には守備範囲・ファインプレーを含めません。評価をクリックすると算出根拠を表示します。未計測は —。平均年齢は守備位置ごとの最多起用野手（重複除外）、当年は本日時点。')),
-      Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: Wrap(spacing: 6, runSpacing: 4, children: [
+      if (!compact) explanation else const SizedBox.shrink(),
+      compact ? const SizedBox.shrink() : Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: Wrap(key: const ValueKey('analysis-grade-legend'), spacing: 6, runSpacing: 4, children: [
         for (final entry in clubAnalysisGradeColors.entries)
           Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
             decoration: BoxDecoration(color: entry.value, borderRadius: BorderRadius.circular(4)),
@@ -123,8 +136,8 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
       ])),
       LayoutBuilder(builder: (context, constraints) {
         final rowHeight = 88 * MediaQuery.textScalerOf(context).scale(12) / 12;
-        Widget fitTable(Widget child) => team == null ? child : FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.topLeft, child: child);
-        final columns = ['球団', ...analysisCategories, 'レギュラー平均年齢', '強み', '弱み'];
+        Widget fitTable(Widget child) => team == null || compact ? child : FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.topLeft, child: child);
+        final columns = [if (team == null) '球団', ...analysisCategories, 'レギュラー平均年齢', '強み', '弱み'];
         double weight(String c) => c == '球団' ? 2 : c == '強み' || c == '弱み' ? 2.4 : c == 'レギュラー平均年齢' ? 1.8 : 1;
         final table = DataTable(
             key: const ValueKey('analysis-table'),
@@ -135,11 +148,11 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
             border: TableBorder.all(color: Colors.grey, width: .5),
             dataRowMinHeight: rowHeight, dataRowMaxHeight: rowHeight,
             columns: [
-            for (final c in columns) DataColumn(columnWidth: FlexColumnWidth(weight(c)), label: team == null ? const SizedBox.shrink() : Expanded(child: Text(c, textAlign: TextAlign.center)))
+            for (final c in columns) DataColumn(columnWidth: compact && c == '球団' ? const FixedColumnWidth(46) : FlexColumnWidth(weight(c)), label: team == null ? const SizedBox.shrink() : Expanded(child: Text(c, textAlign: TextAlign.center)))
           ], rows: [
             for (final row in rows)
               DataRow(cells: [
-                DataCell(_analysisTeamCell(row, rowHeight)),
+                if (team == null) DataCell(_analysisTeamCell(row, rowHeight)),
                 for (final c in analysisCategories)
                   DataCell(Center(child: Tooltip(
                     message: _analysisDetail(row, c),
@@ -172,30 +185,41 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
                 DataCell(Padding(padding: const EdgeInsets.all(8), child: Text('${row['weaknesses']}')))
               ])
           ]);
+        if (compact && team != null) {
+          return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Table(key: const ValueKey('analysis-vertical-table'),
+              columnWidths: const {0: FixedColumnWidth(100), 1: FlexColumnWidth()},
+              border: TableBorder.all(color: Colors.grey, width: .5),
+              defaultVerticalAlignment: TableCellVerticalAlignment.intrinsicHeight,
+              children: [for (var i = 0; i < columns.length; i++) TableRow(children: [
+                Container(key: ValueKey('analysis-header-${columns[i]}'), alignment: Alignment.centerLeft, padding: const EdgeInsets.all(8), color: Colors.black,
+                  child: Text(columns[i], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                Padding(padding: const EdgeInsets.all(8), child: table.rows.first.cells[i].child),
+              ])],
+            ),
+            explanation, ...notes,
+          ]);
+        }
+        final tableContent = compact ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [table, SizedBox(width: math.min(MediaQuery.sizeOf(context).width, constraints.maxWidth), child: Column(children: [explanation, ...notes]))]) : table;
         final width = math.max(1240.0, constraints.maxWidth);
         return sectionScrollView(context,
           key: const ValueKey('analysis-horizontal-scroll'),
           scrollDirection: Axis.horizontal,
           child: fitTable(SizedBox(width: width,
             height: team == null ? constraints.maxHeight : null,
-            child: team != null ? table : Column(children: [
+            child: team != null ? tableContent : Column(children: [
               Table(key: const ValueKey('analysis-fixed-header'),
                 border: TableBorder.all(color: Colors.grey, width: .5),
-                columnWidths: {for(final entry in columns.indexed) entry.$1: FlexColumnWidth(weight(entry.$2))},
+                columnWidths: {for(final entry in columns.indexed) entry.$1: compact && entry.$2 == '球団' ? const FixedColumnWidth(46) : FlexColumnWidth(weight(entry.$2))},
                 children: [TableRow(decoration: const BoxDecoration(color: Colors.black), children: [
                   for(final c in columns) SizedBox(height: 56, child: Center(child: Text(c,
                     style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)))),
                 ])]),
               Expanded(child: SingleChildScrollView(
-                key: const ValueKey('analysis-vertical-scroll'), child: table)),
+                key: const ValueKey('analysis-vertical-scroll'), child: tableContent)),
             ]))));
       }),
-      for (final row in rows)
-        if (row['defense_note'] is Map && '${row['defense_note']['year']}' == '${widget.year}')
-          Padding(padding: const EdgeInsets.all(8), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('${row['name_team']}・守備評価の補足', style: const TextStyle(fontWeight: FontWeight.bold)),
-            Text('${row['defense_note']['summary']}'),
-          ])),
+      if (!compact) ...notes,
     ];
     if (team != null) return SectionList(children: children);
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -312,13 +336,12 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
     if (widget.teams.isEmpty) return const Center(child: Text('戦力情報がありません'));
     final team = widget.teams.firstWhere((t) => '${t['id_team']}' == _selected, orElse: () => favoriteTeamRow(widget.teams) ?? widget.teams.first);
     final club = _clubs.where((c) => c['code'] == npbClubKey(team)).firstOrNull;
-    final sponsors = listMapFromJson(club?['sponsors']);
     final roster = listMapFromJson(team['roster']);
     final positions = <String>{'先発', '中継ぎ', '捕手', '一塁', '二塁', '三塁', '遊撃', '左翼', '中堅', '右翼',
       for (final p in roster) rosterPosition(p, team) == '抑え' ? '中継ぎ' : rosterPosition(p, team)};
     final rosterColumns = positions.fold<int>(1, (count, position) => count + 2 +
       (roster.any((p) => rosterPosition(p, team) == position && p[['先発', '中継ぎ', '投手'].contains(position) ? 'throws' : 'bats'] == '両') ? 1 : 0));
-    final regularWidth = (1 + pitcherAceSlots.length + usagePositions.length - 1 + benchRegularSlots.length) * 128.0;
+    final regularWidth = (pitcherAceSlots.length + usagePositions.length - 1 + benchRegularSlots.length) * 128.0;
     final background = parseColorNameOrNull('${team['color_back']}') ?? widget.org.tabColor;
     final foreground = parseColorNameOrNull('${team['color_font']}') ?? Colors.white;
     return LayoutBuilder(builder: (context, constraints) {
@@ -330,12 +353,12 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
       );
       Widget usage(int index, String title, {double? minWidth}) => section(title,
         () => widget.teamSection(index, team), minWidth: minWidth, key: ValueKey('${team['id_team']}-$index'));
-      return SingleChildScrollView(key: const ValueKey('team-page-vertical-scroll'),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Padding(padding: const EdgeInsets.all(8), child: LayoutBuilder(builder: (context, constraints) {
-            final columns = (constraints.maxWidth / 100).floor().clamp(1, widget.teams.length);
-            final segmentWidth = (constraints.maxWidth - (columns - 1) * 4) / columns;
-            return Wrap(spacing: 4, runSpacing: 4, children: [
+            final compact = compactBaseballLayout(context);
+            final columns = compact ? widget.teams.length : (constraints.maxWidth / 100).floor().clamp(1, widget.teams.length);
+            final segmentWidth = compact ? math.max(24.0, (constraints.maxWidth - (columns - 1) * 4) / columns) : (constraints.maxWidth - (columns - 1) * 4) / columns;
+            final segments = <Widget>[
               for (final option in widget.teams) SizedBox(width: segmentWidth,
                 child: Semantics(button: true, selected: option['id_team'] == team['id_team'],
                   child: Material(
@@ -347,9 +370,9 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
                       borderRadius: BorderRadius.circular(20),
                       onTap: () => setState(() => _selected = '${option['id_team']}'),
                       child: SizedBox(height: 36, child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        padding: EdgeInsets.symmetric(horizontal: compact ? 2 : 8),
                         child: Center(child: FittedBox(fit: BoxFit.scaleDown,
-                          child: Text('${option['name_team']}', style: TextStyle(fontWeight: FontWeight.bold,
+                          child: Text(compact ? '${option['name_shortest'] ?? option['name_team']}' : '${option['name_team']}', style: TextStyle(fontWeight: FontWeight.bold,
                             color: option['id_team'] == team['id_team']
                                 ? parseColorNameOrNull('${option['color_font']}') ?? Colors.white : Colors.black87)))),
                       )),
@@ -357,24 +380,55 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
                   ),
                 ),
               ),
-            ]);
+            ];
+            if (compact) { return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(children: [for (final entry in segments.indexed) ...[
+                if (entry.$1 > 0) const SizedBox(width: 4), entry.$2,
+              ]]),
+            );
+            }
+            return Wrap(spacing: 4, runSpacing: 4, children: segments);
           })),
-          section('チーム分析', () => Builder(builder: (sectionContext) => _analysis(team: team, sectionContext: sectionContext))),
-          section('首脳・スタッフ', () => club == null ? const Padding(padding: EdgeInsets.all(12), child: Text('この年度の首脳情報は未収録です。')) : Builder(builder: (sectionContext) => _staff(onlyClub: club, sectionContext: sectionContext))),
-          usage(2, '主力選手', minWidth: regularWidth),
-          usage(0, '貢献度'),
-          usage(1, '選手起用'),
-          usage(3, '選手一覧', minWidth: rosterColumns * 104 * .7),
-          usage(4, '契約'),
-          section('スポンサー・広告', () => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      if (sponsors.isEmpty) const Padding(padding: EdgeInsets.all(12), child: Text('この年度の公式スポンサー情報は未収録です。')),
-      Padding(
-          padding: const EdgeInsets.all(8),
-          child: Wrap(spacing: 8, runSpacing: 8, children: [
-            for (final sponsor in sponsors) SizedBox(width: 170, child: Card(child: Padding(padding: const EdgeInsets.all(8), child: Column(children: [if (sponsor['logo'] != null) Image.network('${sponsor['logo']}'.startsWith('/') ? Env.api('${sponsor['logo']}').toString() : '${sponsor['logo']}', height: 55, width: 150, fit: BoxFit.contain, errorBuilder: (context, error, stack) => const SizedBox(height: 55, child: Icon(Icons.business))), Text('${sponsor['name']}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 12)), Text('${sponsor['category'] ?? '公式スポンサー'}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 10))]))))
-          ]))
-          ])),
-        ]));
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              for (var i = 0; i < _teamSections.length; i++) ...[
+                if (i > 0) const SizedBox(width: 2),
+                Flexible(
+                  fit: FlexFit.loose,
+                  flex: _teamSections[i].characters.length + 1,
+                  child: ChoiceChip(
+                    key: ValueKey('team-section-segment-$i'),
+                    label: FittedBox(fit: BoxFit.scaleDown,
+                      child: Text(_teamSections[i], maxLines: 1, softWrap: false)),
+                    padding: EdgeInsets.zero,
+                    labelPadding: const EdgeInsets.symmetric(horizontal: 2),
+                    visualDensity: VisualDensity.compact,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    selected: _teamSection == i,
+                    selectedColor: background,
+                    backgroundColor: Color.lerp(background, Colors.white, .9),
+                    labelStyle: TextStyle(fontSize: 12, color: _teamSection == i ? foreground : Colors.black87),
+                    showCheckmark: false,
+                    onSelected: (_) => setState(() => _teamSection = i),
+                  ),
+                ),
+              ],
+            ]),
+          ),
+          Expanded(child: SingleChildScrollView(
+            key: ValueKey('team-page-vertical-scroll-${team['id_team']}-$_teamSection'),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          if (_teamSection == 0) section('分析', () => Builder(builder: (sectionContext) => _analysis(team: team, sectionContext: sectionContext)), minWidth: null),
+          if (_teamSection == 1) section('首脳陣', () => club == null ? const Padding(padding: EdgeInsets.all(12), child: Text('この年度の首脳情報は未収録です。')) : Builder(builder: (sectionContext) => _staff(onlyClub: club, sectionContext: sectionContext)), minWidth: compactBaseballLayout(context) ? 1500 : null),
+          if (_teamSection == 2) usage(2, '主力選手', minWidth: compactBaseballLayout(context) ? null : regularWidth),
+          if (_teamSection == 3) usage(0, '貢献度'),
+          if (_teamSection == 4) usage(1, '選手起用'),
+          if (_teamSection == 5) usage(3, '選手一覧', minWidth: rosterColumns * 104 * .7),
+          if (_teamSection == 6) usage(4, '契約'),
+          ]))),
+        ]);
     });
   }
 

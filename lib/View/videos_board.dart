@@ -1,3 +1,4 @@
+import '../tools/open_youtube.dart';
 import '../logic/favorite_team.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'dart:async';
@@ -146,15 +147,7 @@ class _VideosBoardState extends State<VideosBoard> {
         .hasMatch(id)) {
       return;
     }
-    final uri = channel
-        ? Uri.https('www.youtube.com', '/channel/$id')
-        : Uri.https('www.youtube.com', '/watch', {'v': id});
-    try {
-      if (await launchUrl(uri,
-          mode: LaunchMode.externalApplication, webOnlyWindowName: '_blank')) {
-        return;
-      }
-    } catch (_) {/* Surface unsupported or failed launches below. */}
+    if (await openYoutube(id, channel: channel)) return;
     if (mounted) {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('YouTubeを開けませんでした。')));

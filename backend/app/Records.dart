@@ -1,3 +1,4 @@
+import 'ClubRecords.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:postgres/postgres.dart';
@@ -111,12 +112,24 @@ class Records {
         playoffs.map((r) => r.toColumnMap()).toList(), org);
     final splitStandings = org == OrgKind.npb && splitFile != null
         ? applySplitRecordStandings(standings, usageMaps(jsonDecode(splitFile.readAsStringSync()))) : standings;
+    final clubTeams = <String, Map<String, dynamic>>{};
+    if (org == OrgKind.npb) {
+      // The selected season's participants exclude defunct franchises from the 12-team grid.
+      final latestYear = standingRows.isEmpty ? year : standingRows.first.toColumnMap()['year'];
+      for (final row in standingRows.map((r) => r.toColumnMap())) {
+        if (row['year'] == latestYear) clubTeams['${row['id_team']}'] = row;
+      }
+    }
+    final clubRecords = org == OrgKind.npb
+        ? buildClubRecords(clubTeams.values.toList(), await readClubRecordRows(conn, year), year,
+            streakRows: await readClubStreakRows(conn, baseline, clubTeams.values.toList(), year)) : null;
     final data = <String, dynamic>{
       'org': org.code,
       'year': year,
       'standings': splitStandings,
       'titles': colorRecordTitles(mergeRecordAwards(buildRecordTitles(titles, org), usageMaps(baseline['awards']), year), standingRows.map((r) => r.toColumnMap()).toList(), titles),
       'season': season,
+      if (clubRecords != null) 'club_records': clubRecords,
       'career': combined.isEmpty ? usageMaps(baseline['career']) : combined,
       'streaks': [
         for (final d in streakDefinitions)

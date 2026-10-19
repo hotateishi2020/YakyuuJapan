@@ -21,6 +21,7 @@ import 'app/DisplaySnapshot.dart';
 import 'app/PlayerDisplay.dart';
 import 'app/FieldingErrors.dart';
 import 'app/TeamStrength.dart';
+import 'app/RosterMoves.dart';
 import 'app/Records.dart';
 import 'app/VideoFeed.dart';
 import 'app/VideoChannels.dart';
@@ -230,6 +231,19 @@ String _ymdOf(DateTime date) {
   return '${date.year}-$month-$day';
 }
 
+Future<void> _attachSavedForms(DisplayGames snap, List<Map<String, dynamic>> games, int year) async {
+  final saved = {for (final row in snap.forms) _asInt(row['id_game']): row};
+  final missing = <Map<String, dynamic>>[];
+  for (final game in games) {
+    final row = saved[_asInt(game['id_game'])];
+    if (row == null) { missing.add(game); continue; }
+    game['postseason_form'] = row['postseason_form'];
+    game['player_hands'] = row['player_hands'];
+  }
+  // Compatibility with snapshots produced before form precomputation.
+  if (missing.isNotEmpty) await Postgres.withConnection((conn) => attachPostseasonForm(conn, missing, year));
+}
+
 Future<Map<String, dynamic>> _buildPredictionsPartGames(
   OrgKind org,
   int year, {
@@ -292,7 +306,7 @@ Future<Map<String, dynamic>> _buildPredictionsPartGames(
     plateFeats,
     maxInningByGame(playRows),
   ));
-  await Postgres.withConnection((conn) => attachPostseasonForm(conn, games, year));
+  await _attachSavedForms(snap, games, year);
   _fillMissingLineScores(games, playRows);
   final lineups = battingLineupsOf(
     playRows,
@@ -2064,7 +2078,7 @@ void main() async {
           plateFeats,
           maxInningByGame(playRows),
         ));
-        await Postgres.withConnection((conn) => attachPostseasonForm(conn, games, currentYear));
+        await _attachSavedForms(snap, games, currentYear);
         _fillMissingLineScores(games, playRows);
         final lineups = battingLineupsOf(
           playRows,
@@ -2180,6 +2194,7 @@ void main() async {
     // 個人成績は初期表示では取らず、起動の数分後から定期登録する。
     PlayerStatsSchedule.start(onUpdated: _clearPredictionsCache);
     TeamStrength.start();
+    RosterMoves.start();
     PlayerMetricSchedule.start(onUpdated: _clearPredictionsCache);
     PlayerDetailSnapshot.start();
     PredictionSnapshotSchedule.start(onUpdated: _clearPredictionsCache);

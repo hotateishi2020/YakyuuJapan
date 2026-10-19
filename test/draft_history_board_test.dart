@@ -22,6 +22,10 @@ void main() {
   for (final width in [1366.0, 375.0]) {
     testWidgets('幅$widthで12球団の配置と見出し固定', (tester) async {
       await tester.binding.setSurfaceSize(Size(width, 800));
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = Size(width, 800);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       addTearDown(() => tester.binding.setSurfaceSize(null));
       await tester.runAsync(() => rootBundle.loadString('backend/assets/data/draft_history.json'));
       await tester.pumpWidget(const MaterialApp(home: Scaffold(body: DraftHistoryBoard(year: 2025))));
@@ -54,20 +58,20 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: Scaffold(body: DraftHistoryBoard(year: 2025))));
     await tester.runAsync(() async {await Future<void>.delayed(const Duration(milliseconds: 20));});
     await tester.pumpAndSettle();
-    expect(tester.widget<ChoiceChip>(find.byKey(const ValueKey('draft-team-segment-all'))).selected, isTrue);
-    await tester.tap(find.byKey(const ValueKey('draft-team-segment-all')));
+    expect(tester.widget<ChoiceChip>(find.byKey(const ValueKey('draft-mode-0'))).selected, isTrue);
+    await tester.tap(find.byKey(const ValueKey('draft-mode-0')));
     await tester.pumpAndSettle();
-    expect(tester.widget<ChoiceChip>(find.byKey(const ValueKey('draft-team-segment-all'))).selected, isTrue);
+    expect(tester.widget<ChoiceChip>(find.byKey(const ValueKey('draft-mode-0'))).selected, isTrue);
   });
   testWidgets('draft filters display team picks and competition label', (tester) async {
     await tester.runAsync(() => rootBundle.loadString('backend/assets/data/draft_history.json'));
     await tester.pumpWidget(const MaterialApp(home: Scaffold(body: DraftHistoryBoard(year: 2025))));
     await tester.runAsync(() async { await Future<void>.delayed(const Duration(milliseconds: 20)); });
     await tester.pumpAndSettle();
-    expect(find.text('12球団・1位指名'), findsOneWidget);
+    expect(find.text('12球団1位指名'), findsOneWidget);
     expect(find.text('2025年'), findsOneWidget);
     expect(find.text('2024年'), findsOneWidget);
-    await tester.tap(find.text('12球団・1位指名'));
+    await tester.tap(find.byKey(const ValueKey('draft-mode-1')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('draft-team-segment-ヤクルト')));
     await tester.pumpAndSettle();
@@ -83,4 +87,43 @@ void main() {
     expect(find.text('石垣 元気　2球団競合'), findsNothing);
     expect(tester.takeException(), isNull);
   });
+  testWidgets('年度選択で12球団の育成まで表示し切り替えられる', (t) async {
+    t.view.devicePixelRatio = 1;
+    t.view.physicalSize = const Size(390, 800);
+    addTearDown(t.view.resetPhysicalSize);
+    addTearDown(t.view.resetDevicePixelRatio);
+    await t.runAsync(() => rootBundle.loadString('backend/assets/data/draft_history.json'));
+    await t.pumpWidget(const MaterialApp(home: Scaffold(body: DraftHistoryBoard(year: 2025))));
+    await t.runAsync(() async { await Future<void>.delayed(const Duration(milliseconds: 20)); });
+    await t.pumpAndSettle();
+    await t.tap(find.byKey(const ValueKey('draft-mode-2')));
+    await t.pumpAndSettle();
+    expect(t.widget<DropdownButton<int>>(find.byKey(const ValueKey('draft-year-picker'))).value, 2025);
+    expect(find.text('育成 1位'), findsOneWidget);
+    final grid = find.byKey(const ValueKey('draft-annual-grid'));
+    expect(find.descendant(of: grid, matching: find.text('松下 歩叶')), findsOneWidget);
+    t.widget<DropdownButton<int>>(find.byKey(const ValueKey('draft-year-picker'))).onChanged!(2024);
+    await t.pumpAndSettle();
+    expect(find.text('松下 歩叶'), findsNothing);
+    expect(t.takeException(), isNull);
+  });
+  testWidgets('現役ドラフトは2022年から複数獲得も表示する', (t) async {
+    await t.runAsync(() => rootBundle.loadString('backend/assets/data/active_draft_history.json'));
+    await t.pumpWidget(const MaterialApp(home: Scaffold(body: DraftHistoryBoard(year: 2026, activeDraft: true))));
+    await t.runAsync(() async { await Future<void>.delayed(const Duration(milliseconds: 20)); });
+    await t.pumpAndSettle();
+    expect(find.text('松浦 慶斗'), findsOneWidget);
+    expect(find.textContaining('へ移籍'), findsNothing);
+    final former = find.byKey(const ValueKey('active-draft-former-2025-松浦 慶斗'));
+    expect((t.widget<Container>(former).decoration as BoxDecoration).color, const Color(0xFF0067A5));
+    expect(t.widget<Text>(find.descendant(of: former, matching: find.text('日本ハム'))).style!.color, Colors.white);
+
+    expect(find.text('山足 達也'), findsOneWidget);
+    expect(find.text('鈴木 健矢'), findsOneWidget);
+    expect(find.text('2026年'), findsNothing);
+    expect(find.text('2022年'), findsOneWidget);
+    expect(find.byKey(const ValueKey('draft-mode-0')), findsNothing);
+    expect(t.takeException(), isNull);
+  });
+
 }

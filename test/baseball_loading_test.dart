@@ -12,8 +12,12 @@ void main() {
     await tester.pumpWidget(const MaterialApp(
         home: Scaffold(body: Center(child: BaseballLoading(progress: .42)))));
     expect(find.text('42%'), findsOneWidget);
+    expect(find.bySemanticsLabel('ノックを受けて捕球・送球する守備練習'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
-    await tester.pump(const Duration(milliseconds: 900));
+    for (var i = 0; i < 30; i++) {
+      await tester.pump(const Duration(milliseconds: 420));
+      expect(tester.takeException(), isNull);
+    }
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const MaterialApp(
         home: Scaffold(

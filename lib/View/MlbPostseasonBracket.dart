@@ -237,7 +237,7 @@ class MlbPostseasonBracket extends StatelessWidget {
 
   Widget _worldSeriesFinalist(BracketTeam? team, {required int wins, required int slots, required bool alignLeft, required bool eliminated}) {
     if (team == null || team.id <= 0 || team.name.isEmpty) return const SizedBox(width: 8);
-    final visual = teamLogoVisual(team.name, abbrev: team.nameShortest);
+    final visual = teamLogoVisual(team.name, abbrev: team.nameShortest, mlb: true);
     final logo = SizedBox(
       key: Key('postseason-ws-team-${team.id}'),
       width: 52,
@@ -391,7 +391,7 @@ class MlbPostseasonBracket extends StatelessWidget {
     final out = !unknown && board.eliminated(team.id);
     final nameBg = out ? _eliminatedBg : (unknown ? Colors.white : (parseColorNameOrNull(team.colorBack) ?? Colors.white));
     final nameFg = out || unknown ? Colors.black87 : (parseColorNameOrNull(team.colorFont) ?? Colors.black87);
-    final logoVisual = unknown ? null : teamLogoVisual(team.name, abbrev: team.nameShortest);
+    final logoVisual = unknown ? null : teamLogoVisual(team.name, abbrev: team.nameShortest, mlb: true);
     final logoAsset = logoVisual?.asset;
     final logoUrl = logoVisual?.networkUrl;
 

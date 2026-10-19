@@ -1,5 +1,6 @@
 import 'ScheduledLog.dart';
 import 'RosterBirthplaces.dart';
+import 'RosterMoves.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -172,6 +173,7 @@ class TeamStrength {
       metricsClient.close();
     }
     await StrengthUsage.attachStatuses(org, year, teams);
+    if (org == 'npb') await RosterMoves.attach(year, teams);
     await Postgres.withConnection((conn) => attachRosterBirthplaces(conn, teams));
     if (org == 'npb') await fillNpbBirthplaces(teams);
     await Postgres.withConnection((conn) => conn.runTx((tx) async {
@@ -265,6 +267,7 @@ class TeamStrength {
               'player_key': 'mlb:${_map(row['person'])['id']}',
               'source_player_id': '${_map(row['person'])['id']}',
               'name': _map(row['person'])['fullName'],
+              'uniform_number': row['jerseyNumber'],
               'date_birth': _map(row['person'])['birthDate'],
               'birth_country': _map(row['person'])['birthCountry'],
               'birth_state': _map(row['person'])['birthStateProvince'],

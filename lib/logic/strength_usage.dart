@@ -294,3 +294,17 @@ String? rosterDepartureLabel(Map<String, dynamic> player) {
   }
   return '退団';
 }
+
+/// Confirmed routes and unsettled FA statuses are deliberately separate labels.
+List<String> rosterMoveLabels(Map<String, dynamic> player, int year) {
+  final labels = <String>[];
+  if (usageInt(player['move_method_year']) == year && '${player['move_method'] ?? ''}'.isNotEmpty) {
+    labels.add('${player['move_method']}');
+  }
+  if (player['departure_confirmed'] != true && usageInt(player['move_status_year']) == year && '${player['move_status'] ?? ''}'.isNotEmpty) {
+    labels.add('${player['move_status']}');
+  } else if (player['departure_confirmed'] != true && player['fa_eligible'] == true && labels.isEmpty) {
+    labels.add('FA権保有');
+  }
+  return labels;
+}

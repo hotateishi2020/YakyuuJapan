@@ -1,9 +1,10 @@
+import '../../lib/logic/draft_video_priority.dart';
 import 'dart:convert';
 
 String _name(String value) => value.replaceAll(RegExp(r'[\s　]'), '').replaceAll('髙', '高').replaceAll('﨑', '崎').replaceAll('凜', '凛').replaceAll('澤', '沢');
 String _text(dynamic value) => value is Map ? '${value['simpleText'] ?? (value['runs'] as List? ?? []).map((r) => r['text'] ?? '').join()}' : '';
 
-/// Search is ordered by views, but select numerically rather than trusting order.
+/// Prefer player-focused content; use numerical views to break ties.
 List<Map<String, dynamic>> draftFeatureVideos(String page, String name) {
   final match = RegExp(r'(?:var\s+)?ytInitialData\s*=\s*').firstMatch(page);
   if (match == null) throw const FormatException('Missing search results');
@@ -28,7 +29,7 @@ List<Map<String, dynamic>> draftFeatureVideos(String page, String name) {
       final encoded = jsonEncode(v);
       final views = int.tryParse(_text(v['viewCountText']).replaceAll(RegExp(r'[^0-9]'), ''));
       if (RegExp(r'^[a-zA-Z0-9_-]{11}$').hasMatch(id) && _name(title).contains(_name(name)) && views != null &&
-          !RegExp(r'全打席|負傷|交錯|試合ハイライト|[表裏]途中から|応援歌|応援風景|吹奏楽|ハモリ|準決勝|回戦‼').hasMatch(title) && !encoded.contains('SHORTS') && !encoded.contains('/shorts/') && !encoded.contains('reelWatchEndpoint') && v['upcomingEventData'] == null && !encoded.contains('BADGE_STYLE_TYPE_LIVE_NOW')) {
+          !RegExp(r'負傷|交錯|[表裏]途中から|応援歌|応援風景|吹奏楽|ハモリ').hasMatch(title) && !encoded.contains('SHORTS') && !encoded.contains('/shorts/') && !encoded.contains('reelWatchEndpoint') && v['upcomingEventData'] == null && !encoded.contains('BADGE_STYLE_TYPE_LIVE_NOW')) {
         results[id] = {'video_id':id, 'title':title, 'view_count':views,
           'publisher':_text(v['ownerText']), 'url':'https://www.youtube.com/watch?v=$id',
           'thumbnail_url':'https://i.ytimg.com/vi/$id/hqdefault.jpg'};
@@ -39,5 +40,5 @@ List<Map<String, dynamic>> draftFeatureVideos(String page, String name) {
   }
   // Search results only; never recommendations in other page sections.
   visit(data['contents']?['twoColumnSearchResultsRenderer']?['primaryContents']);
-  return results.values.toList()..sort((a,b) => (b['view_count'] as int).compareTo(a['view_count'] as int));
+  return results.values.toList()..sort(compareDraftVideos);
 }

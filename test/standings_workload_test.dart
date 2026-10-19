@@ -2,6 +2,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/logic/season_schedule.dart';
 
 void main() {
+  test('先発負担率は同リーグの最高最低を判定し同率と未取得を扱う', () {
+    final teams = <Map<String, dynamic>>[
+      for (final value in [0.7, 0.7, 0.5, 0.6, null, double.nan])
+        {'id_league': 1, 'starter_workload_rate': value},
+      {'id_league': 2, 'starter_workload_rate': 0.9},
+    ];
+    expect(teams.map((team) => starterWorkloadExtreme(teams, team)), [1, 1, -1, 0, 0, 0, 0]);
+    expect(starterWorkloadExtreme(teams.take(2).toList(), teams.first), 0);
+  });
   test('先発負担率は割合を百分率へ変換し未取得を区別する', () {
     expect(starterWorkloadLabel(2 / 3), '66.7%');
     expect(starterWorkloadLabel(0), '0.0%');

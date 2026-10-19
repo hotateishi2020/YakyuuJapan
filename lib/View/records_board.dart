@@ -1,3 +1,5 @@
+import 'compact_layout.dart';
+import 'club_records_board.dart';
 import '../logic/favorite_team.dart';
 import 'draft_history_board.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
@@ -15,7 +17,7 @@ import '../tools/json_utils.dart';
 import '../tools/network_error.dart';
 import 'strength_research.dart';
 
-const recordTabs = ['優勝チーム', '個人タイトル', 'シーズン記録', '通算記録', '連続記録', '功績', 'ドラフト'];
+const recordTabs = ['優勝チーム', '個人タイトル', 'シーズン記録', '通算記録', '連続記録', '功績', '新人ドラフト', '球団記録', '現役ドラフト'];
 
 /// Franchise IDs keep former team names in the same championship history.
 List<Map<String, dynamic>> championshipIntervals(List<Map<String, dynamic>> seasons, int year, {bool mlb = false}) {
@@ -51,6 +53,7 @@ class RecordsBoard extends StatefulWidget {
 
 class _RecordsBoardState extends State<RecordsBoard> {
   int tab = 0;
+  List<int> get _tabs => widget.org.kind == OrgKind.npb ? [0, 1, 2, 3, 4, 7, 5, 6, 8] : [0, 1, 2, 3, 4, 5];
   int _standingsLeague = 0;
   int _titlesLeague = 0;
   String? _selectedTeam;
@@ -63,7 +66,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
   void initState() {
     super.initState();
     _restoreStandingsLeague();
-    tab = readSavedTab('records_${widget.org.kind.name}', List.generate(widget.org.kind == OrgKind.npb ? recordTabs.length : recordTabs.length - 1, (i) => i), fallback: 0);
+    tab = readSavedTab('records_${widget.org.kind.name}', _tabs, fallback: 0);
     load();
   }
 
@@ -73,7 +76,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
     if (oldWidget.org.kind != widget.org.kind || oldWidget.year != widget.year) {
       _selectedTeam = null;
       _restoreStandingsLeague();
-      tab = readSavedTab('records_${widget.org.kind.name}', List.generate(widget.org.kind == OrgKind.npb ? recordTabs.length : recordTabs.length - 1, (i) => i), fallback: 0);
+      tab = readSavedTab('records_${widget.org.kind.name}', _tabs, fallback: 0);
       load();
     }
   }
@@ -111,7 +114,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
         SizedBox(
             height: TAB_BAR_H,
             child: Row(children: [
-              for (var i = 0; i < (widget.org.kind == OrgKind.npb ? recordTabs.length : recordTabs.length - 1); i++)
+              for (final i in _tabs)
                 Expanded(
                     child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 2),
@@ -127,7 +130,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
                       },
                       child: Center(
                           child: FittedBox(
-                              child: Text(recordTabs[i],
+                              child: Text(compactBaseballLayout(context) ? (const {0: '優勝', 1: '個人', 2: 'シーズン', 3: '通算', 4: '連続', 6: '新人ドラ', 7: '球団', 8: '現役ドラ'}[i] ?? recordTabs[i]) : recordTabs[i],
                                   style: TextStyle(
                                       color: tab == i
                                           ? widget.org.tabForeground
@@ -138,7 +141,9 @@ class _RecordsBoardState extends State<RecordsBoard> {
             ])),
         const SizedBox(height: 6),
         Expanded(
-            child: tab == 6
+            child: tab == 8
+                ? DraftHistoryBoard(key: ValueKey('active-${widget.year}'), year: widget.year, activeDraft: true)
+                : tab == 6
                 ? (widget.org.kind == OrgKind.npb ? DraftHistoryBoard(key: ValueKey(widget.year), year: widget.year) : const SizedBox.shrink())
                 : tab == 5
                 ? RecordsHonors(org: widget.org, year: widget.year)
@@ -156,6 +161,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
                         : switch (tab) {
                             0 => standings(),
                             1 => titles(),
+                            7 => ClubRecordsBoard(data: Map<String, dynamic>.from(data!['club_records'] as Map? ?? {})),
                             _ => recordComparison(
                                 ['', '', 'season', 'career', 'streaks'][tab]),
                           }),
@@ -205,7 +211,11 @@ class _RecordsBoardState extends State<RecordsBoard> {
     int columnsFor(Map<String,dynamic> season) => widget.org.kind == OrgKind.npb
         ? ((int.tryParse('${season['year']}') ?? 0) < 1958 ? 9 : 6) : mlbCount;
     final singleLeague = _standingsLeague != 0;
-    var championWidth = 240.0;
+    final compact = compactBaseballLayout(context);
+    final championLogoOnly = compact;
+    final yearWidth = compact ? 40.0 : 48.0;
+    final leagueWidth = compact ? 36.0 : 80.0;
+    var championWidth = championLogoOnly ? 48.0 : 240.0;
     for (final season in seasons) {
       for (final league in listMapFromJson(season['leagues'])) {
         final teams = listMapFromJson(league['teams']);
@@ -213,12 +223,12 @@ class _RecordsBoardState extends State<RecordsBoard> {
           final painter = TextPainter(text: TextSpan(text: '${team['name'] ?? '—'}',
             style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
             textScaler: MediaQuery.textScalerOf(context), textDirection: Directionality.of(context))..layout();
-          if (team['champion'] == true) championWidth = math.max(championWidth, painter.width + 42);
+          if (!championLogoOnly && team['champion'] == true) championWidth = math.max(championWidth, painter.width + 42);
           painter.dispose();
         }
       }
     }
-    final fixedWidth = 48 + championWidth + (singleLeague ? 0 : 80);
+    final fixedWidth = yearWidth + championWidth + (singleLeague ? 0 : leagueWidth);
     return LayoutBuilder(builder: (context, constraints) {
       Widget cell(Widget child, double w, double h, {Color color = Colors.white}) => Container(
         width: w, height: h, alignment: Alignment.center,
@@ -230,7 +240,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
         padding: const EdgeInsets.symmetric(horizontal: 3),
         child: Text(text, maxLines: 1, overflow: TextOverflow.ellipsis,
           style: TextStyle(fontSize: 11, color: color, fontWeight: bold ? FontWeight.bold : FontWeight.normal)));
-      Widget teamCell(Map<String, dynamic> team, double w, double h, {bool logo = false, Color rankBackground = Colors.white, Color? backgroundOverride, Object? year}) {
+      Widget teamCell(Map<String, dynamic> team, double w, double h, {bool logo = false, bool logoOnly = false, Color rankBackground = Colors.white, Color? backgroundOverride, Object? year}) {
         final name = logo ? '${team['name'] ?? '—'}' : '${team['short_name'] ?? team['name'] ?? '—'}';
         final teamKey = _teamKey(team);
         final highlighted = !logo && _selectedTeam == teamKey;
@@ -245,9 +255,9 @@ class _RecordsBoardState extends State<RecordsBoard> {
         final visual = savedLogo.startsWith('asset:') ? (asset: savedLogo.substring(6).replaceFirst('images/history_', 'images/thumb_history_'), networkUrl: null)
             : savedLogo.isNotEmpty ? (asset: null, networkUrl: savedLogo)
             : team['historical_identity'] == true ? (asset: null, networkUrl: null)
-            : teamLogoVisual('${team['name'] ?? name}', abbrev: '${team['name_shortest'] ?? ''}');
+            : teamLogoVisual('${team['name'] ?? name}', abbrev: '${team['name_shortest'] ?? ''}', mlb: widget.org.kind == OrgKind.mlb);
         final hasLogo = visual.asset != null || visual.networkUrl != null;
-        Widget fallback() => label(name, color: fg, bold: logo);
+        Widget fallback() => label(logoOnly ? '—' : name, color: fg, bold: logo);
         final image = visual.asset != null
             ? Image.asset(visual.asset!, cacheWidth: 112, fit: BoxFit.contain,
                 errorBuilder: (_, __, ___) => fallback())
@@ -258,7 +268,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
           label: '${team['name'] ?? name}', child: cell(
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             if (hasLogo) SizedBox(width: logo ? 28 : math.min(w - 6, 54), height: 28, child: image),
-            if (logo || !hasLogo) Flexible(child: fallback()),
+            if ((!logoOnly && logo) || !hasLogo) Flexible(child: fallback()),
           ]), w, h, color: background)));
         if (logo) return content;
         return MouseRegion(
@@ -277,9 +287,9 @@ class _RecordsBoardState extends State<RecordsBoard> {
       Color leagueBackground(Map<String, dynamic> league) => Color.lerp(leagueColor(league), Colors.white, .88)!;
 
       Widget header(int count, double teamWidth) => Row(children: [
-        cell(label('年度', bold: true), 48, 26, color: Colors.grey.shade200),
+        cell(label('年度', bold: true), yearWidth, 26, color: Colors.grey.shade200),
         cell(label(widget.org.kind == OrgKind.npb ? '日本一' : 'WS優勝', bold: true), championWidth, 26, color: const Color(0xFFFFF0BF)),
-        if (!singleLeague) cell(label('リーグ', bold: true), 80, 26, color: Colors.grey.shade200),
+        if (!singleLeague) cell(label('リーグ', bold: true), leagueWidth, 26, color: Colors.grey.shade200),
         for (var rank = 1; rank <= count; rank++)
           cell(label('$rank位', bold: true),
             teamWidth, 26, color: Colors.grey.shade200),
@@ -318,7 +328,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
         ]);
       }
       final maxColumns = seasons.map(columnsFor).fold<int>(1, math.max);
-      final width = math.max(constraints.maxWidth, fixedWidth + maxColumns * 68.0);
+      final width = compact ? constraints.maxWidth : math.max(constraints.maxWidth, fixedWidth + maxColumns * 68.0);
       return SingleChildScrollView(
         key: const ValueKey('standings-horizontal-scroll'),
         scrollDirection: Axis.horizontal,
@@ -350,11 +360,11 @@ class _RecordsBoardState extends State<RecordsBoard> {
               cell(FittedBox(fit: BoxFit.scaleDown, child: Column(mainAxisSize: MainAxisSize.min, children: [
                   label('${season['year']}', bold: true),
                   if (season['phase_label'] != null) label('${season['phase_label']}', bold: true),
-                ])), 48, height),
-              teamCell(champion ?? {'name': season['champion'] ?? '—'}, championWidth, height, logo: true),
+                ])), yearWidth, height),
+              teamCell(champion ?? {'name': season['champion'] ?? '—'}, championWidth, height, logo: true, logoOnly: championLogoOnly),
               Column(children: [for (final league in leagues)
                 Row(children: [
-                  if (!singleLeague) cell(label('${league['name']}', color: Colors.white, bold: true), 80, 30,
+                  if (!singleLeague) cell(label(compact ? '${league['name']}'.replaceAll('リーグ', '') : '${league['name']}', color: Colors.white, bold: true), leagueWidth, 30,
                     color: leagueColor(league)),
                   for (final entry in listMapFromJson(league['teams']).take(count).indexed)
                     teamCell(entry.$2, teamWidth, 30,

@@ -1,3 +1,4 @@
+import 'compact_layout.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'personal_stats_style.dart';
 export 'personal_stats_style.dart' show personalStatPositionColor;
@@ -832,9 +833,9 @@ class SeasonTableBlock extends StatelessWidget {
               wChar2 + // 打点
               wChar2 + // 盗塁
               wChar3 + // 失策率
-              wChar2 * 3 + wChar3 * 2; // 防御率3列＋先発負担率
+              wChar2 * 3 + wChar3; // 防御率3列＋先発負担率
           final double pinnedBaseW = (showPredictCols ? wChar2 * 3 : wChar2) + (showNpbLeagueColumn ? wChar2 : 0); // 順位(+立・江)
-          final double wName = _standingsTeamNameWidth([(label: '', rows: widthRows)], showJapan: org.kind == OrgKind.mlb);
+          final double wName = _standingsTeamNameWidth([(label: '', rows: [for (final row in widthRows) {...row, if (compactBaseballLayout(context)) 'name_team': row['name_shortest'] ?? row['name_team']}])], showJapan: org.kind == OrgKind.mlb);
           final double pinnedW = pinnedBaseW + wName;
           final double naturalTable = pinnedW + scrollColsW;
           final double parentW = lb.maxWidth.isFinite ? lb.maxWidth : naturalTable;
@@ -901,7 +902,12 @@ class SeasonTableBlock extends StatelessWidget {
                   ]),
                 ]),
               ),
-              SizedBox(width: cols.pct * 2, child: Tooltip(message: '先発投球回 ÷ チーム総投球回', child: gridCell('先発負担率', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: leagueForeground))),
+              SizedBox(width: cols.pct, child: Tooltip(message: '先発投球回 ÷ チーム総投球回', child: Container(
+                height: ALL_HEADER_H, alignment: Alignment.center,
+                decoration: BoxDecoration(color: leagueColor, border: Border.all(color: Colors.black26)),
+                child: FittedBox(fit: BoxFit.scaleDown, child: Text('先発\n負担率', textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: leagueForeground))),
+              ))),
               for (final opponent in opponents) SizedBox(width: opponentColumnWidth * cols.game / wChar2, child: gridCell('${opponent['name_shortest'] ?? opponent['name_team']}\n勝–負–分', h: ALL_HEADER_H, bg: leagueColor, fg: leagueForeground)),
               for (final date in dates) Container(width: 44 * cols.game / wChar2, height: ALL_HEADER_H,
                 alignment: Alignment.center, color: leagueColor,
@@ -953,7 +959,7 @@ class SeasonTableBlock extends StatelessWidget {
               SizedBox(
                 width: wName,
                 child: teamNameCell(
-                  _num(row['name_team']),
+                  _num(compactBaseballLayout(context) ? row['name_shortest'] ?? row['name_team'] : row['name_team']),
                   h: gridBodyH,
                   bg: teamBg,
                   fg: teamFg,
@@ -1017,6 +1023,7 @@ class SeasonTableBlock extends StatelessWidget {
             final bool hasMagic = gbText.toUpperCase().contains('M');
             final bool isChampion = gbText == '優勝' || gbText.toUpperCase() == 'W';
             final Color? fgGb = isChampion ? Colors.yellow : (closeBehind ? const Color.fromARGB(255, 255, 68, 196) : null);
+            final workloadExtreme = starterWorkloadExtreme(standings, row);
             final Color bgGb = isChampion ? Colors.red : paleBg;
             final FontWeight? wtGb = (closeBehind || hasMagic || isChampion) ? FontWeight.bold : null;
             final gbDisplay = isChampion && org.kind == OrgKind.mlb ? 'W' : _num(row['game_behind']);
@@ -1036,14 +1043,14 @@ class SeasonTableBlock extends StatelessWidget {
               SizedBox(width: cols.era, child: gridCell(_num(row['num_era_total']), h: gridBodyH, bg: paleBg, fg: fgEraT, weight: wtEraT)),
               SizedBox(width: cols.era, child: gridCell(_num(row['num_era_starter']), h: gridBodyH, bg: paleBg, fg: fgEraS, weight: wtEraS)),
               SizedBox(width: cols.era, child: gridCell(_num(row['num_era_relief']), h: gridBodyH, bg: paleBg, fg: fgEraR, weight: wtEraR)),
-              SizedBox(width: cols.pct * 2, child: gridCell(starterWorkloadLabel(row['starter_workload_rate']), h: gridBodyH, bg: paleBg)),
+              SizedBox(width: cols.pct, child: gridCell(starterWorkloadLabel(row['starter_workload_rate']), h: gridBodyH, bg: paleBg, fg: workloadExtreme == 1 ? Colors.green : workloadExtreme == -1 ? Colors.red : null, weight: workloadExtreme != 0 ? FontWeight.bold : null)),
               for (final opponent in opponents)
                 SizedBox(
                     width: opponentColumnWidth * cols.game / wChar2,
                     child: Builder(builder: (context) {
                       final r = scheduleRecord(scheduleGames, row['id_team'], opponent: opponent['id_team']);
                       final extreme = scheduleOpponentExtreme(standings, scheduleGames, row, opponent['id_team']);
-                      return gridCell('${row['id_team']}' == '${opponent['id_team']}' ? '—' : '${r.wins}–${r.losses}–${r.draws}', h: gridBodyH, bg: paleBg, fg: extreme == 1 ? Colors.green : extreme == -1 ? Colors.red : null);
+                      return gridCell('${row['id_team']}' == '${opponent['id_team']}' ? '—' : '${r.wins}–${r.losses}–${r.draws}', h: gridBodyH, bg: paleBg, fg: extreme == 1 ? Colors.green : extreme == -1 ? Colors.red : null, weight: extreme == 1 || extreme == -1 ? FontWeight.bold : FontWeight.normal);
                     })),
               for (final date in dates)
                 SizedBox(

@@ -1,9 +1,12 @@
 import '../data/npb_fa_rights.dart';
+import '../data/npb_transfer_reports.dart';
 import '../tools/json_utils.dart';
 import 'strength_usage.dart';
 
-String contractFaLabel(Map<String, dynamic> event) =>
-    '${event['type'] == 'international' ? '海外' : '国内'}FA権獲得${event['projected'] == true ? '（見込み）' : ''}';
+String contractFaLabel(Map<String, dynamic> event) => event['type'] ==
+        'foreign_exemption'
+    ? '外国人適用除外${event['projected'] == true ? '（見込み）' : ''}'
+    : '${event['type'] == 'international' ? '海外' : '国内'}FA権獲得${event['projected'] == true ? '（見込み）' : ''}';
 
 /// Match official player IDs first; name-only reports are limited to NPB rosters.
 List<Map<String, dynamic>> contractFaEvents(
@@ -14,10 +17,11 @@ List<Map<String, dynamic>> contractFaEvents(
   final name = normalize(player['name']);
   final candidates = <Map<String, dynamic>>[
     if (isNpb)
-      ...npbFaRights.where((event) => event['player_key'] != null
-          ? event['player_key'] == key ||
-              (!key.startsWith('npb:') && normalize(event['name']) == name)
-          : normalize(event['name']) == name),
+      ...[...npbFaRights, ...npbFaAcquisitionSupplements].where((event) =>
+          event['player_key'] != null
+              ? event['player_key'] == key ||
+                  (!key.startsWith('npb:') && normalize(event['name']) == name)
+              : normalize(event['name']) == name),
     ...listMapFromJson(player['fa_events']),
     ...listMapFromJson(contract?['fa_events']),
   ];

@@ -21,7 +21,7 @@ class BaseballLoading extends StatefulWidget {
 class _BaseballLoadingState extends State<BaseballLoading>
     with SingleTickerProviderStateMixin {
   late final AnimationController _motion =
-      AnimationController(vsync: this, duration: const Duration(seconds: 5));
+      AnimationController(vsync: this, duration: const Duration(seconds: 12));
   Timer? _timer;
   int _seconds = 0;
   bool _reduced = false;
@@ -60,7 +60,7 @@ class _BaseballLoadingState extends State<BaseballLoading>
         : (95 * (1 - math.exp(-_seconds / 18))).round();
     final estimated = measured == null || !measured.isFinite;
     return Semantics(
-      label: '内野でボール回し',
+      label: 'ノックを受けて捕球・送球する守備練習',
       value: '${estimated ? '目安 ' : ''}$percent%',
       child: SizedBox(
           width: widget.compact ? 140 : 280,
@@ -71,12 +71,13 @@ class _BaseballLoadingState extends State<BaseballLoading>
                   width: 280,
                   height: 200,
                   child: Column(children: [
-                    Flexible(child: SizedBox(
-                        width: 280,
-                        height: 168,
-                        child: CustomPaint(
-                            painter: _InfieldPainter(
-                                _motion, widget.color, _reduced)))),
+                    Flexible(
+                        child: SizedBox(
+                            width: 280,
+                            height: 168,
+                            child: CustomPaint(
+                                painter: _InfieldPainter(
+                                    _motion, widget.color, _reduced)))),
                     ExcludeSemantics(
                         child: Text('${estimated ? '目安 ' : ''}$percent%',
                             key: const ValueKey('baseball-loading-percent'),
@@ -97,10 +98,11 @@ class _InfieldPainter extends CustomPainter {
   final Color uniform;
   final bool reduced;
   static const players = [
-    Offset(140, 35),
-    Offset(225, 91),
-    Offset(140, 142),
-    Offset(55, 91)
+    Offset(140, 142), // ノッカー
+    Offset(225, 91), // 一塁手
+    Offset(55, 91), // 三塁手
+    Offset(110, 45), // 遊撃手
+    Offset(177, 51), // 二塁手
   ];
   @override
   void paint(Canvas canvas, Size size) {
@@ -136,19 +138,31 @@ class _InfieldPainter extends CustomPainter {
         Paint()
           ..color = Colors.white
           ..strokeWidth = 3);
-    final turn = motion.value * 4;
-    final from = turn.floor() % 4, to = (from + 1) % 4;
+    // Each repetition: swing → bouncing grounder → field → first → return.
+    final turn = (reduced ? .035 : motion.value) * 3;
+    final target = 2 + turn.floor() % 3;
     final phase = turn % 1;
+    double interval(double start, double end) =>
+        ((phase - start) / (end - start)).clamp(0.0, 1.0);
+    final swing = Curves.easeInOut.transform(
+        phase < .88 ? interval(.02, .16) : 1 - interval(.88, 1));
+    final fielding = phase >= .36 && phase < .64
+        ? math.sin(interval(.36, .64) * math.pi)
+        : 0.0;
+    final throwing = phase >= .56 && phase < .8
+        ? math.sin(interval(.56, .8) * math.pi)
+        : 0.0;
+    final positions = List<Offset>.of(players);
+    positions[target] += Offset(8 * fielding, 6 * fielding);
     for (var i = 0; i < players.length; i++) {
-      final p = players[i];
+      final p = positions[i];
       oval(
           Rect.fromCenter(
               center: p + const Offset(0, 15), width: 34, height: 9),
           Colors.black.withValues(alpha: .12));
-      final bounce =
-          reduced ? 0.0 : (i == to ? math.sin(phase * math.pi) * 2 : 0.0);
+      final crouch = i == target ? fielding * 8 : 0.0;
       canvas.save();
-      canvas.translate(p.dx, p.dy - bounce);
+      canvas.translate(p.dx, p.dy + crouch);
       // Oversized head, round body and short limbs: an original toy-like player.
       final dark = uniform.withValues(alpha: 1);
       canvas.drawRRect(
@@ -181,24 +195,85 @@ class _InfieldPainter extends CustomPainter {
             ..color = const Color(0xFFB16C4C)
             ..style = PaintingStyle.stroke
             ..strokeWidth = 1.5);
-      final reach = i == to || i == from ? math.sin(phase * math.pi) * 5 : 0.0;
-      oval(Rect.fromLTWH(-22, -1 - reach, 13, 13), const Color(0xFFAC6F39));
-      canvas.drawLine(
-          Offset(-19, 2 - reach),
-          Offset(-14, 8 - reach),
-          Paint()
-            ..color = const Color(0xFF744822)
-            ..strokeWidth = 1.4);
-      oval(Rect.fromLTWH(10, 0 - reach, 10, 10), const Color(0xFFFFD5AD));
+      if (i == 0) {
+        // Long bat and a broad follow-through make the coach distinct.
+        final angle = -2.4 + swing * 2.8;
+        const grip = Offset(12, 5);
+        final tip = grip + Offset(math.cos(angle), math.sin(angle)) * 37;
+        canvas.drawLine(
+            grip,
+            tip,
+            Paint()
+              ..color = const Color(0xFFAD7139)
+              ..strokeWidth = 6
+              ..strokeCap = StrokeCap.round);
+        oval(const Rect.fromLTWH(6, 1, 12, 10), const Color(0xFFFFD5AD));
+        oval(const Rect.fromLTWH(-16, 1, 10, 10), const Color(0xFFFFD5AD));
+      } else {
+        final glove = i == target
+            ? Offset(-17 + fielding * 14, 5 + fielding * 8)
+            : const Offset(-17, 0);
+        oval(Rect.fromCenter(center: glove, width: 15, height: 14),
+            const Color(0xFFAC6F39));
+        canvas.drawLine(
+            glove + const Offset(-3, -4),
+            glove + const Offset(3, 4),
+            Paint()
+              ..color = const Color(0xFF744822)
+              ..strokeWidth = 1.4);
+        final hand = Offset(15, i == target ? 5 - throwing * 24 : 5);
+        canvas.drawLine(
+            const Offset(10, 4),
+            hand,
+            Paint()
+              ..color = Colors.white
+              ..strokeWidth = 7
+              ..strokeCap = StrokeCap.round);
+        oval(Rect.fromCenter(center: hand, width: 10, height: 10),
+            const Color(0xFFFFD5AD));
+      }
       canvas.restore();
     }
-    final t = Curves.easeInOut.transform(phase);
-    final ball = Offset.lerp(players[from], players[to], t)! +
-        Offset(0, -12 - math.sin(t * math.pi) * 28);
+    final contact = players[0] + const Offset(22, 3);
+    final glove =
+        positions[target] + Offset(-17 + fielding * 14, 5 + fielding * 16);
+    final firstGlove = players[1] + const Offset(-17, 0);
+    Offset ball;
+    double elevation = 0;
+    if (phase < .16) {
+      final toss = interval(0, .16);
+      ball = contact + Offset(0, -math.sin(toss * math.pi) * 12);
+    } else if (phase < .5) {
+      final t = interval(.16, .5);
+      elevation = math.sin(t * math.pi * 3).abs() * (1 - t) * 9;
+      ball = Offset.lerp(contact, glove, t)! + Offset(0, -elevation);
+      // Small ground-ball trail, kept close to the dirt.
+      final direction = (glove - contact).direction;
+      canvas.drawLine(
+          ball - Offset(math.cos(direction), math.sin(direction)) * 13,
+          ball,
+          Paint()
+            ..color = Colors.white.withValues(alpha: .7)
+            ..strokeWidth = 2);
+    } else if (phase < .62) {
+      ball = glove;
+    } else if (phase < .82) {
+      final t = interval(.62, .82);
+      elevation = math.sin(t * math.pi) * 22;
+      ball = Offset.lerp(
+              positions[target] + const Offset(15, -12), firstGlove, t)! +
+          Offset(0, -elevation);
+    } else if (phase < .88) {
+      ball = firstGlove;
+    } else {
+      final t = interval(.88, 1);
+      elevation = math.sin(t * math.pi) * 16;
+      ball = Offset.lerp(firstGlove, contact, t)! + Offset(0, -elevation);
+    }
     oval(
         Rect.fromCenter(
-            center: ball + const Offset(0, 18), width: 10, height: 4),
-        Colors.black.withValues(alpha: .12));
+            center: ball + Offset(0, elevation + 6), width: 9, height: 3),
+        Colors.black.withValues(alpha: .16));
     canvas.drawCircle(ball, 5.5, Paint()..color = const Color(0xFF607D8B));
     canvas.drawCircle(ball, 4.5, Paint()..color = Colors.white);
     canvas.drawArc(

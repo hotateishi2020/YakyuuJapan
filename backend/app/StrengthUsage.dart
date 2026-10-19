@@ -146,6 +146,7 @@ List<Map<String, dynamic>> parseUsageRoster(String source, int year) {
     result[id] = {
       'source_player_id': id,
       'player_key': 'npb:$id',
+      'uniform_number': cells[0].text.trim(),
       'name': cells[1].text.replaceAll(RegExp(r'\s+'), ''),
       'source_surname': cells[1].text.trim().split(RegExp(r'[\s　]+')).first,
       'date_birth': cells[2].text.trim().replaceAll('.', '-'),

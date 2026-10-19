@@ -1,3 +1,8 @@
+import 'package:html/dom.dart';
+
+/// Preserve boundaries such as <br> between statistics and award history.
+String awardCardText(Node node) => node is Text ? node.text : node.nodes.map(awardCardText).join(' ');
+
 /// Extract only the statistic explicitly shown on a statistical award card.
 Map<String, String> npbAwardValue(String label, String text) {
   final spec = switch (label) {

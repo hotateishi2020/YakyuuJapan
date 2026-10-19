@@ -1,0 +1,465 @@
+{
+  "years": {
+    "2022": {
+      "source": "https://npb.jp/geneki_draft/2022/",
+      "picks": [
+        {
+          "team": "オリックス",
+          "name": "渡邉 大樹",
+          "position": "外野手",
+          "from_team": "ヤクルト",
+          "rank": "1",
+          "type": "現役",
+          "from": "ヤクルト"
+        },
+        {
+          "team": "ソフトバンク",
+          "name": "古川 侑利",
+          "position": "投　手",
+          "from_team": "日本ハム",
+          "rank": "1",
+          "type": "現役",
+          "from": "日本ハム"
+        },
+        {
+          "team": "西武",
+          "name": "陽川 尚将",
+          "position": "内野手",
+          "from_team": "阪神",
+          "rank": "1",
+          "type": "現役",
+          "from": "阪神"
+        },
+        {
+          "team": "楽天",
+          "name": "正隨 優弥",
+          "position": "外野手",
+          "from_team": "広島",
+          "rank": "1",
+          "type": "現役",
+          "from": "広島"
+        },
+        {
+          "team": "ロッテ",
+          "name": "大下 誠一郎",
+          "position": "内野手",
+          "from_team": "オリックス",
+          "rank": "1",
+          "type": "現役",
+          "from": "オリックス"
+        },
+        {
+          "team": "日本ハム",
+          "name": "松岡 洸希",
+          "position": "投　手",
+          "from_team": "西武",
+          "rank": "1",
+          "type": "現役",
+          "from": "西武"
+        },
+        {
+          "team": "ヤクルト",
+          "name": "成田 翔",
+          "position": "投　手",
+          "from_team": "ロッテ",
+          "rank": "1",
+          "type": "現役",
+          "from": "ロッテ"
+        },
+        {
+          "team": "DeNA",
+          "name": "笠原 祥太郎",
+          "position": "投　手",
+          "from_team": "中日",
+          "rank": "1",
+          "type": "現役",
+          "from": "中日"
+        },
+        {
+          "team": "阪神",
+          "name": "大竹 耕太郎",
+          "position": "投　手",
+          "from_team": "ソフトバンク",
+          "rank": "1",
+          "type": "現役",
+          "from": "ソフトバンク"
+        },
+        {
+          "team": "巨人",
+          "name": "オコエ 瑠偉",
+          "position": "外野手",
+          "from_team": "楽天",
+          "rank": "1",
+          "type": "現役",
+          "from": "楽天"
+        },
+        {
+          "team": "広島",
+          "name": "戸根 千明",
+          "position": "投　手",
+          "from_team": "巨人",
+          "rank": "1",
+          "type": "現役",
+          "from": "巨人"
+        },
+        {
+          "team": "中日",
+          "name": "細川 成也",
+          "position": "外野手",
+          "from_team": "DeNA",
+          "rank": "1",
+          "type": "現役",
+          "from": "DeNA"
+        }
+      ]
+    },
+    "2023": {
+      "source": "https://npb.jp/geneki_draft/2023/",
+      "picks": [
+        {
+          "team": "阪神",
+          "name": "漆原 大晟",
+          "position": "投　手",
+          "from_team": "オリックス",
+          "rank": "1",
+          "type": "現役",
+          "from": "オリックス"
+        },
+        {
+          "team": "広島",
+          "name": "内間 拓馬",
+          "position": "投　手",
+          "from_team": "楽天",
+          "rank": "1",
+          "type": "現役",
+          "from": "楽天"
+        },
+        {
+          "team": "DeNA",
+          "name": "佐々木 千隼",
+          "position": "投　手",
+          "from_team": "ロッテ",
+          "rank": "1",
+          "type": "現役",
+          "from": "ロッテ"
+        },
+        {
+          "team": "巨人",
+          "name": "馬場 皐輔",
+          "position": "投　手",
+          "from_team": "阪神",
+          "rank": "1",
+          "type": "現役",
+          "from": "阪神"
+        },
+        {
+          "team": "ヤクルト",
+          "name": "北村 拓己",
+          "position": "内野手",
+          "from_team": "巨人",
+          "rank": "1",
+          "type": "現役",
+          "from": "巨人"
+        },
+        {
+          "team": "中日",
+          "name": "梅野 雄吾",
+          "position": "投　手",
+          "from_team": "ヤクルト",
+          "rank": "1",
+          "type": "現役",
+          "from": "ヤクルト"
+        },
+        {
+          "team": "オリックス",
+          "name": "鈴木 博志",
+          "position": "投　手",
+          "from_team": "中日",
+          "rank": "1",
+          "type": "現役",
+          "from": "中日"
+        },
+        {
+          "team": "ロッテ",
+          "name": "愛斗",
+          "position": "外野手",
+          "from_team": "西武",
+          "rank": "1",
+          "type": "現役",
+          "from": "西武"
+        },
+        {
+          "team": "ソフトバンク",
+          "name": "長谷川 威展",
+          "position": "投　手",
+          "from_team": "日本ハム",
+          "rank": "1",
+          "type": "現役",
+          "from": "日本ハム"
+        },
+        {
+          "team": "楽天",
+          "name": "櫻井 周斗",
+          "position": "投　手",
+          "from_team": "DeNA",
+          "rank": "1",
+          "type": "現役",
+          "from": "DeNA"
+        },
+        {
+          "team": "西武",
+          "name": "中村 祐太",
+          "position": "投　手",
+          "from_team": "広島",
+          "rank": "1",
+          "type": "現役",
+          "from": "広島"
+        },
+        {
+          "team": "日本ハム",
+          "name": "水谷 瞬",
+          "position": "外野手",
+          "from_team": "ソフトバンク",
+          "rank": "1",
+          "type": "現役",
+          "from": "ソフトバンク"
+        }
+      ]
+    },
+    "2024": {
+      "source": "https://npb.jp/geneki_draft/2024/",
+      "picks": [
+        {
+          "team": "巨人",
+          "name": "田中 瑛斗",
+          "position": "投　手",
+          "from_team": "日本ハム",
+          "rank": "1",
+          "type": "現役",
+          "from": "日本ハム"
+        },
+        {
+          "team": "ヤクルト",
+          "name": "矢崎 拓也",
+          "position": "投　手",
+          "from_team": "広島",
+          "rank": "1",
+          "type": "現役",
+          "from": "広島"
+        },
+        {
+          "team": "DeNA",
+          "name": "浜地 真澄",
+          "position": "投　手",
+          "from_team": "阪神",
+          "rank": "1",
+          "type": "現役",
+          "from": "阪神"
+        },
+        {
+          "team": "中日",
+          "name": "伊藤 茉央",
+          "position": "投　手",
+          "from_team": "楽天",
+          "rank": "1",
+          "type": "現役",
+          "from": "楽天"
+        },
+        {
+          "team": "阪神",
+          "name": "畠 世周",
+          "position": "投　手",
+          "from_team": "巨人",
+          "rank": "1",
+          "type": "現役",
+          "from": "巨人"
+        },
+        {
+          "team": "広島",
+          "name": "山足 達也",
+          "position": "内野手",
+          "from_team": "オリックス",
+          "rank": "1",
+          "type": "現役",
+          "from": "オリックス"
+        },
+        {
+          "team": "日本ハム",
+          "name": "吉田 賢吾",
+          "position": "捕　手",
+          "from_team": "ソフトバンク",
+          "rank": "1",
+          "type": "現役",
+          "from": "ソフトバンク"
+        },
+        {
+          "team": "楽天",
+          "name": "柴田 大地",
+          "position": "投　手",
+          "from_team": "ヤクルト",
+          "rank": "1",
+          "type": "現役",
+          "from": "ヤクルト"
+        },
+        {
+          "team": "西武",
+          "name": "平沢 大河",
+          "position": "内野手",
+          "from_team": "ロッテ",
+          "rank": "1",
+          "type": "現役",
+          "from": "ロッテ"
+        },
+        {
+          "team": "ロッテ",
+          "name": "石垣 雅海",
+          "position": "内野手",
+          "from_team": "中日",
+          "rank": "1",
+          "type": "現役",
+          "from": "中日"
+        },
+        {
+          "team": "オリックス",
+          "name": "本田 圭佑",
+          "position": "投　手",
+          "from_team": "西武",
+          "rank": "1",
+          "type": "現役",
+          "from": "西武"
+        },
+        {
+          "team": "ソフトバンク",
+          "name": "上茶谷 大河",
+          "position": "投　手",
+          "from_team": "DeNA",
+          "rank": "1",
+          "type": "現役",
+          "from": "DeNA"
+        },
+        {
+          "team": "広島",
+          "name": "鈴木 健矢",
+          "position": "投　手",
+          "from_team": "日本ハム",
+          "rank": "1",
+          "type": "現役",
+          "from": "日本ハム"
+        }
+      ]
+    },
+    "2025": {
+      "source": "https://npb.jp/geneki_draft/2025/",
+      "picks": [
+        {
+          "team": "巨人",
+          "name": "松浦 慶斗",
+          "position": "投　手",
+          "from_team": "日本ハム",
+          "rank": "1",
+          "type": "現役",
+          "from": "日本ハム"
+        },
+        {
+          "team": "ヤクルト",
+          "name": "大道 温貴",
+          "position": "投　手",
+          "from_team": "広島",
+          "rank": "1",
+          "type": "現役",
+          "from": "広島"
+        },
+        {
+          "team": "DeNA",
+          "name": "濱 将乃介",
+          "position": "外野手",
+          "from_team": "中日",
+          "rank": "1",
+          "type": "現役",
+          "from": "中日"
+        },
+        {
+          "team": "中日",
+          "name": "知野 直人",
+          "position": "内野手",
+          "from_team": "DeNA",
+          "rank": "1",
+          "type": "現役",
+          "from": "DeNA"
+        },
+        {
+          "team": "阪神",
+          "name": "濱田 太貴",
+          "position": "外野手",
+          "from_team": "ヤクルト",
+          "rank": "1",
+          "type": "現役",
+          "from": "ヤクルト"
+        },
+        {
+          "team": "広島",
+          "name": "辰見 鴻之介",
+          "position": "内野手",
+          "from_team": "楽天",
+          "rank": "1",
+          "type": "現役",
+          "from": "楽天"
+        },
+        {
+          "team": "日本ハム",
+          "name": "菊地 大稀",
+          "position": "投　手",
+          "from_team": "巨人",
+          "rank": "1",
+          "type": "現役",
+          "from": "巨人"
+        },
+        {
+          "team": "楽天",
+          "name": "佐藤 直樹",
+          "position": "外野手",
+          "from_team": "ソフトバンク",
+          "rank": "1",
+          "type": "現役",
+          "from": "ソフトバンク"
+        },
+        {
+          "team": "西武",
+          "name": "茶野 篤政",
+          "position": "外野手",
+          "from_team": "オリックス",
+          "rank": "1",
+          "type": "現役",
+          "from": "オリックス"
+        },
+        {
+          "team": "ロッテ",
+          "name": "井上 広大",
+          "position": "外野手",
+          "from_team": "阪神",
+          "rank": "1",
+          "type": "現役",
+          "from": "阪神"
+        },
+        {
+          "team": "オリックス",
+          "name": "平沼 翔太",
+          "position": "外野手",
+          "from_team": "西武",
+          "rank": "1",
+          "type": "現役",
+          "from": "西武"
+        },
+        {
+          "team": "ソフトバンク",
+          "name": "中村 稔弥",
+          "position": "投　手",
+          "from_team": "ロッテ",
+          "rank": "1",
+          "type": "現役",
+          "from": "ロッテ"
+        }
+      ]
+    }
+  }
+}

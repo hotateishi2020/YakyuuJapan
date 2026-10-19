@@ -405,7 +405,7 @@ void main() {
   test('公式の新着30件があっても鷹BAKAとももスポの最新動画を残す', () {
     final team = videoChannels.firstWhere((c) => c.tabLabel == 'ソフトバンク');
     final related =
-        videoChannels.where((c) => c.teamIds.contains(team.id)).toList();
+        videoChannels.where((c) => c.teamIds.contains(team.id) && (c.name.startsWith('ももスポ') || c.name == '鷹BAKA軍団')).toList();
     final result = groupVideoChannels([
       team,
       ...related
@@ -861,19 +861,19 @@ void main() {
           ...channel.toJson(),
           'status': 'ok',
           'videos': [
-            if (channel == sources[0])
+            if (channel.id == 'UCWt0yfrBaUk148rxaOp4b4w')
               {
                 'id': 'game',
                 'title': '巨人対阪神 プロ野球',
                 'published_at': '2026-10-18T03:00:00Z'
               },
-            if (channel == sources[1])
+            if (channel.id == 'UCI-w8qGuG4PlmZ25m9x_Q_A')
               {
                 'id': 'older',
                 'title': '【巨人】練習',
                 'published_at': '2026-10-17T03:00:00Z'
               },
-            if (channel == sources[2]) ...[
+            if (channel.id == 'UCePu9zCrsJ7fRx1b2l07nMA') ...[
               {
                 'id': 'lions',
                 'title': 'LIONS CHANNEL',
@@ -881,7 +881,7 @@ void main() {
               },
               {'id': 'news', 'title': '西武鉄道のニュース'},
             ],
-            if (channel == sources[3])
+            if (channel.id == 'UCW7uiApbFl_E852MGqNILDw')
               {
                 'id': 'local',
                 'title': 'ライオンズの始球式',
@@ -897,9 +897,9 @@ void main() {
     expect(
         (result[2]['videos'] as List).map((v) => v['id']), ['local', 'lions']);
   });
-  test('48チャンネルに指定先と12球団が重複なく含まれる', () {
-    expect(videoChannels, hasLength(48));
-    expect(videoChannels.map((c) => c.id).toSet(), hasLength(48));
+  test('52チャンネルに指定先と12球団が重複なく含まれる', () {
+    expect(videoChannels, hasLength(52));
+    expect(videoChannels.map((c) => c.id).toSet(), hasLength(52));
     expect(videoChannels.where((c) => c.category == 'teams'), hasLength(12));
     for (final label in [
       '近藤健介',

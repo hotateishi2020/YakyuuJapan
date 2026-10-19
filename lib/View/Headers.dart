@@ -20,6 +20,7 @@ class Headers {
     VoidCallback? onAuthChanged,
     List<Widget> actions = const [],
     bool authReady = true,
+    bool showRightActions = true,
     Widget? titleTrailing,
     double? titleTrailingWidth,
   }) {
@@ -75,8 +76,8 @@ class Headers {
               },
             ),
           ),
-          ...actions,
-          HeaderAuthAction(
+          if (showRightActions) ...actions,
+          if (showRightActions) HeaderAuthAction(
             loggedIn: loggedIn,
             boardReady: authReady,
             onAuthChanged: onAuthChanged,

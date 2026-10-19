@@ -162,7 +162,9 @@ class InterleagueStandings extends StatelessWidget {
                       .toStringAsFixed(1),
         }
     ];
-    return SeasonTableBlock(
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: SeasonTableBlock(
         standings: standings,
         stats: const [],
         onlyLeagueId: 0,
@@ -176,6 +178,7 @@ class InterleagueStandings extends StatelessWidget {
             logoAsset: 'backend/assets/images/logo_npb.png',
             tabColor: Colors.yellow,
             tabForeground: Colors.black,
-            leagues: [OrgLeague(id: 0, name: '交流戦順位', color: Colors.yellow)]));
+            leagues: [OrgLeague(id: 0, name: '交流戦順位', color: Colors.yellow)])),
+    );
   }
 }

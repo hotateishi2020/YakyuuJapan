@@ -91,17 +91,25 @@
     body { margin: 0; }
     #startup-shell { position: fixed; inset: 0; z-index: 1000; background: white;
       color: #444; font: 14px Arial, sans-serif; padding-top: env(safe-area-inset-top); }
-    #startup-header { height: 50px; padding: 0 12px; display: flex; align-items: center;
-      justify-content: space-between; background: linear-gradient(100deg,#e10600,#ff9800); color: white; }
-    #startup-brand { font-size: 26px; font-weight: 900; font-style: italic; }
-    #startup-year { background: black; border-radius: 16px; padding: 5px 10px; font-size: 12px; }
-    .startup-tabs { display: flex; gap: 5px; padding: 6px 8px 0; }
+    #startup-header { height: 42px; padding: 0 8px; display: flex; align-items: center;
+      background: linear-gradient(to right,#e10600,#ff9800); }
+    #startup-brand { position: relative; overflow: hidden; width: 170.96px; height: 29.4px; transform: translateY(1.5px); }
+    #startup-brand img { position: absolute; width: 185.84px; height: 61.89px; max-width: none; left: -11.07px; top: -14.88px; }
+    .startup-tabs { display: flex; gap: 5px; margin: 8px 8px 0; height: 26px; }
+    #startup-org-tabs { height: 30px; margin-top: 5px; gap: 0; box-sizing: border-box;
+      background: #e8e8ed; border: .5px solid #d0d0d6; border-radius: 16px; }
     #startup-board-tabs[hidden] { display: none; }
-    .startup-tab { flex: 1; min-width: 0; text-align: center; border-radius: 18px;
-      background: #e8e8ed; padding: 6px 2px; white-space: nowrap; font-size: clamp(10px,2.4vw,14px); }
-    .startup-tab[data-org="predict"] { flex: 0 0 100px; }
-    .startup-tab.selected { color: white; background: #cb0115; font-weight: bold; }
+    .startup-tab { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center;
+      text-align: center; border-radius: 16px; background: #e0e0e0; padding: 0 2px;
+      white-space: nowrap; font-size: 12px; color: #222; box-sizing: border-box; }
+    #startup-org-tabs .startup-tab { margin: 2px; border: .5px solid #d0d0d6;
+      border-radius: 14px; background: #e8e8ed; font-size: 13px; font-weight: 600; color: #666; }
+    #startup-org-tabs [data-org="predict"] { flex: 0 0 118px; }
+    #startup-org-tabs img { width: 18px; height: 18px; object-fit: contain; margin-right: 4px; }
+    #startup-org-tabs [data-org="npb"] img { width: 22px; }
+    .startup-tab.selected, #startup-org-tabs .selected { color: white; background: #cb0115; font-weight: bold; }
     #startup-shell[data-org="mlb"] .selected { background: #002d72; }
+    #startup-shell[data-org="predict"] #startup-org-tabs .selected { background: black; }
     #startup-status { text-align: center; padding: 40px 12px; color: #666; }
 
     main {
@@ -119,33 +127,45 @@
 </head>
 <body>
   <div id="startup-shell" aria-busy="true">
-    <header id="startup-header"><span id="startup-brand">Yakyuu! JAPAN</span><span id="startup-year"></span></header>
-    <div class="startup-tabs" aria-label="団体タブ（起動中）">
+    <header id="startup-header"><span id="startup-brand"><img src="assets/backend/assets/images/logo_yakyuu_japan.png" alt="Yakyuu! Japan"></span></header>
+    <div class="startup-tabs" id="startup-org-tabs" aria-label="団体タブ（起動中）">
       <span class="startup-tab" data-org="predict">予想対決</span>
-      <span class="startup-tab selected" data-org="npb">NPB</span>
-      <span class="startup-tab" data-org="mlb">MLB</span>
+      <span class="startup-tab selected" data-org="npb"><img src="assets/backend/assets/images/logo_npb.png" alt="">NPB</span>
+      <span class="startup-tab" data-org="mlb"><img src="assets/backend/assets/images/logo_mlb.webp" alt="">MLB</span>
     </div>
     <div class="startup-tabs" id="startup-board-tabs" aria-label="情報タブ（起動中）">
-      <span class="startup-tab">日程</span><span class="startup-tab selected">試合情報</span>
-      <span class="startup-tab">チーム順位</span><span class="startup-tab">個人成績</span>
-      <span class="startup-tab">戦力</span><span class="startup-tab">記録</span>
+      <span class="startup-tab" data-board="5">日程</span><span class="startup-tab selected" data-board="0">試合情報</span>
+      <span class="startup-tab" data-board="1">チーム順位</span><span class="startup-tab" data-board="2">個人成績</span>
+      <span class="startup-tab" data-board="3">戦力</span><span class="startup-tab" data-board="4">記録</span><span class="startup-tab" data-board="6">動画</span>
     </div>
     <div id="startup-status" role="status">読み込んでいます…</div>
   </div>
   <script>
     (() => {
       const shell = document.getElementById('startup-shell');
-      document.getElementById('startup-year').textContent = new Date().getFullYear();
+      const readSaved = name => {
+        try {
+          const cookie = document.cookie.split(';').map(v => v.trim()).find(v => v.startsWith(name + '='));
+          return cookie ? decodeURIComponent(cookie.slice(name.length + 1)) : localStorage.getItem('koko_cookie_' + name);
+        } catch (_) { return null; }
+      };
       let org = 'npb';
-      try {
-        const cookie = document.cookie.split(';').map(v => v.trim()).find(v => v.startsWith('koko_org='));
-        const saved = cookie ? decodeURIComponent(cookie.slice('koko_org='.length)) : localStorage.getItem('koko_cookie_koko_org');
-        if (['npb', 'mlb', 'predict'].includes(saved)) org = saved;
-      } catch (_) {}
+      const saved = readSaved('koko_org');
+      if (['npb', 'mlb', 'predict'].includes(saved)) org = saved;
       shell.dataset.org = org;
       shell.querySelectorAll('[data-org]').forEach(tab => tab.classList.toggle('selected', tab.dataset.org === org));
       if (org === 'predict') document.getElementById('startup-board-tabs').hidden = true;
-      window.addEventListener('flutter-first-frame', () => shell.remove(), {once: true});
+      const savedBoard = readSaved('koko_tab_main_' + org);
+      const board = /^[0-6]$/.test(savedBoard || '') ? savedBoard : '0';
+      shell.querySelectorAll('[data-board]').forEach(tab => tab.classList.toggle('selected', tab.dataset.board === board));
+      const fitTabs = () => shell.querySelectorAll('[data-board]').forEach(tab => {
+        tab.style.fontSize = '12px';
+        let size = 12;
+        while (tab.scrollWidth > tab.clientWidth && size > 6) tab.style.fontSize = (--size) + 'px';
+      });
+      fitTabs();
+      window.addEventListener('resize', fitTabs);
+      window.addEventListener('flutter-first-frame', () => { window.removeEventListener('resize', fitTabs); shell.remove(); }, {once: true});
     })();
   </script>
   <main>

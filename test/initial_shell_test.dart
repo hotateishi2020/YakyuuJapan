@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:Yakyuu_Japan/View/Headers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -15,6 +16,8 @@ void main() {
         expect(find.text(label), findsWidgets);
       }
       expect(pending.isCompleted, isFalse);
+      expect(find.byType(HeaderAuthAction), findsNothing);
+      expect(find.byIcon(Icons.info_outline), findsNothing);
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox.shrink());
       pending.complete(http.Response('{}', 200));

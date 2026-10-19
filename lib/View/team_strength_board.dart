@@ -1,3 +1,4 @@
+import 'compact_layout.dart';
 import '../logic/favorite_team.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import '../tools/tab_preferences.dart';
@@ -6,6 +7,7 @@ import 'retained_tab_body.dart';
 import 'club_hub_board.dart';
 import 'strength_research.dart';
 import 'strength_careers.dart';
+import 'strength_transfers.dart';
 import '../tools/network_error.dart';
 import 'dart:convert';
 import 'dart:math' as math;
@@ -56,7 +58,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
   int _request = 0;
   int _selectedView = 1;
   static const _bandSideWidth = 88 * 1.2 + 8 + 48;
-  static const _views = ['貢献度', '選手起用', '主力選手', '選手一覧', '契約', 'ドラフト', '功績', '経歴', 'チーム', '首脳', '自主トレ', '分析'];
+  static const _views = ['貢献度', '選手起用', '主力選手', '選手一覧', '契約', 'ドラフト', '功績', '経歴', 'チーム', '首脳', '自主トレ', '分析', '移籍'];
 
   @override
   void initState() {
@@ -68,7 +70,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
     };
     if (widget.providedTeams == null) {
       _selectedView = readSavedTab('strength_${widget.org.kind.name}',
-          const [11, 8, 3, 2, 0, 1, 4, 5, 7, 10], fallback: _selectedView);
+          const [11, 8, 3, 2, 0, 1, 4, 5, 12, 7, 10], fallback: _selectedView);
       if ([1, 3, 6, 9].contains(_selectedView)) _selectedView = 8;
     }
     _load();
@@ -125,7 +127,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
           const SizedBox(height: 6),
           Expanded(child: RetainedTabBody(
             key: ValueKey('${widget.org.kind.name}-${widget.year}-${identityHashCode(_teams)}'),
-            selected: _selectedView >= 8 ? 8 : _selectedView,
+            selected: _selectedView >= 8 && _selectedView <= 11 ? 8 : _selectedView,
             builder: _content,
           )),
         ],
@@ -134,7 +136,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
   Widget _viewTabs() => SizedBox(
         height: TAB_BAR_H,
         child: Row(children: [
-          for (final index in [11, 8, 2, 0, 4, 5, 7, 10]) ...[
+          for (final index in [11, 8, 2, 0, 4, 5, 12, 7, 10]) ...[
             if (index != 11) const SizedBox(width: ALL_SPACE_BLOCK),
             Expanded(
               child: Semantics(
@@ -152,7 +154,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                     child: Center(
                       child: FittedBox(
                           fit: BoxFit.scaleDown,
-                          child: Text(_views[index],
+                          child: Text(index == 2 && compactBaseballLayout(context) ? '主力' : _views[index],
                               style: TextStyle(
                                 fontSize: 12,
                                 height: 1,
@@ -180,6 +182,9 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
     }
     if (_teams.isEmpty) {
       return Center(child: Text('${widget.year}年の${widget.org.label}の戦力情報はまだ登録されていません。'));
+    }
+    if (_selectedView == 12) {
+      return StrengthTransfers(teams: _teams, year: widget.year);
     }
     if (_selectedView >= 8) {
       return ClubHubBoard(
@@ -532,13 +537,13 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
             height: row['slot'] == 'total_bases_walks' && row['header_color'] == null ? 112 : 72,
             child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               Container(
-                width: 88 * 1.2,
+                width: TeamSectionLayout.embedded(context) && compactBaseballLayout(context) && _selectedView == 1 ? 52 : 88 * 1.2,
                 padding: const EdgeInsets.symmetric(vertical: 5),
                 decoration: BoxDecoration(color: _rateHeaderColor(row), borderRadius: BorderRadius.circular(4)),
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: SizedBox(
-                    width: 88 * 1.2,
+                    width: TeamSectionLayout.embedded(context) && compactBaseballLayout(context) && _selectedView == 1 ? 52 : 88 * 1.2,
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
                       Text('${row['label'] ?? row['slot'] ?? ''}', style: TextStyle(color: _rateHeaderTextColor(row), fontSize: 12, fontWeight: FontWeight.bold)),
                       _bandTotalLabel(row, totalUnit),

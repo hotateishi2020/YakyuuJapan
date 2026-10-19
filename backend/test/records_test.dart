@@ -1,3 +1,4 @@
+import 'package:html/parser.dart' as awardHtml;
 import 'dart:convert';
 import 'dart:io';
 import 'package:test/test.dart';
@@ -97,6 +98,8 @@ void main() {
   });
 
   test('表彰カードから受賞回数ではなく成績を取り出す', () {
+    final card = awardHtml.parseFragment('<dd>本塁打　37<br>2年連続6度目</dd>');
+    expect(npbAwardValue('最多本塁打者賞', awardCardText(card))['value'], '37');
     expect(npbAwardValue('首位打者賞', '首位打者賞 選手 打率 .316 初受賞'), {'value': '0.316', 'unit': ''});
     expect(npbAwardValue('最優秀中継ぎ投手賞', 'ホールドポイント 43 2年ぶり3度目'), {'value': '43', 'unit': 'HP'});
     expect(npbAwardValue('最優秀防御率', '防御率 1.38 初受賞')['value'], '1.38');

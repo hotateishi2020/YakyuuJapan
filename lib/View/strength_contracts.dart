@@ -1,8 +1,11 @@
+import 'compact_layout.dart';
+import '../logic/baseball_labor.dart';
 import 'dart:math' as math;
 import 'team_section_layout.dart';
 import 'package:flutter/material.dart';
 import '../logic/strength_usage.dart';
 import '../logic/contract_fa.dart';
+import '../logic/roster_contract_status.dart';
 import 'strength_research.dart' show showStrengthSource;
 import '../tools/json_utils.dart';
 import '../tools/color_parse.dart';
@@ -490,7 +493,7 @@ class _StrengthContractsState extends State<StrengthContracts> {
 
   Widget get _notes => const Padding(padding: EdgeInsets.all(8), child: Text('札束は1段につきNPBは5億円、MLBは2000万ドルで折り返します。年ごとの推定年俸を契約帯の下に表示します。契約期間未確認の年も、年俸・所属が確認できれば球団色で表示します。確認状況は帯の詳細で確認できます。生涯年俸は選択年度までに取得できた年俸の合計（推定額を含む）です。未取得年と将来年は含みません。生涯年俸の札束はNPBでは20億円、MLBでは2000万ドルごとに折り返します。NPBのドル建て年俸は契約時レートで円換算できた分のみ描画します。円と米ドルは別の尺度です。円換算は契約日当日（休業日は直前公表日）のECBレートによる概算です。契約日・レート未確認の場合は換算しません。FAラベルは確認できた取得年（再取得を含む）のみ表示します。将来の最短試算は「見込み」と表示し、一軍登録日数等により変わります。ラベルから根拠を確認できます。', style: TextStyle(fontSize: 11)));
 
-  bool get _pinCareer => MediaQuery.sizeOf(context).width >= 600;
+  bool get _pinCareer => !compactBaseballLayout(context);
   Widget _careerCell(Widget child) => _pinCareer ? _pinnedName(child) : child;
 
   void _focusYear(String dataset, int first) {
@@ -500,7 +503,7 @@ class _StrengthContractsState extends State<StrengthContracts> {
       if (!mounted || _focusedDataset != dataset || !_horizontal.hasClients) {
         return;
       }
-      _horizontal.jumpTo(((widget.year - first) * yearWidth + (_pinCareer ? 0 : 180)).clamp(0.0, _horizontal.position.maxScrollExtent));
+      _horizontal.jumpTo((compactBaseballLayout(context) ? 0.0 : (widget.year - first) * yearWidth + (_pinCareer ? 0 : 180)).clamp(0.0, _horizontal.position.maxScrollExtent));
     });
   }
 
@@ -516,8 +519,10 @@ class _StrengthContractsState extends State<StrengthContracts> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => LayoutBuilder(builder: (context, constraints) {
     final year = widget.year;
+    final compact = compactBaseballLayout(context);
+    final careerWidth = compact ? 0.0 : 180.0;
     final teams = widget.comparisonTeams ?? [widget.team];
     final colorTeams = widget.colorTeams ?? teams;
     final entries = <Map<String, dynamic>>[];
@@ -531,7 +536,10 @@ class _StrengthContractsState extends State<StrengthContracts> {
         final salaries = contractDisplaySalaries(listMapFromJson(record?['salary_history']), periods, year);
         final futureNotes = contractFutureNotes(salaries, periods, year);
         years.addAll(futureNotes.keys);
-        final faEvents = contractFaEvents(player, record, isNpb: t['org'] != 'mlb' && usageInt(t['id_league']) <= 2);
+        final faEvents = [
+          ...contractFaEvents(player, record, isNpb: npbContractTeam(t)),
+          ...registrationExemptionEvents(player, record, isNpb: npbContractTeam(t)),
+        ];
         years.addAll(faEvents.map((e) => usageInt(e['year'])));
         final affiliations = [
           ...listMapFromJson(record?['affiliation_history']),
@@ -554,22 +562,38 @@ class _StrengthContractsState extends State<StrengthContracts> {
       }
     }
     entries.sort((a, b) {
-      final field = _sortByCareer ? 'career_salary' : 'current_salary';
+      final field = _sortByCareer && !compact ? 'career_salary' : 'current_salary';
       final left = a[field] == null ? -1 : usageInt(a[field]);
       final right = b[field] == null ? -1 : usageInt(b[field]);
       final salaryOrder = right.compareTo(left);
       return salaryOrder != 0 ? salaryOrder : usageInt(a['order']).compareTo(usageInt(b['order']));
     });
     years.sort();
-    final first = years.first, last = years.last;
+    final first = compact ? year : years.first, last = compact ? year : years.last;
+    final mlbContracts = teams.isNotEmpty && teams.every((t) => t['org'] == 'mlb' || [3, 4].contains(usageInt(t['id_league'])));
+    Widget yearLabel(int y) {
+      final labor = baseballLaborLabel(y, mlb: mlbContracts);
+      return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Text('$y年'),
+        if (labor != null) Tooltip(message: labor.note, child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 3),
+          color: labor.label.contains('未確定') ? Colors.amber.shade100 : Colors.red.shade50,
+          child: FittedBox(child: Text(labor.label, style: const TextStyle(fontSize: 9, color: Colors.red))),
+        )),
+      ]);
+    }
+    final nameWidth = compactBaseballLayout(context) ? 80.0 : 160.0;
+    final yearWidth = compact && constraints.maxWidth.isFinite
+        ? (constraints.maxWidth - nameWidth).clamp(1.0, double.infinity)
+        : StrengthContracts.yearWidth;
     final chartWidth = (last - first + 1) * yearWidth;
-    _focusYear('$year/$first/$last/${teams.map((t) => t['id_team']).join('-')}', first);
+    _focusYear('$_sortByCareer/$year/$first/$last/${teams.map((t) => t['id_team']).join('-')}', first);
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         child: Wrap(spacing: 8, children: [
-          ChoiceChip(label: const Text('今年度年俸順'), selected: !_sortByCareer, onSelected: (_) => setState(() => _sortByCareer = false)),
-          ChoiceChip(label: const Text('生涯年俸順'), selected: _sortByCareer, onSelected: (_) => setState(() => _sortByCareer = true)),
+          ChoiceChip(label: const Text('今年度年俸順'), selected: compact || !_sortByCareer, onSelected: (_) => setState(() => _sortByCareer = false)),
+          if (!compact) ChoiceChip(label: const Text('生涯年俸順'), selected: _sortByCareer, onSelected: (_) => setState(() => _sortByCareer = true)),
         ]),
       ),
       SectionExpanded(
@@ -583,17 +607,17 @@ class _StrengthContractsState extends State<StrengthContracts> {
                   controller: _horizontal,
                   scrollDirection: Axis.horizontal,
                   child: SizedBox(
-                      width: 160 + chartWidth + 180,
+                      width: nameWidth + chartWidth + careerWidth,
                       child: Column(children: [
                         SizedBox(
-                            height: 32,
+                            height: 48,
                             child: Stack(children: [
                               Row(children: [
-                                const SizedBox(width: 340),
-                                for (var y = first; y <= last; y++) Container(key: ValueKey('contract-year-$y'), width: yearWidth, height: 32, alignment: Alignment.center, color: y == year ? Colors.amber.shade300 : Colors.grey.shade200, child: Text('$y年')),
+                                SizedBox(width: nameWidth + careerWidth),
+                                for (var y = first; y <= last; y++) Container(key: ValueKey('contract-year-$y'), width: yearWidth, height: 48, alignment: Alignment.center, color: y == year ? Colors.amber.shade300 : Colors.grey.shade200, child: yearLabel(y)),
                               ]),
-                              Positioned(left: 160, top: 0, bottom: 0, width: 180, child: _careerCell(Container(color: Colors.grey.shade200, alignment: Alignment.center, child: const Text('生涯年俸')))),
-                              Positioned(left: 0, top: 0, bottom: 0, width: 160, child: _pinnedName(const Center(child: Text('球団・選手')))),
+                              if (!compact) Positioned(left: nameWidth, top: 0, bottom: 0, width: 180, child: _careerCell(Container(color: Colors.grey.shade200, alignment: Alignment.center, child: const Text('生涯年俸')))),
+                              Positioned(left: 0, top: 0, bottom: 0, width: nameWidth, child: _pinnedName(const Center(child: Text('球団・選手')))),
                             ])),
                         SectionExpanded(
                             child: ListView.builder(
@@ -608,7 +632,7 @@ class _StrengthContractsState extends State<StrengthContracts> {
                                   }
                                   final e = entries[index];
                                   final periods = listMapFromJson(e['periods']);
-                                  final salaries = listMapFromJson(e['salaries']);
+                                  final salaries = listMapFromJson(e['salaries']).where((s) => !compact || usageInt(s['year']) == year).toList();
                                   final career = careerSalaryYen(salaries, year);
                                   final isMlb = e['team']['org'] == 'mlb' || [3, 4].contains(usageInt(e['team']['id_league']));
                                   final careerCurrency = isMlb ? 'USD' : 'JPY';
@@ -616,17 +640,17 @@ class _StrengthContractsState extends State<StrengthContracts> {
                                   final careerWrap = isMlb ? 20000000 : 2000000000;
                                   final hasForeign = salaries.any((s) => usageInt(s['year']) > 0 && usageInt(s['year']) <= year && (s['currency'] ?? 'JPY') != 'JPY');
                                   final careerLabel = careerSalaryLabel(salaries, year) + (hasForeign ? '\n${career.missing > 0 ? '円換算確認分' : '円換算'}：${salaryAmount(career.yen, 'JPY')}' : '');
-                                  final careerHeight = 16 + _textHeight(context, careerLabel, const TextStyle(fontSize: 11, fontWeight: FontWeight.bold), 164) + (careerAmount > 0 ? salaryBarRows(careerAmount, careerWrap) * 32.0 : 0) + (career.missing > 0 ? _textHeight(context, '未換算：${career.missing}年分', const TextStyle(fontSize: 10), 164) : 0);
-                                  final bands = contractTimelineBands(periods, salaries, listMapFromJson(e['affiliations']));
+                                  final careerHeight = compact ? 0.0 : 16 + _textHeight(context, careerLabel, const TextStyle(fontSize: 11, fontWeight: FontWeight.bold), 164) + (careerAmount > 0 ? salaryBarRows(careerAmount, careerWrap) * 32.0 : 0) + (career.missing > 0 ? _textHeight(context, '未換算：${career.missing}年分', const TextStyle(fontSize: 10), 164) : 0);
+                                  final bands = contractTimelineBands(periods, salaries, listMapFromJson(e['affiliations'])).where((b) => !compact || usageInt(b['start_year']) <= year && usageInt(b['end_year']) >= year).toList();
                                   final lineHeight = _textHeight(context, '年俸', const TextStyle(fontSize: 11), yearWidth - 8);
                                   final periodHeight = (lineHeight + 4).clamp(22.0, double.infinity);
                                   final topHeight = 4.0 + (bands.isEmpty ? 0 : periodHeight + 2);
                                   final moneyHeight = salaries.any((s) => usageInt(s['year']) > 0) ? salaries.map((s) => salaryBarRows(usageInt(s['amount']), salaryWrapAmount('${s['currency'] ?? 'JPY'}'))).fold<int>(1, (a, b) => a > b ? a : b) * 32.0 + lineHeight + 2 : 0.0;
-                                  final nameHeight = _textHeight(context, '${e['team']['name_team']}', const TextStyle(fontSize: 11), 144) + _textHeight(context, '${e['player']['name']}', const TextStyle(fontWeight: FontWeight.bold), 144) + 8;
-                                  final futureNotes = (e['future_notes'] as Map<int, String>);
+                                  final nameHeight = _textHeight(context, '${e['team']['name_team']}', const TextStyle(fontSize: 11), nameWidth - 16) + _textHeight(context, '${e['player']['name']}', const TextStyle(fontWeight: FontWeight.bold), nameWidth - 16) + 8;
+                                  final futureNotes = {for (final entry in (e['future_notes'] as Map<int, String>).entries) if (!compact || entry.key == year) entry.key: entry.value};
                                   final noteHeight = futureNotes.isEmpty ? 0.0 : 68.0;
                                   final faByYear = <int, List<Map<String, dynamic>>>{};
-                                  for (final event in listMapFromJson(e['fa_events'])) {
+                                  for (final event in listMapFromJson(e['fa_events']).where((e) => !compact || usageInt(e['year']) == year)) {
                                     faByYear.putIfAbsent(usageInt(event['year']), () => []).add(event);
                                   }
                                   final faLabelHeight = _textHeight(context, '国内FA権獲得（見込み）', const TextStyle(fontSize: 10), yearWidth - 16) + 8;
@@ -638,14 +662,14 @@ class _StrengthContractsState extends State<StrengthContracts> {
                                       decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey.shade400))),
                                       child: Stack(children: [
                                         Positioned(
-                                            left: 340,
+                                            left: nameWidth + careerWidth,
                                             top: 0,
                                             bottom: 0,
                                             child: SizedBox(
                                                 width: chartWidth,
                                                 child: Stack(children: [
                                                   for (var y = first; y <= last; y++) Positioned(left: (y - first) * yearWidth, top: 0, bottom: 0, child: Container(width: yearWidth, decoration: BoxDecoration(color: y == year ? Colors.amber.withValues(alpha: .18) : null, border: Border(left: BorderSide(color: Colors.grey.shade300))))),
-                                                  for (var i = 0; i < bands.length; i++) Positioned(left: (usageInt(bands[i]['start_year']) - first) * yearWidth + 2, top: 4, width: (usageInt(bands[i]['end_year']) - usageInt(bands[i]['start_year']) + 1) * yearWidth - 4, height: periodHeight, child: Tooltip(message: '${bands[i]['period'] ?? ''} ${bands[i]['detail'] ?? ''}', child: Container(alignment: Alignment.centerLeft, padding: const EdgeInsets.symmetric(horizontal: 6), decoration: BoxDecoration(color: contractTeamColor(bands[i], colorTeams), borderRadius: BorderRadius.circular(4)), child: Text(bands[i]['start_year'] == bands[i]['end_year'] ? '${bands[i]['start_year']} ${bands[i]['team'] ?? ''}' : '${bands[i]['start_year']}–${bands[i]['end_year']} ${bands[i]['team'] ?? ''}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: contractTeamColor(bands[i], colorTeams).computeLuminance() > .179 ? Colors.black : Colors.white))))),
+                                                  for (var i = 0; i < bands.length; i++) Positioned(left: (compact ? 0 : usageInt(bands[i]['start_year']) - first) * yearWidth + 2, top: 4, width: (compact ? 1 : usageInt(bands[i]['end_year']) - usageInt(bands[i]['start_year']) + 1) * yearWidth - 4, height: periodHeight, child: Tooltip(message: '${bands[i]['period'] ?? ''} ${bands[i]['detail'] ?? ''}', child: Container(alignment: Alignment.centerLeft, padding: const EdgeInsets.symmetric(horizontal: 6), decoration: BoxDecoration(color: contractTeamColor(bands[i], colorTeams), borderRadius: BorderRadius.circular(4)), child: Text(bands[i]['start_year'] == bands[i]['end_year'] ? '${bands[i]['start_year']} ${bands[i]['team'] ?? ''}' : '${bands[i]['start_year']}–${bands[i]['end_year']} ${bands[i]['team'] ?? ''}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: contractTeamColor(bands[i], colorTeams).computeLuminance() > .179 ? Colors.black : Colors.white))))),
                                                   for (final note in futureNotes.entries)
                                                     Positioned(
                                                       left: (note.key - first) * yearWidth + 4,
@@ -703,8 +727,8 @@ class _StrengthContractsState extends State<StrengthContracts> {
                                                             SalaryMoneyBar(banknoteCurrency: salaryBanknoteCurrency(salary), amount: usageInt(salary['amount']), maximum: salaryWrapAmount('${salary['currency'] ?? 'JPY'}'), wrapAt: salaryWrapAmount('${salary['currency'] ?? 'JPY'}'), currency: '${salary['currency'] ?? 'JPY'}'),
                                                           ])),
                                                 ]))),
-                                        Positioned(
-                                          left: 160,
+                                        if (!compact) Positioned(
+                                          left: nameWidth,
                                           top: 0,
                                           bottom: 0,
                                           width: 180,
@@ -730,7 +754,7 @@ class _StrengthContractsState extends State<StrengthContracts> {
                                           left: 0,
                                           top: 0,
                                           bottom: 0,
-                                          width: 160,
+                                          width: nameWidth,
                                           child: _pinnedName(Container(
                                             key: ValueKey('contract-name-${e['team']['id_team']}-${usagePlayerKey(e['player'])}'),
                                             color: contractTeamColor({'team': e['team']['name_team']}, colorTeams),
@@ -751,7 +775,7 @@ class _StrengthContractsState extends State<StrengthContracts> {
                                 }))
                       ]))))),
     ]);
-  }
+  });
 }
 
 /// Team pages share one vertical scrollbar; comparison retains its pinned chart.

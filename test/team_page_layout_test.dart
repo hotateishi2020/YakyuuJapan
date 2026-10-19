@@ -8,9 +8,52 @@ import 'package:Yakyuu_Japan/View/team_strength_board.dart';
 import 'package:Yakyuu_Japan/config/org_config.dart';
 
 void main() {
+  testWidgets('スマホでは12球団の最短名が一行に収まる', (t) async {
+    t.view.devicePixelRatio = 1;
+    t.view.physicalSize = const Size(390, 800);
+    addTearDown(t.view.resetPhysicalSize);
+    addTearDown(t.view.resetDevicePixelRatio);
+    await http.runWithClient(() async {
+      await t.pumpWidget(MaterialApp(home: Scaffold(body: TeamStrengthBoard(
+        org: OrgConfig.npb, year: 2026, initialView: 8,
+        providedTeams: [for (var i=1;i<=12;i++) {'id_team':i, 'name_team':'球団$i', 'name_shortest':'短$i'}],
+      ))));
+      await t.pumpAndSettle();
+      final first = find.byKey(const ValueKey('team-tab-segment-1'));
+      for (var i=1;i<=12;i++) {
+        final segment = find.byKey(ValueKey('team-tab-segment-$i'));
+        expect(t.getTopLeft(segment).dy, t.getTopLeft(first).dy);
+        expect(t.getBottomRight(segment).dx, lessThanOrEqualTo(390));
+        expect(find.descendant(of: segment, matching: find.text('短$i')), findsOneWidget);
+      }
+      final firstSection = find.byKey(const ValueKey('team-section-segment-0'));
+      for (var i=0;i<7;i++) {
+        final section = find.byKey(ValueKey('team-section-segment-$i'));
+        expect(t.getTopLeft(section).dy, t.getTopLeft(firstSection).dy);
+        expect(t.getBottomRight(section).dx, lessThanOrEqualTo(390));
+      }
+      expect(t.takeException(), isNull);
+      t.view.physicalSize = const Size(1400, 900);
+      await t.pumpAndSettle();
+      for (var i=0;i<7;i++) {
+        final section = find.byKey(ValueKey('team-section-segment-$i'));
+        expect(t.getSize(section).width, lessThan(100));
+        expect(t.getTopLeft(section).dy, t.getTopLeft(firstSection).dy);
+        if (i > 0) {
+          final previous = find.byKey(ValueKey('team-section-segment-${i-1}'));
+          expect(t.getTopLeft(section).dx - t.getBottomRight(previous).dx, closeTo(2, .01));
+        }
+      }
+      expect(t.takeException(), isNull);
+    }, () => MockClient((_) async => http.Response('{"clubs":[]}', 200)));
+  });
   for (final org in [OrgConfig.npb, OrgConfig.mlb]) {
-    testWidgets('${org.label}チームは全項目を展開し全体だけでスクロールする', (t) async {
+    testWidgets('${org.label}チームは項目セグメントで選択した内容だけを表示する', (t) async {
       await t.binding.setSurfaceSize(const Size(390, 800));
+      t.view.devicePixelRatio = 1;
+      t.view.physicalSize = const Size(390, 800);
+      addTearDown(t.view.resetPhysicalSize);
+      addTearDown(t.view.resetDevicePixelRatio);
       addTearDown(() => t.binding.setSurfaceSize(null));
       await http.runWithClient(() async {
         await t.pumpWidget(MaterialApp(
@@ -49,41 +92,30 @@ void main() {
         expect(find.byKey(const ValueKey('strength-view-1')), findsNothing);
         expect(find.descendant(of: hub, matching: find.text('選手起用')), findsOneWidget);
         expect(find.descendant(of: hub, matching: find.text('各投手の投球回・負担率')), findsNothing);
-        expect(find.descendant(of: hub, matching: find.text('契約')), findsNothing);
-        expect(find.descendant(of: hub, matching: find.text('ドラフト')), findsNothing);
-        expect(find.descendant(of: hub, matching: find.byType(ChoiceChip)), findsNWidgets(2));
-        expect(find.widgetWithText(ChoiceChip, '年齢順'), findsOneWidget);
-        expect(t.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '起用順')).selected, isTrue);
-        expect(find.descendant(of: hub, matching: find.byType(ExpansionTile)), findsNothing);
-        expect(find.descendant(of: hub, matching: find.byType(Scrollable)), findsNWidgets(3));
-        final sections = ['チーム分析', '首脳・スタッフ', '主力選手', '貢献度', '選手起用', '選手一覧', 'スポンサー・広告'];
-        final tops = [for (final title in sections) t.getTopLeft(find.descendant(of: hub, matching: find.text(title)).first).dy];
-        for (var i = 1; i < tops.length; i++) {
-          expect(tops[i], greaterThan(tops[i - 1]));
+        expect(find.descendant(of: hub, matching: find.byType(ChoiceChip)), findsNWidgets(7));
+        expect(find.byKey(const ValueKey('analysis-vertical-table')), findsOneWidget);
+        expect(t.getSize(find.byKey(const ValueKey('analysis-vertical-table'))).width, lessThanOrEqualTo(390));
+        final analysis = t.widget<Table>(find.byKey(const ValueKey('analysis-vertical-table')));
+        expect(find.descendant(of: find.byKey(const ValueKey('analysis-vertical-table')), matching: find.text('球団')), findsNothing);
+        for (final row in analysis.children) {
+          expect(t.getSize(find.byWidget(row.children.first)).height,
+              t.getSize(find.byWidget(row.children.last)).height);
         }
-        expect(find.byKey(const ValueKey('team-page-horizontal-scroll')), findsNothing);
-        expect(find.byKey(const ValueKey('team-section-horizontal-主力選手')), findsOneWidget);
-        expect(find.byKey(const ValueKey('team-section-horizontal-選手一覧')), findsOneWidget);
-        expect(t.getSize(find.byKey(const ValueKey('analysis-table'))).width, greaterThan(390));
-        expect(find.text('投手のスタメン比率'), findsOneWidget);
 
-        expect(find.descendant(of: hub, matching: find.text('選手49')), findsWidgets);
-        expect(find.descendant(of: hub, matching: find.text('経歴')), findsNothing);
-        expect(find.descendant(of: hub, matching: find.text('自主トレ')), findsNothing);
-        expect(find.descendant(of: hub, matching: find.byType(DataTable)), findsOneWidget);
-        expect(find.descendant(of: hub, matching: find.text('出身地')), findsNothing);
-        final scroll = t.state<ScrollableState>(find.descendant(of: find.byKey(const ValueKey('team-page-vertical-scroll')), matching: find.byType(Scrollable)).first);
-        expect(scroll.position.maxScrollExtent, greaterThan(800));
-        scroll.position.jumpTo(scroll.position.maxScrollExtent);
-        await t.pump();
-        expect(find.text('スポンサー・広告'), findsOneWidget);
-        await t.ensureVisible(find.widgetWithText(ChoiceChip, '年齢順'));
-        await t.tap(find.widgetWithText(ChoiceChip, '年齢順'));
-        await t.pump();
-        expect(t.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '年齢順')).selected, isTrue);
-        await t.tap(find.widgetWithText(ChoiceChip, '起用順'));
-        await t.pump();
-        expect(t.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '起用順')).selected, isTrue);
+        expect(find.byKey(const ValueKey('team-section-horizontal-分析')), findsNothing);
+        expect(find.byKey(const ValueKey('team-section-horizontal-主力選手')), findsNothing);
+        await t.tap(find.byKey(const ValueKey('team-section-segment-2')));
+        await t.pumpAndSettle();
+        expect(find.byKey(const ValueKey('analysis-vertical-table')), findsNothing);
+        expect(find.byKey(const ValueKey('regular-vertical-table-true')), findsOneWidget);
+        expect(find.text('1番'), findsOneWidget);
+        await t.tap(find.byKey(const ValueKey('team-section-segment-5')));
+        await t.pumpAndSettle();
+        expect(find.byKey(const ValueKey('team-section-horizontal-主力選手')), findsNothing);
+        expect(find.byKey(const ValueKey('team-section-horizontal-選手一覧')), findsOneWidget);
+        expect(find.widgetWithText(ChoiceChip, '年齢順'), findsOneWidget);
+        expect(find.byKey(const ValueKey('team-section-segment-7')), findsNothing);
+        expect(find.text('スポンサー・広告'), findsNothing);
         expect(t.takeException(), isNull);
       }, () => MockClient((_) async => http.Response(jsonEncode({'clubs': [], 'training_groups': []}), 200)));
     });

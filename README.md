@@ -8,7 +8,7 @@ sh tool/build_web.sh
 
 git add . 
 
-git commit -m "現役ドラフトタブを追加しました。" 
+git commit -m "現役タブを追加しました。" 
 
 git push 
 

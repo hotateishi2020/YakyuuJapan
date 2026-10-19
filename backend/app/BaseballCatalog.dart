@@ -49,6 +49,7 @@ Map<String, dynamic> catalogFile(String name) {
 List<Map<String, dynamic>> uniformGroups(List<Map<String, dynamic>> history,
     {required int year}) {
   final groups = <String, Map<String, dynamic>>{};
+  final previousWearers = <String, Set<String>>{};
   for (final row in history) {
     final number = '${row['number']}';
     if (!RegExp(r'^\d{1,3}$').hasMatch(number) ||
@@ -56,16 +57,24 @@ List<Map<String, dynamic>> uniformGroups(List<Map<String, dynamic>> history,
         usageInt(row['first_year']) > year) continue;
     final key = '${row['id_team']}|$number|${catalogName(row['name'])}';
     final last = usageInt(row['last_year']);
+    final wornThisYear = usageInt(row['first_year']) <= year && last >= year;
+    if (usageInt(row['first_year']) <= year - 1 && last >= year - 1) {
+      previousWearers
+          .putIfAbsent('${row['id_team']}|$number', () => {})
+          .add(catalogName(row['name']));
+    }
     final old = groups[key];
     if (old == null) {
-      groups[key] = {...row};
+      groups[key] = {...row, 'worn_in_selected_year': wornThisYear};
     } else {
+      final wornInGroup = old['worn_in_selected_year'] == true || wornThisYear;
       if (last > usageInt(old['last_year']) ||
           (last == usageInt(old['last_year']) &&
               row['current_roster'] == true)) {
         final first = old['first_year'];
         groups[key] = {...row, 'first_year': first};
       }
+      groups[key]!['worn_in_selected_year'] = wornInGroup;
       if (usageInt(row['first_year']) < usageInt(groups[key]!['first_year']))
         groups[key]!['first_year'] = row['first_year'];
     }
@@ -81,6 +90,11 @@ List<Map<String, dynamic>> uniformGroups(List<Map<String, dynamic>> history,
               .compareTo(a['current_roster'] == true ? 1 : 0);
     });
   for (final row in result) {
+    final previous = previousWearers['${row['id_team']}|${row['number']}'];
+    row['new_uniform_number'] = row['worn_in_selected_year'] == true &&
+        previous != null &&
+        previous.isNotEmpty &&
+        !previous.contains(catalogName(row['name']));
     row['period'] =
         '${row['first_year']}–${usageInt(row['last_year']) > year ? year : row['last_year']}年';
   }
@@ -183,7 +197,7 @@ class BaseballCatalog {
       };
     }
     final teams = (await conn.execute(
-            '''SELECT id AS id_team,name_short AS name_team,name_full,name_shortest,color_back,color_font
+            '''SELECT id AS id_team,id_league,name_short AS name_team,name_full,name_shortest,color_back,color_font
       FROM m_team WHERE id_league IN (${org.leagueIds.join(',')}) AND NOT COALESCE(flg_delete,false) ORDER BY id'''))
         .map((r) => r.toColumnMap())
         .toList();
@@ -234,16 +248,20 @@ class BaseballCatalog {
                           .contains(catalogName(info['match'])))
                   .firstOrNull;
               final name = '${info['name']}';
-              var image =
-                  StadiumImages.lookup(name.replaceAll('MAZDA', 'マツダ')).inside;
-              if (image.isEmpty && row != null)
-                image = StadiumImages.lookup('${row['name_short']}').inside;
+              var images =
+                  StadiumImages.lookup(name.replaceAll('MAZDA', 'マツダ'));
+              var image = images.inside;
+              if (image.isEmpty && row != null) {
+                images = StadiumImages.lookup('${row['name_short']}');
+                image = images.inside;
+              }
               return {
                 ...?team,
                 ...info,
                 'name': name,
                 'name_team': team?['name_team'] ?? info['team'],
-                'image': image.isEmpty ? null : image
+                'image': image.isEmpty ? null : image,
+                'image_outside': images.outside.isEmpty ? null : images.outside
               };
             })()
         ]
@@ -254,7 +272,9 @@ class BaseballCatalog {
       FROM m_player WHERE NOT COALESCE(flg_delete,false)'''))
         .map((r) => r.toColumnMap())
         .toList();
-    final officialPeople = {for(final p in usageMaps(base['npb_people'])) catalogName(p['name']):p};
+    final officialPeople = {
+      for (final p in usageMaps(base['npb_people'])) catalogName(p['name']): p
+    };
     final playerByName = {for (final p in players) catalogName(p['name']): p};
     final current = <Map<String, dynamic>>[];
     for (final snapshot in snapshots) {
@@ -340,7 +360,11 @@ class BaseballCatalog {
               ? 'active'
               : usageInt(p?['year_retire']) > 0
                   ? 'retired'
-                  : org.code=='npb' && officialPeople[catalogName(row['name'])]?['status']=='npb_ob' ? 'former' : 'unknown');
+                  : org.code == 'npb' &&
+                          officialPeople[catalogName(row['name'])]?['status'] ==
+                              'npb_ob'
+                      ? 'former'
+                      : 'unknown');
     }
     final grouped = uniformGroups([...history, ...current], year: year);
     final reserved = usageMaps(catalogFile('uniform-reserved')['numbers']);

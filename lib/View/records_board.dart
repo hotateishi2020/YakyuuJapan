@@ -18,7 +18,7 @@ import '../tools/json_utils.dart';
 import '../tools/network_error.dart';
 import 'strength_research.dart';
 
-const recordTabs = ['優勝チーム', '個人タイトル', 'シーズン記録', '通算記録', '連続記録', '功績', '新人ドラフト', '球団記録', '現役ドラフト', '背番号', '殿堂'];
+const recordTabs = ['優勝チーム', '個人タイトル', 'シーズン記録', '通算記録', '連続記録', '功績', '新人ドラフト', '球団記録', '現役ドラフト', '背番号', '殿堂入り・名球会'];
 
 /// Franchise IDs keep former team names in the same championship history.
 List<Map<String, dynamic>> championshipIntervals(List<Map<String, dynamic>> seasons, int year, {bool mlb = false}) {
@@ -115,7 +115,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
         DropdownButtonFormField<int>(
           key: ValueKey('records-picker-${widget.org.kind.name}'),
           initialValue: tab, isExpanded: true,
-          style: TextStyle(color: widget.org.tabForeground),
+          style: TextStyle(color: widget.org.tabForeground, fontWeight: FontWeight.bold),
           dropdownColor: widget.org.tabColor,
           iconEnabledColor: widget.org.tabForeground,
           decoration: InputDecoration(
@@ -123,6 +123,13 @@ class _RecordsBoardState extends State<RecordsBoard> {
             isDense: true, contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             border: const OutlineInputBorder(),
           ),
+          selectedItemBuilder: (context) => [
+            for (final i in _tabs)
+              Center(child: Padding(
+                padding: const EdgeInsets.only(left: 24),
+                child: Text(recordTabs[i], textAlign: TextAlign.center),
+              )),
+          ],
           items: [for (final i in _tabs) DropdownMenuItem(value: i, child: Text(recordTabs[i], key: ValueKey('records-tab-$i')))],
           onChanged: (i) {
             if (i == null) return;

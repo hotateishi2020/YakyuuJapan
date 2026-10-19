@@ -5,7 +5,7 @@
       "name": "エスコンフィールドＨＯＫＫＡＩＤＯ",
       "team": "北海道日本ハムファイターズ",
       "category": "開閉式ドーム",
-      "completed": null,
+      "completed": "2023年1月",
       "opened": "2023年3月",
       "capacity": "35,000人",
       "source": "https://npb.jp/stadium/json/290.json",
@@ -14,14 +14,20 @@
       "latitude": 42.990593,
       "longitude": 141.549274,
       "airport_distance": "Sapporo Okadama Airport (OKD)：約19.6km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/RJCO/"
+      "airport_distance_source": "https://ourairports.com/airports/RJCO/",
+      "completed_source": "https://www.obayashi.co.jp/en/works/detail/work_2711.html",
+      "details_checked_at": "2026-10-19",
+      "construction": "約600億円",
+      "construction_source": "https://forbesjapan.com/articles/detail/61850",
+      "station_distance": "北広島駅：約1.5km（歩行者・自転車道）",
+      "station_distance_source": "https://www.hkdballpark.com/access/bicycle/"
     },
     {
       "match": "楽天モバイル 最強パーク宮城",
       "name": "楽天モバイル 最強パーク宮城",
       "team": "東北楽天ゴールデンイーグルス",
       "category": "屋外球場",
-      "completed": null,
+      "completed": "1950年5月27日",
       "opened": "1950年5月",
       "capacity": "30,000人超",
       "source": "https://npb.jp/stadium/json/029.json",
@@ -30,14 +36,18 @@
       "latitude": 38.256351,
       "longitude": 140.902602,
       "airport_distance": "Sendai Airport (SDJ)：約13.0km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/RJSS/"
+      "airport_distance_source": "https://ourairports.com/airports/RJSS/",
+      "station_distance": "宮城野原駅：徒歩約5分",
+      "station_distance_source": "https://www.rakuteneagles.jp/stadium/access/train/",
+      "details_checked_at": "2026-10-19",
+      "completed_source": "https://www.suikon.or.jp/activity/publishing/suikon/055/images/017.pdf"
     },
     {
       "match": "ベルーナドーム",
       "name": "ベルーナドーム",
       "team": "埼玉西武ライオンズ",
       "category": "固定屋根（側面開放）",
-      "completed": null,
+      "completed": "1979年4月8日（竣工式）",
       "opened": "1979年4月",
       "capacity": "28,104人",
       "source": "https://npb.jp/stadium/json/068.json",
@@ -45,15 +55,19 @@
       "capacity_source": "https://biz.softbankhawks.co.jp/biz/blog/210",
       "latitude": 35.771099,
       "longitude": 139.421127,
-      "airport_distance": "Chofu Airport ()：約14.7km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/RJTF/"
+      "airport_distance": "Chofu Airport：約14.7km（直線）",
+      "airport_distance_source": "https://ourairports.com/airports/RJTF/",
+      "station_distance": "西武球場前駅：改札の目の前",
+      "station_distance_source": "https://www.seibulions.jp/special/welcome/",
+      "details_checked_at": "2026-10-19",
+      "completed_source": "https://column.sp.baseball.findfriends.jp/?id=018-20170605-01&pid=column_detail"
     },
     {
       "match": "東京ドーム",
       "name": "東京ドーム",
       "team": "読売ジャイアンツ",
       "category": "ドーム球場",
-      "completed": null,
+      "completed": "1988年3月17日",
       "opened": "1988年3月",
       "capacity": "43,500人",
       "source": "https://npb.jp/stadium/json/081.json",
@@ -64,14 +78,18 @@
       "latitude": 35.703152,
       "longitude": 139.752151,
       "airport_distance": "Tokyo Haneda International Airport (HND)：約17.4km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/RJTT/"
+      "airport_distance_source": "https://ourairports.com/airports/RJTT/",
+      "completed_source": "https://www.nikkenren.com/kenchiku/pdf/430/0430.pdf",
+      "details_checked_at": "2026-10-19",
+      "station_distance": "後楽園駅・水道橋駅（距離未確認）",
+      "station_distance_source": "https://www.tokyo-dome.co.jp/dome/access/"
     },
     {
       "match": "神宮",
       "name": "神宮",
       "team": "東京ヤクルトスワローズ",
       "category": "屋外球場",
-      "completed": null,
+      "completed": "1926年10月22日（竣功奉献式）",
       "opened": "1926年10月",
       "capacity": "29,943人",
       "source": "https://npb.jp/stadium/json/082.json",
@@ -80,14 +98,18 @@
       "latitude": 35.67506,
       "longitude": 139.716995,
       "airport_distance": "Tokyo Haneda International Airport (HND)：約15.3km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/RJTT/"
+      "airport_distance_source": "https://ourairports.com/airports/RJTT/",
+      "completed_source": "https://www.jingu-stadium.com/about_kyujo/history/",
+      "details_checked_at": "2026-10-19",
+      "station_distance": "外苑前駅：徒歩約5分",
+      "station_distance_source": "https://www.jingu-stadium.com/access/"
     },
     {
       "match": "ZOZOマリンスタジアム",
       "name": "ZOZOマリンスタジアム",
       "team": "千葉ロッテマリーンズ",
       "category": "屋外球場",
-      "completed": null,
+      "completed": "1990年2月22日",
       "opened": "1990年2月",
       "capacity": "29,645人",
       "source": "https://npb.jp/stadium/json/073.json",
@@ -96,7 +118,13 @@
       "latitude": 35.641033,
       "longitude": 140.03421,
       "airport_distance": "Tokyo Haneda International Airport (HND)：約24.6km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/RJTT/"
+      "airport_distance_source": "https://ourairports.com/airports/RJTT/",
+      "construction": "約123.1億円（建設事業費）",
+      "construction_source": "https://www.city.chiba.jp/shigikai/documents/shiseigaiyour2.pdf",
+      "details_checked_at": "2026-10-19",
+      "station_distance": "海浜幕張駅：徒歩約15分",
+      "station_distance_source": "https://www.marines.co.jp/stadium/access/",
+      "completed_source": "https://www.marines.co.jp/stadium/ballpark/guide.html"
     },
     {
       "match": "横浜スタジアム",
@@ -115,14 +143,17 @@
       "latitude": 35.443569,
       "longitude": 139.640152,
       "airport_distance": "Tokyo Haneda International Airport (HND)：約17.8km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/RJTT/"
+      "airport_distance_source": "https://ourairports.com/airports/RJTT/",
+      "station_distance": "関内駅：徒歩約3分",
+      "station_distance_source": "https://www.welcome.city.yokohama.jp/accessibility/spot/details.php?sid=189",
+      "details_checked_at": "2026-10-19"
     },
     {
       "match": "バンテリンドーム ナゴヤ",
       "name": "バンテリンドーム ナゴヤ",
       "team": "中日ドラゴンズ",
       "category": "ドーム球場",
-      "completed": null,
+      "completed": "1997年3月12日（竣工式）",
       "opened": "1997年3月",
       "capacity": "36,778人",
       "source": "https://npb.jp/stadium/json/151.json",
@@ -131,14 +162,18 @@
       "latitude": 35.185009,
       "longitude": 136.945374,
       "airport_distance": "Nagoya Airport / JASDF Komaki Air Base (NKM)：約8.1km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/RJNA/"
+      "airport_distance_source": "https://ourairports.com/airports/RJNA/",
+      "completed_source": "https://www.nagoya-dome.co.jp/aboutus/",
+      "details_checked_at": "2026-10-19",
+      "station_distance": "ナゴヤドーム前矢田駅：徒歩約5分",
+      "station_distance_source": "https://www.nagoya-dome.co.jp/sp/access.php"
     },
     {
       "match": "京セラドーム大阪",
       "name": "京セラドーム大阪",
       "team": "オリックス・バファローズ",
       "category": "ドーム球場",
-      "completed": null,
+      "completed": "1997年2月",
       "opened": "1997年3月",
       "capacity": "36,220人",
       "source": "https://npb.jp/stadium/json/175.json",
@@ -147,14 +182,18 @@
       "latitude": 34.669445,
       "longitude": 135.477173,
       "airport_distance": "Osaka Itami International Airport (ITM)：約12.8km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/RJOO/"
+      "airport_distance_source": "https://ourairports.com/airports/RJOO/",
+      "completed_source": "https://www.obayashi.co.jp/chronicle/works/18300.html",
+      "details_checked_at": "2026-10-19",
+      "station_distance": "ドーム前千代崎駅：徒歩約4分",
+      "station_distance_source": "https://metronine.osaka/spot-details/?spot_id=15677688244173"
     },
     {
       "match": "甲子園",
       "name": "甲子園",
       "team": "阪神タイガース",
       "category": "屋外球場",
-      "completed": null,
+      "completed": "1924年8月1日（竣工式）",
       "opened": "1924年8月",
       "capacity": "47,359人",
       "source": "https://npb.jp/stadium/json/181.json",
@@ -163,14 +202,18 @@
       "latitude": 34.722427,
       "longitude": 135.361374,
       "airport_distance": "Osaka Itami International Airport (ITM)：約9.7km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/RJOO/"
+      "airport_distance_source": "https://ourairports.com/airports/RJOO/",
+      "completed_source": "https://koshien.hanshin.co.jp/history/",
+      "details_checked_at": "2026-10-19",
+      "station_distance": "甲子園駅：徒歩約3分",
+      "station_distance_source": "https://koshien.hanshin.co.jp/guide/recommend_highschool.html"
     },
     {
       "match": "MAZDA Zoom-Zoom スタジアム広島",
       "name": "MAZDA Zoom-Zoom スタジアム広島",
       "team": "広島東洋カープ",
       "category": "屋外球場",
-      "completed": null,
+      "completed": "2009年3月28日（竣工式）",
       "opened": "2009年3月",
       "capacity": "33,000人",
       "source": "https://npb.jp/stadium/json/208.json",
@@ -181,7 +224,11 @@
       "latitude": 34.391872,
       "longitude": 132.484375,
       "airport_distance": "Iwakuni Kintaikyo Airport (IWK)：約34.9km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/RJOI/"
+      "airport_distance_source": "https://ourairports.com/airports/RJOI/",
+      "maintenance": "約2.96億円／年（2024年度・管理運営費等、周辺遊歩道を含む）",
+      "maintenance_source": "https://www.city.hiroshima.lg.jp/_res/projects/default_project/_page_/001/043/349/3.pdf",
+      "details_checked_at": "2026-10-19",
+      "completed_source": "https://www.carp.co.jp/stadium/about"
     },
     {
       "match": "みずほPayPayドーム福岡",
@@ -214,7 +261,10 @@
       "latitude": 38.57994,
       "longitude": -121.51246,
       "airport_distance": "Sacramento International Airport (SMF)：約14.5km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KSMF/"
+      "airport_distance_source": "https://ourairports.com/airports/KSMF/",
+      "completed": "2000年",
+      "completed_source": "https://www.milb.com/news/gcs-16428488",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -228,7 +278,10 @@
       "latitude": 40.446904,
       "longitude": -80.005753,
       "airport_distance": "Pittsburgh International Airport (PIT)：約19.8km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KPIT/"
+      "airport_distance_source": "https://ourairports.com/airports/KPIT/",
+      "completed": "2001年",
+      "completed_source": "https://www.thorntontomasetti.com/project/pnc-park",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -242,7 +295,10 @@
       "latitude": 32.707861,
       "longitude": -117.157278,
       "airport_distance": "San Diego International Airport (SAN)：約4.2km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KSAN/"
+      "airport_distance_source": "https://ourairports.com/airports/KSAN/",
+      "completed": "2004年",
+      "completed_source": "https://www.clarkconstruction.com/our-work/projects/petco-park",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -256,7 +312,10 @@
       "latitude": 47.591333,
       "longitude": -122.33251,
       "airport_distance": "King County International Airport - Boeing Field (BFI)：約7.6km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KBFI/"
+      "airport_distance_source": "https://ourairports.com/airports/KBFI/",
+      "completed": "1999年",
+      "completed_source": "https://www.mka.com/projects/t-mobile-park/",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -270,7 +329,12 @@
       "latitude": 37.778383,
       "longitude": -122.389448,
       "airport_distance": "Oakland San Francisco Bay Airport (OAK)：約16.2km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KOAK/"
+      "airport_distance_source": "https://ourairports.com/airports/KOAK/",
+      "construction": "3億5,700万米ドル（当初）",
+      "construction_source": "https://www.mlb.com/giants/ballpark/history",
+      "details_checked_at": "2026-10-19",
+      "completed": "2000年",
+      "completed_source": "https://www.thorntontomasetti.com/index.php/project/oracle-park"
     },
     {
       "org": "mlb",
@@ -284,7 +348,10 @@
       "latitude": 38.62256667,
       "longitude": -90.19286667,
       "airport_distance": "St. Louis Lambert International Airport (STL)：約20.8km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KSTL/"
+      "airport_distance_source": "https://ourairports.com/airports/KSTL/",
+      "completed": "2006年",
+      "completed_source": "https://kwamebuildinggroup.com/portfolio-item/st-louis-cardinals-busch-stadium/",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -298,7 +365,10 @@
       "latitude": 27.767778,
       "longitude": -82.6525,
       "airport_distance": "St. Petersburg Clearwater International Airport (PIE)：約16.2km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KPIE/"
+      "airport_distance_source": "https://ourairports.com/airports/KPIE/",
+      "completed": "1990年",
+      "completed_source": "https://ballparkdigest.com/2018/04/23/ballpark-booms-by-league-mlb/",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -312,7 +382,12 @@
       "latitude": 32.747299,
       "longitude": -97.081818,
       "airport_distance": "Dallas Fort Worth International Airport (DFW)：約17.1km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KDFW/"
+      "airport_distance_source": "https://ourairports.com/airports/KDFW/",
+      "construction": "約12億米ドル（事業費）",
+      "construction_source": "https://www.mlb.com/rangers/ballpark/facts-figures",
+      "details_checked_at": "2026-10-19",
+      "completed": "2020年",
+      "completed_source": "https://www.uni-engineer.com/portfolio/globe-life-field-arlington-texas/"
     },
     {
       "org": "mlb",
@@ -326,7 +401,10 @@
       "latitude": 43.64155,
       "longitude": -79.38915,
       "airport_distance": "Billy Bishop Toronto City Airport (YTZ)：約1.6km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/CYTZ/"
+      "airport_distance_source": "https://ourairports.com/airports/CYTZ/",
+      "completed": "1989年",
+      "completed_source": "https://cisc-icca.ca/ciscwp/wp-content/uploads/2017/03/advantage28_1.pdf",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -340,7 +418,10 @@
       "latitude": 44.981829,
       "longitude": -93.277891,
       "airport_distance": "Minneapolis–Saint Paul International Airport / Wold–Chamberlain Field (MSP)：約12.1km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KMSP/"
+      "airport_distance_source": "https://ourairports.com/airports/KMSP/",
+      "completed": "2010年3月",
+      "completed_source": "https://www.mortenson.com/projects/target-field",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -354,7 +435,12 @@
       "latitude": 39.90539086,
       "longitude": -75.16716957,
       "airport_distance": "Philadelphia International Airport (PHL)：約7.3km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KPHL/"
+      "airport_distance_source": "https://ourairports.com/airports/KPHL/",
+      "construction": "4億5,800万米ドル",
+      "construction_source": "https://www.mlb.com/phillies/news/phillies-alumni-designing-citizens-bank-park",
+      "details_checked_at": "2026-10-19",
+      "completed": "2004年",
+      "completed_source": "https://www.cdfa.net/cdfa/cdfaweb.nsf/ord/201609-Stadium.html/$file/gayerdrukkergold_stadiumsubsidies_090816.pdf"
     },
     {
       "org": "mlb",
@@ -368,7 +454,10 @@
       "latitude": 33.890672,
       "longitude": -84.467641,
       "airport_distance": "DeKalb Peachtree Airport (PDK)：約15.4km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KPDK/"
+      "airport_distance_source": "https://ourairports.com/airports/KPDK/",
+      "completed": "2017年",
+      "completed_source": "https://www.walterpmoore.com/projects/truist-park",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -382,7 +471,10 @@
       "latitude": 41.83,
       "longitude": -87.634167,
       "airport_distance": "Chicago Midway International Airport (MDW)：約11.0km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KMDW/"
+      "airport_distance_source": "https://ourairports.com/airports/KMDW/",
+      "completed": "1991年",
+      "completed_source": "https://journals.lib.unb.ca/index.php/MCR/article/download/17898/22066?inline=1",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -396,7 +488,10 @@
       "latitude": 25.77796236,
       "longitude": -80.21951795,
       "airport_distance": "Miami International Airport (MIA)：約7.3km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KMIA/"
+      "airport_distance_source": "https://ourairports.com/airports/KMIA/",
+      "completed": "2012年",
+      "completed_source": "https://www.aboutpmc.com/project-profiles/miami-marlins-park/",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -410,7 +505,10 @@
       "latitude": 40.82919482,
       "longitude": -73.9264977,
       "airport_distance": "LaGuardia Airport (LGA)：約7.3km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KLGA/"
+      "airport_distance_source": "https://ourairports.com/airports/KLGA/",
+      "completed": "2009年",
+      "completed_source": "https://www.thorntontomasetti.com/project/yankee-stadium",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -424,7 +522,10 @@
       "latitude": 43.02838,
       "longitude": -87.97099,
       "airport_distance": "General Mitchell International Airport (MKE)：約10.9km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KMKE/"
+      "airport_distance_source": "https://ourairports.com/airports/KMKE/",
+      "completed": "2001年",
+      "completed_source": "https://wells.build/projects/american-family-field/",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -438,7 +539,10 @@
       "latitude": 33.80019044,
       "longitude": -117.8823996,
       "airport_distance": "John Wayne Orange County International Airport (SNA)：約14.0km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KSNA/"
+      "airport_distance_source": "https://ourairports.com/airports/KSNA/",
+      "completed": "1966年4月8日",
+      "completed_source": "https://angelsmediaguide.com/files/basic-html/page395.html",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -452,7 +556,10 @@
       "latitude": 33.445302,
       "longitude": -112.066687,
       "airport_distance": "Phoenix Sky Harbor International Airport (PHX)：約5.7km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KPHX/"
+      "airport_distance_source": "https://ourairports.com/airports/KPHX/",
+      "completed": "1998年",
+      "completed_source": "https://www.tutorperini.com/projects/sports/chase-field/",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -466,7 +573,10 @@
       "latitude": 39.283787,
       "longitude": -76.621689,
       "airport_distance": "Baltimore/Washington International Thurgood Marshall Airport (BWI)：約12.7km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KBWI/"
+      "airport_distance_source": "https://ourairports.com/airports/KBWI/",
+      "completed": "1992年",
+      "completed_source": "https://www.hcea.com/project/oriole-park-at-camden-yards/",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -480,7 +590,10 @@
       "latitude": 42.346456,
       "longitude": -71.097441,
       "airport_distance": "Boston Logan International Airport (BOS)：約7.6km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KBOS/"
+      "airport_distance_source": "https://ourairports.com/airports/KBOS/",
+      "completed": "1912年",
+      "completed_source": "https://sabr.org/gamesproj/game/april-20-1912-the-first-game-at-fenway-park/",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -494,7 +607,10 @@
       "latitude": 41.948171,
       "longitude": -87.655503,
       "airport_distance": "Chicago Midway International Airport (MDW)：約19.7km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KMDW/"
+      "airport_distance_source": "https://ourairports.com/airports/KMDW/",
+      "completed": "1914年",
+      "completed_source": "https://www.loc.gov/pictures/item/2020722070/",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -508,7 +624,10 @@
       "latitude": 39.097389,
       "longitude": -84.506611,
       "airport_distance": "Cincinnati Municipal Airport Lunken Field (LUK)：約7.6km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KLUK/"
+      "airport_distance_source": "https://ourairports.com/airports/KLUK/",
+      "completed": "2003年",
+      "completed_source": "https://architour.designlearnandbuild.org/buildings/great-american-ball-park/",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -522,7 +641,10 @@
       "latitude": 41.495861,
       "longitude": -81.685255,
       "airport_distance": "Cleveland Hopkins International Airport (CLE)：約16.6km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KCLE/"
+      "airport_distance_source": "https://ourairports.com/airports/KCLE/",
+      "completed": "1994年",
+      "completed_source": "https://cogence.org/wp-content/uploads/2023/08/JRA-Cogence-Project-Initiation-Presentation-Columbus-Print-Version.pdf",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -536,7 +658,10 @@
       "latitude": 39.756042,
       "longitude": -104.994136,
       "airport_distance": "Rocky Mountain Metropolitan Airport (BJC)：約20.0km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KBJC/"
+      "airport_distance_source": "https://ourairports.com/airports/KBJC/",
+      "completed": "1995年4月",
+      "completed_source": "https://www.mortenson.com/projects/coors-field",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -550,7 +675,10 @@
       "latitude": 42.3391151,
       "longitude": -83.048695,
       "airport_distance": "Windsor International Airport (YQG)：約10.4km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/CYQG/"
+      "airport_distance_source": "https://ourairports.com/airports/CYQG/",
+      "completed": "2000年",
+      "completed_source": "https://www.leg.mn.gov/docs/2004/other/040634/Stadium/www.stadium.state.mn.us/meetings/031209/031209_agenda.pdf",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -564,7 +692,10 @@
       "latitude": 29.756967,
       "longitude": -95.355509,
       "airport_distance": "William P. Hobby Airport (HOU)：約14.6km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KHOU/"
+      "airport_distance_source": "https://ourairports.com/airports/KHOU/",
+      "completed": "2000年",
+      "completed_source": "https://lgbtq.visithoustontexas.com/listings/houston-astros/22502/",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -578,7 +709,10 @@
       "latitude": 39.051567,
       "longitude": -94.480483,
       "airport_distance": "Kansas City International Airport (MCI)：約34.3km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KMCI/"
+      "airport_distance_source": "https://ourairports.com/airports/KMCI/",
+      "completed": "1973年春",
+      "completed_source": "https://www.kcmodern.com/kaufman-stadium",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -592,7 +726,12 @@
       "latitude": 34.07368,
       "longitude": -118.24053,
       "airport_distance": "Hollywood Burbank/Bob Hope Airport (BUR)：約18.0km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KBUR/"
+      "airport_distance_source": "https://ourairports.com/airports/KBUR/",
+      "construction": "2,300万米ドル（当初）",
+      "construction_source": "https://www.walteromalley.com/dodger-stadium/construction-facts/",
+      "details_checked_at": "2026-10-19",
+      "completed": "1962年",
+      "completed_source": "https://planning.lacity.gov/odocument/1473a5d4-1e90-4000-9b7b-110d08c8488a/SLEPEV_Historic_Resources_Survey_Report_HPLAEdit_0.pdf"
     },
     {
       "org": "mlb",
@@ -606,7 +745,10 @@
       "latitude": 38.872861,
       "longitude": -77.007501,
       "airport_distance": "Ronald Reagan Washington National Airport (DCA)：約3.5km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KDCA/"
+      "airport_distance_source": "https://ourairports.com/airports/KDCA/",
+      "completed": "2008年",
+      "completed_source": "https://www.clarkconstruction.com/our-work/projects/nationals-park",
+      "details_checked_at": "2026-10-19"
     },
     {
       "org": "mlb",
@@ -620,7 +762,10 @@
       "latitude": 40.75753012,
       "longitude": -73.84559155,
       "airport_distance": "LaGuardia Airport (LGA)：約3.2km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/KLGA/"
+      "airport_distance_source": "https://ourairports.com/airports/KLGA/",
+      "completed": "2009年",
+      "completed_source": "https://www.wsp.com/en-us/projects/new-york-mets-citi-field",
+      "details_checked_at": "2026-10-19"
     }
   ]
 }

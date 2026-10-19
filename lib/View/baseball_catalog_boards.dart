@@ -83,16 +83,92 @@ Widget catalogLogo(Map<String, dynamic> team) {
                   : fallback()));
 }
 
-class StadiumsBoard extends StatelessWidget {
+// Sort the numeric value, not the formatted Japanese display string.
+(double, String)? stadiumSortValue(dynamic raw, String field) {
+  final text = '${raw ?? ''}'.replaceAll(',', '');
+  if (field == 'completed') {
+    final date = RegExp(r'(\d{4})年(?:(\d+)月)?(?:(\d+)日)?').firstMatch(text);
+    if (date == null) return null;
+    return (
+      double.parse(date[1]!) * 10000 +
+          (double.tryParse(date[2] ?? '') ?? 0) * 100 +
+          (double.tryParse(date[3] ?? '') ?? 0),
+      'date'
+    );
+  }
+  if (field.endsWith('_distance')) {
+    final distance = RegExp(r'(\d+(?:\.\d+)?)\s*(km|m|分)').firstMatch(text);
+    if (distance == null) return null;
+    return (
+      double.parse(distance[1]!) * (distance[2] == 'm' ? .001 : 1),
+      distance[2] == '分' ? 'time' : 'distance'
+    );
+  }
+  final matches = RegExp(r'(\d+(?:\.\d+)?)\s*(億|万|千)?').allMatches(text);
+  if (matches.isEmpty) return null;
+  double value = 0;
+  // Parenthetical notes contain years and must not become part of the amount.
+  final amount = text.split(RegExp(r'[（(／/]')).first;
+  for (final match
+      in RegExp(r'(\d+(?:\.\d+)?)\s*(億|万|千)?').allMatches(amount)) {
+    value += double.parse(match[1]!) *
+        switch (match[2]) {
+          '億' => 100000000,
+          '万' => 10000,
+          '千' => 1000,
+          _ => 1
+        };
+  }
+  return (value, text.contains('ドル') ? 'USD' : 'number');
+}
+
+int compareStadiumRows(Map<String, dynamic> a, Map<String, dynamic> b,
+    String? field, bool ascending) {
+  int teamOrder() {
+    final league = ((a['id_league'] as num?)?.toInt() ?? 999)
+        .compareTo((b['id_league'] as num?)?.toInt() ?? 999);
+    return league != 0
+        ? league
+        : ((a['id_team'] as num?)?.toInt() ?? 999)
+            .compareTo((b['id_team'] as num?)?.toInt() ?? 999);
+  }
+
+  if (field == null) return teamOrder();
+  if (field == 'team') return teamOrder() * (ascending ? 1 : -1);
+  final av = stadiumSortValue(a[field], field),
+      bv = stadiumSortValue(b[field], field);
+  if (av == null || bv == null)
+    return av == null && bv == null
+        ? teamOrder()
+        : av == null
+            ? 1
+            : -1;
+  // Keep currencies and walking times separate instead of inventing conversions.
+  final unit = av.$2.compareTo(bv.$2);
+  if (unit != 0) return unit;
+  final value = av.$1.compareTo(bv.$1) * (ascending ? 1 : -1);
+  return value == 0 ? teamOrder() : value;
+}
+
+class StadiumsBoard extends StatefulWidget {
   const StadiumsBoard({super.key, required this.org});
   final String org;
   @override
+  State<StadiumsBoard> createState() => _StadiumsBoardState();
+}
+
+class _StadiumsBoardState extends State<StadiumsBoard> {
+  String? sortField;
+  bool ascending = true;
+  @override
   Widget build(BuildContext context) => CatalogData(
-      path: '/baseball-catalog?section=stadiums&org=$org',
+      path: '/baseball-catalog?section=stadiums&org=${widget.org}',
       builder: (data) {
-        final rows = listMapFromJson(data['stadiums']);
+        final rows = listMapFromJson(data['stadiums']).toList()
+          ..sort((a, b) => compareStadiumRows(a, b, sortField, ascending));
         const fields = [
           'team',
+          'image_outside',
           'image',
           'name',
           'category',
@@ -106,7 +182,8 @@ class StadiumsBoard extends StatelessWidget {
         ];
         const labels = [
           'ホームチーム',
-          '球場画像',
+          '外観',
+          '内観',
           '球場名',
           '球場カテゴリ',
           '完成日',
@@ -115,7 +192,7 @@ class StadiumsBoard extends StatelessWidget {
           '維持管理費',
           '年間の興行収入',
           '最寄りの空港からの距離',
-          '最寄りの駅からの距離'
+          '最寄り駅・距離／徒歩目安'
         ];
         return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -123,21 +200,37 @@ class StadiumsBoard extends StatelessWidget {
               const Padding(
                   padding: EdgeInsets.all(8),
                   child: Text(
-                      '未確認の項目は「未収録」。開場日と完成日、球団売上と球場収入は区別しています。空港は定期便のある空港が対象。直線距離は移動距離と異なります。',
+                      '完成日は新築時の完成年月（確認できた精度）で表示し、竣工式の場合は明記しています。未確認の項目は「未収録」。開場日と完成日、球団売上と球場収入は区別しています。空港は定期便のある空港が対象。直線距離は移動距離と異なります。見出しで昇順・降順を切り替えます（未収録は末尾、距離と徒歩時間・通貨は別々に比較）。',
                       style: TextStyle(fontSize: 11))),
               Expanded(
                   child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: SizedBox(
-                          width: 1590,
+                          width: 1770,
                           child: Column(children: [
                             _stadiumRow([
-                              for (final label in labels)
-                                Text(label,
+                              for (var i = 0; i < labels.length; i++)
+                                InkWell(
+                                  key: ValueKey('stadium-sort-${fields[i]}'),
+                                  onTap: i > 0 && i < 5
+                                      ? null
+                                      : () => setState(() {
+                                            ascending = sortField == fields[i]
+                                                ? !ascending
+                                                : true;
+                                            sortField = fields[i];
+                                          }),
+                                  child: SizedBox.expand(
+                                      child: Center(
+                                          child: Text(
+                                    '${labels[i]}${i > 0 && i < 5 ? '' : sortField == fields[i] ? ascending ? ' ▲' : ' ▼' : ' ↕'}',
+                                    textAlign: TextAlign.center,
                                     style: const TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 12))
+                                        fontSize: 12),
+                                  ))),
+                                ),
                             ], header: true),
                             Expanded(
                                 child: ListView.builder(
@@ -148,7 +241,9 @@ class StadiumsBoard extends StatelessWidget {
                                         for (final field in fields)
                                           field == 'team'
                                               ? catalogLogo(row)
-                                              : field == 'image' &&
+                                              : (field == 'image' ||
+                                                          field ==
+                                                              'image_outside') &&
                                                       '${row[field] ?? ''}'
                                                           .isNotEmpty
                                                   ? Image.asset('${row[field]}',
@@ -173,9 +268,9 @@ class StadiumsBoard extends StatelessWidget {
           Container(
               width: i == 0
                   ? 90
-                  : i == 1
+                  : i == 1 || i == 2
                       ? 180
-                      : i == 2
+                      : i == 3
                           ? 240
                           : 135,
               height: double.infinity,
@@ -189,16 +284,24 @@ class StadiumsBoard extends StatelessWidget {
 }
 
 final uniformNumbers = ['0', '00', for (var n = 1; n <= 300; n++) '$n'];
-String uniformStatus(Map<String, dynamic> row) => switch (row['status']) {
-      'active' => '現役',
+String uniformDisplayStatus(Map<String, dynamic> row) =>
+    row['status'] == 'active' && row['worn_in_selected_year'] == false
+        ? 'active_past'
+        : '${row['status']}';
+String uniformStatus(Map<String, dynamic> row) =>
+    switch (uniformDisplayStatus(row)) {
+      'active' => '現役（当年着用）',
+      'active_past' => '現役（当年未着用）',
       'retired' => '引退',
       'former' => 'NPB登録外（OB）',
       'permanent' => '永久欠番',
       'honored' => '事実上の永久欠番',
       _ => '現役状況未確認',
     };
-Color uniformColor(Map<String, dynamic> row) => switch (row['status']) {
+Color uniformColor(Map<String, dynamic> row) =>
+    switch (uniformDisplayStatus(row)) {
       'active' => const Color(0xffe0f2f1),
+      'active_past' => const Color(0xffdbeafe),
       'retired' || 'former' => const Color(0xffeeeeee),
       'permanent' => const Color(0xffffdf80),
       'honored' => const Color(0xffe1bee7),
@@ -228,6 +331,7 @@ class UniformHistoryBoard extends StatelessWidget {
                   child: Wrap(spacing: 8, runSpacing: 4, children: [
                     for (final status in [
                       'active',
+                      'active_past',
                       'retired',
                       'permanent',
                       'honored',
@@ -334,30 +438,45 @@ class UniformHistoryBoard extends StatelessWidget {
                 '${latest['name']}・${uniformStatus(latest)}${latest['number_status'] == null ? '' : '・${uniformStatus({
                         'status': latest['number_status']
                       })}'}',
-            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Flexible(
-                  child: TextButton(
-                      style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                      onPressed: details,
-                      child: Text('${latest['surname'] ?? latest['name']}',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontSize: 12, color: Colors.black)))),
-              if (rows.length > 1)
-                InkWell(
-                    key: ValueKey('uniform-more-${team['id_team']}-$number'),
-                    onTap: details,
-                    child: Padding(
-                        padding: const EdgeInsets.all(5),
-                        child: Text('+${rows.length - 1}',
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              if (latest['new_uniform_number'] == true)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                  decoration: BoxDecoration(
+                      color: Colors.deepOrange,
+                      borderRadius: BorderRadius.circular(3)),
+                  child: const Text('新背番号',
+                      style: TextStyle(
+                          fontSize: 9,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold)),
+                ),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Flexible(
+                    child: TextButton(
+                        style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                        onPressed: details,
+                        child: Text('${latest['surname'] ?? latest['name']}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
-                                fontSize: 10,
-                                color: Colors.blue,
-                                fontWeight: FontWeight.bold)))),
+                                fontSize: 12, color: Colors.black)))),
+                if (rows.length > 1)
+                  InkWell(
+                      key: ValueKey('uniform-more-${team['id_team']}-$number'),
+                      onTap: details,
+                      child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Text('+${rows.length - 1}',
+                              style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.blue,
+                                  fontWeight: FontWeight.bold)))),
+              ]),
             ])),
         color: uniformColor({
           ...latest,
@@ -393,20 +512,67 @@ class HallOfFameBoard extends StatelessWidget {
                         style: TextStyle(fontSize: 12))),
               if (listMapFromJson(data[section.$1]).isEmpty)
                 const ListTile(title: Text('該当する登録データがありません')),
-              for (final row in listMapFromJson(data[section.$1]))
-                ListTile(
-                    dense: true,
-                    title: Text('${row['name']}'),
-                    subtitle: Text(section.$1 == 'candidates'
-                        ? '${row['label']} ${row['value']} / ${row['target']}　残り${row['remaining']}　${row['estimate'] == null ? '予測不可（当年実績なし）' : '約${(row['estimate'] as num).toStringAsFixed(1)}シーズン'}'
-                        : [
-                            if (row['year'] != null) '${row['year']}年',
-                            if (row['category'] != null) '${row['category']}'
-                          ].join('・'))),
+              Padding(
+                padding: const EdgeInsets.all(6),
+                child: LayoutBuilder(builder: (context, constraints) {
+                  const gap = 6.0;
+                  final columns = ((constraints.maxWidth + gap) / 180)
+                      .floor()
+                      .clamp(1, 1000);
+                  final width =
+                      (constraints.maxWidth - gap * (columns - 1)) / columns;
+                  final rows = listMapFromJson(data[section.$1]);
+                  return Wrap(
+                      spacing: gap,
+                      runSpacing: gap,
+                      crossAxisAlignment: WrapCrossAlignment.start,
+                      children: [
+                        for (var i = 0; i < rows.length; i++)
+                          SizedBox(
+                            key: ValueKey('hall-card-${section.$1}-$i'),
+                            width: width,
+                            child: _playerCard(rows[i],
+                                candidate: section.$1 == 'candidates'),
+                          ),
+                      ]);
+                }),
+              ),
             ],
             Padding(
                 padding: const EdgeInsets.all(8),
                 child: Text('${data['note'] ?? ''}',
                     style: const TextStyle(fontSize: 11))),
           ]));
+
+  Widget _playerCard(Map<String, dynamic> row, {required bool candidate}) {
+    final detail = candidate
+        ? '${row['label']} ${row['value']} / ${row['target']}\n残り${row['remaining']}　${row['estimate'] == null ? '予測不可（当年実績なし）' : '約${(row['estimate'] as num).toStringAsFixed(1)}シーズン'}'
+        : [
+            if (row['year'] != null) '${row['year']}年',
+            if (row['category'] != null) '${row['category']}'
+          ].join('・');
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.black26, width: .5),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('${row['name']}',
+                style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87)),
+            if (detail.isNotEmpty) ...[
+              const SizedBox(height: 3),
+              Text(detail,
+                  style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            ],
+          ]),
+    );
+  }
 }

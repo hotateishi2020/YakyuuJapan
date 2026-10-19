@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:test/test.dart';
 
 import '../app/StadiumImages.dart';
@@ -20,8 +22,22 @@ void main() {
     expect(citi.inside, contains('mlb-24-citi.jpg'));
     expect(citi.outside, contains('mlb-18-citi.png'));
 
+    final citizens = StadiumImages.lookup('Citizens Bank Park');
+    expect(citizens.inside, contains('mlb-21-citizens.jpg'));
+    expect(citizens.outside, contains('mlb-19-citizens.png'));
+
     final unknown = StadiumImages.lookup('秋田');
     expect(unknown.inside, isEmpty);
     expect(unknown.outside, isEmpty);
+  });
+  test('all catalog stadium images are bundled', () {
+    final data = jsonDecode(File('data/stadium-catalog.json').readAsStringSync());
+    for (final row in data['stadiums']) {
+      final images = StadiumImages.lookup((row['name'] as String).replaceAll('MAZDA', 'マツダ'));
+      for (final path in [images.inside, images.outside]) {
+        expect(path, isNotEmpty, reason: row['name']);
+        expect(File('../$path').existsSync(), isTrue, reason: path);
+      }
+    }
   });
 }

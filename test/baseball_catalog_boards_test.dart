@@ -10,6 +10,24 @@ import 'package:Yakyuu_Japan/View/team_strength_board.dart';
 import 'package:Yakyuu_Japan/config/org_config.dart';
 
 void main() {
+  test('stadium sort uses league, numeric units and keeps missing values last', () {
+    expect(compareStadiumRows({'id_league':1}, {'id_league':2}, null, true), lessThan(0));
+    expect(compareStadiumRows({'id_league':1}, {'id_league':2}, 'team', true), lessThan(0));
+    expect(compareStadiumRows({'id_league':1}, {'id_league':2}, 'team', false), greaterThan(0));
+    expect(compareStadiumRows({'id_league':1, 'id_team':1}, {'id_league':1, 'id_team':2}, 'team', true), lessThan(0));
+    expect(compareStadiumRows({'construction':'約90億円'}, {'construction':'約123.1億円'}, 'construction', true), lessThan(0));
+    expect(compareStadiumRows({'capacity':null}, {'capacity':'35,000人'}, 'capacity', false), greaterThan(0));
+    expect(stadiumSortValue('52億2,800万円（総工費）', 'construction')!.$1, 5228000000);
+    expect(stadiumSortValue('駅：徒歩約15分', 'station_distance')!.$1, 15);
+  });
+  test('現役で当年未着用なら別色、永久欠番の色は優先', () {
+    const current={'status':'active','worn_in_selected_year':true};
+    const past={'status':'active','worn_in_selected_year':false};
+    expect(uniformStatus(past),'現役（当年未着用）');
+    expect(uniformColor(past),isNot(uniformColor(current)));
+    expect(uniformColor(past),isNot(uniformColor({'status':'retired'})));
+    expect(uniformColor({...past,'status':'permanent'}),uniformColor({'status':'permanent'}));
+  });
   testWidgets('record picker switches to uniforms and hall', (tester) async {
     await http.runWithClient(() async {
       await tester.pumpWidget(const MaterialApp(
@@ -24,8 +42,8 @@ void main() {
       expect(find.byType(UniformHistoryBoard), findsOneWidget);
       await tester.tap(picker);
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('殿堂').last);
-      await tester.tap(find.text('殿堂').last);
+      await tester.ensureVisible(find.text('殿堂入り・名球会').last);
+      await tester.tap(find.text('殿堂入り・名球会').last);
       await tester.pumpAndSettle();
       expect(find.byType(HallOfFameBoard), findsOneWidget);
       expect(tester.takeException(), isNull);
@@ -62,6 +80,7 @@ void main() {
       expect(find.text('0'), findsOneWidget);
       expect(find.text('00'), findsOneWidget);
       expect(find.text('現姓'), findsOneWidget);
+      expect(find.text('新背番号'), findsOneWidget);
       expect(find.text('+1'), findsOneWidget);
       await tester.tap(find.byKey(const ValueKey('uniform-more-1-0')));
       await tester.pumpAndSettle();
@@ -80,6 +99,7 @@ void main() {
                   'number': '0',
                   'name': '現姓 選手',
                   'surname': '現姓',
+                  'new_uniform_number': true,
                   'status': 'active'
                 },
                 {
@@ -112,10 +132,22 @@ void main() {
           const MaterialApp(home: Scaffold(body: StadiumsBoard(org: 'npb'))));
       await tester.pumpAndSettle();
       expect(find.text('球場名'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('stadium-sort-team')));
+      await tester.pumpAndSettle();
+      expect(find.text('ホームチーム ▲'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('stadium-sort-team')));
+      await tester.pumpAndSettle();
+      expect(find.text('ホームチーム ▼'), findsOneWidget);
       await tester.drag(
           find.byType(SingleChildScrollView), const Offset(-1500, 0));
       await tester.pumpAndSettle();
-      expect(find.text('最寄りの駅からの距離').hitTestable(), findsOneWidget);
+      expect(find.byKey(const ValueKey('stadium-sort-station_distance')).hitTestable(), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('stadium-sort-station_distance')));
+      await tester.pumpAndSettle();
+      expect(find.text('最寄り駅・距離／徒歩目安 ▲'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('stadium-sort-station_distance')));
+      await tester.pumpAndSettle();
+      expect(find.text('最寄り駅・距離／徒歩目安 ▼'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
         () => MockClient((_) async => http.Response(

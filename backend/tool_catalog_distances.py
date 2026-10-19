@@ -21,7 +21,7 @@ def main():
   nearest=min(airports,key=lambda a:distance(lat,lon,float(a['latitude_deg']),float(a['longitude_deg'])))
   km=distance(lat,lon,float(nearest['latitude_deg']),float(nearest['longitude_deg']))
   name=nearest['name'];code=nearest['iata_code']
-  r['airport_distance']=f'{name} ({code})：約{km:.1f}km（直線）'
+  r['airport_distance']=f'{name}' + (f' ({code})' if code else '') + f'：約{km:.1f}km（直線）'
   r['airport_distance_source']='https://ourairports.com/airports/'+nearest['ident']+'/'
   choices=[]
   for s in stations:
@@ -29,7 +29,7 @@ def main():
    if name and 'lat' in c:
     km=distance(lat,lon,c['lat'],c['lon'])
     if km<=15:choices.append((km,name,s))
-  if choices:
+  if choices and not r.get('station_distance'):
    km,name,s=min(choices,key=lambda x:x[0]);r['station_distance']=f'{name}：約{km:.1f}km（直線）'
    r['station_distance_source']=f"https://www.openstreetmap.org/{s['type']}/{s['id']}"
  p.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')

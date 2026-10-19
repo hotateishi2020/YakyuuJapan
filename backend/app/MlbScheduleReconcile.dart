@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:html/dom.dart';
 import 'package:postgres/postgres.dart';
 import 'YahooTeamNames.dart';
@@ -46,10 +47,36 @@ List<int> obsoleteMlbGameIds(
   ];
 }
 
+/// A confirmed empty day must also suppress fixtures that only exist in the annual snapshot.
+Future<void> ensureScheduleConfirmation(Connection conn) async {
+  await conn.execute('''CREATE TABLE IF NOT EXISTS t_schedule_confirmation (
+    code_org text NOT NULL, date_game date NOT NULL, cards jsonb NOT NULL,
+    checked_at timestamptz NOT NULL DEFAULT NOW(), PRIMARY KEY(code_org,date_game)
+  )''');
+}
+
+List<Map<String, dynamic>> applyScheduleConfirmations(
+    List<Map<String, dynamic>> games,
+    Map<String, List<Map<String, String>>> confirmations) {
+  return games.where((g) {
+    final cards = confirmations['${g['date']}'];
+    if (cards == null || g['finished'] == true || g['has_records'] == true ||
+        RegExp('終了|試合中(?!止)|[0-9]+\\s*回|Final|In Progress', caseSensitive: false).hasMatch('${g['state']}')) return true;
+    final home = YahooTeamNames.normalize('${g['name_home_logo']}');
+    final away = YahooTeamNames.normalize('${g['name_away_logo']}');
+    return cards.any((c) => c['home'] == home && c['away'] == away && !cancelledMlbCard(c['state'] ?? ''));
+  }).toList();
+}
+
 Future<int> reconcileMlbSchedule(
     Connection conn, String day, Document document, {List<int> leagueIds = const [3,4]}) async {
   final cards = mlbScheduleCards(document);
   if (cards == null) return 0;
+  await ensureScheduleConfirmation(conn);
+  await conn.execute('''INSERT INTO t_schedule_confirmation(code_org,date_game,cards)
+    VALUES(\$1,\$2::date,\$3::jsonb)
+    ON CONFLICT(code_org,date_game) DO UPDATE SET cards=EXCLUDED.cards,checked_at=NOW()''',
+    parameters: [leagueIds.contains(1) ? 'npb' : 'mlb', day, jsonEncode(cards)]);
   final rows = (await conn.execute(
           '''SELECT g.id,g.state,h.name_short AS home,a.name_short AS away,
     EXISTS(SELECT 1 FROM t_game_summary s WHERE s.id_game=g.id AND NOT COALESCE(s.flg_delete,false) AND (s.int_batting>0 OR s.int_pitch>0 OR s.double_inning_pitch>0)) AS has_records

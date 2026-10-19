@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:postgres/postgres.dart';
 import 'OrgLeague.dart';
+import 'MlbScheduleReconcile.dart';
 import 'StrengthUsage.dart';
 
 Map<String, dynamic> readClubFile(String name) {
@@ -31,13 +32,23 @@ Future<Map<String, dynamic>> readSeasonSchedule(Connection conn, OrgKind org, in
   final snapshot = readClubFile('schedule-$year.json');
   final rows = await conn.execute('''
  SELECT g.id,g.datetime_start::text AS datetime_start,g.id_team_home,g.id_team_away,g.score_home,g.score_away,g.state,g.code_game,g.flg_delete,
+ EXISTS(SELECT 1 FROM t_game_summary s WHERE s.id_game=g.id AND NOT COALESCE(s.flg_delete,false) AND (s.int_batting>0 OR s.int_pitch>0 OR s.double_inning_pitch>0)) AS has_records,
  h.color_back AS color_back_home,h.color_font AS color_font_home,h.name_shortest AS name_home,a.name_shortest AS name_away,h.name_short AS name_home_logo,a.name_short AS name_away_logo,h.id_league AS league_home,a.id_league AS league_away
  FROM t_game g JOIN m_team h ON h.id=g.id_team_home JOIN m_team a ON a.id=g.id_team_away
  WHERE h.id_league IN (${org.leagueIds.join(',')}) AND g.datetime_start >= make_date(\$1,1,1) AND g.datetime_start < make_date(\$1+1,1,1)
  ORDER BY g.datetime_start,g.id
  ''', parameters: [year]);
   final games = mergeSeasonSchedule(teams, usageMaps(snapshot[org.code]), rows.map((r) => r.toColumnMap()).toList());
-  return {'org': org.code, 'year': year, 'checked_at': snapshot['checked_at'], 'games': games};
+  await ensureScheduleConfirmation(conn);
+  final checked = await conn.execute('''SELECT date_game::text,cards FROM t_schedule_confirmation
+    WHERE code_org=\$1 AND date_game>=make_date(\$2,1,1) AND date_game<make_date(\$2+1,1,1)''',parameters:[org.code,year]);
+  final confirmations = <String,List<Map<String,String>>>{};
+  for(final row in checked) {
+    final raw=row[1];
+    confirmations['${row[0]}']=usageMaps(raw is String ? jsonDecode(raw) : raw)
+      .map((c)=>c.map((k,v)=>MapEntry(k,'$v'))).toList();
+  }
+  return {'org': org.code, 'year': year, 'checked_at': snapshot['checked_at'], 'games': applyScheduleConfirmations(games, confirmations)};
 }
 
 /// Match official fixtures first. Never invent a second game from a timezone shift.

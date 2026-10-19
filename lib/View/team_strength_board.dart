@@ -137,7 +137,14 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
     key: const ValueKey('strength-picker'),
     initialValue: _selectedView,
     isExpanded: true,
-    decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8), border: OutlineInputBorder()),
+    style: TextStyle(color: widget.org.tabForeground),
+    dropdownColor: widget.org.tabColor,
+    iconEnabledColor: widget.org.tabForeground,
+    decoration: InputDecoration(
+      filled: true, fillColor: widget.org.tabColor,
+      isDense: true, contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      border: const OutlineInputBorder(),
+    ),
     items: [for (final index in [if (_selectedView == 1) 1, 11, 8, 2, 0, 4, 5, 12, 7, 10, 13])
       DropdownMenuItem(value: index, child: Text(_views[index], key: ValueKey('strength-view-$index')))],
     onChanged: (index) {

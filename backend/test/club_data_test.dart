@@ -1,5 +1,6 @@
 import 'package:test/test.dart';
 import '../app/ClubData.dart';
+import '../app/MlbScheduleReconcile.dart';
 
 void main() {
   final teams = <Map<String, dynamic>>[
@@ -29,6 +30,20 @@ void main() {
     expect(kept, hasLength(1));
     expect(kept.single['name_home_logo'], '巨人');
     expect(mergeSeasonSchedule(teams, [{...fixture, 'finished': true}], [deleted]), hasLength(1));
+  });
+  test('DB未登録の年間日程も試合なしの確認結果で除外する', () {
+    final merged=mergeSeasonSchedule(teams,[fixture,{...fixture,'date':'2026-10-17'}],[]);
+    final result=applyScheduleConfirmations(merged,{'2026-10-16':[]});
+    expect(result,hasLength(1));
+    expect(result.single['date'],'2026-10-17');
+    expect(applyScheduleConfirmations(merged,{}),hasLength(2));
+  });
+  test('再確認済みの中止・消滅だけ除外し、終了・進行中・成績済を保護する', () {
+    final base=mergeSeasonSchedule(teams,[fixture],[]).single;
+    final rows=[base,{...base,'finished':true},{...base,'state':'5回表'},{...base,'has_records':true}];
+    expect(applyScheduleConfirmations(rows,{'2026-10-16':[]}),hasLength(3));
+    expect(applyScheduleConfirmations([base],{'2026-10-16':[{'home':'巨人','away':'阪神','state':'試合中止'}]}),isEmpty);
+    expect(applyScheduleConfirmations([base],{'2026-10-16':[{'home':'巨人','away':'阪神','state':'18:00'}]}),hasLength(1));
   });
   test('再確認した試合前の開始時刻をカレンダーへ反映する', () {
     final result = mergeSeasonSchedule(teams, [

@@ -115,7 +115,14 @@ class _RecordsBoardState extends State<RecordsBoard> {
         DropdownButtonFormField<int>(
           key: ValueKey('records-picker-${widget.org.kind.name}'),
           initialValue: tab, isExpanded: true,
-          decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8), border: OutlineInputBorder()),
+          style: TextStyle(color: widget.org.tabForeground),
+          dropdownColor: widget.org.tabColor,
+          iconEnabledColor: widget.org.tabForeground,
+          decoration: InputDecoration(
+            filled: true, fillColor: widget.org.tabColor,
+            isDense: true, contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            border: const OutlineInputBorder(),
+          ),
           items: [for (final i in _tabs) DropdownMenuItem(value: i, child: Text(recordTabs[i], key: ValueKey('records-tab-$i')))],
           onChanged: (i) {
             if (i == null) return;

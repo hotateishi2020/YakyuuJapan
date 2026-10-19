@@ -20,13 +20,17 @@ void main() {
       await tester.pumpAndSettle();
       expect(requests, 2);
       expect(find.text('19:00'), findsOneWidget);
+      await tester.pump(const Duration(minutes: 1));
+      await tester.pumpAndSettle();
+      expect(requests, 3);
+      expect(find.text('19:00'), findsNothing);
       await tester.pumpWidget(const SizedBox());
       await tester.pump(const Duration(minutes: 1));
-      expect(requests, 2);
+      expect(requests, 3);
       expect(tester.takeException(), isNull);
     }, () => MockClient((request) async {
       requests++;
-      return http.Response(jsonEncode({'games': [{'time': requests == 1 ? '18:00' : '19:00'}]}), 200);
+      return http.Response(jsonEncode({'games': requests >= 3 ? [] : [{'time': requests == 1 ? '18:00' : '19:00'}]}), 200);
     }));
   });
 }

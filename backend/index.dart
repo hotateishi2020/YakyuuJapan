@@ -1098,7 +1098,7 @@ void main() async {
       } on FormatException catch(e){return Response.badRequest(body:jsonEncode({'error':e.message}),headers:headers);}
     });
     app.get('/season-schedule', (Request request) async {
-      const headers={'content-type':'application/json; charset=utf-8'};
+      const headers={'content-type':'application/json; charset=utf-8','cache-control':'no-store'};
       try {
         final org=OrgKind.parse(request.url.queryParameters['org']);
         final year=int.tryParse(request.url.queryParameters['year']??'')??DateTimeTool.getThisYear();

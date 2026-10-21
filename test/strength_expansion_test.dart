@@ -309,7 +309,7 @@ void main() {
 
   testWidgets('小さい功績はホバーとクリックで正式名と詳細を表示', (t) async {
     await t.pumpWidget(const MaterialApp(home: Scaffold(body: StrengthAchievements(year: 2026, team: {
-      'roster': const [{'name': '選手', 'achievements': const [
+      'roster': [{'name': '選手', 'achievements': [
         {'label': '規定打席到達', 'kind': 'qualification', 'year': 2025, 'detail': '規定443打席に到達'}
       ]}]
     }))));

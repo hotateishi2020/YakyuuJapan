@@ -1,0 +1,8 @@
+{
+  "stadium": "札幌ドーム",
+  "view": "inside",
+  "path": "backend/assets/images/stadiums/inside/regional-001-generated.jpg",
+  "prompt": "Use case: stylized-concept. A landscape architectural illustration for a baseball stadium catalog, specifically Sapporo Dome, 札幌ドーム. Interior from behind home plate: huge enclosed silver dome overhead with visible intricate steel trusses, artificial turf baseball diamond, continuous blue seating tiers, indoor arena light. Clearly an architectural illustration, not documentary photography. No text, no logos, no collage. Depict a dome, not an open-air ballpark.",
+  "method": "built-in image_gen",
+  "display_note": "AI生成の参考イメージ。現地写真・正確な建築資料ではありません。"
+}

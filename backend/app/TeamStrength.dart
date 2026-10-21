@@ -1,3 +1,4 @@
+import 'NpbResearchEvents.dart';
 import 'ScheduledLog.dart';
 import 'RosterBirthplaces.dart';
 import 'RosterMoves.dart';
@@ -173,7 +174,10 @@ class TeamStrength {
       metricsClient.close();
     }
     await StrengthUsage.attachStatuses(org, year, teams);
-    if (org == 'npb') await RosterMoves.attach(year, teams);
+    if (org == 'npb') {
+      await RosterMoves.attach(year, teams);
+      await Postgres.withConnection((c) => NpbResearchEvents.attach(c, year, teams));
+    }
     await Postgres.withConnection((conn) => attachRosterBirthplaces(conn, teams));
     if (org == 'npb') await fillNpbBirthplaces(teams);
     await Postgres.withConnection((conn) => conn.runTx((tx) async {

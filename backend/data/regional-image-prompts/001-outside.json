@@ -1,0 +1,8 @@
+{
+  "stadium": "札幌ドーム",
+  "view": "outside",
+  "path": "backend/assets/images/stadiums/outside/regional-001-generated.jpg",
+  "prompt": "Use case: stylized-concept. A landscape architectural illustration for a baseball stadium catalog, specifically Sapporo Dome, 札幌ドーム. Exterior from a pedestrian approach: distinctive enormous smooth silver elliptical dome rising out of a grassy slope, sweeping asymmetrical form, broad forecourt, cool northern Japanese light. Clearly an architectural illustration, not documentary photography. No text, no logos, no collage. Depict a dome, not an open-air ballpark.",
+  "method": "built-in image_gen",
+  "display_note": "AI生成の参考イメージ。現地写真・正確な建築資料ではありません。"
+}

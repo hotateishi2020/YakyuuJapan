@@ -136,7 +136,7 @@
     </div>
     <div class="startup-tabs" id="startup-board-tabs" aria-label="情報タブ（起動中）">
       <span class="startup-tab" data-board="5">日程</span><span class="startup-tab selected" data-board="0">試合情報</span>
-      <span class="startup-tab" data-board="1">チーム順位</span><span class="startup-tab" data-board="2">個人成績</span>
+      <span class="startup-tab" data-board="1">チーム順位</span><span class="startup-tab" data-board="2">個人成績</span><span class="startup-tab" data-board="8">タイトル</span>
       <span class="startup-tab" data-board="3">戦力</span><span class="startup-tab" data-board="4">記録</span><span class="startup-tab" data-board="6">動画</span>
     </div>
     <div id="startup-status" role="status">読み込んでいます…</div>
@@ -155,10 +155,17 @@
       if (['npb', 'mlb', 'predict', 'other'].includes(saved)) org = saved;
       shell.dataset.org = org;
       shell.querySelectorAll('[data-org]').forEach(tab => tab.classList.toggle('selected', tab.dataset.org === org));
+      if (org === 'mlb') {
+        const japanese = document.createElement('span');
+        japanese.className = 'startup-tab';
+        japanese.dataset.board = '7';
+        japanese.textContent = '日本人';
+        document.querySelector('[data-board="0"]').before(japanese);
+      }
       if (org === 'other') document.getElementById('startup-board-tabs').innerHTML = '<span class="startup-tab selected">高校野球</span><span class="startup-tab">国際シリーズ</span>';
       if (org === 'predict') document.getElementById('startup-board-tabs').hidden = true;
       const savedBoard = readSaved('koko_tab_main_' + org);
-      const board = /^[0-6]$/.test(savedBoard || '') ? savedBoard : '0';
+      const board = (/^[0-68]$/.test(savedBoard || '') || (org === 'mlb' && savedBoard === '7')) ? savedBoard : '0';
       shell.querySelectorAll('[data-board]').forEach(tab => tab.classList.toggle('selected', tab.dataset.board === board));
       const fitTabs = () => shell.querySelectorAll('[data-board]').forEach(tab => {
         tab.style.fontSize = '12px';

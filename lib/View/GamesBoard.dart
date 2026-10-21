@@ -1118,6 +1118,7 @@ class BothLeagueGameDay extends StatefulWidget {
   final List<Map<String, dynamic>> standings;
   final String? initialDate;
   final List<Widget> leading;
+  final List<Widget> trailing;
   final List<({int id, String name, Color color})> leagues;
   final Future<void> Function(DateTime date)? onNeedGameDate;
   final bool Function(DateTime date)? shouldLoadGameDate;
@@ -1134,6 +1135,7 @@ class BothLeagueGameDay extends StatefulWidget {
     this.standings = const [],
     this.initialDate,
     this.leading = const [],
+    this.trailing = const [],
     this.leagues = const [
       (id: 1, name: 'セ・リーグ', color: Color(0xFF0E8E2D)),
       (id: 2, name: 'パ・リーグ', color: Color(0xFF01B1EA)),
@@ -1341,12 +1343,13 @@ class _BothLeagueGameDayState extends State<BothLeagueGameDay> {
                   child: Center(child: BaseballLoading()),
                 )
               else if (leagueBlocks.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 24),
+                const SizedBox(
+                  height: 200,
                   child: Center(child: Text('この日の試合はありません')),
                 )
               else
                 ...leagueBlocks,
+              ...widget.trailing,
             ],
           ),
         ),
@@ -1791,6 +1794,90 @@ class _GamesBoardYahooStyleState extends State<GamesBoardYahooStyle> with Automa
 typedef _PlayerLine = ({String name, String role, String colors, String mark, String pos, String stat, String hrTotal, String predict, String plays, String achieve, String tone, String chips, int rbi, String pinchNames});
 
 typedef _LineupSlot = ({int order, List<_PlayerLine> players});
+
+Widget _gameStatChipsRow(List<Widget> children) => Row(
+  mainAxisSize: MainAxisSize.min,
+  crossAxisAlignment: CrossAxisAlignment.center,
+  children: children,
+);
+
+String _compactStatLabel(String label) =>
+    label.replaceAll(r'\u3000', '').replaceAll(RegExp(r'[\s\u3000]+'), '');
+
+/// 選手詳細でも試合詳細と同じ打席結果・打点バッジを使用する。
+class GameBattingResult extends StatelessWidget {
+  const GameBattingResult({super.key, required this.play});
+  final Map<String, dynamic> play;
+
+  @override
+  Widget build(BuildContext context) {
+    final rawResult = _compactStatLabel('${play['result'] ?? ''}');
+    final circled = RegExp('[①②③④]').firstMatch(rawResult);
+    final result = rawResult.replaceAll(RegExp('[①②③④]'), '');
+    final bases = num.tryParse('${play['bases']}') ?? 0;
+    final rbi = num.tryParse('${play['rbi']}')?.toInt() ??
+        (circled != null ? '①②③④'.indexOf(circled[0]!) + 1 : -1);
+    final kind = result.contains('|') ? ''
+        : RegExp(r'本塁打|本$|本打|HR', caseSensitive: false).hasMatch(result) || bases == 4 ? 'hr'
+        : RegExp('犠飛').hasMatch(result) ? 'sacfly'
+        : RegExp(r'犠打|犠$').hasMatch(result) ? 'sacbunt'
+        : result.contains('四球') ? 'walk'
+        : result.contains('死球') ? 'dead'
+        : RegExp('失|エラー').hasMatch(result) ? 'error'
+        : RegExp('野選').hasMatch(result) ? 'fc'
+        : rbi > 0 && (bases > 0 || RegExp('安|２|３').hasMatch(result)) ? 'timely'
+        : bases == 3 || result.contains('３') || result.contains('三塁打') ? 'triple'
+        : bases == 2 || result.contains('２') || result.contains('二塁打') ? 'double'
+        : bases > 0 || result.contains('安') ? 'single' : '';
+    final renderer = _TableGameCard(const [],
+        onAllBattersChanged: (_) {}, onStatsExpandedChanged: (_) {});
+    return renderer._playChip(result.contains('|') ? result : '$result|$kind',
+        12, compact: true, rbiOverride: rbi);
+  }
+}
+
+const double _gameStatChipHeight = 14;
+
+/// Recent player appearances reuse the game's exact pitching and batting chips.
+class GamePlayerAppearance extends StatelessWidget {
+  const GamePlayerAppearance({super.key, required this.lines, required this.plays});
+  final List<Map<String, dynamic>> lines, plays;
+  @override
+  Widget build(BuildContext context) {
+    final renderer = _TableGameCard(const [], onAllBattersChanged: (_) {}, onStatsExpandedChanged: (_) {});
+    final children = <Widget>[];
+    for (final line in lines) {
+      if (line['double_inning_pitch'] == null) continue;
+      int number(String key) => num.tryParse('${line[key]}')?.toInt() ?? 0;
+      final encoded = renderer._buildPitcherChips(
+        innings: double.tryParse('${line['double_inning_pitch']}') ?? 0,
+        runs: number('int_runs'), hits: number('int_hit'), walks: number('int_four'),
+        hbp: number('int_dead_pitching'), strikeouts: number('int_strike_out'),
+        pitches: number('int_pitch'), starter: line['starter'] == true,
+      ).split(' ');
+      for (final entry in encoded.indexed) {
+        final known = switch (entry.$1) {
+          0 => line['int_runs'] != null,
+          1 => line['int_hit'] != null,
+          2 => line['int_four'] != null && line['int_dead_pitching'] != null,
+          3 => line['int_strike_out'] != null,
+          _ => true,
+        };
+        if (known) children.add(Padding(padding: const EdgeInsets.only(right: 3),
+          child: renderer._metricChip(entry.$2, 12, textScaler: MediaQuery.textScalerOf(context))));
+      }
+    }
+    for (final play in plays) {
+      children.add(Tooltip(message: '${play['inning'] ?? '—'}回', child: GameBattingResult(play: play)));
+    }
+    if (children.isEmpty) return const Text('出場成績は未取得です。', style: TextStyle(fontSize: 12, color: Colors.grey));
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
+      child: _gameStatChipsRow(children),
+    );
+  }
+}
 
 class _TableGameCard extends StatelessWidget {
   final List<Map<String, dynamic>> rows;
@@ -2989,7 +3076,7 @@ class _TableGameCard extends StatelessWidget {
   static const _playChipH = 14.0;
   static const _playChipPadH = 3.0;
 
-  double _playChipSize(double fontSize) => (fontSize - 1).clamp(8.0, 11.0);
+  double _playChipSize(double fontSize) => fontSize;
 
   double _playChipWidth(double fontSize) {
     return _textWidth('中安', _playChipSize(fontSize), weight: FontWeight.w600) + _playChipPadH * 2;
@@ -3599,9 +3686,7 @@ class _TableGameCard extends StatelessWidget {
   }) {
     final parts = _orderedPlays(plays, includeOuts: includeOuts, rbi: rbi);
     final extraAt = _extraRbiIndex(parts, rbi);
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
+    return _gameStatChipsRow([
         for (var i = 0; i < parts.length; i++) _playChip(parts[i], statSize, compact: includeOuts, rbiOverride: extraAt == i ? rbi : -1),
         for (final part in achievements) _playChip(part, statSize, blink: true),
         if (pinchNames.isNotEmpty) _pinchCaptionsRow(pinchNames, statSize),
@@ -3615,8 +3700,7 @@ class _TableGameCard extends StatelessWidget {
               ),
         ],
         if (showFiveTako) _fiveTakoChip(statSize),
-      ],
-    );
+    ]);
   }
 
   Widget _lineupCell(
@@ -5258,6 +5342,7 @@ class _TableGameCard extends StatelessWidget {
   }
 
   String _chipDisplayLabel(String label) {
+    label = _compactStatLabel(label);
     final walks = RegExp(r'^(?:四死球)?(\d+)(?:BB|四死)?$').firstMatch(label);
     if (walks != null && (label.contains('BB') || label.contains('四死'))) {
       return '${walks.group(1)}四死';
@@ -5297,25 +5382,19 @@ class _TableGameCard extends StatelessWidget {
       textAlign: TextAlign.center,
       style: style,
     );
-    final child = minTextW == null
-        ? label
-        : SizedBox(
-            width: minTextW,
-            child: FittedBox(fit: BoxFit.scaleDown, child: label),
-          );
+    final child = label;
     if (!paintBackground) {
       return Container(
-        height: 14,
-        width: minTextW == null ? null : minTextW + 6,
+        height: _gameStatChipHeight,
+        constraints: BoxConstraints(minWidth: minTextW == null ? 0 : minTextW + 6),
         padding: const EdgeInsets.symmetric(horizontal: 3),
         alignment: Alignment.center,
         child: child,
       );
     }
-    if (tone.isEmpty || bg == null) return child;
     return Container(
-      height: 14,
-      width: minTextW == null ? null : minTextW + 6,
+      height: _gameStatChipHeight,
+      constraints: BoxConstraints(minWidth: minTextW == null ? 0 : minTextW + 6),
       padding: const EdgeInsets.symmetric(horizontal: 3),
       alignment: Alignment.center,
       decoration: BoxDecoration(
@@ -5473,7 +5552,7 @@ class _TableGameCard extends StatelessWidget {
 
   Widget _playChip(String encoded, double fontSize, {bool blink = false, bool compact = false, bool notableBatting = false, int rbiOverride = -1, bool pinchOverride = false}) {
     final bar = encoded.lastIndexOf('|');
-    final label = (bar < 0 ? encoded : encoded.substring(0, bar)).trim();
+    final label = _compactStatLabel(bar < 0 ? encoded : encoded.substring(0, bar));
     final kind = _playKind(encoded);
     final flags = _playFlags(encoded);
     if (label.isEmpty) return const SizedBox.shrink();
@@ -5482,7 +5561,7 @@ class _TableGameCard extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.only(right: 4),
         child: SizedBox(
-          height: 14,
+          height: _gameStatChipHeight,
           child: Align(
             alignment: Alignment.center,
             child: _cornerBadge(
@@ -5506,6 +5585,7 @@ class _TableGameCard extends StatelessWidget {
                 : _compactPlay(parsed.body, kind, parsed.direction)
             : _insertDirection(strippedBody, parsed.direction, kind);
     shown = _fullwidthHitDigits(shown).replaceAll(RegExp(r'(?<!\d)1点'), '');
+    shown = _compactStatLabel(shown);
     final hbp = kind == 'dead' && parsed.body.contains('死球');
     final bg = _playColor(kind, parsed.body);
     final ink = hbp ? Colors.black : (parsed.body.contains('併殺') ? const Color(0xFFE53935) : _inkOn(bg));
@@ -5547,7 +5627,8 @@ class _TableGameCard extends StatelessWidget {
     Widget chip;
     if (!blink) {
       chip = Container(
-        height: 14,
+        height: _gameStatChipHeight,
+        constraints: BoxConstraints(minWidth: compact ? _playChipWidth(fontSize) : 0),
         padding: const EdgeInsets.fromLTRB(3, 0, 3, 0),
         alignment: Alignment.center,
         decoration: BoxDecoration(
@@ -5566,7 +5647,7 @@ class _TableGameCard extends StatelessWidget {
         radius: 2,
         duration: const Duration(milliseconds: 700),
         child: Container(
-          height: 14,
+          height: _gameStatChipHeight,
           padding: const EdgeInsets.fromLTRB(3, 0, 3, 0),
           alignment: Alignment.center,
           child: text,

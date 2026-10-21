@@ -28,7 +28,7 @@ def main():
  target=ROOT/'data/stadium-catalog.json'
  if target.exists():
   previous=json.loads(target.read_text())['stadiums']; by_name={r['match']:r for r in previous}
-  stadiums=[{**r,**by_name.get(r['match'],{})} for r in stadiums]+[r for r in previous if r.get('org')=='mlb']
+  stadiums=[{**r,**by_name.get(r['match'],{})} for r in stadiums]+[r for r in previous if r.get('org')=='mlb' or r.get('stadium_level') in ['farm','regional']]
  target.write_text(json.dumps(dict(stadiums=stadiums),ensure_ascii=False,indent=2)+'\n')
  print('active career:',sum(len(r['leaders']) for r in d['active_career']),'MLB hall:',len(d['mlb_hall']),'stadiums:',len(stadiums))
 if __name__=='__main__':main()

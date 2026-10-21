@@ -18,9 +18,10 @@ DateTime? _broadcastDate(String label, DateTime now) {
   final time = RegExp(r'(\d{1,2}):(\d{2})').firstMatch(label);
   var date = DateTime.utc(jst.year, int.parse(match[1]!), int.parse(match[2]!),
       int.parse(time?[1] ?? '0'), int.parse(time?[2] ?? '0'));
-  if (date.isAfter(jst.add(const Duration(days: 1))))
+  if (date.isAfter(jst.add(const Duration(days: 1)))) {
     date = DateTime.utc(
         jst.year - 1, date.month, date.day, date.hour, date.minute);
+  }
   return date.subtract(const Duration(hours: 9));
 }
 
@@ -28,8 +29,9 @@ List<Map<String, dynamic>> parseTverSearch(
     Map<String, dynamic> data, DateTime now) {
   if (data['code'] != 0 ||
       data['result'] is! Map ||
-      data['result']['contents'] is! List)
+      data['result']['contents'] is! List) {
     throw const FormatException('Invalid TVer search');
+  }
   final videos = <String, Map<String, dynamic>>{};
   for (final row in (data['result']['contents'] as List).whereType<Map>()) {
     if (row['type'] != 'episode' || row['content'] is! Map) continue;
@@ -44,13 +46,16 @@ List<Map<String, dynamic>> parseTverSearch(
         episode['isAvailable'] != true ||
         end == null ||
         end * 1000 <= now.millisecondsSinceEpoch ||
-        tverVideoOrganization(title) == null) continue;
+        tverVideoOrganization(title) == null) {
+      continue;
+    }
     final path = '${episode['thumbnailPath'] ?? ''}';
     final thumbnail = Uri.parse('https://statics.tver.jp').resolve(path);
     if (path.isEmpty ||
         thumbnail.scheme != 'https' ||
-        !['statics.tver.jp', 'image-cdn.tver.jp'].contains(thumbnail.host))
+        !['statics.tver.jp', 'image-cdn.tver.jp'].contains(thumbnail.host)) {
       continue;
+    }
     final label = '${episode['broadcastDateLabel'] ?? ''}';
     final date = _broadcastDate(label, now);
     videos[id] = {

@@ -68,7 +68,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('選手0'), findsOneWidget);
       expect(find.text(org.leagues[0].name.replaceAll('・リーグ', '')), findsNothing);
-      await tester.tap(find.text(org.leagues[1].name));
+      await tester.tap(find.byTooltip(org.leagues[1].name));
       await tester.pumpAndSettle();
       expect(find.text('ボール球見極め率'), findsNothing);
       expect(find.text('非表示選手'), findsNothing);
@@ -78,7 +78,11 @@ void main() {
     });
   }
   for (final layout in PersonalStatsLayout.values) {
-    testWidgets('NPB縦画面の${layout.name}表示でもセパ切替', (tester) async {
+    testWidgets('NPB縦画面は保存設定${layout.name}でもセグメント表示でセパ切替', (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(390, 800);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       await tester.binding.setSurfaceSize(const Size(390, 800));
       addTearDown(() => tester.binding.setSurfaceSize(null));
       await tester.pumpWidget(MaterialApp(
@@ -87,8 +91,10 @@ void main() {
         const {'id_league': 1, 'title': 'ボール球見極め率', 'stats': '80', 'name_player': '非表示選手', 'flg_pitcher': false},
         for (var i = 1; i <= 2; i++) {'id_league': i, 'title': '打率', 'stats': '.300', 'int_rank': 1, 'name_player': '選手$i', 'name_team': '球団', 'flg_pitcher': false},
       ]))));
+      expect(find.byType(PersonalStatsLayoutPicker), findsNothing);
+      expect(find.byType(SegmentedLeaguePersonalStats), findsOneWidget);
       expect(find.text('選手1'), findsOneWidget);
-      await tester.tap(find.text('パ・リーグ'));
+      await tester.tap(find.byTooltip('パ・リーグ'));
       await tester.pumpAndSettle();
       expect(find.text('選手2'), findsOneWidget);
       expect(find.text('選手1'), findsNothing);
@@ -107,7 +113,7 @@ void main() {
     ]))));
     expect(find.text('AL選手'), findsOneWidget);
     expect(find.text('NL選手'), findsNothing);
-    await tester.tap(find.text('ナ・リーグ'));
+    await tester.tap(find.byTooltip('ナ・リーグ'));
     await tester.pumpAndSettle();
     expect(find.text('NL選手'), findsOneWidget);
     expect(find.text('AL選手'), findsNothing);
@@ -430,7 +436,7 @@ void main() {
     expect(find.text('12'), findsOneWidget);
   });
 
-  testWidgets('個人成績のリーグ名は切替タブだけに表示する', (tester) async {
+  testWidgets('個人成績のリーグタブはロゴだけを表示する', (tester) async {
     Future<void> expectHeader(Widget child, String label) async {
       await tester.pumpWidget(
         MaterialApp(
@@ -440,12 +446,13 @@ void main() {
         ),
       );
       await tester.pump();
-      if (find.text(label).evaluate().isEmpty && find.text('$label・リーグ').evaluate().isNotEmpty) {
-        await tester.tap(find.text('$label・リーグ'));
+      if (find.text(label).evaluate().isEmpty && find.byTooltip('$label・リーグ').evaluate().isNotEmpty) {
+        await tester.tap(find.byTooltip('$label・リーグ'));
         await tester.pumpAndSettle();
       }
       expect(find.text(label), findsNothing);
-      expect(find.text('$label・リーグ'), findsOneWidget);
+      expect(find.text('$label・リーグ'), findsNothing);
+      expect(find.byTooltip('$label・リーグ'), findsOneWidget);
     }
 
     const row = {
@@ -535,11 +542,11 @@ void main() {
   });
 
   test('個人成績の地色はポジションで分かれる', () {
-    expect(personalStatPositionColor('捕手'), const Color(0xFFCEEEFD));
-    expect(personalStatPositionColor('外野手'), const Color(0xFFC4E4C6));
-    expect(personalStatPositionColor('内野手'), const Color(0xFFFFF8BF));
-    expect(personalStatPositionColor('投手'), const Color(0xFFFFDEE2));
-    expect(personalStatPositionColor('左'), const Color(0xFFC4E4C6));
+    expect(personalStatPositionColor('捕手'), const Color(0xFFDFF4FE));
+    expect(personalStatPositionColor('外野手'), const Color(0xFFD9EDDA));
+    expect(personalStatPositionColor('内野手'), const Color(0xFFFFFAD5));
+    expect(personalStatPositionColor('投手'), const Color(0xFFFFEAEC));
+    expect(personalStatPositionColor('左'), const Color(0xFFD9EDDA));
     expect(personalStatPositionColor(''), isNull);
   });
 

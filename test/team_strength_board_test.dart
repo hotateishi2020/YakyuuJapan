@@ -1188,6 +1188,16 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(Dialog), findsOneWidget);
       expect(find.textContaining(view == 0 ? '少数の選手' : '狭い区分に収まらない選手名'), findsOneWidget);
+      if (view == 0) {
+        for (final key in ['b1', 'b2']) {
+          final bar = tester.getRect(find.byKey(ValueKey('strength-detail-bar-$key')));
+          final parts = tester.getRect(find.byKey(ValueKey('strength-detail-parts-$key')));
+          expect(parts.left, bar.left);
+          expect(parts.right, bar.right);
+          expect(parts.bottom, bar.bottom);
+          expect(parts.height, lessThan(bar.height));
+        }
+      }
       await tester.tap(find.byTooltip('閉じる'));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);

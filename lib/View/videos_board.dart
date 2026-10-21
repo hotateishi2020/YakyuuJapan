@@ -203,9 +203,8 @@ class _VideosBoardState extends State<VideosBoard> {
                           _switchingSection('mlb_teams', '球団関連動画'),
                         _switchingSection('program', '野球番組・対談'),
                         _switchingSection('media', '野球系解説チャンネル'),
-                        for (final channel
-                            in _channels.where((c) => c['category'] == 'tver'))
-                          _channelSection(channel),
+                        _switchingSection('fan', '球団ファン系動画'),
+
                       ],
                     )),
         ],
@@ -225,9 +224,9 @@ class _VideosBoardState extends State<VideosBoard> {
   }
 
   Widget _switchingSection(String category, String title) {
-    final channels = _channels.where((c) => c['category'] == category).toList();
+    final channels = _channels.where((c) => c['category'] == category || category == 'program' && c['category'] == 'tver').toList();
     if (channels.isEmpty) return const SizedBox.shrink();
-    if (category == 'ob' || category == 'media' || category == 'program') {
+    if (['ob', 'media', 'program', 'fan'].contains(category)) {
       final merged = <String, Map<String, dynamic>>{};
       for (final channel in channels) {
         for (final video in _visibleVideos(channel)) {
@@ -243,11 +242,7 @@ class _VideosBoardState extends State<VideosBoard> {
       final videos = _sortVideos(merged.values.toList());
       channels.insert(0, {
         'id': '$category-all',
-        'name': category == 'ob'
-            ? '有識者の動画一覧'
-            : category == 'program'
-                ? '野球番組・対談'
-                : '野球系解説チャンネル',
+        'name': category == 'ob' ? '有識者の動画一覧' : title,
         'tab_label': 'ALL',
         'category': category,
         'display_mode': 'all',
@@ -259,7 +254,7 @@ class _VideosBoardState extends State<VideosBoard> {
         'videos': videos,
       });
     }
-    if (category == 'media' || category == 'program') {
+    if (['media', 'program', 'fan'].contains(category)) {
       return Column(
         key: ValueKey('videos-section-$category'),
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -413,7 +408,7 @@ class _VideosBoardState extends State<VideosBoard> {
         .where(
             (v) => v['is_short'] != true && !'${v['url']}'.contains('/shorts/'))
         .toList());
-    if (['media', 'program', 'tver'].contains(channel['category'])) {
+    if (['media', 'program', 'tver', 'fan'].contains(channel['category'])) {
       return regular;
     }
     if (channel['display_mode'] == 'recent' ||
@@ -511,22 +506,49 @@ class _VideosBoardState extends State<VideosBoard> {
                       ...ScrollConfiguration.of(context).dragDevices,
                       PointerDeviceKind.mouse
                     }),
-                child: SingleChildScrollView(
-                  key: PageStorageKey('video-row-${channel['id']}'),
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        for (final video in videos)
-                          Padding(
-                              padding: const EdgeInsets.only(right: 10),
-                              child: SizedBox(
-                                  width: width, child: _videoCard(video))),
-                      ]),
+                child: SizedBox(
+                  height: _videoRowHeight(context, width, videos),
+                  child: ListView.builder(
+                    key: PageStorageKey('video-row-${channel['id']}'),
+                    scrollDirection: Axis.horizontal,
+                    primary: false,
+                    itemExtent: width + 10,
+                    itemCount: videos.length,
+                    itemBuilder: (context, index) => Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: _videoCard(videos[index]),
+                    ),
+                  ),
                 ),
               );
             }),
         ]));
+  }
+
+  // Reserve text space before thumbnails load so the row never changes height
+  // during scrolling. Respect accessibility text scaling as well.
+  double _videoRowHeight(BuildContext context, double width,
+      List<Map<String, dynamic>> videos) {
+    double textHeight(double size, int lines, {FontWeight? weight}) {
+      final painter = TextPainter(
+        text: TextSpan(
+          text: List.filled(lines, '動画').join('\n'),
+          style: DefaultTextStyle.of(context).style.copyWith(
+              fontSize: size, fontWeight: weight ?? FontWeight.normal),
+        ),
+        textDirection: Directionality.of(context),
+        textScaler: MediaQuery.textScalerOf(context),
+      )..layout();
+      final height = painter.height;
+      painter.dispose();
+      return height;
+    }
+
+    final hasSource = videos.any((video) => video['source_name'] != null);
+    return width * 9 / 16 +
+        textHeight(12, 2, weight: FontWeight.w600) +
+        textHeight(10, 1) * (hasSource ? 2 : 1) +
+        (hasSource ? 26 : 20) + 2;
   }
 
   String _date(dynamic raw) {

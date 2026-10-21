@@ -37,7 +37,7 @@ void main() {
                 {
                   'id_team': 1,
                   'order': 1,
-                  'players': const [
+                  'players': [
                     {'name': '好調選手', 'pos': '中', 'plays': '中安|hit'}
                   ]
                 }

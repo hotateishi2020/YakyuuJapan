@@ -1,3 +1,4 @@
+import 'NpbResearchEvents.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -271,8 +272,9 @@ class RosterMoves {
       final response = await client
           .get(Uri.parse(rosterMovesUrl))
           .timeout(const Duration(seconds: 30));
-      if (response.statusCode != 200)
+      if (response.statusCode != 200) {
         throw StateError('入退団一覧 HTTP ${response.statusCode}');
+      }
       final fetched = parseRosterMoves(utf8.decode(response.bodyBytes), year);
       for (final y in [year - 1, year]) {
         for (final page in ['pn_traded','fa_filed',if(y==year) 'fa_qualified']) {
@@ -300,6 +302,7 @@ class RosterMoves {
           const JsonEncoder.withIndent('  ').convert(values));
       temp.renameSync(file.path);
       final identities = await _identities();
+      final researched = await Postgres.withConnection((c) => NpbResearchEvents.read(c, year));
       var count = 0;
       await Postgres.withConnection((c) => c.runTx((tx) async {
             final rows = await tx.execute(
@@ -320,6 +323,7 @@ class RosterMoves {
             ];
             applyRosterMoves(teams, values, year,
                 previous: previous, identities: identities);
+            NpbResearchEvents.apply(teams, researched, year);
             for (final t in teams) {
               await tx.execute(
                   "UPDATE t_team_strength SET payload=jsonb_set(payload,'{roster}',\$1::jsonb),updated_at=NOW() WHERE code_org='npb' AND int_year=\$2 AND id_team=\$3",

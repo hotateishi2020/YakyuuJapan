@@ -117,6 +117,37 @@ Future<void> show(WidgetTester tester, Finder finder) async {
 }
 
 void main() {
+  testWidgets('動画カードを遅延生成し拡大文字でも末尾までスクロールできる', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 900));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final payload = {'channels': [
+      {'id': channelId(1), 'name': '動画一覧', 'category': 'league',
+       'status': 'ok', 'display_mode': 'all', 'videos': videos(0, 200, '動画')},
+    ]};
+    await http.runWithClient(() async {
+      await tester.pumpWidget(MaterialApp(
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(2)),
+          child: child!,
+        ),
+        home: const Scaffold(body: VideosBoard()),
+      ));
+      await tester.pumpAndSettle();
+      expect(find.byKey(ValueKey('video-${videoId(0)}')), findsOneWidget);
+      expect(find.byKey(ValueKey('video-${videoId(199)}')), findsNothing);
+      expect(find.byType(Image).evaluate().length, lessThan(10));
+      final row = find.byKey(PageStorageKey('video-row-${channelId(1)}'));
+      final scrollable = tester.state<ScrollableState>(
+        find.descendant(of: row, matching: find.byType(Scrollable)));
+      scrollable.position.jumpTo(scrollable.position.maxScrollExtent);
+      await tester.pumpAndSettle();
+      expect(find.byKey(ValueKey('video-${videoId(199)}')), findsOneWidget);
+      expect(find.byType(Image).evaluate().length, lessThan(10));
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    }, () => MockClient((_) async => jsonResponse(payload)));
+  });
+
   testWidgets('MLBの球団関連動画は有識者とは別の球団タブで切り替える', (tester) async {
     await tester.binding.setSurfaceSize(const Size(390, 900));
     addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -215,7 +246,7 @@ void main() {
     launcher = _Launcher();
     UrlLauncherPlatform.instance = launcher;
   });
-  testWidgets('番組とTVerを別欄に表示しTVerの番組ページを開く', (tester) async {
+  testWidgets('番組とTVerを統合しTVerの番組ページを開く', (tester) async {
     final payload = {'channels': [
       {'id': channelId(90), 'name': '野球いっかん！', 'category': 'program', 'status': 'ok', 'videos': videos(9000, 2, '対談動画')},
       {'id': 'tver', 'name': 'TVer', 'category': 'tver', 'platform': 'tver', 'status': 'ok', 'display_mode': 'all', 'url': 'https://tver.jp/search/野球', 'videos': [
@@ -227,7 +258,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('野球番組・対談'), findsOneWidget);
       await show(tester, find.text('ドラフト特番'));
-      expect(find.text('TVer'), findsOneWidget);
+      expect(find.byKey(const ValueKey('videos-section-program')), findsOneWidget);
       await tester.tap(find.byKey(const ValueKey('video-epbaseball')));
       await tester.pumpAndSettle();
       expect(launcher.urls.single, 'https://tver.jp/episodes/epbaseball');

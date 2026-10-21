@@ -32,7 +32,7 @@ typedef CreatePredictYear = Future<String?> Function(int groupId, int year);
 String predictDisplayTitle(String title) => title == '優勝' ? '日本一' : title;
 
 /// MLBタブの右にある予想タブ。
-/// 上部は選んだ年の予想状況。グループ名の枠の中に年度を横並びで置く。
+/// グループごとの年度別予想一覧を上部に置き、その下に選んだ年の予想状況を表示する。
 class PredictGroupBoard extends StatefulWidget {
   final bool loading;
   final String? error;
@@ -119,18 +119,6 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
       children: [
         _inviteList(),
-        if (featured == null)
-          _frame(
-            header: '${_focusYear ?? widget.selectedYear}年の予想状況',
-            large: true,
-            child: const Text('この年の予想グループはありません', style: TextStyle(fontSize: 16)),
-          )
-        else
-          _frame(
-            header: '${featured.year == null ? '年度なし' : '${featured.year}年'}　${predictSeasonHeader(featured.year)}',
-            large: true,
-            child: _situation(featured.row, predictSeasonHeader(featured.year)),
-          ),
         for (final cluster in clusters)
           _frame(
             header: cluster.name,
@@ -147,6 +135,28 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
                   _yearRow(cluster.id, _visibleYears(cluster.years)[i], _userSlots(cluster.years)),
                 ],
               ],
+            ),
+          ),
+        if (featured == null)
+          _frame(
+            header: '${_focusYear ?? widget.selectedYear}年の予想状況',
+            large: true,
+            child: const Text('この年の予想グループはありません', style: TextStyle(fontSize: 16)),
+          )
+        else
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              key: const ValueKey('prediction-situation-block'),
+              constraints: BoxConstraints(
+                maxWidth: (400.0 + 160.0 * _maps(featured.row['users']).length) *
+                    MediaQuery.textScalerOf(context).scale(13) / 13,
+              ),
+              child: _frame(
+                header: '${featured.year == null ? '年度なし' : '${featured.year}年'}　${predictSeasonHeader(featured.year)}',
+                large: true,
+                child: _situation(featured.row, predictSeasonHeader(featured.year)),
+              ),
             ),
           ),
         _addGroupButton(),
@@ -496,17 +506,18 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
 
   Widget _area({required String title, required Color color, required Widget child}) {
     return Container(
-      margin: const EdgeInsets.only(top: 12),
-      padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+      margin: const EdgeInsets.only(top: 16),
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
       decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(8),
+        color: Color.lerp(color, Colors.white, 0.75),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE3E8EF), width: 0.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 6),
+          Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF334155))),
+          const SizedBox(height: 10),
           child,
         ],
       ),
@@ -571,6 +582,8 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
 
   Color? _teamPaint(dynamic name) => parseColorNameOrNull('${name ?? ''}');
 
+  Color _mutedTeamColor(Color color) => Color.lerp(color, Colors.white, 0.72)!;
+
   bool _tiedLeaders(Map<String, dynamic> row) {
     final current = '${row['current'] ?? ''}'.trim();
     return current.contains('、');
@@ -581,7 +594,7 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
     if (raw is! List) return const [];
     return [
       for (final item in raw)
-        if (_teamPaint(item) != null) _teamPaint(item)!,
+        if (_teamPaint(item) != null) _mutedTeamColor(_teamPaint(item)!),
     ];
   }
 
@@ -592,11 +605,12 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
       if (colors.isEmpty) return Colors.white;
       return null;
     }
-    return _teamPaint(row['color_back']);
+    final color = _teamPaint(row['color_back']);
+    return color == null ? null : _mutedTeamColor(color);
   }
 
   Color? _resultFont(Map<String, dynamic> row) {
-    return _teamPaint(row['color_font']);
+    return const Color(0xFF253449);
   }
 
   Widget _waiverNotice(Map<String, dynamic> group) {
@@ -788,26 +802,25 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
     required String Function(Map<String, dynamic> row) centerOf,
     Color? Function(Map<String, dynamic> row)? titleColor,
   }) {
-    const gridLine = Color(0xFFD0D0D6);
+    const gridLine = Color(0xFF9E9E9E);
     const headerBackground = Color(0xFFE0E0E0);
     Widget cell(
       String text, {
       bool hit = false,
       Color? color,
-      FontWeight weight = FontWeight.w600,
       Color? background,
       List<Color>? gradient,
       List<Color?>? nameColors,
       bool names = false,
     }) {
-      final style = TextStyle(fontSize: 13, fontWeight: weight, color: color ?? Colors.black87, height: 1.2);
+      final style = TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: hit ? const Color(0xFF315C46) : (color ?? const Color(0xFF334155)), height: 1.2);
       final paints = gradient ?? const <Color>[];
       final useGradient = !hit && paints.length >= 2;
-      final fill = hit ? const Color(0xFFFFCC00) : (background ?? const Color(0xFFFFF3C4));
+      final fill = hit ? const Color(0xFFE4EFE7) : (background ?? const Color(0xFFFFFFFF));
       return TableCell(
         verticalAlignment: TableCellVerticalAlignment.intrinsicHeight,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 9),
           alignment: Alignment.center,
           color: useGradient ? null : fill,
           decoration: useGradient
@@ -842,28 +855,36 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
 
     TableRow line(List<Widget> cells, {Color? background}) {
       return TableRow(
-        decoration: BoxDecoration(color: background ?? const Color(0xFFFFF3C4)),
+        decoration: BoxDecoration(color: background ?? const Color(0xFFFFFFFF)),
         children: cells,
       );
     }
 
-    return Table(
-      border: TableBorder.all(color: gridLine, width: 1),
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: gridLine, width: 0.5),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Table(
+      border: const TableBorder(
+        horizontalInside: BorderSide(color: gridLine, width: 0.5),
+        verticalInside: BorderSide(color: gridLine, width: 0.5),
+      ),
       defaultVerticalAlignment: TableCellVerticalAlignment.middle,
       columnWidths: {
-        0: const FlexColumnWidth(3),
+        0: FractionColumnWidth(1.5 / (3 + 2 * (users.length + 1))),
         1: const FlexColumnWidth(2),
         for (var i = 0; i < users.length; i++) i + 2: const FlexColumnWidth(2),
       },
       children: [
         line(
           [
-            cell('', weight: FontWeight.bold, background: headerBackground),
-            cell(resultHeader, weight: FontWeight.bold, background: headerBackground),
+            cell('', background: headerBackground),
+            cell(resultHeader, background: headerBackground),
             for (final user in users)
               cell(
                 _userName(user),
-                weight: FontWeight.bold,
                 color: _userColor(user),
                 background: headerBackground,
               ),
@@ -872,20 +893,19 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
         ),
         for (final row in rows)
           line([
-            cell(titleOf(row), weight: FontWeight.bold, color: titleColor?.call(row)),
+            cell(titleOf(row), color: titleColor?.call(row), background: headerBackground),
             cell(
               centerOf(row),
               background: _resultBack(row),
               color: _resultFont(row),
               gradient: _leaderColors(row),
-              nameColors: row['color_fonts'] is List
-                  ? [for (final color in row['color_fonts'] as List) _teamPaint(color)]
-                  : null,
+
               names: true,
             ),
             for (final user in users) cell(pickName(row, user), hit: pickHit(row, user), names: true),
           ]),
       ],
+      ),
     );
   }
 

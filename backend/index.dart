@@ -1,3 +1,10 @@
+import 'app/AdminNews.dart';
+import 'app/PlayerArt.dart';
+import 'app/PlayerArtSchedule.dart';
+import 'app/NpbResearch.dart';
+import 'app/NpbResearchEvents.dart';
+import 'app/AllStarHistory.dart';
+import 'app/JapaneseMlbStats.dart';
 import 'app/BaseballCatalog.dart';
 import 'app/ErrorSnapshot.dart';
 import 'app/GameScheduleWatch.dart';
@@ -19,11 +26,12 @@ import 'app/AppSql.dart';
 import 'app/Achieve.dart';
 import 'app/AceEvaluator.dart';
 import 'app/DisplaySnapshot.dart';
+import 'app/PageSnapshot.dart';
 import 'app/PlayerDisplay.dart';
 import 'app/FieldingErrors.dart';
 import 'app/TeamStrength.dart';
 import 'app/RosterMoves.dart';
-import 'app/Records.dart';
+import 'app/AdditionalRecords.dart';
 import 'app/VideoFeed.dart';
 import 'app/VideoChannels.dart';
 import 'app/ClubData.dart';
@@ -1069,6 +1077,12 @@ void main() async {
 
     app.get('/healthz', (Request _) => Response.ok('ok'));
 
+    app.get('/player-art/<filename>', (Request request, String filename) async {
+      if (!RegExp(r'^(?:npb-)?\d+-[a-f0-9]{64}\.png$').hasMatch(filename)) return Response.notFound('Not found');
+      final file = File('${PlayerArt.root}/$filename');
+      if (!await file.exists()) return Response.notFound('Not found');
+      return Response.ok(file.openRead(), headers: {'content-type': 'image/png', 'cache-control': 'public, max-age=86400', 'x-content-type-options': 'nosniff'});
+    });
     app.get('/club-logos/<year>/<club>/<image>', (Request request,String year,String club,String image) async {
       if(!RegExp(r'^\d{4}$').hasMatch(year)||!npbClubNames.containsKey(club)||!RegExp(r'^[a-z0-9]+\.(png|jpg|jpeg|gif|webp)$').hasMatch(image))return Response.notFound('Not found');
       for(final root in ['public','backend/public']) {
@@ -1103,7 +1117,7 @@ void main() async {
         final org=OrgKind.parse(request.url.queryParameters['org']);
         final year=int.tryParse(request.url.queryParameters['year']??'')??DateTimeTool.getThisYear();
         if(year<(org==OrgKind.mlb?1876:1936)||year>DateTimeTool.getThisYear()+1)throw const FormatException('指定年度の日程は対象外です');
-        final data=await Postgres.withConnection((conn)=>readSeasonSchedule(conn,org,year),urgent:true);
+        final data=await Postgres.withConnection((conn)=>PageSnapshot.read(conn,kind:'schedule',org:org,year:year),urgent:true);
         return Response.ok(jsonEncode(data),headers:headers);
       } on FormatException catch(e){return Response.badRequest(body:jsonEncode({'error':e.message}),headers:headers);
       } catch(error,stack) {
@@ -1140,12 +1154,66 @@ void main() async {
       }
     });
 
+    app.get('/mlb-japanese-stats', (Request request) async {
+      const headers = {'content-type': 'application/json; charset=utf-8'};
+      try {
+        final year = _seasonYear(request, OrgKind.mlb);
+        final data = await Postgres.withConnection((conn) => readJapaneseMlbStats(conn, year), urgent: true);
+        return Response.ok(jsonEncode(data), headers: headers);
+      } on FormatException catch (error) {
+        return Response.badRequest(body: jsonEncode({'error': error.message}), headers: headers);
+      } catch (error, stack) {
+        _printRequestError(request, error, stack);
+        return Response.internalServerError(body: jsonEncode({'error': '日本人選手の成績を取得できませんでした'}), headers: headers);
+      }
+    });
+
+    app.get('/draft-research', (Request request) async {
+      const headers = {'content-type': 'application/json; charset=utf-8'};
+      try {
+        final year = _seasonYear(request, OrgKind.npb);
+        final years = await Postgres.withConnection((c) => NpbResearchEvents.drafts(c, year, request.url.queryParameters['active'] == 'true'));
+        return Response.ok(jsonEncode({'years': years}), headers: headers);
+      } catch (error, stack) {
+        _printRequestError(request, error, stack);
+        return Response.internalServerError(body: '{}', headers: headers);
+      }
+    });
+
+    app.get('/allstar-history', (Request request) async {
+      const headers = {'content-type': 'application/json; charset=utf-8'};
+      try {
+        final year = _seasonYear(request, OrgKind.npb);
+        return Response.ok(jsonEncode(readAllStarHistory(year)), headers: headers);
+      } on FormatException catch (error) {
+        return Response.badRequest(body: jsonEncode({'error': error.message}), headers: headers);
+      } catch (error, stack) {
+        _printRequestError(request, error, stack);
+        return Response.internalServerError(body: jsonEncode({'error': 'オールスター情報を取得できませんでした'}), headers: headers);
+      }
+    });
+
+    app.get('/regular-history', (Request request) async {
+      const headers = {'content-type': 'application/json; charset=utf-8'};
+      try {
+        final org = OrgKind.parse(request.url.queryParameters['org']);
+        final year = _seasonYear(request, org);
+        final rows = await Postgres.withConnection((conn) => readRegularHistory(conn, org, year), urgent: true);
+        return Response.ok(jsonEncode({'regular_history': rows}), headers: headers);
+      } on FormatException catch (error) {
+        return Response.badRequest(body: jsonEncode({'error': error.message}), headers: headers);
+      } catch (error, stack) {
+        _printRequestError(request, error, stack);
+        return Response.internalServerError(body: jsonEncode({'error': 'レギュラー情報を取得できませんでした'}), headers: headers);
+      }
+    });
+
     app.get('/records', (Request request) async {
       const headers = {'content-type': 'application/json; charset=utf-8'};
       try {
         final org = OrgKind.parse(request.url.queryParameters['org']);
         final year = _seasonYear(request, org);
-        final data = await Postgres.withConnection((conn) => Records.read(conn, org: org, year: year), urgent: true);
+        final data = await Postgres.withConnection((conn) => PageSnapshot.read(conn, kind: 'records', org: org, year: year, section: request.url.queryParameters['section']), urgent: true);
         return Response.ok(jsonEncode(data), headers: headers);
       } on FormatException catch (error) {
         return Response.badRequest(body: jsonEncode({'error': error.message}), headers: headers);
@@ -1592,18 +1660,7 @@ void main() async {
           if (decoded is Map) body = Map<String, dynamic>.from(decoded);
         } catch (_) {}
         final action = '${body['action'] ?? ''}'.trim();
-        const allowed = {
-          '初期表示を読み込んだ',
-          'npbタブを開いた',
-          'mlbタブを開いた',
-          '試合情報タブを開いた',
-          'チーム順位タブを開いた',
-          '個人成績タブを開いた',
-          'news・イベント日程ポップアップを開いた',
-          '年度を変更した',
-          'アカウント設定のプルダウンを開いた',
-        };
-        if (!allowed.contains(action)) {
+        if (!LogDetail.clientActions.contains(action)) {
           return Response(400, body: 'unknown action');
         }
         final reporter = m_user();
@@ -1627,7 +1684,7 @@ void main() async {
         log.crtenv = LogDetail.clip('${body['environment'] ?? 'web'}', 20);
         log.txt_detail = LogDetail.encode({
         ...LogDetail.clientInfo(request),
-          'log_type': '操作',
+          'log_type': LogDetail.clientActionType(action),
           'level': 'INFO',
           'user_id': reporter.id,
           'session_id': LogDetail.clip('${body['session_id'] ?? ''}', 80),
@@ -1719,6 +1776,15 @@ void main() async {
         return Response.ok(bytes, headers: {'content-type': 'image/png', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff'});
       });
     });
+
+    app.get('/admin/news', (Request request) async =>
+        tryCatchAPI(request, 'ADMIN', 'NEWS_READ', (conn) => AdminNews.read(conn, request)));
+    app.post('/admin/news', (Request request) async =>
+        tryCatchAPI(request, 'ADMIN', 'NEWS_CREATE', (conn) async {
+          final response = await AdminNews.create(conn, request);
+          if (response.statusCode == 201) _clearPredictionsCache();
+          return response;
+        }));
 
     app.get('/admin/logs', (Request request) async {
       return tryCatchAPI(request, 'ADMIN', 'LOGS', (conn) async {
@@ -2198,6 +2264,7 @@ void main() async {
     }
 
     final port = int.tryParse(Platform.environment['PORT'] ?? '') ?? 8080;
+    await Postgres.withConnection(PageSnapshot.ensure);
     final server = await io.serve(handler, InternetAddress.anyIPv4, port);
     print('✅ Server running on http://${server.address.host}:${server.port}'
         ' (serveStatic=${publicDir != null})');
@@ -2213,8 +2280,11 @@ void main() async {
     PlayerStatsSchedule.start(onUpdated: _clearPredictionsCache);
     TeamStrength.start();
     RosterMoves.start();
+    NpbResearch.start();
+    PlayerArtSchedule.start();
     PlayerMetricSchedule.start(onUpdated: _clearPredictionsCache);
     PlayerDetailSnapshot.start();
+    PageSnapshot.start();
     PredictionSnapshotSchedule.start(onUpdated: _clearPredictionsCache);
     // 取得処理だけ登録する。タイマーは /predictions/ready の通知後に開始する。
     GameScheduleWatch.start(onUpdated: _clearPredictionsCache);
@@ -2343,7 +2413,8 @@ Future<void> _saveAccessLog(
       log.crtenv = 'server';
       log.txt_detail = LogDetail.encode({
         ...LogDetail.clientInfo(request),
-        'log_type': '操作',
+        'log_type': LogDetail.accessType(request,
+            scheduled: ScheduledLog.isScheduledRequest(request)),
         'level': httpStatus >= 500 ? 'ERROR' : (httpStatus >= 400 ? 'WARN' : 'INFO'),
         'user_id': user.id,
         'session_id': '',

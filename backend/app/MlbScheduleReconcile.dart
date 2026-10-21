@@ -61,7 +61,9 @@ List<Map<String, dynamic>> applyScheduleConfirmations(
   return games.where((g) {
     final cards = confirmations['${g['date']}'];
     if (cards == null || g['finished'] == true || g['has_records'] == true ||
-        RegExp('終了|試合中(?!止)|[0-9]+\\s*回|Final|In Progress', caseSensitive: false).hasMatch('${g['state']}')) return true;
+        RegExp('終了|試合中(?!止)|[0-9]+\\s*回|Final|In Progress', caseSensitive: false).hasMatch('${g['state']}')) {
+      return true;
+    }
     final home = YahooTeamNames.normalize('${g['name_home_logo']}');
     final away = YahooTeamNames.normalize('${g['name_away_logo']}');
     return cards.any((c) => c['home'] == home && c['away'] == away && !cancelledMlbCard(c['state'] ?? ''));

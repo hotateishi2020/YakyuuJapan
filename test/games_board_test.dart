@@ -584,7 +584,7 @@ void main() {
     expect(find.textContaining('4日前'), findsOneWidget);
   });
 
-  testWidgets('tournament leading stays visible while games are still loading', (tester) async {
+  testWidgets('tournament follows the games block while games are loading', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: SizedBox(
@@ -594,13 +594,15 @@ void main() {
             games: [],
             initialDate: '2026-10-07',
             loadingGames: true,
-            leading: [Text('トーナメント')],
+            trailing: [Text('トーナメント')],
           ),
         ),
       ),
     );
 
     expect(find.text('トーナメント'), findsOneWidget);
+    expect(tester.getTopLeft(find.text('トーナメント')).dy,
+        greaterThan(tester.getBottomLeft(find.byType(BaseballLoading)).dy));
     expect(find.byType(BaseballLoading), findsOneWidget);
     expect(find.text('この日の試合はありません'), findsNothing);
   });

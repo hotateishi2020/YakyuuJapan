@@ -2,55 +2,53 @@ import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 import '../tools/Env.dart';
 import '../tools/json_utils.dart';
 import '../logic/player_honors.dart';
+import 'GamesBoard.dart' show GamePlayerAppearance;
 import 'strength_contracts.dart' show contractSalaryLabel;
 
 class PlayerDetailScope extends InheritedWidget {
-  const PlayerDetailScope(
-      {super.key, required this.org, required this.year, required super.child});
+  const PlayerDetailScope({super.key, required this.org, required this.year, required super.child});
   final String org;
   final int year;
-  static PlayerDetailScope? of(BuildContext c) =>
-      c.dependOnInheritedWidgetOfExactType<PlayerDetailScope>();
+  static PlayerDetailScope? of(BuildContext c) => c.dependOnInheritedWidgetOfExactType<PlayerDetailScope>();
   @override
-  bool updateShouldNotify(PlayerDetailScope old) =>
-      org != old.org || year != old.year;
+  bool updateShouldNotify(PlayerDetailScope old) => org != old.org || year != old.year;
 }
 
-Future<void> showPlayerDetail(
-    BuildContext context, Map<String, dynamic> player) async {
+Future<void> showPlayerDetail(BuildContext context, Map<String, dynamic> player) async {
   final scope = PlayerDetailScope.of(context);
-  await showDialog<void>(
-      context: context,
-      builder: (_) => PlayerDetailDialog(
-          player: player,
-          org: scope?.org ??
-              ((int.tryParse('${player['id_league']}') ?? 0) >= 3
-                  ? 'mlb'
-                  : 'npb'),
-          year: scope?.year ??
-              int.tryParse('${player['int_year']}') ??
-              DateTime.now().year));
+  await showDialog<void>(context: context, builder: (_) => PlayerDetailDialog(player: playerDetailIdentity(player), org: scope?.org ?? player['org']?.toString() ?? ((int.tryParse('${player['id_league']}') ?? 0) >= 3 ? 'mlb' : 'npb'), year: scope?.year ?? int.tryParse('${player['int_year']}') ?? DateTime.now().year));
+}
+
+/// Preserve stable IDs; never interpret generic record IDs as player IDs.
+Map<String, dynamic> playerDetailIdentity(Map<String, dynamic> player) {
+  String first(List<String> fields) => fields.map((key) => '${player[key] ?? ''}'.trim()).firstWhere((v) => v.isNotEmpty, orElse: () => '');
+  final name = first(['name_full', 'name_player', 'player_name', 'name']);
+  final source = first(['source_player_id', 'official_source_player_id']);
+  final url = first(['player_url', 'url']);
+  final official = RegExp(r'/players/(\d+)\.html').firstMatch(url)?[1] ?? RegExp(r'^(?:npb|mlb):(\d+)$').firstMatch(first(['player_key']))?[1];
+  return {...player, 'name': name, if (source.isNotEmpty || official != null) 'source_player_id': source.isNotEmpty ? source : official};
+}
+
+bool hasPlayerIdentity(Map<String, dynamic> player) {
+  final p = playerDetailIdentity(player);
+  return p['id_player'] != null || p['source_player_id'] != null || !{'', '—', 'ー', '-', '未定', '未取得'}.contains(p['name']);
 }
 
 class PlayerNameLink extends StatelessWidget {
-  const PlayerNameLink({super.key, required this.player, required this.child});
+  const PlayerNameLink({super.key, required this.player, required this.child, this.enabled = true});
   final Map<String, dynamic> player;
   final Widget child;
+  final bool enabled;
   @override
-  Widget build(BuildContext context) => MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => showPlayerDetail(context, player),
-          child: child));
+  Widget build(BuildContext context) => !enabled || !hasPlayerIdentity(player) ? child : MouseRegion(cursor: SystemMouseCursors.click, child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: () => showPlayerDetail(context, player), child: child));
 }
 
 class PlayerDetailDialog extends StatefulWidget {
-  const PlayerDetailDialog(
-      {super.key, required this.player, required this.org, required this.year});
+  const PlayerDetailDialog({super.key, required this.player, required this.org, required this.year});
   final Map<String, dynamic> player;
   final String org;
   final int year;
@@ -75,20 +73,8 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
     });
     try {
       final p = widget.player;
-      final q = <String, String>{
-        'org': widget.org,
-        'year': '${widget.year}',
-        'name':
-            '${p['name'] ?? p['name_full'] ?? p['name_player'] ?? p['player_name'] ?? ''}'
-                .replaceAll(RegExp(r'\(.*\)$'), ''),
-        if (p['id_player'] != null) 'id_player': '${p['id_player']}',
-        if (p['source_player_id'] != null)
-          'source_player_id': '${p['source_player_id']}',
-        if (p['id_team'] != null) 'id_team': '${p['id_team']}'
-      };
-      final r = await http
-          .get(Env.api('/player-detail').replace(queryParameters: q))
-          .timeout(const Duration(seconds: 15));
+      final q = <String, String>{'org': widget.org, 'year': '${widget.year}', 'name': '${p['name'] ?? p['name_full'] ?? p['name_player'] ?? p['player_name'] ?? ''}'.replaceAll(RegExp(r'\(.*\)$'), ''), if (p['id_player'] != null) 'id_player': '${p['id_player']}', if (p['source_player_id'] != null) 'source_player_id': '${p['source_player_id']}', if (p['id_team'] != null) 'id_team': '${p['id_team']}'};
+      final r = await http.get(Env.api('/player-detail').replace(queryParameters: q)).timeout(const Duration(seconds: 15));
       if (r.statusCode != 200) throw Exception('HTTP ${r.statusCode}');
       final d = jsonDecode(utf8.decode(r.bodyBytes));
       if (mounted) setState(() => data = Map<String, dynamic>.from(d));
@@ -99,363 +85,470 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
     }
   }
 
-  Map<String, dynamic> map(dynamic v) =>
-      v is Map ? Map<String, dynamic>.from(v) : {};
-  Widget heading(String s) => Padding(
-      padding: const EdgeInsets.only(top: 20, bottom: 8),
-      child: Text(s,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)));
-  Widget source(dynamic url) => const SizedBox.shrink();
-  Widget facts(Map<String, dynamic> values) =>
-      Wrap(spacing: 10, runSpacing: 8, children: [
-        for (final e in values.entries)
-          SizedBox(
-              width: 210,
-              child: Card(
-                  margin: EdgeInsets.zero,
-                  child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(e.key,
-                                style: const TextStyle(
-                                    fontSize: 11, color: Colors.blueGrey)),
-                            Text(e.value == null || '${e.value}'.isEmpty
-                                ? '未確認'
-                                : '${e.value}')
-                          ]))))
+  Map<String, dynamic> map(dynamic v) => v is Map ? Map<String, dynamic>.from(v) : {};
+  Widget heading(String s) => Padding(padding: const EdgeInsets.only(top: 20, bottom: 8), child: Text(s, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)));
+  String hand(dynamic v) => switch ('$v') { '0' => '右', '1' => '左', '2' => '両', _ => '未確認' };
+
+  Widget facts(Map<String, dynamic> values, {Key? key, bool stretch = false}) {
+    final style = DefaultTextStyle.of(context).style.copyWith(fontWeight: FontWeight.bold, fontSize: stretch ? 14 : null);
+    var headerWidth = 110.0;
+    for (final label in values.keys) {
+      final painter = TextPainter(text: TextSpan(text: label, style: style),
+        textDirection: Directionality.of(context), textScaler: MediaQuery.textScalerOf(context))..layout();
+      if (painter.width + 20 > headerWidth) headerWidth = painter.width + 20;
+      painter.dispose();
+    }
+    if (stretch) {
+      return Column(key: key ?? const ValueKey('player-profile-grid'),
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [for (final e in values.entries) Expanded(child: Container(
+          decoration: BoxDecoration(border: Border.all(color: Colors.black12, width: .5)),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Container(width: headerWidth, alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(color: Color(0xffeceff1),
+                border: Border(right: BorderSide(color: Colors.black12))),
+              child: Text(e.key, softWrap: false, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14))),
+            Expanded(child: Padding(padding: const EdgeInsets.all(8), child: Align(
+              alignment: Alignment.centerLeft,
+              child: DefaultTextStyle.merge(style: const TextStyle(fontSize: 14), child: e.value is Widget ? e.value as Widget : Text(e.value == null || '${e.value}'.isEmpty ? '未確認' : '${e.value}'))))),
+          ]),
+        ))]);
+    }
+    return Table(
+      key: key ?? const ValueKey('player-profile-grid'),
+      columnWidths: {0: FixedColumnWidth(headerWidth)},
+      border: TableBorder.all(color: Colors.black12),
+      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+      children: [
+        for (final e in values.entries) TableRow(children: [TableCell(verticalAlignment: TableCellVerticalAlignment.fill, child: Container(color: const Color(0xffeceff1), padding: const EdgeInsets.all(8), alignment: Alignment.centerLeft, child: Text(e.key, softWrap: false, style: const TextStyle(fontWeight: FontWeight.bold)))), Padding(padding: const EdgeInsets.all(8), child: e.value is Widget ? e.value as Widget : Text(e.value == null || '${e.value}'.isEmpty ? '未確認' : '${e.value}'))])
       ]);
-  String hand(dynamic v) =>
-      switch ('$v') { '0' => '右', '1' => '左', '2' => '両', _ => '未確認' };
-  Widget statRows(List<Map<String, dynamic>> rows) =>
-      Wrap(spacing: 8, runSpacing: 8, children: [
-        for (final r in rows)
-          Tooltip(
-              message: '${r['note'] ?? r['title']}\n${r['checked_at'] ?? ''}',
-              child: SizedBox(
-                  width: 145,
-                  child: Card(
-                      margin: EdgeInsets.zero,
-                      child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Column(children: [
-                            Text('${r['title']}',
-                                style: const TextStyle(fontSize: 11)),
-                            Text('${r['stats'] ?? '—'}',
-                                style: const TextStyle(
-                                    fontSize: 19, fontWeight: FontWeight.bold)),
-                            source(r['source'])
-                          ])))))
+  }
+
+  Widget profileOverview(String name, Map<String, dynamic> values, {bool pitching = false}) {
+    final stats = <String, dynamic>{};
+    for (final row in listMapFromJson(data['season_stats'])) {
+      final title = '${row['title'] ?? ''}'.trim();
+      if (pitching && {'代打起用数', '代打打率'}.contains(title)) continue;
+      if (title.isEmpty || stats.containsKey(title)) continue;
+      final value = '${row['stats'] ?? '—'}';
+      final rank = int.tryParse('${row['int_rank']}');
+      final ranked = rank != null && rank > 0 && rank < 1000 && value != '—';
+      if (ranked && rank <= 3) {
+        final colors = rank == 2
+            ? const [Color(0xff929da7), Color(0xfff4f6f8), Color(0xffa6afb7)]
+            : const [Color(0xffa26840), Color(0xffffd1a3), Color(0xffb4784b)];
+        stats[title] = Wrap(spacing: 6, runSpacing: 4, crossAxisAlignment: WrapCrossAlignment.center, children: [
+          Text(value),
+          Container(
+            key: ValueKey('player-stat-medal-$title'),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: rank == 1 ? const Color(0xffffd700) : null,
+              image: rank == 1 ? const DecorationImage(
+                image: AssetImage('backend/assets/images/analysis_grade_gold.jpg'), fit: BoxFit.cover) : null,
+              gradient: rank == 1 ? null : LinearGradient(
+                begin: Alignment.topLeft, end: Alignment.bottomRight, colors: colors),
+              border: Border.all(color: rank == 1 ? const Color(0xffaa791b) : colors.first),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text('リーグ$rank位', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+          ),
+        ]);
+      } else {
+        stats[title] = '$value（${ranked ? 'リーグ$rank位' : '順位なし'}）';
+      }
+    }
+    final season = <String, dynamic>{
+      ...stats,
+    };
+    if (season.isEmpty) return profileWithImage(name, values);
+    if (MediaQuery.orientationOf(context) == Orientation.portrait) {
+      return profileWithImage(name, {...values, ...season});
+    }
+    return LayoutBuilder(builder: (context, bounds) {
+      final minimum = 1000 * MediaQuery.textScalerOf(context).scale(1);
+      final width = bounds.maxWidth < minimum ? minimum : bounds.maxWidth;
+      final entries = values.entries.toList();
+      final split = entries.indexWhere((e) => e.key == 'Wikipedia');
+      final upper = Map<String, dynamic>.fromEntries(split < 0 ? entries : entries.take(split));
+      final lower = Map<String, dynamic>.fromEntries(split < 0 ? [] : entries.skip(split));
+      final url = map(data['character_image'])['url'];
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: SizedBox(width: width, child: Column(children: [
+          IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            if (url is String) Container(
+              key: const ValueKey('player-character-frame'), width: width * .336,
+              decoration: BoxDecoration(border: Border.all(color: Colors.black12)),
+              child: Stack(children: [Positioned.fill(child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: Image.network(Env.api(url).toString(), fit: BoxFit.contain,
+                  cacheWidth: 640, cacheHeight: 960, semanticLabel: '$nameのキャラクターイラスト',
+                  errorBuilder: (_, __, ___) => const Center(child: Icon(Icons.person_outline, color: Colors.grey))),
+              ))]),
+            ),
+            Expanded(child: facts(upper, stretch: true)),
+            SizedBox(width: width * .3, child: facts(season, stretch: true,
+              key: const ValueKey('player-season-stats-grid'))),
+          ])),
+          if (lower.isNotEmpty) facts(lower, key: const ValueKey('player-profile-links-honors')),
+        ])),
+      );
+    });
+  }
+
+  Widget profileWithImage(String name, Map<String, dynamic> values) {
+    final url = map(data['character_image'])['url'];
+    if (url is! String) return facts(values);
+    final entries = values.entries.toList();
+    final wikipediaIndex = entries.indexWhere((e) => e.key == 'Wikipedia');
+    final split = wikipediaIndex < 0 ? entries.length : wikipediaIndex;
+    final upper = Map<String, dynamic>.fromEntries(entries.take(split));
+    final lower = Map<String, dynamic>.fromEntries(entries.skip(split));
+    Widget image() => Image.network(Env.api(url).toString(), fit: BoxFit.contain,
+      cacheWidth: 640, cacheHeight: 960,
+      semanticLabel: '$nameのキャラクターイラスト',
+      errorBuilder: (_, __, ___) => const Center(child: Icon(Icons.person_outline, color: Colors.grey)));
+    return LayoutBuilder(builder: (context, bounds) {
+      if (MediaQuery.orientationOf(context) == Orientation.portrait) {
+        return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Container(
+            key: const ValueKey('player-character-frame'),
+            height: (bounds.maxWidth * 1.5).clamp(200.0, 420.0),
+            padding: const EdgeInsets.all(8),
+            decoration: const BoxDecoration(border: Border(
+              top: BorderSide(color: Colors.black12),
+              left: BorderSide(color: Colors.black12),
+              right: BorderSide(color: Colors.black12))),
+            child: image(),
+          ),
+          facts(values),
+        ]);
+      }
+      final width = bounds.maxWidth;
+      return SizedBox(width: width, child: Column(children: [
+          IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Container(
+              key: const ValueKey('player-character-frame'),
+              width: width * .48,
+              decoration: const BoxDecoration(border: Border(
+                top: BorderSide(color: Colors.black12),
+                left: BorderSide(color: Colors.black12),
+                bottom: BorderSide(color: Colors.black12))),
+              child: Stack(children: [Positioned.fill(child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: image(),
+              ))]),
+            ),
+            Expanded(child: facts(upper)),
+          ])),
+          if (lower.isNotEmpty) facts(lower, key: const ValueKey('player-profile-links-honors')),
+        ]));
+    });
+  }
+
+  Widget usageBands({required bool batting, required bool pitching}) {
+    int count(dynamic value) => (num.tryParse('$value')?.toInt() ?? 0).clamp(0, 100000);
+    final usage = map(data['usage']);
+    final roles = <String, int>{};
+    if (pitching) {
+      for (final row in listMapFromJson(usage['pitching_workload'])) {
+        final appearances = count(row['appearances']);
+        final starts = count(row['starts']).clamp(0, appearances);
+        roles['先発'] = (roles['先発'] ?? 0) + starts;
+        roles['救援'] = (roles['救援'] ?? 0) + appearances - starts;
+      }
+    }
+    final positions = <String, int>{};
+    if (batting) {
+      for (final row in listMapFromJson(usage['positions'])) {
+        final slot = '${row['slot'] ?? ''}';
+        if (slot.isEmpty || slot.contains('投手')) continue;
+        positions[slot] = (positions[slot] ?? 0) + count(row['count']);
+      }
+    }
+    Widget band(Map<String, int> values, String label) {
+      final entries = values.entries.where((e) => e.value > 0).toList();
+      final total = entries.fold<int>(0, (sum, e) => sum + e.value);
+      const colors = [Color(0xff527ca6), Color(0xff61a394), Color(0xffb38b55),
+        Color(0xff8b78ae), Color(0xffc57b84), Color(0xff6e9fb6), Color(0xff929c55)];
+      String text(int i) => '${entries[i].key} ${entries[i].value}回（${(entries[i].value * 100 / total).toStringAsFixed(1)}%）';
+      return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Text(label, style: const TextStyle(fontSize: 12, color: Colors.blueGrey)),
+        const SizedBox(height: 6),
+        ClipRRect(borderRadius: BorderRadius.circular(8), child: SizedBox(
+          height: 30, child: Row(children: [
+            for (var i = 0; i < entries.length; i++) Expanded(flex: entries[i].value,
+              child: Tooltip(message: text(i), child: Semantics(label: text(i),
+                child: Container(key: ValueKey('player-usage-${entries[i].key}'),
+                  color: colors[i % colors.length], alignment: Alignment.center,
+                  child: LayoutBuilder(builder: (context, bounds) => bounds.maxWidth < 60 * MediaQuery.textScalerOf(context).scale(1)
+                    ? const SizedBox.shrink() : Text('${(entries[i].value * 100 / total).toStringAsFixed(0)}%',
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                ))),
+            ),
+          ]))),
+        const SizedBox(height: 8),
+        Wrap(spacing: 14, runSpacing: 6, children: [
+          for (var i = 0; i < entries.length; i++) Row(mainAxisSize: MainAxisSize.min, children: [
+            Container(width: 10, height: 10, decoration: BoxDecoration(color: colors[i % colors.length], borderRadius: BorderRadius.circular(2))),
+            const SizedBox(width: 5), Text(text(i), style: const TextStyle(fontSize: 12)),
+          ]),
+        ]),
+        const SizedBox(height: 8),
       ]);
-  Widget recentTable(List<Map<String, dynamic>> games) => SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: DataTable(
-        columnSpacing: 16,
-        dataRowMinHeight: 36,
-        dataRowMaxHeight: 44,
-        columns: [
-          for (final label in [
-            '日付',
-            '対戦・結果',
-            '打数',
-            '安打',
-            '打点',
-            '投球回',
-            '奪三振',
-            '自責点',
-            '打席結果',
-            ])
-            DataColumn(label: Text(label))
-        ],
-        rows: [
-          for (final game in games)
-            (() {
-              final lines = listMapFromJson(game['lines']);
-              int sum(String key) => lines.fold(0,
-                  (n, row) => n + (num.tryParse('${row[key]}')?.toInt() ?? 0));
-              final pitchers = lines.where((r) =>
-                  (num.tryParse('${r['double_inning_pitch']}') ?? 0) > 0 ||
-                  (num.tryParse('${r['int_pitch']}') ?? 0) > 0);
-              return DataRow(cells: [
-                DataCell(Text(
-                    '${game['datetime_start']}'.split(RegExp('[ T]')).first)),
-                DataCell(Text(
-                    '${game['away']} ${game['score_away'] ?? '—'}–${game['score_home'] ?? '—'} ${game['home']}')),
-                for (final key in ['int_batting', 'int_hit1', 'int_rbi'])
-                  DataCell(Text(
-                      lines.any((r) => r[key] != null) ? '${sum(key)}' : '—')),
-                DataCell(Text(pitchers.isEmpty
-                    ? '—'
-                    : pitchers
-                        .map((r) => '${r['double_inning_pitch']}')
-                        .join(' / '))),
-                for (final key in ['int_strike_out', 'int_runs_earned'])
-                  DataCell(Text(pitchers.isEmpty ? '—' : '${sum(key)}')),
-                DataCell(Text(listMapFromJson(game['plays'])
-                    .map((r) => '${r['inning']}回 ${r['result']}')
-                    .join(' / '))),
-              ]);
-            })()
-        ],
-      ));
+    }
+    final hasRoles = roles.values.any((n) => n > 0);
+    final hasPositions = positions.values.any((n) => n > 0);
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      if (hasRoles) band(roles, '登板の内訳'),
+      if (hasPositions) band(positions, '取得済みの守備位置別起用回数の内訳'),
+      if (!hasRoles && !hasPositions) const Text('起用情報は未取得です。'),
+    ]);
+  }
+
+  String careerSummary(Map<String, dynamic> roster, Map<String, dynamic> profile) {
+    final names = <String>[];
+    String? lastTeamId;
+    void append(dynamic value, [dynamic teamId]) {
+      final name = '${value ?? ''}'.trim();
+      if (name.isEmpty) return;
+      final id = teamId?.toString();
+      if (names.isNotEmpty && (names.last == name || (id != null && id == lastTeamId))) {
+        return;
+      }
+      names.add(name);
+      lastTeamId = id;
+    }
+
+    for (final entry in listMapFromJson(roster['career_history'])) {
+      append(entry['team']);
+    }
+    final seasons = listMapFromJson(data['careers']).toList()
+      ..sort((a, b) {
+        int number(dynamic value) => int.tryParse('$value') ?? 0;
+        final year = number(a['int_year']).compareTo(number(b['int_year']));
+        return year != 0 ? year : number(a['id']).compareTo(number(b['id']));
+      });
+    for (final season in seasons) {
+      append(season['name_team'], season['id_team']);
+    }
+    append(profile['name_team'], profile['id_team']);
+    return names.isEmpty ? '—' : names.join('→');
+  }
+
+  String careerValue(Map<String, dynamic> row, String key) {
+    if (key == 'ops') {
+      final obp = num.tryParse('${row['double_average_onbase']}');
+      final slg = num.tryParse('${row['double_average_slugging']}');
+      return obp == null || slg == null ? '—' : (obp + slg).toStringAsFixed(3);
+    }
+    final value = row[key];
+    if (value == null) return '—';
+    final number = num.tryParse('$value');
+    if (number != null && key.startsWith('double_average')) {
+      return number.toStringAsFixed(key == 'double_average_earned_runs' ? 2 : 3);
+    }
+    return '$value';
+  }
+
+  Widget history({required bool batting, required bool pitching}) {
+    final columns = <String, String>{
+      'int_year': '年',
+      'name_team': '所属',
+      'int_games': '試合',
+      if (batting) ...{'int_appearance': '打席', 'int_batting': '打数', 'double_average_batting': '打率', 'int_hit1': '安打', 'int_homerun': '本塁打', 'int_rbi': '打点', 'int_steal_base': '盗塁', 'double_average_onbase': '出塁率', 'double_average_slugging': '長打率', 'ops': 'OPS', 'int_hit2': '二塁打', 'int_hit3': '三塁打', 'int_four_batting': '四球', 'int_strike_out_batting': '三振'},
+      if (pitching) ...{'int_pitching': '登板', 'double_inning': '投球回', 'double_average_earned_runs': '防御率', 'int_win': '勝利', 'int_lose': '敗戦', 'double_average_win': '勝率', 'int_save': 'セーブ', 'int_hold': 'ホールド', 'int_hold_point': 'HP', 'int_strike_out_pitcher': '奪三振', 'int_four_pitcher': '与四球', 'int_hit_pitcher': '被安打', 'int_homerun_pitcher': '被本塁打', 'int_complete_game': '完投', 'int_shutout': '完封'}
+    };
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      heading('過去シーズン'),
+      if (listMapFromJson(data['careers']).isEmpty)
+        const Text('過去シーズンの成績は未取得です。')
+      else
+        LayoutBuilder(builder: (context, constraints) => SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minWidth: constraints.maxWidth),
+              child: ClipRRect(borderRadius: BorderRadius.circular(10), child: DataTable(
+              border: TableBorder.all(color: const Color(0xffe0e5ec), width: .5),
+              headingRowColor: const WidgetStatePropertyAll(Color(0xffe8edf3)),
+              headingTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xff334155)),
+              headingRowHeight: 40, dataRowMinHeight: 38, dataRowMaxHeight: 44,
+              horizontalMargin: 14, columnSpacing: 20, columns: [
+              for (final label in columns.values) DataColumn(label: Text(label))
+            ], rows: [
+              for (final entry in listMapFromJson(data['careers']).indexed) DataRow(
+                color: WidgetStatePropertyAll(entry.$1.isEven ? Colors.white : const Color(0xfff5f7fa)),
+                cells: [for (final k in columns.keys) DataCell(Text(careerValue(entry.$2, k)))])
+            ])))))
+    ]);
+  }
+
+  String recentOpponent(Map<String, dynamic> game) {
+    String short(String name) {
+      const aliases = {'西武': ['西武', 'ライオンズ'], 'ロッテ': ['ロッテ', 'マリーンズ'],
+        'ソフトバンク': ['ソフトバンク', 'ホークス'], '日本ハム': ['日本ハム', 'ファイターズ'],
+        '楽天': ['楽天', 'イーグルス'], 'オリックス': ['オリックス', 'バファローズ'],
+        '阪神': ['阪神', 'タイガース'], '巨人': ['巨人', '読売', 'ジャイアンツ'],
+        'DeNA': ['DeNA', 'ベイスターズ'], '広島': ['広島', 'カープ'],
+        'ヤクルト': ['ヤクルト', 'スワローズ'], '中日': ['中日', 'ドラゴンズ']};
+      if (widget.org == 'npb') {
+        for (final entry in aliases.entries) {
+          if (entry.value.any(name.contains)) return entry.key;
+        }
+      }
+      return name;
+    }
+    if (game['opponent'] != null) return 'vs${short('${game['opponent']}')}';
+    final team = short('${map(data['profile'])['name_team'] ?? widget.player['name_team'] ?? ''}');
+    final home = short('${game['home'] ?? ''}'), away = short('${game['away'] ?? ''}');
+    final opponent = team.isNotEmpty && team == home ? away : team.isNotEmpty && team == away ? home : '';
+    return opponent.isEmpty ? '対戦相手未確認' : 'vs$opponent';
+  }
+
+  Widget recentTable(List<Map<String, dynamic>> games) {
+    final scale = MediaQuery.textScalerOf(context).scale(12) / 12;
+    final rowHeight = 48.0 * scale;
+    const widths = {0: FixedColumnWidth(92), 1: FixedColumnWidth(100)};
+    const border = TableBorder(
+      horizontalInside: BorderSide(color: Color(0xffdfe5ec), width: .5),
+      verticalInside: BorderSide(color: Color(0xffdfe5ec), width: .5),
+    );
+    Widget bodyCell(Widget child) => SizedBox(height: rowHeight,
+      child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Align(alignment: Alignment.centerLeft, child: child)));
+    return ClipRRect(borderRadius: BorderRadius.circular(10), child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Table(columnWidths: widths, border: border, children: [
+          TableRow(decoration: const BoxDecoration(color: Color(0xffe8edf3)), children: [
+            for (final title in ['日付', '対戦相手', '出場成績']) SizedBox(height: 40 * scale,
+              child: Padding(padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Align(alignment: Alignment.centerLeft, child: Text(title,
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold))))),
+          ]),
+        ]),
+        SizedBox(
+          key: const ValueKey('recent-appearances-viewport'),
+          height: rowHeight * games.length.clamp(0, 5),
+          child: SingleChildScrollView(
+            key: const ValueKey('recent-appearances-scroll'),
+            primary: false,
+            child: Table(
+              key: const ValueKey('recent-appearances-rows'),
+              columnWidths: widths,
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+              border: border,
+              children: [for (final entry in games.indexed) TableRow(
+                decoration: BoxDecoration(color: entry.$1.isEven ? Colors.white : const Color(0xfff5f7fa)),
+                children: [
+                  bodyCell(Text('${entry.$2['datetime_start']}'.split(RegExp('[ T]')).first, style: const TextStyle(fontSize: 12))),
+                  bodyCell(Text(recentOpponent(entry.$2), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600))),
+                  bodyCell(GamePlayerAppearance(lines: listMapFromJson(entry.$2['lines']), plays: listMapFromJson(entry.$2['plays']))),
+                ],
+              )],
+            ),
+          ),
+        ),
+      ],
+    ));
+  }
+
+  Future<void> showRecentBatting(String name, List<Map<String, dynamic>> games) => showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        final size = MediaQuery.sizeOf(dialogContext);
+        return Dialog(
+            insetPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 24),
+            child: SizedBox(
+                width: 1100,
+                height: size.height * .8,
+                child: Column(children: [
+                  Padding(padding: const EdgeInsets.all(12), child: Row(children: [Expanded(child: Text('$name：直近25試合の出場成績', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))), IconButton(tooltip: '閉じる', onPressed: () => Navigator.pop(dialogContext), icon: const Icon(Icons.close))])),
+                  Expanded(child: SingleChildScrollView(padding: const EdgeInsets.all(12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [if (games.isEmpty) const Text('取得済みの出場成績がありません。') else recentTable(games), const SizedBox(height: 8), Text('${data['recent_note'] ?? ''}', style: const TextStyle(fontSize: 11, color: Colors.blueGrey))])))
+                ])));
+      });
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.sizeOf(context),
-        profile = map(data['profile']),
-        roster = map(data['roster']),
-        verified = map(data['verified']);
-    final name =
-        '${profile['name_full'] ?? widget.player['name'] ?? widget.player['name_player'] ?? widget.player['player_name'] ?? '選手詳細'}';
-    final stats = listMapFromJson(data['season_stats']);
-    final unique = <String, Map<String, dynamic>>{
-      for (final r in stats) '${r['title']}': r
-    };
+    final size = MediaQuery.sizeOf(context);
+    final profile = map(data['profile']), roster = map(data['roster']), verified = map(data['verified']);
+    final position = '${profile['txt_position'] ?? widget.player['txt_position'] ?? roster['position'] ?? ''}';
+    final twoWay = position.contains('二刀流') || RegExp(r'TWP|two.way', caseSensitive: false).hasMatch(position);
+    final pitching = twoWay || position.contains('投手') || RegExp(r'^(P|SP|RP)$').hasMatch(position);
+    final batting = twoWay || !pitching || RegExp('捕手|内野手|外野手|指名打者|DH').hasMatch(position);
     final honors = playerHonors(roster);
+    final salaries = listMapFromJson(map(roster['contract_data'])['salary_history']).where((s) => int.tryParse('${s['year']}') == widget.year).toList();
+    final games = listMapFromJson(data['recent_games']);
+    final name = '${profile['name_full'] ?? widget.player['name'] ?? widget.player['name_player'] ?? widget.player['player_name'] ?? '選手詳細'}';
     return Dialog(
-        insetPadding: EdgeInsets.symmetric(
-            horizontal: size.width < 600 ? 8 : 40, vertical: 16),
+        insetPadding: EdgeInsets.symmetric(horizontal: size.width < 600 ? 8 : 40, vertical: 16),
         child: SizedBox(
             width: 1100,
             height: size.height - 32,
             child: Column(children: [
-              Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Row(children: [
-                    Expanded(
-                        child: Text(name,
-                            style: const TextStyle(
-                                fontSize: 22, fontWeight: FontWeight.bold))),
-                    IconButton(
-                        tooltip: '閉じる',
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close))
-                  ])),
+              Padding(padding: const EdgeInsets.all(12), child: Row(children: [Expanded(child: Text(name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold))), IconButton(tooltip: '閉じる', onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close))])),
               Expanded(
                   child: loading
                       ? const Center(child: BaseballLoading())
                       : error != null
-                          ? Center(
-                              child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                  Text(error!),
-                                  TextButton(
-                                      onPressed: load,
-                                      child: const Text('再読み込み'))
-                                ]))
+                          ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Text(error!), TextButton(onPressed: load, child: const Text('再読み込み'))]))
                           : data['found'] == false
                               ? Center(child: Text('${data['message']}'))
-                              : ListView(
-                                  padding: const EdgeInsets.all(16),
-                                  children: [
-                                      Wrap(
-                                          spacing: 20,
-                                          runSpacing: 12,
-                                          children: [
-                                            SizedBox(
-                                                width: 450,
-                                                child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      facts({
-                                                        '所属': profile[
-                                                            'name_team'],
-                                                        '生年月日': profile[
-                                                            'date_birth'],
-                                                        'ポジション': profile[
-                                                            'txt_position'],
-                                                        '投打':
-                                                            '${hand(profile['pitching'])}投げ／${hand(profile['batting'])}打ち',
-                                                        '身長・体重':
-                                                            '${profile['height'] ?? '—'}cm / ${profile['weight'] ?? '—'}kg',
-                                                        '出身国': profile[
-                                                            'birth_country'],
-                                                        '出身地': profile[
-                                                            'birth_place']
-                                                      }),
-                                                      source(profile['url'])
-                                                    ]))
-                                          ]),
-                                      heading('${widget.year}年 シーズンスタッツ'),
-                                      if (unique.isEmpty)
-                                        const Text('この年度の成績は未取得です。')
-                                      else
-                                        statRows(unique.values.toList()),
-                                      heading('直近25試合の出場成績'),
-                                      Text('${data['recent_note'] ?? ''}',
-                                          style: const TextStyle(
-                                              fontSize: 11,
-                                              color: Colors.blueGrey)),
-                                      if (listMapFromJson(data['recent_games'])
-                                          .isEmpty)
-                                        const Text('取得済みの出場成績がありません。'),
-                                      recentTable(listMapFromJson(
-                                          data['recent_games'])),
-                                      heading('特徴・計測データ'),
-                                      const Text(
-                                          '公表時点・測定条件の分かる情報だけを表示します。未確認は未計測・非公表も含みます。',
-                                          style: TextStyle(fontSize: 11)),
-                                      facts({
-                                        for (final key in [
-                                          '選手の特徴',
-                                          '特技・趣味',
-                                          '打球速度',
-                                          '二塁送球タイム',
-                                          '一塁到達タイム',
-                                          '遠投',
-                                          '投球速度',
-                                          '変化球の球種'
-                                        ])
-                                          key: map(verified[key])['value']
-                                      }),
-                                      for (final e in verified.entries)
-                                        if (e.value is Map)
-                                          Row(children: [
-                                            Text(e.key),
-                                            source(map(e.value)['source']),
-                                            Text(
-                                                '${map(e.value)['as_of'] ?? ''}',
-                                                style: const TextStyle(
-                                                    fontSize: 10))
-                                          ]),
-                                      heading('ゾーンごとの打率'),
-                                      Text(map(verified['zone_batting']).isEmpty
-                                          ? '投球位置データが未取得のため表示できません。'
-                                          : '捕手視点・打席結果が確定した最終球のコース別。分母は打数。'),
-                                      SizedBox(
-                                          width: 300,
-                                          child: Table(
-                                              border: TableBorder.all(
-                                                  color: Colors.black12),
-                                              children: [
-                                                for (var y = 0; y < 3; y++)
-                                                  TableRow(children: [
-                                                    for (var x = 0; x < 3; x++)
-                                                      Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(14),
-                                                          child: Text(
-                                                              '${map(map(verified['zone_batting'])['zones'])['${y * 3 + x + 1}'] ?? '—'}',
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center))
-                                                  ])
-                                              ])),
-                                      source(map(
-                                          verified['zone_batting'])['source']),
-                                      heading('経歴・過去シーズン'),
-                                      for (final c in listMapFromJson(
-                                          roster['career_history']))
-                                        ListTile(
-                                            dense: true,
-                                            title: Text('${c['team'] ?? ''}'),
-                                            subtitle: Text(
-                                                '${c['category'] ?? ''} ${c['detail'] ?? ''}'),
-                                            trailing: source(c['source'])),
-                                      SingleChildScrollView(
-                                          scrollDirection: Axis.horizontal,
-                                          child: DataTable(columns: [
-                                            for (final c in [
-                                              '年',
-                                              '所属',
-                                              '試合',
-                                              '打席',
-                                              '打率',
-                                              '本塁打',
-                                              '登板',
-                                              '投球回',
-                                              '防御率'
-                                            ])
-                                              DataColumn(label: Text(c))
-                                          ], rows: [
-                                            for (final c in listMapFromJson(
-                                                data['careers']))
-                                              DataRow(cells: [
-                                                for (final k in [
-                                                  'int_year',
-                                                  'name_team',
-                                                  'int_games',
-                                                  'int_appearance',
-                                                  'double_average_batting',
-                                                  'int_homerun',
-                                                  'int_pitching',
-                                                  'double_inning',
-                                                  'double_average_earned_runs'
-                                                ])
-                                                  DataCell(
-                                                      Text('${c[k] ?? '—'}'))
-                                              ])
-                                          ])),
-                                      heading('年俸・契約'),
-                                      if (map(roster['contract_data']).isEmpty)
-                                        const Text('確認済みの契約情報は未収録です。'),
-                                      for (final salary in listMapFromJson(
-                                              map(roster['contract_data'])[
-                                                  'salary_history'])
-                                          .where(
-                                              (s) => s['year'] == widget.year))
-                                        ListTile(
-                                            title: Text(
-                                                contractSalaryLabel(salary)),
-                                            subtitle: Text(
-                                                '${salary['detail'] ?? ''}'),
-                                            trailing:
-                                                source(salary['source_url'])),
-                                      for (final c in listMapFromJson(map(
-                                          roster['contract_data'])['periods']))
-                                        ListTile(
-                                            title: Text(
-                                                '${c['start_year'] ?? ''}–${c['end_year'] ?? ''} ${c['total_label'] ?? ''}'),
-                                            subtitle:
-                                                Text('${c['detail'] ?? ''}'),
-                                            trailing: source(c['source_url'])),
-                                      heading('今シーズンの起用'),
-                                      for (final p in listMapFromJson(map(
-                                          data['usage'])['pitching_workload']))
-                                        facts({
-                                          '登板': p['appearances'],
-                                          '先発': p['starts'],
-                                          '先発割合': (num.tryParse(
-                                                          '${p['appearances']}') ??
-                                                      0) >
-                                                  0
-                                              ? '${((num.tryParse('${p['starts']}') ?? 0) * 100 / num.parse('${p['appearances']}')).toStringAsFixed(1)}%'
-                                              : null
-                                        }),
-                                      for (final p in listMapFromJson(
-                                          map(data['usage'])['positions']))
-                                        ListTile(
-                                            dense: true,
-                                            title: Text(
-                                                '${p['slot']}：${p['count']}試合'),
-                                            subtitle: Text((num.tryParse(
-                                                            '${p['total']}') ??
-                                                        0) >
-                                                    0
-                                                ? '起用割合 ${((num.tryParse('${p['count']}') ?? 0) * 100 / num.parse('${p['total']}')).toStringAsFixed(1)}%'
-                                                : '割合の分母は未確認')),
-                                      if (map(data['usage']).values.every(
-                                          (v) => v is! List || v.isEmpty))
-                                        const Text('起用情報は未取得です。'),
-                                      heading('功績'),
-                                      if (honors.isEmpty)
-                                        const Text('確認済みの功績データは未収録です。'),
-                                      Wrap(
-                                          spacing: 8,
-                                          runSpacing: 6,
-                                          children: [
-                                            for (final h in honors)
-                                              Chip(
-                                                  label: Text(
-                                                      '${h['year'] ?? ''} ${h['label']}'))
-                                          ]),
-                                      const SizedBox(height: 20)
-                                    ]))
+                              : ListView(padding: const EdgeInsets.all(16), children: [
+                                  profileOverview(name, {
+                                    '所属': profile['name_team'],
+                                    '生年月日': profile['date_birth'] == null ? null : '${profile['date_birth']}'.split(RegExp(r'[T\s]')).first,
+                                    'ポジション': profile['txt_position'],
+                                    '投打': '${hand(profile['pitching'])}投げ／${hand(profile['batting'])}打ち',
+                                    '身長・体重': '${profile['height'] ?? '—'}cm / ${profile['weight'] ?? '—'}kg',
+                                    '出身国': profile['birth_country'],
+                                    '出身地': profile['birth_place'],
+                                    '経歴': careerSummary(roster, profile),
+                                    '${widget.year}年 年俸': salaries.isEmpty ? '今季の年俸情報は未収録です。' : salaries.map(contractSalaryLabel).join('\n'),
+                                    for (final key in [
+                                      '選手の特徴',
+                                      '特技・趣味',
+                                      if (batting) ...['打球速度', if (position.contains('捕手')) '二塁送球タイム', '一塁到達タイム', '遠投'],
+                                      if (pitching) ...['投球速度', '変化球の球種']
+                                    ])
+                                      key: map(verified[key])['value'],
+                                    'Wikipedia': Builder(builder: (context) {
+                                    final stored = Uri.tryParse('${data['wikipedia_url'] ?? profile['wikipedia_url'] ?? ''}');
+                                    final verified = stored != null && stored.scheme == 'https' && (stored.host == 'wikipedia.org' || stored.host.endsWith('.wikipedia.org'));
+                                    final uri = verified ? stored : Uri.https('ja.wikipedia.org', '/w/index.php', {'search': '${name.replaceAll(RegExp(r'[\s　]'), '')} 野球'});
+                                    return InkWell(
+                                        key: const ValueKey('player-wikipedia-link'),
+                                        onTap: () async {
+                                          if (!await launchUrl(uri, mode: LaunchMode.externalApplication) && context.mounted) {
+                                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Wikipediaを開けませんでした。')));
+                                          }
+                                        },
+                                        child: Text(uri.toString(), style: const TextStyle(color: Colors.blue, decoration: TextDecoration.underline)),
+                                      );
+                                  }),
+                                    '功績': ConstrainedBox(
+                                      constraints: const BoxConstraints(minHeight: 100),
+                                      child: Align(alignment: Alignment.centerLeft,
+                                        child: honors.isEmpty
+                                          ? const Text('確認済みの功績データは未収録です。')
+                                          : Wrap(spacing: 8, runSpacing: 6, children: [
+                                              for (final h in honors) Chip(label: Text('${h['year'] ?? ''} ${h['label']}')),
+                                            ]),
+                                      ),
+                                    ),
+                                  }, pitching: pitching),
+                                  heading('今シーズンの起用'),
+                                  usageBands(batting: batting, pitching: pitching),
+                                  Row(children: [Expanded(child: heading('直近25試合の出場成績')),
+                                    IconButton(tooltip: '直近25試合を表示', onPressed: () => showRecentBatting(name, games.take(25).toList()), icon: const Icon(Icons.more_horiz))]),
+                                  if (games.isEmpty) const Text('取得済みの出場成績がありません。')
+                                  else recentTable(games.take(25).toList()),
+                                  history(batting: batting, pitching: pitching),
+                                  const SizedBox(height: 20),
+
+                                ]))
             ])));
   }
 }

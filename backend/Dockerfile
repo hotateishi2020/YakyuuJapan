@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 COPY --from=build /app/bin/server /app/bin/server
 COPY --from=build /app/public     /app/public
 COPY --from=build /app/data       /app/data
+COPY --from=build /app/prompts    /app/prompts
 
 # Render が渡す PORT を使う
 ENV PORT=10000

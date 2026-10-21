@@ -4,6 +4,34 @@ import 'package:shelf/shelf.dart';
 
 /// 操作ログとエラーログの共通項目。画面の列と `txt_detail` の中身を揃える。
 class LogDetail {
+  static const userOperation = '操作';
+  static const serverProcess = 'サーバー処理';
+  static const browserProcess = 'ブラウザ処理';
+
+  static const clientActions = {
+    '初期表示を読み込んだ', '予想タブを開いた',
+    'npbタブを開いた', 'mlbタブを開いた',
+    '試合情報タブを開いた', 'チーム順位タブを開いた', '個人成績タブを開いた',
+    '戦力タブを開いた', '記録タブを開いた', '日程タブを開いた',
+    '動画タブを開いた', '日本人タブを開いた', 'タイトルタブを開いた',
+    'news・イベント日程ポップアップを開いた', '年度を変更した',
+    'アカウント設定のプルダウンを開いた',
+  };
+
+  static String clientActionType(String action) =>
+      action == '初期表示を読み込んだ' ? browserProcess : userOperation;
+
+  /// Data reads are browser processing; clicks are recorded by /client/action.
+  /// Write endpoints represent user submissions, except automatic notifications.
+  static String accessType(Request request, {required bool scheduled}) {
+    if (scheduled) return serverProcess;
+    if (const {'GET', 'HEAD', 'OPTIONS'}.contains(request.method) ||
+        const {'/predictions/ready', '/auth/mark-read'}.contains(request.requestedUri.path)) {
+      return browserProcess;
+    }
+    return userOperation;
+  }
+
   static Map<String, String> clientInfo(Request request) {
     final ua = clip(request.headers['user-agent'] ?? '', 1000);
     final lower = ua.toLowerCase();

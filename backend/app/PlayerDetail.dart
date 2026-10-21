@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'QualifiedPitchingMetrics.dart';
 import 'package:postgres/postgres.dart';
 import 'ClubData.dart';
@@ -9,6 +10,25 @@ import 'MlbPlayerGames.dart';
 Map<String, dynamic> detailMap(dynamic v) => v is String ? usageMap(jsonDecode(v)) : usageMap(v);
 String normalizedPlayerName(dynamic v) => usageName('$v').replaceAll(RegExp(r'\(.*\)$'), '');
 String? officialPlayerId(Map<String, dynamic> p) => p['official_source_player_id']?.toString() ?? RegExp(r'/players/(\d+)\.html').firstMatch('${p['url']}')?[1];
+
+String? playerWikipediaUrl(Map<String, dynamic> person) {
+  final id = officialPlayerId(person);
+  if (id == null || !RegExp(r'^\d+$').hasMatch(id)) return null;
+  final root = Directory('data').existsSync() ? 'data' : 'backend/data';
+  final file = File('$root/player-art-npb-v3/$id.json');
+  if (!file.existsSync()) return null;
+  try {
+    final saved = detailMap(jsonDecode(file.readAsStringSync()));
+    final research = detailMap(saved['research']);
+    for (final source in (research['sources'] as List? ?? const [])) {
+      final uri = Uri.tryParse('$source');
+      if (uri != null && uri.scheme == 'https' && uri.host.endsWith('.wikipedia.org') && uri.path.startsWith('/wiki/')) {
+        return uri.toString();
+      }
+    }
+  } catch (_) {/* A missing research file must not break player details. */}
+  return null;
+}
 
 /// Never resolve ambiguous names across clubs. Stable IDs take precedence.
 Map<String, dynamic>? matchPlayer(Map<String, dynamic> wanted, List<Map<String, dynamic>> players) {
@@ -63,7 +83,7 @@ Future<List<Map<String, dynamic>>> extraStatRows(Connection conn, int year, List
     if (match == null) continue;
     for (final s in usageMaps(p['metrics'])) {
       if (s['title'] == '盗塁阻止率') continue;
-      rows.add({...match, 'id_player': match['id'], 'name_player': match['name_full'], 'int_year': year, ...s, if (s['title'] == '盗塁阻止数') 'catcher_metric': true, 'id_users': null, 'colors': null, 'id_stats': null, 'int_rank': 1000, 'source': s['source'] ?? p['source'], 'checked_at': data['checked_at']});
+      rows.add({...match, 'id_player': match['id'], 'name_player': match['name_full'], 'int_year': year, ...s, if (s['title'] == '盗塁阻止数') 'catcher_metric': true, 'id_users': null, 'colors_user': null, 'colors': null, 'id_stats': null, 'int_rank': 1000, 'source': s['source'] ?? p['source'], 'checked_at': data['checked_at']});
     }
   }
   final qualificationGames = await readQualificationGames(conn, year);
@@ -157,7 +177,7 @@ Future<Map<String, dynamic>> readPlayerDetail(Connection conn, {required int yea
     }
   }
   final supplement = usageMaps((batch?.profiles ?? readClubFile('player-profiles-$year.json'))['players']).where((p) => p['org'] == (leagues.contains(3) ? 'mlb' : 'npb') && '${p['source_player_id']}' == officialPlayerId(person)).firstOrNull ?? {};
-  return {'found': true, 'year': year, 'profile': person, 'season_stats': stats, 'careers': careers, 'recent_games': games, 'roster': roster, 'usage': usage, 'verified': supplement, 'recent_note': '公式ボックススコア・取得済みの終了試合から直近25試合。未取得の試合は含みません。'};
+  return {'found': true, 'year': year, 'profile': person, 'wikipedia_url': playerWikipediaUrl(person), 'season_stats': stats, 'careers': careers, 'recent_games': games, 'roster': roster, 'usage': usage, 'verified': supplement, 'recent_note': '公式ボックススコア・取得済みの終了試合から直近25試合。未取得の試合は含みません。'};
 }
 
 void addMissingRequestedMetrics(List<Map<String, dynamic>> rows) {
@@ -176,7 +196,7 @@ void addMissingRequestedMetrics(List<Map<String, dynamic>> rows) {
     for (final title in isPitcher ? ['BB/9', '四死球/9', '平均投球回', '投球回数', '登板回数'] : ['ボール球見極め率', '代打起用数', '代打打率', '盗塁阻止数', '打席数']) {
       if (qualifiedPitchingRateTitles.contains(title) || title == '盗塁阻止数') continue;
       if (!known.contains('${e.key}:$title')) {
-        rows.add({...p, 'title': title, 'stats': '—', 'numeric_value': null, 'int_rank': 1000, 'id_users': null, 'colors': null, 'note': '当年度の確認済みデータがありません。', 'id_stats': null, 'source': null});
+        rows.add({...p, 'title': title, 'stats': '—', 'numeric_value': null, 'int_rank': 1000, 'id_users': null, 'colors_user': null, 'colors': null, 'note': '当年度の確認済みデータがありません。', 'id_stats': null, 'source': null});
       }
     }
   }

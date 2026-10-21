@@ -11,6 +11,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../config/org_config.dart';
+import '../config/app_design.dart';
 import '../tools/Env.dart';
 import '../tools/json_utils.dart';
 import '../logic/club_analysis.dart';
@@ -200,24 +201,24 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
             explanation, ...notes,
           ]);
         }
-        final tableContent = compact ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [table, SizedBox(width: math.min(MediaQuery.sizeOf(context).width, constraints.maxWidth), child: Column(children: [explanation, ...notes]))]) : table;
+        if (team == null) {
+          final pinnedWidth = compact ? 46.0 : 180.0;
+          final bodyWidth = math.max(1240.0, constraints.maxWidth) - pinnedWidth;
+          final totalWeight = columns.skip(1).fold<double>(0, (n, c) => n + weight(c));
+          return _PinnedAnalysisGrid(
+            pinnedWidth: pinnedWidth, rowHeight: rowHeight,
+            labels: columns.skip(1).toList(),
+            widths: [for (final c in columns.skip(1)) bodyWidth * weight(c) / totalWeight],
+            teamCells: [for (final row in table.rows) row.cells.first.child],
+            cells: [for (final row in table.rows) [for (final cell in row.cells.skip(1)) cell.child]],
+            footer: Column(children: [if (compact) explanation, if (compact) ...notes]),
+          );
+        }
         final width = math.max(1240.0, constraints.maxWidth);
         return sectionScrollView(context,
           key: const ValueKey('analysis-horizontal-scroll'),
           scrollDirection: Axis.horizontal,
-          child: fitTable(SizedBox(width: width,
-            height: team == null ? constraints.maxHeight : null,
-            child: team != null ? tableContent : Column(children: [
-              Table(key: const ValueKey('analysis-fixed-header'),
-                border: TableBorder.all(color: Colors.grey, width: .5),
-                columnWidths: {for(final entry in columns.indexed) entry.$1: compact && entry.$2 == '球団' ? const FixedColumnWidth(46) : FlexColumnWidth(weight(entry.$2))},
-                children: [TableRow(decoration: const BoxDecoration(color: Colors.black), children: [
-                  for(final c in columns) SizedBox(height: 56, child: Center(child: Text(c,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)))),
-                ])]),
-              Expanded(child: SingleChildScrollView(
-                key: const ValueKey('analysis-vertical-scroll'), child: tableContent)),
-            ]))));
+          child: fitTable(SizedBox(width: width, child: table)));
       }),
       if (!compact) ...notes,
     ];
@@ -354,7 +355,7 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
       Widget usage(int index, String title, {double? minWidth}) => section(title,
         () => widget.teamSection(index, team), minWidth: minWidth, key: ValueKey('${team['id_team']}-$index'));
       return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Padding(padding: const EdgeInsets.all(8), child: LayoutBuilder(builder: (context, constraints) {
+          Padding(padding: const EdgeInsets.fromLTRB(8, 0, 8, 8), child: LayoutBuilder(builder: (context, constraints) {
             final compact = compactBaseballLayout(context);
             final columns = compact ? widget.teams.length : (constraints.maxWidth / 100).floor().clamp(1, widget.teams.length);
             final segmentWidth = compact ? math.max(24.0, (constraints.maxWidth - (columns - 1) * 4) / columns) : (constraints.maxWidth - (columns - 1) * 4) / columns;
@@ -369,7 +370,7 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
                       key: ValueKey('team-tab-segment-${option['id_team']}'),
                       borderRadius: BorderRadius.circular(20),
                       onTap: () => setState(() => _selected = '${option['id_team']}'),
-                      child: SizedBox(height: 36, child: Padding(
+                      child: SizedBox(height: TAB_BAR_H, child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: compact ? 2 : 8),
                         child: Center(child: FittedBox(fit: BoxFit.scaleDown,
                           child: Text(compact ? '${option['name_shortest'] ?? option['name_team']}' : '${option['name_team']}', style: TextStyle(fontWeight: FontWeight.bold,
@@ -392,16 +393,16 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
           })),
           Padding(
             padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
+            child: Row(children: [
               for (var i = 0; i < _teamSections.length; i++) ...[
                 if (i > 0) const SizedBox(width: 2),
-                Flexible(
-                  fit: FlexFit.loose,
-                  flex: _teamSections[i].characters.length + 1,
+                Expanded(
                   child: ChoiceChip(
                     key: ValueKey('team-section-segment-$i'),
-                    label: FittedBox(fit: BoxFit.scaleDown,
-                      child: Text(_teamSections[i], maxLines: 1, softWrap: false)),
+                    label: SizedBox(
+                      width: double.infinity,
+                      child: FittedBox(fit: BoxFit.scaleDown,
+                        child: Text(_teamSections[i], maxLines: 1, softWrap: false))),
                     padding: EdgeInsets.zero,
                     labelPadding: const EdgeInsets.symmetric(horizontal: 2),
                     visualDensity: VisualDensity.compact,
@@ -466,4 +467,71 @@ class _TeamSection extends StatelessWidget {
       TeamSectionLayout(child: builder()),
     ],
   );
+}
+
+
+class _PinnedAnalysisGrid extends StatefulWidget {
+  const _PinnedAnalysisGrid({required this.pinnedWidth, required this.rowHeight,
+    required this.labels, required this.widths, required this.teamCells,
+    required this.cells, required this.footer});
+  final double pinnedWidth, rowHeight;
+  final List<String> labels;
+  final List<double> widths;
+  final List<Widget> teamCells;
+  final List<List<Widget>> cells;
+  final Widget footer;
+  @override
+  State<_PinnedAnalysisGrid> createState() => _PinnedAnalysisGridState();
+}
+
+class _PinnedAnalysisGridState extends State<_PinnedAnalysisGrid> {
+  final _header = ScrollController(), _body = ScrollController();
+  bool _syncing = false;
+  @override
+  void initState() {
+    super.initState();
+    _header.addListener(() => _sync(_header, _body));
+    _body.addListener(() => _sync(_body, _header));
+  }
+  void _sync(ScrollController from, ScrollController to) {
+    if (_syncing || !to.hasClients) return;
+    _syncing = true;
+    to.jumpTo(from.offset.clamp(0.0, to.position.maxScrollExtent));
+    _syncing = false;
+  }
+  @override
+  void dispose() { _header.dispose(); _body.dispose(); super.dispose(); }
+  Widget _cell(Widget child, double width, double height, {bool header = false}) =>
+    Container(width: width, height: height, alignment: Alignment.center,
+      decoration: BoxDecoration(color: header ? Colors.black : null,
+        border: Border.all(color: Colors.grey, width: .5)), child: child);
+  @override
+  Widget build(BuildContext context) => Column(key: const ValueKey('analysis-table'), children: [
+    Row(key: const ValueKey('analysis-fixed-header'), children: [
+      _cell(const Text('球団', style: TextStyle(color: Colors.white)), widget.pinnedWidth, 56, header: true),
+      Expanded(child: SingleChildScrollView(controller: _header,
+        scrollDirection: Axis.horizontal, child: Row(children: [
+          for (var i = 0; i < widget.labels.length; i++)
+            _cell(Text(widget.labels[i], textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), widget.widths[i], 56, header: true),
+        ]))),
+    ]),
+    Expanded(child: SingleChildScrollView(
+      key: const ValueKey('analysis-vertical-scroll'),
+      child: Column(children: [
+        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Column(key: const ValueKey('analysis-pinned-teams'), children: [
+            for (final cell in widget.teamCells) _cell(cell, widget.pinnedWidth, widget.rowHeight),
+          ]),
+          Expanded(child: SingleChildScrollView(controller: _body,
+            key: const ValueKey('analysis-horizontal-scroll'),
+            scrollDirection: Axis.horizontal, child: Column(children: [
+              for (final row in widget.cells) Row(children: [
+                for (var i = 0; i < row.length; i++) _cell(row[i], widget.widths[i], widget.rowHeight),
+              ]),
+            ]))),
+        ]),
+        widget.footer,
+      ]))),
+  ]);
 }

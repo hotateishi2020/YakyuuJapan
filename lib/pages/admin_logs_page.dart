@@ -1,3 +1,4 @@
+import 'admin_news_panel.dart';
 import 'dart:typed_data';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import '../tools/network_error.dart';
@@ -8,6 +9,7 @@ import 'package:http/http.dart' as http;
 
 import '../logic/auth_session.dart';
 import '../tools/Env.dart';
+import '../tools/browser_cookie.dart';
 
 /// 操作ログとエラーログを同じ時系列の表で見る。
 class AdminLogsPage extends StatefulWidget {
@@ -26,7 +28,7 @@ class _LogColumn {
 
 const _columns = <_LogColumn>[
   _LogColumn('timestamp', '発生日時', 156),
-  _LogColumn('log_type', '種別', 56),
+  _LogColumn('log_type', '種別', 108),
   _LogColumn('level', 'レベル', 64),
   _LogColumn('user_id', 'ユーザー', 108),
   _LogColumn('ip_address', 'IPアドレス', 160),
@@ -54,6 +56,10 @@ const _columns = <_LogColumn>[
 
 class _AdminLogsPageState extends State<AdminLogsPage> {
   final _query = TextEditingController();
+  int _section = 0;
+  bool _showAccess = true;
+  List<Map<String, dynamic>> get _visibleLogs =>
+      _logs.where((r) => _showAccess || r['log_type'] == 'エラー').toList();
   bool _loading = true;
   String? _error;
   List<Map<String, dynamic>> _logs = const [];
@@ -61,6 +67,7 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
   @override
   void initState() {
     super.initState();
+    _showAccess = readBrowserCookie('koko_logs_show_access') != 'false';
     _load();
   }
 
@@ -269,68 +276,101 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
         foregroundColor: Colors.white,
         title: const Text('管理者'),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _query,
-                    decoration: const InputDecoration(
-                      labelText: 'ユーザー名またはユーザーID',
-                      isDense: true,
-                      border: OutlineInputBorder(),
-                    ),
-                    onSubmitted: (_) => _load(),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                FilledButton(
-                    onPressed: _loading ? null : _load,
-                    child: const Text('絞り込み')),
-              ],
-            ),
-          ),
-          if (_error != null)
+      body: Column(children: [
+        Padding(
+            padding: const EdgeInsets.all(12),
+            child: SizedBox(
+                width: double.infinity,
+                child: SegmentedButton<int>(
+                  segments: const [
+                    ButtonSegment(
+                        value: 0,
+                        label: Text('ログ管理'),
+                        icon: Icon(Icons.list_alt)),
+                    ButtonSegment(
+                        value: 1,
+                        label: Text('News登録'),
+                        icon: Icon(Icons.newspaper))
+                  ],
+                  selected: {_section},
+                  onSelectionChanged: (value) =>
+                      setState(() => _section = value.single),
+                ))),
+        Expanded(
+            child: IndexedStack(index: _section, children: [
+          Column(children: [
             Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text(_error!, style: const TextStyle(color: Colors.red)),
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _query,
+                      decoration: const InputDecoration(
+                        labelText: 'ユーザー名またはユーザーID',
+                        isDense: true,
+                        border: OutlineInputBorder(),
+                      ),
+                      onSubmitted: (_) => _load(),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton(
+                      onPressed: _loading ? null : _load,
+                      child: const Text('絞り込み')),
+                ],
+              ),
             ),
-          Expanded(
-            child: _loading
-                ? const Center(child: BaseballLoading())
-                : _logs.isEmpty
-                    ? const Center(child: Text('ログはありません'))
-                    : LayoutBuilder(
-                        builder: (context, constraints) {
-                          return Scrollbar(
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: SizedBox(
-                                width: tableWidth,
-                                height: constraints.maxHeight,
-                                child: Column(
-                                  children: [
-                                    _headerRow(),
-                                    Expanded(
-                                      child: ListView.builder(
-                                        itemCount: _logs.length,
-                                        itemBuilder: (context, index) =>
-                                            _dataRow(_logs[index]),
+            CheckboxListTile(
+              title: const Text('操作ログを表示'),
+              value: _showAccess,
+              dense: true,
+              controlAffinity: ListTileControlAffinity.leading,
+              onChanged: (value) {
+                setState(() => _showAccess = value ?? true);
+                writeBrowserCookie('koko_logs_show_access', '$_showAccess');
+              },
+            ),
+            if (_error != null)
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Text(_error!, style: const TextStyle(color: Colors.red)),
+              ),
+            Expanded(
+              child: _loading
+                  ? const Center(child: BaseballLoading())
+                  : _visibleLogs.isEmpty
+                      ? const Center(child: Text('ログはありません'))
+                      : LayoutBuilder(
+                          builder: (context, constraints) {
+                            return Scrollbar(
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: SizedBox(
+                                  width: tableWidth,
+                                  height: constraints.maxHeight,
+                                  child: Column(
+                                    children: [
+                                      _headerRow(),
+                                      Expanded(
+                                        child: ListView.builder(
+                                          itemCount: _visibleLogs.length,
+                                          itemBuilder: (context, index) =>
+                                              _dataRow(_visibleLogs[index]),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-          ),
-        ],
-      ),
+                            );
+                          },
+                        ),
+            ),
+          ]),
+          const AdminNewsPanel(),
+        ])),
+      ]),
     );
   }
 

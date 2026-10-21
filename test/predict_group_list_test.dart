@@ -144,7 +144,7 @@ void main() {
     expect(tester.getTopLeft(find.text('沢村賞')).dy, lessThan(tester.getTopLeft(find.text('セ・リーグ').first).dy));
     expect(tester.getTopLeft(find.text('MVP')).dy, lessThan(tester.getTopLeft(find.text('打率')).dy));
     expect(
-      find.byWidgetPredicate((widget) => widget is Container && widget.color == const Color(0xFFFF6347)),
+      find.byWidgetPredicate((widget) => widget is Container && widget.color == Color.lerp(const Color(0xFFFF6347), Colors.white, .82)),
       findsOneWidget,
     );
     expect(
@@ -152,8 +152,8 @@ void main() {
       findsWidgets,
     );
     expect(find.text('佐藤輝明、近本光司'), findsNothing);
-    final sato = find.byWidgetPredicate((widget) => widget is Text && widget.data == '佐藤輝明' && widget.style?.color == Colors.white);
-    final chikamoto = find.byWidgetPredicate((widget) => widget is Text && widget.data == '近本光司' && widget.style?.color == const Color(0xFFFFEB3B));
+    final sato = find.byWidgetPredicate((widget) => widget is Text && widget.data == '佐藤輝明' && widget.style?.color == const Color(0xFF253449));
+    final chikamoto = find.byWidgetPredicate((widget) => widget is Text && widget.data == '近本光司' && widget.style?.color == const Color(0xFF253449));
     expect(sato, findsOneWidget);
     expect(chikamoto, findsOneWidget, reason: tester.widgetList<Text>(find.text('近本光司')).map((text) => text.style?.color).join(' | '));
     expect(tester.widget<Text>(sato).maxLines, 1);
@@ -163,13 +163,16 @@ void main() {
     final tiedGradient = (tiedBox.decoration as BoxDecoration).gradient as LinearGradient;
     expect(tiedGradient.begin, Alignment.topCenter);
     expect(tiedGradient.end, Alignment.bottomCenter);
-    expect(tiedGradient.colors, [const Color(0xFFFF6347), const Color(0xFF001F3F)]);
+    expect(tiedGradient.colors, [
+      Color.lerp(const Color(0xFFFF6347), Colors.white, .82),
+      Color.lerp(const Color(0xFF001F3F), Colors.white, .82),
+    ]);
     expect(
-      find.byWidgetPredicate((widget) => widget is Container && widget.color == const Color(0xFF001F3F)),
+      find.byWidgetPredicate((widget) => widget is Container && widget.color == Color.lerp(const Color(0xFF001F3F), Colors.white, .82)),
       findsOneWidget,
     );
     expect(
-      find.byWidgetPredicate((widget) => widget is Container && widget.color == const Color(0xFFFFCC00)),
+      find.byWidgetPredicate((widget) => widget is Container && widget.color == const Color(0xFFE4EFE7)),
       findsWidgets,
     );
     expect(

@@ -17,8 +17,9 @@ Future<void> main(List<String> args) async {
         final response = await client
             .get(Uri.parse(url))
             .timeout(const Duration(seconds: 30));
-        if (response.statusCode != 200)
+        if (response.statusCode != 200) {
           throw StateError('$year: HTTP ${response.statusCode}');
+        }
         await file.writeAsBytes(response.bodyBytes);
         await Future<void>.delayed(const Duration(seconds: 1));
       }
@@ -45,8 +46,9 @@ Future<void> main(List<String> args) async {
       }
       if (picks.length < 12 ||
           picks.map((p) => p['team']).toSet().length !=
-              (year == 1978 ? 11 : 12))
+              (year == 1978 ? 11 : 12)) {
         throw StateError('$year: incomplete (${picks.length})');
+      }
       years['$year'] = {'source': url, 'picks': picks};
       print('$year: ${picks.length}');
     }

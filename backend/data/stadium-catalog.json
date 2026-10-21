@@ -20,7 +20,16 @@
       "construction": "約600億円",
       "construction_source": "https://forbesjapan.com/articles/detail/61850",
       "station_distance": "北広島駅：約1.5km（歩行者・自転車道）",
-      "station_distance_source": "https://www.hkdballpark.com/access/bicycle/"
+      "station_distance_source": "https://www.hkdballpark.com/access/bicycle/",
+      "stadium_level": "first",
+      "address": "北海道北広島市Fビレッジ1番地",
+      "address_source": "https://npb.jp/stadium/json/290.json",
+      "outfield_distance": "左翼 98m\n中堅 122m\n右翼 100m",
+      "outfield_distance_source": "https://npb.jp/stadium/json/290.json",
+      "dimensions_checked_at": "2026-10-21",
+      "fence_height": "約2.8m（大部分）",
+      "fence_height_source": "https://www.joqr.co.jp/qr/article/83241/",
+      "fence_height_checked_at": "2026-10-21"
     },
     {
       "match": "楽天モバイル 最強パーク宮城",
@@ -40,7 +49,16 @@
       "station_distance": "宮城野原駅：徒歩約5分",
       "station_distance_source": "https://www.rakuteneagles.jp/stadium/access/train/",
       "details_checked_at": "2026-10-19",
-      "completed_source": "https://www.suikon.or.jp/activity/publishing/suikon/055/images/017.pdf"
+      "completed_source": "https://www.suikon.or.jp/activity/publishing/suikon/055/images/017.pdf",
+      "stadium_level": "first",
+      "address": "宮城県仙台市宮城野区宮城野2-11-6",
+      "address_source": "https://npb.jp/stadium/json/029.json",
+      "outfield_distance": "左翼 100.1m\n中堅 122m\n右翼 100.1m",
+      "outfield_distance_source": "https://npb.jp/stadium/json/029.json",
+      "dimensions_checked_at": "2026-10-21",
+      "fence_height": "2m（一部1.8m）\n2026年改修後",
+      "fence_height_source": "https://www.rakuteneagles.jp/news/detail/202500956507.html",
+      "fence_height_checked_at": "2026-10-21"
     },
     {
       "match": "ベルーナドーム",
@@ -60,7 +78,16 @@
       "station_distance": "西武球場前駅：改札の目の前",
       "station_distance_source": "https://www.seibulions.jp/special/welcome/",
       "details_checked_at": "2026-10-19",
-      "completed_source": "https://column.sp.baseball.findfriends.jp/?id=018-20170605-01&pid=column_detail"
+      "completed_source": "https://column.sp.baseball.findfriends.jp/?id=018-20170605-01&pid=column_detail",
+      "stadium_level": "first",
+      "address": "埼玉県所沢市上山口2135",
+      "address_source": "https://npb.jp/stadium/json/068.json",
+      "outfield_distance": "左翼 100m\n中堅 122m\n右翼 100m",
+      "outfield_distance_source": "https://npb.jp/stadium/json/068.json",
+      "dimensions_checked_at": "2026-10-21",
+      "fence_height": "3.2〜4.37m",
+      "fence_height_source": "https://en.wikipedia.org/wiki/Belluna_Dome",
+      "fence_height_checked_at": "2026-10-21"
     },
     {
       "match": "東京ドーム",
@@ -82,7 +109,16 @@
       "completed_source": "https://www.nikkenren.com/kenchiku/pdf/430/0430.pdf",
       "details_checked_at": "2026-10-19",
       "station_distance": "後楽園駅・水道橋駅（距離未確認）",
-      "station_distance_source": "https://www.tokyo-dome.co.jp/dome/access/"
+      "station_distance_source": "https://www.tokyo-dome.co.jp/dome/access/",
+      "stadium_level": "first",
+      "address": "東京都文京区後楽1-3-61",
+      "address_source": "https://npb.jp/stadium/json/081.json",
+      "outfield_distance": "左翼 100m\n中堅 122m\n右翼 100m",
+      "outfield_distance_source": "https://npb.jp/stadium/json/081.json",
+      "dimensions_checked_at": "2026-10-21",
+      "fence_height": "4m",
+      "fence_height_source": "https://www.tokyo-dome.co.jp/dome/about/",
+      "fence_height_checked_at": "2026-10-21"
     },
     {
       "match": "神宮",
@@ -102,7 +138,16 @@
       "completed_source": "https://www.jingu-stadium.com/about_kyujo/history/",
       "details_checked_at": "2026-10-19",
       "station_distance": "外苑前駅：徒歩約5分",
-      "station_distance_source": "https://www.jingu-stadium.com/access/"
+      "station_distance_source": "https://www.jingu-stadium.com/access/",
+      "stadium_level": "first",
+      "address": "東京都新宿区霞ヶ丘町3-1",
+      "address_source": "https://npb.jp/stadium/json/082.json",
+      "outfield_distance": "左翼 97.5m\n中堅 120m\n右翼 97.5m",
+      "outfield_distance_source": "https://npb.jp/stadium/json/082.json",
+      "dimensions_checked_at": "2026-10-21",
+      "fence_height": "3.3m\nラバー1.8m＋金網1.5m",
+      "fence_height_source": "https://www.jingu-stadium.com/about_kyujo/equipment/equipment.html",
+      "fence_height_checked_at": "2026-10-21"
     },
     {
       "match": "ZOZOマリンスタジアム",
@@ -124,7 +169,16 @@
       "details_checked_at": "2026-10-19",
       "station_distance": "海浜幕張駅：徒歩約15分",
       "station_distance_source": "https://www.marines.co.jp/stadium/access/",
-      "completed_source": "https://www.marines.co.jp/stadium/ballpark/guide.html"
+      "completed_source": "https://www.marines.co.jp/stadium/ballpark/guide.html",
+      "stadium_level": "first",
+      "address": "千葉県千葉市美浜区美浜1",
+      "address_source": "https://npb.jp/stadium/json/073.json",
+      "outfield_distance": "左翼 99.5m\n中堅 122m\n右翼 99.5m",
+      "outfield_distance_source": "https://npb.jp/stadium/json/073.json",
+      "dimensions_checked_at": "2026-10-21",
+      "fence_height": "3.3m",
+      "fence_height_source": "https://column.sp.baseball.findfriends.jp/?id=001-20240506-42&pid=column_detail",
+      "fence_height_checked_at": "2026-10-21"
     },
     {
       "match": "横浜スタジアム",
@@ -146,7 +200,16 @@
       "airport_distance_source": "https://ourairports.com/airports/RJTT/",
       "station_distance": "関内駅：徒歩約3分",
       "station_distance_source": "https://www.welcome.city.yokohama.jp/accessibility/spot/details.php?sid=189",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "神奈川県横浜市中区横浜公園",
+      "address_source": "https://npb.jp/stadium/json/093.json",
+      "outfield_distance": "左翼 94m\n中堅 118m\n右翼 94m",
+      "outfield_distance_source": "https://npb.jp/stadium/json/093.json",
+      "dimensions_checked_at": "2026-10-21",
+      "fence_height": "5m",
+      "fence_height_source": "https://www.daily.co.jp/baseball/2019/06/07/0012406706.shtml",
+      "fence_height_checked_at": "2026-10-21"
     },
     {
       "match": "バンテリンドーム ナゴヤ",
@@ -166,7 +229,16 @@
       "completed_source": "https://www.nagoya-dome.co.jp/aboutus/",
       "details_checked_at": "2026-10-19",
       "station_distance": "ナゴヤドーム前矢田駅：徒歩約5分",
-      "station_distance_source": "https://www.nagoya-dome.co.jp/sp/access.php"
+      "station_distance_source": "https://www.nagoya-dome.co.jp/sp/access.php",
+      "stadium_level": "first",
+      "address": "愛知県名古屋市東区大幸南1-1-1",
+      "address_source": "https://npb.jp/stadium/json/151.json",
+      "outfield_distance": "左翼 100m\n中堅 122m\n右翼 100m",
+      "outfield_distance_source": "https://npb.jp/stadium/json/151.json",
+      "dimensions_checked_at": "2026-10-21",
+      "fence_height": "3.6m\n2026年改修後",
+      "fence_height_source": "https://npb.jp/news/detail/20260319_01.html",
+      "fence_height_checked_at": "2026-10-21"
     },
     {
       "match": "京セラドーム大阪",
@@ -186,7 +258,16 @@
       "completed_source": "https://www.obayashi.co.jp/chronicle/works/18300.html",
       "details_checked_at": "2026-10-19",
       "station_distance": "ドーム前千代崎駅：徒歩約4分",
-      "station_distance_source": "https://metronine.osaka/spot-details/?spot_id=15677688244173"
+      "station_distance_source": "https://metronine.osaka/spot-details/?spot_id=15677688244173",
+      "stadium_level": "first",
+      "address": "大阪府大阪市西区千代崎3-中2-1",
+      "address_source": "https://npb.jp/stadium/json/175.json",
+      "outfield_distance": "左翼 100m\n中堅 122m\n右翼 100m",
+      "outfield_distance_source": "https://npb.jp/stadium/json/175.json",
+      "dimensions_checked_at": "2026-10-21",
+      "fence_height": "4.2m",
+      "fence_height_source": "https://www.kyoceradome-osaka.jp/use_guide/arena/",
+      "fence_height_checked_at": "2026-10-21"
     },
     {
       "match": "甲子園",
@@ -206,7 +287,13 @@
       "completed_source": "https://koshien.hanshin.co.jp/history/",
       "details_checked_at": "2026-10-19",
       "station_distance": "甲子園駅：徒歩約3分",
-      "station_distance_source": "https://koshien.hanshin.co.jp/guide/recommend_highschool.html"
+      "station_distance_source": "https://koshien.hanshin.co.jp/guide/recommend_highschool.html",
+      "stadium_level": "first",
+      "address": "兵庫県西宮市甲子園町1-82",
+      "address_source": "https://npb.jp/stadium/json/181.json",
+      "outfield_distance": "左翼 95m\n中堅 118m\n右翼 95m",
+      "outfield_distance_source": "https://npb.jp/stadium/json/181.json",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "match": "MAZDA Zoom-Zoom スタジアム広島",
@@ -228,7 +315,13 @@
       "maintenance": "約2.96億円／年（2024年度・管理運営費等、周辺遊歩道を含む）",
       "maintenance_source": "https://www.city.hiroshima.lg.jp/_res/projects/default_project/_page_/001/043/349/3.pdf",
       "details_checked_at": "2026-10-19",
-      "completed_source": "https://www.carp.co.jp/stadium/about"
+      "completed_source": "https://www.carp.co.jp/stadium/about",
+      "stadium_level": "first",
+      "address": "広島県広島市南区南蟹屋2-3-1",
+      "address_source": "https://npb.jp/stadium/json/208.json",
+      "outfield_distance": "左翼 101m\n中堅 122m\n右翼 100m",
+      "outfield_distance_source": "https://npb.jp/stadium/json/208.json",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "match": "みずほPayPayドーム福岡",
@@ -247,7 +340,16 @@
       "latitude": 33.594341,
       "longitude": 130.362411,
       "airport_distance": "Fukuoka Airport (FUK)：約8.3km（直線）",
-      "airport_distance_source": "https://ourairports.com/airports/RJFF/"
+      "airport_distance_source": "https://ourairports.com/airports/RJFF/",
+      "stadium_level": "first",
+      "address": "福岡県福岡市中央区地行浜2-2-2",
+      "address_source": "https://npb.jp/stadium/json/245.json",
+      "outfield_distance": "左翼 100m\n中堅 122m\n右翼 100m",
+      "outfield_distance_source": "https://npb.jp/stadium/json/245.json",
+      "dimensions_checked_at": "2026-10-21",
+      "fence_height": "約4.2m",
+      "fence_height_source": "https://column.sp.baseball.findfriends.jp/?id=001-20240506-42&pid=column_detail",
+      "fence_height_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -264,7 +366,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KSMF/",
       "completed": "2000年",
       "completed_source": "https://www.milb.com/news/gcs-16428488",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "400 Ballpark Drive, Sacramento, California, 95691, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/2529?hydrate=location",
+      "outfield_distance": "左翼 330ft（100.6m）\n中堅 403ft（122.8m）\n右翼 325ft（99.1m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/2529?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -281,7 +389,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KPIT/",
       "completed": "2001年",
       "completed_source": "https://www.thorntontomasetti.com/project/pnc-park",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "115 Federal Street, Pittsburgh, Pennsylvania, 15212, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/31?hydrate=location",
+      "outfield_distance": "左翼 325ft（99.1m）\n中堅 399ft（121.6m）\n右翼 320ft（97.5m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/31?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -298,7 +412,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KSAN/",
       "completed": "2004年",
       "completed_source": "https://www.clarkconstruction.com/our-work/projects/petco-park",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "100 Park Boulevard, San Diego, California, 92101, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/2680?hydrate=location",
+      "outfield_distance": "左翼 336ft（102.4m）\n中堅 396ft（120.7m）\n右翼 322ft（98.1m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/2680?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -315,7 +435,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KBFI/",
       "completed": "1999年",
       "completed_source": "https://www.mka.com/projects/t-mobile-park/",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "P.O. Box 4100, Seattle, Washington, 98104, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/680?hydrate=location",
+      "outfield_distance": "左翼 331ft（100.9m）\n中堅 405ft（123.4m）\n右翼 327ft（99.7m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/680?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -334,7 +460,13 @@
       "construction_source": "https://www.mlb.com/giants/ballpark/history",
       "details_checked_at": "2026-10-19",
       "completed": "2000年",
-      "completed_source": "https://www.thorntontomasetti.com/index.php/project/oracle-park"
+      "completed_source": "https://www.thorntontomasetti.com/index.php/project/oracle-park",
+      "stadium_level": "first",
+      "address": "24 Willie Mays Plaza, San Francisco, California, 94107, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/2395?hydrate=location",
+      "outfield_distance": "左翼 339ft（103.3m）\n中堅 391ft（119.2m）\n右翼 309ft（94.2m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/2395?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -351,7 +483,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KSTL/",
       "completed": "2006年",
       "completed_source": "https://kwamebuildinggroup.com/portfolio-item/st-louis-cardinals-busch-stadium/",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "700 Clark Street, St. Louis, Missouri, 63102, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/2889?hydrate=location",
+      "outfield_distance": "左翼 336ft（102.4m）\n中堅 400ft（121.9m）\n右翼 335ft（102.1m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/2889?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -368,7 +506,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KPIE/",
       "completed": "1990年",
       "completed_source": "https://ballparkdigest.com/2018/04/23/ballpark-booms-by-league-mlb/",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "One Tropicana Drive, St. Petersburg, Florida, 33705, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/12?hydrate=location",
+      "outfield_distance": "左翼 315ft（96.0m）\n中堅 404ft（123.1m）\n右翼 322ft（98.1m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/12?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -387,7 +531,13 @@
       "construction_source": "https://www.mlb.com/rangers/ballpark/facts-figures",
       "details_checked_at": "2026-10-19",
       "completed": "2020年",
-      "completed_source": "https://www.uni-engineer.com/portfolio/globe-life-field-arlington-texas/"
+      "completed_source": "https://www.uni-engineer.com/portfolio/globe-life-field-arlington-texas/",
+      "stadium_level": "first",
+      "address": "734 Stadium Drive, Arlington, Texas, 76011, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/5325?hydrate=location",
+      "outfield_distance": "左翼 329ft（100.3m）\n中堅 407ft（124.1m）\n右翼 326ft（99.4m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/5325?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -404,7 +554,13 @@
       "airport_distance_source": "https://ourairports.com/airports/CYTZ/",
       "completed": "1989年",
       "completed_source": "https://cisc-icca.ca/ciscwp/wp-content/uploads/2017/03/advantage28_1.pdf",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "1 Blue Jays Way, Suite 3200, Toronto, Ontario, M5V1J1, Canada",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/14?hydrate=location",
+      "outfield_distance": "左翼 328ft（100.0m）\n中堅 404ft（123.1m）\n右翼 328ft（100.0m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/14?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -421,7 +577,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KMSP/",
       "completed": "2010年3月",
       "completed_source": "https://www.mortenson.com/projects/target-field",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "1 Twins Way, Minneapolis, Minnesota, 55403, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/3312?hydrate=location",
+      "outfield_distance": "左翼 339ft（103.3m）\n中堅 404ft（123.1m）\n右翼 328ft（100.0m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/3312?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -440,7 +602,13 @@
       "construction_source": "https://www.mlb.com/phillies/news/phillies-alumni-designing-citizens-bank-park",
       "details_checked_at": "2026-10-19",
       "completed": "2004年",
-      "completed_source": "https://www.cdfa.net/cdfa/cdfaweb.nsf/ord/201609-Stadium.html/$file/gayerdrukkergold_stadiumsubsidies_090816.pdf"
+      "completed_source": "https://www.cdfa.net/cdfa/cdfaweb.nsf/ord/201609-Stadium.html/$file/gayerdrukkergold_stadiumsubsidies_090816.pdf",
+      "stadium_level": "first",
+      "address": "One Citizens Bank Way, Philadelphia, Pennsylvania, 19148, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/2681?hydrate=location",
+      "outfield_distance": "左翼 329ft（100.3m）\n中堅 401ft（122.2m）\n右翼 330ft（100.6m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/2681?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -457,7 +625,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KPDK/",
       "completed": "2017年",
       "completed_source": "https://www.walterpmoore.com/projects/truist-park",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "755 Battery Avenue, Atlanta, Georgia, 30339, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/4705?hydrate=location",
+      "outfield_distance": "左翼 335ft（102.1m）\n中堅 400ft（121.9m）\n右翼 325ft（99.1m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/4705?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -474,7 +648,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KMDW/",
       "completed": "1991年",
       "completed_source": "https://journals.lib.unb.ca/index.php/MCR/article/download/17898/22066?inline=1",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "333 West 35th Street, Chicago, Illinois, 60616, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/4?hydrate=location",
+      "outfield_distance": "左翼 330ft（100.6m）\n中堅 400ft（121.9m）\n右翼 335ft（102.1m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/4?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -491,7 +671,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KMIA/",
       "completed": "2012年",
       "completed_source": "https://www.aboutpmc.com/project-profiles/miami-marlins-park/",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "501 Marlins Way, Miami, Florida, 33125, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/4169?hydrate=location",
+      "outfield_distance": "左翼 344ft（104.9m）\n中堅 407ft（124.1m）\n右翼 335ft（102.1m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/4169?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -508,7 +694,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KLGA/",
       "completed": "2009年",
       "completed_source": "https://www.thorntontomasetti.com/project/yankee-stadium",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "One East 161st Street, Bronx, New York, 10451, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/3313?hydrate=location",
+      "outfield_distance": "左翼 318ft（96.9m）\n中堅 408ft（124.4m）\n右翼 314ft（95.7m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/3313?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -525,7 +717,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KMKE/",
       "completed": "2001年",
       "completed_source": "https://wells.build/projects/american-family-field/",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "One Brewers Way, Milwaukee, Wisconsin, 53214, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/32?hydrate=location",
+      "outfield_distance": "左翼 344ft（104.9m）\n中堅 400ft（121.9m）\n右翼 345ft（105.2m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/32?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -542,7 +740,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KSNA/",
       "completed": "1966年4月8日",
       "completed_source": "https://angelsmediaguide.com/files/basic-html/page395.html",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "2000 Gene Autry Way, Anaheim, California, 92806, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/1?hydrate=location",
+      "outfield_distance": "左翼 330ft（100.6m）\n中堅 396ft（120.7m）\n右翼 330ft（100.6m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/1?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -559,7 +763,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KPHX/",
       "completed": "1998年",
       "completed_source": "https://www.tutorperini.com/projects/sports/chase-field/",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "401 East Jefferson Street, Phoenix, Arizona, 85004, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/15?hydrate=location",
+      "outfield_distance": "左翼 328ft（100.0m）\n中堅 407ft（124.1m）\n右翼 335ft（102.1m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/15?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -576,7 +786,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KBWI/",
       "completed": "1992年",
       "completed_source": "https://www.hcea.com/project/oriole-park-at-camden-yards/",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "333 West Camden Street, Baltimore, Maryland, 21201, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/2?hydrate=location",
+      "outfield_distance": "左翼 333ft（101.5m）\n中堅 410ft（125.0m）\n右翼 318ft（96.9m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/2?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -593,7 +809,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KBOS/",
       "completed": "1912年",
       "completed_source": "https://sabr.org/gamesproj/game/april-20-1912-the-first-game-at-fenway-park/",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "4 Yawkey Way, Boston, Massachusetts, 02215, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/3?hydrate=location",
+      "outfield_distance": "左翼 310ft（94.5m）\n中堅 420ft（128.0m）\n右翼 302ft（92.0m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/3?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -610,7 +832,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KMDW/",
       "completed": "1914年",
       "completed_source": "https://www.loc.gov/pictures/item/2020722070/",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "1060 West Addison, Chicago, Illinois, 60613-4397, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/17?hydrate=location",
+      "outfield_distance": "左翼 355ft（108.2m）\n中堅 400ft（121.9m）\n右翼 353ft（107.6m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/17?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -627,7 +855,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KLUK/",
       "completed": "2003年",
       "completed_source": "https://architour.designlearnandbuild.org/buildings/great-american-ball-park/",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "100 Main Street, Cincinnati, Ohio, 45202-4109, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/2602?hydrate=location",
+      "outfield_distance": "左翼 328ft（100.0m）\n中堅 404ft（123.1m）\n右翼 325ft（99.1m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/2602?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -644,7 +878,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KCLE/",
       "completed": "1994年",
       "completed_source": "https://cogence.org/wp-content/uploads/2023/08/JRA-Cogence-Project-Initiation-Presentation-Columbus-Print-Version.pdf",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "2401 Ontario Street, Cleveland, Ohio, 44115, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/5?hydrate=location",
+      "outfield_distance": "左翼 325ft（99.1m）\n中堅 405ft（123.4m）\n右翼 325ft（99.1m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/5?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -661,7 +901,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KBJC/",
       "completed": "1995年4月",
       "completed_source": "https://www.mortenson.com/projects/coors-field",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "2001 Blake Street, Denver, Colorado, 80205-2000, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/19?hydrate=location",
+      "outfield_distance": "左翼 347ft（105.8m）\n中堅 415ft（126.5m）\n右翼 350ft（106.7m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/19?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -678,7 +924,13 @@
       "airport_distance_source": "https://ourairports.com/airports/CYQG/",
       "completed": "2000年",
       "completed_source": "https://www.leg.mn.gov/docs/2004/other/040634/Stadium/www.stadium.state.mn.us/meetings/031209/031209_agenda.pdf",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "2100 Woodward Avenue, Detroit, Michigan, 48201, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/2394?hydrate=location",
+      "outfield_distance": "左翼 345ft（105.2m）\n中堅 420ft（128.0m）\n右翼 330ft（100.6m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/2394?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -695,7 +947,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KHOU/",
       "completed": "2000年",
       "completed_source": "https://lgbtq.visithoustontexas.com/listings/houston-astros/22502/",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "501 Crawford Street, Houston, Texas, 77002, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/2392?hydrate=location",
+      "outfield_distance": "左翼 315ft（96.0m）\n中堅 409ft（124.7m）\n右翼 326ft（99.4m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/2392?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -712,7 +970,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KMCI/",
       "completed": "1973年春",
       "completed_source": "https://www.kcmodern.com/kaufman-stadium",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "One Royal Way, Kansas City, Missouri, 64129, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/7?hydrate=location",
+      "outfield_distance": "左翼 347ft（105.8m）\n中堅 410ft（125.0m）\n右翼 344ft（104.9m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/7?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -731,7 +995,13 @@
       "construction_source": "https://www.walteromalley.com/dodger-stadium/construction-facts/",
       "details_checked_at": "2026-10-19",
       "completed": "1962年",
-      "completed_source": "https://planning.lacity.gov/odocument/1473a5d4-1e90-4000-9b7b-110d08c8488a/SLEPEV_Historic_Resources_Survey_Report_HPLAEdit_0.pdf"
+      "completed_source": "https://planning.lacity.gov/odocument/1473a5d4-1e90-4000-9b7b-110d08c8488a/SLEPEV_Historic_Resources_Survey_Report_HPLAEdit_0.pdf",
+      "stadium_level": "first",
+      "address": "1000 Vin Scully Avenue, Los Angeles, California, 90012-1199, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/22?hydrate=location",
+      "outfield_distance": "左翼 330ft（100.6m）\n中堅 395ft（120.4m）\n右翼 330ft（100.6m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/22?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -748,7 +1018,13 @@
       "airport_distance_source": "https://ourairports.com/airports/KDCA/",
       "completed": "2008年",
       "completed_source": "https://www.clarkconstruction.com/our-work/projects/nationals-park",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "1500 South Capitol Street, SE, Washington, District of Columbia, 20003-1507, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/3309?hydrate=location",
+      "outfield_distance": "左翼 336ft（102.4m）\n中堅 402ft（122.5m）\n右翼 335ft（102.1m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/3309?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
     },
     {
       "org": "mlb",
@@ -765,7 +1041,1591 @@
       "airport_distance_source": "https://ourairports.com/airports/KLGA/",
       "completed": "2009年",
       "completed_source": "https://www.wsp.com/en-us/projects/new-york-mets-citi-field",
-      "details_checked_at": "2026-10-19"
+      "details_checked_at": "2026-10-19",
+      "stadium_level": "first",
+      "address": "Citi Field, Flushing, New York, 11368, USA",
+      "address_source": "https://statsapi.mlb.com/api/v1/venues/3289?hydrate=location",
+      "outfield_distance": "左翼 335ft（102.1m）\n中堅 408ft（124.4m）\n右翼 330ft（100.6m）",
+      "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/3289?hydrate=fieldInfo",
+      "dimensions_checked_at": "2026-10-21"
+    },
+    {
+      "org": "npb",
+      "team": "読売ジャイアンツ",
+      "name": "ジャイアンツタウンスタジアム",
+      "match": "ジャイアンツタウンスタジアム",
+      "address": "東京都稲城市",
+      "stadium_level": "farm",
+      "category": "屋外球場",
+      "source": "https://npb.jp/news/detail/20260123_01.html"
+    },
+    {
+      "org": "npb",
+      "team": "東京ヤクルトスワローズ",
+      "name": "ヤクルト戸田球場",
+      "match": "ヤクルト戸田球場",
+      "address": "埼玉県戸田市",
+      "stadium_level": "farm",
+      "category": "屋外球場",
+      "source": "https://npb.jp/news/detail/20260123_01.html"
+    },
+    {
+      "org": "npb",
+      "team": "北海道日本ハムファイターズ",
+      "name": "ファイターズ鎌ケ谷スタジアム",
+      "match": "ファイターズ鎌ケ谷スタジアム",
+      "address": "千葉県鎌ケ谷市",
+      "stadium_level": "farm",
+      "category": "屋外球場",
+      "source": "https://npb.jp/news/detail/20260220_02.html"
+    },
+    {
+      "org": "npb",
+      "team": "横浜DeNAベイスターズ",
+      "name": "横須賀スタジアム",
+      "match": "横須賀スタジアム",
+      "address": "神奈川県横須賀市",
+      "stadium_level": "farm",
+      "category": "屋外球場",
+      "source": "https://npb.jp/news/detail/20260220_02.html"
+    },
+    {
+      "org": "npb",
+      "team": "東北楽天ゴールデンイーグルス",
+      "name": "森林どりスタジアム泉",
+      "match": "森林どりスタジアム泉",
+      "address": "宮城県仙台市泉区",
+      "stadium_level": "farm",
+      "category": "屋外球場",
+      "source": "https://npb.jp/news/detail/20260220_02.html"
+    },
+    {
+      "org": "npb",
+      "team": "千葉ロッテマリーンズ",
+      "name": "ロッテ浦和球場",
+      "match": "ロッテ浦和球場",
+      "address": "埼玉県さいたま市南区",
+      "stadium_level": "farm",
+      "category": "屋外球場",
+      "source": "https://npb.jp/news/detail/20260206_01.html"
+    },
+    {
+      "org": "npb",
+      "team": "埼玉西武ライオンズ",
+      "name": "CAR3219フィールド",
+      "match": "CAR3219フィールド",
+      "address": "埼玉県所沢市",
+      "stadium_level": "farm",
+      "category": "屋外球場",
+      "source": "https://npb.jp/news/detail/20260206_01.html"
+    },
+    {
+      "org": "npb",
+      "team": "福岡ソフトバンクホークス",
+      "name": "タマホーム スタジアム筑後",
+      "match": "タマホーム スタジアム筑後",
+      "address": "福岡県筑後市",
+      "stadium_level": "farm",
+      "category": "屋外球場",
+      "source": "https://npb.jp/news/detail/20260312_01.html"
+    },
+    {
+      "org": "npb",
+      "team": "オリックス・バファローズ",
+      "name": "杉本商事バファローズスタジアム舞洲",
+      "match": "杉本商事バファローズスタジアム舞洲",
+      "address": "大阪府大阪市此花区",
+      "stadium_level": "farm",
+      "category": "屋外球場",
+      "source": "https://npb.jp/news/detail/20260312_01.html"
+    },
+    {
+      "org": "npb",
+      "team": "中日ドラゴンズ",
+      "name": "ナゴヤ球場",
+      "match": "ナゴヤ球場",
+      "address": "愛知県名古屋市中川区",
+      "stadium_level": "farm",
+      "category": "屋外球場",
+      "source": "https://npb.jp/news/detail/20260312_01.html"
+    },
+    {
+      "org": "npb",
+      "team": "阪神タイガース",
+      "name": "日鉄鋼板SGLスタジアム尼崎",
+      "match": "日鉄鋼板SGLスタジアム尼崎",
+      "address": "兵庫県尼崎市",
+      "stadium_level": "farm",
+      "category": "屋外球場",
+      "source": "https://npb.jp/news/detail/20260306_01.html"
+    },
+    {
+      "org": "npb",
+      "team": "広島東洋カープ",
+      "name": "広島東洋カープ由宇練習場",
+      "match": "広島東洋カープ由宇練習場",
+      "address": "山口県岩国市",
+      "stadium_level": "farm",
+      "category": "屋外球場",
+      "source": "https://npb.jp/news/detail/20260306_01.html"
+    },
+    {
+      "org": "npb",
+      "name": "札幌ドーム",
+      "match": "札幌ドーム",
+      "team": "—",
+      "address": "北海道札幌市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?001"
+    },
+    {
+      "org": "npb",
+      "name": "札幌市円山球場",
+      "match": "札幌市円山球場",
+      "team": "—",
+      "address": "北海道札幌市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?003"
+    },
+    {
+      "org": "npb",
+      "name": "北見市営球場",
+      "match": "北見市営球場",
+      "team": "—",
+      "address": "北海道北見市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?004"
+    },
+    {
+      "org": "npb",
+      "name": "釧路市民球場",
+      "match": "釧路市民球場",
+      "team": "—",
+      "address": "北海道釧路市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?006"
+    },
+    {
+      "org": "npb",
+      "name": "帯広の森野球場",
+      "match": "帯広の森野球場",
+      "team": "—",
+      "address": "北海道帯広市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?008"
+    },
+    {
+      "org": "npb",
+      "name": "花咲スポーツ公園硬式野球場",
+      "match": "花咲スポーツ公園硬式野球場",
+      "team": "—",
+      "address": "北海道旭川市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?009"
+    },
+    {
+      "org": "npb",
+      "name": "夕張鹿の谷球場",
+      "match": "夕張鹿の谷球場",
+      "team": "—",
+      "address": "北海道夕張市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?012"
+    },
+    {
+      "org": "npb",
+      "name": "小樽桜ヶ丘球場",
+      "match": "小樽桜ヶ丘球場",
+      "team": "—",
+      "address": "北海道小樽市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?013"
+    },
+    {
+      "org": "npb",
+      "name": "室蘭新日鐵球場",
+      "match": "室蘭新日鐵球場",
+      "team": "—",
+      "address": "北海道室蘭市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?015"
+    },
+    {
+      "org": "npb",
+      "name": "千代台公園野球場",
+      "match": "千代台公園野球場",
+      "team": "—",
+      "address": "北海道函館市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?017"
+    },
+    {
+      "org": "npb",
+      "name": "青森市営野球場",
+      "match": "青森市営野球場",
+      "team": "—",
+      "address": "青森県青森市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?018"
+    },
+    {
+      "org": "npb",
+      "name": "青森県総合運動公園野球場",
+      "match": "青森県総合運動公園野球場",
+      "team": "—",
+      "address": "青森県青森市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?019"
+    },
+    {
+      "org": "npb",
+      "name": "弘前市運動公園野球場",
+      "match": "弘前市運動公園野球場",
+      "team": "—",
+      "address": "青森県弘前市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?021"
+    },
+    {
+      "org": "npb",
+      "name": "八戸市長根野球場",
+      "match": "八戸市長根野球場",
+      "team": "—",
+      "address": "青森県八戸市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?022"
+    },
+    {
+      "org": "npb",
+      "name": "盛岡南公園野球場",
+      "match": "盛岡南公園野球場",
+      "team": "—",
+      "address": "岩手県盛岡市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?291"
+    },
+    {
+      "org": "npb",
+      "name": "花巻市営球場",
+      "match": "花巻市営球場",
+      "team": "—",
+      "address": "岩手県花巻市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?026"
+    },
+    {
+      "org": "npb",
+      "name": "希望ヶ丘球場",
+      "match": "希望ヶ丘球場",
+      "team": "—",
+      "address": "岩手県一関市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?028"
+    },
+    {
+      "org": "npb",
+      "name": "石巻水押球場",
+      "match": "石巻水押球場",
+      "team": "—",
+      "address": "宮城県石巻市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?030"
+    },
+    {
+      "org": "npb",
+      "name": "評定河原野球場",
+      "match": "評定河原野球場",
+      "team": "—",
+      "address": "宮城県仙台市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?031"
+    },
+    {
+      "org": "npb",
+      "name": "秋田県営手形野球場",
+      "match": "秋田県営手形野球場",
+      "team": "—",
+      "address": "秋田県秋田市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?032"
+    },
+    {
+      "org": "npb",
+      "name": "秋田市営八橋球場",
+      "match": "秋田市営八橋球場",
+      "team": "—",
+      "address": "秋田県秋田市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?033"
+    },
+    {
+      "org": "npb",
+      "name": "秋田県立野球場",
+      "match": "秋田県立野球場",
+      "team": "—",
+      "address": "秋田県秋田市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?035"
+    },
+    {
+      "org": "npb",
+      "name": "山形市総合スポーツセンター野球場",
+      "match": "山形市総合スポーツセンター野球場",
+      "team": "—",
+      "address": "山形県山形市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?289"
+    },
+    {
+      "org": "npb",
+      "name": "山形県野球場",
+      "match": "山形県野球場",
+      "team": "—",
+      "address": "山形県東村山郡中山町",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?037"
+    },
+    {
+      "org": "npb",
+      "name": "米沢市営野球場",
+      "match": "米沢市営野球場",
+      "team": "—",
+      "address": "山形県米沢市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?038"
+    },
+    {
+      "org": "npb",
+      "name": "酒田市営光ヶ丘野球場",
+      "match": "酒田市営光ヶ丘野球場",
+      "team": "—",
+      "address": "山形県酒田市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?040"
+    },
+    {
+      "org": "npb",
+      "name": "信夫ヶ丘球場",
+      "match": "信夫ヶ丘球場",
+      "team": "—",
+      "address": "福島県福島市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?041"
+    },
+    {
+      "org": "npb",
+      "name": "福島県営あづま球場",
+      "match": "福島県営あづま球場",
+      "team": "—",
+      "address": "福島県福島市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?042"
+    },
+    {
+      "org": "npb",
+      "name": "会津総合運動公園あいづ球場",
+      "match": "会津総合運動公園あいづ球場",
+      "team": "—",
+      "address": "福島県会津若松市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?044"
+    },
+    {
+      "org": "npb",
+      "name": "郡山総合運動場開成山野球場",
+      "match": "郡山総合運動場開成山野球場",
+      "team": "—",
+      "address": "福島県郡山市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?046"
+    },
+    {
+      "org": "npb",
+      "name": "平市営球場",
+      "match": "平市営球場",
+      "team": "—",
+      "address": "福島県いわき市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?047"
+    },
+    {
+      "org": "npb",
+      "name": "いわきグリーンスタジアム",
+      "match": "いわきグリーンスタジアム",
+      "team": "—",
+      "address": "福島県いわき市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?048"
+    },
+    {
+      "org": "npb",
+      "name": "茨城県営球場",
+      "match": "茨城県営球場",
+      "team": "—",
+      "address": "茨城県水戸市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?051"
+    },
+    {
+      "org": "npb",
+      "name": "水戸市民球場",
+      "match": "水戸市民球場",
+      "team": "—",
+      "address": "茨城県水戸市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?052"
+    },
+    {
+      "org": "npb",
+      "name": "日立会瀬球場",
+      "match": "日立会瀬球場",
+      "team": "—",
+      "address": "茨城県日立市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?053"
+    },
+    {
+      "org": "npb",
+      "name": "ひたちなか市民球場",
+      "match": "ひたちなか市民球場",
+      "team": "—",
+      "address": "茨城県ひたちなか市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?054"
+    },
+    {
+      "org": "npb",
+      "name": "土浦市営球場",
+      "match": "土浦市営球場",
+      "team": "—",
+      "address": "茨城県土浦市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?055"
+    },
+    {
+      "org": "npb",
+      "name": "宇都宮総合球場",
+      "match": "宇都宮総合球場",
+      "team": "—",
+      "address": "栃木県宇都宮市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?056"
+    },
+    {
+      "org": "npb",
+      "name": "宇都宮清原球場",
+      "match": "宇都宮清原球場",
+      "team": "—",
+      "address": "栃木県宇都宮市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?058"
+    },
+    {
+      "org": "npb",
+      "name": "足利市営球場",
+      "match": "足利市営球場",
+      "team": "—",
+      "address": "栃木県足利市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?059"
+    },
+    {
+      "org": "npb",
+      "name": "鹿沼御殿山球場",
+      "match": "鹿沼御殿山球場",
+      "team": "—",
+      "address": "栃木県鹿沼市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?060"
+    },
+    {
+      "org": "npb",
+      "name": "大田原市営球場",
+      "match": "大田原市営球場",
+      "team": "—",
+      "address": "栃木県大田原市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?061"
+    },
+    {
+      "org": "npb",
+      "name": "群馬県立敷島公園野球場",
+      "match": "群馬県立敷島公園野球場",
+      "team": "—",
+      "address": "群馬県前橋市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?062"
+    },
+    {
+      "org": "npb",
+      "name": "高崎城南球場",
+      "match": "高崎城南球場",
+      "team": "—",
+      "address": "群馬県高崎市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?063"
+    },
+    {
+      "org": "npb",
+      "name": "桐生球場",
+      "match": "桐生球場",
+      "team": "—",
+      "address": "群馬県桐生市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?065"
+    },
+    {
+      "org": "npb",
+      "name": "太田市営東山球場",
+      "match": "太田市営東山球場",
+      "team": "—",
+      "address": "群馬県太田市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?066"
+    },
+    {
+      "org": "npb",
+      "name": "沼田町公園球場",
+      "match": "沼田町公園球場",
+      "team": "—",
+      "address": "群馬県沼田市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?067"
+    },
+    {
+      "org": "npb",
+      "name": "埼玉県営大宮公園野球場",
+      "match": "埼玉県営大宮公園野球場",
+      "team": "—",
+      "address": "埼玉県さいたま市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?069"
+    },
+    {
+      "org": "npb",
+      "name": "川越初雁公園野球場",
+      "match": "川越初雁公園野球場",
+      "team": "—",
+      "address": "埼玉県川越市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?070"
+    },
+    {
+      "org": "npb",
+      "name": "浦和市営球場",
+      "match": "浦和市営球場",
+      "team": "—",
+      "address": "埼玉県さいたま市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?072"
+    },
+    {
+      "org": "npb",
+      "name": "千葉県営野球場",
+      "match": "千葉県営野球場",
+      "team": "—",
+      "address": "千葉県千葉市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?076"
+    },
+    {
+      "org": "npb",
+      "name": "市川国府台球場",
+      "match": "市川国府台球場",
+      "team": "—",
+      "address": "千葉県市川市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?077"
+    },
+    {
+      "org": "npb",
+      "name": "銚子市営球場",
+      "match": "銚子市営球場",
+      "team": "—",
+      "address": "千葉県銚子市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?078"
+    },
+    {
+      "org": "npb",
+      "name": "木更津市営野球場",
+      "match": "木更津市営野球場",
+      "team": "—",
+      "address": "千葉県木更津市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?079"
+    },
+    {
+      "org": "npb",
+      "name": "昭島市営球場",
+      "match": "昭島市営球場",
+      "team": "—",
+      "address": "東京都昭島市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?090"
+    },
+    {
+      "org": "npb",
+      "name": "八王子市営球場",
+      "match": "八王子市営球場",
+      "team": "—",
+      "address": "東京都八王子市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?091"
+    },
+    {
+      "org": "npb",
+      "name": "福生グラウンド",
+      "match": "福生グラウンド",
+      "team": "—",
+      "address": "東京都福生市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?092"
+    },
+    {
+      "org": "npb",
+      "name": "神奈川県立保土ヶ谷野球場",
+      "match": "神奈川県立保土ヶ谷野球場",
+      "team": "—",
+      "address": "神奈川県横浜市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?096"
+    },
+    {
+      "org": "npb",
+      "name": "横須賀市営追浜球場",
+      "match": "横須賀市営追浜球場",
+      "team": "—",
+      "address": "神奈川県横須賀市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?097"
+    },
+    {
+      "org": "npb",
+      "name": "相模原市立相模原球場",
+      "match": "相模原市立相模原球場",
+      "team": "—",
+      "address": "神奈川県相模原市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?098"
+    },
+    {
+      "org": "npb",
+      "name": "茅ヶ崎市営球場",
+      "match": "茅ヶ崎市営球場",
+      "team": "—",
+      "address": "神奈川県茅ヶ崎市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?099"
+    },
+    {
+      "org": "npb",
+      "name": "平塚球場",
+      "match": "平塚球場",
+      "team": "—",
+      "address": "神奈川県平塚市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?100"
+    },
+    {
+      "org": "npb",
+      "name": "新潟市営鳥屋野野球場",
+      "match": "新潟市営鳥屋野野球場",
+      "team": "—",
+      "address": "新潟県新潟市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?102"
+    },
+    {
+      "org": "npb",
+      "name": "新潟県立鳥屋野潟公園野球場",
+      "match": "新潟県立鳥屋野潟公園野球場",
+      "team": "—",
+      "address": "新潟県新潟市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?103"
+    },
+    {
+      "org": "npb",
+      "name": "長岡市営悠久山野球場",
+      "match": "長岡市営悠久山野球場",
+      "team": "—",
+      "address": "新潟県長岡市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?105"
+    },
+    {
+      "org": "npb",
+      "name": "柏崎市佐藤池野球場",
+      "match": "柏崎市佐藤池野球場",
+      "team": "—",
+      "address": "新潟県柏崎市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?108"
+    },
+    {
+      "org": "npb",
+      "name": "三条市総合運動公園市民球場",
+      "match": "三条市総合運動公園市民球場",
+      "team": "—",
+      "address": "新潟県三条市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?109"
+    },
+    {
+      "org": "npb",
+      "name": "上越市営球場",
+      "match": "上越市営球場",
+      "team": "—",
+      "address": "新潟県上越市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?110"
+    },
+    {
+      "org": "npb",
+      "name": "富山県営富山野球場",
+      "match": "富山県営富山野球場",
+      "team": "—",
+      "address": "富山県富山市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?112"
+    },
+    {
+      "org": "npb",
+      "name": "富山市民球場",
+      "match": "富山市民球場",
+      "team": "—",
+      "address": "富山県富山市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?113"
+    },
+    {
+      "org": "npb",
+      "name": "高岡市営城光寺野球場",
+      "match": "高岡市営城光寺野球場",
+      "team": "—",
+      "address": "富山県高岡市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?116"
+    },
+    {
+      "org": "npb",
+      "name": "石川県立野球場",
+      "match": "石川県立野球場",
+      "team": "—",
+      "address": "石川県金沢市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?119"
+    },
+    {
+      "org": "npb",
+      "name": "小松末広野球場",
+      "match": "小松末広野球場",
+      "team": "—",
+      "address": "石川県小松市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?120"
+    },
+    {
+      "org": "npb",
+      "name": "福井県営球場",
+      "match": "福井県営球場",
+      "team": "—",
+      "address": "福井県福井市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?123"
+    },
+    {
+      "org": "npb",
+      "name": "敦賀市総合運動公園野球場",
+      "match": "敦賀市総合運動公園野球場",
+      "team": "—",
+      "address": "福井県敦賀市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?124"
+    },
+    {
+      "org": "npb",
+      "name": "山梨県営甲府飯田球場",
+      "match": "山梨県営甲府飯田球場",
+      "team": "—",
+      "address": "山梨県甲府市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?125"
+    },
+    {
+      "org": "npb",
+      "name": "山梨県営甲府総合球場",
+      "match": "山梨県営甲府総合球場",
+      "team": "—",
+      "address": "山梨県甲府市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?126"
+    },
+    {
+      "org": "npb",
+      "name": "小瀬スポーツ公園野球場",
+      "match": "小瀬スポーツ公園野球場",
+      "team": "—",
+      "address": "山梨県甲府市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?127"
+    },
+    {
+      "org": "npb",
+      "name": "長野県営野球場",
+      "match": "長野県営野球場",
+      "team": "—",
+      "address": "長野県長野市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?129"
+    },
+    {
+      "org": "npb",
+      "name": "南長野運動公園野球場",
+      "match": "南長野運動公園野球場",
+      "team": "—",
+      "address": "長野県長野市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?130"
+    },
+    {
+      "org": "npb",
+      "name": "松本市営球場",
+      "match": "松本市営球場",
+      "team": "—",
+      "address": "長野県松本市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?131"
+    },
+    {
+      "org": "npb",
+      "name": "松本市野球場",
+      "match": "松本市野球場",
+      "team": "—",
+      "address": "長野県松本市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?133"
+    },
+    {
+      "org": "npb",
+      "name": "上田市営野球場",
+      "match": "上田市営野球場",
+      "team": "—",
+      "address": "長野県上田市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?134"
+    },
+    {
+      "org": "npb",
+      "name": "下諏訪町営球場",
+      "match": "下諏訪町営球場",
+      "team": "—",
+      "address": "長野県諏訪郡下諏訪町",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?136"
+    },
+    {
+      "org": "npb",
+      "name": "飯田市営今宮球場",
+      "match": "飯田市営今宮球場",
+      "team": "—",
+      "address": "長野県飯田市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?138"
+    },
+    {
+      "org": "npb",
+      "name": "市営岡谷球場",
+      "match": "市営岡谷球場",
+      "team": "—",
+      "address": "長野県岡谷市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?139"
+    },
+    {
+      "org": "npb",
+      "name": "伊那市営野球場",
+      "match": "伊那市営野球場",
+      "team": "—",
+      "address": "長野県伊那市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?141"
+    },
+    {
+      "org": "npb",
+      "name": "岐阜県営長良川球場",
+      "match": "岐阜県営長良川球場",
+      "team": "—",
+      "address": "岐阜県岐阜市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?142"
+    },
+    {
+      "org": "npb",
+      "name": "多治見市営球場",
+      "match": "多治見市営球場",
+      "team": "—",
+      "address": "岐阜県多治見市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?143"
+    },
+    {
+      "org": "npb",
+      "name": "静岡県草薙総合運動場硬式野球場",
+      "match": "静岡県草薙総合運動場硬式野球場",
+      "team": "—",
+      "address": "静岡県静岡市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?145"
+    },
+    {
+      "org": "npb",
+      "name": "沼津市営野球場",
+      "match": "沼津市営野球場",
+      "team": "—",
+      "address": "静岡県沼津市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?147"
+    },
+    {
+      "org": "npb",
+      "name": "島田球場",
+      "match": "島田球場",
+      "team": "—",
+      "address": "静岡県島田市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?148"
+    },
+    {
+      "org": "npb",
+      "name": "磐田城山球場",
+      "match": "磐田城山球場",
+      "team": "—",
+      "address": "静岡県磐田市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?149"
+    },
+    {
+      "org": "npb",
+      "name": "浜松球場",
+      "match": "浜松球場",
+      "team": "—",
+      "address": "静岡県浜松市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?150"
+    },
+    {
+      "org": "npb",
+      "name": "豊橋市民球場",
+      "match": "豊橋市民球場",
+      "team": "—",
+      "address": "愛知県豊橋市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?154"
+    },
+    {
+      "org": "npb",
+      "name": "豊川いなり外苑球場",
+      "match": "豊川いなり外苑球場",
+      "team": "—",
+      "address": "愛知県豊川市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?155"
+    },
+    {
+      "org": "npb",
+      "name": "刈谷市営グラウンド",
+      "match": "刈谷市営グラウンド",
+      "team": "—",
+      "address": "愛知県刈谷市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?156"
+    },
+    {
+      "org": "npb",
+      "name": "挙母球場",
+      "match": "挙母球場",
+      "team": "—",
+      "address": "愛知県豊田市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?157"
+    },
+    {
+      "org": "npb",
+      "name": "一宮市営球場",
+      "match": "一宮市営球場",
+      "team": "—",
+      "address": "愛知県一宮市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?161"
+    },
+    {
+      "org": "npb",
+      "name": "津市営球場",
+      "match": "津市営球場",
+      "team": "—",
+      "address": "三重県津市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?162"
+    },
+    {
+      "org": "npb",
+      "name": "伊勢市営倉田山野球場",
+      "match": "伊勢市営倉田山野球場",
+      "team": "—",
+      "address": "三重県伊勢市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?165"
+    },
+    {
+      "org": "npb",
+      "name": "松阪市営球場",
+      "match": "松阪市営球場",
+      "team": "—",
+      "address": "三重県松阪市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?166"
+    },
+    {
+      "org": "npb",
+      "name": "四日市市営球場",
+      "match": "四日市市営球場",
+      "team": "—",
+      "address": "三重県四日市市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?167"
+    },
+    {
+      "org": "npb",
+      "name": "滋賀県立彦根球場",
+      "match": "滋賀県立彦根球場",
+      "team": "—",
+      "address": "滋賀県彦根市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?169"
+    },
+    {
+      "org": "npb",
+      "name": "皇子山総合運動公園野球場",
+      "match": "皇子山総合運動公園野球場",
+      "team": "—",
+      "address": "滋賀県大津市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?170"
+    },
+    {
+      "org": "npb",
+      "name": "西京極総合運動公園野球場",
+      "match": "西京極総合運動公園野球場",
+      "team": "—",
+      "address": "京都府京都市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?172"
+    },
+    {
+      "org": "npb",
+      "name": "福知山市民球場",
+      "match": "福知山市民球場",
+      "team": "—",
+      "address": "京都府福知山市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?173"
+    },
+    {
+      "org": "npb",
+      "name": "堺大浜球場",
+      "match": "堺大浜球場",
+      "team": "—",
+      "address": "大阪府堺市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?179"
+    },
+    {
+      "org": "npb",
+      "name": "神戸総合運動公園野球場",
+      "match": "神戸総合運動公園野球場",
+      "team": "—",
+      "address": "兵庫県神戸市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?183"
+    },
+    {
+      "org": "npb",
+      "name": "明石公園野球場",
+      "match": "明石公園野球場",
+      "team": "—",
+      "address": "兵庫県明石市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?186"
+    },
+    {
+      "org": "npb",
+      "name": "姫路市立姫路球場",
+      "match": "姫路市立姫路球場",
+      "team": "—",
+      "address": "兵庫県姫路市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?188"
+    },
+    {
+      "org": "npb",
+      "name": "奈良市営球場",
+      "match": "奈良市営球場",
+      "team": "—",
+      "address": "奈良県奈良市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?190"
+    },
+    {
+      "org": "npb",
+      "name": "奈良県立橿原球場",
+      "match": "奈良県立橿原球場",
+      "team": "—",
+      "address": "奈良県橿原市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?192"
+    },
+    {
+      "org": "npb",
+      "name": "和歌山県営紀三井寺球場",
+      "match": "和歌山県営紀三井寺球場",
+      "team": "—",
+      "address": "和歌山県和歌山市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?194"
+    },
+    {
+      "org": "npb",
+      "name": "米子市民球場",
+      "match": "米子市民球場",
+      "team": "—",
+      "address": "鳥取県米子市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?197"
+    },
+    {
+      "org": "npb",
+      "name": "倉吉市営野球場",
+      "match": "倉吉市営野球場",
+      "team": "—",
+      "address": "鳥取県倉吉市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?198"
+    },
+    {
+      "org": "npb",
+      "name": "松江市営野球場",
+      "match": "松江市営野球場",
+      "team": "—",
+      "address": "島根県松江市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?200"
+    },
+    {
+      "org": "npb",
+      "name": "浜田市設野球場",
+      "match": "浜田市設野球場",
+      "team": "—",
+      "address": "島根県浜田市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?201"
+    },
+    {
+      "org": "npb",
+      "name": "島根県立浜山公園野球場",
+      "match": "島根県立浜山公園野球場",
+      "team": "—",
+      "address": "島根県出雲市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?202"
+    },
+    {
+      "org": "npb",
+      "name": "岡山県営球場",
+      "match": "岡山県営球場",
+      "team": "—",
+      "address": "岡山県岡山市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?203"
+    },
+    {
+      "org": "npb",
+      "name": "倉敷市営球場",
+      "match": "倉敷市営球場",
+      "team": "—",
+      "address": "岡山県倉敷市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?205"
+    },
+    {
+      "org": "npb",
+      "name": "岡山県倉敷スポーツ公園野球場",
+      "match": "岡山県倉敷スポーツ公園野球場",
+      "team": "—",
+      "address": "岡山県倉敷市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?206"
+    },
+    {
+      "org": "npb",
+      "name": "津山市営球場",
+      "match": "津山市営球場",
+      "team": "—",
+      "address": "岡山県津山市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?207"
+    },
+    {
+      "org": "npb",
+      "name": "広島総合グランド野球場",
+      "match": "広島総合グランド野球場",
+      "team": "—",
+      "address": "広島県広島市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?210"
+    },
+    {
+      "org": "npb",
+      "name": "福山市竹ヶ端運動公園野球場",
+      "match": "福山市竹ヶ端運動公園野球場",
+      "team": "—",
+      "address": "広島県福山市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?212"
+    },
+    {
+      "org": "npb",
+      "name": "広島県立びんご運動公園野球場",
+      "match": "広島県立びんご運動公園野球場",
+      "team": "—",
+      "address": "広島県尾道市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?215"
+    },
+    {
+      "org": "npb",
+      "name": "御建公園野球場",
+      "match": "御建公園野球場",
+      "team": "—",
+      "address": "広島県東広島市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?216"
+    },
+    {
+      "org": "npb",
+      "name": "呉市二河野球場",
+      "match": "呉市二河野球場",
+      "team": "—",
+      "address": "広島県呉市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?217"
+    },
+    {
+      "org": "npb",
+      "name": "みよし運動公園野球場",
+      "match": "みよし運動公園野球場",
+      "team": "—",
+      "address": "広島県三次市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?220"
+    },
+    {
+      "org": "npb",
+      "name": "西京スタジアム",
+      "match": "西京スタジアム",
+      "team": "—",
+      "address": "山口県山口市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?222"
+    },
+    {
+      "org": "npb",
+      "name": "岩国市民球場",
+      "match": "岩国市民球場",
+      "team": "—",
+      "address": "山口県岩国市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?224"
+    },
+    {
+      "org": "npb",
+      "name": "新南陽球場",
+      "match": "新南陽球場",
+      "team": "—",
+      "address": "山口県周南市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?225"
+    },
+    {
+      "org": "npb",
+      "name": "小野田市営球場",
+      "match": "小野田市営球場",
+      "team": "—",
+      "address": "山口県山陽小野田市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?226"
+    },
+    {
+      "org": "npb",
+      "name": "厚狭球場",
+      "match": "厚狭球場",
+      "team": "—",
+      "address": "山口県山陽小野田市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?227"
+    },
+    {
+      "org": "npb",
+      "name": "徳山市営球場",
+      "match": "徳山市営球場",
+      "team": "—",
+      "address": "山口県周南市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?229"
+    },
+    {
+      "org": "npb",
+      "name": "宇部市野球場",
+      "match": "宇部市野球場",
+      "team": "—",
+      "address": "山口県宇部市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?230"
+    },
+    {
+      "org": "npb",
+      "name": "下関球場",
+      "match": "下関球場",
+      "team": "—",
+      "address": "山口県下関市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?234"
+    },
+    {
+      "org": "npb",
+      "name": "徳島県営蔵本球場",
+      "match": "徳島県営蔵本球場",
+      "team": "—",
+      "address": "徳島県徳島市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?236"
+    },
+    {
+      "org": "npb",
+      "name": "徳島県営鳴門球場",
+      "match": "徳島県営鳴門球場",
+      "team": "—",
+      "address": "徳島県鳴門市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?237"
+    },
+    {
+      "org": "npb",
+      "name": "香川県営野球場",
+      "match": "香川県営野球場",
+      "team": "—",
+      "address": "香川県高松市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?239"
+    },
+    {
+      "org": "npb",
+      "name": "松山中央公園野球場",
+      "match": "松山中央公園野球場",
+      "team": "—",
+      "address": "愛媛県松山市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?242"
+    },
+    {
+      "org": "npb",
+      "name": "今治市営球場",
+      "match": "今治市営球場",
+      "team": "—",
+      "address": "愛媛県今治市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?243"
+    },
+    {
+      "org": "npb",
+      "name": "高知市営球場",
+      "match": "高知市営球場",
+      "team": "—",
+      "address": "高知県高知市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?244"
+    },
+    {
+      "org": "npb",
+      "name": "北九州市民球場",
+      "match": "北九州市民球場",
+      "team": "—",
+      "address": "福岡県北九州市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?248"
+    },
+    {
+      "org": "npb",
+      "name": "八幡桃園球場",
+      "match": "八幡桃園球場",
+      "team": "—",
+      "address": "福岡県北九州市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?251"
+    },
+    {
+      "org": "npb",
+      "name": "八幡大谷球場",
+      "match": "八幡大谷球場",
+      "team": "—",
+      "address": "福岡県北九州市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?252"
+    },
+    {
+      "org": "npb",
+      "name": "大牟田延命球場",
+      "match": "大牟田延命球場",
+      "team": "—",
+      "address": "福岡県大牟田市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?256"
+    },
+    {
+      "org": "npb",
+      "name": "みどりの森県営球場",
+      "match": "みどりの森県営球場",
+      "team": "—",
+      "address": "佐賀県佐賀市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?260"
+    },
+    {
+      "org": "npb",
+      "name": "杵島炭鉱グラウンド",
+      "match": "杵島炭鉱グラウンド",
+      "team": "—",
+      "address": "佐賀県杵島郡大町町",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?263"
+    },
+    {
+      "org": "npb",
+      "name": "長崎県営野球場",
+      "match": "長崎県営野球場",
+      "team": "—",
+      "address": "長崎県長崎市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?265"
+    },
+    {
+      "org": "npb",
+      "name": "佐世保野球場",
+      "match": "佐世保野球場",
+      "team": "—",
+      "address": "長崎県佐世保市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?268"
+    },
+    {
+      "org": "npb",
+      "name": "島原市営球場",
+      "match": "島原市営球場",
+      "team": "—",
+      "address": "長崎県島原市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?269"
+    },
+    {
+      "org": "npb",
+      "name": "熊本水前寺野球場",
+      "match": "熊本水前寺野球場",
+      "team": "—",
+      "address": "熊本県熊本市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?270"
+    },
+    {
+      "org": "npb",
+      "name": "藤崎台県営野球場",
+      "match": "藤崎台県営野球場",
+      "team": "—",
+      "address": "熊本県熊本市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?271"
+    },
+    {
+      "org": "npb",
+      "name": "大洲総合運動公園硬式野球場",
+      "match": "大洲総合運動公園硬式野球場",
+      "team": "—",
+      "address": "大分県大分市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?273"
+    },
+    {
+      "org": "npb",
+      "name": "宮崎県総合運動公園硬式野球場",
+      "match": "宮崎県総合運動公園硬式野球場",
+      "team": "—",
+      "address": "宮崎県宮崎市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?276"
+    },
+    {
+      "org": "npb",
+      "name": "宮崎市営球場",
+      "match": "宮崎市営球場",
+      "team": "—",
+      "address": "宮崎県宮崎市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?277"
+    },
+    {
+      "org": "npb",
+      "name": "都城市営球場",
+      "match": "都城市営球場",
+      "team": "—",
+      "address": "宮崎県都城市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?278"
+    },
+    {
+      "org": "npb",
+      "name": "鴨池市民球場",
+      "match": "鴨池市民球場",
+      "team": "—",
+      "address": "鹿児島県鹿児島市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?279"
+    },
+    {
+      "org": "npb",
+      "name": "鹿児島県立鴨池野球場",
+      "match": "鹿児島県立鴨池野球場",
+      "team": "—",
+      "address": "鹿児島県鹿児島市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?280"
+    },
+    {
+      "org": "npb",
+      "name": "那覇市営奥武山野球場",
+      "match": "那覇市営奥武山野球場",
+      "team": "—",
+      "address": "沖縄県那覇市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?282"
+    },
+    {
+      "org": "npb",
+      "name": "台北市立天母棒球場",
+      "match": "台北市立天母棒球場",
+      "team": "—",
+      "address": "海外台北市",
+      "stadium_level": "regional",
+      "source": "https://npb.jp/stadium/detail.html?287"
     }
   ]
 }

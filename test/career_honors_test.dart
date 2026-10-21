@@ -117,7 +117,7 @@ void main() {
       await t.pumpAndSettle();
       expect(find.text('乙大学  1人'), findsOneWidget);
       expect(find.text('選手B'), findsNothing);
-      await t.tap(find.text('選手A'));
+      await t.tap(find.text('球団A').first);
       await t.pumpAndSettle();
       expect(find.byType(AlertDialog), findsOneWidget);
       expect(find.textContaining('大学：乙大学'), findsOneWidget);

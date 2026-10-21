@@ -22,8 +22,9 @@ Future<void> main() async {
       print(
           '${channel['name']}: ${channel['status']} (${videos.length}) ${videos.isEmpty ? '' : videos.first['title']}');
     }
-    if ((result['channels'] as List).any((c) => c['status'] != 'ok'))
+    if ((result['channels'] as List).any((c) => c['status'] != 'ok')) {
       exitCode = 1;
+    }
     if (Platform.environment['VIDEO_VERIFY_OUTPUT'] case final String path) {
       File(path).writeAsStringSync(jsonEncode(result));
     }

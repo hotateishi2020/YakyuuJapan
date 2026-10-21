@@ -163,7 +163,7 @@ void main() {
     expect(rows.last['number'], '00');
   });
   test(
-      'membership estimates rank by pace, exclude members, retain unknown pace last',
+      'membership candidates rank by achievement ratio regardless of annual pace',
       () {
     final rows = membershipCandidates([
       {
@@ -184,8 +184,9 @@ void main() {
     ], {
       'C'
     });
-    expect(rows.map((r) => r['name']), ['B', 'A', 'D']);
-    expect(rows.first['estimate'], .8);
-    expect(rows.last['estimate'], isNull);
+    expect(rows.map((r) => r['name']), ['D', 'A', 'B']);
+    expect(rows.last['estimate'], .8);
+    expect(rows.first['achievement_ratio'], 1999 / 2000);
+    expect(rows.first['estimate'], isNull);
   });
 }

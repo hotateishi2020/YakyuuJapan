@@ -1,0 +1,1742 @@
+[
+  {
+    "stadium": "札幌ドーム",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-001-generated-v2.png"
+  },
+  {
+    "stadium": "札幌ドーム",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-001-generated-v2.png"
+  },
+  {
+    "stadium": "札幌市円山球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-002-generated-v2.png"
+  },
+  {
+    "stadium": "札幌市円山球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-002-generated-v2.png"
+  },
+  {
+    "stadium": "北見市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-003-generated-v2.png"
+  },
+  {
+    "stadium": "北見市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-003-generated-v2.png"
+  },
+  {
+    "stadium": "釧路市民球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-004-generated-v2.png"
+  },
+  {
+    "stadium": "釧路市民球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-004-generated-v2.png"
+  },
+  {
+    "stadium": "帯広の森野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-005-generated-v2.png"
+  },
+  {
+    "stadium": "帯広の森野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-005-generated-v2.png"
+  },
+  {
+    "stadium": "花咲スポーツ公園硬式野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-006-generated-v2.png"
+  },
+  {
+    "stadium": "花咲スポーツ公園硬式野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-006-generated-v2.png"
+  },
+  {
+    "stadium": "夕張鹿の谷球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-007-generated-v2.png"
+  },
+  {
+    "stadium": "夕張鹿の谷球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-007-generated-v2.png"
+  },
+  {
+    "stadium": "小樽桜ヶ丘球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-008-generated-v2.png"
+  },
+  {
+    "stadium": "小樽桜ヶ丘球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-008-generated-v2.png"
+  },
+  {
+    "stadium": "室蘭新日鐵球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-009-generated-v2.png"
+  },
+  {
+    "stadium": "室蘭新日鐵球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-009-generated-v2.png"
+  },
+  {
+    "stadium": "千代台公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-010-generated-v2.png"
+  },
+  {
+    "stadium": "千代台公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-010-generated-v2.png"
+  },
+  {
+    "stadium": "青森市営野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-011-generated-v2.png"
+  },
+  {
+    "stadium": "青森市営野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-011-generated-v2.png"
+  },
+  {
+    "stadium": "青森県総合運動公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-012-generated-v2.png"
+  },
+  {
+    "stadium": "青森県総合運動公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-012-generated-v2.png"
+  },
+  {
+    "stadium": "弘前市運動公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-013-generated-v2.png"
+  },
+  {
+    "stadium": "弘前市運動公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-013-generated-v2.png"
+  },
+  {
+    "stadium": "八戸市長根野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-014-generated-v2.png"
+  },
+  {
+    "stadium": "八戸市長根野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-014-generated-v2.png"
+  },
+  {
+    "stadium": "盛岡南公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-015-generated-v2.png"
+  },
+  {
+    "stadium": "盛岡南公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-015-generated-v2.png"
+  },
+  {
+    "stadium": "花巻市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-016-generated-v2.png"
+  },
+  {
+    "stadium": "花巻市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-016-generated-v2.png"
+  },
+  {
+    "stadium": "希望ヶ丘球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-017-generated-v2.png"
+  },
+  {
+    "stadium": "希望ヶ丘球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-017-generated-v2.png"
+  },
+  {
+    "stadium": "石巻水押球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-018-generated-v2.png"
+  },
+  {
+    "stadium": "石巻水押球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-018-generated-v2.png"
+  },
+  {
+    "stadium": "評定河原野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-019-generated-v2.png"
+  },
+  {
+    "stadium": "評定河原野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-019-generated-v2.png"
+  },
+  {
+    "stadium": "秋田県営手形野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-020-generated-v2.png"
+  },
+  {
+    "stadium": "秋田県営手形野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-020-generated-v2.png"
+  },
+  {
+    "stadium": "秋田市営八橋球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-021-generated-v2.png"
+  },
+  {
+    "stadium": "秋田市営八橋球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-021-generated-v2.png"
+  },
+  {
+    "stadium": "秋田県立野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-022-generated-v2.png"
+  },
+  {
+    "stadium": "秋田県立野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-022-generated-v2.png"
+  },
+  {
+    "stadium": "山形市総合スポーツセンター野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-023-generated-v2.png"
+  },
+  {
+    "stadium": "山形市総合スポーツセンター野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-023-generated-v2.png"
+  },
+  {
+    "stadium": "山形県野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-024-generated-v2.png"
+  },
+  {
+    "stadium": "山形県野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-024-generated-v2.png"
+  },
+  {
+    "stadium": "米沢市営野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-025-generated-v2.png"
+  },
+  {
+    "stadium": "米沢市営野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-025-generated-v2.png"
+  },
+  {
+    "stadium": "酒田市営光ヶ丘野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-026-generated-v2.png"
+  },
+  {
+    "stadium": "酒田市営光ヶ丘野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-026-generated-v2.png"
+  },
+  {
+    "stadium": "信夫ヶ丘球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-027-generated-v2.png"
+  },
+  {
+    "stadium": "信夫ヶ丘球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-027-generated-v2.png"
+  },
+  {
+    "stadium": "福島県営あづま球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-028-generated-v2.png"
+  },
+  {
+    "stadium": "福島県営あづま球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-028-generated-v2.png"
+  },
+  {
+    "stadium": "会津総合運動公園あいづ球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-029-generated-v2.png"
+  },
+  {
+    "stadium": "会津総合運動公園あいづ球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-029-generated-v2.png"
+  },
+  {
+    "stadium": "郡山総合運動場開成山野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-030-generated-v2.png"
+  },
+  {
+    "stadium": "郡山総合運動場開成山野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-030-generated-v2.png"
+  },
+  {
+    "stadium": "平市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-031-generated-v2.png"
+  },
+  {
+    "stadium": "平市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-031-generated-v2.png"
+  },
+  {
+    "stadium": "いわきグリーンスタジアム",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-032-generated-v2.png"
+  },
+  {
+    "stadium": "いわきグリーンスタジアム",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-032-generated-v2.png"
+  },
+  {
+    "stadium": "茨城県営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-033-generated-v2.png"
+  },
+  {
+    "stadium": "茨城県営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-033-generated-v2.png"
+  },
+  {
+    "stadium": "水戸市民球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-034-generated-v2.png"
+  },
+  {
+    "stadium": "水戸市民球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-034-generated-v2.png"
+  },
+  {
+    "stadium": "日立会瀬球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-035-generated-v2.png"
+  },
+  {
+    "stadium": "日立会瀬球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-035-generated-v2.png"
+  },
+  {
+    "stadium": "ひたちなか市民球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-036-generated-v2.png"
+  },
+  {
+    "stadium": "ひたちなか市民球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-036-generated-v2.png"
+  },
+  {
+    "stadium": "土浦市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-037-generated-v2.png"
+  },
+  {
+    "stadium": "土浦市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-037-generated-v2.png"
+  },
+  {
+    "stadium": "宇都宮総合球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-038-generated-v2.png"
+  },
+  {
+    "stadium": "宇都宮総合球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-038-generated-v2.png"
+  },
+  {
+    "stadium": "宇都宮清原球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-039-generated-v2.png"
+  },
+  {
+    "stadium": "宇都宮清原球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-039-generated-v2.png"
+  },
+  {
+    "stadium": "足利市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-040-generated-v2.png"
+  },
+  {
+    "stadium": "足利市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-040-generated-v2.png"
+  },
+  {
+    "stadium": "鹿沼御殿山球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-041-generated-v2.png"
+  },
+  {
+    "stadium": "鹿沼御殿山球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-041-generated-v2.png"
+  },
+  {
+    "stadium": "大田原市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-042-generated-v2.png"
+  },
+  {
+    "stadium": "大田原市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-042-generated-v2.png"
+  },
+  {
+    "stadium": "群馬県立敷島公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-043-generated-v2.png"
+  },
+  {
+    "stadium": "群馬県立敷島公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-043-generated-v2.png"
+  },
+  {
+    "stadium": "高崎城南球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-044-generated-v2.png"
+  },
+  {
+    "stadium": "高崎城南球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-044-generated-v2.png"
+  },
+  {
+    "stadium": "桐生球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-045-generated-v2.png"
+  },
+  {
+    "stadium": "桐生球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-045-generated-v2.png"
+  },
+  {
+    "stadium": "太田市営東山球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-046-generated-v2.png"
+  },
+  {
+    "stadium": "太田市営東山球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-046-generated-v2.png"
+  },
+  {
+    "stadium": "沼田町公園球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-047-generated-v2.png"
+  },
+  {
+    "stadium": "沼田町公園球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-047-generated-v2.png"
+  },
+  {
+    "stadium": "埼玉県営大宮公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-048-generated-v2.png"
+  },
+  {
+    "stadium": "埼玉県営大宮公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-048-generated-v2.png"
+  },
+  {
+    "stadium": "川越初雁公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-049-generated-v2.png"
+  },
+  {
+    "stadium": "川越初雁公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-049-generated-v2.png"
+  },
+  {
+    "stadium": "浦和市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-050-generated-v2.png"
+  },
+  {
+    "stadium": "浦和市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-050-generated-v2.png"
+  },
+  {
+    "stadium": "千葉県営野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-051-generated-v2.png"
+  },
+  {
+    "stadium": "千葉県営野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-051-generated-v2.png"
+  },
+  {
+    "stadium": "市川国府台球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-052-generated-v2.png"
+  },
+  {
+    "stadium": "市川国府台球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-052-generated-v2.png"
+  },
+  {
+    "stadium": "銚子市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-053-generated-v2.png"
+  },
+  {
+    "stadium": "銚子市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-053-generated-v2.png"
+  },
+  {
+    "stadium": "木更津市営野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-054-generated-v2.png"
+  },
+  {
+    "stadium": "木更津市営野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-054-generated-v2.png"
+  },
+  {
+    "stadium": "昭島市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-055-generated-v2.png"
+  },
+  {
+    "stadium": "昭島市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-055-generated-v2.png"
+  },
+  {
+    "stadium": "八王子市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-056-generated-v2.png"
+  },
+  {
+    "stadium": "八王子市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-056-generated-v2.png"
+  },
+  {
+    "stadium": "福生グラウンド",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-057-generated-v2.png"
+  },
+  {
+    "stadium": "福生グラウンド",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-057-generated-v2.png"
+  },
+  {
+    "stadium": "神奈川県立保土ヶ谷野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-058-generated-v2.png"
+  },
+  {
+    "stadium": "神奈川県立保土ヶ谷野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-058-generated-v2.png"
+  },
+  {
+    "stadium": "横須賀市営追浜球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-059-generated-v2.png"
+  },
+  {
+    "stadium": "横須賀市営追浜球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-059-generated-v2.png"
+  },
+  {
+    "stadium": "相模原市立相模原球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-060-generated-v2.png"
+  },
+  {
+    "stadium": "相模原市立相模原球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-060-generated-v2.png"
+  },
+  {
+    "stadium": "茅ヶ崎市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-061-generated-v2.png"
+  },
+  {
+    "stadium": "茅ヶ崎市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-061-generated-v2.png"
+  },
+  {
+    "stadium": "平塚球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-062-generated-v2.png"
+  },
+  {
+    "stadium": "平塚球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-062-generated-v2.png"
+  },
+  {
+    "stadium": "新潟市営鳥屋野野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-063-generated-v2.png"
+  },
+  {
+    "stadium": "新潟市営鳥屋野野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-063-generated-v2.png"
+  },
+  {
+    "stadium": "新潟県立鳥屋野潟公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-064-generated-v2.png"
+  },
+  {
+    "stadium": "新潟県立鳥屋野潟公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-064-generated-v2.png"
+  },
+  {
+    "stadium": "長岡市営悠久山野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-065-generated-v2.png"
+  },
+  {
+    "stadium": "長岡市営悠久山野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-065-generated-v2.png"
+  },
+  {
+    "stadium": "柏崎市佐藤池野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-066-generated-v2.png"
+  },
+  {
+    "stadium": "柏崎市佐藤池野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-066-generated-v2.png"
+  },
+  {
+    "stadium": "三条市総合運動公園市民球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-067-generated-v2.png"
+  },
+  {
+    "stadium": "三条市総合運動公園市民球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-067-generated-v2.png"
+  },
+  {
+    "stadium": "上越市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-068-generated-v2.png"
+  },
+  {
+    "stadium": "上越市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-068-generated-v2.png"
+  },
+  {
+    "stadium": "富山県営富山野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-069-generated-v2.png"
+  },
+  {
+    "stadium": "富山県営富山野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-069-generated-v2.png"
+  },
+  {
+    "stadium": "富山市民球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-070-generated-v2.png"
+  },
+  {
+    "stadium": "富山市民球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-070-generated-v2.png"
+  },
+  {
+    "stadium": "高岡市営城光寺野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-071-generated-v2.png"
+  },
+  {
+    "stadium": "高岡市営城光寺野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-071-generated-v2.png"
+  },
+  {
+    "stadium": "石川県立野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-072-generated-v2.png"
+  },
+  {
+    "stadium": "石川県立野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-072-generated-v2.png"
+  },
+  {
+    "stadium": "小松末広野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-073-generated-v2.png"
+  },
+  {
+    "stadium": "小松末広野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-073-generated-v2.png"
+  },
+  {
+    "stadium": "福井県営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-074-generated-v2.png"
+  },
+  {
+    "stadium": "福井県営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-074-generated-v2.png"
+  },
+  {
+    "stadium": "敦賀市総合運動公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-075-generated-v2.png"
+  },
+  {
+    "stadium": "敦賀市総合運動公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-075-generated-v2.png"
+  },
+  {
+    "stadium": "山梨県営甲府飯田球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-076-generated-v2.png"
+  },
+  {
+    "stadium": "山梨県営甲府飯田球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-076-generated-v2.png"
+  },
+  {
+    "stadium": "山梨県営甲府総合球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-077-generated-v2.png"
+  },
+  {
+    "stadium": "山梨県営甲府総合球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-077-generated-v2.png"
+  },
+  {
+    "stadium": "小瀬スポーツ公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-078-generated-v2.png"
+  },
+  {
+    "stadium": "小瀬スポーツ公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-078-generated-v2.png"
+  },
+  {
+    "stadium": "長野県営野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-079-generated-v2.png"
+  },
+  {
+    "stadium": "長野県営野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-079-generated-v2.png"
+  },
+  {
+    "stadium": "南長野運動公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-080-generated-v2.png"
+  },
+  {
+    "stadium": "南長野運動公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-080-generated-v2.png"
+  },
+  {
+    "stadium": "松本市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-081-generated-v2.png"
+  },
+  {
+    "stadium": "松本市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-081-generated-v2.png"
+  },
+  {
+    "stadium": "松本市野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-082-generated-v2.png"
+  },
+  {
+    "stadium": "松本市野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-082-generated-v2.png"
+  },
+  {
+    "stadium": "上田市営野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-083-generated-v2.png"
+  },
+  {
+    "stadium": "上田市営野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-083-generated-v2.png"
+  },
+  {
+    "stadium": "下諏訪町営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-084-generated-v2.png"
+  },
+  {
+    "stadium": "下諏訪町営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-084-generated-v2.png"
+  },
+  {
+    "stadium": "飯田市営今宮球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-085-generated-v2.png"
+  },
+  {
+    "stadium": "飯田市営今宮球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-085-generated-v2.png"
+  },
+  {
+    "stadium": "市営岡谷球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-086-generated-v2.png"
+  },
+  {
+    "stadium": "市営岡谷球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-086-generated-v2.png"
+  },
+  {
+    "stadium": "伊那市営野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-087-generated-v2.png"
+  },
+  {
+    "stadium": "伊那市営野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-087-generated-v2.png"
+  },
+  {
+    "stadium": "岐阜県営長良川球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-088-generated-v2.png"
+  },
+  {
+    "stadium": "岐阜県営長良川球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-088-generated-v2.png"
+  },
+  {
+    "stadium": "多治見市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-089-generated-v2.png"
+  },
+  {
+    "stadium": "多治見市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-089-generated-v2.png"
+  },
+  {
+    "stadium": "静岡県草薙総合運動場硬式野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-090-generated-v2.png"
+  },
+  {
+    "stadium": "静岡県草薙総合運動場硬式野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-090-generated-v2.png"
+  },
+  {
+    "stadium": "沼津市営野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-091-generated-v2.png"
+  },
+  {
+    "stadium": "沼津市営野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-091-generated-v2.png"
+  },
+  {
+    "stadium": "島田球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-092-generated-v2.png"
+  },
+  {
+    "stadium": "島田球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-092-generated-v2.png"
+  },
+  {
+    "stadium": "磐田城山球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-093-generated-v2.png"
+  },
+  {
+    "stadium": "磐田城山球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-093-generated-v2.png"
+  },
+  {
+    "stadium": "浜松球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-094-generated-v2.png"
+  },
+  {
+    "stadium": "浜松球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-094-generated-v2.png"
+  },
+  {
+    "stadium": "豊橋市民球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-095-generated-v2.png"
+  },
+  {
+    "stadium": "豊橋市民球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-095-generated-v2.png"
+  },
+  {
+    "stadium": "豊川いなり外苑球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-096-generated-v2.png"
+  },
+  {
+    "stadium": "豊川いなり外苑球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-096-generated-v2.png"
+  },
+  {
+    "stadium": "刈谷市営グラウンド",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-097-generated-v2.png"
+  },
+  {
+    "stadium": "刈谷市営グラウンド",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-097-generated-v2.png"
+  },
+  {
+    "stadium": "挙母球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-098-generated-v2.png"
+  },
+  {
+    "stadium": "挙母球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-098-generated-v2.png"
+  },
+  {
+    "stadium": "一宮市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-099-generated-v2.png"
+  },
+  {
+    "stadium": "一宮市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-099-generated-v2.png"
+  },
+  {
+    "stadium": "津市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-100-generated-v2.png"
+  },
+  {
+    "stadium": "津市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-100-generated-v2.png"
+  },
+  {
+    "stadium": "伊勢市営倉田山野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-101-generated-v2.png"
+  },
+  {
+    "stadium": "伊勢市営倉田山野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-101-generated-v2.png"
+  },
+  {
+    "stadium": "松阪市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-102-generated-v2.png"
+  },
+  {
+    "stadium": "松阪市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-102-generated-v2.png"
+  },
+  {
+    "stadium": "四日市市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-103-generated-v2.png"
+  },
+  {
+    "stadium": "四日市市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-103-generated-v2.png"
+  },
+  {
+    "stadium": "滋賀県立彦根球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-104-generated-v2.png"
+  },
+  {
+    "stadium": "滋賀県立彦根球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-104-generated-v2.png"
+  },
+  {
+    "stadium": "皇子山総合運動公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-105-generated-v2.png"
+  },
+  {
+    "stadium": "皇子山総合運動公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-105-generated-v2.png"
+  },
+  {
+    "stadium": "西京極総合運動公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-106-generated-v2.png"
+  },
+  {
+    "stadium": "西京極総合運動公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-106-generated-v2.png"
+  },
+  {
+    "stadium": "福知山市民球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-107-generated-v2.png"
+  },
+  {
+    "stadium": "福知山市民球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-107-generated-v2.png"
+  },
+  {
+    "stadium": "堺大浜球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-108-generated-v2.png"
+  },
+  {
+    "stadium": "堺大浜球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-108-generated-v2.png"
+  },
+  {
+    "stadium": "神戸総合運動公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-109-generated-v2.png"
+  },
+  {
+    "stadium": "神戸総合運動公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-109-generated-v2.png"
+  },
+  {
+    "stadium": "明石公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-110-generated-v2.png"
+  },
+  {
+    "stadium": "明石公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-110-generated-v2.png"
+  },
+  {
+    "stadium": "姫路市立姫路球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-111-generated-v2.png"
+  },
+  {
+    "stadium": "姫路市立姫路球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-111-generated-v2.png"
+  },
+  {
+    "stadium": "奈良市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-112-generated-v2.png"
+  },
+  {
+    "stadium": "奈良市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-112-generated-v2.png"
+  },
+  {
+    "stadium": "奈良県立橿原球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-113-generated-v2.png"
+  },
+  {
+    "stadium": "奈良県立橿原球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-113-generated-v2.png"
+  },
+  {
+    "stadium": "和歌山県営紀三井寺球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-114-generated-v2.png"
+  },
+  {
+    "stadium": "和歌山県営紀三井寺球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-114-generated-v2.png"
+  },
+  {
+    "stadium": "米子市民球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-115-generated-v2.png"
+  },
+  {
+    "stadium": "米子市民球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-115-generated-v2.png"
+  },
+  {
+    "stadium": "倉吉市営野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-116-generated-v2.png"
+  },
+  {
+    "stadium": "倉吉市営野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-116-generated-v2.png"
+  },
+  {
+    "stadium": "松江市営野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-117-generated-v2.png"
+  },
+  {
+    "stadium": "松江市営野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-117-generated-v2.png"
+  },
+  {
+    "stadium": "浜田市設野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-118-generated-v2.png"
+  },
+  {
+    "stadium": "浜田市設野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-118-generated-v2.png"
+  },
+  {
+    "stadium": "島根県立浜山公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-119-generated-v2.png"
+  },
+  {
+    "stadium": "島根県立浜山公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-119-generated-v2.png"
+  },
+  {
+    "stadium": "岡山県営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-120-generated-v2.png"
+  },
+  {
+    "stadium": "岡山県営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-120-generated-v2.png"
+  },
+  {
+    "stadium": "倉敷市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-121-generated-v2.png"
+  },
+  {
+    "stadium": "倉敷市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-121-generated-v2.png"
+  },
+  {
+    "stadium": "岡山県倉敷スポーツ公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-122-generated-v2.png"
+  },
+  {
+    "stadium": "岡山県倉敷スポーツ公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-122-generated-v2.png"
+  },
+  {
+    "stadium": "津山市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-123-generated-v2.png"
+  },
+  {
+    "stadium": "津山市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-123-generated-v2.png"
+  },
+  {
+    "stadium": "広島総合グランド野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-124-generated-v2.png"
+  },
+  {
+    "stadium": "広島総合グランド野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-124-generated-v2.png"
+  },
+  {
+    "stadium": "福山市竹ヶ端運動公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-125-generated-v2.png"
+  },
+  {
+    "stadium": "福山市竹ヶ端運動公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-125-generated-v2.png"
+  },
+  {
+    "stadium": "広島県立びんご運動公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-126-generated-v2.png"
+  },
+  {
+    "stadium": "広島県立びんご運動公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-126-generated-v2.png"
+  },
+  {
+    "stadium": "御建公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-127-generated-v2.png"
+  },
+  {
+    "stadium": "御建公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-127-generated-v2.png"
+  },
+  {
+    "stadium": "呉市二河野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-128-generated-v2.png"
+  },
+  {
+    "stadium": "呉市二河野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-128-generated-v2.png"
+  },
+  {
+    "stadium": "みよし運動公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-129-generated-v2.png"
+  },
+  {
+    "stadium": "みよし運動公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-129-generated-v2.png"
+  },
+  {
+    "stadium": "西京スタジアム",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-130-generated-v2.png"
+  },
+  {
+    "stadium": "西京スタジアム",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-130-generated-v2.png"
+  },
+  {
+    "stadium": "岩国市民球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-131-generated-v2.png"
+  },
+  {
+    "stadium": "岩国市民球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-131-generated-v2.png"
+  },
+  {
+    "stadium": "新南陽球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-132-generated-v2.png"
+  },
+  {
+    "stadium": "新南陽球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-132-generated-v2.png"
+  },
+  {
+    "stadium": "小野田市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-133-generated-v2.png"
+  },
+  {
+    "stadium": "小野田市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-133-generated-v2.png"
+  },
+  {
+    "stadium": "厚狭球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-134-generated-v2.png"
+  },
+  {
+    "stadium": "厚狭球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-134-generated-v2.png"
+  },
+  {
+    "stadium": "徳山市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-135-generated-v2.png"
+  },
+  {
+    "stadium": "徳山市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-135-generated-v2.png"
+  },
+  {
+    "stadium": "宇部市野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-136-generated-v2.png"
+  },
+  {
+    "stadium": "宇部市野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-136-generated-v2.png"
+  },
+  {
+    "stadium": "下関球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-137-generated-v2.png"
+  },
+  {
+    "stadium": "下関球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-137-generated-v2.png"
+  },
+  {
+    "stadium": "徳島県営蔵本球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-138-generated-v2.png"
+  },
+  {
+    "stadium": "徳島県営蔵本球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-138-generated-v2.png"
+  },
+  {
+    "stadium": "徳島県営鳴門球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-139-generated-v2.png"
+  },
+  {
+    "stadium": "徳島県営鳴門球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-139-generated-v2.png"
+  },
+  {
+    "stadium": "香川県営野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-140-generated-v2.png"
+  },
+  {
+    "stadium": "香川県営野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-140-generated-v2.png"
+  },
+  {
+    "stadium": "松山中央公園野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-141-generated-v2.png"
+  },
+  {
+    "stadium": "松山中央公園野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-141-generated-v2.png"
+  },
+  {
+    "stadium": "今治市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-142-generated-v2.png"
+  },
+  {
+    "stadium": "今治市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-142-generated-v2.png"
+  },
+  {
+    "stadium": "高知市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-143-generated-v2.png"
+  },
+  {
+    "stadium": "高知市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-143-generated-v2.png"
+  },
+  {
+    "stadium": "北九州市民球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-144-generated-v2.png"
+  },
+  {
+    "stadium": "北九州市民球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-144-generated-v2.png"
+  },
+  {
+    "stadium": "八幡桃園球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-145-generated-v2.png"
+  },
+  {
+    "stadium": "八幡桃園球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-145-generated-v2.png"
+  },
+  {
+    "stadium": "八幡大谷球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-146-generated-v2.png"
+  },
+  {
+    "stadium": "八幡大谷球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-146-generated-v2.png"
+  },
+  {
+    "stadium": "大牟田延命球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-147-generated-v2.png"
+  },
+  {
+    "stadium": "大牟田延命球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-147-generated-v2.png"
+  },
+  {
+    "stadium": "みどりの森県営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-148-generated-v2.png"
+  },
+  {
+    "stadium": "みどりの森県営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-148-generated-v2.png"
+  },
+  {
+    "stadium": "杵島炭鉱グラウンド",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-149-generated-v2.png"
+  },
+  {
+    "stadium": "杵島炭鉱グラウンド",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-149-generated-v2.png"
+  },
+  {
+    "stadium": "長崎県営野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-150-generated-v2.png"
+  },
+  {
+    "stadium": "長崎県営野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-150-generated-v2.png"
+  },
+  {
+    "stadium": "佐世保野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-151-generated-v2.png"
+  },
+  {
+    "stadium": "佐世保野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-151-generated-v2.png"
+  },
+  {
+    "stadium": "島原市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-152-generated-v2.png"
+  },
+  {
+    "stadium": "島原市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-152-generated-v2.png"
+  },
+  {
+    "stadium": "熊本水前寺野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-153-generated-v2.png"
+  },
+  {
+    "stadium": "熊本水前寺野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-153-generated-v2.png"
+  },
+  {
+    "stadium": "藤崎台県営野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-154-generated-v2.png"
+  },
+  {
+    "stadium": "藤崎台県営野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-154-generated-v2.png"
+  },
+  {
+    "stadium": "大洲総合運動公園硬式野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-155-generated-v2.png"
+  },
+  {
+    "stadium": "大洲総合運動公園硬式野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-155-generated-v2.png"
+  },
+  {
+    "stadium": "宮崎県総合運動公園硬式野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-156-generated-v2.png"
+  },
+  {
+    "stadium": "宮崎県総合運動公園硬式野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-156-generated-v2.png"
+  },
+  {
+    "stadium": "宮崎市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-157-generated-v2.png"
+  },
+  {
+    "stadium": "宮崎市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-157-generated-v2.png"
+  },
+  {
+    "stadium": "都城市営球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-158-generated-v2.png"
+  },
+  {
+    "stadium": "都城市営球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-158-generated-v2.png"
+  },
+  {
+    "stadium": "鴨池市民球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-159-generated-v2.png"
+  },
+  {
+    "stadium": "鴨池市民球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-159-generated-v2.png"
+  },
+  {
+    "stadium": "鹿児島県立鴨池野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-160-generated-v2.png"
+  },
+  {
+    "stadium": "鹿児島県立鴨池野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-160-generated-v2.png"
+  },
+  {
+    "stadium": "那覇市営奥武山野球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-161-generated-v2.png"
+  },
+  {
+    "stadium": "那覇市営奥武山野球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-161-generated-v2.png"
+  },
+  {
+    "stadium": "台北市立天母棒球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/regional-162-generated-v2.png"
+  },
+  {
+    "stadium": "台北市立天母棒球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/regional-162-generated-v2.png"
+  },
+  {
+    "stadium": "ジャイアンツタウンスタジアム",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-01-generated-v2.png"
+  },
+  {
+    "stadium": "ジャイアンツタウンスタジアム",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-01-generated-v2.png"
+  },
+  {
+    "stadium": "ヤクルト戸田球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-02-generated-v2.png"
+  },
+  {
+    "stadium": "ヤクルト戸田球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-02-generated-v2.png"
+  },
+  {
+    "stadium": "ファイターズ鎌ケ谷スタジアム",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-03-generated-v2.png"
+  },
+  {
+    "stadium": "ファイターズ鎌ケ谷スタジアム",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-03-generated-v2.png"
+  },
+  {
+    "stadium": "横須賀スタジアム",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-04-generated-v2.png"
+  },
+  {
+    "stadium": "横須賀スタジアム",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-04-generated-v2.png"
+  },
+  {
+    "stadium": "森林どりスタジアム泉",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-05-generated-v2.png"
+  },
+  {
+    "stadium": "森林どりスタジアム泉",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-05-generated-v2.png"
+  },
+  {
+    "stadium": "ロッテ浦和球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-06-generated-v2.png"
+  },
+  {
+    "stadium": "ロッテ浦和球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-06-generated-v2.png"
+  },
+  {
+    "stadium": "CAR3219フィールド",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-07-generated-v2.png"
+  },
+  {
+    "stadium": "CAR3219フィールド",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-07-generated-v2.png"
+  },
+  {
+    "stadium": "タマホーム スタジアム筑後",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-08-generated-v2.png"
+  },
+  {
+    "stadium": "タマホーム スタジアム筑後",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-08-generated-v2.png"
+  },
+  {
+    "stadium": "杉本商事バファローズスタジアム舞洲",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-09-generated-v2.png"
+  },
+  {
+    "stadium": "杉本商事バファローズスタジアム舞洲",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-09-generated-v2.png"
+  },
+  {
+    "stadium": "ナゴヤ球場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-10-generated-v2.png"
+  },
+  {
+    "stadium": "ナゴヤ球場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-10-generated-v2.png"
+  },
+  {
+    "stadium": "日鉄鋼板SGLスタジアム尼崎",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-11-generated-v2.png"
+  },
+  {
+    "stadium": "日鉄鋼板SGLスタジアム尼崎",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-11-generated-v2.png"
+  },
+  {
+    "stadium": "広島東洋カープ由宇練習場",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-12-generated-v2.png"
+  },
+  {
+    "stadium": "広島東洋カープ由宇練習場",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-12-generated-v2.png"
+  }
+]

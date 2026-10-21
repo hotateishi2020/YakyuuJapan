@@ -229,6 +229,7 @@ double rosterCardTint(Map<String, dynamic> player) {
 
 /// Each card appears once, at its most-used level; ties prefer the higher level.
 int rosterMainLevel(Map<String, dynamic> player) {
+  if (player['new_arrival'] == true && usageInt(player['arrival_year']) > DateTime.now().year && player['departure_confirmed'] != true) return 1;
   final counts = player['level_appearances'];
   var level = 0, most = 0;
   if (counts is Map) {

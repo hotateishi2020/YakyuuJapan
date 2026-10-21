@@ -141,16 +141,19 @@ Map<String, List<Map<String, dynamic>>> buildEventStreaks(List<Map<String, dynam
   };
 }
 
-/// Local runs only cover observed intervals. They are not verified season maxima.
+/// Show observed runs without claiming that incomplete coverage is a season maximum.
 Map<String, dynamic> seasonStreakPresentation({
   required List<Map<String, dynamic>> observed,
   required bool official,
   required int completedGames,
   required int loadedGames,
 }) => {
-  'current': official ? observed : <Map<String, dynamic>>[],
+  'current': observed,
   if (!official) ...{
-    'current_status': 'unverified',
-    'current_message': 'シーズン最高記録は未確認です。\n詳細成績取得済み：$loadedGames／$completedGames試合。取得済み区間の最長をシーズン記録として表示しません。',
+    'current_status': observed.isEmpty ? 'unavailable' : 'partial',
+    'current_label': '今シーズン・取得済み区間の最長',
+    'current_message': observed.isEmpty
+        ? '判定に必要な記録がまだ取得できていません。詳細成績取得済み：$loadedGames／$completedGames試合。'
+        : '詳細成績取得済み：$loadedGames／$completedGames試合。未取得試合で連続区間を区切って集計しています。シーズン全体の最高記録は未確認です。',
   },
 };

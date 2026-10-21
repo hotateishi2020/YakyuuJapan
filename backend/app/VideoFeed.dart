@@ -15,9 +15,10 @@ import 'VideoTeamRouting.dart';
 final _videoId = RegExp(r'^[A-Za-z0-9_-]{11}$');
 
 Map<String, dynamic> _video(String id, String title,
-        {String? publishedAt, String? publishedLabel}) =>
+        {String? publishedAt, String? publishedLabel, int? viewCount}) =>
     {
       'id': id,
+      if (viewCount != null) 'view_count': viewCount,
       'title': title,
       'url': 'https://www.youtube.com/watch?v=$id',
       'thumbnail_url': 'https://i.ytimg.com/vi/$id/hqdefault.jpg',
@@ -25,20 +26,33 @@ Map<String, dynamic> _video(String id, String title,
       if (publishedLabel != null) 'published_label': publishedLabel,
     };
 
+int? parseVideoViewCount(String label) {
+  final match = RegExp(r'([0-9][0-9,.]*)\s*(万|億|[KMB])?\s*(?:回|views)', caseSensitive: false).firstMatch(label);
+  if (match == null) return null;
+  final value = double.tryParse(match[1]!.replaceAll(',', ''));
+  final scale = switch (match[2]?.toUpperCase()) {
+    '万' => 10000, '億' => 100000000, 'K' => 1000,
+    'M' => 1000000, 'B' => 1000000000, _ => 1,
+  };
+  return value == null ? null : (value * scale).round();
+}
+
 /// Read only entries belonging to the configured channel, never related videos.
 List<Map<String, dynamic>> parseVideoFeed(String body, String channelId,
     {DateTime? now}) {
   final root = XmlDocument.parse(body).rootElement;
-  if (root.name.local != 'feed')
+  if (root.name.local != 'feed') {
     throw const FormatException('Not an Atom feed');
+  }
   String text(XmlElement node, String local) =>
       node.childElements
           .where((e) => e.name.local == local)
           .map((e) => e.innerText.trim())
           .firstOrNull ??
       '';
-  if (text(root, 'channelId') != channelId)
+  if (text(root, 'channelId') != channelId) {
     throw const FormatException('Wrong channel');
+  }
   final seen = <String>{};
   final videos = <Map<String, dynamic>>[];
   for (final entry
@@ -50,9 +64,14 @@ List<Map<String, dynamic>> parseVideoFeed(String body, String channelId,
         title.isEmpty ||
         published == null ||
         published.isAfter(now ?? DateTime.now()) ||
-        !seen.add(id)) continue;
+        !seen.add(id)) {
+      continue;
+    }
     videos.add(
-        _video(id, title, publishedAt: published.toUtc().toIso8601String()));
+        _video(id, title, publishedAt: published.toUtc().toIso8601String(),
+          viewCount: int.tryParse(entry.descendants.whereType<XmlElement>()
+              .where((e) => e.name.local == 'statistics')
+              .firstOrNull?.getAttribute('views') ?? '')));
   }
   videos
       .sort((a, b) => '${b['published_at']}'.compareTo('${a['published_at']}'));
@@ -162,7 +181,9 @@ List<Map<String, dynamic>> _parseVideos(dynamic content) {
     if (node is! Map) return;
     if (node.containsKey('shortsLockupViewModel') ||
         node.containsKey('reelItemRenderer') ||
-        node.containsKey('reelShelfRenderer')) return;
+        node.containsKey('reelShelfRenderer')) {
+      return;
+    }
     final modern = node['lockupViewModel'];
     final legacy = node['videoRenderer'] ?? node['playlistVideoRenderer'];
     if (modern is Map && modern['contentType'] == 'LOCKUP_CONTENT_TYPE_VIDEO') {
@@ -194,7 +215,8 @@ List<Map<String, dynamic>> _parseVideos(dynamic content) {
           _videoId.hasMatch(id) &&
           title.isNotEmpty &&
           seen.add(id)) {
-        videos.add(_video(id, title, publishedLabel: label));
+        videos.add(_video(id, title, publishedLabel: label,
+            viewCount: labels.map(parseVideoViewCount).whereType<int>().firstOrNull));
       }
       return;
     }
@@ -207,6 +229,7 @@ List<Map<String, dynamic>> _parseVideos(dynamic content) {
           title.isNotEmpty &&
           seen.add(id)) {
         videos.add(_video(id, title,
+            viewCount: parseVideoViewCount(_text(legacy['viewCountText'] ?? legacy['shortViewCountText'])),
             publishedLabel:
                 _text(legacy['publishedTimeText'] ?? legacy['videoInfo'])));
       }
@@ -253,7 +276,9 @@ DateTime? estimateVideoPublishedAt(String label, DateTime reference) {
 Map<String, dynamic> withVideoSortTime(
     Map<String, dynamic> video, DateTime reference) {
   if (DateTime.tryParse('${video['published_at']}') != null ||
-      DateTime.tryParse('${video['published_sort_at']}') != null) return video;
+      DateTime.tryParse('${video['published_sort_at']}') != null) {
+    return video;
+  }
   final estimated =
       estimateVideoPublishedAt('${video['published_label'] ?? ''}', reference);
   return estimated == null
@@ -289,8 +314,9 @@ List<Map<String, dynamic>> selectChannelVideos(
     return expires == null || expires.isAfter(now);
   }).toList();
   if (channel.category == 'tver') return sortVideosByPublishedAt(videos);
-  if (!channel.daily)
+  if (!channel.daily) {
     return sortVideosByPublishedAt(videos).take(channel.limit).toList();
+  }
   final start = videoWindowStart(now, lookbackDays: channel.lookbackDays);
   final dated = videos.where((v) {
     final published = DateTime.tryParse('${v['published_at']}');
@@ -311,7 +337,9 @@ List<Map<String, dynamic>> selectChannelVideos(
 bool _olderThanWindow(Map<String, dynamic> video, {int lookbackDays = 1}) {
   final label = '${video['published_label'] ?? ''}';
   if (RegExp(r'週間前|か月前|ヶ月前|年前|weeks? ago|months? ago|years? ago')
-      .hasMatch(label)) return true;
+      .hasMatch(label)) {
+    return true;
+  }
   final days = RegExp(r'(\d+)\s*(?:日前|days? ago)').firstMatch(label);
   return days != null && int.parse(days[1]!) > lookbackDays;
 }
@@ -355,8 +383,9 @@ List<Map<String, dynamic>> filterVideoOrganization(
     }
     final organizations = videoOrganizations('${video['title'] ?? ''}');
     if (organizations.isEmpty &&
-        (channel.category == 'ob' || channel.unknownToNpb))
+        (channel.category == 'ob' || channel.unknownToNpb)) {
       return scope == 'npb';
+    }
     return organizations.contains(scope);
   }).toList();
 }
@@ -377,7 +406,7 @@ List<Map<String, dynamic>> groupVideoChannels(
   final moved = <String, Map<String, Map<String, dynamic>>>{};
   final movedIds = <String, Set<String>>{};
   final movedIncomplete = <String>{};
-  for (final source in definitions.where((c) => c.category == 'ob')) {
+  for (final source in definitions.where((c) => c.category == 'ob' || c.category == 'tver')) {
     final cached = byId[source.id];
     if (cached == null) continue;
     for (final video
@@ -387,8 +416,9 @@ List<Map<String, dynamic>> groupVideoChannels(
       final mlb = target.startsWith('mlb-team-');
       if (mlb
           ? source.videoOrg != 'mlb'
-          : !definitions.any((c) => c.id == target && c.category == 'teams'))
+          : !definitions.any((c) => c.id == target && c.category == 'teams')) {
         continue;
+      }
       if (cached['status'] != 'ok') movedIncomplete.add(target);
       moved.putIfAbsent(target, () => {}).putIfAbsent(
           '${video['id']}',
@@ -410,7 +440,8 @@ List<Map<String, dynamic>> groupVideoChannels(
         if (team.category != 'teams')
           {
             ...value,
-            if (team.category == 'ob')
+            if (team.category == 'tver') 'category': 'program',
+            if (team.category == 'ob' || team.category == 'tver')
               'videos': (value['videos'] as List)
                   .where((v) =>
                       !(movedIds[team.id]?.contains('${v['id']}') ?? false))
@@ -426,13 +457,15 @@ List<Map<String, dynamic>> groupVideoChannels(
             for (final source in definitions) {
               final own = source.id == team.id;
               final dedicated = source.teamIds.contains(team.id);
-              final shared = ['league', 'ob', 'media', 'program', 'broadcast']
+              final shared = ['league', 'ob', 'media', 'program', 'broadcast', 'tver']
                   .contains(source.category);
               if (!own && !dedicated && !shared) continue;
               final cached = byId[source.id];
               if (cached == null) continue;
               if (cached['status'] == 'ok' &&
-                  (cached['videos'] as List).isNotEmpty) fresh = true;
+                  (cached['videos'] as List).isNotEmpty) {
+                fresh = true;
+              }
               if (own || dedicated) {
                 incomplete |= cached['status'] != 'ok';
                 loading |= cached['status'] == 'loading';
@@ -441,13 +474,15 @@ List<Map<String, dynamic>> groupVideoChannels(
                   in (cached['videos'] as List).cast<Map<String, dynamic>>()) {
                 final title = '${video['title']}'.toLowerCase();
                 if (source.category == 'broadcast' &&
-                    !broadcastVideoTeams(source, title).contains(team.id))
+                    !broadcastVideoTeams(source, title).contains(team.id)) {
                   continue;
+                }
                 if (!own &&
                     !dedicated &&
                     !(teamVideoKeywords[team.id] ?? [])
-                        .any((word) => title.contains(word.toLowerCase())))
+                        .any((word) => title.contains(word.toLowerCase()))) {
                   continue;
+                }
                 if (own || dedicated) {
                   requiredVideos.putIfAbsent(source.id, () => '${video['id']}');
                 }
@@ -659,8 +694,9 @@ class VideoFeedService {
       ..._headers,
       if (uri.host == 'service-api.tver.jp') 'x-tver-platform-type': 'web'
     }).timeout(const Duration(seconds: 8));
-    if (response.statusCode != 200)
+    if (response.statusCode != 200) {
       throw const FormatException('YouTube unavailable');
+    }
     return utf8.decode(response.bodyBytes);
   }
 
@@ -739,7 +775,9 @@ class VideoFeedService {
         videos.addAll(dated.whereType<Map<String, dynamic>>());
       }
       if ((batch.every(older) && videos.length >= channel.minimumVideos) ||
-          token == null) break;
+          token == null) {
+        break;
+      }
       if (page >= 9 || !tokens.add(token) || first.version == null) {
         complete = false;
         break;
@@ -759,8 +797,9 @@ class VideoFeedService {
                   'continuation': token
                 }))
             .timeout(const Duration(seconds: 8));
-        if (response.statusCode != 200)
+        if (response.statusCode != 200) {
           throw const FormatException('Continuation unavailable');
+        }
         final data = jsonDecode(utf8.decode(response.bodyBytes));
         batch = _parseVideos(data);
         token = _continuation(data);
@@ -800,12 +839,15 @@ class VideoFeedService {
     final key = '${channel.id}:${video['id']}';
     if (_contentMatches.containsKey(key)) return _contentMatches[key]!;
     final title = '${video['title']}';
-    if (matchesVideoContent(channel.contentFilter, title))
+    if (matchesVideoContent(channel.contentFilter, title)) {
       return _contentMatches[key] = true;
-    if (channel.contentFilter == 'baseball')
+    }
+    if (channel.contentFilter == 'baseball') {
       return _contentMatches[key] = false;
-    if (!RegExp(r'里崎|satozaki', caseSensitive: false).hasMatch(title))
+    }
+    if (!RegExp(r'里崎|satozaki', caseSensitive: false).hasMatch(title)) {
       return _contentMatches[key] = false;
+    }
     // Mixed channels require the description to identify the guest/topic.
     final page = await _get(Uri.https(
         'www.youtube.com', '/watch', {'v': '${video['id']}', 'hl': 'ja'}));
@@ -844,7 +886,9 @@ class VideoFeedService {
           token == null ||
           first.version == null ||
           page == 4 ||
-          !tokens.add(token)) break;
+          !tokens.add(token)) {
+        break;
+      }
       try {
         final response = await _client
             .post(
@@ -882,8 +926,9 @@ class VideoFeedService {
         final candidates =
             parseRegularVideosPage(search, channel.id, tab: 'search').videos;
         for (final video in candidates) {
-          if (await _matchesContent(channel, video))
+          if (await _matchesContent(channel, video)) {
             videos.putIfAbsent('${video['id']}', () => video);
+          }
         }
       } catch (_) {
         complete = false;
@@ -905,7 +950,9 @@ class VideoFeedService {
         : const Duration(minutes: 1);
     if (previous != null &&
         attempted != null &&
-        _now().difference(attempted) < ttl) return _visible(channel, previous);
+        _now().difference(attempted) < ttl) {
+      return _visible(channel, previous);
+    }
     _attempted[channel.id] = _now();
     try {
       List<Map<String, dynamic>> videos;

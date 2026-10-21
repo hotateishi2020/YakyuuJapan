@@ -10,7 +10,7 @@ void main() {
       'measured progress, estimated cap, reduced motion and tight spaces',
       (tester) async {
     await tester.pumpWidget(const MaterialApp(
-        home: Scaffold(body: Center(child: BaseballLoading(progress: .42)))));
+        home: Scaffold(body: Center(child: BaseballLoading(progress: .42, scene: BaseballLoadingScene.fielding)))));
     expect(find.text('42%'), findsOneWidget);
     expect(find.bySemanticsLabel('ノックを受けて捕球・送球する守備練習'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
@@ -26,13 +26,38 @@ void main() {
                 child: Center(
                     child: BaseballLoading(key: ValueKey('estimate')))))));
     await tester.pump(const Duration(seconds: 600));
-    expect(find.text('目安 95%'), findsOneWidget);
+    expect(find.text('Loading... 95%'), findsOneWidget);
     expect(find.text('100%'), findsNothing);
     await tester.pumpWidget(const MaterialApp(
         home: Scaffold(
             body: SizedBox(width: 18, height: 18, child: BaseballLoading()))));
     await tester.pump(const Duration(milliseconds: 300));
     expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  for (final scene in BaseballLoadingScene.values) {
+    testWidgets('loading scene ${scene.name} handles progress and animation', (tester) async {
+      for (final progress in [0.0, .42, 1.0]) {
+        await tester.pumpWidget(MaterialApp(home: Center(child: BaseballLoading(
+          scene: scene, progress: progress))));
+        expect(find.bySemanticsLabel(scene.label), findsOneWidget);
+        expect(find.text('${(progress * 100).floor()}%'), findsOneWidget);
+        for (var i = 0; i < 12; i++) {
+          await tester.pump(const Duration(milliseconds: 300));
+          expect(tester.takeException(), isNull);
+        }
+      }
+      await tester.pumpWidget(const SizedBox());
+    });
+  }
+
+  testWidgets('random scene stays fixed throughout the loading instance', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: BaseballLoading()));
+    final labels = BaseballLoadingScene.values.where((scene) => find.bySemanticsLabel(scene.label).evaluate().isNotEmpty).toList();
+    expect(labels, hasLength(1));
+    await tester.pump(const Duration(seconds: 3));
+    expect(find.bySemanticsLabel(labels.single.label), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
   });
 
@@ -43,11 +68,11 @@ void main() {
             body: Center(
                 child: RepaintBoundary(
                     key: key,
-                    child: const ColoredBox(
+                    child: ColoredBox(
                         color: Color(0xFFF7F9FC),
                         child: Padding(
                             padding: EdgeInsets.all(28),
-                            child: BaseballLoading(progress: .42))))))));
+                            child: SizedBox(width: 560, child: Wrap(children: [for (final scene in BaseballLoadingScene.values) BaseballLoading(progress: .42, scene: scene)])))))))));
     await tester.pump(const Duration(milliseconds: 800));
     final boundary =
         key.currentContext!.findRenderObject()! as RenderRepaintBoundary;

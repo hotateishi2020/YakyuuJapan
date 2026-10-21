@@ -6,6 +6,21 @@ import '../app/TverFeed.dart';
 import '../app/VideoFeed.dart';
 
 void main() {
+  test('TVer team episodes move to teams and general episodes join programs', () {
+    final team = videoChannels.firstWhere((c) => c.tabLabel == '阪神');
+    final tver = videoChannels.singleWhere((c) => c.id == 'tver');
+    final grouped = groupVideoChannels([team, tver], [
+      {...team.toJson(), 'status':'ok', 'videos': <Map<String,dynamic>>[]},
+      {...tver.toJson(), 'status':'ok', 'videos': [
+        {'id':'epteam', 'title':'阪神タイガースの特集', 'platform':'tver'},
+        {'id':'epdraft', 'title':'プロ野球ドラフト特番', 'platform':'tver'},
+      ]},
+    ]);
+    expect(grouped.where((c) => c['category'] == 'tver'), isEmpty);
+    expect((grouped.firstWhere((c) => c['id'] == team.id)['videos'] as List).map((v) => v['id']), ['epteam']);
+    expect((grouped.firstWhere((c) => c['category'] == 'program')['videos'] as List).map((v) => v['id']), ['epdraft']);
+  });
+
   test('mixed channels include baseball and exclude unrelated subjects', () {
     expect(matchesVideoContent('baseball', '野球球団の経営を考える'), isTrue);
     expect(matchesVideoContent('baseball', '大谷翔平の価値'), isTrue);

@@ -9,7 +9,12 @@ class EventCalendar extends StatefulWidget {
   final DateTime? initialMonth;
   final ValueChanged<DateTime>? onMonthChanged;
 
-  const EventCalendar({super.key, required this.events, this.games = const [], this.initialMonth, this.onMonthChanged});
+  const EventCalendar(
+      {super.key,
+      required this.events,
+      this.games = const [],
+      this.initialMonth,
+      this.onMonthChanged});
 
   @override
   State<EventCalendar> createState() => _EventCalendarState();
@@ -28,7 +33,8 @@ class _EventCalendarState extends State<EventCalendar> {
   @override
   void didUpdateWidget(covariant EventCalendar old) {
     super.didUpdateWidget(old);
-    if (old.initialMonth != widget.initialMonth && widget.initialMonth != null) {
+    if (old.initialMonth != widget.initialMonth &&
+        widget.initialMonth != null) {
       _month = widget.initialMonth!;
     }
   }
@@ -38,7 +44,9 @@ class _EventCalendarState extends State<EventCalendar> {
     widget.onMonthChanged?.call(_month);
   }
 
-  List<Map<String, dynamic>> _gamesOn(DateTime? d) => d == null ? [] : widget.games.where((g) => g['date'] == scheduleDate(d)).toList();
+  List<Map<String, dynamic>> _gamesOn(DateTime? d) => d == null
+      ? []
+      : widget.games.where((g) => g['date'] == scheduleDate(d)).toList();
   DateTime? _dayOf(dynamic value) {
     final text = '$value'.trim();
     if (text.isEmpty || text == 'null') return null;
@@ -105,7 +113,8 @@ class _EventCalendarState extends State<EventCalendar> {
                 child: Text(
                   '${_month.year}年${_month.month}月',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 13),
                 ),
               ),
               IconButton(
@@ -122,20 +131,29 @@ class _EventCalendarState extends State<EventCalendar> {
           children: [
             for (final label in weekdays)
               Expanded(
-                child: Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                child: Text(label,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontSize: 11, fontWeight: FontWeight.bold)),
               ),
           ],
         ),
         Expanded(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final mins = [for (var r = 0; r < rows; r++) _weekMinHeight(r, lead, days)];
-              final sum = mins.fold<double>(0, (total, height) => total + height);
+              final mins = [
+                for (var r = 0; r < rows; r++) _weekMinHeight(r, lead, days)
+              ];
+              final sum =
+                  mins.fold<double>(0, (total, height) => total + height);
               final available = constraints.maxHeight;
-              final grow = available.isFinite && rows > 0 && available > sum ? (available - sum) / rows : 0.0;
+              final grow = available.isFinite && rows > 0 && available > sum
+                  ? (available - sum) / rows
+                  : 0.0;
               final grid = Column(
                 children: [
-                  for (var r = 0; r < rows; r++) _week(r, lead, days, constraints.maxWidth, mins[r] + grow),
+                  for (var r = 0; r < rows; r++)
+                    _week(r, lead, days, constraints.maxWidth, mins[r] + grow),
                 ],
               );
               if (grow > 0) return grid;
@@ -156,8 +174,13 @@ class _EventCalendarState extends State<EventCalendar> {
   double _weekMinHeight(int row, int lead, int days) {
     final bars = _barsForWeek(row, lead, days);
     const barH = 14.0;
-    final lanes = bars.isEmpty ? 0 : bars.map((bar) => bar.lane).reduce((a, b) => a > b ? a : b) + 1;
-    final maxGames = [for (var c = 0; c < 7; c++) _gamesOn(_cellDate(row * 7 + c, lead, days)).length].reduce((a, b) => a > b ? a : b);
+    final lanes = bars.isEmpty
+        ? 0
+        : bars.map((bar) => bar.lane).reduce((a, b) => a > b ? a : b) + 1;
+    final maxGames = [
+      for (var c = 0; c < 7; c++)
+        _gamesOn(_cellDate(row * 7 + c, lead, days)).length
+    ].reduce((a, b) => a > b ? a : b);
     return 26.0 + lanes * (barH + 2) + maxGames * 17;
   }
 
@@ -166,7 +189,9 @@ class _EventCalendarState extends State<EventCalendar> {
     final bars = _barsForWeek(row, lead, days);
     const barH = 14.0;
     final today = DateTime.now();
-    final lanes = bars.isEmpty ? 0 : bars.map((b) => b.lane).reduce((a, b) => a > b ? a : b) + 1;
+    final lanes = bars.isEmpty
+        ? 0
+        : bars.map((b) => b.lane).reduce((a, b) => a > b ? a : b) + 1;
     return SizedBox(
       height: height,
       child: Stack(
@@ -178,7 +203,10 @@ class _EventCalendarState extends State<EventCalendar> {
                 Expanded(
                   child: Builder(builder: (context) {
                     final date = _cellDate(row * 7 + c, lead, days);
-                    final isToday = date != null && date.year == today.year && date.month == today.month && date.day == today.day;
+                    final isToday = date != null &&
+                        date.year == today.year &&
+                        date.month == today.month &&
+                        date.day == today.day;
                     return Container(
                       padding: const EdgeInsets.only(top: 1, left: 2),
                       decoration: BoxDecoration(
@@ -186,7 +214,23 @@ class _EventCalendarState extends State<EventCalendar> {
                         border: Border.all(color: Colors.black26),
                       ),
                       alignment: Alignment.topLeft,
-                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(date == null ? '' : '${date.day}', style: const TextStyle(fontSize: 10, height: 1.1, fontWeight: FontWeight.bold)), SizedBox(height: lanes * 16.0 + 5), for (final game in _gamesOn(date)) SizedBox(height: 17, child: Tooltip(message: '${scheduleMatchup(game)} ${game['time'] ?? ''} ${game['stadium'] ?? ''}', child: ScheduleGameTile(game: game)))]),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(date == null ? '' : '${date.day}',
+                                style: const TextStyle(
+                                    fontSize: 10,
+                                    height: 1.1,
+                                    fontWeight: FontWeight.bold)),
+                            SizedBox(height: lanes * 16.0 + 5),
+                            for (final game in _gamesOn(date))
+                              SizedBox(
+                                  height: 17,
+                                  child: Tooltip(
+                                      message:
+                                          '${scheduleMatchup(game)} ${game['time'] ?? ''} ${game['stadium'] ?? ''}',
+                                      child: ScheduleGameTile(game: game)))
+                          ]),
                     );
                   }),
                 ),
@@ -194,22 +238,31 @@ class _EventCalendarState extends State<EventCalendar> {
           ),
           for (final bar in bars)
             Positioned(
-              left: bar.start * cellW + 2,
-              width: (bar.end - bar.start + 1) * cellW - 4,
-              top: 16 + bar.lane * (barH + 2),
-              height: barH,
-              child: Container(
-                alignment: Alignment.centerLeft,
-                padding: const EdgeInsets.symmetric(horizontal: 3),
-                decoration: BoxDecoration(color: bar.color),
-                child: Text(
-                  bar.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 9, height: 1.1, color: bar.font, fontWeight: FontWeight.w600),
-                ),
-              ),
-            ),
+                left: bar.start * cellW + 2,
+                width: (bar.end - bar.start + 1) * cellW - 4,
+                top: 16 + bar.lane * (barH + 2),
+                height: barH,
+                child: Tooltip(
+                  message: bar.detail.isEmpty
+                      ? bar.title
+                      : "${bar.title}\n${bar.detail}",
+                  triggerMode: TooltipTriggerMode.tap,
+                  child: Container(
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.symmetric(horizontal: 3),
+                    decoration: BoxDecoration(color: bar.color),
+                    child: Text(
+                      bar.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          fontSize: 9,
+                          height: 1.1,
+                          color: bar.font,
+                          fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                )),
         ],
       ),
     );
@@ -218,7 +271,14 @@ class _EventCalendarState extends State<EventCalendar> {
   List<_EventBar> _barsForWeek(int row, int lead, int days) {
     final placed = <_EventBar>[];
     final laneEnds = <int>[];
-    final items = <({int start, int end, String title, Color color, Color font})>[];
+    final items = <({
+      int start,
+      int end,
+      String title,
+      String detail,
+      Color color,
+      Color font
+    })>[];
     for (final event in widget.events) {
       int? start;
       int? end;
@@ -229,11 +289,13 @@ class _EventCalendarState extends State<EventCalendar> {
         end = c;
       }
       if (start == null || end == null) continue;
-      final color = _parse(event['event_category_color_back'], const Color(0xFF1565C0));
+      final color =
+          _parse(event['event_category_color_back'], const Color(0xFF1565C0));
       items.add((
         start: start,
         end: end,
         title: '${event['title_event'] ?? ''}',
+        detail: '${event['detail'] ?? ''}',
         color: color,
         font: _parse(event['event_category_color_font'], Colors.white),
       ));
@@ -249,7 +311,14 @@ class _EventCalendarState extends State<EventCalendar> {
       } else {
         laneEnds[lane] = item.end;
       }
-      placed.add(_EventBar(start: item.start, end: item.end, lane: lane, title: item.title, color: item.color, font: item.font));
+      placed.add(_EventBar(
+          start: item.start,
+          end: item.end,
+          lane: lane,
+          title: item.title,
+          detail: item.detail,
+          color: item.color,
+          font: item.font));
     }
     return placed;
   }
@@ -260,6 +329,7 @@ class _EventBar {
   final int end;
   final int lane;
   final String title;
+  final String detail;
   final Color color;
   final Color font;
 
@@ -268,6 +338,7 @@ class _EventBar {
     required this.end,
     required this.lane,
     required this.title,
+    required this.detail,
     required this.color,
     required this.font,
   });
@@ -277,22 +348,56 @@ class ScheduleGameTile extends StatelessWidget {
   const ScheduleGameTile({super.key, required this.game});
   final Map<String, dynamic> game;
   Widget logo(String side) {
-    final raw = '${game['name_${side}_logo'] ?? game['name_$side'] ?? ''}'.trim();
-    const names = {'巨':'巨人','神':'阪神','中':'中日','ヤ':'ヤクルト','広':'広島','De':'DeNA','ソ':'ソフトバンク','日':'日本ハム','ロ':'ロッテ','西':'西武','楽':'楽天','オ':'オリックス'};
+    final raw =
+        '${game['name_${side}_logo'] ?? game['name_$side'] ?? ''}'.trim();
+    const names = {
+      '巨': '巨人',
+      '神': '阪神',
+      '中': '中日',
+      'ヤ': 'ヤクルト',
+      '広': '広島',
+      'De': 'DeNA',
+      'ソ': 'ソフトバンク',
+      '日': '日本ハム',
+      'ロ': 'ロッテ',
+      '西': '西武',
+      '楽': '楽天',
+      'オ': 'オリックス'
+    };
     final name = names[raw] ?? raw;
-    final visual = teamLogoVisual(name, abbrev: '${game['${side}_code'] ?? ''}');
-    Widget fallback() => const Icon(Icons.sports_baseball, size: 14, color: Colors.grey);
-    return Semantics(label: name, child: SizedBox(width: 16, height: 16,
-      child: visual.asset != null ? Image.asset(visual.asset!, fit: BoxFit.contain, errorBuilder: (_, __, ___) => fallback())
-      : visual.networkUrl != null ? Image.network(visual.networkUrl!, fit: BoxFit.contain, errorBuilder: (_, __, ___) => fallback()) : fallback()));
+    final visual =
+        teamLogoVisual(name, abbrev: '${game['${side}_code'] ?? ''}');
+    Widget fallback() =>
+        const Icon(Icons.sports_baseball, size: 14, color: Colors.grey);
+    return Semantics(
+        label: name,
+        child: SizedBox(
+            width: 16,
+            height: 16,
+            child: visual.asset != null
+                ? Image.asset(visual.asset!,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => fallback())
+                : visual.networkUrl != null
+                    ? Image.network(visual.networkUrl!,
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => fallback())
+                    : fallback()));
   }
+
   @override
-  Widget build(BuildContext context) => FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft,
-    child: Row(mainAxisSize: MainAxisSize.min, children: [
-      logo('away'),
-      Padding(padding: const EdgeInsets.symmetric(horizontal: 2), child: Text(
-        game['finished'] == true ? '${game['score_away'] ?? '—'}–${game['score_home'] ?? '—'}' : 'vs',
-        style: const TextStyle(fontSize: 9))),
-      logo('home'),
-    ]));
+  Widget build(BuildContext context) => FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: Alignment.centerLeft,
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        logo('away'),
+        Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2),
+            child: Text(
+                game['finished'] == true
+                    ? '${game['score_away'] ?? '—'}–${game['score_home'] ?? '—'}'
+                    : 'vs',
+                style: const TextStyle(fontSize: 9))),
+        logo('home'),
+      ]));
 }

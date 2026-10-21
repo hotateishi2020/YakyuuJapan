@@ -1,3 +1,4 @@
+import 'high_school_records_board.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,8 +16,61 @@ class OtherBaseballBoard extends StatelessWidget {
             tabs: [Tab(text: '高校野球'), Tab(text: '国際シリーズ')]),
         Expanded(
             child: TabBarView(children: [
-          AutumnKyushuBracket(year: year),
+          HighSchoolBoard(year: year),
           const Center(child: Text('国際シリーズの大会情報はまだ登録されていません。')),
+        ])),
+      ]));
+}
+
+class HighSchoolBoard extends StatelessWidget {
+  const HighSchoolBoard({super.key, required this.year});
+  final int year;
+  @override
+  Widget build(BuildContext context) => DefaultTabController(
+      length: 4,
+      initialIndex: 1,
+      child: Column(children: [
+        const TabBar(
+            labelColor: Colors.black,
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
+            tabs: [
+              Tab(text: '全国大会'),
+              Tab(text: 'ブロック大会'),
+              Tab(text: '地区大会'),
+              Tab(text: '記録')
+            ]),
+        Expanded(
+            child: TabBarView(children: [
+          HighSchoolRecordsBoard(
+              year: year, scope: 'national', currentOnly: true),
+          DefaultTabController(
+              length: highSchoolBlocks.length,
+              initialIndex: 9,
+              child: Column(children: [
+                TabBar(
+                    labelColor: Colors.black,
+                    isScrollable: true,
+                    tabAlignment: TabAlignment.start,
+                    tabs: [
+                      for (final region in highSchoolBlocks) Tab(text: region)
+                    ]),
+                Expanded(
+                    child: TabBarView(children: [
+                  for (final region in highSchoolBlocks)
+                    if (region == '九州')
+                      AutumnKyushuBracket(year: year)
+                    else
+                      HighSchoolRecordsBoard(
+                          year: year,
+                          scope: 'block',
+                          region: region,
+                          currentOnly: true),
+                ])),
+              ])),
+          HighSchoolRecordsBoard(
+              year: year, scope: 'district', currentOnly: true),
+          HighSchoolRecordsBoard(year: year),
         ])),
       ]));
 }
@@ -38,10 +92,12 @@ class _AutumnKyushuBracketState extends State<AutumnKyushuBracket> {
       : FutureBuilder<Map<String, dynamic>>(
           future: data,
           builder: (context, snapshot) {
-            if (snapshot.hasError)
+            if (snapshot.hasError) {
               return const Center(child: Text('組合せを取得できませんでした'));
-            if (!snapshot.hasData)
+            }
+            if (!snapshot.hasData) {
               return const Center(child: BaseballLoading());
+            }
             final info = snapshot.data!;
             final matches =
                 (info['matches'] as List).cast<Map<String, dynamic>>();

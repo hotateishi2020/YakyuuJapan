@@ -2,15 +2,26 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
+enum BaseballLoadingScene {
+  fielding('ノックを受けて捕球・送球する守備練習'),
+  longThrow('遠投の弧線で読み込み状況を表示'),
+  catchBall('二人の選手がキャッチボール'),
+  pitching('ピッチャーからキャッチャーへの投球');
+  const BaseballLoadingScene(this.label);
+  final String label;
+}
+
 /// Shared loading scene. [progress] is a measured fraction; otherwise the
 /// percentage is explicitly an estimate and never reaches 100 before completion.
 class BaseballLoading extends StatefulWidget {
   const BaseballLoading(
       {super.key,
       this.progress,
+      this.scene,
       this.compact = false,
       this.color = const Color(0xFF214E78)});
   final double? progress;
+  final BaseballLoadingScene? scene;
   final bool compact;
   final Color color;
 
@@ -22,6 +33,8 @@ class _BaseballLoadingState extends State<BaseballLoading>
     with SingleTickerProviderStateMixin {
   late final AnimationController _motion =
       AnimationController(vsync: this, duration: const Duration(seconds: 12));
+  static final _random = math.Random();
+  late final _scene = widget.scene ?? BaseballLoadingScene.values[_random.nextInt(BaseballLoadingScene.values.length)];
   Timer? _timer;
   int _seconds = 0;
   bool _reduced = false;
@@ -60,8 +73,8 @@ class _BaseballLoadingState extends State<BaseballLoading>
         : (95 * (1 - math.exp(-_seconds / 18))).round();
     final estimated = measured == null || !measured.isFinite;
     return Semantics(
-      label: 'ノックを受けて捕球・送球する守備練習',
-      value: '${estimated ? '目安 ' : ''}$percent%',
+      label: _scene.label,
+      value: '${estimated ? 'Loading... ' : ''}$percent%',
       child: SizedBox(
           width: widget.compact ? 140 : 280,
           height: widget.compact ? 100 : 200,
@@ -76,10 +89,12 @@ class _BaseballLoadingState extends State<BaseballLoading>
                             width: 280,
                             height: 168,
                             child: CustomPaint(
-                                painter: _InfieldPainter(
-                                    _motion, widget.color, _reduced)))),
+                                painter: _scene == BaseballLoadingScene.fielding
+                                  ? _InfieldPainter(_motion, widget.color, _reduced)
+                                  : _ThrowPainter(_motion, widget.color, _reduced,
+                                      _scene, estimated ? null : percent / 100)))),
                     ExcludeSemantics(
-                        child: Text('${estimated ? '目安 ' : ''}$percent%',
+                        child: Text('${estimated ? 'Loading... ' : ''}$percent%',
                             key: const ValueKey('baseball-loading-percent'),
                             style: TextStyle(
                                 fontSize: 20,
@@ -89,6 +104,83 @@ class _BaseballLoadingState extends State<BaseballLoading>
                   ])))),
     );
   }
+}
+
+class _ThrowPainter extends CustomPainter {
+  _ThrowPainter(this.motion, this.uniform, this.reduced, this.scene, this.progress)
+      : super(repaint: motion);
+  final Animation<double> motion;
+  final Color uniform;
+  final bool reduced;
+  final BaseballLoadingScene scene;
+  final double? progress;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.scale(size.width / 280, size.height / 168);
+    final phase = reduced ? .3 : (motion.value * 4) % 1;
+    final pitching = scene == BaseballLoadingScene.pitching;
+    final longThrow = scene == BaseballLoadingScene.longThrow;
+    final returning = !longThrow && phase >= .5;
+    final flight = longThrow ? (progress ?? phase) : (phase * 2) % 1;
+    final t = ((flight - .15) / .7).clamp(0.0, 1.0);
+    final from = returning ? const Offset(227, 100) : const Offset(53, 94);
+    final to = returning ? const Offset(53, 94) : const Offset(227, 100);
+    final path = Path()..moveTo(from.dx, from.dy)
+      ..quadraticBezierTo(140, longThrow ? -35 : pitching && !returning ? 78 : 36, to.dx, to.dy);
+    final metric = path.computeMetrics().first;
+    final fraction = longThrow ? flight : t;
+    final ball = metric.getTangentForOffset(metric.length * fraction)!.position;
+    canvas.drawOval(const Rect.fromLTWH(15, 119, 250, 34), Paint()..color = const Color(0xffdcebd7));
+    if (pitching) {
+      canvas.drawOval(const Rect.fromLTWH(20, 127, 65, 18), Paint()..color = const Color(0xffeacb97));
+      canvas.drawLine(const Offset(36, 135), const Offset(59, 135), Paint()..color = Colors.white..strokeWidth = 3);
+      canvas.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTWH(217, 129, 22, 13), const Radius.circular(3)), Paint()..color = Colors.white);
+    }
+    if (longThrow) {
+      canvas.drawPath(path, Paint()..color = uniform.withValues(alpha: .15)..style = PaintingStyle.stroke..strokeWidth = 5);
+      canvas.drawPath(metric.extractPath(0, metric.length * fraction), Paint()..color = uniform..style = PaintingStyle.stroke..strokeWidth = 5..strokeCap = StrokeCap.round);
+    }
+    void player(Offset position, {required bool catcher, required bool throwing, required bool faceLeft}) {
+      canvas.save();
+      canvas.translate(position.dx, position.dy + (catcher ? 12 : 0));
+      if (faceLeft) canvas.scale(-1, 1);
+      final action = throwing ? math.sin(flight * math.pi) : 0.0;
+      final skin = Paint()..color = const Color(0xffffd5ad);
+      final clothes = Paint()..color = uniform;
+      final limb = Paint()..color = uniform..strokeWidth = 8..strokeCap = StrokeCap.round;
+      canvas.drawLine(const Offset(-6, 15), Offset(-10 - (catcher ? 6 : action * 6), catcher ? 23 : 32), limb);
+      canvas.drawLine(const Offset(6, 15), Offset(12 + action * 7, catcher ? 23 : 32), limb);
+      canvas.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTWH(-13, -5, 26, 26), const Radius.circular(8)), Paint()..color = Colors.white);
+      canvas.drawLine(const Offset(0, -3), const Offset(0, 17), Paint()..color = uniform..strokeWidth = 3);
+      canvas.drawCircle(const Offset(0, -20), 17, skin);
+      canvas.drawArc(const Rect.fromLTWH(-18, -39, 36, 34), math.pi, math.pi, true, clothes);
+      canvas.drawLine(const Offset(-15, -23), const Offset(21, -23), Paint()..color = uniform..strokeWidth = 6..strokeCap = StrokeCap.round);
+      canvas.drawCircle(const Offset(7, -17), 2, Paint()..color = const Color(0xff273444));
+      final hand = Offset(18 + action * 8, -2 - action * 23);
+      canvas.drawLine(const Offset(10, 0), hand, limb);
+      canvas.drawCircle(hand, 5, skin);
+      canvas.drawOval(Rect.fromCenter(center: Offset(catcher ? 23 : -17, catcher ? -3 : 5), width: 18, height: 16), Paint()..color = const Color(0xffac6f39));
+      if (catcher) {
+        canvas.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTWH(-10, -2, 20, 21), const Radius.circular(4)), clothes);
+        final mask = Paint()..color = const Color(0xff607d8b)..style = PaintingStyle.stroke..strokeWidth = 2;
+        canvas.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTWH(-12, -29, 27, 23), const Radius.circular(5)), mask);
+        canvas.drawLine(const Offset(-12, -17), const Offset(15, -17), mask);
+      }
+      canvas.restore();
+    }
+    player(const Offset(40, 102), catcher: false, throwing: !returning, faceLeft: false);
+    player(const Offset(240, 102), catcher: pitching, throwing: returning, faceLeft: true);
+    canvas.drawCircle(ball, 5.5, Paint()..color = uniform);
+    canvas.drawCircle(ball, 4.5, Paint()..color = Colors.white);
+    canvas.drawArc(Rect.fromCircle(center: ball + const Offset(-3, 0), radius: 3), -.9, 1.8, false,
+      Paint()..color = const Color(0xffd8544d)..style = PaintingStyle.stroke..strokeWidth = 1);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_ThrowPainter old) => old.uniform != uniform || old.reduced != reduced || old.scene != scene || old.progress != progress;
 }
 
 class _InfieldPainter extends CustomPainter {

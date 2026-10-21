@@ -1,10 +1,32 @@
 import '../data/npb_registration_status.dart';
 import '../data/npb_transfer_reports.dart';
 import '../data/npb_fa_holders.dart';
+import '../data/npb_retirement_announcements.dart';
 import '../tools/json_utils.dart';
 import 'contract_fa.dart';
 import 'roster_contract_status.dart';
 import 'strength_usage.dart';
+
+bool _retiring(
+    Map<String, dynamic> player, Map<String, dynamic> team, int year) {
+  final retirementYear = usageInt(player['retirement_year']);
+  if ((player['retirement_confirmed'] == true ||
+          player['retirement_announced'] == true) &&
+      (retirementYear == 0 || retirementYear <= year)) {
+    return true;
+  }
+  if (usageInt(player['move_status_year']) == year &&
+      const {'引退', '現役引退', '引退表明', '引退予定', '今季限りで引退'}
+          .contains(player['move_status'])) {
+    return true;
+  }
+  return npbRetirementAnnouncements.any((announcement) =>
+      usageInt(announcement['year']) <= year &&
+      (announcement['player_key'] == usagePlayerKey(player) ||
+          (usageInt(team['id_team']) == announcement['team_id'] &&
+              '${player['name']}'.replaceAll(RegExp(r'[\s　]'), '') ==
+                  '${announcement['name']}'.replaceAll(RegExp(r'[\s　]'), ''))));
+}
 
 List<Map<String, dynamic>> transferCandidates(
     List<Map<String, dynamic>> teams, int year) {
@@ -13,7 +35,8 @@ List<Map<String, dynamic>> transferCandidates(
     final seen = <String>{};
     for (final player in listMapFromJson(team['roster'])) {
       if (!seen.add(usagePlayerKey(player)) ||
-          player['departure_confirmed'] == true) {
+          player['departure_confirmed'] == true ||
+          _retiring(player, team, year)) {
         continue;
       }
       final status = usageInt(player['move_status_year']) == year
@@ -53,6 +76,7 @@ List<Map<String, dynamic>> transferCandidates(
           .where((label) => label == '国内FA' || label == '海外FA')
           .toSet();
       if (status == 'FA宣言（移籍先未定）') eligibility.add('FA宣言');
+      if (status == 'ポスティング容認') eligibility.add('ポスティング容認');
       for (final report in reports) {
         switch (report['type']) {
           case 'posting':
@@ -87,12 +111,12 @@ List<Map<String, dynamic>> transferCandidates(
             : end == year
                 ? '$year年まで'
                 : '$end年まで',
-        'status': reports.isNotEmpty
+        'status': status == 'ポスティング容認' ? 'ポスティング容認・契約成立未確認' : reports.isNotEmpty
             ? '移籍関連の報道あり'
             : status == 'FA宣言（移籍先未定）'
                 ? 'FA宣言・移籍先未定'
                 : '権利保有・行使未確認',
-        'detail': reports.isNotEmpty
+        'detail': status == 'ポスティング容認' ? '球団の公式発表により容認を確認。移籍先との契約成立は別途確認します。' : reports.isNotEmpty
             ? reports
                 .map((e) => e['detail'] ?? '移籍の可能性に関する報道。')
                 .toSet()

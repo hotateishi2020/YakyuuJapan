@@ -3345,3 +3345,685 @@ Severity.error 25P02: current transaction is aborted, commands ignored until end
 <asynchronous suspension>
 
 
+2026-10-21
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Auth._requireUserId (file:///Users/standapp/StudioProjects/Koko/backend/app/Auth.dart:218:29)
+<asynchronous suspension>
+#4      _attachRequestUser (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2364:14)
+<asynchronous suspension>
+#5      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:16)
+<asynchronous suspension>
+#6      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2454:7)
+<asynchronous suspension>
+#7      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#8      RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#9      RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#10     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#11     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#12     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#13     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#14     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Postgres.insert (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:312:31)
+#4      insertLogError (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2580:25)
+#5      _saveErrorLog.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2327:14)
+#6      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:30)
+<asynchronous suspension>
+#7      _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2326:16)
+<asynchronous suspension>
+#8      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2462:15)
+<asynchronous suspension>
+#9      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#10     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#11     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#12     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#13     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#14     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#15     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#16     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-21
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Auth._requireUserId (file:///Users/standapp/StudioProjects/Koko/backend/app/Auth.dart:218:29)
+<asynchronous suspension>
+#4      _attachRequestUser (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2364:14)
+<asynchronous suspension>
+#5      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:16)
+<asynchronous suspension>
+#6      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2454:7)
+<asynchronous suspension>
+#7      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#8      RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#9      RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#10     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#11     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#12     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#13     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#14     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Postgres.insert (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:312:31)
+#4      insertLogError (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2580:25)
+#5      _saveErrorLog.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2327:14)
+#6      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:30)
+<asynchronous suspension>
+#7      _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2326:16)
+<asynchronous suspension>
+#8      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2462:15)
+<asynchronous suspension>
+#9      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#10     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#11     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#12     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#13     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#14     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#15     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#16     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-21
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Auth._requireUserId (file:///Users/standapp/StudioProjects/Koko/backend/app/Auth.dart:218:29)
+<asynchronous suspension>
+#4      _attachRequestUser (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2364:14)
+<asynchronous suspension>
+#5      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:16)
+<asynchronous suspension>
+#6      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2454:7)
+<asynchronous suspension>
+#7      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#8      RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#9      RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#10     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#11     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#12     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#13     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#14     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Postgres.insert (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:312:31)
+#4      insertLogError (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2580:25)
+#5      _saveErrorLog.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2327:14)
+#6      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:30)
+<asynchronous suspension>
+#7      _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2326:16)
+<asynchronous suspension>
+#8      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2462:15)
+<asynchronous suspension>
+#9      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#10     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#11     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#12     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#13     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#14     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#15     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#16     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-21
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Auth._requireUserId (file:///Users/standapp/StudioProjects/Koko/backend/app/Auth.dart:218:29)
+<asynchronous suspension>
+#4      _attachRequestUser (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2364:14)
+<asynchronous suspension>
+#5      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:16)
+<asynchronous suspension>
+#6      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2454:7)
+<asynchronous suspension>
+#7      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#8      RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#9      RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#10     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#11     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#12     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#13     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#14     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Postgres.insert (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:312:31)
+#4      insertLogError (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2580:25)
+#5      _saveErrorLog.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2327:14)
+#6      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:30)
+<asynchronous suspension>
+#7      _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2326:16)
+<asynchronous suspension>
+#8      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2462:15)
+<asynchronous suspension>
+#9      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#10     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#11     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#12     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#13     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#14     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#15     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#16     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-21
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Auth._requireUserId (file:///Users/standapp/StudioProjects/Koko/backend/app/Auth.dart:218:29)
+<asynchronous suspension>
+#4      _attachRequestUser (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2364:14)
+<asynchronous suspension>
+#5      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:16)
+<asynchronous suspension>
+#6      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2454:7)
+<asynchronous suspension>
+#7      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#8      RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#9      RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#10     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#11     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#12     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#13     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#14     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Postgres.insert (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:312:31)
+#4      insertLogError (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2580:25)
+#5      _saveErrorLog.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2327:14)
+#6      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:30)
+<asynchronous suspension>
+#7      _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2326:16)
+<asynchronous suspension>
+#8      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2462:15)
+<asynchronous suspension>
+#9      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#10     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#11     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#12     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#13     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#14     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#15     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#16     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-21
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Auth._requireUserId (file:///Users/standapp/StudioProjects/Koko/backend/app/Auth.dart:218:29)
+<asynchronous suspension>
+#4      _attachRequestUser (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2364:14)
+<asynchronous suspension>
+#5      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:16)
+<asynchronous suspension>
+#6      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2454:7)
+<asynchronous suspension>
+#7      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#8      RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#9      RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#10     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#11     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#12     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#13     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#14     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Postgres.insert (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:312:31)
+#4      insertLogError (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2580:25)
+#5      _saveErrorLog.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2327:14)
+#6      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:30)
+<asynchronous suspension>
+#7      _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2326:16)
+<asynchronous suspension>
+#8      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2462:15)
+<asynchronous suspension>
+#9      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#10     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#11     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#12     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#13     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#14     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#15     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#16     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-21
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Auth._requireUserId (file:///Users/standapp/StudioProjects/Koko/backend/app/Auth.dart:218:29)
+<asynchronous suspension>
+#4      _attachRequestUser (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2364:14)
+<asynchronous suspension>
+#5      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:16)
+<asynchronous suspension>
+#6      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2454:7)
+<asynchronous suspension>
+#7      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#8      RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#9      RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#10     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#11     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#12     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#13     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#14     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Postgres.insert (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:312:31)
+#4      insertLogError (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2580:25)
+#5      _saveErrorLog.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2327:14)
+#6      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:30)
+<asynchronous suspension>
+#7      _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2326:16)
+<asynchronous suspension>
+#8      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2462:15)
+<asynchronous suspension>
+#9      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#10     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#11     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#12     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#13     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#14     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#15     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#16     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-21
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Auth._requireUserId (file:///Users/standapp/StudioProjects/Koko/backend/app/Auth.dart:218:29)
+<asynchronous suspension>
+#4      _attachRequestUser (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2364:14)
+<asynchronous suspension>
+#5      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:16)
+<asynchronous suspension>
+#6      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2454:7)
+<asynchronous suspension>
+#7      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#8      RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#9      RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#10     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#11     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#12     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#13     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#14     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Postgres.insert (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:312:31)
+#4      insertLogError (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2580:25)
+#5      _saveErrorLog.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2327:14)
+#6      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:30)
+<asynchronous suspension>
+#7      _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2326:16)
+<asynchronous suspension>
+#8      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2462:15)
+<asynchronous suspension>
+#9      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#10     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#11     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#12     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#13     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#14     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#15     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#16     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-21
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Auth._requireUserId (file:///Users/standapp/StudioProjects/Koko/backend/app/Auth.dart:218:29)
+<asynchronous suspension>
+#4      _attachRequestUser (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2364:14)
+<asynchronous suspension>
+#5      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:16)
+<asynchronous suspension>
+#6      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2454:7)
+<asynchronous suspension>
+#7      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#8      RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#9      RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#10     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#11     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#12     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#13     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#14     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Postgres.insert (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:312:31)
+#4      insertLogError (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2580:25)
+#5      _saveErrorLog.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2327:14)
+#6      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:30)
+<asynchronous suspension>
+#7      _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2326:16)
+<asynchronous suspension>
+#8      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2462:15)
+<asynchronous suspension>
+#9      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#10     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#11     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#12     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#13     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#14     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#15     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#16     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-21
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Auth._requireUserId (file:///Users/standapp/StudioProjects/Koko/backend/app/Auth.dart:218:29)
+<asynchronous suspension>
+#4      _attachRequestUser (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2364:14)
+<asynchronous suspension>
+#5      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:16)
+<asynchronous suspension>
+#6      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2454:7)
+<asynchronous suspension>
+#7      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#8      RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#9      RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#10     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#11     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#12     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#13     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#14     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Postgres.insert (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:312:31)
+#4      insertLogError (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2580:25)
+#5      _saveErrorLog.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2327:14)
+#6      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:30)
+<asynchronous suspension>
+#7      _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2326:16)
+<asynchronous suspension>
+#8      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2462:15)
+<asynchronous suspension>
+#9      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#10     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#11     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#12     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#13     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#14     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#15     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#16     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-21
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Auth._requireUserId (file:///Users/standapp/StudioProjects/Koko/backend/app/Auth.dart:218:29)
+<asynchronous suspension>
+#4      _attachRequestUser (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2364:14)
+<asynchronous suspension>
+#5      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:16)
+<asynchronous suspension>
+#6      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2454:7)
+<asynchronous suspension>
+#7      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#8      RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#9      RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#10     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#11     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#12     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#13     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#14     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+Severity.error 25P02: current transaction is aborted, commands ignored until end of transaction block
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      Postgres.insert (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:312:31)
+#4      insertLogError (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2580:25)
+#5      _saveErrorLog.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2327:14)
+#6      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:218:30)
+<asynchronous suspension>
+#7      _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2326:16)
+<asynchronous suspension>
+#8      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2462:15)
+<asynchronous suspension>
+#9      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2019:14)
+<asynchronous suspension>
+#10     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#11     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#12     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#13     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#14     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#15     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#16     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+

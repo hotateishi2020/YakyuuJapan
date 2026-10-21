@@ -1,0 +1,9 @@
+{
+  "stadium": "島田球場",
+  "address": "静岡県島田市",
+  "view": "outside",
+  "path": "backend/assets/images/stadiums/outside/regional-092-generated.jpg",
+  "prompt": "Use case: stylized-concept. Asset: Japanese baseball stadium directory thumbnail. Create a single landscape architectural illustration of 島田球場, 静岡県島田市, a regional baseball ground. Show the exterior entrance and stadium building from an approaching visitor's viewpoint. Respect the specific ground's characteristic structure and size as far as known; do not default to a giant major-league stadium or copy another stadium. Modest municipal ground if details unknown. Open air baseball park. Architectural illustration, clean daylight, clear silhouette. No text, no logos, no collage, no watermarks. This is a labeled AI reference illustration, not a factual photograph or precise historical reconstruction.",
+  "method": "built-in image_gen",
+  "display_note": "AI生成の参考イメージ。現地写真・正確な建築資料ではありません。"
+}

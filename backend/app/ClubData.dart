@@ -1,3 +1,4 @@
+import 'CalendarResearch.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:postgres/postgres.dart';
@@ -48,7 +49,7 @@ Future<Map<String, dynamic>> readSeasonSchedule(Connection conn, OrgKind org, in
     confirmations['${row[0]}']=usageMaps(raw is String ? jsonDecode(raw) : raw)
       .map((c)=>c.map((k,v)=>MapEntry(k,'$v'))).toList();
   }
-  return {'org': org.code, 'year': year, 'checked_at': snapshot['checked_at'], 'games': applyScheduleConfirmations(games, confirmations)};
+  return {'org': org.code, 'year': year, 'checked_at': snapshot['checked_at'], 'events': CalendarResearch.display(await CalendarResearch.entries(conn), org.code, year), 'games': applyScheduleConfirmations(games, confirmations)};
 }
 
 /// Match official fixtures first. Never invent a second game from a timezone shift.

@@ -368,11 +368,12 @@ void main() {
         channels: [pl],
         now: () => now,
         client: MockClient((r) async {
-          if (r.url.path.endsWith('/videos'))
+          if (r.url.path.endsWith('/videos')) {
             return response(
                 regularPage([item(0, label: '2 日前'), item(1, label: '3 日前')],
                     token: 'next'),
                 200);
+          }
           if (r.method == 'POST') {
             pages++;
             return response(
@@ -483,10 +484,12 @@ void main() {
         channels: [daily],
         now: () => now,
         client: MockClient((r) async {
-          if (r.url.path.endsWith('/videos'))
+          if (r.url.path.endsWith('/videos')) {
             return response(regularPage([item(refresh ? 2 : 1)]), 200);
-          if (r.url.queryParameters['v'] == 'v0000000001')
+          }
+          if (r.url.queryParameters['v'] == 'v0000000001') {
             return response(watch('v0000000001', now), 200);
+          }
           return response('', 503);
         }));
     addTearDown(service.dispose);
@@ -551,10 +554,11 @@ void main() {
         channels: [daily],
         now: () => now,
         client: MockClient((r) async {
-          if (r.url.path.endsWith('/videos'))
+          if (r.url.path.endsWith('/videos')) {
             return response(
                 regularPage([item(1), item(2, label: '3 日前')], token: 'next'),
                 200);
+          }
           if (r.method == 'POST') {
             pages++;
             return response(
@@ -563,8 +567,9 @@ void main() {
                 }),
                 200);
           }
-          if (r.url.path == '/watch')
+          if (r.url.path == '/watch') {
             return response(watch(r.url.queryParameters['v']!, now), 200);
+          }
           return response('', 503);
         }));
     addTearDown(service.dispose);
@@ -582,14 +587,16 @@ void main() {
         channels: [daily],
         now: () => now,
         client: MockClient((r) async {
-          if (r.url.path.endsWith('/videos'))
+          if (r.url.path.endsWith('/videos')) {
             return response(regularPage([item(1)]), 200);
-          if (r.url.path.endsWith('/streams'))
+          }
+          if (r.url.path.endsWith('/streams')) {
             return response(
                 regularPage([item(2), item(3)])
                     .replaceAll('"title":"動画"', '"title":"ライブ"'),
                 200);
-          if (r.url.path == '/watch')
+          }
+          if (r.url.path == '/watch') {
             return response(
                 watch(
                     r.url.queryParameters['v']!,
@@ -598,6 +605,7 @@ void main() {
                             .subtract(const Duration(seconds: 1))
                         : videoWindowStart(now)),
                 200);
+          }
           return response('', 503);
         }));
     addTearDown(service.dispose);
@@ -960,11 +968,12 @@ void main() {
     var continuations = 0, watchCalls = 0;
     final now = DateTime.utc(2026, 10, 18, 3);
     final client = MockClient((r) async {
-      if (r.url.path.endsWith('/videos'))
+      if (r.url.path.endsWith('/videos')) {
         return response(
             regularPage([for (var i = 0; i < 100; i++) item(i)],
                 token: 'next-page'),
             200);
+      }
       if (r.url.path == '/youtubei/v1/browse') {
         expect(jsonDecode(r.body)['continuation'], 'next-page');
         continuations++;
@@ -1012,10 +1021,11 @@ void main() {
         channels: [daily],
         now: () => DateTime.utc(2026, 10, 2, 12),
         client: MockClient((r) async {
-          if (r.url.path.endsWith('/videos'))
+          if (r.url.path.endsWith('/videos')) {
             return response(
                 page().replaceAll('2 日前', '1 時間前').replaceAll('3 日前', '1 日前'),
                 200);
+          }
           if (r.url.path.contains('/feeds/')) return response(feed(), 200);
           watchCalls++;
           return response('', 503);

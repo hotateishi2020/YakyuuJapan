@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-20",
+  "targets": 1075,
+  "research": {
+    "prepared": 907,
+    "needs_research": 163,
+    "error": 5
+  },
+  "generated": 0,
+  "reviewed": 0,
+  "registered": 0
+}

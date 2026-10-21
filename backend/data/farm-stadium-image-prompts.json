@@ -1,0 +1,218 @@
+[
+  {
+    "stadium": "ジャイアンツタウンスタジアム（東京都稲城市）",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-01-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-fc218dcc-b272-4888-87ff-68c1da547d8f.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by ジャイアンツタウンスタジアム（東京都稲城市）, a Japanese farm-team baseball stadium. View: 内観。本塁後方の観客席からダイヤモンド全体と外野を見渡す。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "ジャイアンツタウンスタジアム（東京都稲城市）",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-01-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-5ce850f7-9d2e-4f40-82c8-41c066fc830b.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by ジャイアンツタウンスタジアム（東京都稲城市）, a Japanese farm-team baseball stadium. View: 外観。球場の入口と低層スタンドの外壁を歩行者の視点から見る。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "ヤクルト戸田球場（埼玉県戸田市）",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-02-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-ee3fec4a-1909-4980-bad6-ba78b286984f.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by ヤクルト戸田球場（埼玉県戸田市）, a Japanese farm-team baseball stadium. View: 内観。本塁後方の観客席からダイヤモンド全体と外野を見渡す。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "ヤクルト戸田球場（埼玉県戸田市）",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-02-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-ece04507-bf96-46fb-8830-1b98d309e54e.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by ヤクルト戸田球場（埼玉県戸田市）, a Japanese farm-team baseball stadium. View: 外観。球場の入口と低層スタンドの外壁を歩行者の視点から見る。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "ファイターズ鎌ケ谷スタジアム（千葉県鎌ケ谷市）",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-03-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-a4365b51-a831-4c4d-96aa-9891f9dc276c.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by ファイターズ鎌ケ谷スタジアム（千葉県鎌ケ谷市）, a Japanese farm-team baseball stadium. View: 内観。本塁後方の観客席からダイヤモンド全体と外野を見渡す。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "ファイターズ鎌ケ谷スタジアム（千葉県鎌ケ谷市）",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-03-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-f4dcd7cb-7f89-4e5a-93ab-e97fb55ad42e.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by ファイターズ鎌ケ谷スタジアム（千葉県鎌ケ谷市）, a Japanese farm-team baseball stadium. View: 外観。球場の入口と低層スタンドの外壁を歩行者の視点から見る。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "横須賀スタジアム（神奈川県横須賀市）",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-04-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-2ff576ea-8cc7-4aed-aece-7bd7ea9b9600.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by 横須賀スタジアム（神奈川県横須賀市）, a Japanese farm-team baseball stadium. View: 内観。本塁後方の観客席からダイヤモンド全体と外野を見渡す。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "横須賀スタジアム（神奈川県横須賀市）",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-04-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-41d822fd-ef23-40e6-af47-c5355a61e3da.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by 横須賀スタジアム（神奈川県横須賀市）, a Japanese farm-team baseball stadium. View: 外観。球場の入口と低層スタンドの外壁を歩行者の視点から見る。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "森林どりスタジアム泉（宮城県仙台市泉区）",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-05-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-c5c0eaa9-e09d-4d49-b870-50a8480804f4.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by 森林どりスタジアム泉（宮城県仙台市泉区）, a Japanese farm-team baseball stadium. View: 内観。本塁後方の観客席からダイヤモンド全体と外野を見渡す。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "森林どりスタジアム泉（宮城県仙台市泉区）",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-05-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-d6f87c6c-a4de-430c-87a8-c5236de90a8c.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by 森林どりスタジアム泉（宮城県仙台市泉区）, a Japanese farm-team baseball stadium. View: 外観。球場の入口と低層スタンドの外壁を歩行者の視点から見る。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "ロッテ浦和球場（さいたま市）",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-06-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-775a3a02-1606-45b2-a7d5-a403368e5831.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by ロッテ浦和球場（さいたま市）, a Japanese farm-team baseball stadium. View: 内観。本塁後方の観客席からダイヤモンド全体と外野を見渡す。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "ロッテ浦和球場（さいたま市）",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-06-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-4d2e0e92-8a68-40c4-abfc-1ead31a8b03f.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by ロッテ浦和球場（さいたま市）, a Japanese farm-team baseball stadium. View: 外観。球場の入口と低層スタンドの外壁を歩行者の視点から見る。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "CAR3219フィールド（所沢市）",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-07-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-c72def03-d186-48c4-97a6-2581fb8f3990.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by CAR3219フィールド（所沢市）, a Japanese farm-team baseball stadium. View: 内観。本塁後方の観客席からダイヤモンド全体と外野を見渡す。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "CAR3219フィールド（所沢市）",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-07-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-9899b452-20f7-46ed-90ec-260c6283a7f8.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by CAR3219フィールド（所沢市）, a Japanese farm-team baseball stadium. View: 外観。球場の入口と低層スタンドの外壁を歩行者の視点から見る。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "タマホーム スタジアム筑後（筑後市）",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-08-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-6220a036-9c66-4f25-bc58-e2716564d4f6.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by タマホーム スタジアム筑後（筑後市）, a Japanese farm-team baseball stadium. View: 内観。本塁後方の観客席からダイヤモンド全体と外野を見渡す。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "タマホーム スタジアム筑後（筑後市）",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-08-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-9c69bddf-cfe7-4f0a-8180-3a4460fa62d5.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by タマホーム スタジアム筑後（筑後市）, a Japanese farm-team baseball stadium. View: 外観。球場の入口と低層スタンドの外壁を歩行者の視点から見る。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "杉本商事バファローズスタジアム舞洲（大阪市）",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-09-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-75199205-f6b6-47e4-96df-c5d310044d75.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by 杉本商事バファローズスタジアム舞洲（大阪市）, a Japanese farm-team baseball stadium. View: 内観。本塁後方の観客席からダイヤモンド全体と外野を見渡す。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "杉本商事バファローズスタジアム舞洲（大阪市）",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-09-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-a6f81a29-831e-4dc5-9b02-7f65c699f972.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by 杉本商事バファローズスタジアム舞洲（大阪市）, a Japanese farm-team baseball stadium. View: 外観。球場の入口と低層スタンドの外壁を歩行者の視点から見る。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "ナゴヤ球場（名古屋市）",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-10-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-06e06716-9745-4ec5-9f3f-11de96725f4c.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by ナゴヤ球場（名古屋市）, a Japanese farm-team baseball stadium. View: 内観。本塁後方の観客席からダイヤモンド全体と外野を見渡す。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "ナゴヤ球場（名古屋市）",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-10-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-baa2ce63-84db-4dee-9824-f43c31bbd3ee.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by ナゴヤ球場（名古屋市）, a Japanese farm-team baseball stadium. View: 外観。球場の入口と低層スタンドの外壁を歩行者の視点から見る。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "日鉄鋼板SGLスタジアム尼崎（尼崎市）",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-11-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-bb849632-a327-4e31-bb74-fca612595dac.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by 日鉄鋼板SGLスタジアム尼崎（尼崎市）, a Japanese farm-team baseball stadium. View: 内観。本塁後方の観客席からダイヤモンド全体と外野を見渡す。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "日鉄鋼板SGLスタジアム尼崎（尼崎市）",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-11-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-0651e9fd-bfa6-4491-b5aa-59514aa3e389.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by 日鉄鋼板SGLスタジアム尼崎（尼崎市）, a Japanese farm-team baseball stadium. View: 外観。球場の入口と低層スタンドの外壁を歩行者の視点から見る。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "広島東洋カープ由宇練習場（岩国市）",
+    "view": "inside",
+    "path": "backend/assets/images/stadiums/inside/farm-12-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-07099fee-116e-4b00-a450-851c7eb46401.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by 広島東洋カープ由宇練習場（岩国市）, a Japanese farm-team baseball stadium. View: 内観。本塁後方の観客席からダイヤモンド全体と外野を見渡す。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  },
+  {
+    "stadium": "広島東洋カープ由宇練習場（岩国市）",
+    "view": "outside",
+    "path": "backend/assets/images/stadiums/outside/farm-12-generated.png",
+    "source": "/Users/standapp/.codex/generated_images/01a14cec-7367-7600-a28d-dd0d77b30cba/exec-18aceb75-e137-46cc-8bfc-b030be11beba.png",
+    "prompt": "Use case: stylized-concept. Asset: Japanese baseball app stadium thumbnail. Create one landscape architectural illustration inspired by 広島東洋カープ由宇練習場（岩国市）, a Japanese farm-team baseball stadium. View: 外観。球場の入口と低層スタンドの外壁を歩行者の視点から見る。清潔な建築イラスト、晴天、読みやすい形、実写ではなく参考イメージ。架空の文字・ロゴ・透かしなし。No montage, no inset, one single view.",
+    "method": "built-in image_gen",
+    "description": "AI生成イメージ。現地写真・正確な建築資料ではありません。"
+  }
+]

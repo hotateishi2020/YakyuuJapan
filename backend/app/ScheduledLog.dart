@@ -24,6 +24,7 @@ class ScheduledLog {
       }.contains(request.requestedUri.path);
 
   static Map<String, dynamic> detail(String action, {Object? error}) => {
+        'log_type': LogDetail.serverProcess,
         'user_id': userId,
         'source': 'scheduler',
         'environment': 'server',
@@ -108,7 +109,7 @@ class ScheduledLog {
       ..category = 'scheduler'
       ..code = LogDetail.clip(action, 20)
       ..memo = action
-      ..txt_detail = LogDetail.encode({...fields, 'log_type': '操作'});
+      ..txt_detail = LogDetail.encode(fields);
     return (operation: log, error: errorLog);
   }
 }

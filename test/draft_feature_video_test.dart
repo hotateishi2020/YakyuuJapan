@@ -51,6 +51,16 @@ void main() {
 
     expect(find.byWidgetPredicate((widget) => widget is InkWell && '${widget.key}'.contains('draft-video-織田翔希')), findsNWidgets(4));
     final scroller=tester.widget<SingleChildScrollView>(find.byKey(const ValueKey('draft-horizontal-scroll')));
+    scroller.controller!.jumpTo(300);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('draft-features-織田翔希')));
+    await tester.pumpAndSettle();
+    expect(find.text('織田翔希の特徴'), findsOneWidget);
+    expect(find.text('今後の確認ポイント（独自の評価観点）'), findsOneWidget);
+    expect(find.text('資料確認日：2026-10-21'), findsOneWidget);
+    expect(find.text('https://sp.baseball.findfriends.jp/player/20080002/'), findsOneWidget);
+    await tester.tap(find.text('閉じる'));
+    await tester.pumpAndSettle();
     scroller.controller!.jumpTo(scroller.controller!.position.maxScrollExtent);
     await tester.pumpAndSettle();
     await tester.tap(thumbnail);

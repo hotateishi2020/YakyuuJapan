@@ -1,3 +1,9 @@
+import 'ChampionshipSummary.dart';
+import 'ClubData.dart' show readClubFile, clubKey;
+import 'RecordInterleague.dart';
+import 'SeasonAwards.dart';
+import 'BaseballTimeline.dart';
+import 'AdditionalRecords.dart';
 import 'ClubRecords.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -10,10 +16,10 @@ import 'StrengthUsage.dart';
 /// Read-only records endpoint. Official historical baselines are refreshed offline.
 class Records {
   static final _cache = <String, ({DateTime at, Map<String, dynamic> data})>{};
-  static Future<Map<String, dynamic>> read(Connection conn, {required OrgKind org, required int year}) async {
+  static Future<Map<String, dynamic>> read(Connection conn, {required OrgKind org, required int year, bool force = false}) async {
     final key = '${org.code}:$year';
     final cached = _cache[key];
-    if (cached != null && DateTime.now().difference(cached.at).inMinutes < 10) {
+    if (!force && cached != null && DateTime.now().difference(cached.at).inMinutes < 10) {
       return cached.data;
     }
     final leagues = org.leagueIds.join(',');
@@ -22,6 +28,7 @@ class Records {
         COALESCE(h.name_full,NULLIF(s.name_team,''),t.name_short) AS name,
         COALESCE(h.name_short,NULLIF(s.name_team,''),t.name_short) AS short_name,
         COALESCE(h.name_shortest,s.name_shortest) AS name_shortest,
+        t.url_npb_players AS manager_team_url, t.name_short AS manager_team_name,
         t.color_back AS color_back,
         t.color_font AS color_font,h.logo_url,
         COALESCE(h.name_full,s.name_team) IS DISTINCT FROM t.name_short
@@ -42,7 +49,7 @@ class Records {
     ''', parameters: [year]);
     final titleRows = await conn.execute('''
       SELECT s.int_year AS year,s.id_league,s.id_stats,s.id_player,s.stats AS value,
-        s.id_team,p.name_full AS name,COALESCE(h.name_short,NULLIF(st.name_team,''),t.name_short) AS team,
+        s.id_team, ms.title AS stat_title, p.name_full AS name,COALESCE(h.name_short,NULLIF(st.name_team,''),t.name_short) AS team,
         t.color_back AS color_back,
         t.color_font AS color_font,
         CASE WHEN p.year_retire > 0 THEN 'retired' ELSE 'unknown' END AS status
@@ -52,6 +59,7 @@ class Records {
         UNION ALL
         SELECT EXTRACT(YEAR FROM CURRENT_DATE)::int,id_league,id_stats,id_player,id_team,int_rank,stats FROM t_stats_player_latest
       ) s JOIN m_player p ON p.id=s.id_player
+      LEFT JOIN m_stats ms ON ms.id=s.id_stats
       LEFT JOIN m_team t ON t.id=s.id_team
       LEFT JOIN m_team_season_identity h ON h.id_franchise=s.id_team AND h.int_year=s.int_year
       LEFT JOIN LATERAL (SELECT name_team FROM t_stats_team WHERE year=s.int_year AND id_team=s.id_team AND NOT COALESCE(flg_delete,false) ORDER BY crtat DESC,id DESC LIMIT 1) st ON true
@@ -108,10 +116,32 @@ class Records {
     }
     final splitFile = [File('data/npb_split_standings.json'), File('backend/data/npb_split_standings.json')]
         .where((f) => f.existsSync()).firstOrNull;
-    final standings = buildRecordStandings(standingRows.map((r) => r.toColumnMap()).toList(),
+    final managerCatalog = org == OrgKind.npb
+        ? usageMap(readClubFile('timeline-managers-npb.json')['clubs']) : <String, dynamic>{};
+    final standings = buildRecordStandings(standingRows.map((r) {
+      final row = r.toColumnMap();
+      final code = clubKey({'url_npb_players': row['manager_team_url'], 'name_team': row['manager_team_name']});
+      final entry = usageMap(managerCatalog[code]);
+      final manager = usageMap(entry['years'])['${row['year']}'];
+      return {...row, if (manager != null) 'manager': manager};
+    }).toList(),
         playoffs.map((r) => r.toColumnMap()).toList(), org);
     final splitStandings = org == OrgKind.npb && splitFile != null
         ? applySplitRecordStandings(standings, usageMaps(jsonDecode(splitFile.readAsStringSync()))) : standings;
+    if (org == OrgKind.npb) {
+      final file = [File('data/interleague_champions.json'), File('backend/data/interleague_champions.json')]
+          .where((f) => f.existsSync()).firstOrNull;
+      final champions = file == null ? <String,dynamic>{} : usageMap(jsonDecode(file.readAsStringSync()));
+      for (final season in splitStandings) {
+        final winner = usageMap(champions['${season['year']}']);
+        attachInterleagueRanks(season, winner);
+        if (winner.isEmpty) continue;
+        final teams = usageMaps(season['leagues']).expand((l) => usageMaps(l['teams']));
+        final team = teams.where((t) => t['name'] == winner['name'] ||
+          '${winner['name']}'.contains('${t['short_name'] ?? t['name']}')).firstOrNull;
+        season['interleague_champion'] = {...?team, ...winner};
+      }
+    }
     final clubTeams = <String, Map<String, dynamic>>{};
     if (org == OrgKind.npb) {
       // The selected season's participants exclude defunct franchises from the 12-team grid.
@@ -123,11 +153,24 @@ class Records {
     final clubRecords = org == OrgKind.npb
         ? buildClubRecords(clubTeams.values.toList(), await readClubRecordRows(conn, year), year,
             streakRows: await readClubStreakRows(conn, baseline, clubTeams.values.toList(), year)) : null;
+    final additional = await readAdditionalRecords(conn, org, year);
+    final completeTitles = colorRecordTitles(mergeRecordAwards(buildRecordTitles(titles, org), usageMaps(baseline['awards']), year), standingRows.map((r) => r.toColumnMap()).toList(), titles);
+    season.add(usageMap(additional['hr_sb']));
     final data = <String, dynamic>{
       'org': org.code,
       'year': year,
       'standings': splitStandings,
-      'titles': colorRecordTitles(mergeRecordAwards(buildRecordTitles(titles, org), usageMaps(baseline['awards']), year), standingRows.map((r) => r.toColumnMap()).toList(), titles),
+      'championship_summary': championshipSummary(splitStandings, year, mlb: org == OrgKind.mlb, officialLeagueWinners: usageMap(readClubFile('npb_league_champions.json')['years'])),
+      'timeline': readBaseballTimeline(org.code, year),
+      'titles': completeTitles,
+      'season_awards': org == OrgKind.npb ? SeasonAwards.read(year) : {},
+      'season_award_supplement': readSeasonAwardSupplement(org.code, year),
+      'minor_title_leaders': [for (final row in titles)
+        if (usageInt(row['year']) == year && ![1,2,3,4,5,6,9,10,11,18,19].contains(usageInt(row['id_stats'])))
+          {...row, 'title':row['stat_title'], 'league':_league(org,usageInt(row['id_league']),year)}],
+      'age_records': additional['age_records'],
+      'regular_history': additional['regular_history'],
+      'count_records': buildCountRecords(usageMaps(additional['count_seasons']), completeTitles, npb: org == OrgKind.npb),
       'season': season,
       if (clubRecords != null) 'club_records': clubRecords,
       'career': combined.isEmpty ? usageMaps(baseline['career']) : combined,
@@ -156,6 +199,7 @@ class Records {
           }
       ],
     };
+    _cache.clear(); // Background historical builds must not retain every full season in memory.
     _cache[key] = (at: DateTime.now(), data: data);
     return data;
   }
@@ -265,7 +309,7 @@ List<Map<String, dynamic>> buildRecordStandings(List<Map<String, dynamic>> rows,
       league = {'id_league': r['id_league'], 'name': label, 'teams': <Map<String, dynamic>>[]};
       leagues.add(league);
     }
-    (league['teams'] as List).add({'id_team': team, 'historical_identity': r['historical_identity'], 'logo_url': r['logo_url'], 'color_back': r['color_back'], 'color_font': r['color_font'], 'name_shortest': r['name_shortest'], 'league_champion': org == OrgKind.npb || year < 1969 ? usageInt(r['int_rank']) == 1 : (leagueWinners[year]?[team] ?? 0) >= (year < 1985 ? 3 : 4), 'rank': r['int_rank'], 'name': r['name'], 'short_name': r['short_name'] ?? r['name'], 'wins': r['int_win'], 'losses': r['int_lose'], 'draws': r['int_draw'], 'postseason': entrants[year]?.contains(team) ?? false, 'champion': champion});
+    (league['teams'] as List).add({'id_team': team, 'manager': r['manager'], 'historical_identity': r['historical_identity'], 'logo_url': r['logo_url'], 'color_back': r['color_back'], 'color_font': r['color_font'], 'name_shortest': r['name_shortest'], 'league_champion': org == OrgKind.npb || year < 1969 ? usageInt(r['int_rank']) == 1 : (leagueWinners[year]?[team] ?? 0) >= (year < 1985 ? 3 : 4), 'rank': r['int_rank'], 'name': r['name'], 'short_name': r['short_name'] ?? r['name'], 'wins': r['int_win'], 'losses': r['int_lose'], 'draws': r['int_draw'], 'postseason': entrants[year]?.contains(team) ?? false, 'champion': champion});
   }
   for (final s in seasons.values) {
     for (final l in s['leagues']) {

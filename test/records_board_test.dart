@@ -89,11 +89,84 @@ final fixture = {
       'current': [
         {'name': '今季選手', 'value': 5, 'status': 'active'}
       ],
-      'current_note': '取得済み試合の確認範囲'
+      'current_note': '取得済み試合の確認範囲',
+      'current_label': '今シーズン・取得済み区間の最長',
+      'current_message': '詳細成績取得済み：21／471試合。',
     }
   ],
 };
 void main() {
+  testWidgets('年表の出来事チェックで5列と行の高さを切り替える', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(2400, 850));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await http.runWithClient(() async {
+      await tester.pumpWidget(const MaterialApp(
+          home: Scaffold(body: RecordsBoard(org: OrgConfig.npb, year: 2026))));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('records-tab-0')));
+      await tester.pumpAndSettle();
+      final row = find.byKey(const ValueKey('standings-year-2025'));
+      final expandedHeight = tester.getSize(row).height;
+      expect(find.text('ルール変更'), findsOneWidget);
+      expect(find.text('国際大会結果'), findsOneWidget);
+      await tester.tap(find.text('出来事を表示する'));
+      await tester.pumpAndSettle();
+      expect(find.text('ルール変更'), findsNothing);
+      expect(find.text('国際大会結果'), findsNothing);
+      expect(tester.getSize(row).height, lessThan(expandedHeight));
+      expect(tester.getSize(row).height, 28);
+      await tester.tap(find.text('出来事を表示する'));
+      await tester.pumpAndSettle();
+      expect(find.text('ルール変更'), findsOneWidget);
+      expect(tester.getSize(row).height, expandedHeight);
+      expect(tester.takeException(), isNull);
+    }, () => MockClient((_) async => http.Response(jsonEncode(fixture), 200,
+        headers: {'content-type': 'application/json; charset=utf-8'})));
+  });
+  testWidgets('連続記録の取得済み結果と未確認範囲を同時に表示する', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(2400, 850));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await http.runWithClient(() async {
+      await tester.pumpWidget(const MaterialApp(
+          home: Scaffold(body: RecordsBoard(org: OrgConfig.npb, year: 2026))));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('records-tab-4')));
+      await tester.pumpAndSettle();
+      expect(find.text('今季選手'), findsOneWidget);
+      expect(find.text('5打席'), findsOneWidget);
+      expect(find.text('今シーズン・取得済み区間の最長（2026年）'), findsOneWidget);
+      expect(find.text('詳細成績取得済み：21／471試合。'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }, () => MockClient((_) async => http.Response(jsonEncode(fixture), 200,
+        headers: {'content-type': 'application/json; charset=utf-8'})));
+  });
+  testWidgets('携帯では球団名をタップしたセルに3秒表示する', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final payload = {'standings': [{'year': 2025, 'leagues': [
+      {'id_league': 1, 'name': 'セ・リーグ', 'teams': [
+        {'id_team': 1, 'name': '東京読売ジャイアンツ', 'champion': true,
+          'historical_identity': true}
+      ]}
+    ]}]};
+    await http.runWithClient(() async {
+      await tester.pumpWidget(const MaterialApp(home: Scaffold(
+        body: RecordsBoard(org: OrgConfig.npb, year: 2026))));
+      await tester.pumpAndSettle();
+      final cell = find.byKey(const ValueKey('rank-team-2025-id:1'));
+      await tester.tap(cell);
+      await tester.pump();
+      expect(find.byKey(const ValueKey('tapped-team-name')), findsOneWidget);
+      await tester.pump(const Duration(seconds: 2));
+      expect(find.byKey(const ValueKey('tapped-team-name')), findsOneWidget);
+      await tester.pump(const Duration(seconds: 1));
+      expect(find.byKey(const ValueKey('tapped-team-name')), findsNothing);
+      expect(tester.takeException(), isNull);
+    }, () => MockClient((_) async => http.Response(jsonEncode(payload), 200,
+      headers: {'content-type': 'application/json; charset=utf-8'})));
+  });
   test('championship intervals follow franchise IDs and selected year', () {
     Map<String,dynamic> season(int year,String name,{bool champion=false,int rank=2}) => {
       'year':year,'leagues':[{'teams':[{'id_team':1,'name':name,'rank':rank,'champion':champion}, {'id_team':2,'name':'未優勝','rank':3}]}]
@@ -306,7 +379,8 @@ void main() {
         await tester.tap(find.byKey(const ValueKey('records-tab-4')));
         await tester.pumpAndSettle();
         expect(find.text('歴代記録'), findsOneWidget);
-        expect(find.text('今シーズン記録（2026年）'), findsOneWidget);
+        expect(find.text('今シーズン・取得済み区間の最長（2026年）'), findsOneWidget);
+        expect(find.text('詳細成績取得済み：21／471試合。'), findsOneWidget);
         expect(tester.getCenter(find.text('歴代選手')).dy,
             lessThan(tester.getCenter(find.text('今季選手')).dy));
         final streakHistorical = find.byKey(const ValueKey('streaks-bar-連続安打（打席）-historical-0'));

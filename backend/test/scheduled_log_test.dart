@@ -54,6 +54,7 @@ void main() {
     expect(logs.operation.flg_user, isFalse);
     final detail = jsonDecode(logs.operation.txt_detail);
     expect(detail['user_id'], -1);
+    expect(detail['log_type'], 'サーバー処理');
     expect(detail['status'], '成功');
     expect(detail['duration_ms'], 120);
   });
@@ -65,6 +66,8 @@ void main() {
     expect(logs.error!.crtby, -1);
     expect(logs.error!.updby, -1);
     expect(jsonDecode(logs.operation.txt_detail)['status'], '失敗');
+    expect(jsonDecode(logs.operation.txt_detail)['log_type'], 'サーバー処理');
+    expect(jsonDecode(logs.error!.txt_detail)['log_type'], 'エラー');
     expect(jsonDecode(logs.error!.txt_detail)['user_id'], -1);
     expect(logs.error!.message_error, contains('取得失敗'));
     expect(logs.error!.stacktrace, isNotEmpty);

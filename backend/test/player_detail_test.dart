@@ -10,6 +10,22 @@ import '../app/PinchMetrics.dart';
 import '../app/RecentPlayerGames.dart';
 
 void main() {
+  test('旧投手キャッシュは再取得し失点ゼロの新データは保持する', () {
+    final line = <String, dynamic>{'double_inning_pitch': '4.0', 'int_runs_earned': 0};
+    final game = {'players': {'1': {'lines': [line]}}};
+    expect(needsNpbPitchingRefresh(null), isTrue);
+    expect(needsNpbPitchingRefresh(game), isTrue);
+    line.addAll({'int_runs': 0, 'int_four': 0, 'int_dead_pitching': 0, 'starter': false});
+    expect(needsNpbPitchingRefresh(game), isFalse);
+  });
+  test('補完スタッツに別スタッツの予想色を引き継がない', () {
+    final rows = <Map<String, dynamic>>[{'id_player': 1, 'title': '本塁打', 'colors_user': '/red/', 'id_users': '/1/'}];
+    addMissingRequestedMetrics(rows);
+    final pinch = rows.firstWhere((r) => r['title'] == '代打起用数');
+    expect(pinch['colors_user'], isNull);
+    expect(pinch['id_users'], isNull);
+  });
+
   test('捕手の盗塁阻止数は守備記録の当年一軍Cだけから取得する', () {
     String row(int year,String league,String position,String count,String rate) {
       final cells=List.filled(26,'0');
@@ -127,6 +143,12 @@ void main() {
         'https://npb.jp/scores/2026/0327/g-t-01/box.html');
     expect(row!['players']['1']['lines'], hasLength(2));
     expect(row['players']['1']['plays'].single['result'], '中前安');
+    final pitcher = row['players']['1']['lines'].last;
+    expect(pitcher['starter'], true);
+    expect(pitcher['int_runs'], 0);
+    expect(pitcher['int_four'], 0);
+    expect(pitcher['int_dead_pitching'], 0);
+    expect(row['players']['1']['opponent'], row['home']);
   });
 
   test('同名選手を推測で選ばずID照合を優先', () {

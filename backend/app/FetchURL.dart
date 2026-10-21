@@ -3107,9 +3107,93 @@ class FetchURL {
     ''');
   }
 
+  /// The provider's RISP ranking includes qualified batters only.
+  static Future<void> ensureRispStat(Connection conn) async {
+    await conn.execute("""
+      INSERT INTO m_stats (title,flg_pitcher,flg_positive,flg_delete,int_index,
+        code_display,title_shortest,crtpgm,updpgm,crtat,updat)
+      SELECT '得点圏打率',false,true,false,
+        COALESCE((SELECT MAX(int_index) FROM m_stats),0)+1,
+        code_display,'得点圏','RISP','RISP',NOW(),NOW()
+      FROM m_stats WHERE title='打率' AND NOT COALESCE(flg_delete,false)
+        AND NOT EXISTS (SELECT 1 FROM m_stats WHERE title='得点圏打率' AND NOT COALESCE(flg_delete,false))
+      LIMIT 1
+    """);
+    await conn.execute("""
+      INSERT INTO m_stats_details (id_stats,id_league,flg_predict,url,int_idx_col,
+        id_website,flg_delete,int_idx_col_details,int_idx_row_details,crtpgm,updpgm,crtat,updat)
+      SELECT k.id,d.id_league,false,
+        CASE WHEN d.url LIKE '%type=%' THEN regexp_replace(d.url,'type=[^&]*','type=risp')
+          ELSE d.url || CASE WHEN d.url LIKE '%?%' THEN '&' ELSE '?' END || 'type=risp' END,24,d.id_website,false,
+        d.int_idx_col_details,d.int_idx_row_details,'RISP','RISP',NOW(),NOW()
+      FROM m_stats k JOIN m_stats src ON src.title='打率' AND NOT COALESCE(src.flg_delete,false)
+      JOIN m_stats_details d ON d.id_stats=src.id AND NOT COALESCE(d.flg_delete,false)
+      WHERE k.title='得点圏打率' AND NOT COALESCE(k.flg_delete,false)
+        AND d.url LIKE '%baseball.yahoo.co.jp/%'
+        AND NOT EXISTS (SELECT 1 FROM m_stats_details x WHERE x.id_stats=k.id AND x.id_league=d.id_league AND NOT COALESCE(x.flg_delete,false))
+    """);
+  }
+
+  /// 勝率の専用ランキングを取得し、提供元の対象投手と順位を保持する。
+  static Future<void> ensureWinningPercentageStat(Connection conn) async {
+    await conn.execute("""
+      INSERT INTO m_stats (title,flg_pitcher,flg_positive,flg_delete,int_index,
+        code_display,title_shortest,crtpgm,updpgm,crtat,updat)
+      SELECT '勝率',true,true,false,
+        COALESCE((SELECT MAX(int_index) FROM m_stats),0)+1,
+        'NUM_NO_ZERO_3','勝率','WIN_RATE','WIN_RATE',NOW(),NOW()
+      FROM m_stats WHERE title='防御率' AND NOT COALESCE(flg_delete,false)
+        AND NOT EXISTS (SELECT 1 FROM m_stats WHERE title='勝率' AND NOT COALESCE(flg_delete,false))
+      LIMIT 1
+    """);
+    await conn.execute("""
+      INSERT INTO m_stats_details (id_stats,id_league,flg_predict,url,int_idx_col,
+        id_website,flg_delete,int_idx_col_details,int_idx_row_details,crtpgm,updpgm,crtat,updat)
+      SELECT k.id,d.id_league,false,
+        CASE WHEN d.url LIKE '%type=%' THEN regexp_replace(d.url,'type=[^&]*','type=wp')
+          ELSE d.url || CASE WHEN d.url LIKE '%?%' THEN '&' ELSE '?' END || 'type=wp' END,13,d.id_website,false,
+        d.int_idx_col_details,d.int_idx_row_details,'WIN_RATE','WIN_RATE',NOW(),NOW()
+      FROM m_stats k JOIN m_stats src ON src.title='防御率' AND NOT COALESCE(src.flg_delete,false)
+      JOIN m_stats_details d ON d.id_stats=src.id AND NOT COALESCE(d.flg_delete,false)
+      WHERE k.title='勝率' AND NOT COALESCE(k.flg_delete,false)
+        AND d.url LIKE '%baseball.yahoo.co.jp/%'
+        AND NOT EXISTS (SELECT 1 FROM m_stats_details x WHERE x.id_stats=k.id AND x.id_league=d.id_league AND NOT COALESCE(x.flg_delete,false))
+    """);
+  }
+
+  /// HPの専用ランキングを取得し、提供元の対象投手と順位を保持する。
+  static Future<void> ensureHoldPointsStat(Connection conn) async {
+    await conn.execute("""
+      INSERT INTO m_stats (title,flg_pitcher,flg_positive,flg_delete,int_index,
+        code_display,title_shortest,crtpgm,updpgm,crtat,updat)
+      SELECT 'HP',true,true,false,
+        COALESCE((SELECT MAX(int_index) FROM m_stats),0)+1,
+        'INTEGER','HP','HOLD_POINTS','HOLD_POINTS',NOW(),NOW()
+      FROM m_stats WHERE title='防御率' AND NOT COALESCE(flg_delete,false)
+        AND NOT EXISTS (SELECT 1 FROM m_stats WHERE title='HP' AND NOT COALESCE(flg_delete,false))
+      LIMIT 1
+    """);
+    await conn.execute("""
+      INSERT INTO m_stats_details (id_stats,id_league,flg_predict,url,int_idx_col,
+        id_website,flg_delete,int_idx_col_details,int_idx_row_details,crtpgm,updpgm,crtat,updat)
+      SELECT k.id,d.id_league,false,
+        CASE WHEN d.url LIKE '%type=%' THEN regexp_replace(d.url,'type=[^&]*','type=hldp')
+          ELSE d.url || CASE WHEN d.url LIKE '%?%' THEN '&' ELSE '?' END || 'type=hldp' END,11,d.id_website,false,
+        d.int_idx_col_details,d.int_idx_row_details,'HOLD_POINTS','HOLD_POINTS',NOW(),NOW()
+      FROM m_stats k JOIN m_stats src ON src.title='防御率' AND NOT COALESCE(src.flg_delete,false)
+      JOIN m_stats_details d ON d.id_stats=src.id AND NOT COALESCE(d.flg_delete,false)
+      WHERE k.title='HP' AND NOT COALESCE(k.flg_delete,false)
+        AND d.id_league IN (1,2) AND d.url LIKE '%baseball.yahoo.co.jp/%'
+        AND NOT EXISTS (SELECT 1 FROM m_stats_details x WHERE x.id_stats=k.id AND x.id_league=d.id_league AND NOT COALESCE(x.flg_delete,false))
+    """);
+  }
+
   /// NPB / MLB 共通。指定リーグの m_stats_details URL を巡回して個人成績を登録する。
   static Future<Response> fetchStatsPlayerForLeagues(Connection conn, List<int> leagueIds, {String? onlyTitle}) async {
     await ensureKbbStat(conn);
+    await ensureRispStat(conn);
+    await ensureWinningPercentageStat(conn);
+    await ensureHoldPointsStat(conn);
     // t_stats_player は履歴用に削除せず INSERT のみ。
     // t_stats_player_latest のみ同内容で deleteInsert する。
     final results = await conn.execute(AppSql.selectStatsDetails(leagueIds: leagueIds));
@@ -3153,7 +3237,15 @@ class FetchURL {
 
       final table = tables.first;
       List<t_stats_player> listStats = [];
-      final colIdx = int.tryParse('${stat['int_idx_col']}') ?? 0;
+      final colIdx = title == 'ホールド'
+          ? table.querySelectorAll('thead th').indexWhere((th) => th.text.replaceAll(RegExp(r'\s|　'), '') == 'ホールド')
+          : title == 'HP'
+          ? table.querySelectorAll('thead th').indexWhere((th) => th.text.replaceAll(RegExp(r'\s|　'), '').replaceAll('Ｈ', 'H').replaceAll('Ｐ', 'P') == 'HP')
+          : title == '勝率'
+          ? table.querySelectorAll('thead th').indexWhere((th) => th.text.replaceAll(RegExp(r'\s'), '') == '勝率')
+          : title == '得点圏打率'
+          ? table.querySelectorAll('thead th').indexWhere((th) => th.text.replaceAll(RegExp(r'\s'), '').contains('得点圏'))
+          : int.tryParse('${stat['int_idx_col']}') ?? 0;
       final isPitcherTable = url.contains('/pitcher');
 
       for (final tr in table.querySelectorAll('tr')) {
@@ -3267,7 +3359,7 @@ class FetchURL {
         }
       } //for選手
 
-      if (title == '盗塁成功率') {
+      if (title == '盗塁成功率' || title == '得点圏打率') {
         assignCompetitionRanks(listStats, higherIsBetter: true);
       } else if (title == '与四球率') {
         assignCompetitionRanks(listStats, higherIsBetter: false);

@@ -158,7 +158,7 @@ class HeaderAuthAction extends StatelessWidget {
             children: [
               if (admin)
                 IconButton(
-                  tooltip: 'ログ管理',
+                  tooltip: '管理者画面',
                   onPressed: () {
                     Navigator.of(iconContext).push(
                       MaterialPageRoute<void>(builder: (_) => const AdminLogsPage()),

@@ -1,5 +1,9 @@
 # README【YakyuuJapan】
 
+【neon利用状況】
+
+[https://console.neon.tech/app/org-empty-fog-22600075/billing](https://console.neon.tech/app/org-empty-fog-22600075/billing)
+
 【コミット&デプロイ記述】
 
 cd /Users/standapp/StudioProjects/Koko 
@@ -8,7 +12,7 @@ sh tool/build_web.sh
 
 git add . 
 
-git commit -m "現役タブを追加しました。" 
+git commit -m "大幅な表示修正を追加しました。" 
 
 git push 
 
@@ -24,10 +28,10 @@ dart run tool_sql2.dart
 
 【データ登録用URL】
 
-- ++[[http://127.0.0.1:8080/](http://127.0.0.1:8080/)++fetchGamesNPB]([http://127.0.0.1:8080/fetchGamesNPB](http://127.0.0.1:8080/fetchGamesNPB))
+- ++[http://127.0.0.1:8080/](http://127.0.0.1:8080/)++fetchGamesNPB
 - ++[http://127.0.0.1:8080/fetchStatsTeamNPB](http://127.0.0.1:8080/fetchStatsTeamNPB)++
-- ++[[http://127.0.0.1:8080/](http://127.0.0.1:8080/)++fetchStatsPlayerNPB]([http://127.0.0.1:8080/fetchStatsPlayerNPB](http://127.0.0.1:8080/fetchStatsPlayerNPB))
-- ++[[http://127.0.0.1:8080/](http://127.0.0.1:8080/)++insertNewPlayersNPB]([http://127.0.0.1:8080/insertNewPlayersNPB](http://127.0.0.1:8080/insertNewPlayersNPB))
+- ++[http://127.0.0.1:8080/](http://127.0.0.1:8080/)++fetchStatsPlayerNPB
+- ++[http://127.0.0.1:8080/](http://127.0.0.1:8080/)++insertNewPlayersNPB
 
 【ショートカット】
 

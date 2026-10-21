@@ -70,6 +70,8 @@ List<String> rosterContractLabels(
   final status = usageInt(player['move_status_year']) == year
       ? '${player['move_status'] ?? ''}'
       : '';
+  if (status == 'FA宣言（移籍先未定）') labels.add('FA宣言');
+  if (status == 'ポスティング容認') labels.add('ポスティング容認');
   final exercised = usageInt(player['fa_exercised_year']) >= year - 1 ||
       (usageInt(player['move_method_year']) == year &&
           player['move_method'] == 'FA移籍') ||

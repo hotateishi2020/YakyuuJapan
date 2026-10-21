@@ -53,8 +53,9 @@ List<Map<String, dynamic>> uniformGroups(List<Map<String, dynamic>> history,
   for (final row in history) {
     final number = '${row['number']}';
     if (!RegExp(r'^\d{1,3}$').hasMatch(number) ||
-        usageInt(number) > 300 ||
-        usageInt(row['first_year']) > year) continue;
+        usageInt(row['first_year']) > year) {
+      continue;
+    }
     final key = '${row['id_team']}|$number|${catalogName(row['name'])}';
     final last = usageInt(row['last_year']);
     final wornThisYear = usageInt(row['first_year']) <= year && last >= year;
@@ -75,8 +76,9 @@ List<Map<String, dynamic>> uniformGroups(List<Map<String, dynamic>> history,
         groups[key] = {...row, 'first_year': first};
       }
       groups[key]!['worn_in_selected_year'] = wornInGroup;
-      if (usageInt(row['first_year']) < usageInt(groups[key]!['first_year']))
+      if (usageInt(row['first_year']) < usageInt(groups[key]!['first_year'])) {
         groups[key]!['first_year'] = row['first_year'];
+      }
     }
   }
   final result = groups.values.toList()
@@ -132,20 +134,20 @@ List<Map<String, dynamic>> membershipCandidates(
         'label': metric['label'],
         'target': target,
         'remaining': remaining,
+        'achievement_ratio': value / target,
         'pace': pace,
         'estimate': estimate
       };
       final old = people[name];
       if (old == null ||
-          (estimate ?? double.infinity) <
-              ((old['estimate'] as num?)?.toDouble() ?? double.infinity))
+          (candidate['achievement_ratio'] as num) > (old['achievement_ratio'] as num)) {
         people[name] = candidate;
+      }
     }
   }
   return people.values.toList()
     ..sort((a, b) {
-      final cmp = ((a['estimate'] as num?)?.toDouble() ?? double.infinity)
-          .compareTo((b['estimate'] as num?)?.toDouble() ?? double.infinity);
+      final cmp = (b['achievement_ratio'] as num).compareTo(a['achievement_ratio'] as num);
       return cmp != 0 ? cmp : '${a['name']}'.compareTo('${b['name']}');
     });
 }
@@ -261,7 +263,8 @@ class BaseballCatalog {
                 'name': name,
                 'name_team': team?['name_team'] ?? info['team'],
                 'image': image.isEmpty ? null : image,
-                'image_outside': images.outside.isEmpty ? null : images.outside
+                'image_outside': images.outside.isEmpty ? null : images.outside,
+                'image_generated': images.generated
               };
             })()
         ]
@@ -318,7 +321,7 @@ class BaseballCatalog {
                 catalogFranchise('${t['name_full']}') ==
                 catalogFranchise('${person['team']}'))
             .firstOrNull;
-        if (team != null)
+        if (team != null) {
           current.add({
             ...person,
             'id_team': team['id_team'],
@@ -326,6 +329,7 @@ class BaseballCatalog {
             'last_year': year,
             'current_roster': true
           });
+        }
       }
     }
     final source = org.code == 'npb'
@@ -379,8 +383,9 @@ class BaseballCatalog {
               usageInt(r['since']) <= year)
           .firstOrNull;
       if (mark != null) row['number_status'] = mark['status'];
-      if (org.code == 'mlb' && row['number'] == '42' && year >= 1997)
+      if (org.code == 'mlb' && row['number'] == '42' && year >= 1997) {
         row['number_status'] = 'permanent';
+      }
     }
     for (final mark in reserved
         .where((r) => r['org'] == org.code && usageInt(r['since']) <= year)) {
@@ -391,8 +396,9 @@ class BaseballCatalog {
           .firstOrNull;
       if (team == null ||
           grouped.any((r) =>
-              r['id_team'] == team['id_team'] && r['number'] == mark['number']))
+              r['id_team'] == team['id_team'] && r['number'] == mark['number'])) {
         continue;
+      }
       grouped.add({
         'id_team': team['id_team'],
         'number': mark['number'],
@@ -407,7 +413,7 @@ class BaseballCatalog {
       'teams': teams,
       'uniforms': grouped,
       'coverage':
-          '${org.code == 'mlb' ? 'MLB公式歴代名簿の代表番号（番号変更の全履歴ではありません）。' : ''}登録済みの歴代着用履歴＋${year}年度名簿。空欄は未使用ではなく未収録を含みます。人数は同一選手を重複除外。履歴出典：NPB名鑑／球団名簿。'
+          '${org.code == 'mlb' ? 'MLB公式歴代名簿の代表番号（番号変更の全履歴ではありません）。' : ''}登録済みの歴代着用履歴＋$year年度名簿。空欄は未使用ではなく未収録を含みます。人数は同一選手を重複除外。履歴出典：NPB名鑑／球団名簿。'
     };
   }
 }

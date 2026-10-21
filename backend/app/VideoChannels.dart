@@ -47,7 +47,7 @@ class VideoChannel {
           category == 'related' ||
           category == 'broadcast'
       ? 30
-      : ['media', 'program'].contains(category)
+      : ['media', 'program', 'fan'].contains(category)
           ? 10
           : 4;
   Map<String, dynamic> toJson() => {
@@ -74,6 +74,10 @@ class VideoChannel {
 
 // Official channel identities verified on 2026-10-18. sourceUrl records provenance.
 const videoChannels = <VideoChannel>[
+  VideoChannel('UCiLrlqt9mfRGeAugoYqON7g', '工藤公康 official YouTubeチャンネル', 'ob', 'https://www.youtube.com/@kimiyasukudo_official', tabLabel: '工藤公康', videoOrg: 'npb', unknownToNpb: true, contentFilter: 'baseball'),
+  VideoChannel('UCwPaG8zQJvsCwiTstXcx8ng', 'B-モレル B桑', 'fan', 'https://www.youtube.com/channel/UCwPaG8zQJvsCwiTstXcx8ng', videoOrg: 'npb', unknownToNpb: true),
+  VideoChannel('UCIgvsl9EWxnXzSm9aoXp-lQ', 'ギー太 ホークス応援チャンネル', 'fan', 'https://www.youtube.com/channel/UCIgvsl9EWxnXzSm9aoXp-lQ', videoOrg: 'npb', unknownToNpb: true),
+  VideoChannel('UCchbZjsjbnsk1RYSam4_OAg', 'クラチくんch【西武ライオンズ】', 'fan', 'https://www.youtube.com/channel/UCchbZjsjbnsk1RYSam4_OAg', videoOrg: 'npb', unknownToNpb: true),
   VideoChannel("UC0v-pxTo1XamIDE-f__Ad0Q", "(パーソル パ・リーグTV公式)PacificLeagueTV",
       "league", "https://www.pacificleague.jp/service/",
       daily: true, includeStreams: true, lookbackDays: 2, minimumVideos: 10),
@@ -232,13 +236,13 @@ const videoChannels = <VideoChannel>[
 
 // MLB sources plus per-video MLB filtering for the shared MNsports channel.
 final mlbVideoChannels = <VideoChannel>[
-  VideoChannel('UCJ-l-sMQFHogSy8KXRyMIRA', 'SPOTV NOW', 'league',
+  const VideoChannel('UCJ-l-sMQFHogSy8KXRyMIRA', 'SPOTV NOW', 'league',
       'https://prtimes.jp/main/html/rd/p/000000026.000075946.html',
       daily: true),
-  VideoChannel('UCoLrcjPV5PbUrUyXq5mjc_A', 'MLB公式', 'league',
+  const VideoChannel('UCoLrcjPV5PbUrUyXq5mjc_A', 'MLB公式', 'league',
       'https://www.youtube.com/@MLB',
       daily: true),
-  VideoChannel('UCgxdkQmUjKLWjh058Pl4dAQ', 'MNsports', 'media',
+  const VideoChannel('UCgxdkQmUjKLWjh058Pl4dAQ', 'MNsports', 'media',
       'https://www.youtube.com/@mnsports',
       videoOrg: 'mlb'),
   ...videoChannels
@@ -279,8 +283,9 @@ Set<String> broadcastVideoTeams(VideoChannel channel, String title) {
   const ambiguous = {'巨人', '阪神', '広島', '中日', '楽天', '西武', 'ソフトバンク', 'オリックス'};
   final result = <String>{};
   for (final entry in teamVideoKeywords.entries) {
-    if (channel.teamIds.isNotEmpty && !channel.teamIds.contains(entry.key))
+    if (channel.teamIds.isNotEmpty && !channel.teamIds.contains(entry.key)) {
       continue;
+    }
     if (entry.value.any((word) {
       final keyword = word.toLowerCase();
       if (!text.contains(keyword)) return false;
@@ -289,7 +294,9 @@ Set<String> broadcastVideoTeams(VideoChannel channel, String title) {
           text.contains('【$keyword】') ||
           text.contains('【$keyword・') ||
           text.contains('[$keyword]');
-    })) result.add(entry.key);
+    })) {
+      result.add(entry.key);
+    }
   }
   // Program title used by TV Saitama, including English-only editions.
   if (channel.teamIds.contains('UChLK3zS3-kR21JVTaNovPIg') &&

@@ -4,6 +4,26 @@ import 'package:shelf/shelf.dart';
 import '../app/LogDetail.dart';
 
 void main() {
+  test('API読み込み・自動通知とユーザーの更新を分類する', () {
+    for (final path in ['/predictions/part', '/season-schedule', '/videos', '/auth/me']) {
+      expect(LogDetail.accessType(Request('GET', Uri.parse('https://example.test$path')),
+          scheduled: false), 'ブラウザ処理');
+    }
+    expect(LogDetail.accessType(Request('POST', Uri.parse('https://example.test/predictions/ready')),
+        scheduled: false), 'ブラウザ処理');
+    expect(LogDetail.accessType(Request('POST', Uri.parse('https://example.test/auth/profile')),
+        scheduled: false), '操作');
+    expect(LogDetail.accessType(Request('GET', Uri.parse('https://example.test/fetchGamesNPB')),
+        scheduled: true), 'サーバー処理');
+  });
+  test('初期読み込みはブラウザ処理、クリックによる画面選択は操作', () {
+    expect(LogDetail.clientActionType('初期表示を読み込んだ'), 'ブラウザ処理');
+    for (final action in LogDetail.clientActions.where((a) => a != '初期表示を読み込んだ')) {
+      expect(LogDetail.clientActionType(action), '操作');
+    }
+    expect(LogDetail.clientActions, containsAll(['タイトルタブを開いた', '予想タブを開いた', '動画タブを開いた']));
+  });
+
   test('接続元IPとブラウザ・端末を記録する', () {
     final info = LogDetail.clientInfo(Request('GET', Uri.parse('https://example.test/'), headers: {
       'x-forwarded-for': '203.0.113.8, 10.0.0.1',

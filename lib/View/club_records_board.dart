@@ -1,3 +1,4 @@
+import 'player_detail_dialog.dart';
 import 'package:flutter/material.dart';
 import '../tools/json_utils.dart';
 import '../tools/color_parse.dart';
@@ -48,9 +49,11 @@ class _ClubRecordsBoardState extends State<ClubRecordsBoard> {
                     Tooltip(
                         message:
                             '${rows[i]['source_url'] ?? rows[i]['sources'] ?? ''}',
-                        child: Text(
-                            '${rows[i]['name']}\n${rows[i]['value']}$unit${past ? '（${rows[i]['year']}）' : ''}',
-                            style: const TextStyle(fontSize: 11))),
+                        child: PlayerNameLink(
+                            player: rows[i],
+                            child: Text(
+                                '${rows[i]['name']}\n${rows[i]['value']}$unit${past ? '（${rows[i]['year']}）' : ''}',
+                                style: const TextStyle(fontSize: 11)))),
                     const SizedBox(height: 3),
                     if (value(rows[i]) != null)
                       Semantics(
@@ -85,8 +88,6 @@ class _ClubRecordsBoardState extends State<ClubRecordsBoard> {
             'streak': '連続記録'
           }[_group]}',
           style: const TextStyle(fontWeight: FontWeight.bold)),
-      Text('${data['note'] ?? ''}',
-          style: const TextStyle(fontSize: 11, color: Colors.black54)),
       Expanded(child: LayoutBuilder(builder: (context, constraints) {
         final width = ((constraints.maxWidth - 100) / teams.length)
             .clamp(190.0, 300.0)
@@ -169,36 +170,51 @@ class _ClubRecordsBoardState extends State<ClubRecordsBoard> {
                                               CrossAxisAlignment.stretch,
                                           children: [
                                             const Text('歴代最高',
-                                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                                                style: TextStyle(
+                                                    fontSize: 11,
+                                                    fontWeight:
+                                                        FontWeight.bold)),
                                             entries(record, '${metric['unit']}',
-                                                past: true, maximum: maximum,
-                                                color: const Color(0xFF546E7A), key: '$barKey-record'),
-                                            const SizedBox(height: 8),
-                                            Text(_group == 'career' ? '今季出場者の通算' : '今季トップ',
-                                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                                            entries(current, '${metric['unit']}',
+                                                past: true,
                                                 maximum: maximum,
-                                                color: parseColorNameOrNull('${team['color_back']}') ?? Colors.blue,
+                                                color: const Color(0xFF546E7A),
+                                                key: '$barKey-record'),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                                _group == 'career'
+                                                    ? '今季出場者の通算'
+                                                    : '今季トップ',
+                                                style: const TextStyle(
+                                                    fontSize: 11,
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                            entries(
+                                                current, '${metric['unit']}',
+                                                maximum: maximum,
+                                                color: parseColorNameOrNull(
+                                                        '${team['color_back']}') ??
+                                                    Colors.blue,
                                                 key: '$barKey-current'),
                                             if (gap != null)
                                               Padding(
                                                   padding:
                                                       const EdgeInsets.only(
                                                           top: 6),
-                                                  child: Text(
-                                                      gap < 0
-                                                          ? '登録済み最高を更新'
-                                                          : gap == 0
+                                                  child: gap < 0
+                                                      ? const _RecordUpdatedLabel()
+                                                      : Text(
+                                                          gap == 0
                                                               ? '登録済み最高に並ぶ'
                                                               : 'あと${gap == gap.roundToDouble() ? gap.toInt() : gap.toStringAsFixed(2)}${metric['unit']}',
-                                                      style: TextStyle(
-                                                          fontSize: 11,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: gap <= 0
-                                                              ? Colors.red
-                                                              : Colors
-                                                                  .black54))),
+                                                          style: TextStyle(
+                                                              fontSize: 11,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color: gap <= 0
+                                                                  ? Colors.red
+                                                                  : Colors
+                                                                      .black54))),
                                           ]);
                                     }), width,
                                         color: Color.lerp(
@@ -211,6 +227,39 @@ class _ClubRecordsBoardState extends State<ClubRecordsBoard> {
                           })),
                 ])));
       })),
+      Text('${data['note'] ?? ''}',
+          style: const TextStyle(fontSize: 11, color: Colors.black54)),
     ]);
   }
+}
+
+class _RecordUpdatedLabel extends StatefulWidget {
+  const _RecordUpdatedLabel();
+
+  @override
+  State<_RecordUpdatedLabel> createState() => _RecordUpdatedLabelState();
+}
+
+class _RecordUpdatedLabelState extends State<_RecordUpdatedLabel>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 700),
+  )..repeat(reverse: true);
+  late final Animation<double> _opacity = Tween<double>(begin: 1, end: .25)
+      .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => FadeTransition(
+        opacity: _opacity,
+        child: const Text('球団記録更新',
+            style: TextStyle(
+                fontSize: 11, fontWeight: FontWeight.bold, color: Colors.red)),
+      );
 }

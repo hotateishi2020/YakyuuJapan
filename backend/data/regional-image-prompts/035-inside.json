@@ -1,0 +1,9 @@
+{
+  "stadium": "日立会瀬球場",
+  "address": "茨城県日立市",
+  "view": "inside",
+  "path": "backend/assets/images/stadiums/inside/regional-035-generated.jpg",
+  "prompt": "Use case: stylized-concept. Asset: Japanese baseball stadium directory thumbnail. Create a single landscape architectural illustration of 日立会瀬球場, 茨城県日立市, a regional baseball ground. Show the interior, baseball diamond and stands seen from behind home plate. Respect the specific ground's characteristic structure and size as far as known; do not default to a giant major-league stadium or copy another stadium. Modest municipal ground if details unknown. Open air baseball park. Architectural illustration, clean daylight, clear silhouette. No text, no logos, no collage, no watermarks. This is a labeled AI reference illustration, not a factual photograph or precise historical reconstruction.",
+  "method": "built-in image_gen",
+  "display_note": "AI生成の参考イメージ。現地写真・正確な建築資料ではありません。"
+}

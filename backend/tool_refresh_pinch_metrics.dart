@@ -23,7 +23,8 @@ Future<void> main(List<String> args) async {
     final cache = readClubFile('npb-pinch-games-$year.json');
     final games = usageMap(cache['games']);
     final recent = usageMap(readClubFile('npb-recent-games-$year.json')['games']);
-    final missing = urls.where((u) => !games.containsKey(u) || !recent.containsKey(u)).toList();
+    final missing = urls.where((u) => !games.containsKey(u) ||
+        needsNpbPitchingRefresh(recent[u])).toList();
     var cursor = 0, done = 0;
     await Future.wait(List.generate(4, (_) async {
       while (cursor < missing.length) {

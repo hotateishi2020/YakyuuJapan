@@ -1,0 +1,66 @@
+{
+  "date": "2026-10-21",
+  "method": "built-in image_gen",
+  "registered_this_resume": 59,
+  "newly_generated": [
+    "43145157"
+  ],
+  "edited_and_registered": [
+    "01905134",
+    "13115138",
+    "11315130"
+  ],
+  "existing_images_reviewed_and_registered": 55,
+  "all_players_complete": false,
+  "manifest": "resume-20261021-manifest.json",
+  "image_validation": {
+    "checked": 59,
+    "invalid": 0,
+    "duplicates": 0
+  },
+  "live_api_check": {
+    "source_player_id": "43145157",
+    "detail_image_url_present": true,
+    "served_png_matches_source": true
+  },
+  "teams": {
+    "ロッテ": 9,
+    "広島": 5,
+    "ソフトバンク": 5,
+    "日本ハム": 6,
+    "ヤクルト": 4,
+    "オリックス": 5,
+    "阪神": 4,
+    "DeNA": 5,
+    "巨人": 5,
+    "楽天": 4,
+    "西武": 4,
+    "中日": 3
+  },
+  "remaining_by_status": {
+    "prepared": 833,
+    "excluded": 110,
+    "needs_research": 23,
+    "registered": 88,
+    "needs_visual_fix": 21
+  },
+  "notes": [
+    "74件の既存未登録画像を確認。修正が必要な画像は登録を保留。",
+    "成果物ファイルと実行セルのない過去の生成中7件はpreparedへ戻した。",
+    "全選手の画像作成は未完了。組み込み画像生成を使用。サーバーAPI自動生成は開始していない。"
+  ],
+  "detail_verification": {
+    "verified": 59,
+    "failures": [],
+    "note": "最初の58件検証は57件成功・澤田1件失敗。公式に基づく背番号66→54修正後に澤田を再検証して成功。石田追加分も1件成功。"
+  },
+  "identity_corrections": [
+    {
+      "source_player_id": "01905134",
+      "field": "uniform_number",
+      "before": "66",
+      "after": "54",
+      "source": "https://npb.jp/bis/players/01905134.html"
+    }
+  ]
+}

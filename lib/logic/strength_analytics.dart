@@ -54,15 +54,20 @@ Map<String, dynamic> pitchingRoleBand(Map<String, dynamic> team) {
   final rows = pitchingWorkloadBands(listMapFromJson(team['pitching_workload']));
   final total = rows.isEmpty ? 0 : usageInt(rows.first['total']);
   return {
-    'slot': 'pitching_role', 'label': '先発・中継ぎ',
-    'unit': 'outs', 'total': total, 'role_outs': total,
+    'slot': 'pitching_role',
+    'label': '先発・中継ぎ',
+    'unit': 'outs',
+    'total': total,
+    'role_outs': total,
     'players': [
       for (final row in rows)
-        if (usageInt(row['role_outs']) > 0) {
-          'name': row['slot'] == 'starter' ? '先発' : '中継ぎ・抑え',
-          'player_key': 'pitching_role:${row['slot']}',
-          'count': row['role_outs'], 'unit': 'outs',
-        },
+        if (usageInt(row['role_outs']) > 0)
+          {
+            'name': row['slot'] == 'starter' ? '先発' : '中継ぎ・抑え',
+            'player_key': 'pitching_role:${row['slot']}',
+            'count': row['role_outs'],
+            'unit': 'outs',
+          },
     ],
   };
 }
@@ -123,13 +128,7 @@ List<Map<String, dynamic>> contributionBands(Map<String, dynamic> team) => [
                     ]
                 }
           ]..sort((a, b) => usageInt(b['count']).compareTo(usageInt(a['count'])));
-          return <String, dynamic>{
-            'slot': metric.$1,
-            'label': metric.$2,
-            'total': players.fold<int>(0, (n, p) => n + usageInt(p['count'])),
-            'unit': 'contribution',
-            'players': players
-          };
+          return <String, dynamic>{'slot': metric.$1, 'label': metric.$2, 'total': players.fold<int>(0, (n, p) => n + usageInt(p['count'])), 'unit': 'contribution', 'players': players};
         })()
     ];
 
@@ -149,9 +148,16 @@ Map<String, List<Map<String, dynamic>>> selectPitcherAces(Map<String, dynamic> t
   if (closer != null) result['CL'] = [closer];
   for (final hand in ['L', 'R']) {
     bool matches(Map<String, dynamic> p) => [hand == 'L' ? '左' : '右', hand].contains(p['throws']);
-    final starter = best(players.where((p) => matches(p) && usageInt(p['starter_outs']) > 0).toList(), 'starter_outs', 'starts');
-    final relief = best(
-        players.where((p) => matches(p) && usageInt(p['relief_outs']) > 0 && usagePlayerKey(p) != (closer == null ? '' : usagePlayerKey(closer))).toList(), 'holds', 'relief_outs');
+    var starter = best(players.where((p) => matches(p) && usageInt(p['starter_outs']) > 0).toList(), 'starter_outs', 'starts');
+    // A mixed-role pitcher's total innings are an upper bound on starts.
+    // Publish only if missing splits cannot change the winner.
+    if (starter != null && players.any((p) => matches(p) && (p['starts'] == null || usageInt(p['starts']) > 0) && p['starter_outs'] == null && (p['total_outs'] == null || usageInt(p['total_outs']) >= usageInt(starter!['starter_outs'])))) {
+      starter = null;
+    }
+    var relief = best(players.where((p) => matches(p) && usageInt(p['relief_outs']) > 0 && usagePlayerKey(p) != (closer == null ? '' : usagePlayerKey(closer))).toList(), 'holds', 'relief_outs');
+    if (relief != null && players.any((p) => matches(p) && usagePlayerKey(p) != (closer == null ? '' : usagePlayerKey(closer)) && p['relief_outs'] == null && (usageInt(p['holds']) > usageInt(relief!['holds']) || (usageInt(p['holds']) == usageInt(relief['holds']) && (p['total_outs'] == null || usageInt(p['total_outs']) >= usageInt(relief['relief_outs'])))))) {
+      relief = null;
+    }
     if (starter != null) result['SP_$hand'] = [starter];
     if (relief != null) result['RP_$hand'] = [relief];
   }
@@ -180,8 +186,7 @@ Map<String, List<Map<String, dynamic>>> selectBenchRegulars(Map<String, dynamic>
       if (slot == 'PH_L' && !['左', 'L', '両', 'S'].contains(hand)) continue;
       if (slot == 'PH_R' && !['右', 'R', '両', 'S'].contains(hand)) continue;
       if (usageInt(raw['count']) <= 0) continue;
-      players
-          .add({...p, 'count': usageInt(raw['count']), 'position': slot, 'usage_rate': usageInt(source?['total']) > 0 ? usageInt(raw['count']) / usageInt(source?['total']) : 0.0});
+      players.add({...p, 'count': usageInt(raw['count']), 'position': slot, 'usage_rate': usageInt(source?['total']) > 0 ? usageInt(raw['count']) / usageInt(source?['total']) : 0.0});
     }
     final total = players.fold<int>(0, (sum, p) => sum + usageInt(p['count']));
     for (final p in players) {

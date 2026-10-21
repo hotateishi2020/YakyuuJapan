@@ -3,8 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/logic/transfer_candidates.dart';
 import 'package:Yakyuu_Japan/logic/contract_fa.dart';
 import 'package:Yakyuu_Japan/logic/roster_contract_status.dart';
-import 'package:Yakyuu_Japan/View/team_strength_board.dart';
-import 'package:Yakyuu_Japan/config/org_config.dart';
+import 'package:Yakyuu_Japan/View/strength_transfers.dart';
 
 void main() {
   final team = <String, dynamic>{
@@ -68,27 +67,71 @@ void main() {
     expect(rosterContractLabels({'player_key': 'npb:31035136'}, team, 2026),
         ['ポスティング？']);
   });
-  testWidgets('狭い画面でドラフトの右に移籍がありFA・ポスティングで絞れる', (t) async {
+  test('引退表明・引退確定はFA権があっても移籍候補から除外する', () {
+    Map<String, dynamic> candidate(String key, Map<String, dynamic> extra) => {
+          'player_key': key,
+          'name': key,
+          'fa_rights_type': 'domestic',
+          'fa_rights_year': 2026,
+          ...extra,
+        };
+    final roster = [
+      candidate('npb:51755115', {'name': '栗山 巧'}),
+      candidate('名前のみ', {'name': '栗山　巧'}),
+      candidate('引退確定', {'retirement_confirmed': true}),
+      candidate(
+          '引退表明', {'retirement_announced': true, 'retirement_year': 2026}),
+      candidate('当年ステータス', {'move_status': '引退表明', 'move_status_year': 2026}),
+      candidate('未確定', {'move_status': '引退の可能性', 'move_status_year': 2026}),
+      candidate(
+          '翌年引退', {'retirement_announced': true, 'retirement_year': 2027}),
+      candidate('現役', {}),
+    ];
+    final result = transferCandidates([
+      {...team, 'roster': roster}
+    ], 2026);
+    expect(result.map((r) => r['player']['name']),
+        unorderedEquals(['未確定', '翌年引退', '現役']));
+    expect(
+        transferCandidates([
+          {
+            ...team,
+            'roster': [
+              candidate(
+                  'npb:51755115', {'name': '栗山 巧', 'fa_rights_year': 2025}),
+            ]
+          }
+        ], 2025),
+        hasLength(1));
+  });
+  testWidgets('狭い画面の移籍一覧に引退表明済み選手を表示しない', (t) async {
     await t.binding.setSurfaceSize(const Size(390, 844));
     addTearDown(() => t.binding.setSurfaceSize(null));
     await t.pumpWidget(MaterialApp(
         home: Scaffold(
-            body: TeamStrengthBoard(
-                org: OrgConfig.npb,
-                year: 2026,
-                providedTeams: [team],
-                initialView: 12))));
+            body: StrengthTransfers(
+      year: 2026,
+      teams: [
+        {
+          ...team,
+          'roster': [
+            ...(team['roster'] as List),
+            const {
+              'player_key': 'npb:51755115',
+              'name': '栗山 巧',
+              'fa_rights_type': 'international',
+              'fa_rights_year': 2026
+            },
+          ]
+        }
+      ],
+    ))));
     await t.pump();
-    expect(t.getTopLeft(find.text('移籍')).dx,
-        greaterThan(t.getTopLeft(find.text('ドラフト')).dx));
     expect(find.text('海外FA'), findsOneWidget);
     expect(find.text('ポスティング？'), findsOneWidget);
-    await t.tap(find.widgetWithText(ChoiceChip, 'ポスティング'));
-    await t.pump();
-    expect(find.text('海外FA'), findsNothing);
     expect(find.text('平良 海馬'), findsOneWidget);
+    expect(find.text('栗山 巧'), findsNothing);
     expect(find.byKey(const ValueKey('transfer-grid')), findsOneWidget);
-    expect(find.text('出典'), findsNothing);
     expect(t.takeException(), isNull);
   });
 }

@@ -11,9 +11,10 @@ import '../tools/color_parse.dart';
 import '../tools/json_utils.dart';
 
 class StrengthRegularGrid extends StatefulWidget {
-  const StrengthRegularGrid({super.key, required this.teams, this.battingOrder});
+  const StrengthRegularGrid({super.key, required this.teams, this.battingOrder, this.teamHeader = '球団'});
   /// 固定表示する場合のモード。球団ページでは両モードを並べる。
   final bool? battingOrder;
+  final String teamHeader;
   final List<Map<String, dynamic>> teams;
   @override
   State<StrengthRegularGrid> createState() => _StrengthRegularGridState();
@@ -51,6 +52,7 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
   Iterable<String> get _slots => _battingOrder
       ? [for (var i = 1; i <= 9; i++) '$i']
       : [
+          if (widget.teamHeader == '年度' && widget.teams.any((t) => listMapFromJson(t['pitching_workload']).isEmpty && listMapFromJson(t['positions']).any((p) => p['slot'] == 'P'))) 'P',
           ...pitcherAceSlots.keys,
           ...usagePositions.keys.where((slot) => slot != 'P'),
           ...benchRegularSlots.keys
@@ -62,7 +64,7 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
         'DEF_IF' ||
         'DEF_OF' =>
           const Color(0xFF757575),
-        'SP_L' || 'SP_R' || 'RP_L' || 'RP_R' || 'CL' => const Color(0xFFEF5350),
+        'P' || 'SP_L' || 'SP_R' || 'RP_L' || 'RP_R' || 'CL' => const Color(0xFFEF5350),
         'C' => const Color(0xFF2196F3),
         '1B' || '2B' || '3B' || 'SS' => const Color(0xFFFFD54F),
         'LF' || 'CF' || 'RF' => const Color(0xFF43A047),
@@ -118,7 +120,7 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
                   onSelected: (_) => setState(() => _selectedBattingOrder = true)),
             ]),
             if (!hideTeam) Row(children: [
-              if (!hideTeam) _fixedCell('球団', Colors.grey.shade200, Colors.black87,
+              if (!hideTeam) _fixedCell(widget.teamHeader, Colors.grey.shade200, Colors.black87,
                   height: 44, width: teamWidth),
               Expanded(
                   child: sectionScrollView(context, 
@@ -248,6 +250,18 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
             ...selectRegularGroups(listMapFromJson(team['positions'])),
             ...selectPitcherAces(team)
           };
+    if (!_battingOrder && _slots.contains('P')) {
+      final group = listMapFromJson(team['positions']).where((p) => p['slot'] == 'P').firstOrNull;
+      final players = listMapFromJson(group?['players']);
+      final total = usageInt(group?['total']);
+      final most = players.fold<int>(0, (n, p) => usageInt(p['count']) > n ? usageInt(p['count']) : n);
+      if (total > 0 && most > 0) {
+        selected['P'] = [
+        for (final player in players.where((p) => usageInt(p['count']) == most))
+          {...player, 'usage_rate': most / total}
+        ];
+      }
+    }
     if (!_battingOrder) selected.addAll(selectBenchRegulars(team, selected));
     final roster = listMapFromJson(team['roster']);
     final teamColor =
@@ -595,7 +609,7 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
           !['国内FA権保有', '海外FA権保有', 'FA権保有'].contains(label)),
       ...rosterContractLabels(p, team, year),
     }.toList();
-    final newArrival = p['new_arrival'] == true && usageInt(p['arrival_year']) == year && departure == null;
+    final newArrival = p['new_arrival'] == true && [year, year + 1].contains(usageInt(p['arrival_year'])) && departure == null;
     final former = p['previous_team'] is Map ? Map<String, dynamic>.from(p['previous_team'] as Map) : <String, dynamic>{};
     final formerColor = parseColorNameOrNull('${former['color_back']}') ?? Colors.blueGrey;
     final formerText = parseColorNameOrNull('${former['color_font']}') ?? (formerColor.computeLuminance() > .45 ? Colors.black : Colors.white);
@@ -654,7 +668,7 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
                         size: 12)),
                     if (newArrival)
                       Wrap(spacing: 3, runSpacing: 3, children: [
-                        Container(padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1), color: Colors.red.shade700, child: _fitRosterText('新戦力', bold: true, color: Colors.white)),
+                        _NewArrivalBadge(child: Container(padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1), color: Colors.red.shade700, child: _fitRosterText('新戦力', bold: true, color: Colors.white))),
                         if ('${former['label'] ?? ''}'.isNotEmpty)
                           Tooltip(message: '前所属：${former['name']}', child: Container(padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1), color: formerColor, child: _fitRosterText('${former['label']}', bold: true, color: formerText))),
                       ]),
@@ -711,4 +725,24 @@ class _WideGridState extends State<_WideGrid> {
             padding: const EdgeInsets.only(top: 12),
             child: widget.child),
       );
+}
+
+class _NewArrivalBadge extends StatefulWidget {
+  const _NewArrivalBadge({required this.child});
+  final Widget child;
+  @override
+  State<_NewArrivalBadge> createState() => _NewArrivalBadgeState();
+}
+class _NewArrivalBadgeState extends State<_NewArrivalBadge> with SingleTickerProviderStateMixin {
+  late final AnimationController controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 850));
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (MediaQuery.disableAnimationsOf(context)) { controller.stop(); controller.value = 1; }
+    else { controller.repeat(reverse: true); }
+  }
+  @override
+  void dispose() { controller.dispose(); super.dispose(); }
+  @override
+  Widget build(BuildContext context) => FadeTransition(opacity: Tween<double>(begin: .35, end: 1).animate(controller), child: widget.child);
 }

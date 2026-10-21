@@ -1,0 +1,2532 @@
+[
+  {
+    "name": "カーター・スチュワート・ジュニア",
+    "number": "2",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001335.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/2_01.jpg",
+    "players": [
+      {
+        "id": 948,
+        "name_full": "スチュワート・ジュニア",
+        "url": null,
+        "uniform_number": "2",
+        "date_birth": "1999-11-02 00:00:00",
+        "height": 198,
+        "weight": 101,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "上沢　直之",
+    "number": "10",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001466.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/10_01.jpg",
+    "players": [
+      {
+        "id": 949,
+        "name_full": "上沢　直之",
+        "url": null,
+        "uniform_number": "10",
+        "date_birth": "1994-02-06 00:00:00",
+        "height": 185,
+        "weight": 88,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "津森　宥紀",
+    "number": "11",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001341.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/11_01.jpg",
+    "players": [
+      {
+        "id": 950,
+        "name_full": "津森　宥紀",
+        "url": null,
+        "uniform_number": "11",
+        "date_birth": "1998-01-21 00:00:00",
+        "height": 176,
+        "weight": 87,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "稲川　竜汰",
+    "number": "13",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001633.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/13_02.jpg",
+    "players": [
+      {
+        "id": 4958,
+        "name_full": "稲川　竜汰",
+        "url": null,
+        "uniform_number": "13",
+        "date_birth": "2004-02-25 00:00:00",
+        "height": 184,
+        "weight": 90,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "ジャクソン・ラトリッジ",
+    "number": "14",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001815.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/14_01.jpg",
+    "players": [
+      {
+        "id": 4919,
+        "name_full": "ラトリッジ",
+        "url": null,
+        "uniform_number": "14",
+        "date_birth": "1999-04-01 00:00:00",
+        "height": 203,
+        "weight": 109,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "東浜　巨",
+    "number": "16",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001613.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/16_01.jpg",
+    "players": [
+      {
+        "id": 953,
+        "name_full": "東浜　巨",
+        "url": null,
+        "uniform_number": "16",
+        "date_birth": "1990-06-20 00:00:00",
+        "height": 183,
+        "weight": 84,
+        "txt_position": "投手",
+        "year_retire": 2025,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "張　峻瑋",
+    "number": "17",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001460.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/153_01.jpg",
+    "players": []
+  },
+  {
+    "name": "徐　若熙",
+    "number": "18",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001634.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/18_01.jpg",
+    "players": [
+      {
+        "id": 2966,
+        "name_full": "徐　若熙",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2000-11-01 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "大津　亮介",
+    "number": "19",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001346.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/19_01.jpg",
+    "players": [
+      {
+        "id": 957,
+        "name_full": "大津　亮介",
+        "url": null,
+        "uniform_number": "26",
+        "date_birth": "1999-01-13 00:00:00",
+        "height": 175,
+        "weight": 65,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "村上　泰斗",
+    "number": "20",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001442.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/20_01.jpg",
+    "players": [
+      {
+        "id": 956,
+        "name_full": "村上　泰斗",
+        "url": null,
+        "uniform_number": "20",
+        "date_birth": "2007-02-20 00:00:00",
+        "height": 178,
+        "weight": 70,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "藤原　大翔",
+    "number": "22",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001403.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/142_01.jpg",
+    "players": [
+      {
+        "id": 4161,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4164,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4167,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4170,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4173,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4176,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4179,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4182,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4187,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4192,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4197,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4202,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4207,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4212,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4217,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4322,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4325,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4328,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4331,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4334,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4337,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4340,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4343,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4347,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4351,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4355,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4359,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 4363,
+        "name_full": "藤原大翔",
+        "url": null,
+        "uniform_number": "",
+        "date_birth": "2005-12-26 00:00:00",
+        "height": 0,
+        "weight": 0,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 28948,
+        "name_full": "藤原　大翔",
+        "url": null,
+        "uniform_number": null,
+        "date_birth": null,
+        "height": null,
+        "weight": null,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "鈴木　豪太",
+    "number": "26",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001635.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/26_02.jpg",
+    "players": [
+      {
+        "id": 4889,
+        "name_full": "鈴木　豪太",
+        "url": null,
+        "uniform_number": "26",
+        "date_birth": "2003-08-31 00:00:00",
+        "height": 175,
+        "weight": 86,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "岩井　俊介",
+    "number": "27",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001347.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/27_01.jpg",
+    "players": [
+      {
+        "id": 958,
+        "name_full": "岩井　俊介",
+        "url": null,
+        "uniform_number": "27",
+        "date_birth": "2001-07-30 00:00:00",
+        "height": 182,
+        "weight": 90,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "安德　駿",
+    "number": "28",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001444.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/28_01.jpg",
+    "players": [
+      {
+        "id": 959,
+        "name_full": "安德駿",
+        "url": null,
+        "uniform_number": "28",
+        "date_birth": "2002-05-18 00:00:00",
+        "height": 177,
+        "weight": 82,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "大江　竜聖",
+    "number": "29",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001471.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/29_01.jpg",
+    "players": [
+      {
+        "id": 960,
+        "name_full": "大江竜聖",
+        "url": null,
+        "uniform_number": "29",
+        "date_birth": "1999-01-15 00:00:00",
+        "height": 173,
+        "weight": 82,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 28922,
+        "name_full": "大江　竜聖",
+        "url": null,
+        "uniform_number": null,
+        "date_birth": null,
+        "height": null,
+        "weight": null,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "中村　稔弥",
+    "number": "30",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001730.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/30_02.jpg",
+    "players": [
+      {
+        "id": 4844,
+        "name_full": "中村稔弥",
+        "url": null,
+        "uniform_number": "30",
+        "date_birth": "1996-07-08 00:00:00",
+        "height": 178,
+        "weight": 84,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "アレクサンダー・アルメンタ",
+    "number": "34",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001400.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/135_01.jpg",
+    "players": []
+  },
+  {
+    "name": "リバン・モイネロ",
+    "number": "35",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001352.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/35_01.jpg",
+    "players": [
+      {
+        "id": 962,
+        "name_full": "モイネロ",
+        "url": null,
+        "uniform_number": "35",
+        "date_birth": "1995-12-08 00:00:00",
+        "height": 178,
+        "weight": 69,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "杉山　一樹",
+    "number": "40",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001356.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/40_01.jpg",
+    "players": [
+      {
+        "id": 964,
+        "name_full": "杉山　一樹",
+        "url": null,
+        "uniform_number": "40",
+        "date_birth": "1997-12-07 00:00:00",
+        "height": 192,
+        "weight": 107,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "前田　悠伍",
+    "number": "41",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001357.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/41_01.jpg",
+    "players": [
+      {
+        "id": 965,
+        "name_full": "前田　悠伍",
+        "url": null,
+        "uniform_number": "41",
+        "date_birth": "2005-08-04 00:00:00",
+        "height": 179,
+        "weight": 80,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "伊藤　優輔",
+    "number": "42",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001467.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/42_01.jpg",
+    "players": [
+      {
+        "id": 966,
+        "name_full": "伊藤　優輔",
+        "url": null,
+        "uniform_number": "42",
+        "date_birth": "1997-01-14 00:00:00",
+        "height": 178,
+        "weight": 82,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "北斗（大山　北斗）",
+    "number": "43",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001645.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/164_02.jpg",
+    "players": [
+      {
+        "id": 4801,
+        "name_full": "北斗",
+        "url": null,
+        "uniform_number": "43",
+        "date_birth": "2004-03-10 00:00:00",
+        "height": 180,
+        "weight": 83,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "大関　友久",
+    "number": "47",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001358.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/47_01.jpg",
+    "players": [
+      {
+        "id": 967,
+        "name_full": "大関　友久",
+        "url": null,
+        "uniform_number": "47",
+        "date_birth": "1997-12-14 00:00:00",
+        "height": 185,
+        "weight": 85,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "藤井　皓哉",
+    "number": "48",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001362.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/48_01.jpg",
+    "players": [
+      {
+        "id": 968,
+        "name_full": "藤井　皓哉",
+        "url": null,
+        "uniform_number": "48",
+        "date_birth": "1996-07-29 00:00:00",
+        "height": 183,
+        "weight": 86,
+        "txt_position": "投手",
+        "year_retire": 2025,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "松本　晴",
+    "number": "49",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001363.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/49_01.jpg",
+    "players": [
+      {
+        "id": 969,
+        "name_full": "松本　晴",
+        "url": null,
+        "uniform_number": "49",
+        "date_birth": "2001-02-24 00:00:00",
+        "height": 181,
+        "weight": 87,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "相良　雅斗",
+    "number": "50",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001636.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/50_02.jpg",
+    "players": [
+      {
+        "id": 4893,
+        "name_full": "相良雅斗",
+        "url": null,
+        "uniform_number": "50",
+        "date_birth": "2003-09-24 00:00:00",
+        "height": 182,
+        "weight": 73,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "前田　純",
+    "number": "51",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001415.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/51_01.jpg",
+    "players": [
+      {
+        "id": 971,
+        "name_full": "前田　純",
+        "url": null,
+        "uniform_number": "51",
+        "date_birth": "2000-06-04 00:00:00",
+        "height": 189,
+        "weight": 88,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "大山　凌",
+    "number": "53",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001364.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/53_01.jpg",
+    "players": [
+      {
+        "id": 972,
+        "name_full": "大山　凌",
+        "url": null,
+        "uniform_number": "53",
+        "date_birth": "2002-03-27 00:00:00",
+        "height": 179,
+        "weight": 80,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "ロベルト・オスナ",
+    "number": "54",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001365.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/54_02.jpg",
+    "players": [
+      {
+        "id": 973,
+        "name_full": "オスナ",
+        "url": null,
+        "uniform_number": "54",
+        "date_birth": "1995-02-07 00:00:00",
+        "height": 188,
+        "weight": 104,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "木村　大成",
+    "number": "58",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001366.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/58_01.jpg",
+    "players": [
+      {
+        "id": 975,
+        "name_full": "木村大成",
+        "url": null,
+        "uniform_number": "58",
+        "date_birth": "2003-09-12 00:00:00",
+        "height": 180,
+        "weight": 82,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "大竹　風雅",
+    "number": "59",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001401.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/136_01.jpg",
+    "players": [
+      {
+        "id": 4946,
+        "name_full": "大竹　風雅",
+        "url": null,
+        "uniform_number": "59",
+        "date_birth": "1999-08-22 00:00:00",
+        "height": 186,
+        "weight": 90,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "大野　稼頭央",
+    "number": "60",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001367.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/60_01.jpg",
+    "players": [
+      {
+        "id": 977,
+        "name_full": "大野　稼頭央",
+        "url": null,
+        "uniform_number": "60",
+        "date_birth": "2004-08-06 00:00:00",
+        "height": 176,
+        "weight": 70,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "ダーウィンゾン・ヘルナンデス",
+    "number": "63",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001368.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/63_02.jpg",
+    "players": [
+      {
+        "id": 978,
+        "name_full": "ヘルナンデス",
+        "url": null,
+        "uniform_number": "63",
+        "date_birth": "1996-12-17 00:00:00",
+        "height": 188,
+        "weight": 115,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "上茶谷　大河",
+    "number": "64",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001465.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/64_01.jpg",
+    "players": [
+      {
+        "id": 979,
+        "name_full": "上茶谷　大河",
+        "url": null,
+        "uniform_number": "64",
+        "date_birth": "1996-08-31 00:00:00",
+        "height": 182,
+        "weight": 83,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "松本　裕樹",
+    "number": "66",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001371.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/66_01.jpg",
+    "players": [
+      {
+        "id": 980,
+        "name_full": "松本　裕樹",
+        "url": null,
+        "uniform_number": "66",
+        "date_birth": "1996-04-14 00:00:00",
+        "height": 183,
+        "weight": 92,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "木村　光",
+    "number": "68",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001372.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/68_01.jpg",
+    "players": [
+      {
+        "id": 981,
+        "name_full": "木村　光",
+        "url": null,
+        "uniform_number": "68",
+        "date_birth": "2000-07-02 00:00:00",
+        "height": 173,
+        "weight": 73,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "岩崎　峻典",
+    "number": "69",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001447.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/69_01.jpg",
+    "players": [
+      {
+        "id": 982,
+        "name_full": "岩崎　峻典",
+        "url": null,
+        "uniform_number": "69",
+        "date_birth": "2003-03-11 00:00:00",
+        "height": 177,
+        "weight": 80,
+        "txt_position": "投手",
+        "year_retire": 2025,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "ルイス・ロドリゲス",
+    "number": "85",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001407.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/156_01.jpg",
+    "players": [
+      {
+        "id": 4807,
+        "name_full": "ロドリゲス",
+        "url": null,
+        "uniform_number": "85",
+        "date_birth": "2001-08-18 00:00:00",
+        "height": 182,
+        "weight": 90,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "小林　樹斗",
+    "number": "95",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001808.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/165_02.jpg",
+    "players": [
+      {
+        "id": 4882,
+        "name_full": "小林　樹斗",
+        "url": null,
+        "uniform_number": "95",
+        "date_birth": "2003-01-16 00:00:00",
+        "height": 182,
+        "weight": 87,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "長谷川　威展",
+    "number": "120",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001437.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/120_01.jpg",
+    "players": [
+      {
+        "id": 976,
+        "name_full": "長谷川威展",
+        "url": null,
+        "uniform_number": "59",
+        "date_birth": "1999-08-09 00:00:00",
+        "height": 179,
+        "weight": 86,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "宮里　優吾",
+    "number": "126",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001395.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/126_01.jpg",
+    "players": []
+  },
+  {
+    "name": "河野　伸一朗",
+    "number": "128",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001451.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/128_01.jpg",
+    "players": []
+  },
+  {
+    "name": "川口　冬弥",
+    "number": "132",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001452.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/132_01.jpg",
+    "players": [
+      {
+        "id": 984,
+        "name_full": "川口　冬弥",
+        "url": null,
+        "uniform_number": "95",
+        "date_birth": "1999-10-26 00:00:00",
+        "height": 187,
+        "weight": 88,
+        "txt_position": "投手",
+        "year_retire": 2025,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "村田　賢一",
+    "number": "134",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001351.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/134_01.jpg",
+    "players": [
+      {
+        "id": 961,
+        "name_full": "村田賢一",
+        "url": null,
+        "uniform_number": "34",
+        "date_birth": "2001-08-31 00:00:00",
+        "height": 179,
+        "weight": 88,
+        "txt_position": "投手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "津嘉山　憲志郎",
+    "number": "137",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001453.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/137_01.jpg",
+    "players": []
+  },
+  {
+    "name": "相原　雄太",
+    "number": "138",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001454.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/138_01.jpg",
+    "players": []
+  },
+  {
+    "name": "井﨑　燦志郎",
+    "number": "139",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001402.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/139_01.jpg",
+    "players": []
+  },
+  {
+    "name": "岡田　皓一朗",
+    "number": "140",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001455.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/140_01.jpg",
+    "players": []
+  },
+  {
+    "name": "澤柳　亮太郎",
+    "number": "141",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001435.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/141_01.jpg",
+    "players": []
+  },
+  {
+    "name": "ハモンド（田中　怜利　ハモンド）",
+    "number": "145",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001404.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/145_01.jpg",
+    "players": []
+  },
+  {
+    "name": "大矢　琉晟",
+    "number": "146",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001640.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/146_02.jpg",
+    "players": []
+  },
+  {
+    "name": "山崎　琢磨",
+    "number": "148",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001405.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/148_01.jpg",
+    "players": []
+  },
+  {
+    "name": "熊谷　太雅",
+    "number": "149",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001458.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/149_01.jpg",
+    "players": []
+  },
+  {
+    "name": "塩士　暖",
+    "number": "152",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001459.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/152_01.jpg",
+    "players": []
+  },
+  {
+    "name": "長﨑　蓮汰",
+    "number": "155",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001643.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/155_02.jpg",
+    "players": []
+  },
+  {
+    "name": "田上　奏大",
+    "number": "157",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001373.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/157_01.jpg",
+    "players": []
+  },
+  {
+    "name": "⾧水　啓眞",
+    "number": "160",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001409.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/160_01.jpg",
+    "players": []
+  },
+  {
+    "name": "内野　海斗",
+    "number": "161",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001410.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/161_01.jpg",
+    "players": []
+  },
+  {
+    "name": "岡植　純平",
+    "number": "162",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001411.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/162_01.jpg",
+    "players": []
+  },
+  {
+    "name": "佐々木　明都",
+    "number": "163",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001412.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/163_01.jpg",
+    "players": []
+  },
+  {
+    "name": "飛田　悠成",
+    "number": "169",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001417.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/169_01.jpg",
+    "players": []
+  },
+  {
+    "name": "ダリオ・サルディ",
+    "number": "176",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001440.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/176_03.jpg",
+    "players": []
+  },
+  {
+    "name": "渡邉　陸",
+    "number": "00",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001379.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/00_01.jpg",
+    "players": [
+      {
+        "id": 985,
+        "name_full": "渡邉　陸",
+        "url": null,
+        "uniform_number": "00",
+        "date_birth": "2000-09-24 00:00:00",
+        "height": 187,
+        "weight": 90,
+        "txt_position": "捕手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "嶺井　博希",
+    "number": "12",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001342.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/12_01.jpg",
+    "players": [
+      {
+        "id": 986,
+        "name_full": "嶺井　博希",
+        "url": null,
+        "uniform_number": "12",
+        "date_birth": "1991-06-04 00:00:00",
+        "height": 176,
+        "weight": 86,
+        "txt_position": "捕手",
+        "year_retire": 2025,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "山本　祐大",
+    "number": "39",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001807.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/39_03.jpg",
+    "players": [
+      {
+        "id": 4802,
+        "name_full": "山本祐大",
+        "url": null,
+        "uniform_number": "39",
+        "date_birth": "1998-09-11 00:00:00",
+        "height": 180,
+        "weight": 87,
+        "txt_position": "捕手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "谷川原　健太",
+    "number": "45",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001361.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/45_01.jpg",
+    "players": [
+      {
+        "id": 988,
+        "name_full": "谷川原　健太",
+        "url": null,
+        "uniform_number": "45",
+        "date_birth": "1997-04-16 00:00:00",
+        "height": 174,
+        "weight": 87,
+        "txt_position": "捕手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "石塚　綜一郎",
+    "number": "55",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001391.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/55_01.jpg",
+    "players": [
+      {
+        "id": 989,
+        "name_full": "石塚　綜一郎",
+        "url": null,
+        "uniform_number": "55",
+        "date_birth": "2001-06-07 00:00:00",
+        "height": 181,
+        "weight": 91,
+        "txt_position": "捕手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "海野　隆司",
+    "number": "62",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001369.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/62_01.jpg",
+    "players": [
+      {
+        "id": 990,
+        "name_full": "海野　隆司",
+        "url": null,
+        "uniform_number": "62",
+        "date_birth": "1997-07-15 00:00:00",
+        "height": 174,
+        "weight": 84,
+        "txt_position": "捕手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "藤田　悠太郎",
+    "number": "65",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001370.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/65_01.jpg",
+    "players": [
+      {
+        "id": 991,
+        "name_full": "藤田悠太郎",
+        "url": null,
+        "uniform_number": "65",
+        "date_birth": "2005-06-03 00:00:00",
+        "height": 170,
+        "weight": 73,
+        "txt_position": "捕手",
+        "year_retire": 2025,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "大友　宗",
+    "number": "125",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001449.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/125_01.jpg",
+    "players": []
+  },
+  {
+    "name": "牧原　巧汰",
+    "number": "130",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001343.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/130_01.jpg",
+    "players": [
+      {
+        "id": 987,
+        "name_full": "牧原巧汰",
+        "url": null,
+        "uniform_number": "22",
+        "date_birth": "2002-07-13 00:00:00",
+        "height": 176,
+        "weight": 84,
+        "txt_position": "捕手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "池田　栞太",
+    "number": "133",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001638.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/133_02.jpg",
+    "players": []
+  },
+  {
+    "name": "盛島　稜大",
+    "number": "171",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001419.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/171_01.jpg",
+    "players": []
+  },
+  {
+    "name": "川瀬　晃",
+    "number": "0",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001421.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/0_01.jpg",
+    "players": [
+      {
+        "id": 992,
+        "name_full": "川瀬　晃",
+        "url": null,
+        "uniform_number": "0",
+        "date_birth": "1997-09-15 00:00:00",
+        "height": 176,
+        "weight": 71,
+        "txt_position": "内野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "ジーター・ダウンズ",
+    "number": "4",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001441.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/4_01.jpg",
+    "players": [
+      {
+        "id": 993,
+        "name_full": "ダウンズ",
+        "url": null,
+        "uniform_number": "4",
+        "date_birth": "1998-07-27 00:00:00",
+        "height": 178,
+        "weight": 89,
+        "txt_position": "内野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "山川　穂高",
+    "number": "5",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001439.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/5_01.jpg",
+    "players": [
+      {
+        "id": 994,
+        "name_full": "山川　穂高",
+        "url": null,
+        "uniform_number": "5",
+        "date_birth": "1991-11-23 00:00:00",
+        "height": 177,
+        "weight": 114,
+        "txt_position": "内野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "今宮　健太",
+    "number": "6",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001337.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/6_01.jpg",
+    "players": [
+      {
+        "id": 995,
+        "name_full": "今宮　健太",
+        "url": null,
+        "uniform_number": "6",
+        "date_birth": "1991-07-15 00:00:00",
+        "height": 172,
+        "weight": 76,
+        "txt_position": "内野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "中村　晃",
+    "number": "7",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001338.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/7_01.jpg",
+    "players": [
+      {
+        "id": 1009,
+        "name_full": "中村　晃",
+        "url": null,
+        "uniform_number": "7",
+        "date_birth": "1989-11-05 00:00:00",
+        "height": 175,
+        "weight": 81,
+        "txt_position": "内野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "牧原　大成",
+    "number": "8",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001339.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/8_01.jpg",
+    "players": [
+      {
+        "id": 996,
+        "name_full": "牧原　大成",
+        "url": null,
+        "uniform_number": "8",
+        "date_birth": "1992-10-15 00:00:00",
+        "height": 172,
+        "weight": 72,
+        "txt_position": "内野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "栗原　陵矢",
+    "number": "24",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001345.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/24_01.jpg",
+    "players": [
+      {
+        "id": 998,
+        "name_full": "栗原　陵矢",
+        "url": null,
+        "uniform_number": "24",
+        "date_birth": "1996-07-04 00:00:00",
+        "height": 179,
+        "weight": 83,
+        "txt_position": "内野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "庄子　雄大",
+    "number": "25",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001443.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/25_01.jpg",
+    "players": [
+      {
+        "id": 999,
+        "name_full": "庄子　雄大",
+        "url": null,
+        "uniform_number": "25",
+        "date_birth": "2002-10-02 00:00:00",
+        "height": 177,
+        "weight": 75,
+        "txt_position": "内野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "廣瀨　隆太",
+    "number": "33",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001350.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/33_01.jpg",
+    "players": [
+      {
+        "id": 1000,
+        "name_full": "廣瀨　隆太",
+        "url": null,
+        "uniform_number": "33",
+        "date_birth": "2001-04-07 00:00:00",
+        "height": 181,
+        "weight": 87,
+        "txt_position": "内野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "イヒネ　イツア",
+    "number": "36",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001353.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/36_01.jpg",
+    "players": [
+      {
+        "id": 1001,
+        "name_full": "イヒネイツア",
+        "url": null,
+        "uniform_number": "36",
+        "date_birth": "2004-09-02 00:00:00",
+        "height": 184,
+        "weight": 83,
+        "txt_position": "内野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "宇野　真仁朗",
+    "number": "46",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001445.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/46_01.jpg",
+    "players": [
+      {
+        "id": 1003,
+        "name_full": "宇野真仁朗",
+        "url": null,
+        "uniform_number": "46",
+        "date_birth": "2006-07-05 00:00:00",
+        "height": 177,
+        "weight": 81,
+        "txt_position": "内野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "秋広　優人",
+    "number": "52",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001472.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/52_01.jpg",
+    "players": [
+      {
+        "id": 1005,
+        "name_full": "秋広優人",
+        "url": null,
+        "uniform_number": "52",
+        "date_birth": "2002-09-17 00:00:00",
+        "height": 200,
+        "weight": 100,
+        "txt_position": "内野手",
+        "year_retire": 2025,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "髙橋　隆慶",
+    "number": "56",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001637.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/56_02.jpg",
+    "players": [
+      {
+        "id": 4923,
+        "name_full": "髙橋隆慶",
+        "url": null,
+        "uniform_number": "56",
+        "date_birth": "2001-12-21 00:00:00",
+        "height": 186,
+        "weight": 93,
+        "txt_position": "内野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      },
+      {
+        "id": 28937,
+        "name_full": "髙橋　隆慶",
+        "url": null,
+        "uniform_number": null,
+        "date_birth": null,
+        "height": null,
+        "weight": null,
+        "txt_position": "内野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "石見　颯真",
+    "number": "67",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001446.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/67_01.jpg",
+    "players": [
+      {
+        "id": 1006,
+        "name_full": "石見颯真",
+        "url": null,
+        "uniform_number": "67",
+        "date_birth": "2006-06-10 00:00:00",
+        "height": 176,
+        "weight": 74,
+        "txt_position": "内野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "野村　勇",
+    "number": "99",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001390.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/99_01.jpg",
+    "players": [
+      {
+        "id": 1007,
+        "name_full": "野村　勇",
+        "url": null,
+        "uniform_number": "99",
+        "date_birth": "1996-12-01 00:00:00",
+        "height": 174,
+        "weight": 82,
+        "txt_position": "内野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "ザイレン（曽布川　ザイレン）",
+    "number": "121",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001448.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/121_01.jpg",
+    "players": []
+  },
+  {
+    "name": "藤野　恵音",
+    "number": "122",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001392.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/122_01.jpg",
+    "players": []
+  },
+  {
+    "name": "桑原　秀侍",
+    "number": "124",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001394.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/124_01.jpg",
+    "players": []
+  },
+  {
+    "name": "広瀬　結煌",
+    "number": "127",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001450.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/127_01.jpg",
+    "players": []
+  },
+  {
+    "name": "佐倉　俠史朗",
+    "number": "129",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001397.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/129_01.jpg",
+    "players": []
+  },
+  {
+    "name": "中澤　恒貴",
+    "number": "131",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001398.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/131_01.jpg",
+    "players": []
+  },
+  {
+    "name": "江崎　歩",
+    "number": "144",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001639.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/144_02.jpg",
+    "players": []
+  },
+  {
+    "name": "大橋　令和",
+    "number": "150",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001641.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/150_02.jpg",
+    "players": []
+  },
+  {
+    "name": "山下　恭吾",
+    "number": "159",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001408.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/159_01.jpg",
+    "players": []
+  },
+  {
+    "name": "西尾　歩真",
+    "number": "170",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001418.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/170_01.jpg",
+    "players": []
+  },
+  {
+    "name": "ジョナサン・モレノ",
+    "number": "174",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001646.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/174_01.jpg",
+    "players": []
+  },
+  {
+    "name": "デービッド・アルモンテ",
+    "number": "175",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001438.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/175_01.jpg",
+    "players": []
+  },
+  {
+    "name": "近藤　健介",
+    "number": "3",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001336.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/3_01.jpg",
+    "players": [
+      {
+        "id": 1008,
+        "name_full": "近藤　健介",
+        "url": null,
+        "uniform_number": "3",
+        "date_birth": "1993-08-09 00:00:00",
+        "height": 173,
+        "weight": 85,
+        "txt_position": "外野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "柳田　悠岐",
+    "number": "9",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001340.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/9_01.jpg",
+    "players": [
+      {
+        "id": 1010,
+        "name_full": "柳田　悠岐",
+        "url": null,
+        "uniform_number": "9",
+        "date_birth": "1988-10-09 00:00:00",
+        "height": 187,
+        "weight": 90,
+        "txt_position": "外野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "周東　佑京",
+    "number": "23",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001344.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/23_01.jpg",
+    "players": [
+      {
+        "id": 997,
+        "name_full": "周東　佑京",
+        "url": null,
+        "uniform_number": "23",
+        "date_birth": "1996-02-10 00:00:00",
+        "height": 180,
+        "weight": 71,
+        "txt_position": "外野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "正木　智也",
+    "number": "31",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001348.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/31_01.jpg",
+    "players": [
+      {
+        "id": 1012,
+        "name_full": "正木　智也",
+        "url": null,
+        "uniform_number": "31",
+        "date_birth": "1999-11-05 00:00:00",
+        "height": 182,
+        "weight": 91,
+        "txt_position": "外野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "柳町　達",
+    "number": "32",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001349.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/32_01.jpg",
+    "players": [
+      {
+        "id": 1013,
+        "name_full": "柳町　達",
+        "url": null,
+        "uniform_number": "32",
+        "date_birth": "1997-04-20 00:00:00",
+        "height": 180,
+        "weight": 78,
+        "txt_position": "外野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "笹川　吉康",
+    "number": "44",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001360.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/44_01.jpg",
+    "players": [
+      {
+        "id": 1014,
+        "name_full": "笹川　吉康",
+        "url": null,
+        "uniform_number": "44",
+        "date_birth": "2002-05-31 00:00:00",
+        "height": 194,
+        "weight": 97,
+        "txt_position": "外野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "緒方　理貢",
+    "number": "57",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001396.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/57_01.jpg",
+    "players": [
+      {
+        "id": 1015,
+        "name_full": "緒方　理貢",
+        "url": null,
+        "uniform_number": "57",
+        "date_birth": "1998-09-22 00:00:00",
+        "height": 175,
+        "weight": 69,
+        "txt_position": "外野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "川村　友斗",
+    "number": "61",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001399.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/61_01.jpg",
+    "players": [
+      {
+        "id": 1016,
+        "name_full": "川村　友斗",
+        "url": null,
+        "uniform_number": "61",
+        "date_birth": "1999-08-13 00:00:00",
+        "height": 181,
+        "weight": 88,
+        "txt_position": "外野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "山本　恵大",
+    "number": "77",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001406.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/77_01.jpg",
+    "players": [
+      {
+        "id": 1017,
+        "name_full": "山本　恵大",
+        "url": null,
+        "uniform_number": "77",
+        "date_birth": "1999-08-06 00:00:00",
+        "height": 183,
+        "weight": 86,
+        "txt_position": "外野手",
+        "year_retire": null,
+        "flg_delete": false,
+        "id_team": 7,
+        "team_name": "福岡ソフトバンクホークス",
+        "name_short": "ソフトバンク",
+        "id_league": 2
+      }
+    ]
+  },
+  {
+    "name": "大泉　周也",
+    "number": "123",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001393.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/123_01.jpg",
+    "players": []
+  },
+  {
+    "name": "漁府　輝羽",
+    "number": "143",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001456.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/143_01.jpg",
+    "players": []
+  },
+  {
+    "name": "木下　勇人",
+    "number": "147",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001457.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/147_01.jpg",
+    "players": []
+  },
+  {
+    "name": "鈴木　貴大",
+    "number": "151",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001642.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/151_02.jpg",
+    "players": []
+  },
+  {
+    "name": "生海（甲斐　生海）",
+    "number": "154",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001354.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/154_01.jpg",
+    "players": []
+  },
+  {
+    "name": "エミール　セラーノ　プレンサ",
+    "number": "158",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001644.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/158_02.jpg",
+    "players": []
+  },
+  {
+    "name": "重松　凱人",
+    "number": "166",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001414.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/166_01.jpg",
+    "players": []
+  },
+  {
+    "name": "佐藤　航太",
+    "number": "168",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001416.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/168_01.jpg",
+    "players": []
+  },
+  {
+    "name": "ホセ・オスーナ",
+    "number": "173",
+    "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001420.html",
+    "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/173_01.jpg",
+    "players": []
+  }
+]

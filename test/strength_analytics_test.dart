@@ -7,6 +7,16 @@ import 'package:Yakyuu_Japan/View/SeasonTable.dart';
 import 'package:Yakyuu_Japan/pages/display_settings_page.dart';
 
 void main() {
+  test('過去年の兼任投手の内訳不明時は順位を確定できる場合だけ先発エースを出す', () {
+    Map<String, dynamic> team(int mixedOuts) => {
+      'pitching_workload': [
+        {'name': '先発', 'throws': '右', 'starts': 20, 'starter_outs': 400, 'total_outs': 400},
+        {'name': '兼任', 'throws': '右', 'starts': 5, 'total_outs': mixedOuts},
+      ]
+    };
+    expect(selectPitcherAces(team(200))['SP_R']!.single['name'], '先発');
+    expect(selectPitcherAces(team(450)).containsKey('SP_R'), false);
+  });
   test('投手の負担割合は左右でなく実投球回を先発と救援に分ける', () {
     final band = pitchingRoleBand({'pitching_workload': [
       {'starter_outs': 150, 'relief_outs': 30, 'total_outs': 180},

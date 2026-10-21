@@ -21,7 +21,7 @@ class AppSql {
           d.flg_predict = TRUE
           OR s.title IN (
              '最多安打', '長打率', 'OPS', '盗塁成功率',
-             '奪三振率', '与四球率', 'K/BB', '被打率', 'WHIP', 'QS率'
+             'HP', 'ホールド', '勝率', '奪三振率', '与四球率', 'K/BB', '被打率', 'WHIP', 'QS率'
            )
          )
     ''';

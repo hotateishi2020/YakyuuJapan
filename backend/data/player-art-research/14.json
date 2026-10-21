@@ -1,0 +1,33 @@
+{
+  "name": "ジャクソン・ラトリッジ",
+  "number": "14",
+  "profile_url": "https://www.softbankhawks.co.jp/team/player/detail/2026_00001815.html",
+  "photo_url": "https://www.softbankhawks.co.jp/media/sites/7/team/player/2026/14_01.jpg",
+  "players": [
+    {
+      "id": 4919,
+      "name_full": "ラトリッジ",
+      "url": null,
+      "uniform_number": "14",
+      "date_birth": "1999-04-01 00:00:00",
+      "height": 203,
+      "weight": 109,
+      "txt_position": "投手",
+      "year_retire": null,
+      "flg_delete": false,
+      "id_team": 7,
+      "team_name": "福岡ソフトバンクホークス",
+      "name_short": "ソフトバンク",
+      "id_league": 2
+    }
+  ],
+  "official_text": "登録名/本名 ジャクソン・ラトリッジ ふりがな じゃくそん・らとりっじ 生年月日 1999年04月01日 年齢 27歳 身長 203cm 体重 109kg 出身地 アメリカ合衆国 投打 右投げ/右打ち 2026 対パ・リーグ チーム別成績 対セ・リーグ チーム別成績 球場別成績 月別成績 時間帯別成績 2026 経歴・獲得タイトル 経歴 ワシントン・ナショナルズ（23～26）- フィラデルフィア・フィリーズ（26） 獲得タイトル 登場曲 曲名 アーティスト名 Shine Collective Soul ",
+  "wiki_url": "https://ja.wikipedia.org/wiki/%E3%82%B8%E3%83%A3%E3%82%AF%E3%82%BD%E3%83%B3%E3%83%BB%E3%83%A9%E3%83%88%E3%83%AA%E3%83%83%E3%82%B8",
+  "wiki_profile": "ジャクソン・ラトリッジ Jackson Rutledge 福岡ソフトバンクホークス #14 ワシントン・ナショナルズ時代 （2025年7月22日） 基本情報 国籍 アメリカ合衆国 出身地 ミズーリ州 セントルイス郡 フェントン （ 英語版 ） 生年月日 ( 1999-04-01 ) 1999年 4月1日 （27歳） 身長 体重 6' 8\" ＝約203.2 cm 241 lb ＝約109.3 kg 選手情報 投球・打席 右投右打 ポジション 投手 プロ入り 2019年 MLBドラフト1巡目 初出場 MLB / 2023年9月13日 NPB / 2026年9月12日 最終出場 MLB / 2026年4月13日 経歴 （括弧内はプロチーム在籍年度） ロックウッド・サミット高等学校 （ 英語版 ） アーカンソー大学 サンジャッキント大学 （ 英語版 ） ワシントン・ナショナルズ (2023 - 2026) 福岡ソフトバンクホークス (2026-) 派遣歴 サプライズ・サグアロス （ 英語版 ） (2021) この表について この表はテンプレートを用いて表示しています。編集方法は Template:Infobox baseball player を参照してください。 ■ プロジェクト:野球選手 ■ テンプレート",
+  "wiki_notes": "",
+  "source_player_id": "23025152",
+  "npb_name": "ラトリッジ",
+  "npb_row": "14 ラトリッジ 1999.04.01 203 109 右 右 7/30 支配下選手登録",
+  "english_name": "JACKSON RUTLEDGE",
+  "photo_path": "/tmp/koko-player-research/photo-14.jpg"
+}

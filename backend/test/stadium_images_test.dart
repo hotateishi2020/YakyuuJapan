@@ -30,6 +30,35 @@ void main() {
     expect(unknown.inside, isEmpty);
     expect(unknown.outside, isEmpty);
   });
+  test('farm stadiums have distinct generated inside and outside assets', () {
+    final data = jsonDecode(File('data/stadium-catalog.json').readAsStringSync());
+    final farms = (data['stadiums'] as List).where((r) => r['stadium_level'] == 'farm');
+    expect(farms.length, 12);
+    final paths = <String>{};
+    for (final row in farms) {
+      final images = StadiumImages.lookup(row['name']);
+      expect(images.generated, isTrue);
+      for (final path in [images.inside, images.outside]) {
+        expect(paths.add(path), isTrue);
+        expect(File('../$path').existsSync(), isTrue, reason: path);
+      }
+    }
+    expect(StadiumImages.lookup('東京ドーム').generated, isFalse);
+  });
+  test('regional stadiums have unique generated inside and outside assets', () {
+    final data = jsonDecode(File('data/stadium-catalog.json').readAsStringSync());
+    final rows = (data['stadiums'] as List).where((r) => r['stadium_level'] == 'regional');
+    expect(rows.length, 162);
+    final paths = <String>{};
+    for (final row in rows) {
+      final images = StadiumImages.lookup(row['name']);
+      expect(images.generated, isTrue, reason: row['name']);
+      for (final path in [images.inside, images.outside]) {
+        expect(paths.add(path), isTrue, reason: path);
+        expect(File('../$path').existsSync(), isTrue, reason: path);
+      }
+    }
+  });
   test('all catalog stadium images are bundled', () {
     final data = jsonDecode(File('data/stadium-catalog.json').readAsStringSync());
     for (final row in data['stadiums']) {

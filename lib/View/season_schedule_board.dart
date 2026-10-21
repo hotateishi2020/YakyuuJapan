@@ -15,17 +15,22 @@ class SeasonScheduleLoader extends StatefulWidget {
       {super.key,
       required this.org,
       required this.year,
-      required this.builder});
+      required this.builder,
+      this.calendarBuilder});
   final OrgConfig org;
   final int year;
   final Widget Function(List<Map<String, dynamic>>) builder;
+  final Widget Function(List<Map<String, dynamic>>, List<Map<String, dynamic>>)?
+      calendarBuilder;
   @override
   State<SeasonScheduleLoader> createState() => _SeasonScheduleLoaderState();
 }
 
-class _SeasonScheduleLoaderState extends State<SeasonScheduleLoader> with WidgetsBindingObserver {
+class _SeasonScheduleLoaderState extends State<SeasonScheduleLoader>
+    with WidgetsBindingObserver {
   Timer? _refreshTimer;
   List<Map<String, dynamic>> _games = [];
+  List<Map<String, dynamic>> _events = [];
   String? _error;
   bool _loading = true;
   bool _showLoading = true;
@@ -45,6 +50,7 @@ class _SeasonScheduleLoaderState extends State<SeasonScheduleLoader> with Widget
     super.didUpdateWidget(old);
     if (old.org.kind != widget.org.kind || old.year != widget.year) {
       _games = [];
+      _events = [];
       _load();
     }
   }
@@ -64,7 +70,12 @@ class _SeasonScheduleLoaderState extends State<SeasonScheduleLoader> with Widget
   Future<void> _load({bool silent = false}) async {
     final request = ++_request;
     _loading = true;
-    if (!silent) setState(() { _error = null; _showLoading = true; });
+    if (!silent) {
+      setState(() {
+        _error = null;
+        _showLoading = true;
+      });
+    }
     try {
       final response = await http
           .get(Env.api(
@@ -73,13 +84,26 @@ class _SeasonScheduleLoaderState extends State<SeasonScheduleLoader> with Widget
       if (response.statusCode != 200) throw const FormatException('日程取得失敗');
       final data = jsonDecode(utf8.decode(response.bodyBytes));
       if (!mounted || request != _request) return;
-      setState(() { _games = listMapFromJson(data['games']); _error = null; });
+      if (data['pending'] == true) {
+        setState(() => _error = '${data['message']}');
+        return;
+      }
+      setState(() {
+        _games = listMapFromJson(data['games']);
+        _events = listMapFromJson(data['events']);
+        _error = null;
+      });
     } catch (_) {
       if (mounted && request == _request) {
         setState(() => _error = '日程・対戦結果を取得できませんでした');
       }
     } finally {
-      if (mounted && request == _request) setState(() { _loading = false; _showLoading = false; });
+      if (mounted && request == _request) {
+        setState(() {
+          _loading = false;
+          _showLoading = false;
+        });
+      }
     }
   }
 
@@ -92,7 +116,9 @@ class _SeasonScheduleLoaderState extends State<SeasonScheduleLoader> with Widget
             Expanded(child: Text(_error!)),
             TextButton(onPressed: _load, child: const Text('再読み込み'))
           ]),
-        Expanded(child: widget.builder(_games))
+        Expanded(
+            child: widget.calendarBuilder?.call(_games, _events) ??
+                widget.builder(_games))
       ]);
 }
 
@@ -118,8 +144,9 @@ class _SeasonCalendarBoardState extends State<SeasonCalendarBoard> {
   Widget build(BuildContext context) => SeasonScheduleLoader(
       org: widget.org,
       year: _year,
-      builder: (games) => EventCalendar(
-            events: widget.events,
+      builder: (_) => const SizedBox.shrink(),
+      calendarBuilder: (games, events) => EventCalendar(
+            events: [...widget.events, ...events],
             games: games,
             initialMonth: DateTime(widget.year,
                 widget.year == DateTime.now().year ? DateTime.now().month : 3),
@@ -165,20 +192,22 @@ class InterleagueStandings extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 12),
       child: SeasonTableBlock(
-        standings: standings,
-        stats: const [],
-        onlyLeagueId: 0,
-        showPredictionColumns: false,
-        showNpbLeagueColumn: true,
-        pane: SeasonPane.standings,
-        portraitLayout: true,
-        org: const OrgConfig(
-            kind: OrgKind.npb,
-            label: '交流戦',
-            logoAsset: 'backend/assets/images/logo_npb.png',
-            tabColor: Colors.yellow,
-            tabForeground: Colors.black,
-            leagues: [OrgLeague(id: 0, name: '交流戦順位', color: Colors.yellow)])),
+          standings: standings,
+          stats: const [],
+          onlyLeagueId: 0,
+          showPredictionColumns: false,
+          showNpbLeagueColumn: true,
+          pane: SeasonPane.standings,
+          portraitLayout: true,
+          org: const OrgConfig(
+              kind: OrgKind.npb,
+              label: '交流戦',
+              logoAsset: 'backend/assets/images/logo_npb.png',
+              tabColor: Colors.yellow,
+              tabForeground: Colors.black,
+              leagues: [
+                OrgLeague(id: 0, name: '交流戦順位', color: Colors.yellow)
+              ])),
     );
   }
 }

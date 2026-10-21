@@ -1,9 +1,11 @@
+import 'player_detail_dialog.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../tools/Env.dart';
 import '../tools/color_parse.dart';
 import '../tools/json_utils.dart';
+import '../logic/stadium_location.dart';
 import '../widgets/baseball_loading.dart';
 import 'GamesBoard.dart' show teamLogoVisual;
 
@@ -137,12 +139,13 @@ int compareStadiumRows(Map<String, dynamic> a, Map<String, dynamic> b,
   if (field == 'team') return teamOrder() * (ascending ? 1 : -1);
   final av = stadiumSortValue(a[field], field),
       bv = stadiumSortValue(b[field], field);
-  if (av == null || bv == null)
+  if (av == null || bv == null) {
     return av == null && bv == null
         ? teamOrder()
         : av == null
             ? 1
             : -1;
+  }
   // Keep currencies and walking times separate instead of inventing conversions.
   final unit = av.$2.compareTo(bv.$2);
   if (unit != 0) return unit;
@@ -159,35 +162,46 @@ class StadiumsBoard extends StatefulWidget {
 
 class _StadiumsBoardState extends State<StadiumsBoard> {
   String? sortField;
+  String stadiumLevel = 'first';
   bool ascending = true;
   @override
   Widget build(BuildContext context) => CatalogData(
       path: '/baseball-catalog?section=stadiums&org=${widget.org}',
       builder: (data) {
-        final rows = listMapFromJson(data['stadiums']).toList()
+        final rows = listMapFromJson(data['stadiums'])
+            .map((row) => {...row, 'address': stadiumLocation(row['address'])})
+            .where((r) =>
+                stadiumLevel == 'all' ||
+                (r['stadium_level'] ?? 'first') == stadiumLevel)
+            .toList()
           ..sort((a, b) => compareStadiumRows(a, b, sortField, ascending));
-        const fields = [
+        final showDimensions = stadiumLevel == 'first' || stadiumLevel == 'all';
+        final fields = [
           'team',
           'image_outside',
           'image',
           'name',
           'category',
+          'address',
           'completed',
           'capacity',
+          if (showDimensions) ...['outfield_distance', 'fence_height'],
           'construction',
           'maintenance',
           'revenue',
           'airport_distance',
           'station_distance'
         ];
-        const labels = [
+        final labels = [
           'ホームチーム',
           '外観',
           '内観',
           '球場名',
           '球場カテゴリ',
+          '所在地',
           '完成日',
           '収容人数',
+          if (showDimensions) ...['スタンドまでの距離', '外野フェンスの高さ'],
           '建設費',
           '維持管理費',
           '年間の興行収入',
@@ -197,22 +211,37 @@ class _StadiumsBoardState extends State<StadiumsBoard> {
         return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Text(
-                      '完成日は新築時の完成年月（確認できた精度）で表示し、竣工式の場合は明記しています。未確認の項目は「未収録」。開場日と完成日、球団売上と球場収入は区別しています。空港は定期便のある空港が対象。直線距離は移動距離と異なります。見出しで昇順・降順を切り替えます（未収録は末尾、距離と徒歩時間・通貨は別々に比較）。',
-                      style: TextStyle(fontSize: 11))),
+              SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(children: [
+                    for (final entry in const {
+                      'first': '1軍球場',
+                      'farm': '2軍球場',
+                      'regional': '地方球場',
+                      'all': 'すべて'
+                    }.entries)
+                      Padding(
+                          padding: const EdgeInsets.all(3),
+                          child: ChoiceChip(
+                              label: Text(entry.value),
+                              selected: stadiumLevel == entry.key,
+                              onSelected: (_) =>
+                                  setState(() => stadiumLevel = entry.key))),
+                  ])),
               Expanded(
                   child: SingleChildScrollView(
+                      key: const ValueKey('stadium-grid-scroll'),
                       scrollDirection: Axis.horizontal,
                       child: SizedBox(
-                          width: 1770,
+                          width: 1905 + (showDimensions ? 360 : 0),
                           child: Column(children: [
                             _stadiumRow([
                               for (var i = 0; i < labels.length; i++)
                                 InkWell(
                                   key: ValueKey('stadium-sort-${fields[i]}'),
-                                  onTap: i > 0 && i < 5
+                                  onTap: (i > 0 && i < 5 ||
+                                          ['outfield_distance', 'fence_height']
+                                              .contains(fields[i]))
                                       ? null
                                       : () => setState(() {
                                             ascending = sortField == fields[i]
@@ -223,7 +252,10 @@ class _StadiumsBoardState extends State<StadiumsBoard> {
                                   child: SizedBox.expand(
                                       child: Center(
                                           child: Text(
-                                    '${labels[i]}${i > 0 && i < 5 ? '' : sortField == fields[i] ? ascending ? ' ▲' : ' ▼' : ' ↕'}',
+                                    '${labels[i]}${(i > 0 && i < 5 || [
+                                          'outfield_distance',
+                                          'fence_height'
+                                        ].contains(fields[i])) ? '' : sortField == fields[i] ? ascending ? ' ▲' : ' ▼' : ' ↕'}',
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(
                                         color: Colors.white,
@@ -246,19 +278,45 @@ class _StadiumsBoardState extends State<StadiumsBoard> {
                                                               'image_outside') &&
                                                       '${row[field] ?? ''}'
                                                           .isNotEmpty
-                                                  ? Image.asset('${row[field]}',
-                                                      height: 82,
-                                                      fit: BoxFit.contain,
-                                                      errorBuilder: (_, __,
-                                                              ___) =>
-                                                          const Text('画像未収録'))
-                                                  : Text(
-                                                      '${row[field] ?? '未収録'}',
-                                                      style: const TextStyle(
-                                                          fontSize: 12))
+                                                  ? Column(
+                                                      mainAxisSize: MainAxisSize
+                                                          .min,
+                                                      children: [
+                                                          Flexible(
+                                                              child: Image.asset(
+                                                                  '${row[field]}',
+                                                                  cacheWidth:
+                                                                      360,
+                                                                  height:
+                                                                      row['image_generated'] ==
+                                                                              true
+                                                                          ? 64
+                                                                          : 82,
+                                                                  fit: BoxFit
+                                                                      .contain,
+                                                                  errorBuilder: (_,
+                                                                          __,
+                                                                          ___) =>
+                                                                      const Text(
+                                                                          '画像未収録'))),
+                                                        ])
+                                                  : Tooltip(
+                                                      message:
+                                                          '${row['${field}_source'] ?? ''}',
+                                                      child: Text(
+                                                          '${row[field] ?? '未収録'}',
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize:
+                                                                      12)))
                                       ]);
                                     })),
                           ])))),
+              const Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Text(
+                      '距離は本塁から左翼・中堅・右翼の外野フェンスまで。フェンス高は外野のもので、内野の防球ネットとは区別しています。完成日は新築時の完成年月（確認できた精度）で表示し、竣工式の場合は明記しています。未確認の項目は「未収録」。開場日と完成日、球団売上と球場収入は区別しています。空港は定期便のある空港が対象。直線距離は移動距離と異なります。見出しで昇順・降順を切り替えます（未収録は末尾、距離と徒歩時間・通貨は別々に比較）。',
+                      style: TextStyle(fontSize: 11))),
             ]);
       });
   Widget _stadiumRow(List<Widget> cells, {bool header = false}) => SizedBox(
@@ -272,7 +330,11 @@ class _StadiumsBoardState extends State<StadiumsBoard> {
                       ? 180
                       : i == 3
                           ? 240
-                          : 135,
+                          : (stadiumLevel == 'first' ||
+                                      stadiumLevel == 'all') &&
+                                  (i == 8 || i == 9)
+                              ? 180
+                              : 135,
               height: double.infinity,
               alignment: Alignment.center,
               padding: const EdgeInsets.all(6),
@@ -283,7 +345,7 @@ class _StadiumsBoardState extends State<StadiumsBoard> {
       ]));
 }
 
-final uniformNumbers = ['0', '00', for (var n = 1; n <= 300; n++) '$n'];
+final uniformNumbers = ['0', '00', for (var n = 1; n <= 250; n++) '$n'];
 String uniformDisplayStatus(Map<String, dynamic> row) =>
     row['status'] == 'active' && row['worn_in_selected_year'] == false
         ? 'active_past'
@@ -317,6 +379,25 @@ class UniformHistoryBoard extends StatelessWidget {
       path: '/baseball-catalog?section=uniforms&org=$org&year=$year',
       builder: (data) {
         final teams = listMapFromJson(data['teams']);
+        final numbers = {
+          ...uniformNumbers,
+          for (final row in listMapFromJson(data['uniforms']))
+            if ((int.tryParse('${row['number']}') ?? 0) <= 250 ||
+                (int.tryParse('${row['number']}') ?? 0) > 300)
+              '${row['number']}'
+        }.toList()
+          ..sort((a, b) {
+            int group(String number) => RegExp(r'^0[0-9]{2}$').hasMatch(number)
+                ? 1
+                : (int.tryParse(number) ?? 0) <= 250
+                    ? 0
+                    : 2;
+            final category = group(a).compareTo(group(b));
+            if (category != 0) return category;
+            final numeric =
+                (int.tryParse(a) ?? 0).compareTo(int.tryParse(b) ?? 0);
+            return numeric != 0 ? numeric : a.length.compareTo(b.length);
+          });
         final indexed = <String, List<Map<String, dynamic>>>{};
         for (final row in listMapFromJson(data['uniforms'])) {
           indexed
@@ -326,28 +407,6 @@ class UniformHistoryBoard extends StatelessWidget {
         return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Padding(
-                  padding: const EdgeInsets.all(6),
-                  child: Wrap(spacing: 8, runSpacing: 4, children: [
-                    for (final status in [
-                      'active',
-                      'active_past',
-                      'retired',
-                      'permanent',
-                      'honored',
-                      'former',
-                      'unknown'
-                    ])
-                      Container(
-                          color: uniformColor({'status': status}),
-                          padding: const EdgeInsets.all(4),
-                          child: Text(uniformStatus({'status': status}),
-                              style: const TextStyle(fontSize: 11))),
-                  ])),
-              Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                  child: Text('${data['coverage'] ?? ''}',
-                      style: const TextStyle(fontSize: 11))),
               Expanded(
                   child: LayoutBuilder(
                       builder: (context, constraints) => SingleChildScrollView(
@@ -376,9 +435,9 @@ class UniformHistoryBoard extends StatelessWidget {
                                         child: ListView.builder(
                                             scrollDirection: Axis.horizontal,
                                             itemExtent: 94,
-                                            itemCount: uniformNumbers.length,
+                                            itemCount: numbers.length,
                                             itemBuilder: (context, i) {
-                                              final number = uniformNumbers[i];
+                                              final number = numbers[i];
                                               return Column(children: [
                                                 _numberCell(
                                                     Text(number,
@@ -396,6 +455,24 @@ class UniformHistoryBoard extends StatelessWidget {
                                               ]);
                                             })),
                                   ]))))),
+              Padding(
+                  padding: const EdgeInsets.all(6),
+                  child: Wrap(spacing: 8, runSpacing: 4, children: [
+                    for (final status in [
+                      'active',
+                      'active_past',
+                      'retired',
+                      'permanent',
+                      'honored',
+                      'former',
+                      'unknown'
+                    ])
+                      Container(
+                          color: uniformColor({'status': status}),
+                          padding: const EdgeInsets.all(4),
+                          child: Text(uniformStatus({'status': status}),
+                              style: const TextStyle(fontSize: 11))),
+                  ])),
             ]);
       });
   Widget _numberCell(Widget child, {Color? color, double width = 94}) =>
@@ -409,9 +486,11 @@ class UniformHistoryBoard extends StatelessWidget {
           child: child);
   Widget _uniformCell(BuildContext context, Map<String, dynamic> team,
       String number, List<Map<String, dynamic>> rows) {
-    if (rows.isEmpty)
+    if (rows.isEmpty) {
       return _numberCell(const Text('—', style: TextStyle(color: Colors.grey)));
+    }
     final latest = rows.first;
+    final scope = PlayerDetailScope.of(context);
     void details() => showDialog<void>(
         context: context,
         builder: (context) => AlertDialog(
@@ -422,7 +501,11 @@ class UniformHistoryBoard extends StatelessWidget {
                     for (final row in rows)
                       ListTile(
                           dense: true,
-                          title: Text('${row['name']}'),
+                          title: PlayerNameLink(player: {
+                            ...row,
+                            if (scope != null) 'org': scope.org,
+                            if (scope != null) 'int_year': scope.year
+                          }, child: Text('${row['name']}')),
                           subtitle: Text(
                               '${row['period'] ?? ''}　${uniformStatus(row)}')),
                   ])),
@@ -459,7 +542,8 @@ class UniformHistoryBoard extends StatelessWidget {
                             padding: EdgeInsets.zero,
                             minimumSize: Size.zero,
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                        onPressed: details,
+                        onPressed: () => showPlayerDetail(
+                            context, {...latest, 'id_team': team['id_team']}),
                         child: Text('${latest['surname'] ?? latest['name']}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -489,64 +573,110 @@ class HallOfFameBoard extends StatelessWidget {
   const HallOfFameBoard({super.key, required this.org, required this.year});
   final String org;
   final int year;
+  // Source names may include typography footnotes; keep them out of cards.
+  static String _displayName(dynamic value) =>
+      '${value ?? ''}'.replaceAll(RegExp(r'【\s*※[^】]*】'), '').trim();
   @override
   Widget build(BuildContext context) => CatalogData(
       path: '/baseball-catalog?section=hall&org=$org&year=$year',
-      builder: (data) => ListView(children: [
-            for (final section in [
-              ('hall', '殿堂入り'),
-              ('members', '名球会会員'),
-              ('candidates', '名球会の基準達成候補（推定所要シーズン順）')
-            ]) ...[
-              Container(
-                  color: Colors.black87,
-                  padding: const EdgeInsets.all(10),
-                  child: Text(section.$2,
-                      style: const TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold))),
-              if (section.$1 == 'candidates')
-                const Padding(
-                    padding: EdgeInsets.all(8),
-                    child: Text(
-                        '2000安打・200勝・250セーブ。残り記録 ÷ 選択年度の実績で比較（単純推計）。殿堂入りは投票によるため到達予測は行いません。',
-                        style: TextStyle(fontSize: 12))),
-              if (listMapFromJson(data[section.$1]).isEmpty)
-                const ListTile(title: Text('該当する登録データがありません')),
-              Padding(
-                padding: const EdgeInsets.all(6),
-                child: LayoutBuilder(builder: (context, constraints) {
-                  const gap = 6.0;
-                  final columns = ((constraints.maxWidth + gap) / 180)
-                      .floor()
-                      .clamp(1, 1000);
-                  final width =
-                      (constraints.maxWidth - gap * (columns - 1)) / columns;
-                  final rows = listMapFromJson(data[section.$1]);
-                  return Wrap(
-                      spacing: gap,
-                      runSpacing: gap,
-                      crossAxisAlignment: WrapCrossAlignment.start,
-                      children: [
-                        for (var i = 0; i < rows.length; i++)
-                          SizedBox(
-                            key: ValueKey('hall-card-${section.$1}-$i'),
-                            width: width,
-                            child: _playerCard(rows[i],
-                                candidate: section.$1 == 'candidates'),
-                          ),
-                      ]);
-                }),
-              ),
-            ],
+      builder: (data) {
+        String normalizedName(dynamic value) => _displayName(value)
+            .replaceAll(RegExp(r'[\s　・･.]'), '')
+            .replaceAll('髙', '高')
+            .replaceAll('﨑', '崎');
+        final members = listMapFromJson(data['members'])
+            .map((row) => normalizedName(row['name']))
+            .where((name) => name.isNotEmpty)
+            .toSet();
+        List<Map<String, dynamic>> sectionRows(String key) {
+          final rows = listMapFromJson(data[key])
+              .where((row) =>
+                  key != 'candidates' ||
+                  !members.contains(normalizedName(row['name'])))
+              .toList();
+          if (key == 'candidates') return rows;
+          int dateKey(Map<String, dynamic> row) {
+            final raw = row['joined_date'] ??
+                row['membership_sort_date'] ??
+                row['inducted_date'] ??
+                row['year'];
+            final parts = RegExp(r'\d+')
+                .allMatches('${raw ?? ''}')
+                .map((m) => int.parse(m[0]!))
+                .toList();
+            if (parts.isEmpty) return 99999999;
+            return parts[0] * 10000 +
+                (parts.length > 1 ? parts[1] : 1) * 100 +
+                (parts.length > 2 ? parts[2] : 1);
+          }
+
+          final original = {for (var i = 0; i < rows.length; i++) rows[i]: i};
+          rows.sort((a, b) {
+            final order = dateKey(a).compareTo(dateKey(b));
+            return order != 0 ? order : original[a]!.compareTo(original[b]!);
+          });
+          return rows;
+        }
+
+        return ListView(children: [
+          for (final section in [
+            ('hall', '殿堂入り'),
+            ('members', '名球会会員'),
+            ('candidates', '名球会の基準達成候補（達成割合順）')
+          ]) ...[
+            Container(
+                color: Colors.black87,
+                padding: const EdgeInsets.all(10),
+                child: Text(section.$2,
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold))),
+            if (section.$1 == 'candidates')
+              const Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Text(
+                      '2000安打・200勝・250セーブ。各基準に対する通算記録の達成割合で比較。殿堂入りは投票によるため到達予測は行いません。',
+                      style: TextStyle(fontSize: 12))),
+            if (sectionRows(section.$1).isEmpty)
+              const ListTile(title: Text('該当する登録データがありません')),
             Padding(
-                padding: const EdgeInsets.all(8),
-                child: Text('${data['note'] ?? ''}',
-                    style: const TextStyle(fontSize: 11))),
-          ]));
+              padding: const EdgeInsets.all(6),
+              child: LayoutBuilder(builder: (context, constraints) {
+                const gap = 6.0;
+                final columns =
+                    ((constraints.maxWidth + gap) / 180).floor().clamp(1, 1000);
+                final width =
+                    (constraints.maxWidth - gap * (columns - 1)) / columns;
+                final rows = sectionRows(section.$1);
+                return Wrap(
+                    spacing: gap,
+                    runSpacing: gap,
+                    crossAxisAlignment: WrapCrossAlignment.start,
+                    children: [
+                      for (var i = 0; i < rows.length; i++)
+                        SizedBox(
+                          key: ValueKey('hall-card-${section.$1}-$i'),
+                          width: width,
+                          child: _playerCard(rows[i],
+                              candidate: section.$1 == 'candidates'),
+                        ),
+                    ]);
+              }),
+            ),
+          ],
+          Padding(
+              padding: const EdgeInsets.all(8),
+              child: Text('${data['note'] ?? ''}',
+                  style: const TextStyle(fontSize: 11))),
+        ]);
+      });
 
   Widget _playerCard(Map<String, dynamic> row, {required bool candidate}) {
+    final value = num.tryParse('${row['value']}') ?? 0;
+    final target = num.tryParse('${row['target']}') ?? 0;
+    final overTarget = candidate && target > 0 && value > target;
+    final nearTarget = candidate && target > 0 && value / target >= 0.9;
     final detail = candidate
-        ? '${row['label']} ${row['value']} / ${row['target']}\n残り${row['remaining']}　${row['estimate'] == null ? '予測不可（当年実績なし）' : '約${(row['estimate'] as num).toStringAsFixed(1)}シーズン'}'
+        ? '${row['label']} ${row['value']} / ${row['target']}\n達成${((num.tryParse('${row['value']}') ?? 0) / (num.tryParse('${row['target']}') ?? 1) * 100).toStringAsFixed(1)}%　残り${row['remaining']}　${row['estimate'] == null ? '予測不可（当年実績なし）' : '約${(row['estimate'] as num).toStringAsFixed(1)}シーズン'}'
         : [
             if (row['year'] != null) '${row['year']}年',
             if (row['category'] != null) '${row['category']}'
@@ -554,7 +684,11 @@ class HallOfFameBoard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: overTarget
+            ? Colors.orange.shade100
+            : nearTarget
+                ? Colors.yellow.shade100
+                : Colors.white,
         border: Border.all(color: Colors.black26, width: .5),
         borderRadius: BorderRadius.circular(6),
       ),
@@ -562,11 +696,13 @@ class HallOfFameBoard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${row['name']}',
-                style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87)),
+            PlayerNameLink(
+                player: {...row, 'name': _displayName(row['name'])},
+                child: Text(_displayName(row['name']),
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87))),
             if (detail.isNotEmpty) ...[
               const SizedBox(height: 3),
               Text(detail,

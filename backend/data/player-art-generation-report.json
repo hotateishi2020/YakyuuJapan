@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-20",
+  "team": "福岡ソフトバンクホークス",
+  "count": 118,
+  "method": "built-in image_gen",
+  "template": "backend/prompts/player-character-v1.md",
+  "manifest": "backend/data/player-art-initial-manifest.json",
+  "reviewed": true,
+  "api_live_tested": false,
+  "api_status": "Server API credentials must be configured"
+}

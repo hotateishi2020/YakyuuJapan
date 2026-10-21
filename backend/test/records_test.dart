@@ -14,12 +14,22 @@ Map<String, dynamic> team(int year, int id, int rank) => {'year': year, 'id_team
 Map<String, dynamic> game(int id, {bool loaded = true}) => {'id': id, 'id_team_home': 1, 'id_team_away': 2, 'flg_stats_loaded': loaded};
 Map<String, dynamic> box(int game, int player, {String decision = '', int runs = 0, int hits = 0, int walks = 0, int ab = 1}) => {'id_game': game, 'id_player': player, 'name': '選手$player', 'int_batting': ab, 'int_hit1': hits, 'int_fourball': walks, 'int_pitch': decision.isEmpty ? 0 : 20, 'int_runs': runs, 'code_result_pitcher': decision};
 void main() {
-  test('partial game streaks must not be presented as season records', () {
+  test('年表の順位セル用にその年度の監督名を保持する', () {
+    final result = buildRecordStandings([
+      {...team(2025, 1, 1), 'manager': '当年監督'},
+      {...team(2024, 1, 1), 'manager': '前年監督'},
+    ], [], OrgKind.npb);
+    expect(result.first['leagues'][0]['teams'][0]['manager'], '当年監督');
+    expect(result.last['leagues'][0]['teams'][0]['manager'], '前年監督');
+  });
+
+  test('partial game streaks remain visible with explicit coverage and scope', () {
     final result = seasonStreakPresentation(
       observed: [{'name': '選手', 'value': 4}], official: false,
       completedGames: 471, loadedGames: 21);
-    expect(result['current'], isEmpty);
-    expect(result['current_status'], 'unverified');
+    expect(result['current'], [{'name': '選手', 'value': 4}]);
+    expect(result['current_status'], 'partial');
+    expect(result['current_label'], contains('取得済み区間'));
     expect(result['current_message'], contains('21／471'));
   });
   test('verified season snapshots remain visible independently of local coverage', () {

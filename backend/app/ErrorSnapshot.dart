@@ -25,8 +25,9 @@ class ErrorSnapshotStore {
       final data = ByteData.sublistView(bytes);
       final width = data.getUint32(16);
       final height = data.getUint32(20);
-      if (width == 0 || height == 0 || width > 1280 || height > 1280)
+      if (width == 0 || height == 0 || width > 1280 || height > 1280) {
         return null;
+      }
       return bytes;
     } catch (_) {
       return null;

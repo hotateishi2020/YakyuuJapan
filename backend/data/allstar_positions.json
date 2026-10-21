@@ -1,0 +1,2855 @@
+{
+  "2026:浦田俊輔": {
+    "position": "二塁手",
+    "games": 92,
+    "source": "https://npb.jp/bis/2026/stats/idf1_g.html"
+  },
+  "2026:坂本勇人": {
+    "position": "三塁手",
+    "games": 44,
+    "source": "https://npb.jp/bis/2026/stats/idf1_g.html"
+  },
+  "2025:滝澤夏央": {
+    "position": "二塁手",
+    "games": 83,
+    "source": "https://npb.jp/bis/2025/stats/idf1_l.html"
+  },
+  "2026:牧秀悟": {
+    "position": "二塁手",
+    "games": 105,
+    "source": "https://npb.jp/bis/2026/stats/idf1_db.html"
+  },
+  "2025:野村勇": {
+    "position": "遊撃手",
+    "games": 73,
+    "source": "https://npb.jp/bis/2025/stats/idf1_h.html"
+  },
+  "2025:村林一輝": {
+    "position": "三塁手",
+    "games": 104,
+    "source": "https://npb.jp/bis/2025/stats/idf1_e.html"
+  },
+  "2025:中野拓夢": {
+    "position": "二塁手",
+    "games": 142,
+    "source": "https://npb.jp/bis/2025/stats/idf1_t.html"
+  },
+  "2025:泉口友汰": {
+    "position": "遊撃手",
+    "games": 132,
+    "source": "https://npb.jp/bis/2025/stats/idf1_g.html"
+  },
+  "2026:太田椋": {
+    "position": "二塁手",
+    "games": 78,
+    "source": "https://npb.jp/bis/2026/stats/idf1_b.html"
+  },
+  "2024:宮崎敏郎": {
+    "position": "三塁手",
+    "games": 117,
+    "source": "https://npb.jp/bis/2024/stats/idf1_db.html"
+  },
+  "2024:鈴木大地": {
+    "position": "一塁手",
+    "games": 76,
+    "source": "https://npb.jp/bis/2024/stats/idf1_e.html"
+  },
+  "2024:中野拓夢": {
+    "position": "二塁手",
+    "games": 143,
+    "source": "https://npb.jp/bis/2024/stats/idf1_t.html"
+  },
+  "2024:太田椋": {
+    "position": "一塁手",
+    "games": 58,
+    "source": "https://npb.jp/bis/2024/stats/idf1_b.html"
+  },
+  "2024:紅林弘太郎": {
+    "position": "遊撃手",
+    "games": 136,
+    "source": "https://npb.jp/bis/2024/stats/idf1_b.html"
+  },
+  "2024:小園海斗": {
+    "position": "三塁手",
+    "games": 128,
+    "source": "https://npb.jp/bis/2024/stats/idf1_c.html"
+  },
+  "2023:安田尚憲": {
+    "position": "三塁手",
+    "games": 106,
+    "source": "https://npb.jp/bis/2023/stats/idf1_m.html"
+  },
+  "2023:小深田大翔": {
+    "position": "二塁手",
+    "games": 77,
+    "source": "https://npb.jp/bis/2023/stats/idf1_e.html"
+  },
+  "2023:紅林弘太郎": {
+    "position": "遊撃手",
+    "games": 127,
+    "source": "https://npb.jp/bis/2023/stats/idf1_b.html"
+  },
+  "2023:岡本和真": {
+    "position": "三塁手",
+    "games": 84,
+    "source": "https://npb.jp/bis/2023/stats/idf1_g.html"
+  },
+  "2023:長岡秀樹": {
+    "position": "遊撃手",
+    "games": 132,
+    "source": "https://npb.jp/bis/2023/stats/idf1_s.html"
+  },
+  "2022:清宮幸太郎": {
+    "position": "一塁手",
+    "games": 108,
+    "source": "https://npb.jp/bis/2022/stats/idf1_f.html"
+  },
+  "2022:牧原大成": {
+    "position": "二塁手",
+    "games": 41,
+    "source": "https://npb.jp/bis/2022/stats/idf1_h.html"
+  },
+  "2022:小深田大翔": {
+    "position": "遊撃手",
+    "games": 95,
+    "source": "https://npb.jp/bis/2022/stats/idf1_e.html"
+  },
+  "2022:小園海斗": {
+    "position": "遊撃手",
+    "games": 127,
+    "source": "https://npb.jp/bis/2022/stats/idf1_c.html"
+  },
+  "2022:岡本和真": {
+    "position": "三塁手",
+    "games": 140,
+    "source": "https://npb.jp/bis/2022/stats/idf1_g.html"
+  },
+  "2022:中野拓夢": {
+    "position": "遊撃手",
+    "games": 135,
+    "source": "https://npb.jp/bis/2022/stats/idf1_t.html"
+  },
+  "2022:大山悠輔": {
+    "position": "一塁手",
+    "games": 100,
+    "source": "https://npb.jp/bis/2022/stats/idf1_t.html"
+  },
+  "2022:長岡秀樹": {
+    "position": "遊撃手",
+    "games": 139,
+    "source": "https://npb.jp/bis/2022/stats/idf1_s.html"
+  },
+  "2022:山田哲人": {
+    "position": "二塁手",
+    "games": 120,
+    "source": "https://npb.jp/bis/2022/stats/idf1_s.html"
+  },
+  "2021:小深田大翔": {
+    "position": "遊撃手",
+    "games": 109,
+    "source": "https://npb.jp/bis/2021/stats/idf1_e.html"
+  },
+  "2021:呉念庭": {
+    "position": "一塁手",
+    "games": 68,
+    "source": "https://npb.jp/bis/2021/stats/idf1_l.html"
+  },
+  "2021:中村奨吾": {
+    "position": "二塁手",
+    "games": 143,
+    "source": "https://npb.jp/bis/2021/stats/idf1_m.html"
+  },
+  "2019:菊池涼介": {
+    "position": "二塁手",
+    "games": 138,
+    "source": "https://npb.jp/bis/2019/stats/idf1_c.html"
+  },
+  "2019:京田陽太": {
+    "position": "遊撃手",
+    "games": 139,
+    "source": "https://npb.jp/bis/2019/stats/idf1_d.html"
+  },
+  "2019:源田壮亮": {
+    "position": "遊撃手",
+    "games": 133,
+    "source": "https://npb.jp/bis/2019/stats/idf1_l.html"
+  },
+  "2019:鈴木大地": {
+    "position": "一塁手",
+    "games": 89,
+    "source": "https://npb.jp/bis/2019/stats/idf1_m.html"
+  },
+  "2019:茂木栄五郎": {
+    "position": "遊撃手",
+    "games": 122,
+    "source": "https://npb.jp/bis/2019/stats/idf1_e.html"
+  },
+  "2019:銀次": {
+    "position": "一塁手",
+    "games": 134,
+    "source": "https://npb.jp/bis/2019/stats/idf1_e.html"
+  },
+  "2018:中村奨吾": {
+    "position": "二塁手",
+    "games": 143,
+    "source": "https://npb.jp/bis/2018/stats/idf1_m.html"
+  },
+  "2018:安達了一": {
+    "position": "遊撃手",
+    "games": 140,
+    "source": "https://npb.jp/bis/2018/stats/idf1_bs.html"
+  },
+  "2018:田中広輔": {
+    "position": "遊撃手",
+    "games": 143,
+    "source": "https://npb.jp/bis/2018/stats/idf1_c.html"
+  },
+  "2018:糸原健斗": {
+    "position": "二塁手",
+    "games": 121,
+    "source": "https://npb.jp/bis/2018/stats/idf1_t.html"
+  },
+  "2018:外崎修汰": {
+    "position": "三塁手",
+    "games": 61,
+    "source": "https://npb.jp/bis/2018/stats/idf1_l.html"
+  },
+  "2018:今江年晶": {
+    "position": "一塁手",
+    "games": 49,
+    "source": "https://npb.jp/bis/2018/stats/idf1_e.html"
+  },
+  "2018:中田翔": {
+    "position": "一塁手",
+    "games": 131,
+    "source": "https://npb.jp/bis/2018/stats/idf1_f.html"
+  },
+  "2017:源田壮亮": {
+    "position": "遊撃手",
+    "games": 143,
+    "source": "https://npb.jp/bis/2017/stats/idf1_l.html"
+  },
+  "2017:鈴木大地": {
+    "position": "二塁手",
+    "games": 143,
+    "source": "https://npb.jp/bis/2017/stats/idf1_m.html"
+  },
+  "2017:宮崎敏郎": {
+    "position": "三塁手",
+    "games": 119,
+    "source": "https://npb.jp/bis/2017/stats/idf1_db.html"
+  },
+  "2017:田中広輔": {
+    "position": "遊撃手",
+    "games": 143,
+    "source": "https://npb.jp/bis/2017/stats/idf1_c.html"
+  },
+  "2016:鈴木大地": {
+    "position": "遊撃手",
+    "games": 135,
+    "source": "https://npb.jp/bis/2016/stats/idf1_m.html"
+  },
+  "2016:菊池涼介": {
+    "position": "二塁手",
+    "games": 141,
+    "source": "https://npb.jp/bis/2016/stats/idf1_c.html"
+  },
+  "2016:大引啓次": {
+    "position": "遊撃手",
+    "games": 99,
+    "source": "https://npb.jp/bis/2016/stats/idf1_s.html"
+  },
+  "2015:田中広輔": {
+    "position": "遊撃手",
+    "games": 141,
+    "source": "https://npb.jp/bis/2015/stats/idf1_c.html"
+  },
+  "2015:山田哲人": {
+    "position": "二塁手",
+    "games": 143,
+    "source": "https://npb.jp/bis/2015/stats/idf1_s.html"
+  },
+  "2015:中島卓也": {
+    "position": "遊撃手",
+    "games": 143,
+    "source": "https://npb.jp/bis/2015/stats/idf1_f.html"
+  },
+  "2015:松田宣浩": {
+    "position": "三塁手",
+    "games": 143,
+    "source": "https://npb.jp/bis/2015/stats/idf1_h.html"
+  },
+  "2014:山田哲人": {
+    "position": "二塁手",
+    "games": 143,
+    "source": "https://npb.jp/bis/2014/stats/idf1_s.html"
+  },
+  "2014:坂本勇人": {
+    "position": "遊撃手",
+    "games": 140,
+    "source": "https://npb.jp/bis/2014/stats/idf1_g.html"
+  },
+  "2014:大引啓次": {
+    "position": "遊撃手",
+    "games": 122,
+    "source": "https://npb.jp/bis/2014/stats/idf1_f.html"
+  },
+  "2014:銀次": {
+    "position": "一塁手",
+    "games": 74,
+    "source": "https://npb.jp/bis/2014/stats/idf1_e.html"
+  },
+  "2014:鈴木大地": {
+    "position": "遊撃手",
+    "games": 107,
+    "source": "https://npb.jp/bis/2014/stats/idf1_m.html"
+  },
+  "2013:鈴木大地": {
+    "position": "遊撃手",
+    "games": 123,
+    "source": "https://npb.jp/bis/2013/stats/idf1_m.html"
+  },
+  "2013:今江敏晃": {
+    "position": "三塁手",
+    "games": 130,
+    "source": "https://npb.jp/bis/2013/stats/idf1_m.html"
+  },
+  "2013:浅村栄斗": {
+    "position": "一塁手",
+    "games": 136,
+    "source": "https://npb.jp/bis/2013/stats/idf1_l.html"
+  },
+  "2013:大引啓次": {
+    "position": "遊撃手",
+    "games": 120,
+    "source": "https://npb.jp/bis/2013/stats/idf1_f.html"
+  },
+  "2013:堂林翔太": {
+    "position": "三塁手",
+    "games": 105,
+    "source": "https://npb.jp/bis/2013/stats/idf1_c.html"
+  },
+  "2013:中村紀洋": {
+    "position": "三塁手",
+    "games": 115,
+    "source": "https://npb.jp/bis/2013/stats/idf1_db.html"
+  },
+  "2013:新井貴浩": {
+    "position": "一塁手",
+    "games": 133,
+    "source": "https://npb.jp/bis/2013/stats/idf1_t.html"
+  },
+  "2013:寺内崇幸": {
+    "position": "二塁手",
+    "games": 96,
+    "source": "https://npb.jp/bis/2013/stats/idf1_g.html"
+  },
+  "2012:明石健志": {
+    "position": "一塁手",
+    "games": 59,
+    "source": "https://npb.jp/bis/2012/stats/idf1_h.html"
+  },
+  "2012:堂林翔太": {
+    "position": "三塁手",
+    "games": 143,
+    "source": "https://npb.jp/bis/2012/stats/idf1_c.html"
+  },
+  "2012:村田修一": {
+    "position": "三塁手",
+    "games": 139,
+    "source": "https://npb.jp/bis/2012/stats/idf1_g.html"
+  },
+  "2012:荒木雅博": {
+    "position": "二塁手",
+    "games": 129,
+    "source": "https://npb.jp/bis/2012/stats/idf1_d.html"
+  },
+  "2012:畠山和洋": {
+    "position": "一塁手",
+    "games": 121,
+    "source": "https://npb.jp/bis/2012/stats/idf1_s.html"
+  },
+  "2011:中村剛也": {
+    "position": "三塁手",
+    "games": 121,
+    "source": "https://npb.jp/bis/2011/stats/idf1_l.html"
+  },
+  "2011:渡辺直人": {
+    "position": "二塁手",
+    "games": 97,
+    "source": "https://npb.jp/bis/2011/stats/idf1_yb.html"
+  },
+  "2011:栗原健太": {
+    "position": "一塁手",
+    "games": 144,
+    "source": "https://npb.jp/bis/2011/stats/idf1_c.html"
+  },
+  "2011:宮本慎也": {
+    "position": "三塁手",
+    "games": 132,
+    "source": "https://npb.jp/bis/2011/stats/idf1_s.html"
+  },
+  "2011:荒木雅博": {
+    "position": "遊撃手",
+    "games": 127,
+    "source": "https://npb.jp/bis/2011/stats/idf1_d.html"
+  },
+  "2010:森野将彦": {
+    "position": "三塁手",
+    "games": 143,
+    "source": "https://npb.jp/bis/2010/stats/idf1_d.html"
+  },
+  "2010:平野恵一": {
+    "position": "二塁手",
+    "games": 125,
+    "source": "https://npb.jp/bis/2010/stats/idf1_t.html"
+  },
+  "2010:小谷野栄一": {
+    "position": "三塁手",
+    "games": 143,
+    "source": "https://npb.jp/bis/2010/stats/idf1_f.html"
+  },
+  "2010:田中賢介": {
+    "position": "二塁手",
+    "games": 143,
+    "source": "https://npb.jp/bis/2010/stats/idf1_f.html"
+  },
+  "2010:西岡剛": {
+    "position": "遊撃手",
+    "games": 144,
+    "source": "https://npb.jp/bis/2010/stats/idf1_m.html"
+  },
+  "2009:井端弘和": {
+    "position": "遊撃手",
+    "games": 144,
+    "source": "https://npb.jp/bis/2009/stats/idf1_d.html"
+  },
+  "2009:宮本慎也": {
+    "position": "三塁手",
+    "games": 118,
+    "source": "https://npb.jp/bis/2009/stats/idf1_s.html"
+  },
+  "2009:金子誠": {
+    "position": "遊撃手",
+    "games": 136,
+    "source": "https://npb.jp/bis/2009/stats/idf1_f.html"
+  },
+  "2008:中島裕之": {
+    "position": "遊撃手",
+    "games": 122,
+    "source": "https://npb.jp/bis/2008/stats/idf1_l.html"
+  },
+  "2008:リック": {
+    "position": "一塁手",
+    "games": 12,
+    "source": "https://npb.jp/bis/2008/stats/idf1_e.html"
+  },
+  "2008:西岡剛": {
+    "position": "遊撃手",
+    "games": 115,
+    "source": "https://npb.jp/bis/2008/stats/idf1_m.html"
+  },
+  "2008:宮本慎也": {
+    "position": "遊撃手",
+    "games": 58,
+    "source": "https://npb.jp/bis/2008/stats/idf1_s.html"
+  },
+  "2007:中島裕之": {
+    "position": "遊撃手",
+    "games": 140,
+    "source": "https://npb.jp/bis/2007/stats/idf1_l.html"
+  },
+  "2007:新井貴浩": {
+    "position": "三塁手",
+    "games": 144,
+    "source": "https://npb.jp/bis/2007/stats/idf1_c.html"
+  },
+  "2007:宮本慎也": {
+    "position": "遊撃手",
+    "games": 129,
+    "source": "https://npb.jp/bis/2007/stats/idf1_s.html"
+  },
+  "2007:タイロンウッズ": {
+    "position": "一塁手",
+    "games": 137,
+    "source": "https://npb.jp/bis/2007/stats/idf1_d.html"
+  },
+  "2007:森野将彦": {
+    "position": "三塁手",
+    "games": 40,
+    "source": "https://npb.jp/bis/2007/stats/idf1_d.html"
+  },
+  "2006:中島裕之": {
+    "position": "遊撃手",
+    "games": 99,
+    "source": "https://npb.jp/bis/2006/stats/idf1_l.html"
+  },
+  "2006:福浦和也": {
+    "position": "一塁手",
+    "games": 112,
+    "source": "https://npb.jp/bis/2006/stats/idf1_m.html"
+  },
+  "2006:西岡剛": {
+    "position": "遊撃手",
+    "games": 115,
+    "source": "https://npb.jp/bis/2006/stats/idf1_m.html"
+  },
+  "2006:東出輝裕": {
+    "position": "二塁手",
+    "games": 122,
+    "source": "https://npb.jp/bis/2006/stats/idf1_c.html"
+  },
+  "2006:李承ヨプ": {
+    "position": "一塁手",
+    "games": 140,
+    "source": "https://npb.jp/bis/2006/stats/idf1_g.html"
+  },
+  "2006:二岡智宏": {
+    "position": "遊撃手",
+    "games": 144,
+    "source": "https://npb.jp/bis/2006/stats/idf1_g.html"
+  },
+  "2006:岩村明憲": {
+    "position": "三塁手",
+    "games": 143,
+    "source": "https://npb.jp/bis/2006/stats/idf1_s.html"
+  },
+  "2006:村田修一": {
+    "position": "三塁手",
+    "games": 145,
+    "source": "https://npb.jp/bis/2006/stats/idf1_yb.html"
+  },
+  "2005:李承ヨプ": {
+    "position": "一塁手",
+    "games": 18,
+    "source": "https://npb.jp/bis/2005/stats/idf1_m.html"
+  },
+  "2005:福浦和也": {
+    "position": "一塁手",
+    "games": 112,
+    "source": "https://npb.jp/bis/2005/stats/idf1_m.html"
+  },
+  "2005:木元邦之": {
+    "position": "二塁手",
+    "games": 121,
+    "source": "https://npb.jp/bis/2005/stats/idf1_f.html"
+  },
+  "2005:石井義人": {
+    "position": "二塁手",
+    "games": 76,
+    "source": "https://npb.jp/bis/2005/stats/idf1_l.html"
+  },
+  "2005:種田仁": {
+    "position": "二塁手",
+    "games": 145,
+    "source": "https://npb.jp/bis/2005/stats/idf1_yb.html"
+  },
+  "2005:新井貴浩": {
+    "position": "三塁手",
+    "games": 121,
+    "source": "https://npb.jp/bis/2005/stats/idf1_c.html"
+  },
+  "2005:岩村明憲": {
+    "position": "三塁手",
+    "games": 142,
+    "source": "https://npb.jp/bis/2005/stats/idf1_s.html"
+  },
+  "2005:井端弘和": {
+    "position": "遊撃手",
+    "games": 146,
+    "source": "https://npb.jp/bis/2005/stats/idf1_d.html"
+  },
+  "2005:荒木雅博": {
+    "position": "二塁手",
+    "games": 145,
+    "source": "https://npb.jp/bis/2005/stats/idf1_d.html"
+  },
+  "2024:オースティン": {
+    "position": "一塁手",
+    "games": 100,
+    "source": "https://npb.jp/bis/2024/stats/idf1_db.html"
+  },
+  "2019:グラシアル": {
+    "position": "一塁手",
+    "games": 1,
+    "source": "https://npb.jp/bis/2019/stats/idf1_h.html"
+  },
+  "2017:レアード": {
+    "position": "三塁手",
+    "games": 136,
+    "source": "https://npb.jp/bis/2017/stats/idf1_f.html"
+  },
+  "2017:ゲレーロ": {
+    "position": "三塁手",
+    "games": 32,
+    "source": "https://npb.jp/bis/2017/stats/idf1_d.html"
+  },
+  "2016:レアード": {
+    "position": "三塁手",
+    "games": 140,
+    "source": "https://npb.jp/bis/2016/stats/idf1_f.html"
+  },
+  "2015:ルナ": {
+    "position": "三塁手",
+    "games": 81,
+    "source": "https://npb.jp/bis/2015/stats/idf1_d.html"
+  },
+  "2015:クルーズ": {
+    "position": "二塁手",
+    "games": 123,
+    "source": "https://npb.jp/bis/2015/stats/idf1_m.html"
+  },
+  "2012:李大浩": {
+    "position": "一塁手",
+    "games": 129,
+    "source": "https://npb.jp/bis/2012/stats/idf1_bs.html"
+  },
+  "2010:ブラゼル": {
+    "position": "一塁手",
+    "games": 143,
+    "source": "https://npb.jp/bis/2010/stats/idf1_t.html"
+  },
+  "2007:ラロッカ": {
+    "position": "三塁手",
+    "games": 115,
+    "source": "https://npb.jp/bis/2007/stats/idf1_bs.html"
+  },
+  "2007:カブレラ": {
+    "position": "一塁手",
+    "games": 95,
+    "source": "https://npb.jp/bis/2007/stats/idf1_l.html"
+  },
+  "2006:フェルナンデス": {
+    "position": "三塁手",
+    "games": 91,
+    "source": "https://npb.jp/bis/2006/stats/idf1_e.html"
+  },
+  "2006:カブレラ": {
+    "position": "一塁手",
+    "games": 119,
+    "source": "https://npb.jp/bis/2006/stats/idf1_l.html"
+  },
+  "2005:平野恵一": {
+    "position": "二塁手",
+    "games": 115,
+    "source": "https://npb.jp/bis/2005/stats/idf1_bs.html"
+  },
+  "2005:フランコ": {
+    "position": "一塁手",
+    "games": 36,
+    "source": "https://npb.jp/bis/2005/stats/idf1_m.html"
+  },
+  "2004:中村紀洋": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2004_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2004:金子誠": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2004_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2004:中島裕之": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2004_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2004:立浪和義": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2004_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2004:嶋重宣": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2004_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2004:種田仁": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2004_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2004:仁志敏久": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2004_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "2004:ラロッカ": {
+    "position": "DH",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2004_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "2004:福浦和也": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2004_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "2004:オーティズ": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2004_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "2003:小坂誠": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2003_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2003:阿部真宏": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2003_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2003:塩谷和彦": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2003_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2003:二岡智宏": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2003_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2003:宮本慎也": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2003_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2003:立浪和義": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2003_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "2003:鈴木健": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2003_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "2003:高木浩之": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2003_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "2002:宮本慎也": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2002_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2002:アリアス": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2002_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2002:金子誠": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2002_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2002:小久保裕紀": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2002_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "2002:立浪和義": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2002_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "2002:新井貴浩": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2002_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "2007:TSUYOSHI": {
+    "position": "遊撃手",
+    "games": 127,
+    "source": "https://npb.jp/bis/2007/stats/idf1_m.html"
+  },
+  "2007:ウッズ": {
+    "position": "一塁手",
+    "games": 137,
+    "source": "https://npb.jp/bis/2007/stats/idf1_d.html"
+  },
+  "2006:松中信彦": {
+    "position": "外野手",
+    "games": 72,
+    "source": "https://npb.jp/bis/2006/stats/idf1_h.html"
+  },
+  "2004:岩村明憲": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2004_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2003:ウッズ": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2003_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2002:吉岡雄二": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2002_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "2003:松中信彦": {
+    "position": "一塁手",
+    "source": "https://npb.jp/allstar/2003/ballotresult.html",
+    "basis": "同年度ファン投票の守備位置"
+  },
+  "1951:浜田義雄": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1951_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1951:蔭山和夫": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1951_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1952:本堂保弥": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1952_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1952:白坂長栄": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1952_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1953:中西太": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1953_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1953:平井三郎": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1953_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1953:西沢道夫": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1953_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1953:藤村富美男": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1953_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1953:宇野光雄": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1953_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1953:本堂保弥": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1953_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1956:森下正夫": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1956_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1956:佐々木信也": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1956_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1956:箱田淳": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1956_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1954:西沢道夫": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1954_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1954:白坂長栄": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1954_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1954:レインズ": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1954_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1954:蔭山和夫": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1954_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1954:広岡達朗": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1954_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1954:飯島滋弥": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1954_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1955:中谷準志": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1955_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1955:西沢道夫": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1955_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1955:児玉利一": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1955_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1955:豊田泰光": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1955_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1955:坂本文次郎": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1955_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1958:広岡達朗": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1958_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1958:藤井弘": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1958_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1958:榎本喜八": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1958_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1958:広瀬叔功": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1958_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1958:豊田泰光": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1958_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1958:小玉明利": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1958_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1958:三宅秀史": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1958_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1959:桑田武": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1959_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1959:吉田義男": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1959_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1959:岡本伊三美": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1959_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1959:寺田陽介": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1959_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1959:半田春夫": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1959_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1959:三宅秀史": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1959_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1959:江藤慎一": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1959_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1959:飯田徳治": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1959_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1959:小玉明利": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1959_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1957:森下正夫": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1957_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1957:小玉明利": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1957_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1957:葛城隆雄": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1957_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1957:河野昭修": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1957_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1957:岡嶋博治": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1957_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1957:藤井弘": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1957_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1957:広岡達朗": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1957_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1962:桑田武": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1962_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1962:ピート": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1962_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1962:広瀬叔功": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1962_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1962:小坂佳隆": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1962_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1960:広瀬叔功": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1960_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1960:本屋敷錦吾": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1960_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1960:小玉明利": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1960_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1960:森下整鎮": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1960_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1960:吉田勝豊": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1960_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1960:桑田武": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1960_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1960:飯田徳治": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1960_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1960:三宅秀史": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1960_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1961:小玉明利": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1961_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1961:広瀬叔功": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1961_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1961:ブルーム": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1961_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1961:桑田武": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1961_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1961:西園寺昭夫": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1961_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1961:江藤慎一": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1961_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1964:スペンサー": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1964_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1964:石井晶": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1964_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1964:小池兼司": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1964_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1964:桑田武": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1964_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1964:クレス": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1964_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1964:城戸則文": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1964_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1964:矢ノ浦国満": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1964_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1964:古葉竹識": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1964_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1964:豊田泰光": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1964_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1964:マーシャル": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1964_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1965:前田益穂": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1965_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1965:ロイ": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1965_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1965:アグリー": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1965_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1965:マーシャル": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1965_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1965:桑田武": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1965_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1965:近藤昭仁": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1965_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1963:広瀬叔功": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1963_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1963:ブルーム": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1963_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1963:榎本喜八": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1963_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1963:豊田泰光": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1963_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1963:徳武定之": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1963_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1963:古葉毅": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1963_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1963:吉田義男": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1963_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1963:ピート": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1963_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1963:中西太": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1963_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1966:矢ノ浦国満": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1966_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1966:古葉竹識": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1966_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1966:バーマ": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1966_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1966:国貞泰汎": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1966_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1966:船田和英": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1966_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1968:基満男": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1968_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1968:阪本敏三": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1968_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1968:国貞泰汎": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1968_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1968:武上四郎": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1968_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1968:一枝修平": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1968_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1968:松原誠": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1968_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1967:小池兼司": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1967_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1967:前田益穂": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1967_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1967:山口富士雄": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1967_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1967:黒江透修": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1967_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1967:松原誠": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1967_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1967:高木守道": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1967_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1970:大下剛史": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1970_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1970:大橋穣": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1970_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1970:有藤通世": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1970_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1970:松原誠": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1970_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1970:安藤統夫": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1970_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1970:遠井吾郎": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1970_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1970:三村敏之": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1970_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1969:松原誠": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1969_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1969:広野功": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1969_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1969:阪本敏三": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1969_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1969:ブレイザー": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1969_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1971:藤田平": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1971_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1971:衣笠祥雄": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1971_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1971:松原誠": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1971_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1971:国貞泰汎": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1971_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1971:基満男": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1971_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1971:江藤慎一": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1971_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1971:阪本敏三": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1971_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1974:シピン": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1974_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1974:藤田平": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1974_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1974:大杉勝男": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1974_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1974:松原誠": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1974_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1974:桜井輝秀": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1974_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1974:羽田耕一": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1974_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1972:ロバーツ": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1972_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1972:シピン": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1972_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1972:松原誠": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1972_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1972:ジョーンズ": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1972_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1972:森本潔": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1972_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1972:基満男": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1972_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1972:三村敏之": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1972_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1973:加藤秀司": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1973_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1973:大橋穣": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1973_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1973:大下剛史": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1973_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1973:基満男": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1973_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1973:高木守道": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1973_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1973:シピン": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1973_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1973:藤田平": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1973_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1973:桜井輝秀": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1973_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1976:小田義人": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1976_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1976:マルカーノ": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1976_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1976:藤原満": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1976_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1976:松原誠": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1976_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1976:衣笠祥雄": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1976_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1976:島谷金二": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1976_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1976:掛布雅之": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1976_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1977:掛布雅之": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1977_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1977:シピン": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1977_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1977:田代富雄": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1977_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1977:ブリーデン": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1977_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1977:大島康徳": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1977_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1977:島谷金二": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1977_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1977:石渡茂": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1977_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1977:基満男": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1977_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1977:衣笠祥雄": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1977_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1975:マルカーノ": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1975_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1975:土井正博": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1975_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1975:大橋穣": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1975_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1975:藤原満": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1975_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1975:藤田平": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1975_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1975:島谷金二": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1975_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1975:中村勝広": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1975_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1975:松原誠": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1975_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1980:高橋慶彦": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1980_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1980:スコット": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1980_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1980:衣笠祥雄": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1980_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1980:土井正博": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1980_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1980:島谷金二": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1980_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1980:山崎裕之": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1980_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1980:基満男": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1980_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1980:片平晋作": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1980_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1978:加藤秀司": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1978_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1978:マルカーノ": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1978_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1978:有藤通世": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1978_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1978:真弓明信": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1978_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1978:島谷金二": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1978_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1978:掛布雅之": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1978_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1978:河埜和正": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1978_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1978:藤原満": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1978_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1979:高橋慶彦": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1979_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1979:大島康徳": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1979_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1979:三村敏之": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1979_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1979:藤原満": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1979_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1979:島谷金二": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1979_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1979:加藤英司": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1979_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1979:有藤通世": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1979_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1979:高木守道": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1979_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1981:河埜敬幸": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1981_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1981:落合博満": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1981_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1981:藤原満": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1981_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1981:藤田平": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1981_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1981:掛布雅之": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1981_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1981:谷沢健一": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1981_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1981:山下大輔": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1981_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1982:モッカ": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1982_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1982:岡田彰布": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1982_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1982:掛布雅之": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1982_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1982:衣笠祥雄": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1982_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1982:有藤通世": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1982_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1983:スティーブ": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1983_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1983:落合博満": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1983_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1983:高代延博": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1983_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1983:高橋慶彦": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1983_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1983:高木豊": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1983_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1983:掛布雅之": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1983_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1983:衣笠祥雄": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1983_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1983:谷沢健一": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1983_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1983:松永浩美": {
+    "position": "DH",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1983_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1983:山崎裕之": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1983_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1985:落合博満": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1985_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1985:ブーマー": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1985_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1985:篠塚利夫": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1985_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1985:中畑清": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1985_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1985:衣笠祥雄": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1985_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1985:原辰徳": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1985_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1985:高橋慶彦": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1985_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1985:松永浩美": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1985_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1985:古屋英夫": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1985_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1985:西村徳文": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1985_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1986:篠塚利夫": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1986_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1986:衣笠祥雄": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1986_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1986:長内孝": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1986_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1986:高橋慶彦": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1986_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1986:辻発彦": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1986_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1986:落合博満": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1986_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1986:ブーマー": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1986_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1986:松永浩美": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1986_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1984:弓岡敬二郎": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1984_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1984:松永浩美": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1984_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1984:高木豊": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1984_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1984:衣笠祥雄": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1984_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1984:掛布雅之": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1984_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1984:小早川毅彦": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1984_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1984:谷沢健一": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1984_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1987:落合博満": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1987_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1987:ゲーリー": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1987_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1987:白井一幸": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1987_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1987:西村徳文": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1987_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1987:デービス": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1987_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1987:正田耕三": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1987_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1987:バース": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1987_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1988:正田耕三": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1988_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1988:池山隆寛": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1988_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1988:落合博満": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1988_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1988:岡田彰布": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1988_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1988:福良淳一": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1988_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1988:ブーマー": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1988_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1988:松永浩美": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1988_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1988:西村徳文": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1988_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1988:高木豊": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1988_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1989:辻発彦": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1989_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1989:ブーマー": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1989_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1989:石毛宏典": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1989_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1989:正田耕三": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1989_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1989:和田豊": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1989_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1989:落合博満": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1989_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1989:岡田彰布": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1989_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1989:宇野勝": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1989_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1989:愛甲猛": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1989_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1990:辻発彦": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1990_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1990:金村義明": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1990_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1990:田中幸雄": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1990_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1990:松永浩美": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1990_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1990:池山隆寛": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1990_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1990:落合博満": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1990_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1990:パリッシュ": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1990_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1991:立浪和義": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1991_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1991:高木豊": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1991_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1991:落合博満": {
+    "position": "DH",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1991_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1991:駒田徳広": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1991_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1991:松永浩美": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1991_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1991:白井一幸": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1991_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1991:トレーバー": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1991_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1991:小川博文": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1991_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1992:大石大二郎": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1992_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1992:松永浩美": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1992_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1992:田辺徳雄": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1992_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1992:小川博文": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1992_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1992:池山隆寛": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1992_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1992:駒田徳広": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1992_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1992:正田耕三": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1992_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1992:シーツ": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1992_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1992:前原博之": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1992_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1994:立浪和義": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1994_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1994:野村謙二郎": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1994_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1994:大豊泰昭": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1994_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1994:松永浩美": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1994_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1994:田辺徳雄": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1994_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1994:トラックスラー": {
+    "position": "DH",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1994_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1994:石井浩郎": {
+    "position": "DH",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1994_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1994:小川博文": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1994_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1994:初芝清": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1994_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1994:広沢克己": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1994_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1993:辻発彦": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1993_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1993:片岡篤史": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1993_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1993:広瀬哲朗": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1993_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1993:落合博満": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1993_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1993:江藤智": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1993_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1993:広沢克己": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1993_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1993:種田仁": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1993_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1993:川相昌弘": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1993_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1993:石井浩郎": {
+    "position": "DH",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1993_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1995:フランコ": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1995_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1995:田中幸雄": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1995_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1995:堀幸一": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1995_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1995:初芝清": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1995_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1995:中村紀洋": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1995_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1995:立浪和義": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1995_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1995:久慈照嘉": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1995_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1995:落合博満": {
+    "position": "DH",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1995_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1995:和田豊": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1995_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1995:土橋勝征": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1995_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1996:久慈照嘉": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1996_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1996:オマリー": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1996_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1996:辻発彦": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1996_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1996:田中幸雄": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1996_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1996:初芝清": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1996_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1996:水口栄二": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1996_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1996:和田豊": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1996_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1996:大豊泰昭": {
+    "position": "DH",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1996_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1996:堀幸一": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1996_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1997:石井琢朗": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1997_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1997:駒田徳広": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1997_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1997:田中幸雄": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1997_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1997:吉永幸一郎": {
+    "position": "DH",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1997_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1997:鈴木健": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1997_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1997:小坂誠": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1997_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1997:立浪和義": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1997_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1998:片岡篤史": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1998_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1998:武藤孝司": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1998_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1998:野村謙二郎": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1998_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1998:今岡誠": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1998_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1998:駒田徳広": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1998_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1998:石井琢朗": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1998_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1998:池山隆寛": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1998_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1998:柳田聖人": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1998_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1998:初芝清": {
+    "position": "DH",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1998_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "2001:木村拓也": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2001_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2001:ペタジーニ": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2001_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2001:岩村明憲": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2001_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2001:井端弘和": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2001_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2001:小笠原道大": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2001_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2001:松中信彦": {
+    "position": "DH",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2001_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2001:小久保裕紀": {
+    "position": "DH",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2001_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2001:小坂誠": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2001_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1999:石井琢朗": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1999_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1999:ペタジーニ": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1999_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1999:福留孝介": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1999_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1999:小坂誠": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1999_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1999:松中信彦": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1999_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1999:小笠原道大": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1999_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1999:田中幸雄": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1999_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1999:中村紀洋": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1999_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "2000:小坂誠": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2000_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2000:小久保裕紀": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2000_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2000:小笠原道大": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2000_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2000:石井琢朗": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2000_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2000:ペタジーニ": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2000_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2000:ゴメス": {
+    "position": "DH",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2000_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2000:清原和博": {
+    "position": "DH",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2000_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "2000:立浪和義": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2000_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "2000:山崎武司": {
+    "position": "DH",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2000_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "2000:松中信彦": {
+    "position": "DH",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2000_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "2000:片岡篤史": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2000_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "2000:福浦和也": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2000_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1966:遠井吾郎": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1966_3.html",
+    "basis": "オールスター第3戦の守備位置"
+  },
+  "1966:松原誠": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1966_3.html",
+    "basis": "オールスター第3戦の守備位置"
+  },
+  "1967:遠井吾郎": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1967_3.html",
+    "basis": "オールスター第3戦の守備位置"
+  },
+  "1969:黒江透修": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1969_3.html",
+    "basis": "オールスター第3戦の守備位置"
+  },
+  "1973:谷沢健一": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1973_3.html",
+    "basis": "オールスター第3戦の守備位置"
+  },
+  "1974:衣笠祥雄": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1974_3.html",
+    "basis": "オールスター第3戦の守備位置"
+  },
+  "1977:大杉勝男": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1977_3.html",
+    "basis": "オールスター第3戦の守備位置"
+  },
+  "1980:石渡茂": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1980_3.html",
+    "basis": "オールスター第3戦の守備位置"
+  },
+  "1981:衣笠祥雄": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1981_3.html",
+    "basis": "オールスター第3戦の守備位置"
+  },
+  "1982:加藤英司": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1982_3.html",
+    "basis": "オールスター第3戦の守備位置"
+  },
+  "1982:河埜敬幸": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1982_3.html",
+    "basis": "オールスター第3戦の守備位置"
+  },
+  "1987:衣笠祥雄": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1987_3.html",
+    "basis": "オールスター第3戦の守備位置"
+  },
+  "1987:小早川毅彦": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1987_3.html",
+    "basis": "オールスター第3戦の守備位置"
+  },
+  "1992:高木豊": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1992_3.html",
+    "basis": "オールスター第3戦の守備位置"
+  },
+  "2000:ローズ": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore2000_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1999:ローズ": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1999_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1998:鈴木健": {
+    "position": "DH",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1998_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1997:野村謙二郎": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1997_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1997:ローズ": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1997_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1995:石井琢朗": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1995_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1993:野村謙二郎": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1993_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1992:石井浩郎": {
+    "position": "三塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1992_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1991:野村謙二郎": {
+    "position": "外野手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1991_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1990:野村謙二郎": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1990_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1985:高木豊": {
+    "position": "遊撃手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1985_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1982:大石大二郎": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1982_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1979:河埜敬幸": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1979_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1978:松原誠": {
+    "position": "一塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1978_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1969:土井正三": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1969_1.html",
+    "basis": "オールスター第1戦の守備位置"
+  },
+  "1965:吉田義男": {
+    "position": "二塁手",
+    "source": "https://npb.jp/bis/scores/allstargame/boxscore1965_2.html",
+    "basis": "オールスター第2戦の守備位置"
+  },
+  "1999:江藤智": {
+    "position": "三塁手",
+    "games": 97,
+    "source": "https://sta-men.jp/1999carp.html",
+    "basis": "同年度の公式戦スタメンで最も多い守備位置"
+  },
+  "1992:落合博満": {
+    "position": "一塁手",
+    "games": 114,
+    "source": "https://sta-men.jp/1992dragons.html",
+    "basis": "同年度の公式戦スタメンで最も多い守備位置"
+  },
+  "1990:正田耕三": {
+    "position": "二塁手",
+    "games": 119,
+    "source": "https://sta-men.jp/1990carp.html",
+    "basis": "同年度の公式戦スタメンで最も多い守備位置"
+  },
+  "1984:田淵幸一": {
+    "position": "DH",
+    "games": 73,
+    "source": "https://sta-men.jp/1984lions.html",
+    "basis": "同年度の公式戦スタメンで最も多い守備位置"
+  },
+  "1984:バース": {
+    "position": "一塁手",
+    "games": 100,
+    "source": "https://sta-men.jp/1984tigers.html",
+    "basis": "同年度の公式戦スタメンで最も多い守備位置"
+  },
+  "1981:ソレイタ": {
+    "position": "DH",
+    "games": 119,
+    "source": "https://sta-men.jp/1981fighters.html",
+    "basis": "同年度の公式戦スタメンで最も多い守備位置"
+  },
+  "1981:大杉勝男": {
+    "position": "一塁手",
+    "games": 110,
+    "source": "https://sta-men.jp/1981swallows.html",
+    "basis": "同年度の公式戦スタメンで最も多い守備位置"
+  },
+  "1990:高木豊": {
+    "position": "二塁手",
+    "games": 111,
+    "source": "https://sta-men.jp/1990whales.html",
+    "basis": "同年度の公式戦スタメンで最も多い守備位置"
+  }
+}

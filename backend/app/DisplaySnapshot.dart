@@ -1,3 +1,4 @@
+import 'TeamScoringRates.dart';
 import 'dart:convert';
 
 import 'package:postgres/postgres.dart';
@@ -117,6 +118,8 @@ class DisplaySnapshot {
   static Future<void> _refreshTeams(Connection conn, int year) async {
     await ensure(conn);
     final rows = Postgres.toJson(await Postgres.execute(conn, AppSql.selectStatsTeam(), data: [year]));
+    final scoringRates = await readTeamScoringRates(conn, year, expectedGames: {for (final row in rows) '${row['id_team']}': int.tryParse('${row['int_game']}') ?? -1});
+    for (final row in rows) { row['runs_per_nine'] = scoringRates['${row['id_team']}']; }
     // 起用データが未作成の環境でも順位表の更新は継続する。
     final pitchingTable = await conn.execute("SELECT to_regclass('t_strength_pitching') IS NOT NULL");
     if (pitchingTable.first.first == true) {
@@ -212,23 +215,8 @@ class DisplaySnapshot {
     return PredictionSnapshot.players(conn, year, leagueIds);
   }
 
-  static Future<List<Map<String, dynamic>>> teams(Connection conn, int year) async {
-    // Workload and standings refresh independently. Join the saved pitching totals
-    // on every read so an older standings snapshot does not hide newer workload.
-    final available = await conn.execute("SELECT to_regclass('public.t_strength_pitching') IS NOT NULL");
-    if (available.first.first != true) return _readYear(conn, 'v_stats_teams', year);
-    final rows = await conn.execute('''
-      WITH workload AS (
-        SELECT id_team, SUM(starter_outs)::double precision / NULLIF(SUM(total_outs), 0) AS rate
-        FROM t_strength_pitching WHERE int_year = \$1 GROUP BY id_team
-      )
-      SELECT s.payload || CASE WHEN w.id_team IS NULL THEN '{}'::jsonb
-        ELSE jsonb_build_object('starter_workload_rate', w.rate) END
-      FROM v_stats_teams s LEFT JOIN workload w ON w.id_team = (s.payload->>'id_team')::integer
-      WHERE s.int_year = \$1 ORDER BY s.row_no
-    ''', parameters: [year]);
-    return [for (final row in rows) _decode(row[0])];
-  }
+  static Future<List<Map<String, dynamic>>> teams(Connection conn, int year) =>
+      _readYear(conn, 'v_stats_teams', year);
 
   static Future<DisplayGames> games(Connection conn, int year, {String? from, String? to}) async {
     await ensure(conn);

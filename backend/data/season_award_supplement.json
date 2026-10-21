@@ -1,0 +1,136 @@
+[
+  {
+    "org": "npb",
+    "year": 2025,
+    "key": "derby",
+    "name": "牧 秀悟",
+    "team": "横浜DeNA",
+    "detail": "",
+    "source": "https://npb.jp/news/detail/20250724_01.html",
+    "confirmed": true
+  },
+  {
+    "org": "npb",
+    "year": 2026,
+    "key": "derby",
+    "name": "細川 成也",
+    "team": "中日",
+    "detail": "",
+    "source": "https://npb.jp/news/detail/20260729_02.html",
+    "confirmed": true
+  },
+  {
+    "org": "npb",
+    "year": 2025,
+    "key": "cs_mvp",
+    "name": "森下 翔太",
+    "team": "阪神",
+    "detail": "セ・リーグ",
+    "source": "https://www.nikkansports.com/baseball/news/202510170002019.html",
+    "confirmed": true
+  },
+  {
+    "org": "npb",
+    "year": 2025,
+    "key": "cs_mvp",
+    "name": "Ｌ．モイネロ",
+    "team": "福岡ソフトバンク",
+    "detail": "パ・リーグ",
+    "source": "https://www.sponichi.co.jp/baseball/news/2025/10/20/kiji/20251020s00001173303000c.html",
+    "confirmed": true
+  },
+  {
+    "org": "npb",
+    "year": 2026,
+    "key": "cs_mvp",
+    "name": "牧 秀悟",
+    "team": "横浜DeNA",
+    "detail": "セ・リーグ",
+    "source": "https://ec.baystars.co.jp/items/4573676122605",
+    "confirmed": true
+  },
+  {
+    "org": "npb",
+    "year": 2026,
+    "key": "cs_mvp",
+    "name": "庄子 雄大",
+    "team": "福岡ソフトバンク",
+    "detail": "パ・リーグ",
+    "source": "https://pacificleague.com/news/2026/10/10056100",
+    "confirmed": true
+  },
+  {
+    "org": "npb",
+    "year": 2026,
+    "key": "series_entrants",
+    "name": "横浜DeNAベイスターズ",
+    "team": "",
+    "detail": "セ・リーグ",
+    "source": "https://ec.baystars.co.jp/news?cp=22",
+    "confirmed": true
+  },
+  {
+    "org": "npb",
+    "year": 2026,
+    "key": "series_entrants",
+    "name": "福岡ソフトバンクホークス",
+    "team": "",
+    "detail": "パ・リーグ",
+    "source": "https://kbc.co.jp/asadesu_kbc/detail.php?cdid=47785&mid=1",
+    "confirmed": true
+  },
+  {
+    "org": "npb",
+    "year": 2026,
+    "key": "fresh_champion",
+    "name": "パ・リーグ",
+    "team": "",
+    "detail": "フレッシュオールスター優勝",
+    "source": "ユーザー指定（2026-10-21）",
+    "confirmed": true,
+    "override": true
+  },
+  {
+    "org": "npb",
+    "year": 2026,
+    "key": "allstar_champion",
+    "name": "引き分け",
+    "team": "",
+    "detail": "1勝1敗",
+    "source": "ユーザー指定（2026-10-21）",
+    "confirmed": true,
+    "override": true
+  },
+  {
+    "org": "npb",
+    "year": 2026,
+    "key": "interleague_outstanding",
+    "name": "栗原 陵矢",
+    "team": "福岡ソフトバンク",
+    "detail": "パ・リーグ 交流戦優秀選手賞",
+    "source": "ユーザー指定（2026-10-21）",
+    "confirmed": true,
+    "override": true
+  },
+  {
+    "org": "npb",
+    "year": 2026,
+    "key": "interleague_outstanding",
+    "name": "高橋 遥人",
+    "team": "阪神",
+    "detail": "セ・リーグ 交流戦優秀選手賞",
+    "source": "ユーザー指定（2026-10-21）",
+    "confirmed": true,
+    "override": true
+  },
+  {
+    "org": "npb",
+    "year": 2026,
+    "key": "weekly",
+    "name": "森下 翔太",
+    "team": "阪神",
+    "detail": "2026/08/17発表 セ・リーグ 野手",
+    "source": "ユーザー指定（2026-10-21）：8月2週目 セ・リーグ野手",
+    "confirmed": true
+  }
+]

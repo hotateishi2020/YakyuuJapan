@@ -1,0 +1,464 @@
+[
+  {
+    "org": "mlb",
+    "year": 1965,
+    "category": "recruitment",
+    "text": "初のアマチュアドラフトを開催",
+    "source": "https://www.mlb.com/news/first-mlb-draft-full-of-stars-hall-of-famers/c-127179568"
+  },
+  {
+    "org": "mlb",
+    "year": 1995,
+    "category": "records",
+    "text": "カル・リプケン：2,131試合連続出場でMLB記録を更新",
+    "source": "https://www.mlb.com/orioles/video/topic/cal-ripken-2131"
+  },
+  {
+    "org": "mlb",
+    "year": 2004,
+    "category": "records",
+    "text": "イチロー：シーズン262安打でMLB記録を更新",
+    "source": "https://www.mlb.com/news/ichiro-s-season-hit-record-may-be-unbreakable-c275212644"
+  },
+  {
+    "org": "mlb",
+    "year": 2006,
+    "category": "international",
+    "text": "WBC：日本が優勝（決勝 10–6 キューバ）",
+    "source": "https://i.japan-baseball.jp/jp/games/wbc2026/"
+  },
+  {
+    "org": "mlb",
+    "year": 2007,
+    "category": "records",
+    "text": "バリー・ボンズ：通算756本塁打でMLB記録を更新",
+    "source": "https://www.mlb.com/video/bonds-756th-career-homer-c7143409"
+  },
+  {
+    "org": "mlb",
+    "year": 2009,
+    "category": "international",
+    "text": "WBC：日本が優勝（決勝 5–3 韓国）",
+    "source": "https://i.japan-baseball.jp/jp/games/wbc2026/"
+  },
+  {
+    "org": "mlb",
+    "year": 2013,
+    "category": "international",
+    "text": "WBC：ドミニカ共和国が優勝（決勝 3–0 プエルトリコ）",
+    "source": "https://i.japan-baseball.jp/jp/games/wbc2026/"
+  },
+  {
+    "org": "mlb",
+    "year": 2017,
+    "category": "international",
+    "text": "WBC：米国が優勝（決勝 8–0 プエルトリコ）",
+    "source": "https://i.japan-baseball.jp/jp/games/wbc2026/"
+  },
+  {
+    "org": "mlb",
+    "year": 2022,
+    "category": "incidents",
+    "text": "2021年末からのロックアウトが新労使協定の合意で終了",
+    "source": "https://www.mlbplayers.com/history/solidarity-again-yields-gains-in-new-cba-"
+  },
+  {
+    "org": "mlb",
+    "year": 2022,
+    "category": "rules",
+    "text": "両リーグでDH制を採用",
+    "source": "https://www.mlb.com/news/mlb-rule-changes-for-2022"
+  },
+  {
+    "org": "mlb",
+    "year": 2023,
+    "category": "international",
+    "text": "WBC：日本が優勝（決勝 3–2 米国）",
+    "source": "https://i.japan-baseball.jp/jp/games/wbc2026/"
+  },
+  {
+    "org": "mlb",
+    "year": 2023,
+    "category": "rules",
+    "text": "ピッチタイマー・守備シフト制限・大型ベースを導入",
+    "source": "https://www.mlb.com/news/mlb-new-rules-for-2023-faq"
+  },
+  {
+    "org": "mlb",
+    "year": 2026,
+    "category": "international",
+    "text": "WBC：ベネズエラが優勝（決勝 3–2 米国）",
+    "source": "https://i.japan-baseball.jp/jp/games/wbc2026/"
+  },
+  {
+    "org": "npb",
+    "year": 1938,
+    "category": "records",
+    "text": "秋季 中島 治康（巨　人）三冠王：打率.361・10本塁打・38打点",
+    "source": "https://npb.jp/history/alltime/triplecrown.html"
+  },
+  {
+    "org": "npb",
+    "year": 1950,
+    "category": "records",
+    "text": "別当 薫（毎　日）トリプルスリー：打率.335・43本塁打・34盗塁",
+    "source": "https://npb.jp/history/alltime/triplethree.html"
+  },
+  {
+    "org": "npb",
+    "year": 1950,
+    "category": "records",
+    "text": "岩本 義行（松　竹）トリプルスリー：打率.319・39本塁打・34盗塁",
+    "source": "https://npb.jp/history/alltime/triplethree.html"
+  },
+  {
+    "org": "npb",
+    "year": 1953,
+    "category": "records",
+    "text": "中西 太（西　鉄）トリプルスリー：打率.314・36本塁打・36盗塁",
+    "source": "https://npb.jp/history/alltime/triplethree.html"
+  },
+  {
+    "org": "npb",
+    "year": 1965,
+    "category": "records",
+    "text": "野村 克也（南　海）三冠王：打率.320・42本塁打・110打点",
+    "source": "https://npb.jp/history/alltime/triplecrown.html"
+  },
+  {
+    "org": "npb",
+    "year": 1965,
+    "category": "recruitment",
+    "text": "新人選手のドラフト会議を初開催",
+    "source": "https://npb.jp/pl/history.html"
+  },
+  {
+    "org": "npb",
+    "year": 1973,
+    "category": "records",
+    "text": "王 貞治（巨　人）三冠王：打率.355・51本塁打・114打点",
+    "source": "https://npb.jp/history/alltime/triplecrown.html"
+  },
+  {
+    "org": "npb",
+    "year": 1974,
+    "category": "records",
+    "text": "王 貞治（巨　人）三冠王：打率.332・49本塁打・107打点",
+    "source": "https://npb.jp/history/alltime/triplecrown.html"
+  },
+  {
+    "org": "npb",
+    "year": 1974,
+    "category": "records",
+    "text": "王貞治：通算600本塁打、日本新記録",
+    "source": "https://npb.jp/cl/history.html"
+  },
+  {
+    "org": "npb",
+    "year": 1975,
+    "category": "rules",
+    "text": "パ・リーグで指名打者（DH）制を採用",
+    "source": "https://npb.jp/pl/history.html"
+  },
+  {
+    "org": "npb",
+    "year": 1977,
+    "category": "records",
+    "text": "王貞治：通算756本塁打、アーロンの記録を超える",
+    "source": "https://npb.jp/cl/history.html"
+  },
+  {
+    "org": "npb",
+    "year": 1982,
+    "category": "records",
+    "text": "落合 博満（ロッテ）三冠王：打率.325・32本塁打・99打点",
+    "source": "https://npb.jp/history/alltime/triplecrown.html"
+  },
+  {
+    "org": "npb",
+    "year": 1983,
+    "category": "records",
+    "text": "簑田 浩二（阪　急）トリプルスリー：打率.312・32本塁打・35盗塁",
+    "source": "https://npb.jp/history/alltime/triplethree.html"
+  },
+  {
+    "org": "npb",
+    "year": 1984,
+    "category": "records",
+    "text": "ブーマー（阪　急）三冠王：打率.355・37本塁打・130打点",
+    "source": "https://npb.jp/history/alltime/triplecrown.html"
+  },
+  {
+    "org": "npb",
+    "year": 1985,
+    "category": "records",
+    "text": "バース（阪　神）三冠王：打率.350・54本塁打・134打点",
+    "source": "https://npb.jp/history/alltime/triplecrown.html"
+  },
+  {
+    "org": "npb",
+    "year": 1985,
+    "category": "records",
+    "text": "落合 博満（ロッテ）三冠王：打率.367・52本塁打・146打点",
+    "source": "https://npb.jp/history/alltime/triplecrown.html"
+  },
+  {
+    "org": "npb",
+    "year": 1986,
+    "category": "records",
+    "text": "バース（阪　神）三冠王：打率.389・47本塁打・109打点",
+    "source": "https://npb.jp/history/alltime/triplecrown.html"
+  },
+  {
+    "org": "npb",
+    "year": 1986,
+    "category": "records",
+    "text": "落合 博満（ロッテ）三冠王：打率.360・50本塁打・116打点",
+    "source": "https://npb.jp/history/alltime/triplecrown.html"
+  },
+  {
+    "org": "npb",
+    "year": 1987,
+    "category": "records",
+    "text": "衣笠祥雄：連続出場が2,215試合に到達",
+    "source": "https://npb.jp/cl/history.html"
+  },
+  {
+    "org": "npb",
+    "year": 1989,
+    "category": "records",
+    "text": "秋山 幸二（西　武）トリプルスリー：打率.301・31本塁打・31盗塁",
+    "source": "https://npb.jp/history/alltime/triplethree.html"
+  },
+  {
+    "org": "npb",
+    "year": 1993,
+    "category": "recruitment",
+    "text": "FA（フリーエージェント）制度が発効",
+    "source": "https://npb.jp/pl/history.html"
+  },
+  {
+    "org": "npb",
+    "year": 1995,
+    "category": "records",
+    "text": "野村 謙二郎（広　島）トリプルスリー：打率.315・32本塁打・30盗塁",
+    "source": "https://npb.jp/history/alltime/triplethree.html"
+  },
+  {
+    "org": "npb",
+    "year": 2000,
+    "category": "records",
+    "text": "金本 知憲（広　島）トリプルスリー：打率.315・30本塁打・30盗塁",
+    "source": "https://npb.jp/history/alltime/triplethree.html"
+  },
+  {
+    "org": "npb",
+    "year": 2002,
+    "category": "records",
+    "text": "松井 稼頭央（西　武）トリプルスリー：打率.332・36本塁打・33盗塁",
+    "source": "https://npb.jp/history/alltime/triplethree.html"
+  },
+  {
+    "org": "npb",
+    "year": 2004,
+    "category": "incidents",
+    "text": "選手会が初のストライキ。9月18・19日の公式戦が中止",
+    "source": "https://npb.jp/pl/history.html"
+  },
+  {
+    "org": "npb",
+    "year": 2004,
+    "category": "records",
+    "text": "松中 信彦（ダイエー）三冠王：打率.358・44本塁打・120打点",
+    "source": "https://npb.jp/history/alltime/triplecrown.html"
+  },
+  {
+    "org": "npb",
+    "year": 2006,
+    "category": "international",
+    "text": "WBC：日本が優勝（決勝 10–6 キューバ）",
+    "source": "https://i.japan-baseball.jp/jp/games/wbc2026/"
+  },
+  {
+    "org": "npb",
+    "year": 2007,
+    "category": "recruitment",
+    "text": "ドラフトの希望入団枠を廃止",
+    "source": "https://npb.jp/pl/history.html"
+  },
+  {
+    "org": "npb",
+    "year": 2009,
+    "category": "international",
+    "text": "WBC：日本が優勝（決勝 5–3 韓国）",
+    "source": "https://i.japan-baseball.jp/jp/games/wbc2026/"
+  },
+  {
+    "org": "npb",
+    "year": 2011,
+    "category": "incidents",
+    "text": "東日本大震災の影響でシーズン開幕を延期",
+    "source": "https://npb.jp/cl/history.html"
+  },
+  {
+    "org": "npb",
+    "year": 2011,
+    "category": "rules",
+    "text": "統一試合球を導入",
+    "source": "https://npb.jp/cl/history.html"
+  },
+  {
+    "org": "npb",
+    "year": 2013,
+    "category": "international",
+    "text": "WBC：ドミニカ共和国が優勝（決勝 3–0 プエルトリコ）",
+    "source": "https://i.japan-baseball.jp/jp/games/wbc2026/"
+  },
+  {
+    "org": "npb",
+    "year": 2013,
+    "category": "records",
+    "text": "バレンティン：シーズン60本塁打、日本新記録",
+    "source": "https://npb.jp/cl/history.html"
+  },
+  {
+    "org": "npb",
+    "year": 2015,
+    "category": "incidents",
+    "text": "野球賭博への関与により巨人の3選手に無期失格処分",
+    "source": "https://npb.jp/cl/history.html"
+  },
+  {
+    "org": "npb",
+    "year": 2015,
+    "category": "records",
+    "text": "山田 哲人（ヤクルト）トリプルスリー：打率.329・38本塁打・34盗塁",
+    "source": "https://npb.jp/history/alltime/triplethree.html"
+  },
+  {
+    "org": "npb",
+    "year": 2015,
+    "category": "records",
+    "text": "柳田 悠岐（ソフトバンク）トリプルスリー：打率.363・34本塁打・32盗塁",
+    "source": "https://npb.jp/history/alltime/triplethree.html"
+  },
+  {
+    "org": "npb",
+    "year": 2015,
+    "category": "records",
+    "text": "秋山翔吾：シーズン216安打、日本新記録",
+    "source": "https://npb.jp/pl/history.html"
+  },
+  {
+    "org": "npb",
+    "year": 2015,
+    "category": "recruitment",
+    "text": "ドラフト指名順のリーグ優先権を交流戦の勝ち越しリーグへ変更",
+    "source": "https://npb.jp/pl/history.html"
+  },
+  {
+    "org": "npb",
+    "year": 2016,
+    "category": "records",
+    "text": "山田 哲人（ヤクルト）トリプルスリー：打率.304・38本塁打・30盗塁",
+    "source": "https://npb.jp/history/alltime/triplethree.html"
+  },
+  {
+    "org": "npb",
+    "year": 2017,
+    "category": "international",
+    "text": "WBC：米国が優勝（決勝 8–0 プエルトリコ）",
+    "source": "https://i.japan-baseball.jp/jp/games/wbc2026/"
+  },
+  {
+    "org": "npb",
+    "year": 2017,
+    "category": "records",
+    "text": "岩瀬仁紀：950試合登板で通算登板の日本記録を更新",
+    "source": "https://npb.jp/cl/history.html"
+  },
+  {
+    "org": "npb",
+    "year": 2018,
+    "category": "records",
+    "text": "山田 哲人（ヤクルト）トリプルスリー：打率.315・34本塁打・33盗塁",
+    "source": "https://npb.jp/history/alltime/triplethree.html"
+  },
+  {
+    "org": "npb",
+    "year": 2018,
+    "category": "rules",
+    "text": "リプレイ検証のリクエスト制度を導入",
+    "source": "https://npb.jp/cl/history.html"
+  },
+  {
+    "org": "npb",
+    "year": 2019,
+    "category": "international",
+    "text": "プレミア12：日本が優勝",
+    "source": "https://www.japan-baseball.jp/jp/games/2019premier12/"
+  },
+  {
+    "org": "npb",
+    "year": 2020,
+    "category": "incidents",
+    "text": "新型コロナウイルスの感染拡大により開幕を延期",
+    "source": "https://npb.jp/cl/history.html"
+  },
+  {
+    "org": "npb",
+    "year": 2021,
+    "category": "rules",
+    "text": "感染拡大対策で延長戦を行わず、9回打ち切り",
+    "source": "https://npb.jp/cl/history.html"
+  },
+  {
+    "org": "npb",
+    "year": 2022,
+    "category": "records",
+    "text": "村上 宗隆（ヤクルト）三冠王：打率.318・56本塁打・134打点",
+    "source": "https://npb.jp/history/alltime/triplecrown.html"
+  },
+  {
+    "org": "npb",
+    "year": 2022,
+    "category": "records",
+    "text": "村上宗隆：シーズン56本塁打、日本選手の最多記録を更新",
+    "source": "https://npb.jp/cl/history.html"
+  },
+  {
+    "org": "npb",
+    "year": 2022,
+    "category": "recruitment",
+    "text": "現役ドラフトを初開催",
+    "source": "https://c.npb.jp/geneki_draft/2022/"
+  },
+  {
+    "org": "npb",
+    "year": 2023,
+    "category": "international",
+    "text": "WBC：日本が優勝（決勝 3–2 米国）",
+    "source": "https://i.japan-baseball.jp/jp/games/wbc2026/"
+  },
+  {
+    "org": "npb",
+    "year": 2024,
+    "category": "international",
+    "text": "プレミア12：チャイニーズ・タイペイ優勝、日本は準優勝",
+    "source": "https://www.japan-baseball.jp/jp/news/press/20241124_3.html"
+  },
+  {
+    "org": "npb",
+    "year": 2026,
+    "category": "international",
+    "text": "WBC：ベネズエラが優勝（決勝 3–2 米国）",
+    "source": "https://i.japan-baseball.jp/jp/games/wbc2026/"
+  },
+  {
+    "org": "npb",
+    "year": 2026,
+    "category": "records",
+    "text": "佐藤 輝明（阪　神）三冠王：打率.306・39本塁打・106打点",
+    "source": "https://npb.jp/history/alltime/triplecrown.html"
+  }
+]

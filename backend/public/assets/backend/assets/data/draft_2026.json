@@ -11,7 +11,7 @@
       "weight": 81,
       "hand": "右投右打",
       "achievement": "2026年U-18日本代表。アジア選手権・台湾戦で6回7奪三振。",
-      "features": "長身の右腕。代表戦での奪三振能力に注目。",
+      "features": "154km/hの直球に、カーブ・スライダー・チェンジアップ・フォークを組み合わせる。速球だけに頼らず緩急と落ち球を使える右腕。2年春の選抜優勝、夏の8強を経験。",
       "sources": [
         "https://www.japan-baseball.jp/jp/news/press/20260912_1.html",
         "https://www.japan-baseball.jp/jp/news/press/20260822_1.html",
@@ -253,7 +253,15 @@
         }
       ],
       "feature_video_checked_at": "2026-10-18T20:54:28.404630Z",
-      "feature_video_status": "ok"
+      "feature_video_status": "ok",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "154km/hの直球に、カーブ・スライダー・チェンジアップ・フォークを組み合わせる。速球だけに頼らず緩急と落ち球を使える右腕。2年春の選抜優勝、夏の8強を経験。",
+        "watch_points": "長いイニングでの球威維持と、変化球を狙ったコースに投げられるか。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20080002/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -264,7 +272,7 @@
       "weight": 86,
       "hand": "左投左打",
       "achievement": "2026年U-18日本代表に選出。",
-      "features": "左投げの投手。国際大会代表に選ばれた左腕。",
+      "features": "149km/hの左腕。2種類のカーブにスライダー、チェンジアップを持ち、速度と軌道の違いが特徴。1年夏の甲子園準々決勝でも先発し、3回途中まで無失点。",
       "sources": [
         "https://www.japan-baseball.jp/jp/news/press/20260331_2.html",
         "https://www.japan-baseball.jp/jp/news/press/20260822_1.html",
@@ -350,7 +358,15 @@
         }
       ],
       "feature_video_checked_at": "2026-10-18T20:54:28.404630Z",
-      "feature_video_status": "ok"
+      "feature_video_status": "ok",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "149km/hの左腕。2種類のカーブにスライダー、チェンジアップを持ち、速度と軌道の違いが特徴。1年夏の甲子園準々決勝でも先発し、3回途中まで無失点。",
+        "watch_points": "右打者への配球の幅と、連戦での投球内容の再現性。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20080014/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -361,7 +377,7 @@
       "weight": 101,
       "hand": "右投右打",
       "achievement": "山梨学院高",
-      "features": "最速152km/h。先発型の投手。",
+      "features": "195cmの大型二刀流。投手では152km/hと複数の変化球、打者では高校通算39本塁打の長打力を持つ。2年夏の甲子園は全4試合に先発して4強。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
         "https://sp.baseball.findfriends.jp/player/20080007/",
@@ -647,7 +663,15 @@
         }
       ],
       "feature_video_checked_at": "2026-10-18T20:54:28.404630Z",
-      "feature_video_status": "ok"
+      "feature_video_status": "ok",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "195cmの大型二刀流。投手では152km/hと複数の変化球、打者では高校通算39本塁打の長打力を持つ。2年夏の甲子園は全4試合に先発して4強。",
+        "watch_points": "投打どちらを主軸に育成するか。投手ではフォームの再現性、打者では速球への対応を確認。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20080007/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -658,7 +682,7 @@
       "weight": 91,
       "hand": "左投左打",
       "achievement": "沖縄尚学高",
-      "features": "最速150km/h。先発型の投手。",
+      "features": "150km/hの左腕で、カーブ・スライダー・ツーシームを持つ。2025年夏の甲子園優勝とU-18代表を経験しており、大舞台での先発経験も評価材料。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
         "https://sp.baseball.findfriends.jp/player/20080003/",
@@ -845,7 +869,15 @@
         }
       ],
       "feature_video_checked_at": "2026-10-18T20:54:28.404630Z",
-      "feature_video_status": "ok"
+      "feature_video_status": "ok",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "150km/hの左腕で、カーブ・スライダー・ツーシームを持つ。2025年夏の甲子園優勝とU-18代表を経験しており、大舞台での先発経験も評価材料。",
+        "watch_points": "直球と動く球のコースの使い分け、終盤までの制球と球威。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20080003/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -856,7 +888,7 @@
       "weight": 71,
       "hand": "左投左打",
       "achievement": "聖隷クリストファー高",
-      "features": "最速150km/h。先発型の投手。",
+      "features": "テンポの良い投球と球の切れが持ち味の左腕。2年夏の西日本短大付戦では8回を無四球・9奪三振。四球を抑えながら三振を取った実戦内容が光る。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
         "https://sp.baseball.findfriends.jp/player/20090001/",
@@ -962,7 +994,15 @@
         }
       ],
       "feature_video_checked_at": "2026-10-18T20:54:28.404630Z",
-      "feature_video_status": "ok"
+      "feature_video_status": "ok",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "テンポの良い投球と球の切れが持ち味の左腕。2年夏の西日本短大付戦では8回を無四球・9奪三振。四球を抑えながら三振を取った実戦内容が光る。",
+        "watch_points": "強打の相手にも同様の制球と空振りを再現できるか。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20090001/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -973,7 +1013,7 @@
       "weight": 70,
       "hand": "左投左打",
       "achievement": "高岡第一高",
-      "features": "最速150km/h。先発型の投手。",
+      "features": "カーブ・スライダー・チェンジアップを備える左腕。2年秋はエースとして県準優勝、北信越8強。小柄な体格からの投球と、緩急を使う球種構成に注目。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
         "https://sp.baseball.findfriends.jp/player/20090004/",
@@ -1133,7 +1173,15 @@
         }
       ],
       "feature_video_checked_at": "2026-10-18T20:54:28.404630Z",
-      "feature_video_status": "ok"
+      "feature_video_status": "ok",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "カーブ・スライダー・チェンジアップを備える左腕。2年秋はエースとして県準優勝、北信越8強。小柄な体格からの投球と、緩急を使う球種構成に注目。",
+        "watch_points": "体づくりによる出力の伸びと、各変化球を実戦で使い分ける精度。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20090004/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -1144,7 +1192,7 @@
       "weight": 73,
       "hand": "右投右打",
       "achievement": "中京高",
-      "features": "最速147km/h。先発型の投手。",
+      "features": "遊撃手から主戦投手になった右腕。スライダーにカーブ、スプリットを組み合わせる。横方向の変化と落ち球の両方を持つ点が特徴。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
         "https://sp.baseball.findfriends.jp/player/20080025/",
@@ -1178,7 +1226,15 @@
         }
       ],
       "feature_video_checked_at": "2026-10-18T20:54:28.404630Z",
-      "feature_video_status": "ok"
+      "feature_video_status": "ok",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "遊撃手から主戦投手になった右腕。スライダーにカーブ、スプリットを組み合わせる。横方向の変化と落ち球の両方を持つ点が特徴。",
+        "watch_points": "主戦としての投球回の積み重ねと、追い込んでからの決め球の精度。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20080025/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -1189,7 +1245,7 @@
       "weight": 80,
       "hand": "右投右打",
       "achievement": "近江高",
-      "features": "最速148km/h。先発型の投手。",
+      "features": "148km/hの直球と、スライダー・チェンジアップ・カーブ・カットを持つ。高校1年秋からエースを務め、早い時期から先発経験を積んだ右腕。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
         "https://sp.baseball.findfriends.jp/player/20080015/",
@@ -1331,7 +1387,15 @@
         }
       ],
       "feature_video_checked_at": "2026-10-18T20:54:28.404630Z",
-      "feature_video_status": "ok"
+      "feature_video_status": "ok",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "148km/hの直球と、スライダー・チェンジアップ・カーブ・カットを持つ。高校1年秋からエースを務め、早い時期から先発経験を積んだ右腕。",
+        "watch_points": "左右の打者への配球と、複数の球種をストライクゾーンで扱う精度。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20080015/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -1342,7 +1406,7 @@
       "weight": 77,
       "hand": "右投右打",
       "achievement": "市和歌山高",
-      "features": "最速151km/h。先発型の投手。",
+      "features": "185cmの右腕で、カーブ・スライダー・カット・フォークを備える。センバツ登板を経験し、直球と横・縦の変化を組み合わせられる球種構成。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
         "https://sp.baseball.findfriends.jp/player/20090002/",
@@ -1533,7 +1597,15 @@
         }
       ],
       "feature_video_checked_at": "2026-10-18T20:54:28.404630Z",
-      "feature_video_status": "ok"
+      "feature_video_status": "ok",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "185cmの右腕で、カーブ・スライダー・カット・フォークを備える。センバツ登板を経験し、直球と横・縦の変化を組み合わせられる球種構成。",
+        "watch_points": "多彩な球種の中でプロでも軸にできる決め球と、その制球。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20090002/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -1544,7 +1616,7 @@
       "weight": 73,
       "hand": "右投右打",
       "achievement": "大阪桐蔭高",
-      "features": "最速153km/h。先発型の投手。",
+      "features": "153km/hの直球は回転の良さが紹介されている。スライダー・チェンジアップ・カーブを持ち、速球に緩急を加えられる右腕。2年秋からエース。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
         "https://sp.baseball.findfriends.jp/player/20080012/",
@@ -1705,7 +1777,15 @@
         }
       ],
       "feature_video_checked_at": "2026-10-18T20:54:28.404630Z",
-      "feature_video_status": "ok"
+      "feature_video_status": "ok",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "153km/hの直球は回転の良さが紹介されている。スライダー・チェンジアップ・カーブを持ち、速球に緩急を加えられる右腕。2年秋からエース。",
+        "watch_points": "直球の強さが試合終盤まで続くか、緩い球との投げ分け。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20080012/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -1716,7 +1796,7 @@
       "weight": 80,
       "hand": "右投右打",
       "achievement": "高川学園高",
-      "features": "最速146km/h。先発型の投手。",
+      "features": "縦・横の2種類のスライダーが武器の右腕。1年秋から主戦を担い、2年夏は甲子園に出場。変化の方向を使い分けて三振を狙える点に注目。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
         "https://sp.baseball.findfriends.jp/player/20080023/",
@@ -1887,7 +1967,15 @@
         }
       ],
       "feature_video_checked_at": "2026-10-18T20:54:28.404630Z",
-      "feature_video_status": "ok"
+      "feature_video_status": "ok",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "縦・横の2種類のスライダーが武器の右腕。1年秋から主戦を担い、2年夏は甲子園に出場。変化の方向を使い分けて三振を狙える点に注目。",
+        "watch_points": "直球との見分けにくさと、スライダーで空振りを取るコースの再現性。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20080023/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -1898,7 +1986,7 @@
       "weight": 87,
       "hand": "右投右打",
       "achievement": "鵡川高",
-      "features": "最速148km/h。先発型の投手。",
+      "features": "セットポジションから148km/hを投げる右腕で、高校代表候補合宿にも選出。球速という明確な材料を持つ一方、球種別の詳細評価は資料を追加確認したい。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
         "https://sp.baseball.findfriends.jp/player/20080019/"
@@ -1930,7 +2018,15 @@
         }
       ],
       "feature_video_checked_at": "2026-10-18T20:54:28.404630Z",
-      "feature_video_status": "ok"
+      "feature_video_status": "ok",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "セットポジションから148km/hを投げる右腕で、高校代表候補合宿にも選出。球速という明確な材料を持つ一方、球種別の詳細評価は資料を追加確認したい。",
+        "watch_points": "公式戦での制球、決め球、長いイニングの内容。球速だけで完成度を判断しない。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20080019/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -1941,7 +2037,7 @@
       "weight": 80,
       "hand": "右投右打",
       "achievement": "桐光学園高",
-      "features": "最速151km/h。リリーフ型の投手。",
+      "features": "191cmの長身から角度をつける右腕。紹介資料では冬場に球速を9km/h伸ばして151km/hに到達。体格を生かす直球と成長幅が注目点。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
         "https://sp.baseball.findfriends.jp/player/20080024/"
@@ -2105,7 +2201,15 @@
         }
       ],
       "feature_video_checked_at": "2026-10-18T20:54:28.404630Z",
-      "feature_video_status": "ok"
+      "feature_video_status": "ok",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "191cmの長身から角度をつける右腕。紹介資料では冬場に球速を9km/h伸ばして151km/hに到達。体格を生かす直球と成長幅が注目点。",
+        "watch_points": "角度のある直球をストライクに集める精度と、フォームの再現性。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20080024/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -2116,7 +2220,7 @@
       "weight": 81,
       "hand": "右投右打",
       "achievement": "福井商高",
-      "features": "最速144km/h。リリーフ型の投手。",
+      "features": "144km/hの直球に、スライダー・カット・チェンジアップ・カーブを持つ。2年秋はエースとして県3位、北信越大会に進出。左右・緩急を組み合わせる球種構成。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
         "https://sp.baseball.findfriends.jp/player/20080016/"
@@ -2140,7 +2244,15 @@
         }
       ],
       "feature_video_checked_at": "2026-10-18T20:54:28.404630Z",
-      "feature_video_status": "ok"
+      "feature_video_status": "ok",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "144km/hの直球に、スライダー・カット・チェンジアップ・カーブを持つ。2年秋はエースとして県3位、北信越大会に進出。左右・緩急を組み合わせる球種構成。",
+        "watch_points": "上位打線に対して空振りを取れる球と、先行カウントを作る制球。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20080016/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -2151,7 +2263,7 @@
       "weight": 74,
       "hand": "左投左打",
       "achievement": "京都国際高",
-      "features": "最速144km/h。リリーフ型の投手。",
+      "features": "左腕で、カーブ・スライダー・チェンジアップを備える。紹介資料では2025年秋に144km/hを計測。速球と緩急の組み合わせを評価するタイプ。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
         "https://sp.baseball.findfriends.jp/player/20080020/"
@@ -2275,7 +2387,15 @@
         }
       ],
       "feature_video_checked_at": "2026-10-18T20:54:28.404630Z",
-      "feature_video_status": "ok"
+      "feature_video_status": "ok",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "左腕で、カーブ・スライダー・チェンジアップを備える。紹介資料では2025年秋に144km/hを計測。速球と緩急の組み合わせを評価するタイプ。",
+        "watch_points": "公式戦の登板数と投球内容を追加確認し、球速の一場面だけで評価しない。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20080020/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -2286,7 +2406,7 @@
       "weight": 84,
       "hand": "右投右打",
       "achievement": "奈良大付高",
-      "features": "最速145km/h。先発型の投手。",
+      "features": "148km/hの直球に、スライダー・カーブ・フォーク・チェンジアップを持つ。2年夏の県4強を経験。横の変化に加え、落ち球の選択肢がある右腕。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
         "https://sp.baseball.findfriends.jp/player/20080017/"
@@ -2440,7 +2560,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%96%B0%E5%9F%8E%E6%A5%93%E9%9B%85+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "148km/hの直球に、スライダー・カーブ・フォーク・チェンジアップを持つ。2年夏の県4強を経験。横の変化に加え、落ち球の選択肢がある右腕。",
+        "watch_points": "深いカウントでも変化球を使えるか、落ち球の空振り率と制球。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20080017/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -2451,7 +2579,7 @@
       "weight": 75,
       "hand": "右投右打",
       "achievement": "鳥栖工高",
-      "features": "最速143km/h。先発型の投手。",
+      "features": "入学時の120km/h台から140km/h超へ伸びた右腕。球質を意識して練習し、ピンチで出力を上げる投球が紹介されている。成長過程を追いたい素材。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
         "https://sp.baseball.findfriends.jp/player/20080021/"
@@ -2464,7 +2592,15 @@
       "attention_as_of": "2026-10-15",
       "feature_video_status": "ok",
       "feature_videos": [],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "入学時の120km/h台から140km/h超へ伸びた右腕。球質を意識して練習し、ピンチで出力を上げる投球が紹介されている。成長過程を追いたい素材。",
+        "watch_points": "公式戦での球威・制球の再現性と、力を入れた際の投球フォーム。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20080021/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -2475,7 +2611,7 @@
       "weight": 78,
       "hand": "右投左打",
       "achievement": "嬉野高",
-      "features": "最速140km/h。先発型の投手。",
+      "features": "捕手から転向した右腕。切れのある直球に、カーブ・スライダー・シュート・チェンジアップ・スプリット・カットと多くの球種を持つ。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
         "https://sp.baseball.findfriends.jp/player/20080018/"
@@ -2488,7 +2624,15 @@
       "attention_as_of": "2026-10-15",
       "feature_video_status": "ok",
       "feature_videos": [],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "捕手から転向した右腕。切れのある直球に、カーブ・スライダー・シュート・チェンジアップ・スプリット・カットと多くの球種を持つ。",
+        "watch_points": "球種の数と完成度を分けて評価し、実戦で軸になる球と配球を確認。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20080018/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -2499,7 +2643,7 @@
       "weight": 85,
       "hand": "右投左打",
       "achievement": "日本ウエルネス高",
-      "features": "最速144km/h。先発型の投手。",
+      "features": "147km/hの投球と三塁守備を兼ねる。ツーシーム・シュートなど動く球に、フォーク・チェンジアップも持つ。投打両面を見て適性を判断したい選手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
         "https://sp.baseball.findfriends.jp/player/20080022/",
@@ -2552,7 +2696,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E9%95%B7%E5%B1%B1%E6%AD%A6%E8%94%B5+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "147km/hの投球と三塁守備を兼ねる。ツーシーム・シュートなど動く球に、フォーク・チェンジアップも持つ。投打両面を見て適性を判断したい選手。",
+        "watch_points": "投手・野手の育成方針と、打者の左右に応じた変化球の制球。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20080022/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -2563,7 +2715,7 @@
       "weight": 90,
       "hand": "右投左打",
       "achievement": "専大松戸高",
-      "features": "長打力が注目される捕手。",
+      "features": "広い方向へ長打を打ち、紹介資料では高校通算10本塁打超。送球の安定感も評価される捕手で、打撃だけでなく守備面も見たい攻守型。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8725",
         "https://sp.baseball.findfriends.jp/player/20090009/",
@@ -2751,7 +2903,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E5%90%89%E5%B2%A1%E4%BC%B8%E5%A4%AA%E6%9C%97+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "広い方向へ長打を打ち、紹介資料では高校通算10本塁打超。送球の安定感も評価される捕手で、打撃だけでなく守備面も見たい攻守型。",
+        "watch_points": "捕球・ブロッキングの安定性と、高い球速帯に対する打撃内容。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20090009/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -2762,7 +2922,7 @@
       "weight": 86,
       "hand": "右投右打",
       "achievement": "沼津商高",
-      "features": "守備力が注目される捕手。",
+      "features": "二塁送球1.8秒、50m走5.9秒が紹介される捕手。肩と脚力を備え、後輩投手を引っ張る姿勢も特徴。捕手としての身体能力が目を引く。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8725",
         "https://sp.baseball.findfriends.jp/player/20080026/"
@@ -2886,7 +3046,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E5%BE%8C%E8%97%A4%E5%B9%B8%E6%A8%B9+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "二塁送球1.8秒、50m走5.9秒が紹介される捕手。肩と脚力を備え、後輩投手を引っ張る姿勢も特徴。捕手としての身体能力が目を引く。",
+        "watch_points": "送球タイムに加え、実戦での正確性と捕球から送球までの安定感。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20080026/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -2897,7 +3065,7 @@
       "weight": 78,
       "hand": "右投左打",
       "achievement": "横浜高",
-      "features": "守備力が注目される内野手。",
+      "features": "U-15では投手として143km/hを投げ、高校では遊撃手。陸上でも実績がある運動能力と肩が特徴で、2年春の選抜優勝を経験している。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8725",
         "https://sp.baseball.findfriends.jp/player/20080013/",
@@ -3096,7 +3264,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%B1%A0%E7%94%B0%E8%81%96%E6%91%A9+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "U-15では投手として143km/hを投げ、高校では遊撃手。陸上でも実績がある運動能力と肩が特徴で、2年春の選抜優勝を経験している。",
+        "watch_points": "遊撃での打球判断・送球の安定性と、打席での選球・対応力。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20080013/"
+        ]
+      }
     },
     {
       "category": "高校生",
@@ -3107,7 +3283,7 @@
       "weight": 89,
       "hand": "右投右打",
       "achievement": "九州国際大付高",
-      "features": "長打力が注目される外野手。",
+      "features": "50m走6.0秒、遠投105mの走力・肩を持つ外野手。2025年秋の九州大会、神宮大会優勝を経験。走攻守を総合して評価したい選手。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8725",
         "https://sp.baseball.findfriends.jp/player/20080011/",
@@ -3258,7 +3434,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E7%89%9F%E7%A6%AE%E7%BF%94+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "50m走6.0秒、遠投105mの走力・肩を持つ外野手。2025年秋の九州大会、神宮大会優勝を経験。走攻守を総合して評価したい選手。",
+        "watch_points": "実戦での守備範囲と走塁判断、打撃では対応できる球種・コース。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20080011/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -3269,7 +3453,7 @@
       "weight": 92,
       "hand": "右投右打",
       "achievement": "2026年WCBC韓国戦で6回1安打14奪三振。",
-      "features": "長身の右腕。国際試合で高い奪三振力を示した。",
+      "features": "155km/hの直球にスライダー・カーブ・スプリット・フォークを持つ。青学大のリーグ連覇、大学全国大会優勝を経験し、球威と大舞台の経験が評価材料。",
       "sources": [
         "https://www.japan-baseball.jp/jp/news/press/20260712_1.html",
         "https://www.univbbl.com/alljapan/samuraijapan/2026.html",
@@ -3458,7 +3642,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E9%88%B4%E6%9C%A8%E6%B3%B0%E6%88%90+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "155km/hの直球にスライダー・カーブ・スプリット・フォークを持つ。青学大のリーグ連覇、大学全国大会優勝を経験し、球威と大舞台の経験が評価材料。",
+        "watch_points": "落ち球で空振りを取る精度と、先発・救援それぞれでの出力の持続。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040035/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -3469,7 +3661,7 @@
       "weight": 92,
       "hand": "右投右打",
       "achievement": "2026年大学日本代表の主将。",
-      "features": "右打ちの捕手。代表の主将として投手陣を支える。",
+      "features": "高校通算38本塁打の打力を備え、大学1年春から正捕手。複数季のベストナインと2年秋のMVPを獲得。継続して強豪の扇の要を担った実績がある。",
       "sources": [
         "https://www.univbbl.com/alljapan/samuraijapan/2026.html",
         "https://www.aoyama.ac.jp/sports_info/2026/news_20261008_01",
@@ -3772,7 +3964,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%B8%A1%E9%83%A8%E6%B5%B7+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "高校通算38本塁打の打力を備え、大学1年春から正捕手。複数季のベストナインと2年秋のMVPを獲得。継続して強豪の扇の要を担った実績がある。",
+        "watch_points": "捕球・送球・配球を個別に確認し、打撃と守備を両立できるか。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040068/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -3783,7 +3983,7 @@
       "weight": 77,
       "hand": "左投左打",
       "achievement": "愛工大名電高 → 立命大",
-      "features": "最速151km/h。先発型の投手。",
+      "features": "151km/hの左腕で、ツーシーム・カット・チェンジアップなど球種が豊富。3年春に最優秀投手、日米大学選手権でも優勝を経験した。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
         "https://sp.baseball.findfriends.jp/player/20040137/",
@@ -4009,7 +4209,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%9C%89%E9%A6%AC%E4%BC%BD%E4%B9%85+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "151km/hの左腕で、ツーシーム・カット・チェンジアップなど球種が豊富。3年春に最優秀投手、日米大学選手権でも優勝を経験した。",
+        "watch_points": "動く球と緩急を左右の打者に使い分ける精度、終盤の投球内容。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040137/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -4020,7 +4228,7 @@
       "weight": 93,
       "hand": "右投左打",
       "achievement": "高岡商高 → 亜大",
-      "features": "最速156km/h。リリーフ型の投手。",
+      "features": "156km/hの直球とスプリット、縦のスライダーが武器。大学では救援中心から4年春に先発も経験。高出力に加え、役割を広げられるかが注目点。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
         "https://sp.baseball.findfriends.jp/player/20040156/",
@@ -4204,7 +4412,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E5%B7%9D%E5%B0%BB%E5%95%93%E4%BA%BA+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "156km/hの直球とスプリット、縦のスライダーが武器。大学では救援中心から4年春に先発も経験。高出力に加え、役割を広げられるかが注目点。",
+        "watch_points": "先発での球速維持と制球。短い救援登板の出力と分けて評価する。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040156/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -4215,7 +4431,7 @@
       "weight": 83,
       "hand": "右投右打",
       "achievement": "下関国際高 → 駒大",
-      "features": "最速158km/h。複数の役割を担える投手。",
+      "features": "高校では遊撃手兼投手として甲子園準優勝。大学では投手として早期から登板し、ツーシーム・シンカー・フォークなど多方向に変化させる球を持つ。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
         "https://sp.baseball.findfriends.jp/player/20040099/",
@@ -4396,7 +4612,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E4%BB%B2%E4%BA%95%E6%85%8E+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "高校では遊撃手兼投手として甲子園準優勝。大学では投手として早期から登板し、ツーシーム・シンカー・フォークなど多方向に変化させる球を持つ。",
+        "watch_points": "球種の中で軸となる決め球と、投手として継続登板した際の安定感。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040099/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -4407,7 +4631,7 @@
       "weight": 80,
       "hand": "左投左打",
       "achievement": "金沢高 → 関大",
-      "features": "最速149km/h。先発型の投手。",
+      "features": "大学4年春にリーグ最優秀選手、全日本大学選手権で最高殊勲選手。スライダー・カーブ・チェンジアップ・スプリットを持ち、全国大会で結果を残した左腕。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
         "https://sp.baseball.findfriends.jp/player/20040161/",
@@ -4557,7 +4781,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E7%B1%B3%E6%B2%A2%E5%8F%8B%E7%BF%94+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "大学4年春にリーグ最優秀選手、全日本大学選手権で最高殊勲選手。スライダー・カーブ・チェンジアップ・スプリットを持ち、全国大会で結果を残した左腕。",
+        "watch_points": "全国大会の好投を年間で再現できるか、直球と落ち球の制球。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040161/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -4568,7 +4800,7 @@
       "weight": 81,
       "hand": "右投右打",
       "achievement": "龍谷大平安高 → びわこ成蹊スポーツ大",
-      "features": "最速151km/h。先発型の投手。",
+      "features": "151km/hの直球にカーブ・スライダー・チェンジアップ・フォーク。高校では公式戦登板がなく、大学で伸びた右腕として成長幅に注目したい。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
         "https://sp.baseball.findfriends.jp/player/20040155/"
@@ -4762,7 +4994,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E5%B0%8F%E6%9D%BE%E5%8B%87%E8%BC%9D+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "151km/hの直球にカーブ・スライダー・チェンジアップ・フォーク。高校では公式戦登板がなく、大学で伸びた右腕として成長幅に注目したい。",
+        "watch_points": "大学での投球回と対戦水準、球速以外の制球・奪三振内容。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040155/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -4773,7 +5013,7 @@
       "weight": 89,
       "hand": "右投右打",
       "achievement": "習志野高 → 千葉商大",
-      "features": "最速151km/h。先発型の投手。",
+      "features": "大学で体重を10kg増やし151km/hに成長。3年時は春秋とも防御率1点台で、スライダーとカーブによる緩急も特徴。出力向上と実戦成績が結びつく右腕。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
         "https://sp.baseball.findfriends.jp/player/20040159/"
@@ -4865,7 +5105,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E5%90%89%E5%B7%9D%E5%87%8C%E5%B9%B3+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "大学で体重を10kg増やし151km/hに成長。3年時は春秋とも防御率1点台で、スライダーとカーブによる緩急も特徴。出力向上と実戦成績が結びつく右腕。",
+        "watch_points": "増した球威を維持できるか、上位打者への制球と変化球の効果。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040159/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -4876,7 +5124,7 @@
       "weight": 78,
       "hand": "左投左打",
       "achievement": "高松商高 → 慶大",
-      "features": "最速151km/h。先発型の投手。",
+      "features": "151km/hとカーブ・チェンジアップなどを持つ左腕。4年春は7勝、防御率1.28でリーグ優勝に貢献。複数季の最優秀防御率が安定感の根拠となる。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
         "https://sp.baseball.findfriends.jp/player/20040138/",
@@ -5106,7 +5354,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%B8%A1%E8%BE%BA%E5%92%8C%E5%A4%A7+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "151km/hとカーブ・チェンジアップなどを持つ左腕。4年春は7勝、防御率1.28でリーグ優勝に貢献。複数季の最優秀防御率が安定感の根拠となる。",
+        "watch_points": "投球回が増えても制球・球威を保てるか、右打者への対応。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040138/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -5117,7 +5373,7 @@
       "weight": 85,
       "hand": "右投左打",
       "achievement": "慶応高 → 慶大",
-      "features": "最速156km/h。リリーフ型の投手。",
+      "features": "156km/hを投げる高出力右腕。紹介資料では救援適性が評価され、4年春には先発も担当。自らトレーニングを研究する姿勢も特徴として紹介される。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
         "https://sp.baseball.findfriends.jp/player/20040157/"
@@ -5307,7 +5563,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E5%BA%83%E6%B1%A0%E6%B5%A9%E6%88%90+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "156km/hを投げる高出力右腕。紹介資料では救援適性が評価され、4年春には先発も担当。自らトレーニングを研究する姿勢も特徴として紹介される。",
+        "watch_points": "継続して登板できるかと、短いイニング以外での出力・制球。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040157/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -5318,7 +5582,7 @@
       "weight": 88,
       "hand": "右投右打",
       "achievement": "福岡大大濠高 → 日体大",
-      "features": "最速154km/h。複数の役割を担える投手。",
+      "features": "サイド気味のトルネード投法から151km/h。2025年秋は防御率0.95、39奪三振で最優秀投手。独特の角度と実戦での三振・失点抑止が評価材料。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
         "https://sp.baseball.findfriends.jp/player/20040160/",
@@ -5572,7 +5836,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E9%A6%AC%E5%A0%B4%E6%8B%93%E6%B5%B7+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "サイド気味のトルネード投法から151km/h。2025年秋は防御率0.95、39奪三振で最優秀投手。独特の角度と実戦での三振・失点抑止が評価材料。",
+        "watch_points": "左右打者での成績差と、独特なフォームの再現性。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040160/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -5583,7 +5855,7 @@
       "weight": 91,
       "hand": "右投右打",
       "achievement": "筑陽学園高 → 上武大",
-      "features": "最速151km/h。複数の役割を担える投手。",
+      "features": "151km/hの直球は回転の多さが紹介され、奪三振力が持ち味。大学1年秋に最高殊勲選手。速球の質を評価する一方、直近の登板状況も確認したい右腕。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
         "https://sp.baseball.findfriends.jp/player/20040158/"
@@ -5737,7 +6009,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%9C%A8%E5%8F%A3%E6%B0%B8%E7%BF%94+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "151km/hの直球は回転の多さが紹介され、奪三振力が持ち味。大学1年秋に最高殊勲選手。速球の質を評価する一方、直近の登板状況も確認したい右腕。",
+        "watch_points": "継続登板時の球威と制球。過去のピーク時の評価を現在と混同しない。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040158/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -5748,7 +6028,7 @@
       "weight": 87,
       "hand": "右投右打",
       "achievement": "市原中央高 → 神奈川大",
-      "features": "最速138km/h。複数の役割を担える投手。",
+      "features": "アンダースローから138km/h。カーブ・スライダーにシンカー・ツーシームも持つ。低いリリースと球の動きを生かす、他候補と異なる投球スタイル。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
         "https://sp.baseball.findfriends.jp/player/20040149/"
@@ -5910,7 +6190,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%9D%BE%E5%B9%B3%E5%BF%AB%E8%81%96+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "アンダースローから138km/h。カーブ・スライダーにシンカー・ツーシームも持つ。低いリリースと球の動きを生かす、他候補と異なる投球スタイル。",
+        "watch_points": "左右打者への対応、低めへの制球、複数巡した打線への有効性。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040149/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -5921,7 +6209,7 @@
       "weight": 84,
       "hand": "右投右打",
       "achievement": "横浜隼人高 → 亜大",
-      "features": "守備力が注目される捕手。",
+      "features": "二塁送球1.83秒、遠投110mの肩と中軸を任される打力を持つ捕手。リーダーシップと視野の広さも紹介され、攻守両面が評価対象になる。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
         "https://sp.baseball.findfriends.jp/player/20040030/",
@@ -6124,7 +6412,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E5%89%8D%E5%B6%8B%E8%97%8D+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "二塁送球1.83秒、遠投110mの肩と中軸を任される打力を持つ捕手。リーダーシップと視野の広さも紹介され、攻守両面が評価対象になる。",
+        "watch_points": "送球の正確性、捕球・ブロッキング、強い投手に対する打撃の再現性。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040030/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -6135,7 +6431,7 @@
       "weight": 74,
       "hand": "右投右打",
       "achievement": "東海大菅生高 → 明大",
-      "features": "ミート力が注目される打者。",
+      "features": "高校で二塁手と捕手を経験し、その後は正捕手。U-12・U-15代表経験も持つ。紹介資料は経歴が中心のため、送球や打力の数値評価は追加資料を待ちたい。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
         "https://sp.baseball.findfriends.jp/player/20040145/",
@@ -6321,7 +6617,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E7%A6%8F%E5%8E%9F%E8%81%96%E7%9F%A2+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "高校で二塁手と捕手を経験し、その後は正捕手。U-12・U-15代表経験も持つ。紹介資料は経歴が中心のため、送球や打力の数値評価は追加資料を待ちたい。",
+        "watch_points": "大学での捕球・二塁送球と打撃成績。代表歴だけで現在の完成度を断定しない。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040145/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -6332,7 +6636,7 @@
       "weight": 78,
       "hand": "右投右打",
       "achievement": "高知高 → 立命大",
-      "features": "長打力が注目される捕手。",
+      "features": "2025年は春秋連続ベストナインの強肩強打の捕手。神宮大会で毛利海大から本塁打、中西聖輝から二塁打を放ち、好投手に長打を打った内容が評価材料。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
         "https://sp.baseball.findfriends.jp/player/20040154/",
@@ -6572,7 +6876,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E8%A5%BF%E9%87%8E%E5%95%93%E4%B9%9F+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "2025年は春秋連続ベストナインの強肩強打の捕手。神宮大会で毛利海大から本塁打、中西聖輝から二塁打を放ち、好投手に長打を打った内容が評価材料。",
+        "watch_points": "強い投手への打撃を継続できるか、送球と捕球の安定性。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040154/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -6583,7 +6895,7 @@
       "weight": 79,
       "hand": "右投左打",
       "achievement": "前橋育英高 → 明大",
-      "features": "走力が注目される選手。",
+      "features": "代表候補合宿で50m走5.69秒を計測した脚力が特徴。3年秋は正二塁手として打率リーグ5位、ベストナイン。走力だけでなく打撃実績も持つ。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
         "https://sp.baseball.findfriends.jp/player/20040148/",
@@ -6776,7 +7088,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E5%B2%A1%E7%94%B0%E5%95%93%E5%90%BE+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "代表候補合宿で50m走5.69秒を計測した脚力が特徴。3年秋は正二塁手として打率リーグ5位、ベストナイン。走力だけでなく打撃実績も持つ。",
+        "watch_points": "実戦での盗塁・走塁判断と、二塁守備での打球処理・送球。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040148/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -6787,7 +7107,7 @@
       "weight": 84,
       "hand": "右投左打",
       "achievement": "履正社高 → 明大",
-      "features": "守備力が注目される内野手。",
+      "features": "高校から遊撃を担い、大学3年秋は正遊撃手としてリーグ優勝、ベストナイン。紹介資料では継続した遊撃経験が強みで、守備の具体的内容も確認したい。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
         "https://sp.baseball.findfriends.jp/player/20040050/",
@@ -6967,7 +7287,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E5%85%89%E5%BC%98%E5%B8%86%E9%AB%98+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "高校から遊撃を担い、大学3年秋は正遊撃手としてリーグ優勝、ベストナイン。紹介資料では継続した遊撃経験が強みで、守備の具体的内容も確認したい。",
+        "watch_points": "守備範囲・送球精度と、規定打席に立った後の打撃の継続性。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040050/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -6978,7 +7306,7 @@
       "weight": 79,
       "hand": "左投左打",
       "achievement": "報徳学園高 → 明大",
-      "features": "ミート力が注目される打者。",
+      "features": "大学1年秋から中堅レギュラー、3年秋は打率.390でベストナイン。高校で投手も経験し、大学代表として国際大会にも出場。打撃実績を持つ中堅候補。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
         "https://sp.baseball.findfriends.jp/player/20040135/",
@@ -7130,7 +7458,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%A6%8A%E5%8E%9F%E4%B8%83%E6%96%97+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "大学1年秋から中堅レギュラー、3年秋は打率.390でベストナイン。高校で投手も経験し、大学代表として国際大会にも出場。打撃実績を持つ中堅候補。",
+        "watch_points": "中堅としての打球判断・守備範囲と、速球・変化球への打撃対応。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040135/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -7141,7 +7477,7 @@
       "weight": 84,
       "hand": "右投左打",
       "achievement": "九州国際大付高 → 東日本国際大",
-      "features": "走力が注目される選手。",
+      "features": "大学で首位打者・盗塁王・打点王を獲得し、三塁と外野でベストナイン。打撃と走塁の両方に実績があり、複数ポジションを経験している。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
         "https://sp.baseball.findfriends.jp/player/20040075/",
@@ -7343,7 +7679,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E9%BB%92%E7%94%B0%E7%BE%A9%E4%BF%A1+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "大学で首位打者・盗塁王・打点王を獲得し、三塁と外野でベストナイン。打撃と走塁の両方に実績があり、複数ポジションを経験している。",
+        "watch_points": "守備位置ごとの完成度と、全国・国際大会での打撃内容。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040075/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -7354,7 +7698,7 @@
       "weight": 83,
       "hand": "右投右打",
       "achievement": "報徳学園高 → 東北福祉大",
-      "features": "ミート力が注目される打者。",
+      "features": "高校で投手から野手へ転向。全日本大学選手権で打率.440、1本塁打、6打点を挙げ最高殊勲選手。全国大会で得点につなげた打撃が評価材料。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
         "https://sp.baseball.findfriends.jp/player/20040147/"
@@ -7541,7 +7885,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E4%BD%90%E8%97%A4%E6%82%A0%E5%A4%AA+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "高校で投手から野手へ転向。全日本大学選手権で打率.440、1本塁打、6打点を挙げ最高殊勲選手。全国大会で得点につなげた打撃が評価材料。",
+        "watch_points": "短期大会の好成績をリーグ戦でも維持できるか、守備での貢献。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040147/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -7552,7 +7904,7 @@
       "weight": 85,
       "hand": "右投右打",
       "achievement": "敦賀気比高 → 大商大",
-      "features": "長打力が注目される外野手。",
+      "features": "大学で複数季にわたりベストナインを獲得し、大学代表でも優勝を経験。継続して結果を残した点が評価材料。打撃の得意球種などは追加確認したい。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
         "https://sp.baseball.findfriends.jp/player/20040146/",
@@ -7739,7 +8091,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%98%A5%E5%B1%B1%E9%99%BD%E7%99%BB+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "大学で複数季にわたりベストナインを獲得し、大学代表でも優勝を経験。継続して結果を残した点が評価材料。打撃の得意球種などは追加確認したい。",
+        "watch_points": "長打・出塁の内訳と対戦水準、守備・走塁を含む総合的な貢献。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040146/"
+        ]
+      }
     },
     {
       "category": "大学生",
@@ -7750,7 +8110,7 @@
       "weight": 85,
       "hand": "右投右打",
       "achievement": "佐久長聖高 → 早大",
-      "features": "長打力が注目される外野手。",
+      "features": "大学3年から四番を担う右の長距離打者。3年春は打率.422、15打点。広い方向へ強い打球を運べる点が紹介され、打率と長打力を併せて評価したい。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
         "https://sp.baseball.findfriends.jp/player/20040153/",
@@ -7963,7 +8323,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E5%AF%BA%E5%B0%BE%E6%8B%B3%E8%81%96+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "大学3年から四番を担う右の長距離打者。3年春は打率.422、15打点。広い方向へ強い打球を運べる点が紹介され、打率と長打力を併せて評価したい。",
+        "watch_points": "速球への対応、ボール球の見極め、守備で任せられる役割。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040153/"
+        ]
+      }
     },
     {
       "category": "社会人",
@@ -7974,7 +8342,7 @@
       "weight": 90,
       "hand": "右投右打",
       "achievement": "2023年U-18W杯優勝メンバー。2025年日本選手権ベスト4。",
-      "features": "直球とフォークを組み合わせる右腕。",
+      "features": "高校3年夏は県大会から甲子園まで全7試合を投げ切り、U-18世界一も経験。社会人2年目に日本選手権登板。高校時代の完投実績に加え現在の成長を確認したい。",
       "sources": [
         "https://www.ntt-east.co.jp/symbol/baseball/contents/mori.html",
         "https://www.sponichi.co.jp/baseball/news/2026/03/03/kiji/20260303s00001003009000c.html",
@@ -8185,7 +8553,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%A3%AE%E7%85%8C%E8%AA%A0+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "高校3年夏は県大会から甲子園まで全7試合を投げ切り、U-18世界一も経験。社会人2年目に日本選手権登板。高校時代の完投実績に加え現在の成長を確認したい。",
+        "watch_points": "社会人打者への球種別の有効性と、高校時代からの制球・球威の変化。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20050057/"
+        ]
+      }
     },
     {
       "category": "社会人",
@@ -8196,7 +8572,7 @@
       "weight": 91,
       "hand": "右投右打",
       "achievement": "早稲田大学と大学日本代表で主将を経験。",
-      "features": "正捕手・主将の経験が豊富。投手を導くリーダーシップ。",
+      "features": "高校・大学・大学代表で主将を経験した捕手。社会人では四番・一塁も任され、打撃面の成長が紹介される。捕手経験と中軸の打力を持つ点が特徴。",
       "sources": [
         "https://sp.baseball.findfriends.jp/player/20020050/",
         "https://www.mhi.com/jp/company/sports/baseball/east/member",
@@ -8407,7 +8783,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E5%8D%B0%E5%87%BA%E5%A4%AA%E4%B8%80+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "高校・大学・大学代表で主将を経験した捕手。社会人では四番・一塁も任され、打撃面の成長が紹介される。捕手経験と中軸の打力を持つ点が特徴。",
+        "watch_points": "捕手としての守備力と一塁でも通用する打撃力を分けて評価する。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20020050/"
+        ]
+      }
     },
     {
       "category": "社会人",
@@ -8418,7 +8802,7 @@
       "weight": 83,
       "hand": "左投左打",
       "achievement": "掛川西高 → ヤマハ",
-      "features": "最速151km/h。複数の役割を担える投手。",
+      "features": "社会人日本選手権優勝に加え、2026年WBCではブラジル代表。2試合に先発して計8回4安打6奪三振無失点。国際大会での先発内容が評価材料。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
         "https://sp.baseball.findfriends.jp/player/20030071/"
@@ -8552,7 +8936,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%B2%A2%E5%B1%B1%E5%84%AA%E4%BB%8B+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "社会人日本選手権優勝に加え、2026年WBCではブラジル代表。2試合に先発して計8回4安打6奪三振無失点。国際大会での先発内容が評価材料。",
+        "watch_points": "国際大会の好投を継続できるか、球種・コース別の対応と投球回の維持。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20030071/"
+        ]
+      }
     },
     {
       "category": "社会人",
@@ -8563,7 +8955,7 @@
       "weight": 80,
       "hand": "右投右打",
       "achievement": "東洋大姫路高 → 東洋大 → パナソニック",
-      "features": "最速151km/h。リリーフ型の投手。",
+      "features": "社会人1年目の都市対抗で王子相手に先発し、7回3安打1失点。大学二部から一部、社会人へと経験を積み、全国大会で試合を作った実績がある。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
         "https://sp.baseball.findfriends.jp/player/20020249/"
@@ -8717,7 +9109,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%9F%BF%E6%9C%AC%E6%99%9F%E5%BC%A5+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "社会人1年目の都市対抗で王子相手に先発し、7回3安打1失点。大学二部から一部、社会人へと経験を積み、全国大会で試合を作った実績がある。",
+        "watch_points": "好投時の球種・コースを再現できるか、年間を通じた先発の安定感。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20020249/"
+        ]
+      }
     },
     {
       "category": "社会人",
@@ -8728,7 +9128,7 @@
       "weight": 84,
       "hand": "左投左打",
       "achievement": "千葉経大付高 → 愛知工大 → 王子",
-      "features": "最速151km/h。先発型の投手。",
+      "features": "151km/hの左腕。社会人1年目に都市対抗優勝、年間防御率1.25で最優秀防御率。球速に加え、継続して失点を抑えた実戦成績が強み。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
         "https://sp.baseball.findfriends.jp/player/20020242/",
@@ -8902,7 +9302,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%A8%8B%E5%8F%A3%E6%96%B0+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "151km/hの左腕。社会人1年目に都市対抗優勝、年間防御率1.25で最優秀防御率。球速に加え、継続して失点を抑えた実戦成績が強み。",
+        "watch_points": "投球負荷が増えても球威と制球を保てるか、左右打者への対応。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20020242/"
+        ]
+      }
     },
     {
       "category": "社会人",
@@ -8913,7 +9321,7 @@
       "weight": 90,
       "hand": "右投右打",
       "achievement": "天理高 → 同大 → 日本生命",
-      "features": "最速152km/h。複数の役割を担える投手。",
+      "features": "高校では軟式、大学から硬式へ転じた右腕。野手経験も持つ一方、紹介資料には2025年春の右肘手術が記載される。現在の投球を確認して評価したい。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
         "https://sp.baseball.findfriends.jp/player/20020142/"
@@ -9127,7 +9535,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E7%9C%9F%E9%87%8E%E5%87%9C%E9%A2%A8+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "高校では軟式、大学から硬式へ転じた右腕。野手経験も持つ一方、紹介資料には2025年春の右肘手術が記載される。現在の投球を確認して評価したい。",
+        "watch_points": "復帰後の登板実績・球威・制球。過去の能力から現在の状態を推定しない。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20020142/"
+        ]
+      }
     },
     {
       "category": "社会人",
@@ -9138,7 +9554,7 @@
       "weight": 82,
       "hand": "右投右打",
       "achievement": "東海大菅生高 → 明大 → JR東日本",
-      "features": "ミート力が注目される打者。",
+      "features": "高校通算50本塁打超の長打型。社会人1年目の都市対抗予選で打率.500、7打点、本大会でも二塁打2本・3打点。大学から社会人で打撃実績を伸ばした。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
         "https://sp.baseball.findfriends.jp/player/20020239/",
@@ -9301,7 +9717,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%9D%89%E5%B4%8E%E6%88%90+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "高校通算50本塁打超の長打型。社会人1年目の都市対抗予選で打率.500、7打点、本大会でも二塁打2本・3打点。大学から社会人で打撃実績を伸ばした。",
+        "watch_points": "木製バットでの長打の継続性と、速球・変化球の見極め。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20020239/"
+        ]
+      }
     },
     {
       "category": "社会人",
@@ -9312,7 +9736,7 @@
       "weight": 90,
       "hand": "右投右打",
       "achievement": "佐野日大高 → 横浜国大 → 東京ガス",
-      "features": "走力が注目される選手。",
+      "features": "長打力と脚力を持つ大型野手。大学では最多打点・ベストナインを獲得し、横浜スタジアムで看板直撃の本塁打。内野経験を持ち、外野でも評価対象となる。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
         "https://sp.baseball.findfriends.jp/player/20020174/",
@@ -9464,7 +9888,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E8%97%A4%E6%BE%A4%E6%B6%BC%E4%BB%8B+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "長打力と脚力を持つ大型野手。大学では最多打点・ベストナインを獲得し、横浜スタジアムで看板直撃の本塁打。内野経験を持ち、外野でも評価対象となる。",
+        "watch_points": "守備位置の適性と、長打を狙いながら出塁できるか。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20020174/"
+        ]
+      }
     },
     {
       "category": "社会人",
@@ -9475,7 +9907,7 @@
       "weight": 83,
       "hand": "右投左打",
       "achievement": "岐阜第一高 → 大経大 → 王子",
-      "features": "ミート力が注目される打者。",
+      "features": "大学通算100安打、外野ベストナイン3回。社会人1年目も都市対抗で2試合連続本塁打、若獅子賞と社会人ベストナイン。打撃が次の段階でも結果につながった。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
         "https://sp.baseball.findfriends.jp/player/20020196/",
@@ -9626,7 +10058,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%9F%B4%E5%B4%8E%E8%81%96%E4%BA%BA+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "大学通算100安打、外野ベストナイン3回。社会人1年目も都市対抗で2試合連続本塁打、若獅子賞と社会人ベストナイン。打撃が次の段階でも結果につながった。",
+        "watch_points": "対戦投手の質が上がった際の打撃対応と、外野守備・走塁の貢献。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20020196/"
+        ]
+      }
     },
     {
       "category": "社会人",
@@ -9637,7 +10077,7 @@
       "weight": 82,
       "hand": "右投左打",
       "achievement": "中央学院高 → 立正大 → ENEOS",
-      "features": "走力が注目される選手。",
+      "features": "大学で首位打者・ベストナイン、大学代表も経験。社会人1年目から外野レギュラーで、都市対抗では一番・中堅。打撃と中堅の役割を継続して担う。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
         "https://sp.baseball.findfriends.jp/player/20030126/",
@@ -9785,7 +10225,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E9%A3%AF%E5%B1%B1%E5%BF%97%E5%A4%A2+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "大学で首位打者・ベストナイン、大学代表も経験。社会人1年目から外野レギュラーで、都市対抗では一番・中堅。打撃と中堅の役割を継続して担う。",
+        "watch_points": "一番打者としての出塁・走塁と、中堅での守備範囲・送球。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20030126/"
+        ]
+      }
     },
     {
       "category": "社会人",
@@ -9796,7 +10244,7 @@
       "weight": 80,
       "hand": "右投左打",
       "achievement": "小松大谷高 → 法大 → 日本生命",
-      "features": "走力が注目される選手。",
+      "features": "大学リーグ通算7本塁打。社会人1年目は一番・中堅として都市対抗4強、日本選手権準優勝に貢献し敢闘賞。先頭打者としての起用と長打実績が評価材料。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
         "https://sp.baseball.findfriends.jp/player/20020195/",
@@ -9970,7 +10418,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E4%B8%AD%E6%B4%A5%E5%A4%A7%E5%92%8C+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "大学リーグ通算7本塁打。社会人1年目は一番・中堅として都市対抗4強、日本選手権準優勝に貢献し敢闘賞。先頭打者としての起用と長打実績が評価材料。",
+        "watch_points": "出塁と長打の両立、走塁判断、中堅守備の実戦内容。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20020195/"
+        ]
+      }
     },
     {
       "category": "独立リーグ",
@@ -9981,7 +10437,7 @@
       "weight": 89,
       "hand": "右投左打",
       "achievement": "2026年30登板、6セーブ、防御率1.18。",
-      "features": "38回で42奪三振・8四球。救援での安定感。",
+      "features": "高校では遊撃手として選抜出場、大学で投手に転向した経歴を持つ。大学4年の春秋に12試合登板後、徳島へ。転向後の伸びを追いたい投手。",
       "sources": [
         "https://indigo-socks.com/players/no18/",
         "https://baseball.omyutech.com/draftplayer.action?year=2026",
@@ -10145,7 +10601,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E9%8E%8C%E7%94%B0%E5%B7%9E%E7%9C%9F+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "高校では遊撃手として選抜出場、大学で投手に転向した経歴を持つ。大学4年の春秋に12試合登板後、徳島へ。転向後の伸びを追いたい投手。",
+        "watch_points": "独立リーグでの球速・球種・制球を追加確認し、野手歴だけで投手適性を断定しない。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20020250/"
+        ]
+      }
     },
     {
       "category": "独立リーグ",
@@ -10156,7 +10620,7 @@
       "weight": 82,
       "hand": "右投左打",
       "achievement": "2026年70試合、打率.300、12本塁打、51打点。",
-      "features": "左打ちの内野手。打率と長打の両面で実績。",
+      "features": "球団公式の2026年成績は70試合で打率.300、12本塁打、51打点。左打ちの内野手で、年間を通した打撃と長打の実績が評価材料になる。",
       "sources": [
         "https://indigo-socks.com/players/no1/",
         "https://baseball.omyutech.com/draftplayer.action?year=2026"
@@ -10360,7 +10824,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%B1%A0%E7%94%B0%E5%87%9C+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "球団公式の2026年成績は70試合で打率.300、12本塁打、51打点。左打ちの内野手で、年間を通した打撃と長打の実績が評価材料になる。",
+        "watch_points": "守備位置ごとの内容と、上位投手への対応。独立リーグ成績を他カテゴリーと単純比較しない。",
+        "sources": [
+          "https://indigo-socks.com/players/no1/"
+        ]
+      }
     },
     {
       "category": "独立リーグ",
@@ -10371,7 +10843,7 @@
       "weight": 82,
       "hand": "右投左打",
       "achievement": "青森山田高 → BCL/茨城",
-      "features": "最速154km/h。リリーフ型の投手。",
+      "features": "高校卒業後に独立リーグへ進み、3年目の2026年は抑えに抜てき。役割の変化は評価材料だが、球種・制球などの技術面は資料を追加確認したい。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8729",
         "https://sp.baseball.findfriends.jp/player/20060059/"
@@ -10525,7 +10997,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E4%B8%89%E6%B5%A6%E9%81%BC%E5%A4%A7+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "高校卒業後に独立リーグへ進み、3年目の2026年は抑えに抜てき。役割の変化は評価材料だが、球種・制球などの技術面は資料を追加確認したい。",
+        "watch_points": "救援での奪三振・四球、連投時の球威、走者を背負った場面の投球。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20060059/"
+        ]
+      }
     },
     {
       "category": "独立リーグ",
@@ -10536,7 +11016,7 @@
       "weight": 86,
       "hand": "右投右打",
       "achievement": "大分商高 → 聖カタリナ大 → 四国IL/愛媛",
-      "features": "最速152km/h。複数の役割を担える投手。",
+      "features": "152km/hの直球にスライダー・シュート・チェンジアップを持つクローザー。強い直球に横の動きと緩急を組み合わせる救援タイプ。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8729",
         "https://sp.baseball.findfriends.jp/player/20010267/",
@@ -10620,7 +11100,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E7%AA%AA%E7%94%B0%E5%AF%9B%E4%B9%8B+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "152km/hの直球にスライダー・シュート・チェンジアップを持つクローザー。強い直球に横の動きと緩急を組み合わせる救援タイプ。",
+        "watch_points": "連投での球威維持と、僅差・走者ありの場面での制球。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20010267/"
+        ]
+      }
     },
     {
       "category": "独立リーグ",
@@ -10631,7 +11119,7 @@
       "weight": 77,
       "hand": "左投左打",
       "achievement": "至学館高 → 中京大 → 四国IL/高知",
-      "features": "最速150km/h。複数の役割を担える投手。",
+      "features": "150km/h超の直球にカット・フォークを持つ左腕。2025年は125奪三振、奪三振率9.96でともにリーグ2位。空振りを奪う実績が明確な先発候補。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8729",
         "https://sp.baseball.findfriends.jp/player/20020251/"
@@ -10755,7 +11243,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%B8%A1%E9%82%89%E9%83%BD%E6%96%97+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "150km/h超の直球にカット・フォークを持つ左腕。2025年は125奪三振、奪三振率9.96でともにリーグ2位。空振りを奪う実績が明確な先発候補。",
+        "watch_points": "奪三振に加え四球・球数も確認し、長いイニングでの効率を評価する。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20020251/"
+        ]
+      }
     },
     {
       "category": "独立リーグ",
@@ -10766,7 +11262,7 @@
       "weight": 83,
       "hand": "左投左打",
       "achievement": "東海大浦安高 → 東海大(中退) → BCL/茨城",
-      "features": "最速150km/h。先発型の投手。",
+      "features": "上体が立った独特のフォームから150km/hと角度のある変化球。独立リーグで先発を担い、少ない球数で打者を打ち取る意識も紹介される。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8729",
         "https://sp.baseball.findfriends.jp/player/20040127/"
@@ -10950,7 +11446,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E9%87%91%E9%9F%93%E6%A0%B9+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "上体が立った独特のフォームから150km/hと角度のある変化球。独立リーグで先発を担い、少ない球数で打者を打ち取る意識も紹介される。",
+        "watch_points": "実際の球数・四球・被長打の内容と、独特のフォームの再現性。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20040127/"
+        ]
+      }
     },
     {
       "category": "独立リーグ",
@@ -10961,7 +11465,7 @@
       "weight": 67,
       "hand": "右投左打",
       "achievement": "盛岡大付高 → 白鴎大 → BCL/栃木",
-      "features": "走力が注目される選手。",
+      "features": "独立リーグ1年目の2025年は55試合で打率.354、42盗塁、盗塁王。大学でも最多安打・最多盗塁を獲得しており、打撃と脚力の実績がつながる。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8729",
         "https://sp.baseball.findfriends.jp/player/20020236/",
@@ -11049,7 +11553,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E9%81%A0%E8%97%A4%E6%A1%83%E6%AC%A1%E9%83%8E+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "独立リーグ1年目の2025年は55試合で打率.354、42盗塁、盗塁王。大学でも最多安打・最多盗塁を獲得しており、打撃と脚力の実績がつながる。",
+        "watch_points": "盗塁成功率と出塁の内訳、外野守備。盗塁数だけで走塁を判断しない。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20020236/"
+        ]
+      }
     },
     {
       "category": "独立リーグ",
@@ -11060,7 +11572,7 @@
       "weight": 76,
       "hand": "右投左打",
       "achievement": "2026年のチーム主将。関東学園大学附属高校出身。",
-      "features": "球団プロフィールでミート力と好機での打撃をアピール。",
+      "features": "球団公式で本人がミート力と得点圏での打撃をアピールする左打ち内野手。自己紹介と客観的な成績は区別し、実戦の打撃内容を追加確認したい。",
       "sources": [
         "https://musashibears.com/player/takahashi-kuta",
         "https://musashibears.com/playgame/2026シーズン-キャプテン決定のお知らせ"
@@ -11184,7 +11696,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E9%AB%98%E6%A9%8B%E7%A9%BA%E5%A4%A7+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "球団公式で本人がミート力と得点圏での打撃をアピールする左打ち内野手。自己紹介と客観的な成績は区別し、実戦の打撃内容を追加確認したい。",
+        "watch_points": "打率・三振率・得点圏の打席数、守備位置別の内容を確認して自己評価を検証する。",
+        "sources": [
+          "https://musashibears.com/player/takahashi-kuta"
+        ]
+      }
     },
     {
       "category": "独立リーグ",
@@ -11195,7 +11715,7 @@
       "weight": 90,
       "hand": "右投右打",
       "achievement": "2026年4月22日の西武3軍戦でサイクル安打を達成。",
-      "features": "社会人FedExを経て独立リーグへ。好機での打撃をアピール。",
+      "features": "高校・大学・社会人を経て独立リーグへ。紹介資料は経歴が中心で、技術的な長所を裏づける記述は不足している。現時点では打力・守備力の断定を避ける。",
       "sources": [
         "https://musashibears.com/player/tsuboi-sohji",
         "https://bc-l.jp/news.php?keyno=1717",
@@ -11418,7 +11938,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E5%9D%AA%E4%BA%95%E5%A3%AE%E5%9C%B0+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "高校・大学・社会人を経て独立リーグへ。紹介資料は経歴が中心で、技術的な長所を裏づける記述は不足している。現時点では打力・守備力の断定を避ける。",
+        "watch_points": "直近の打撃成績、守備位置と出場数、実戦映像を追加確認して評価を具体化する。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20000294/"
+        ]
+      }
     },
     {
       "category": "独立リーグ",
@@ -11429,7 +11957,7 @@
       "weight": 82,
       "hand": "右投右打",
       "achievement": "日本大学第三高校 → 創価大学 → 埼玉武蔵ヒートベアーズ。",
-      "features": "球団プロフィールで広角への打撃を持ち味に挙げる。",
+      "features": "球団公式で本人が広角打法を持ち味として挙げる右打ち内野手。打球方向を使い分ける点に注目するが、自己紹介だけで打力の水準は断定しない。",
       "sources": [
         "https://musashibears.com/player/ohshiro-ryoma",
         "https://baseball.omyutech.com/draftplayer.action?year=2026"
@@ -11603,7 +12131,15 @@
           "search_url": "https://www.youtube.com/results?search_query=%E5%A4%A7%E5%9F%8E%E9%BE%8D%E9%A6%AC+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z"
+      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "球団公式で本人が広角打法を持ち味として挙げる右打ち内野手。打球方向を使い分ける点に注目するが、自己紹介だけで打力の水準は断定しない。",
+        "watch_points": "逆方向への打球の強さ、長打・出塁の実績と内野守備を追加確認する。",
+        "sources": [
+          "https://musashibears.com/player/ohshiro-ryoma"
+        ]
+      }
     }
   ],
   "reference_videos": [
@@ -11776,5 +12312,6 @@
     "failed_players": 0,
     "scope": "YouTube再生数順検索。氏名がタイトルにある通常動画の取得結果内で比較。"
   },
-  "professional_amateur_awards_checked_at": "2026-10-19"
+  "professional_amateur_awards_checked_at": "2026-10-19",
+  "features_checked_at": "2026-10-21"
 }

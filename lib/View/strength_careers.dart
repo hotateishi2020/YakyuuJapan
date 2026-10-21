@@ -1,3 +1,4 @@
+import 'player_detail_dialog.dart';
 import '../logic/favorite_team.dart';
 import '../config/org_config.dart';
 import 'compact_card_layout.dart';
@@ -92,52 +93,63 @@ List<Map<String, dynamic>> careerGroups(
     });
 }
 
-Widget careerGroupCard(BuildContext context, Map<String, dynamic> group, double width,
-    {required String category, Widget? subtitle, Widget? footer}) => Container(
-      width: width,
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade600),
-          borderRadius: BorderRadius.circular(8)),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Text(
-            '${group['area'] ?? group['name']}  ${(group['players'] as List).length}人',
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-        if (subtitle != null) subtitle,
-        const Divider(),
-        Wrap(spacing: 5, runSpacing: 5, children: [
-          for (final entry in listMapFromJson(group['players']))
-            Material(
-                color:
-                    (parseColorNameOrNull('${entry['team']['color_back']}') ??
-                            Colors.blueGrey)
-                        .withValues(alpha: .12),
-                borderRadius: BorderRadius.circular(4),
-                child: InkWell(
-                    onTap: () => showStrengthSource(
-                            context,
-                            '${entry['player']['name']}',
-                            '${entry['team']['name_team']}\n$category：${group['name']}\n${entry['career']['detail'] ?? ''}',
-                            [
-                              if (entry['career']['source_url'] != null)
-                                '${entry['career']['source_url']}'
-                            ]),
-                    child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 7, vertical: 5),
-                        child:
-                            Column(mainAxisSize: MainAxisSize.min, children: [
-                          Text('${entry['player']['name']}'),
-                          Text('${entry['team']['name_team']}',
-                              style: const TextStyle(
-                                  fontSize: 10, color: Colors.black54)),
-                        ])))),
-        ]),
-        if (footer != null) footer,
-      ]));
+Widget careerGroupCard(
+        BuildContext context, Map<String, dynamic> group, double width,
+        {required String category, Widget? subtitle, Widget? footer}) =>
+    Container(
+        width: width,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade600),
+            borderRadius: BorderRadius.circular(8)),
+        child:
+            Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Text(
+              '${group['area'] ?? group['name']}  ${(group['players'] as List).length}人',
+              style:
+                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+          if (subtitle != null) subtitle,
+          const Divider(),
+          Wrap(spacing: 5, runSpacing: 5, children: [
+            for (final entry in listMapFromJson(group['players']))
+              Material(
+                  color:
+                      (parseColorNameOrNull('${entry['team']['color_back']}') ??
+                              Colors.blueGrey)
+                          .withValues(alpha: .12),
+                  borderRadius: BorderRadius.circular(4),
+                  child: InkWell(
+                      onTap: () => showStrengthSource(
+                              context,
+                              '${entry['player']['name']}',
+                              '${entry['team']['name_team']}\n$category：${group['name']}\n${entry['career']['detail'] ?? ''}',
+                              [
+                                if (entry['career']['source_url'] != null)
+                                  '${entry['career']['source_url']}'
+                              ]),
+                      child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 7, vertical: 5),
+                          child:
+                              Column(mainAxisSize: MainAxisSize.min, children: [
+                            PlayerNameLink(player: {
+                              ...entry['player'],
+                              'id_team': entry['team']['id_team']
+                            }, child: Text('${entry['player']['name']}')),
+                            Text('${entry['team']['name_team']}',
+                                style: const TextStyle(
+                                    fontSize: 10, color: Colors.black54)),
+                          ])))),
+          ]),
+          if (footer != null) footer,
+        ]));
 
 class StrengthCareers extends StatefulWidget {
-  const StrengthCareers({super.key, required this.teams, this.initialCategory, this.org = OrgConfig.npb});
+  const StrengthCareers(
+      {super.key,
+      required this.teams,
+      this.initialCategory,
+      this.org = OrgConfig.npb});
   final List<Map<String, dynamic>> teams;
   final String? initialCategory;
   final OrgConfig org;
@@ -154,6 +166,7 @@ class _StrengthCareersState extends State<StrengthCareers> {
     super.initState();
     category = widget.initialCategory ?? '高校';
   }
+
   Widget _groupCard(Map<String, dynamic> group, double width) =>
       careerGroupCard(context, group, width, category: category);
 
@@ -202,67 +215,96 @@ class _StrengthCareersState extends State<StrengthCareers> {
     if (TeamSectionLayout.embedded(context) && widget.initialCategory == null) {
       return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         for (final value in careerCategories) ...[
-          Padding(padding: const EdgeInsets.all(8), child: Text(value, style: const TextStyle(fontWeight: FontWeight.bold))),
-          StrengthCareers(teams: widget.teams, initialCategory: value, org: widget.org),
+          Padding(
+              padding: const EdgeInsets.all(8),
+              child: Text(value,
+                  style: const TextStyle(fontWeight: FontWeight.bold))),
+          StrengthCareers(
+              teams: widget.teams, initialCategory: value, org: widget.org),
         ],
       ]);
     }
     final embedded = TeamSectionLayout.embedded(context);
     final favorite = favoriteTeamRow(widget.teams);
     final singleTeam = !embedded && _singleTeamCategories.contains(category);
-    final selectedTeam = widget.teams.any((t) => '${t['id_team']}' == _selectedTeams[category])
-        ? _selectedTeams[category] : widget.teams.isEmpty ? null : '${(favorite ?? widget.teams.first)['id_team']}';
-    final visibleTeams = singleTeam ? widget.teams.where((t) => '${t['id_team']}' == selectedTeam).toList() : widget.teams;
+    final selectedTeam =
+        widget.teams.any((t) => '${t['id_team']}' == _selectedTeams[category])
+            ? _selectedTeams[category]
+            : widget.teams.isEmpty
+                ? null
+                : '${(favorite ?? widget.teams.first)['id_team']}';
+    final visibleTeams = singleTeam
+        ? widget.teams.where((t) => '${t['id_team']}' == selectedTeam).toList()
+        : widget.teams;
     final groups = careerGroups(visibleTeams, category);
     return Column(children: [
-      if (!TeamSectionLayout.embedded(context)) Row(children: [
-        for (final value in careerCategories)
-          Expanded(
-              child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  child: Material(
-                      color: category == value
-                          ? Theme.of(context).colorScheme.primary
-                          : Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(20),
-                      child: InkWell(
-                          onTap: () => setState(() => category = value),
-                          borderRadius: BorderRadius.circular(20),
-                          child: SizedBox(
-                              height: 32,
-                              child: Center(
-                                  child: Text(value,
-                                      style: TextStyle(
-                                          color: category == value
-                                              ? Colors.white
-                                              : Colors.black87)))))))),
-      ]),
+      if (!TeamSectionLayout.embedded(context))
+        Row(children: [
+          for (final value in careerCategories)
+            Expanded(
+                child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    child: Material(
+                        color: category == value
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(20),
+                        child: InkWell(
+                            onTap: () => setState(() => category = value),
+                            borderRadius: BorderRadius.circular(20),
+                            child: SizedBox(
+                                height: 32,
+                                child: Center(
+                                    child: Text(value,
+                                        style: TextStyle(
+                                            color: category == value
+                                                ? Colors.white
+                                                : Colors.black87)))))))),
+        ]),
       if (!embedded) ...[
         const SizedBox(height: 8),
-        SizedBox(width: double.infinity, child: SegmentedButton<bool>(
-          segments: [
-            ButtonSegment(value: false, label: Text(widget.org.kind == OrgKind.npb ? '12球団表示' : '30球団表示')),
-            const ButtonSegment(value: true, label: Text('各球団')),
-          ],
-          selected: {singleTeam},
-          onSelectionChanged: (values) => setState(() {
-            if (values.single) { _singleTeamCategories.add(category); }
-            else { _singleTeamCategories.remove(category); }
-          }),
-        )),
-        if (singleTeam && selectedTeam != null) DropdownButton<String>(
-          key: ValueKey('career-team-$category'), isExpanded: true, value: selectedTeam,
-          items: [for (final team in widget.teams) DropdownMenuItem(
-            value: '${team['id_team']}', child: Text('${team['name_team']}'))],
-          onChanged: (value) => setState(() { if (value != null) _selectedTeams[category] = value; }),
-        ),
+        SizedBox(
+            width: double.infinity,
+            child: SegmentedButton<bool>(
+              segments: [
+                ButtonSegment(
+                    value: false,
+                    label: Text(
+                        widget.org.kind == OrgKind.npb ? '12球団表示' : '30球団表示')),
+                const ButtonSegment(value: true, label: Text('各球団')),
+              ],
+              selected: {singleTeam},
+              onSelectionChanged: (values) => setState(() {
+                if (values.single) {
+                  _singleTeamCategories.add(category);
+                } else {
+                  _singleTeamCategories.remove(category);
+                }
+              }),
+            )),
+        if (singleTeam && selectedTeam != null)
+          DropdownButton<String>(
+            key: ValueKey('career-team-$category'),
+            isExpanded: true,
+            value: selectedTeam,
+            items: [
+              for (final team in widget.teams)
+                DropdownMenuItem(
+                    value: '${team['id_team']}',
+                    child: Text('${team['name_team']}'))
+            ],
+            onChanged: (value) => setState(() {
+              if (value != null) _selectedTeams[category] = value;
+            }),
+          ),
       ],
       const SizedBox(height: 8),
       SectionExpanded(child: LayoutBuilder(builder: (context, constraints) {
         final columns = (constraints.maxWidth / 320).floor().clamp(1, 6);
         final width = (constraints.maxWidth - (columns - 1) * 8) / columns;
-        return sectionScrollView(context, 
-            key: PageStorageKey('career-$category-${singleTeam ? selectedTeam : 'all'}'),
+        return sectionScrollView(context,
+            key: PageStorageKey(
+                'career-$category-${singleTeam ? selectedTeam : 'all'}'),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [

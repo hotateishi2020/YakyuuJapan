@@ -2,6 +2,7 @@
 Run with python3 backend/tool_refresh_baseball_catalog.py. Downloads are cached.
 """
 import concurrent.futures, datetime, html, json, pathlib, re, subprocess, time
+from tool_enrich_meikyukai_dates import enrich
 ROOT = pathlib.Path(__file__).resolve().parent
 CACHE = pathlib.Path('/tmp/koko-catalog'); CACHE.mkdir(exist_ok=True)
 def text(s): return html.unescape(re.sub('<[^>]+>', '', s)).strip()
@@ -44,7 +45,13 @@ def build():
   sources=['https://baseball-museum.or.jp/hall-of-famers/list/search/','https://meikyukai.jp/members-all/','https://npb-meikan.jp/number/'])
  assert len(hall)>200 and len(members)>50 and len(uniforms)>10000
  target=ROOT/'data/baseball-catalog.json'
- if target.exists(): data={**json.loads(target.read_text()),**data}
+ if target.exists():
+  old=json.loads(target.read_text())
+  previous_members={r['source']:r for r in old.get('members',[]) if r.get('source')}
+  data['members']=[{**previous_members.get(r['source'],{}),**r} for r in data['members']]
+  data['uniforms'] += [r for r in old.get('uniforms',[]) if r.get('registration')=='育成']; data={**old,**data}
+ enrich(data['members'], fetch('https://ja.wikipedia.org/wiki/日本プロ野球名球会',
+                              'membership-dates-'+datetime.date.today().isoformat()))
  target.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
  print(f'hall={len(hall)} members={len(members)} uniform tenures={len(uniforms)}')
 if __name__=='__main__': build()

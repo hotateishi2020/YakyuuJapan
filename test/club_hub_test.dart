@@ -106,11 +106,7 @@ void main() {
       await t.tap(find.text('閉じる'));
       await t.pumpAndSettle();
       final tableFinder = find.byKey(const ValueKey('analysis-table'));
-      final table = t.widget<DataTable>(tableFinder);
-      expect(table.headingRowColor!.resolve({}), Colors.black);
-      expect(table.headingTextStyle!.color, Colors.white);
-      expect(table.border!.verticalInside.style, BorderStyle.solid);
-      expect(table.border!.horizontalInside.style, BorderStyle.solid);
+      expect(find.byKey(const ValueKey('analysis-fixed-header')), findsOneWidget);
       final teamCell = find.byKey(const ValueKey('analysis-team-1'));
       expect(t.widget<Container>(teamCell).color, const Color(0xFF003366));
       await t.binding.setSurfaceSize(const Size(1600, 800));
@@ -126,7 +122,7 @@ void main() {
       addTearDown(t.view.resetPhysicalSize);
       addTearDown(t.view.resetDevicePixelRatio);
       await t.pumpAndSettle();
-      expect(t.getSize(tableFinder).width, closeTo(1240, .01));
+      expect(t.getSize(tableFinder).width, closeTo(600, .01));
       expect(t.getSize(teamCell).width, closeTo(46, 1));
       expect(find.descendant(of: teamCell, matching: find.byType(Text)), findsNothing);
       expect(find.descendant(of: find.byKey(const ValueKey('analysis-vertical-scroll')), matching: find.textContaining('取得済み成績による団体内')), findsOneWidget);
@@ -136,9 +132,11 @@ void main() {
         matching: find.byWidgetPredicate((w) => w is Scrollable && w.axisDirection == AxisDirection.right),
       );
       expect(t.state<ScrollableState>(horizontal).position.maxScrollExtent, greaterThan(600));
+      final teamLeft = t.getTopLeft(teamCell).dx;
       await t.drag(horizontal, const Offset(-300, 0));
       await t.pumpAndSettle();
       expect(t.state<ScrollableState>(horizontal).position.pixels, greaterThan(0));
+      expect(t.getTopLeft(teamCell).dx, teamLeft);
       expect(t.takeException(), isNull);
     }, () => MockClient((_) async => http.Response('{}', 200)));
   });

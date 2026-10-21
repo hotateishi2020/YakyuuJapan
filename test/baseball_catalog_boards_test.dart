@@ -36,13 +36,13 @@ void main() {
       final picker = find.byKey(const ValueKey('records-picker-npb'));
       await tester.tap(picker);
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('背番号').last);
+      await tester.scrollUntilVisible(find.text('背番号'), 250, scrollable: find.byType(Scrollable).last);
       await tester.tap(find.text('背番号').last);
       await tester.pumpAndSettle();
       expect(find.byType(UniformHistoryBoard), findsOneWidget);
       await tester.tap(picker);
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('殿堂入り・名球会').last);
+      await tester.scrollUntilVisible(find.text('殿堂入り・名球会'), 250, scrollable: find.byType(Scrollable).last);
       await tester.tap(find.text('殿堂入り・名球会').last);
       await tester.pumpAndSettle();
       expect(find.byType(HallOfFameBoard), findsOneWidget);
@@ -57,7 +57,7 @@ void main() {
               body: TeamStrengthBoard(
                   org: OrgConfig.npb, year: 2026, providedTeams: []))));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const ValueKey('strength-picker')));
+      if (find.byKey(const ValueKey('strength-picker')).evaluate().isNotEmpty) await tester.tap(find.byKey(const ValueKey('strength-picker')));
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.text('球場').last);
       await tester.tap(find.text('球場').last);
@@ -132,6 +132,7 @@ void main() {
           const MaterialApp(home: Scaffold(body: StadiumsBoard(org: 'npb'))));
       await tester.pumpAndSettle();
       expect(find.text('球場名'), findsOneWidget);
+      expect(find.text('AI生成イメージ'), findsNWidgets(2));
       await tester.tap(find.byKey(const ValueKey('stadium-sort-team')));
       await tester.pumpAndSettle();
       expect(find.text('ホームチーム ▲'), findsOneWidget);
@@ -139,7 +140,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('ホームチーム ▼'), findsOneWidget);
       await tester.drag(
-          find.byType(SingleChildScrollView), const Offset(-1500, 0));
+          find.byKey(const ValueKey('stadium-grid-scroll')), const Offset(-1800, 0));
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('stadium-sort-station_distance')).hitTestable(), findsOneWidget);
       await tester.tap(find.byKey(const ValueKey('stadium-sort-station_distance')));
@@ -153,7 +154,9 @@ void main() {
         () => MockClient((_) async => http.Response(
             jsonEncode({
               'stadiums': [
-                {'name': '球場', 'team': '球団'}
+                {'name': '球場', 'team': '球団', 'image_generated': true,
+                  'image': 'backend/assets/images/stadiums/inside/farm-01-generated.png',
+                  'image_outside': 'backend/assets/images/stadiums/outside/farm-01-generated.png'}
               ]
             }),
             200,

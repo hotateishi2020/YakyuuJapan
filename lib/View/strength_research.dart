@@ -1,3 +1,4 @@
+import 'player_detail_dialog.dart';
 import '../logic/draft_video_priority.dart';
 import 'compact_layout.dart';
 import '../tools/open_youtube.dart';
@@ -104,6 +105,47 @@ class _StrengthDraftState extends State<StrengthDraft> {
 
   String _careerText(Map<String, dynamic> player) => draftCareerText(player);
 
+  void _showFeatures(Map<String, dynamic> player) {
+    final evaluation = Map<String, dynamic>.from(player['feature_evaluation'] as Map? ?? const {});
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('${player['name']}の特徴'),
+        content: SizedBox(
+          width: 520,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('特徴・評価材料', style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Text('${player['features'] ?? '未登録'}'),
+                if (evaluation['watch_points'] != null) ...[
+                  const SizedBox(height: 20),
+                  const Text('今後の確認ポイント（独自の評価観点）', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  Text('${evaluation['watch_points']}'),
+                  const SizedBox(height: 8),
+                  const Text('確認ポイントは、実際に弱点があると断定するものではありません。', style: TextStyle(fontSize: 12, color: Colors.black54)),
+                ],
+                if (evaluation['checked_at'] != null) ...[
+                  const SizedBox(height: 20),
+                  Text('資料確認日：${evaluation['checked_at']}', style: const TextStyle(fontSize: 12)),
+                  const Text('数値・実績は各紹介資料の掲載時点のものです。', style: TextStyle(fontSize: 12)),
+                ],
+                const SizedBox(height: 12),
+                const Text('出典', style: TextStyle(fontWeight: FontWeight.bold)),
+                for (final url in (evaluation['sources'] ?? player['sources'] ?? []) as List) Padding(padding: const EdgeInsets.only(top: 6), child: SelectableText('$url', style: const TextStyle(fontSize: 12))),
+              ],
+            ),
+          ),
+        ),
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('閉じる'))],
+      ),
+    );
+  }
+
   List<String> _values(Map<String, dynamic> p) => [
         '${p['attention_grade'] ?? '—'}',
         '${p['name'] ?? ''}',
@@ -142,7 +184,7 @@ class _StrengthDraftState extends State<StrengthDraft> {
               final frozenColumns = compactBaseballLayout(context) ? 3 : 4;
               const headers = ['注目度', '選手名', '所属', 'チーム', '年齢', '身長', '体重', '投打', 'ポジション', '経歴', '特徴', '獲得予想', '特集動画'];
               final videoCount = players.fold<int>(1, (max, p) => draftRelatedVideos(p.$2).length > max ? draftRelatedVideos(p.$2).length : max);
-              final minimumWidths = [42.0, 72.0, 50.0, 100.0, 42.0, 52.0, 50.0, 76.0, 68.0, 180.0, 180.0, 140.0, videoCount * 168.0 + (videoCount - 1) * 8 + 16];
+              final minimumWidths = [42.0, 72.0, 50.0, 100.0, 42.0, 52.0, 50.0, 76.0, 68.0, 180.0, 240.0, 140.0, videoCount * 168.0 + (videoCount - 1) * 8 + 16];
               final minimumWidth = minimumWidths.reduce((a, b) => a + b);
               final scale = constraints.maxWidth > minimumWidth ? constraints.maxWidth / minimumWidth : 1.0;
               final widths = [for (final width in minimumWidths) width * scale];
@@ -150,10 +192,7 @@ class _StrengthDraftState extends State<StrengthDraft> {
               const style = TextStyle(inherit: false, fontSize: 12, height: 1.4, color: Colors.black87);
               double textHeight(String text, double width, int column) {
                 // Match the rendered font and the space inside padding + border.
-                final painter = TextPainter(text: TextSpan(text: text,
-                    style: style.copyWith(fontWeight: column <= 2 ? FontWeight.bold : FontWeight.normal)),
-                    textDirection: Directionality.of(context), textScaler: MediaQuery.textScalerOf(context))
-                  ..layout(maxWidth: width - 13);
+                final painter = TextPainter(text: TextSpan(text: text, style: style.copyWith(fontWeight: column <= 2 ? FontWeight.bold : FontWeight.normal)), textDirection: Directionality.of(context), textScaler: MediaQuery.textScalerOf(context))..layout(maxWidth: width - 13);
                 final height = painter.height;
                 painter.dispose();
                 return height.ceilToDouble() + 14;
@@ -176,29 +215,41 @@ class _StrengthDraftState extends State<StrengthDraft> {
                   }
                 } else if (index == 12) {
                   final videos = draftRelatedVideos(player);
-                  child = videos.isEmpty ? Text(player['feature_video_checked_at'] == null ? '未取得' : '—', style: style) : Row(mainAxisSize: MainAxisSize.min, children: [
-                    for (final entry in videos.indexed) Padding(padding: EdgeInsets.only(right: entry.$1 == videos.length - 1 ? 0 : 8), child: SizedBox(width: 168, child: Builder(builder: (context) {
-                    final video = entry.$2;
-                    return Tooltip(
-                    message: '${video['title']}\n${video['view_count']}回再生（取得時点）',
-                    child: InkWell(
-                      key: ValueKey(entry.$1 == 0 ? 'draft-video-${player['name']}' : 'draft-video-${player['name']}-${video['video_id']}'),
-                      onTap: () async {
-                        final opened = await openYoutube('${video['video_id']}');
-                        if (!opened && context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('動画を開けませんでした。')));
-                      },
-                      child: Column(mainAxisSize: MainAxisSize.min, children: [
-                        Flexible(child: SizedBox(height: 94, width: 168, child: Stack(fit: StackFit.expand, children: [
-                          Image.network('https://i.ytimg.com/vi/${video['video_id']}/hqdefault.jpg', fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black12)),
-                          const Center(child: Icon(Icons.play_circle_fill, color: Colors.white, size: 32)),
-                        ]))),
-                        Text('${video['view_count']}回再生', maxLines: 1, style: const TextStyle(inherit: false, color: Colors.black87, height: 1.4, fontSize: 11)),
-                      ]),
-                    ),
-                  );
-                  }))),
-                  ]);
+                  child = videos.isEmpty
+                      ? Text(player['feature_video_checked_at'] == null ? '未取得' : '—', style: style)
+                      : Row(mainAxisSize: MainAxisSize.min, children: [
+                          for (final entry in videos.indexed)
+                            Padding(
+                                padding: EdgeInsets.only(right: entry.$1 == videos.length - 1 ? 0 : 8),
+                                child: SizedBox(
+                                    width: 168,
+                                    child: Builder(builder: (context) {
+                                      final video = entry.$2;
+                                      return Tooltip(
+                                        message: '${video['title']}\n${video['view_count']}回再生（取得時点）',
+                                        child: InkWell(
+                                          key: ValueKey(entry.$1 == 0 ? 'draft-video-${player['name']}' : 'draft-video-${player['name']}-${video['video_id']}'),
+                                          onTap: () async {
+                                            final opened = await openYoutube('${video['video_id']}');
+                                            if (!opened && context.mounted) {
+                                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('動画を開けませんでした。')));
+                                            }
+                                          },
+                                          child: Column(mainAxisSize: MainAxisSize.min, children: [
+                                            Flexible(
+                                                child: SizedBox(
+                                                    height: 94,
+                                                    width: 168,
+                                                    child: Stack(fit: StackFit.expand, children: [
+                                                      Image.network('https://i.ytimg.com/vi/${video['video_id']}/hqdefault.jpg', fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black12)),
+                                                      const Center(child: Icon(Icons.play_circle_fill, color: Colors.white, size: 32)),
+                                                    ]))),
+                                            Text('${video['view_count']}回再生', maxLines: 1, style: const TextStyle(inherit: false, color: Colors.black87, height: 1.4, fontSize: 11)),
+                                          ]),
+                                        ),
+                                      );
+                                    }))),
+                        ]);
                 } else if (index == 11) {
                   child = Wrap(spacing: 2, runSpacing: 2, children: [
                     for (final prediction in listMapFromJson(player['predictions']))
@@ -210,8 +261,7 @@ class _StrengthDraftState extends State<StrengthDraft> {
                           child: SizedBox(
                             width: 36,
                             height: 36,
-                            child: Image.asset('${prediction['logo_asset']}',
-                                semanticLabel: '${prediction['team']}', errorBuilder: (_, __, ___) => Center(child: Text('${prediction['team']}', style: style))),
+                            child: Image.asset('${prediction['logo_asset']}', semanticLabel: '${prediction['team']}', errorBuilder: (_, __, ___) => Center(child: Text('${prediction['team']}', style: style))),
                           ),
                         ),
                       ),
@@ -223,25 +273,20 @@ class _StrengthDraftState extends State<StrengthDraft> {
                         fontWeight: index <= 2 ? FontWeight.bold : FontWeight.normal,
                       ));
                   if (index == 1) {
-                    child = InkWell(
-                        onTap: () => showStrengthSource(
-                            context, '${player['name']}', "確認日：${data['checked_at']}\n${_careerText(player)}\n${player['features']}", (player['sources'] as List).cast<String>()),
-                        child: child);
+                    child = PlayerNameLink(player: player, child: child);
+                  } else if (index == 10) {
+                    child = Tooltip(
+                      message: '評価の確認ポイント・出典を見る',
+                      child: InkWell(
+                        key: ValueKey('draft-features-${player['name']}'),
+                        onTap: () => _showFeatures(player),
+                        child: child,
+                      ),
+                    );
                   }
                 }
                 if (index == 0 && player != null) {
-                  child = Tooltip(
-                      message: '${draftAttentionLabels[player['attention_grade']] ?? '未評価'}\n${player['attention_reason'] ?? ''}',
-                      child: InkWell(
-                          onTap: () => showStrengthSource(
-                                  context,
-                                  '${player['name']} 注目度 ${player['attention_grade']}',
-                                  '${draftAttentionLabels[player['attention_grade']] ?? '未評価'}\nアプリ独自の予想評価（${player['attention_as_of'] ?? ''}）\n${player['attention_reason'] ?? ''}\n\n${listMapFromJson(player['attention_sources']).map((e) => '${e['reason']}').join('\n\n')}',
-                                  [
-                                    for (final e in listMapFromJson(player['attention_sources'])) '${e['source_url']}',
-                                    if (player['attention_source'] != null) '${player['attention_source']}'
-                                  ]),
-                          child: Center(child: Text('${player['attention_grade'] ?? '—'}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)))));
+                  child = Tooltip(message: '${draftAttentionLabels[player['attention_grade']] ?? '未評価'}\n${player['attention_reason'] ?? ''}', child: InkWell(onTap: () => showStrengthSource(context, '${player['name']} 注目度 ${player['attention_grade']}', '${draftAttentionLabels[player['attention_grade']] ?? '未評価'}\nアプリ独自の予想評価（${player['attention_as_of'] ?? ''}）\n${player['attention_reason'] ?? ''}\n\n${listMapFromJson(player['attention_sources']).map((e) => '${e['reason']}').join('\n\n')}', [for (final e in listMapFromJson(player['attention_sources'])) '${e['source_url']}', if (player['attention_source'] != null) '${player['attention_source']}']), child: Center(child: Text('${player['attention_grade'] ?? '—'}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)))));
                 }
                 if (index >= 4 && index <= 8) {
                   child = FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: child);
@@ -252,26 +297,18 @@ class _StrengthDraftState extends State<StrengthDraft> {
                   height: height,
                   alignment: Alignment.centerLeft,
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
-                  decoration: BoxDecoration(
-                      color: player == null ? Colors.grey.shade200 : _positionColor('${player['position']}'), border: Border.all(color: Colors.grey.shade400, width: .5)),
+                  decoration: BoxDecoration(color: player == null ? Colors.grey.shade200 : _positionColor('${player['position']}'), border: Border.all(color: Colors.grey.shade400, width: .5)),
                   child: child,
                 );
               }
 
               return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                 Row(children: [
-                  Expanded(
-                      child: Padding(
-                          padding: const EdgeInsets.all(8), child: Text('${widget.year}年 NPBドラフト注目選手（計${players.length}人）', style: const TextStyle(fontWeight: FontWeight.bold)))),
+                  Expanded(child: Padding(padding: const EdgeInsets.all(8), child: Text('${widget.year}年 NPBドラフト注目選手（計${players.length}人）', style: const TextStyle(fontWeight: FontWeight.bold)))),
                 ]),
                 Row(children: [
                   for (var i = 0; i < frozenColumns; i++) cell(i, 40),
-                  Expanded(
-                      child: SingleChildScrollView(
-                          controller: _header,
-                          physics: const NeverScrollableScrollPhysics(),
-                          scrollDirection: Axis.horizontal,
-                          child: Row(children: [for (var i = frozenColumns; i < headers.length; i++) cell(i, 40)]))),
+                  Expanded(child: SingleChildScrollView(controller: _header, physics: const NeverScrollableScrollPhysics(), scrollDirection: Axis.horizontal, child: Row(children: [for (var i = frozenColumns; i < headers.length; i++) cell(i, 40)]))),
                 ]),
                 Expanded(
                     child: SingleChildScrollView(
@@ -291,17 +328,12 @@ class _StrengthDraftState extends State<StrengthDraft> {
                           controller: _horizontal,
                           scrollDirection: Axis.horizontal,
                           child: Column(children: [
-                            for (var row = 0; row < players.length; row++)
-                              Row(children: [for (var col = frozenColumns; col < headers.length; col++) cell(col, heights[row], player: players[row].$2)])
+                            for (var row = 0; row < players.length; row++) Row(children: [for (var col = frozenColumns; col < headers.length; col++) cell(col, heights[row], player: players[row].$2)])
                           ]),
                         ),
                       )),
                     ]),
-                    Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text(
-                            "確認日：${data['checked_at']}。年齢は${widget.year + 1}年3月31日時点（生年月日未確認は—）。選手名で詳細、球団ロゴで指名予想の根拠を表示。注目度はアプリ予想（タップで基準と根拠）。S競合必至／A競合の可能性／Bドラ1候補／C上位候補／D指名候補／E育成候補。ロゴなしは予想根拠未確認。特集動画は能力・試合のプレー・プレイスタイル・私生活に焦点を当てた内容をタイトルから優先し、同程度なら再生数順に最大4件（表全体の横スクロール・タップで再生）。指名・獲得確定ではありません。",
-                            style: const TextStyle(fontSize: 11, color: Colors.black54))),
+                    Padding(padding: const EdgeInsets.all(8), child: Text("確認日：${data['checked_at']}。年齢は${widget.year + 1}年3月31日時点（生年月日未確認は—）。選手名で詳細、球団ロゴで指名予想の根拠を表示。注目度はアプリ予想（タップで基準と根拠）。S競合必至／A競合の可能性／Bドラ1候補／C上位候補／D指名候補／E育成候補。ロゴなしは予想根拠未確認。特集動画は能力・試合のプレー・プレイスタイル・私生活に焦点を当てた内容をタイトルから優先し、同程度なら再生数順に最大4件（表全体の横スクロール・タップで再生）。指名・獲得確定ではありません。", style: const TextStyle(fontSize: 11, color: Colors.black54))),
                   ]),
                 )),
               ]);
@@ -310,9 +342,7 @@ class _StrengthDraftState extends State<StrengthDraft> {
 }
 
 List<Map<String, dynamic>> draftRelatedVideos(Map<String, dynamic> player) {
-  final videos = listMapFromJson(player['feature_videos']).where((v) =>
-    RegExp(r'^[A-Za-z0-9_-]{11}$').hasMatch('${v['video_id']}') && v['view_count'] is num && v['is_short'] != true).toList()
-    ..sort(compareDraftVideos);
+  final videos = listMapFromJson(player['feature_videos']).where((v) => RegExp(r'^[A-Za-z0-9_-]{11}$').hasMatch('${v['video_id']}') && v['view_count'] is num && v['is_short'] != true).toList()..sort(compareDraftVideos);
   final seen = <String>{};
   return videos.where((video) => seen.add('${video['video_id']}')).take(4).toList();
 }
@@ -324,12 +354,10 @@ Map<String, dynamic>? draftTopVideo(Map<String, dynamic> player) {
 
 String draftCareerText(Map<String, dynamic> player) {
   final entries = <Map<String, dynamic>>[
-    if ('${player['achievement'] ?? ''}'.trim().isNotEmpty)
-      {'label': '${player['achievement']}'},
+    if ('${player['achievement'] ?? ''}'.trim().isNotEmpty) {'label': '${player['achievement']}'},
     ...listMapFromJson(player['career_facts']),
   ].indexed.toList();
-  int year(Map<String, dynamic> fact) => int.tryParse('${fact['year']}') ??
-      int.tryParse(RegExp(r'(?:19|20)\d{2}').firstMatch('${fact['label']}')?.group(0) ?? '') ?? 0;
+  int year(Map<String, dynamic> fact) => int.tryParse('${fact['year']}') ?? int.tryParse(RegExp(r'(?:19|20)\d{2}').firstMatch('${fact['label']}')?.group(0) ?? '') ?? 0;
   int season(Map<String, dynamic> fact) {
     final text = '${fact['season'] ?? fact['label'] ?? ''}';
     if (text.contains('春')) return 1;
@@ -338,21 +366,25 @@ String draftCareerText(Map<String, dynamic> player) {
     if (text.contains('冬')) return 4;
     return 0;
   }
+
   entries.sort((a, b) {
     final byYear = year(b.$2).compareTo(year(a.$2));
     if (byYear != 0) return byYear;
     final bySeason = season(b.$2).compareTo(season(a.$2));
     return bySeason != 0 ? bySeason : a.$1.compareTo(b.$1);
   });
-  return entries.map((entry) {
-    final fact = entry.$2;
-    final label = '${fact['label'] ?? ''}';
-    final school = '${fact['school'] ?? ''}'.trim();
-    if (fact['kind'] == 'koshien' && school.isNotEmpty && !label.contains(school)) {
-      return label.replaceFirst('甲子園', '甲子園（$school）');
-    }
-    return label;
-  }).where((label) => label.isNotEmpty).join('\n');
+  return entries
+      .map((entry) {
+        final fact = entry.$2;
+        final label = '${fact['label'] ?? ''}';
+        final school = '${fact['school'] ?? ''}'.trim();
+        if (fact['kind'] == 'koshien' && school.isNotEmpty && !label.contains(school)) {
+          return label.replaceFirst('甲子園', '甲子園（$school）');
+        }
+        return label;
+      })
+      .where((label) => label.isNotEmpty)
+      .join('\n');
 }
 
 int? draftAgeOnMarch31(dynamic rawBirth, int year) {
@@ -406,11 +438,7 @@ class StrengthAchievements extends StatelessWidget {
           return const Padding(padding: EdgeInsets.all(8), child: Text('選手は功績の多い順。評価の高い功績から左に並べ、空きを詰めて表示します。\nホバーで内容、クリックで詳細を表示します。'));
         }
         if (index == roster.length + 1) {
-          return const Padding(
-              padding: EdgeInsets.all(8),
-              child: Text(
-                  '取得・照合できた記録のみ表示。通算記録はNPBとMLBを別集計。優勝時のレギュラー認定は根拠を確認できた場合のみ付与します。代表選出は大会名簿、招集は強化試合等の名簿を根拠とします。レギュラー級の基準は各アイコンの詳細に表示します。ドラフト指名は入団確定を意味しません。未取得の受賞・記録があります。面積はアプリ独自の評価値に比例します（リーグMVP=100、個人タイトル=56.25、月間MVP=9、規定到達=4、三冠王=225、トリプルスリー=400）。公式な価値の比較ではありません。',
-                  style: TextStyle(fontSize: 11, color: Colors.black54)));
+          return const Padding(padding: EdgeInsets.all(8), child: Text('取得・照合できた記録のみ表示。通算記録はNPBとMLBを別集計。優勝時のレギュラー認定は根拠を確認できた場合のみ付与します。代表選出は大会名簿、招集は強化試合等の名簿を根拠とします。レギュラー級の基準は各アイコンの詳細に表示します。ドラフト指名は入団確定を意味しません。未取得の受賞・記録があります。面積はアプリ独自の評価値に比例します（リーグMVP=100、個人タイトル=56.25、月間MVP=9、規定到達=4、三冠王=225、トリプルスリー=400）。公式な価値の比較ではありません。', style: TextStyle(fontSize: 11, color: Colors.black54)));
         }
         final entry = roster[index - 1];
         final color = parseColorNameOrNull('${entry.team['color_back']}') ?? Colors.blueGrey;
@@ -422,12 +450,8 @@ class StrengthAchievements extends StatelessWidget {
             SizedBox(
                 width: 120,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  if (comparisonTeams != null)
-                    Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
-                        color: color,
-                        child: Text('${entry.team['name_team']}', style: TextStyle(fontSize: 11, color: parseColorNameOrNull('${entry.team['color_font']}') ?? (color.computeLuminance() > .45 ? Colors.black : Colors.white)))),
-                  Text('${entry.player['name']}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  if (comparisonTeams != null) Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3), color: color, child: Text('${entry.team['name_team']}', style: TextStyle(fontSize: 11, color: parseColorNameOrNull('${entry.team['color_font']}') ?? (color.computeLuminance() > .45 ? Colors.black : Colors.white)))),
+                  PlayerNameLink(player: {...entry.player, 'id_team': entry.team['id_team']}, child: Text('${entry.player['name']}', style: const TextStyle(fontWeight: FontWeight.bold))),
                 ])),
             Expanded(
                 child: AchievementLayout(sizes: [
@@ -441,8 +465,7 @@ class StrengthAchievements extends StatelessWidget {
                   constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
                   iconSize: achievementBadgeSize(a),
                   icon: AchievementBadge(achievement: a),
-                  onPressed: () => showStrengthSource(context, '${entry.player['name']}：${a['label']}',
-                      '${a['year']}年\n${a['detail'] ?? ''}\n表示評価値：${achievementValue(a)}（リーグMVP=100、面積比例・アプリ独自）', [if (a['source'] != null) '${a['source']}']),
+                  onPressed: () => showStrengthSource(context, '${entry.player['name']}：${a['label']}', '${a['year']}年\n${a['detail'] ?? ''}\n表示評価値：${achievementValue(a)}（リーグMVP=100、面積比例・アプリ独自）', [if (a['source'] != null) '${a['source']}']),
                 ),
             ])),
           ]),

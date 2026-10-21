@@ -1,4 +1,5 @@
 import 'ChampionshipSummary.dart';
+import 'TimelineCs.dart';
 import 'ClubData.dart' show readClubFile, clubKey;
 import 'RecordInterleague.dart';
 import 'SeasonAwards.dart';
@@ -29,8 +30,8 @@ class Records {
         COALESCE(h.name_short,NULLIF(s.name_team,''),t.name_short) AS short_name,
         COALESCE(h.name_shortest,s.name_shortest) AS name_shortest,
         t.url_npb_players AS manager_team_url, t.name_short AS manager_team_name,
-        t.color_back AS color_back,
-        t.color_font AS color_font,h.logo_url,
+        CASE WHEN h.name_full='近畿グレートリング' THEN COALESCE(h.color_back,t.color_back) ELSE t.color_back END AS color_back,
+        CASE WHEN h.name_full='近畿グレートリング' THEN COALESCE(h.color_font,t.color_font) ELSE t.color_font END AS color_font,h.logo_url,
         COALESCE(h.name_full,s.name_team) IS DISTINCT FROM t.name_short
           AND COALESCE(h.name_full,s.name_team) IS DISTINCT FROM t.name_full AS historical_identity, s.code_area
       FROM t_stats_team s JOIN m_team t ON t.id=s.id_team
@@ -39,13 +40,14 @@ class Records {
       ORDER BY s.year DESC,s.id_team,s.crtat DESC,s.id DESC
     ''', parameters: [year]);
     final playoffs = await conn.execute('''
-      SELECT EXTRACT(YEAR FROM g.datetime_start)::int AS year,g.id_team_home,g.id_team_away,
+      SELECT DISTINCT ON (g.datetime_start::date,g.id_team_home,g.id_team_away,g.code_game)
+        EXTRACT(YEAR FROM g.datetime_start)::int AS year,g.id_team_home,g.id_team_away,
         g.score_home,g.score_away,g.state,g.code_game
       FROM t_game g JOIN m_team t ON t.id=g.id_team_home
       WHERE t.id_league IN ($leagues) AND g.datetime_start < make_date(\$1+1,1,1)
-        AND g.code_game IN ('CS1','CSF','JS','WC','DS','LCS','ALCS','NLCS','WS')
+        AND g.code_game IN ('CS1','CSF','CS2','CS','JS','WC','DS','LCS','ALCS','NLCS','WS')
         AND NOT COALESCE(g.flg_delete,false)
-      ORDER BY g.datetime_start,g.id
+      ORDER BY g.datetime_start::date,g.id_team_home,g.id_team_away,g.code_game,g.updat DESC NULLS LAST,g.id DESC
     ''', parameters: [year]);
     final titleRows = await conn.execute('''
       SELECT s.int_year AS year,s.id_league,s.id_stats,s.id_player,s.stats AS value,
@@ -316,6 +318,7 @@ List<Map<String, dynamic>> buildRecordStandings(List<Map<String, dynamic>> rows,
       (l['teams'] as List).sort((a, b) => usageInt(a['rank']).compareTo(usageInt(b['rank'])));
     }
   }
+  if (org == OrgKind.npb) addTimelineCs(seasons.values.toList(), games);
   return seasons.values.toList()..sort((a, b) => usageInt(b['year']).compareTo(usageInt(a['year'])));
 }
 
@@ -337,7 +340,7 @@ List<Map<String, dynamic>> applySplitRecordStandings(
         return <String, dynamic>{
           if (old != null) ...old,
           ...team, 'short_name': team['name'], 'historical_identity': true,
-          if (old != null && old['name'] != team['name']) 'logo_url': null,
+          if (old != null && old['name'] != team['name'] && team['logo_url'] == null) 'logo_url': null,
           'champion': team['rank'] == 1, 'league_champion': team['rank'] == 1,
         };
       }).toList()..sort((a, b) => usageInt(a['rank']).compareTo(usageInt(b['rank'])));

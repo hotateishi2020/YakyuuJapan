@@ -1,3 +1,4 @@
+import '../widgets/collapsible_menu.dart';
 import 'package:flutter/material.dart';
 import '../config/app_design.dart';
 
@@ -11,32 +12,44 @@ class AdaptiveSectionSelector extends StatelessWidget {
       required this.background,
       required this.foreground,
       this.pickerKey,
+      this.fitLabels = false,
       this.itemKeyPrefix});
   final Map<int, String> labels;
   final int value;
   final ValueChanged<int> onChanged;
   final Color background, foreground;
   final Key? pickerKey;
+  /// Allocate width by label length and shrink modestly before using a picker.
+  final bool fitLabels;
   final String? itemKeyPrefix;
   @override
   Widget build(BuildContext context) =>
-      LayoutBuilder(builder: (context, bounds) {
-        const textStyle = TextStyle(fontSize: 12, fontWeight: FontWeight.bold);
-        final style = textStyle.copyWith(color: foreground);
-        final cellWidth =
-            (bounds.maxWidth - (labels.length - 1) * ALL_SPACE_BLOCK) /
-                labels.length;
-        final fits = labels.values.every((label) {
+      MenuBand(level: 2, child: LayoutBuilder(builder: (context, bounds) {
+        var textStyle = const TextStyle(fontSize: 12, fontWeight: FontWeight.bold);
+        final available = bounds.maxWidth - (labels.length - 1) * ALL_SPACE_BLOCK;
+        List<double> measure(TextStyle style) => labels.values.map((label) {
           final painter = TextPainter(
-              text: TextSpan(text: label, style: textStyle),
+              text: TextSpan(text: label, style: style),
               textDirection: Directionality.of(context),
-              textScaler: MediaQuery.textScalerOf(context),
-              maxLines: 1)
-            ..layout();
-          final fits = painter.width + 4 <= cellWidth;
+              textScaler: MediaQuery.textScalerOf(context), maxLines: 1)..layout();
+          final width = painter.width.ceilToDouble() + (fitLabels ? 12 : 4);
           painter.dispose();
-          return fits;
-        });
+          return width;
+        }).toList();
+        var widths = measure(textStyle);
+        double total() => widths.fold(0.0, (a, b) => a + b);
+        if (fitLabels) {
+          for (final size in [11.5, 11.0]) {
+            if (total() <= available) break;
+            textStyle = textStyle.copyWith(fontSize: size);
+            widths = measure(textStyle);
+          }
+        }
+        final fits = fitLabels
+            ? total() <= available
+            : widths.every((width) => width <= available / labels.length);
+        final extraWidth = (available - total()) / labels.length;
+        final style = textStyle.copyWith(color: foreground);
         void select(int next) {
           if (next != value) onChanged(next);
         }
@@ -47,7 +60,8 @@ class AdaptiveSectionSelector extends StatelessWidget {
               child: Row(children: [
                 for (final entry in labels.entries.indexed) ...[
                   if (entry.$1 > 0) const SizedBox(width: ALL_SPACE_BLOCK),
-                  Expanded(
+                  SizedBox(
+                      width: fitLabels ? widths[entry.$1] + extraWidth : available / labels.length,
                       child: Semantics(
                           button: true,
                           selected: value == entry.$2.key,
@@ -118,5 +132,5 @@ class AdaptiveSectionSelector extends StatelessWidget {
                 onChanged: (v) {
                   if (v != null) select(v);
                 })));
-      });
+      }));
 }

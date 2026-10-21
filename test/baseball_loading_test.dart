@@ -6,11 +6,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 
 void main() {
+  testWidgets('遠投は横長の領域に表示する', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: Scaffold(body: Center(
+      child: BaseballLoading(progress: .5, scene: BaseballLoadingScene.longThrow)))));
+    expect(tester.getSize(find.byKey(const ValueKey('baseball-loading-area'))), const Size(800, 200));
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+  });
   testWidgets(
       'measured progress, estimated cap, reduced motion and tight spaces',
       (tester) async {
     await tester.pumpWidget(const MaterialApp(
         home: Scaffold(body: Center(child: BaseballLoading(progress: .42, scene: BaseballLoadingScene.fielding)))));
+    expect(tester.getSize(find.byKey(const ValueKey('baseball-loading-area'))), const Size(420, 300));
     expect(find.text('42%'), findsOneWidget);
     expect(find.bySemanticsLabel('ノックを受けて捕球・送球する守備練習'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
@@ -72,8 +80,8 @@ void main() {
                         color: Color(0xFFF7F9FC),
                         child: Padding(
                             padding: EdgeInsets.all(28),
-                            child: SizedBox(width: 560, child: Wrap(children: [for (final scene in BaseballLoadingScene.values) BaseballLoading(progress: .42, scene: scene)])))))))));
-    await tester.pump(const Duration(milliseconds: 800));
+                            child: SizedBox(width: 560, child: Wrap(children: [for (final scene in BaseballLoadingScene.values) SizedBox(width: 280, height: 200, child: BaseballLoading(progress: .42, scene: scene))])))))))));
+    await tester.pump(const Duration(milliseconds: 4800));
     final boundary =
         key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
     await tester.runAsync(() async {

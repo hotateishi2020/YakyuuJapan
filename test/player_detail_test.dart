@@ -11,7 +11,26 @@ import 'package:Yakyuu_Japan/View/GamesBoard.dart' show GameBattingResult, GameP
 
 void main() {
   for (final portrait in [false, true]) {
-    testWidgets('代打の今季スタッツは投手では非表示にし野手では表示する', (t) async {
+    testWidgets('本塁打がある試合だけ出場成績の横に再生ボタンを表示する', (t) async {
+    await http.runWithClient(() async {
+      await t.pumpWidget(const MaterialApp(home: Scaffold(body: PlayerDetailDialog(
+        player: {'name':'甲'}, org:'npb', year:2026))));
+      await t.pumpAndSettle();
+      final button = find.byKey(const ValueKey('home-run-video-2026-10-20'));
+      await t.scrollUntilVisible(button, 300, scrollable: find.byType(Scrollable).first);
+      expect(button, findsOneWidget);
+      expect(find.byKey(const ValueKey('home-run-video-2026-10-19')), findsNothing);
+      expect(t.takeException(), isNull);
+    }, () => MockClient((_) async => http.Response(jsonEncode({
+      'found':true,'profile':{'name_full':'甲','id_league':2},
+      'recent_games':[
+        {'datetime_start':'2026-10-20','opponent':'西武','plays':[{'result':'左本','bases':4}]},
+        {'datetime_start':'2026-10-19','opponent':'西武','plays':[{'result':'左安','bases':1}]},
+      ],
+    }),200, headers:{'content-type':'application/json; charset=utf-8'})));
+  });
+
+  testWidgets('代打の今季スタッツは投手では非表示にし野手では表示する', (t) async {
     for (final pitcher in [true, false]) {
       await http.runWithClient(() async {
         await t.pumpWidget(MaterialApp(home: Scaffold(body: PlayerDetailDialog(
@@ -35,11 +54,13 @@ void main() {
   testWidgets('成績ブロックの半角全角空白を除去する', (t) async {
     await t.pumpWidget(const MaterialApp(home: Scaffold(body: GamePlayerAppearance(
       lines: [], plays: [
-        {'result': '三　振'}, {'result': '四 球'},
+        {'result': '空 三 振'}, {'result': '故意四球'},
         {'result': r'中\u3000飛'}, {'result': '左 前 安', 'bases': 1},
+        {'result': '右中間二塁打', 'bases': 2}, {'result': '遊ゴロ併殺打'},
+        {'result': '捕犠打'}, {'result': '右犠飛'},
       ],
     ))));
-    for (final label in ['三振', '四球', '中飛', '左前安']) {
+    for (final label in ['三振', '四球', '中飛', '左安', '右２', '遊併', '犠打', '犠飛']) {
       expect(find.text(label), findsOneWidget);
     }
     expect(t.takeException(), isNull);
@@ -57,6 +78,16 @@ void main() {
         expect(find.text('.320'), findsOneWidget);
         expect(find.text('リーグ2位'), findsOneWidget);
         expect(find.text('今季成績'), findsNothing);
+        if (!portrait) {
+      final profileGrid = find.byKey(const ValueKey('player-profile-grid'));
+      final statsGrid = find.byKey(const ValueKey('player-season-stats-grid'));
+      expect(t.getSize(profileGrid).width, t.getSize(statsGrid).width);
+      final profileHeader = find.descendant(of: profileGrid, matching: find.byType(Container)).evaluate()
+          .map((e) => e.widget as Container).where((c) => c.constraints?.hasTightWidth == true).first;
+      final statsHeader = find.descendant(of: statsGrid, matching: find.byType(Container)).evaluate()
+          .map((e) => e.widget as Container).where((c) => c.constraints?.hasTightWidth == true).first;
+      expect(profileHeader.constraints!.maxWidth, statsHeader.constraints!.maxWidth);
+        }
         expect(find.text('リーグ1位'), findsOneWidget);
         expect(find.text('リーグ3位'), findsOneWidget);
         expect(find.text('12（リーグ4位）'), findsOneWidget);
@@ -186,19 +217,14 @@ void main() {
       final more = find.byTooltip('直近25試合を表示');
       await t.scrollUntilVisible(more, 200, scrollable: find.byWidgetPredicate((w) => w is Scrollable && w.axisDirection == AxisDirection.down).first);
       await t.pumpAndSettle();
-      expect(find.byType(GameBattingResult), findsNWidgets(25));
-      expect(find.text('vs巨人'), findsNWidgets(25));
+      expect(find.text('直近の試合の出場成績'), findsOneWidget);
+      expect(find.byType(GameBattingResult), findsNWidgets(10));
+      expect(find.text('vs巨人'), findsNWidgets(10));
       final recentGrid = t.widget<Table>(find.byKey(const ValueKey('recent-appearances-rows')));
-      expect(recentGrid.children, hasLength(25));
+      expect(recentGrid.children, hasLength(10));
       final viewport = find.byKey(const ValueKey('recent-appearances-viewport'));
-      expect(t.getSize(viewport).height, 240);
-      final inner = find.descendant(of: find.byKey(const ValueKey('recent-appearances-scroll')),
-        matching: find.byWidgetPredicate((w) => w is Scrollable && w.axisDirection == AxisDirection.down));
-      final position = t.state<ScrollableState>(inner).position;
-      expect(position.maxScrollExtent, 48 * 20);
-      position.jumpTo(position.maxScrollExtent);
-      await t.pump();
-      expect(position.pixels, 48 * 20);
+      expect(t.getSize(viewport).height, 480);
+      expect(find.byKey(const ValueKey('recent-appearances-scroll')), findsNothing);
       expect(recentGrid.children.every((row) => row.children.length == 3), isTrue);
       await t.tap(more);
       await t.pumpAndSettle();

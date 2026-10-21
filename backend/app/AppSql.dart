@@ -1327,12 +1327,23 @@ class AppSql {
   //予想者が予想した選手であるが、個人成績にランクインしていない選手を取得
   static String selectStatsPlayerNoRank() {
     return '''
-      SELECT 
-        t_predict_player.id_user,
+      WITH supplemental_targets AS (
+        SELECT id_user,id_player,id_league,id_stats,year FROM t_predict_player
+        WHERE year=\$1 AND NOT COALESCE(flg_delete,false)
+        UNION
+        SELECT NULL::int,p.id,t.id_league,d.id_stats,\$1::int
+        FROM m_player p JOIN m_team t ON t.id=p.id_team
+        JOIN m_country c ON c.id=p.id_country
+        JOIN m_stats_details d ON d.id_league=t.id_league
+        JOIN m_stats s ON s.id=d.id_stats
+        WHERE t.id_league IN (3,4) AND c.name='日本'
+          AND NOT COALESCE(p.flg_delete,false)
+          AND NOT COALESCE(d.flg_delete,false) AND NOT COALESCE(s.flg_delete,false)
+      )
+      SELECT DISTINCT
         t_predict_player.id_player,
         t_predict_player.id_league,
         t_predict_player.id_stats,
-        m_user.code_color,
         m_player.name_full,
         m_player.url,
         m_team.id AS id_team,
@@ -1342,8 +1353,7 @@ class AppSql {
         m_stats.flg_pitcher,
         m_stats_details.int_idx_col_details,
         m_stats_details.int_idx_row_details
-      FROM t_predict_player
-        LEFT OUTER JOIN m_user ON m_user.id = t_predict_player.id_user
+      FROM supplemental_targets t_predict_player
         LEFT OUTER JOIN m_player ON m_player.id = t_predict_player.id_player
         LEFT OUTER JOIN m_team ON m_team.id = m_player.id_team
         LEFT OUTER JOIN m_stats ON m_stats.id = t_predict_player.id_stats

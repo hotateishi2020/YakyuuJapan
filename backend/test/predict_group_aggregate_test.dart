@@ -37,11 +37,11 @@ void main() {
         {'id_predict_group': 20, 'id_user': 9, 'name_last': '予想者'},
       ],
       'leaders': [
-        {'int_year': 2026, 'id_league': 1, 'id_stats': 5, 'id_player': 100, 'player_name': '一位A', 'color_back': 'navy', 'color_font': 'white'},
-        {'int_year': 2026, 'id_league': 1, 'id_stats': 5, 'id_player': 101, 'player_name': '一位B', 'color_back': 'yellow', 'color_font': 'black'},
+        {'int_year': 2026, 'id_league': 1, 'id_stats': 5, 'id_player': 100, 'player_name': '一位A', 'team_shortest': 'ヤ', 'color_back': 'navy', 'color_font': 'white'},
+        {'int_year': 2026, 'id_league': 1, 'id_stats': 5, 'id_player': 101, 'player_name': '一位B', 'team_shortest': '神', 'color_back': 'yellow', 'color_font': 'black'},
       ],
       'players': [
-        {'int_year': 2026, 'id_predict_setting': 1, 'id_user': 9, 'id_league': 1, 'id_stats': 5, 'id_player': 100, 'player_name': '一位A', 'title': '打率'},
+        {'int_year': 2026, 'id_predict_setting': 1, 'id_user': 9, 'id_league': 1, 'id_stats': 5, 'id_player': 100, 'player_name': '一位A', 'team_shortest': 'ヤ', 'title': '打率'},
         {'int_year': 2026, 'id_predict_setting': 2, 'id_user': 9, 'id_league': 1, 'id_stats': 5, 'id_player': 102, 'player_name': '別選手', 'title': '打率'},
       ],
     });
@@ -51,6 +51,8 @@ void main() {
     expect((groups[1]['users'] as List).single['hits'], 0);
     final current = (groups[0]['players'] as List).single;
     expect(current['current'], '一位A、一位B');
+    expect((current['current_players'] as List).map((p) => p['team_shortest']), ['ヤ', '神']);
+    expect((current['picks'] as List).single['team_shortest'], 'ヤ');
     expect(current['color_backs'], ['navy', 'yellow']);
     expect(current['color_fonts'], ['white', 'black']);
     expect(conn.aggregateSql, contains('p.year IN (2025, 2026)'));

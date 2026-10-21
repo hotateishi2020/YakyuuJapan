@@ -23,7 +23,8 @@
         "rank": 3,
         "wins": 30,
         "losses": 26,
-        "draws": 0
+        "draws": 0,
+        "logo_url": "asset:backend/assets/images/history_tokyo_senators.png"
       },
       {
         "name": "阪急",
@@ -37,14 +38,16 @@
         "rank": 5,
         "wins": 25,
         "losses": 30,
-        "draws": 1
+        "draws": 1,
+        "logo_url": "asset:backend/assets/images/history_nagoya_kinko.png"
       },
       {
         "name": "大東京",
         "rank": 6,
         "wins": 21,
         "losses": 31,
-        "draws": 4
+        "draws": 4,
+        "logo_url": "asset:backend/assets/images/history_daitokyo.png"
       },
       {
         "name": "名古屋",
@@ -93,21 +96,24 @@
         "rank": 4,
         "wins": 23,
         "losses": 25,
-        "draws": 1
+        "draws": 1,
+        "logo_url": "asset:backend/assets/images/history_nagoya_kinko.png"
       },
       {
         "name": "東京セネタース",
         "rank": 5,
         "wins": 20,
         "losses": 27,
-        "draws": 1
+        "draws": 1,
+        "logo_url": "asset:backend/assets/images/history_tokyo_senators.png"
       },
       {
         "name": "ライオン",
         "rank": 6,
         "wins": 19,
         "losses": 29,
-        "draws": 1
+        "draws": 1,
+        "logo_url": "asset:backend/assets/images/history_lion.png"
       },
       {
         "name": "阪急",
@@ -163,14 +169,16 @@
         "rank": 5,
         "wins": 13,
         "losses": 21,
-        "draws": 1
+        "draws": 1,
+        "logo_url": "asset:backend/assets/images/history_tokyo_senators.png"
       },
       {
         "name": "名古屋金鯱",
         "rank": 6,
         "wins": 13,
         "losses": 22,
-        "draws": 0
+        "draws": 0,
+        "logo_url": "asset:backend/assets/images/history_nagoya_kinko.png"
       },
       {
         "name": "名古屋",
@@ -184,7 +192,8 @@
         "rank": 8,
         "wins": 9,
         "losses": 26,
-        "draws": 0
+        "draws": 0,
+        "logo_url": "asset:backend/assets/images/history_lion.png"
       }
     ]
   },
@@ -226,14 +235,16 @@
         "rank": 5,
         "wins": 19,
         "losses": 20,
-        "draws": 1
+        "draws": 1,
+        "logo_url": "asset:backend/assets/images/history_tokyo_senators.png"
       },
       {
         "name": "ライオン",
         "rank": 6,
         "wins": 19,
         "losses": 20,
-        "draws": 1
+        "draws": 1,
+        "logo_url": "asset:backend/assets/images/history_lion.png"
       },
       {
         "name": "イーグルス",
@@ -254,7 +265,8 @@
         "rank": 9,
         "wins": 11,
         "losses": 29,
-        "draws": 0
+        "draws": 0,
+        "logo_url": "asset:backend/assets/images/history_nagoya_kinko.png"
       }
     ]
   }

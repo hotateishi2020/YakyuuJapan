@@ -2,8 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/View/adaptive_section_selector.dart';
 import 'package:Yakyuu_Japan/config/app_design.dart';
+import 'package:Yakyuu_Japan/View/records_board.dart';
 
 void main() {
+  for (final width in [390.0, 1200.0, 1920.0]) {
+    testWidgets('記録の全タブは幅$widthに合わせて表示する', (tester) async {
+      tester.view.physicalSize = Size(width, 800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      var selected = 0;
+      await tester.pumpWidget(MaterialApp(home: Scaffold(body:
+        AdaptiveSectionSelector(
+          fitLabels: true, labels: {for (var i = 0; i < recordTabs.length; i++) i: recordTabs[i]},
+          value: selected, onChanged: (value) => selected = value,
+          background: Colors.red, foreground: Colors.white,
+        ))));
+      expect(find.byType(DropdownButton<int>), width < 1000 ? findsOneWidget : findsNothing);
+      if (width >= 1000) {
+        for (final label in recordTabs) {
+          expect(find.text(label).hitTestable(), findsOneWidget);
+          final text = tester.widget<Text>(find.text(label));
+          expect(text.style!.fontSize, inInclusiveRange(11, 12));
+        }
+        await tester.tap(find.text(recordTabs.last));
+        expect(selected, recordTabs.length - 1);
+      }
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('狭い幅のpickerは丸い形で文字を上下中央に表示し選択を反映する',
       (tester) async {
     var selected = 0;

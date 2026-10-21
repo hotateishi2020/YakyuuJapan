@@ -2,6 +2,11 @@ import 'package:test/test.dart';
 import '../app/CareerEvidence.dart';
 
 void main() {
+  test('リトルシニアをリトルと混同しない', () {
+    expect(careerCategory('調布リトルリーグ'), 'リトル');
+    expect(careerCategory('調布リトルシニア'), 'シニア');
+  });
+
   test('経歴から学校・社会人・独立を抽出し海外プロは除外', () {
     final p = npbCareerEvidence(
         '''<table><tr><th>経歴</th><td>横浜高 - 明治大 - ENEOS - 四国・徳島 - 米マイナー - パドレス</td></tr><tr><th>ドラフト</th><td>2020年ドラフト1位</td></tr></table>''',

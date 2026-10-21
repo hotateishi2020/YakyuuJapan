@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/collapsible_menu.dart';
 import 'package:Yakyuu_Japan/logic/auth_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -48,6 +49,20 @@ final teams = <Map<String, dynamic>>[
   }
 ];
 void main() {
+  test('リトル・シニアは重複と引退選手を除き現役2人以上に限定', () {
+    for (final category in ['リトル', 'シニア']) {
+      Map<String, dynamic> player(String key, String club, {bool active = true}) => {
+        'player_key': key, 'name': key, 'active': active,
+        'career_history': [for (var i = 0; i < 2; i++) {'category': category, 'team': club}],
+      };
+      final result = careerGroups([{'roster': [
+        player('a', '共通'), player('a', '共通'), player('b', '共通'),
+        player('c', '単独'), player('d', '単独', active: false),
+      ]}], category);
+      expect(result.map((g) => g['name']), ['共通']);
+      expect(result.single['players'], hasLength(2));
+    }
+  });
   testWidgets('経歴の各分類で全球団と選択球団を切り替える', (tester) async {
     AuthSession.instance.user = AuthUser.fromJson({'id': 1, 'id_team_fav': 1});
     AuthSession.instance.token = 'test';
@@ -111,7 +126,16 @@ void main() {
       t.view.devicePixelRatio = 1;
       addTearDown(t.view.resetPhysicalSize);
       addTearDown(t.view.resetDevicePixelRatio);
-      await t.pumpWidget(MaterialApp(home: Scaffold(body: StrengthCareers(teams: teams))));
+      await t.pumpWidget(MaterialApp(home: Scaffold(body: MenuScope(child: StrengthCareers(teams: teams)))));
+      await t.pumpAndSettle();
+      expect(t.getTopLeft(find.text('出身地')).dx, lessThan(t.getTopLeft(find.text('リトル')).dx));
+      expect(t.getTopLeft(find.text('▲ メニューを非表示 ▲')).dy, greaterThan(t.getBottomLeft(find.text('独立')).dy));
+      await t.tap(find.text('▲ メニューを非表示 ▲'));
+      await t.pumpAndSettle();
+      expect(find.text('リトル').hitTestable(), findsNothing);
+      await t.tap(find.text('▼ メニュー表示 ▼'));
+      await t.pumpAndSettle();
+      expect(find.text('リトル').hitTestable(), findsOneWidget);
       expect(find.text('甲高校  2人'), findsOneWidget);
       await t.tap(find.text('大学'));
       await t.pumpAndSettle();

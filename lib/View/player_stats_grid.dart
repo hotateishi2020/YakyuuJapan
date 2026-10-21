@@ -3,9 +3,10 @@ import '../tools/color_parse.dart';
 import 'package:flutter/material.dart';
 import 'player_detail_dialog.dart';
 
-const extraBattingTitles = ['ボール球見極め率', '代打起用数', '得点圏打率', 'HR - 盗塁', '盗塁阻止数', '打席数'];
-const extraPitchingTitles = ['BB/9', '四死球/9', '平均投球回', '投球回数', '登板回数'];
+const extraBattingTitles = ['ボール球見極め率', '代打起用数', '得点圏打率', 'HR - 盗塁', '打席数', 'GG受賞回数', '盗塁阻止数'];
+const extraPitchingTitles = ['BB/9', '四死球/9', '平均投球回', '投球回数', '登板回数', 'GG受賞回数'];
 const metricNotes = {
+  'GG受賞回数': '選択年度までのゴールデングラブ賞の通算受賞回数。移籍前の受賞も含む。',
   'ボール球見極め率': 'ストライクゾーン外の投球のうち、スイングしなかった割合（1 − O-Swing%）。投球位置・スイング判定が必要。',
   '代打起用数': '代打として起用された回数。代打打数とは異なり、四死球等も含む。',
   '得点圏打率': '規定打席到達選手のみ。二塁または三塁に走者がいる打席の安打÷打数。',
@@ -89,6 +90,9 @@ class _PlayerStatsGridState extends State<PlayerStatsGrid> {
         if ('${r['title'] ?? ''}'.isNotEmpty && !['盗塁成功率', '代打打率'].contains(r['title'])) '${r['title']}',
       ...(widget.batting ? extraBattingTitles : extraPitchingTitles)
     }.where((title) => widget.showBallSelection || title != 'ボール球見極め率').toList();
+    if (columns.contains('GG受賞回数') && columns.remove('盗塁阻止数')) {
+      columns.insert(columns.indexOf('GG受賞回数') + 1, '盗塁阻止数');
+    }
     final people = <String, Map<String, dynamic>>{};
     final values = <String, Map<String, Map<String, dynamic>>>{};
     for (final r in withHrStealStats(widget.rows)) {
@@ -192,10 +196,9 @@ bool isPredictedStatPlayer(Map<String, dynamic> row) =>
 
 /// Keep the preview at ten rows, replacing the lowest non-predicted players.
 List<Map<String, dynamic>> personalStatPreview(List<Map<String, dynamic>> ranked,
-    {bool showPredictions = true}) {
+    {bool showPredictions = true, bool Function(Map<String, dynamic>)? isHighlighted}) {
   final result = ranked.take(10).toList();
-  if (!showPredictions) return result;
-  final outside = ranked.skip(10).where(isPredictedStatPlayer).toList();
+  final outside = showPredictions ? ranked.skip(10).where(isPredictedStatPlayer).toList() : <Map<String, dynamic>>[];
   var slot = result.length - 1;
   for (final player in outside) {
     while (slot >= 0 && isPredictedStatPlayer(result[slot])) { slot--; }
@@ -205,11 +208,19 @@ List<Map<String, dynamic>> personalStatPreview(List<Map<String, dynamic>> ranked
   // Display retained rows in the same numeric order as the full ranking.
   final positions = {for (var i = 0; i < ranked.length; i++) ranked[i]: i};
   result.sort((a, b) => positions[a]!.compareTo(positions[b]!));
+  final highlighted = isHighlighted == null ? null : ranked.where(isHighlighted).firstOrNull;
+  if (highlighted != null && !result.contains(highlighted)) {
+    if (result.length < 10) {
+      result.add(highlighted);
+    } else {
+      result[result.length - 1] = highlighted;
+    }
+  }
   return result;
 }
 
 /// Qualification changes rank labels, not the numeric ordering of displayed rows.
-void sortPersonalStatRows(List<Map<String, dynamic>> rows) {
+void sortPersonalStatRows(List<Map<String, dynamic>> rows, {bool limitToThirty = true}) {
   rows.sort((a, b) {
     final title = '${a['title']}';
     final av = statNumeric(a), bv = statNumeric(b);
@@ -223,9 +234,18 @@ void sortPersonalStatRows(List<Map<String, dynamic>> rows) {
     return (int.tryParse('${a['int_rank']}') ?? 1000)
         .compareTo(int.tryParse('${b['int_rank']}') ?? 1000);
   });
-  if (rows.length > 30) {
+  if (limitToThirty && rows.length > 30) {
     final predicted = rows.skip(30).where(isPredictedStatPlayer).toList();
     rows.removeRange(30, rows.length);
     rows.addAll(predicted);
   }
+}
+
+/// Japanese MLB players remain available beyond the normal popup cutoff.
+List<Map<String, dynamic>> personalStatRankingDetail(List<Map<String, dynamic>> ranked, {bool includeJapanese = false}) {
+  bool japanese(Map<String, dynamic> row) => ['true', 't', '1'].contains('${row['flg_japan']}'.toLowerCase());
+  final top = (includeJapanese
+      ? ranked.where((row) => int.tryParse('${row['int_rank']}') != 1000)
+      : ranked).take(50).toSet();
+  return ranked.where((row) => top.contains(row) || includeJapanese && japanese(row)).toList();
 }

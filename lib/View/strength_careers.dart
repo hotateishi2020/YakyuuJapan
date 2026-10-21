@@ -1,3 +1,4 @@
+import '../widgets/collapsible_menu.dart';
 import 'player_detail_dialog.dart';
 import '../logic/favorite_team.dart';
 import '../config/org_config.dart';
@@ -10,7 +11,7 @@ import '../tools/color_parse.dart';
 import '../logic/strength_usage.dart';
 import 'strength_research.dart' show showStrengthSource;
 
-const careerCategories = ['高校', '大学', '社会人', '独立', '出身地'];
+const careerCategories = ['出身地', 'リトル', 'シニア', '高校', '大学', '社会人', '独立'];
 
 List<Map<String, dynamic>> careerGroups(
     List<Map<String, dynamic>> teams, String category) {
@@ -73,6 +74,7 @@ List<Map<String, dynamic>> careerGroups(
   }
   return [
     for (final group in groups.values)
+      if (!const ['リトル', 'シニア'].contains(category) || (group['players'] as Map).length >= 2)
       {
         'name': group['name'],
         if (category == '出身地') ...{
@@ -236,10 +238,16 @@ class _StrengthCareersState extends State<StrengthCareers> {
     final visibleTeams = singleTeam
         ? widget.teams.where((t) => '${t['id_team']}' == selectedTeam).toList()
         : widget.teams;
-    final groups = careerGroups(visibleTeams, category);
+    final groups = const ['リトル', 'シニア'].contains(category)
+        ? careerGroups(widget.teams, category).map((group) => {
+            ...group,
+            'players': listMapFromJson(group['players']).where((entry) =>
+              !singleTeam || '${entry['team']['id_team']}' == selectedTeam).toList(),
+          }).where((group) => (group['players'] as List).isNotEmpty).toList()
+        : careerGroups(visibleTeams, category);
     return Column(children: [
       if (!TeamSectionLayout.embedded(context))
-        Row(children: [
+        MenuBand(level: 3, child: Row(children: [
           for (final value in careerCategories)
             Expanded(
                 child: Padding(
@@ -260,7 +268,7 @@ class _StrengthCareersState extends State<StrengthCareers> {
                                             color: category == value
                                                 ? Colors.white
                                                 : Colors.black87)))))))),
-        ]),
+        ])),
       if (!embedded) ...[
         const SizedBox(height: 8),
         SizedBox(
@@ -311,7 +319,7 @@ class _StrengthCareersState extends State<StrengthCareers> {
                   if (groups.isEmpty)
                     const Padding(
                         padding: EdgeInsets.all(24),
-                        child: Text('確認できた所属歴はまだありません。')),
+                        child: Text('表示条件に該当する所属歴はまだありません。')),
                   if (category == '出身地')
                     _birthplaceRegions(groups)
                   else
@@ -323,7 +331,7 @@ class _StrengthCareersState extends State<StrengthCareers> {
                       child: Text(
                           category == '出身地'
                               ? '地域・都道府県別に表示しています。海外は国・州などで分類します。選手を押すと詳細を表示します。'
-                              : '表示中のリーグの現役名簿から、確認できた所属歴を集計。人数の多い順（同数は名称順）。同一チーム内の選手の重複は除きます。未取得の経歴は含みません。選手を押すと詳細を表示します。',
+                              : '${const ['リトル', 'シニア'].contains(category) ? '現役選手が2人以上いる出身チームのみ表示。' : ''}表示中のリーグの現役名簿から、確認できた所属歴を集計。人数の多い順（同数は名称順）。同一チーム内の選手の重複は除きます。未取得の経歴は含みません。選手を押すと詳細を表示します。',
                           style: const TextStyle(
                               fontSize: 11, color: Colors.black54))),
                 ]));

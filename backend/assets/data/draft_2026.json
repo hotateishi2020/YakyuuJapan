@@ -1,6 +1,6 @@
 {
   "year": 2026,
-  "checked_at": "2026-10-15",
+  "checked_at": "2026-10-21",
   "players": [
     {
       "category": "高校生",
@@ -21,7 +21,8 @@
         "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
         "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
         "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
-        "https://smart.asahi.com/v/koshien/stats/summer/y2026.php"
+        "https://smart.asahi.com/v/koshien/stats/summer/y2026.php",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=130s"
       ],
       "date_birth": "2008-06-03",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080002/",
@@ -111,6 +112,18 @@
         }
       ],
       "feature_videos": [
+        {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=130s",
+          "start_seconds": 130,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
         {
           "video_id": "fXdEGgKHzTc",
           "title": "6回裏 横浜の織田翔希が甲子園史上最速156キロ計測！無死満塁で背番号1が立ちはだかる｜日南学園―横浜 6回裏【第108回全国高校野球選手権大会】",
@@ -252,7 +265,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E7%B9%94%E7%94%B0%E7%BF%94%E5%B8%8C+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:54:28.404630Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_video_status": "ok",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
@@ -261,6 +274,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20080002/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=130s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -384,7 +402,8 @@
         "https://www.nikkansports.com/baseball/highschool/news/202607060000296.html",
         "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
         "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
-        "https://smart.asahi.com/v/koshien/stats/spring/y2026.php"
+        "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=270s"
       ],
       "date_birth": "2008-12-21",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080007/",
@@ -532,6 +551,18 @@
       ],
       "feature_videos": [
         {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=270s",
+          "start_seconds": 270,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
+        {
           "video_id": "gAyXTOpy1dA",
           "title": "【仮想ドラフト③】二刀流・菰田陽生(山梨学院高)に密着！最速152㌔＆高校通算39HR！レジェンドたちがその凄さを語る「プロ野球ドラフトちゃんねる」スカイA公式",
           "view_count": 153288,
@@ -662,7 +693,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E8%8F%B0%E7%94%B0%E9%99%BD%E7%94%9F+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:54:28.404630Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_video_status": "ok",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
@@ -671,6 +702,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20080007/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=270s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -1017,7 +1053,8 @@
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8724",
         "https://sp.baseball.findfriends.jp/player/20090004/",
-        "https://www.japan-baseball.jp/jp/team/18u/2026/asianchampionship/player.html"
+        "https://www.japan-baseball.jp/jp/team/18u/2026/asianchampionship/player.html",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=360s"
       ],
       "date_birth": "2009-01-23",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20090004/",
@@ -1132,6 +1169,18 @@
       ],
       "feature_videos": [
         {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=360s",
+          "start_seconds": 360,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
+        {
           "video_id": "iK9uckRl_Sg",
           "title": "【最速156キロ左腕】前田侑大 2026夏富山大会&国際試合 投球ハイライト【2026年ドラフト候補】",
           "view_count": 126772,
@@ -1172,7 +1221,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E5%89%8D%E7%94%B0%E4%BE%91%E5%A4%A7+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:54:28.404630Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_video_status": "ok",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
@@ -1181,6 +1230,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20090004/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=360s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -3073,7 +3127,8 @@
         "https://smart.asahi.com/v/koshien/stats/spring/y2025.php",
         "https://smart.asahi.com/v/koshien/stats/summer/y2025.php",
         "https://smart.asahi.com/v/koshien/stats/spring/y2026.php",
-        "https://smart.asahi.com/v/koshien/stats/summer/y2026.php"
+        "https://smart.asahi.com/v/koshien/stats/summer/y2026.php",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=500s"
       ],
       "date_birth": "2008-06-26",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080013/",
@@ -3163,6 +3218,18 @@
       ],
       "feature_video_status": "ok",
       "feature_videos": [
+        {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=500s",
+          "start_seconds": 500,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
         {
           "video_id": "Kk8n0X8rvXA",
           "title": "【中学日本代表】横浜高校で1年夏に背番号6を背負う男。熊本の天才・池田聖摩",
@@ -3264,7 +3331,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%B1%A0%E7%94%B0%E8%81%96%E6%91%A9+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
         "summary": "U-15では投手として143km/hを投げ、高校では遊撃手。陸上でも実績がある運動能力と肩が特徴で、2年春の選抜優勝を経験している。",
@@ -3272,6 +3339,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20080013/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=500s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -3463,7 +3535,8 @@
         "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
         "https://www.japan-baseball.jp/jp/team/univ/2025/univ_us_japan/player.html",
         "https://www.nikkansports.com/baseball/news/202605230001084.html",
-        "https://smart.asahi.com/v/koshien/stats/spring/y2021.php"
+        "https://smart.asahi.com/v/koshien/stats/spring/y2021.php",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=580s"
       ],
       "date_birth": "2004-05-28",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040035/",
@@ -3572,6 +3645,18 @@
       "feature_video_status": "ok",
       "feature_videos": [
         {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=580s",
+          "start_seconds": 580,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
+        {
           "video_id": "90tWwkzvbcg",
           "title": "【神宮大会注目選手】鈴木泰成（青山学院大・3年）【2026ドラフト候補】",
           "view_count": 91360,
@@ -3642,7 +3727,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E9%88%B4%E6%9C%A8%E6%B3%B0%E6%88%90+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
         "summary": "155km/hの直球にスライダー・カーブ・スプリット・フォークを持つ。青学大のリーグ連覇、大学全国大会優勝を経験し、球威と大舞台の経験が評価材料。",
@@ -3650,6 +3735,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20040035/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=580s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -3673,7 +3763,8 @@
         "https://www.nikkansports.com/baseball/news/202605230001084.html",
         "https://omyutech.com/playerTop.action?playerId=2516327",
         "https://smart.asahi.com/v/koshien/stats/summer/y2021.php",
-        "https://smart.asahi.com/v/koshien/stats/summer/y2022.php"
+        "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1390s"
       ],
       "date_birth": "2004-08-20",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040068/",
@@ -3844,6 +3935,18 @@
       "feature_video_status": "ok",
       "feature_videos": [
         {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1390s",
+          "start_seconds": 1390,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
+        {
           "video_id": "8H1H9Apqx7Q",
           "title": "【ドラ１＆ドラ１候補】中西聖輝＆渡部海 全国の舞台で先輩後輩バッテリー!!! 高校と大学 両方の聖地で躍動！明治神宮野球大会「プロ野球ドラフトちゃんねる」スカイA公式",
           "view_count": 271901,
@@ -3964,7 +4067,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%B8%A1%E9%83%A8%E6%B5%B7+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
         "summary": "高校通算38本塁打の打力を備え、大学1年春から正捕手。複数季のベストナインと2年秋のMVPを獲得。継続して強豪の扇の要を担った実績がある。",
@@ -3972,6 +4075,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20040068/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1390s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -3988,7 +4096,8 @@
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
         "https://sp.baseball.findfriends.jp/player/20040137/",
         "https://www.japan-baseball.jp/jp/team/univ/2025/univ_us_japan/player.html",
-        "https://smart.asahi.com/v/koshien/stats/summer/y2022.php"
+        "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1020s"
       ],
       "date_birth": "2004-07-29",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040137/",
@@ -4058,6 +4167,18 @@
       ],
       "feature_video_status": "ok",
       "feature_videos": [
+        {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1020s",
+          "start_seconds": 1020,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
         {
           "video_id": "rYMSSqBLsOA",
           "title": "【岩瀬jrも】二遊間やプロ注目の147キロ左腕・有馬 伽久など！今年の愛工大名電も投打に逸材",
@@ -4209,7 +4330,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%9C%89%E9%A6%AC%E4%BC%BD%E4%B9%85+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
         "summary": "151km/hの左腕で、ツーシーム・カット・チェンジアップなど球種が豊富。3年春に最優秀投手、日米大学選手権でも優勝を経験した。",
@@ -4217,6 +4338,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20040137/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1020s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -4233,7 +4359,8 @@
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
         "https://sp.baseball.findfriends.jp/player/20040156/",
         "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
-        "https://blog.livedoor.jp/augustoparty/archives/52130270.html"
+        "https://blog.livedoor.jp/augustoparty/archives/52130270.html",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=940s"
       ],
       "date_birth": "2004-10-23",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040156/",
@@ -4311,6 +4438,18 @@
       ],
       "feature_video_status": "ok",
       "feature_videos": [
+        {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=940s",
+          "start_seconds": 940,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
         {
           "video_id": "t2mGPnLWxeM",
           "title": "北海道日本ハムファイターズスカウト会議【ドラフトニュース】亜細亜川尻啓人投手國学院大相手にノーヒットノーラン",
@@ -4412,7 +4551,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E5%B7%9D%E5%B0%BB%E5%95%93%E4%BA%BA+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
         "summary": "156km/hの直球とスプリット、縦のスライダーが武器。大学では救援中心から4年春に先発も経験。高出力に加え、役割を広げられるかが注目点。",
@@ -4420,6 +4559,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20040156/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=940s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -4437,7 +4581,8 @@
         "https://sp.baseball.findfriends.jp/player/20040099/",
         "https://www.japan-baseball.jp/jp/team/18u/2022/worldcup/player.html",
         "https://smart.asahi.com/v/koshien/stats/spring/y2021.php",
-        "https://smart.asahi.com/v/koshien/stats/summer/y2022.php"
+        "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1200s"
       ],
       "date_birth": "2004-04-22",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040099/",
@@ -4521,6 +4666,18 @@
       ],
       "feature_video_status": "ok",
       "feature_videos": [
+        {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1200s",
+          "start_seconds": 1200,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
         {
           "video_id": "8uEmigigiPQ",
           "title": "仲井 慎【リリーフで東都デビュー】駒大1年 下関国際 2023.4.27 駒大vs中大",
@@ -4612,7 +4769,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E4%BB%B2%E4%BA%95%E6%85%8E+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
         "summary": "高校では遊撃手兼投手として甲子園準優勝。大学では投手として早期から登板し、ツーシーム・シンカー・フォークなど多方向に変化させる球を持つ。",
@@ -4620,6 +4777,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20040099/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1200s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -4635,7 +4797,8 @@
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
         "https://sp.baseball.findfriends.jp/player/20040161/",
-        "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html"
+        "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=640s"
       ],
       "date_birth": "2004-06-01",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040161/",
@@ -4751,6 +4914,18 @@
       "feature_video_status": "ok",
       "feature_videos": [
         {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=640s",
+          "start_seconds": 640,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
+        {
           "video_id": "5P0e4i1TiPw",
           "title": "【仮想ドラフト⑤】即戦力間違いなし！関西ドラフト大学生BIG３に密着！有馬伽玖(立命館大)米沢友翔(関西大)宮原廉(近畿大)「プロ野球ドラフトちゃんねる」スカイA公式",
           "view_count": 134491,
@@ -4781,7 +4956,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E7%B1%B3%E6%B2%A2%E5%8F%8B%E7%BF%94+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
         "summary": "大学4年春にリーグ最優秀選手、全日本大学選手権で最高殊勲選手。スライダー・カーブ・チェンジアップ・スプリットを持ち、全国大会で結果を残した左腕。",
@@ -4789,6 +4964,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20040161/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=640s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -5130,7 +5310,8 @@
         "https://sp.baseball.findfriends.jp/player/20040138/",
         "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
         "https://smart.asahi.com/v/koshien/stats/summer/y2021.php",
-        "https://smart.asahi.com/v/koshien/stats/summer/y2022.php"
+        "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=770s"
       ],
       "date_birth": "2004-05-28",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040138/",
@@ -5254,6 +5435,18 @@
       "feature_video_status": "ok",
       "feature_videos": [
         {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=770s",
+          "start_seconds": 770,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
+        {
           "video_id": "qJfObM6FRB8",
           "title": "【早朝5時半】慶應野球部早朝練習に潜入取材！その頃あの人は…VS法政戦へ再始動！#慶応#堀井哲也 #清原正吾 #keio #丸田#吉野#水鳥#清原#本間#横地#林#渡辺憩#渡辺和大#慶應#中塚遥翔",
           "view_count": 76249,
@@ -5354,7 +5547,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%B8%A1%E8%BE%BA%E5%92%8C%E5%A4%A7+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
         "summary": "151km/hとカーブ・チェンジアップなどを持つ左腕。4年春は7勝、防御率1.28でリーグ優勝に貢献。複数季の最優秀防御率が安定感の根拠となる。",
@@ -5362,6 +5555,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20040138/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=770s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -5587,7 +5785,8 @@
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8726",
         "https://sp.baseball.findfriends.jp/player/20040160/",
         "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
-        "https://smart.asahi.com/v/koshien/stats/spring/y2021.php"
+        "https://smart.asahi.com/v/koshien/stats/spring/y2021.php",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1100s"
       ],
       "date_birth": "2004-12-20",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040160/",
@@ -5685,6 +5884,18 @@
       ],
       "feature_video_status": "ok",
       "feature_videos": [
+        {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1100s",
+          "start_seconds": 1100,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
         {
           "video_id": "0aRqck0nULA",
           "title": "最速156km/hの変則右腕！馬場拓海（日本体育大学）",
@@ -5836,7 +6047,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E9%A6%AC%E5%A0%B4%E6%8B%93%E6%B5%B7+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
         "summary": "サイド気味のトルネード投法から151km/h。2025年秋は防御率0.95、39奪三振で最優秀投手。独特の角度と実戦での三振・失点抑止が評価材料。",
@@ -5844,6 +6055,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20040160/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1100s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -6214,7 +6430,8 @@
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
         "https://sp.baseball.findfriends.jp/player/20040030/",
         "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
-        "https://www.japan-baseball.jp/jp/team/univ/2025/univ_us_japan/player.html"
+        "https://www.japan-baseball.jp/jp/team/univ/2025/univ_us_japan/player.html",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1550s"
       ],
       "date_birth": "2004-11-20",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040030/",
@@ -6271,6 +6488,18 @@
       ],
       "feature_video_status": "ok",
       "feature_videos": [
+        {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1550s",
+          "start_seconds": 1550,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
         {
           "video_id": "Pz5TGv9-vDg",
           "title": "谷繁元信氏に「横浜隼人のキャッチャーは面白いね」と言わせたプロ注目の捕手！二塁送球1秒82、遠投105メートルの強肩！横浜隼人 前嶋藍捕手 2022 ドラフト候補",
@@ -6412,7 +6641,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E5%89%8D%E5%B6%8B%E8%97%8D+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
         "summary": "二塁送球1.83秒、遠投110mの肩と中軸を任される打力を持つ捕手。リーダーシップと視野の広さも紹介され、攻守両面が評価対象になる。",
@@ -6420,6 +6649,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20040030/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1550s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -6643,7 +6877,8 @@
         "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
         "https://kansaibig6.jp/mvp/",
         "https://smart.asahi.com/v/koshien/stats/spring/y2022.php",
-        "https://baseball.omyutech.com/CupHomePageHistory.action?gameId=20221152057"
+        "https://baseball.omyutech.com/CupHomePageHistory.action?gameId=20221152057",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1470s"
       ],
       "date_birth": "2004-07-15",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040154/",
@@ -6735,6 +6970,18 @@
       ],
       "feature_video_status": "ok",
       "feature_videos": [
+        {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1470s",
+          "start_seconds": 1470,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
         {
           "video_id": "9mkIkPzkEDg",
           "title": "【どこよりも詳しく&分かりやすく解説】西野啓也(立命館大学)編!!【プロ野球2026ドラフト指名予想】",
@@ -6876,7 +7123,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E8%A5%BF%E9%87%8E%E5%95%93%E4%B9%9F+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
         "summary": "2025年は春秋連続ベストナインの強肩強打の捕手。神宮大会で毛利海大から本塁打、中西聖輝から二塁打を放ち、好投手に長打を打った内容が評価材料。",
@@ -6884,6 +7131,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20040154/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1470s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -6900,7 +7152,8 @@
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
         "https://sp.baseball.findfriends.jp/player/20040148/",
         "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
-        "https://smart.asahi.com/v/koshien/stats/summer/y2021.php"
+        "https://smart.asahi.com/v/koshien/stats/summer/y2021.php",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1630s"
       ],
       "date_birth": "2004-05-07",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040148/",
@@ -6977,6 +7230,18 @@
       ],
       "feature_video_status": "ok",
       "feature_videos": [
+        {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1630s",
+          "start_seconds": 1630,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
         {
           "video_id": "ELcP0L4wgxg",
           "title": "【今年も明治大がすごい！】ドラフト17年連続指名なるか！？明治大・榊原七斗＆岡田啓吾「プロ野球ドラフトちゃんねる」スカイA公式",
@@ -7088,7 +7353,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E5%B2%A1%E7%94%B0%E5%95%93%E5%90%BE+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
         "summary": "代表候補合宿で50m走5.69秒を計測した脚力が特徴。3年秋は正二塁手として打率リーグ5位、ベストナイン。走力だけでなく打撃実績も持つ。",
@@ -7096,6 +7361,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20040148/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1630s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -7311,7 +7581,8 @@
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8727",
         "https://sp.baseball.findfriends.jp/player/20040135/",
         "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
-        "https://www.japan-baseball.jp/jp/team/univ/2025/univ_us_japan/player.html"
+        "https://www.japan-baseball.jp/jp/team/univ/2025/univ_us_japan/player.html",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1810s"
       ],
       "date_birth": "2004-07-15",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040135/",
@@ -7408,6 +7679,18 @@
       "feature_video_status": "ok",
       "feature_videos": [
         {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1810s",
+          "start_seconds": 1810,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
+        {
           "video_id": "5TEtcF-Y8P4",
           "title": "【現役最多本塁打】明治大学／外野手 榊原 七斗（４年）",
           "view_count": 293394,
@@ -7458,7 +7741,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%A6%8A%E5%8E%9F%E4%B8%83%E6%96%97+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
         "summary": "大学1年秋から中堅レギュラー、3年秋は打率.390でベストナイン。高校で投手も経験し、大学代表として国際大会にも出場。打撃実績を持つ中堅候補。",
@@ -7466,6 +7749,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20040135/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1810s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -7485,7 +7773,8 @@
         "https://www.japan-baseball.jp/jp/team/18u/2022/worldcup/player.html",
         "https://column.sp.baseball.findfriends.jp/?id=002-20260824-42&pid=column_detail",
         "https://smart.asahi.com/v/koshien/stats/spring/y2022.php",
-        "https://smart.asahi.com/v/koshien/stats/summer/y2022.php"
+        "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=2000s"
       ],
       "date_birth": "2004-05-26",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040075/",
@@ -7609,6 +7898,18 @@
       "feature_video_status": "ok",
       "feature_videos": [
         {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=2000s",
+          "start_seconds": 2000,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
+        {
           "video_id": "JnJ_2z0ElNM",
           "title": "【どこよりも詳しく&分かりやすく解説】黒田義信(東日本国際大学)編!!【プロ野球2026ドラフト指名予想】",
           "view_count": 15359,
@@ -7679,7 +7980,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E9%BB%92%E7%94%B0%E7%BE%A9%E4%BF%A1+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
         "summary": "大学で首位打者・盗塁王・打点王を獲得し、三塁と外野でベストナイン。打撃と走塁の両方に実績があり、複数ポジションを経験している。",
@@ -7687,6 +7988,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20040075/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=2000s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -7912,7 +8218,8 @@
         "https://sports.yahoo.co.jp/official/detail/2026101400043-spnaviow",
         "https://www.kan6bb.jp/rekidai_bestnine/",
         "https://smart.asahi.com/v/koshien/stats/spring/y2022.php",
-        "https://smart.asahi.com/v/koshien/stats/summer/y2022.php"
+        "https://smart.asahi.com/v/koshien/stats/summer/y2022.php",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1900s"
       ],
       "date_birth": "2004-12-10",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20040146/",
@@ -8021,6 +8328,18 @@
       "feature_video_status": "ok",
       "feature_videos": [
         {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1900s",
+          "start_seconds": 1900,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
+        {
           "video_id": "INkfScDj0Oc",
           "title": "【即戦力大砲候補だとＮＯ.１！？】大阪商業大『春山陽登』が関西六大学リーグ本塁打記録を３４年ぶりに更新し評価急浮上！？大学生ＴＯＰ級スラッガーは大砲候補不作気味の中で、ドラ１に上がってくる可能性も！？",
           "view_count": 48049,
@@ -8091,7 +8410,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%98%A5%E5%B1%B1%E9%99%BD%E7%99%BB+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
         "summary": "大学で複数季にわたりベストナインを獲得し、大学代表でも優勝を経験。継続して結果を残した点が評価材料。打撃の得意球種などは追加確認したい。",
@@ -8099,6 +8418,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20040146/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1900s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -8805,7 +9129,8 @@
       "features": "社会人日本選手権優勝に加え、2026年WBCではブラジル代表。2試合に先発して計8回4安打6奪三振無失点。国際大会での先発内容が評価材料。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
-        "https://sp.baseball.findfriends.jp/player/20030071/"
+        "https://sp.baseball.findfriends.jp/player/20030071/",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=2140s"
       ],
       "date_birth": "2003-10-15",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20030071/",
@@ -8815,6 +9140,18 @@
       "attention_as_of": "2026-10-15",
       "feature_video_status": "ok",
       "feature_videos": [
+        {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=2140s",
+          "start_seconds": 2140,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
         {
           "video_id": "DwIF307Z0n4",
           "title": "【日米注目】WBCブラジル代表・ヤマハ…沢山優介の魔球！チェンジアップ！",
@@ -8936,7 +9273,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%B2%A2%E5%B1%B1%E5%84%AA%E4%BB%8B+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
         "summary": "社会人日本選手権優勝に加え、2026年WBCではブラジル代表。2試合に先発して計8回4安打6奪三振無失点。国際大会での先発内容が評価材料。",
@@ -8944,6 +9281,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20030071/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=2140s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -8958,7 +9300,8 @@
       "features": "社会人1年目の都市対抗で王子相手に先発し、7回3安打1失点。大学二部から一部、社会人へと経験を積み、全国大会で試合を作った実績がある。",
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
-        "https://sp.baseball.findfriends.jp/player/20020249/"
+        "https://sp.baseball.findfriends.jp/player/20020249/",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=2080s"
       ],
       "date_birth": "2002-05-09",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20020249/",
@@ -8998,6 +9341,18 @@
       ],
       "feature_video_status": "ok",
       "feature_videos": [
+        {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=2080s",
+          "start_seconds": 2080,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
         {
           "video_id": "qPsk18tKyOQ",
           "title": "【休部発表のパナソニックから指名なるか！？】社会人屈指の本格派右腕・柿本晟弥「プロ野球ドラフトちゃんねる」スカイA公式",
@@ -9109,7 +9464,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%9F%BF%E6%9C%AC%E6%99%9F%E5%BC%A5+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
         "summary": "社会人1年目の都市対抗で王子相手に先発し、7回3安打1失点。大学二部から一部、社会人へと経験を積み、全国大会で試合を作った実績がある。",
@@ -9117,6 +9472,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20020249/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=2080s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -9740,7 +10100,8 @@
       "sources": [
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
         "https://sp.baseball.findfriends.jp/player/20020174/",
-        "https://www.jaba.or.jp/bbs/detail/?id=26185"
+        "https://www.jaba.or.jp/bbs/detail/?id=26185",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=2230s"
       ],
       "date_birth": "2002-06-04",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20020174/",
@@ -9858,6 +10219,18 @@
       "feature_video_status": "ok",
       "feature_videos": [
         {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=2230s",
+          "start_seconds": 2230,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
+        {
           "video_id": "vvl-j_E-__0",
           "title": "【2026年ドラフト候補】藤澤 涼介（東京ガス）選手のプレー集",
           "view_count": 94030,
@@ -9888,7 +10261,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E8%97%A4%E6%BE%A4%E6%B6%BC%E4%BB%8B+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
         "summary": "長打力と脚力を持つ大型野手。大学では最多打点・ベストナインを獲得し、横浜スタジアムで看板直撃の本塁打。内野経験を持ち、外野でも評価対象となる。",
@@ -9896,6 +10269,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20020174/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=2230s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -9912,7 +10290,8 @@
         "https://dir.sp.baseball.findfriends.jp/yakyumatome/detail.html?no=8728",
         "https://sp.baseball.findfriends.jp/player/20020196/",
         "https://www.jaba.or.jp/news/detail/?id=24793",
-        "https://www.sponichi.co.jp/baseball/news/2025/12/30/kiji/20251229s00001002334000c.html"
+        "https://www.sponichi.co.jp/baseball/news/2025/12/30/kiji/20251229s00001002334000c.html",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=2320s"
       ],
       "date_birth": "2002-04-04",
       "birth_source_url": "https://sp.baseball.findfriends.jp/player/20020196/",
@@ -9967,6 +10346,18 @@
       ],
       "feature_video_status": "ok",
       "feature_videos": [
+        {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=2320s",
+          "start_seconds": 2320,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        },
         {
           "video_id": "-kef8aQ9aSU",
           "title": "新庄剛志クラスの爆肩！プロ11球団が注目…社会人No.1外野手「柴崎聖人」",
@@ -10058,7 +10449,7 @@
           "search_url": "https://www.youtube.com/results?search_query=%E6%9F%B4%E5%B4%8E%E8%81%96%E4%BA%BA+%E9%87%8E%E7%90%83&sp=CAMSAhAB&hl=ja"
         }
       ],
-      "feature_video_checked_at": "2026-10-18T20:57:58.610345Z",
+      "feature_video_checked_at": "2026-10-21",
       "feature_evaluation": {
         "checked_at": "2026-10-21",
         "summary": "大学通算100安打、外野ベストナイン3回。社会人1年目も都市対抗で2試合連続本塁打、若獅子賞と社会人ベストナイン。打撃が次の段階でも結果につながった。",
@@ -10066,6 +10457,11 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20020196/"
         ]
+      },
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=2320s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     },
     {
@@ -12139,6 +12535,384 @@
         "sources": [
           "https://musashibears.com/player/ohshiro-ryoma"
         ]
+      }
+    },
+    {
+      "name": "平田玲翔",
+      "category": "高校生",
+      "team": "大分商業高校",
+      "position": "投手",
+      "height": 188,
+      "weight": 80,
+      "hand": "右投右打",
+      "date_birth": "2008-07-05",
+      "birth_source_url": "https://sp.baseball.findfriends.jp/player/20080037/",
+      "achievement": "大分商業高校",
+      "features": "最速152km/hの長身右腕。高いリリースからの直球が特徴。2026年夏の甲子園では救援登板し、150km/h台を記録。",
+      "sources": [
+        "https://sp.baseball.findfriends.jp/player/20080037/",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=430s"
+      ],
+      "predictions": [],
+      "attention_grade": "D",
+      "attention_reason": "紹介動画で2026年の注目候補として掲載。確認できた実績から指名候補として評価（アプリ独自）。指名順位・獲得球団の予想根拠は未確認。",
+      "attention_source": "https://www.youtube.com/watch?v=tjC8fvX94Fw",
+      "attention_as_of": "2026-10-21",
+      "career_facts": [],
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "最速152km/hの長身右腕。高いリリースからの直球が特徴。2026年夏の甲子園では救援登板し、150km/h台を記録。",
+        "sources": [
+          "https://sp.baseball.findfriends.jp/player/20080037/",
+          "https://www.youtube.com/watch?v=tjC8fvX94Fw"
+        ]
+      },
+      "feature_videos": [
+        {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=430s",
+          "start_seconds": 430,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        }
+      ],
+      "feature_video_checked_at": "2026-10-21",
+      "feature_video_status": "ok",
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=430s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      }
+    },
+    {
+      "name": "宮原廉",
+      "category": "大学生",
+      "team": "近畿大学",
+      "position": "投手",
+      "height": 182,
+      "weight": 88,
+      "hand": "右投右打",
+      "date_birth": "2005-01-24",
+      "birth_source_url": "https://kindaipicks.com/article/003421",
+      "achievement": "崇徳高校 → 近畿大学",
+      "features": "最速156km/hの直球と長いイニングを投げるスタミナが持ち味。2026年春のリーグ戦で4勝を挙げ、大学日本代表にも選出。",
+      "sources": [
+        "https://kindaipicks.com/article/003421",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw",
+        "https://sp.baseball.findfriends.jp/player/20050109/",
+        "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=710s"
+      ],
+      "predictions": [],
+      "attention_grade": "D",
+      "attention_reason": "紹介動画で2026年の注目候補として掲載。確認できた実績から指名候補として評価（アプリ独自）。指名順位・獲得球団の予想根拠は未確認。",
+      "attention_source": "https://www.youtube.com/watch?v=tjC8fvX94Fw",
+      "attention_as_of": "2026-10-21",
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "year": 2026,
+          "label": "2026年大学日本代表（WCBC）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+          "checked_at": "2026-10-21"
+        }
+      ],
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "最速156km/hの直球と長いイニングを投げるスタミナが持ち味。2026年春のリーグ戦で4勝を挙げ、大学日本代表にも選出。",
+        "sources": [
+          "https://kindaipicks.com/article/003421",
+          "https://www.youtube.com/watch?v=tjC8fvX94Fw",
+          "https://sp.baseball.findfriends.jp/player/20050109/",
+          "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html"
+        ]
+      },
+      "feature_videos": [
+        {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=710s",
+          "start_seconds": 710,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        }
+      ],
+      "feature_video_checked_at": "2026-10-21",
+      "feature_video_status": "ok",
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=710s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      }
+    },
+    {
+      "name": "角田楓斗",
+      "category": "大学生",
+      "team": "富士大学",
+      "position": "投手",
+      "height": 178,
+      "weight": 83,
+      "hand": "右投左打",
+      "date_birth": "2004-09-23",
+      "birth_source_url": "https://www.hb-nippon.com/players/28096",
+      "achievement": "東奥義塾高校 → 富士大学",
+      "features": "最速153km/hの右腕。150km/h前後の直球と奪三振能力が特徴。大学日本代表ではリリーフとして国際大会優勝に貢献。",
+      "sources": [
+        "https://www.hb-nippon.com/players/28096",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw",
+        "https://www.japan-baseball.jp/jp/profile/202604004.html",
+        "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=820s"
+      ],
+      "predictions": [],
+      "attention_grade": "D",
+      "attention_reason": "紹介動画で2026年の注目候補として掲載。確認できた実績から指名候補として評価（アプリ独自）。指名順位・獲得球団の予想根拠は未確認。",
+      "attention_source": "https://www.youtube.com/watch?v=tjC8fvX94Fw",
+      "attention_as_of": "2026-10-21",
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "year": 2026,
+          "label": "2026年大学日本代表（WCBC）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+          "checked_at": "2026-10-21"
+        }
+      ],
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "最速153km/hの右腕。150km/h前後の直球と奪三振能力が特徴。大学日本代表ではリリーフとして国際大会優勝に貢献。",
+        "sources": [
+          "https://www.hb-nippon.com/players/28096",
+          "https://www.youtube.com/watch?v=tjC8fvX94Fw",
+          "https://www.japan-baseball.jp/jp/profile/202604004.html",
+          "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html"
+        ]
+      },
+      "feature_videos": [
+        {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=820s",
+          "start_seconds": 820,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        }
+      ],
+      "feature_video_checked_at": "2026-10-21",
+      "feature_video_status": "ok",
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=820s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      }
+    },
+    {
+      "name": "星野世那",
+      "category": "大学生",
+      "team": "大阪商業大学",
+      "position": "投手",
+      "height": 179,
+      "weight": 78,
+      "hand": "左投左打",
+      "date_birth": "2004-06-14",
+      "birth_source_url": "https://baseball.yahoo.co.jp/npb/draft/players/467/hoshino_sena",
+      "achievement": "近江高校 → 大阪商業大学",
+      "features": "最速149km/hの左腕。速度と変化の異なる2種類のチェンジアップを使い分ける。高校時代の控え投手から大学で成長し、日本代表に選出。",
+      "sources": [
+        "https://baseball.yahoo.co.jp/npb/draft/players/467/hoshino_sena",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw",
+        "https://www.japan-baseball.jp/jp/profile/202604005.html",
+        "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=880s"
+      ],
+      "predictions": [],
+      "attention_grade": "D",
+      "attention_reason": "紹介動画で2026年の注目候補として掲載。確認できた実績から指名候補として評価（アプリ独自）。指名順位・獲得球団の予想根拠は未確認。",
+      "attention_source": "https://www.youtube.com/watch?v=tjC8fvX94Fw",
+      "attention_as_of": "2026-10-21",
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "year": 2026,
+          "label": "2026年大学日本代表（WCBC）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+          "checked_at": "2026-10-21"
+        }
+      ],
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "最速149km/hの左腕。速度と変化の異なる2種類のチェンジアップを使い分ける。高校時代の控え投手から大学で成長し、日本代表に選出。",
+        "sources": [
+          "https://baseball.yahoo.co.jp/npb/draft/players/467/hoshino_sena",
+          "https://www.youtube.com/watch?v=tjC8fvX94Fw",
+          "https://www.japan-baseball.jp/jp/profile/202604005.html",
+          "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html"
+        ]
+      },
+      "feature_videos": [
+        {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=880s",
+          "start_seconds": 880,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        }
+      ],
+      "feature_video_checked_at": "2026-10-21",
+      "feature_video_status": "ok",
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=880s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      }
+    },
+    {
+      "name": "猪俣駿太",
+      "category": "大学生",
+      "team": "東北福祉大学",
+      "position": "投手",
+      "height": 185,
+      "weight": 92,
+      "hand": "右投左打",
+      "date_birth": "2004-09-08",
+      "birth_source_url": "https://www.draft-kaigi.jp/university/univ-draftnews/88648/",
+      "achievement": "明秀学園日立高校 → 東北福祉大学",
+      "features": "最速155km/hの大型右腕。2026年春は5勝、防御率1.09。大学日本代表にも選出され、奪三振能力が評価材料。",
+      "sources": [
+        "https://www.draft-kaigi.jp/university/univ-draftnews/88648/",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw",
+        "https://www.japan-baseball.jp/jp/profile/202604007.html",
+        "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1300s"
+      ],
+      "predictions": [],
+      "attention_grade": "D",
+      "attention_reason": "紹介動画で2026年の注目候補として掲載。確認できた実績から指名候補として評価（アプリ独自）。指名順位・獲得球団の予想根拠は未確認。",
+      "attention_source": "https://www.youtube.com/watch?v=tjC8fvX94Fw",
+      "attention_as_of": "2026-10-21",
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "year": 2026,
+          "label": "2026年大学日本代表（WCBC）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+          "checked_at": "2026-10-21"
+        }
+      ],
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "最速155km/hの大型右腕。2026年春は5勝、防御率1.09。大学日本代表にも選出され、奪三振能力が評価材料。",
+        "sources": [
+          "https://www.draft-kaigi.jp/university/univ-draftnews/88648/",
+          "https://www.youtube.com/watch?v=tjC8fvX94Fw",
+          "https://www.japan-baseball.jp/jp/profile/202604007.html",
+          "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html"
+        ]
+      },
+      "feature_videos": [
+        {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1300s",
+          "start_seconds": 1300,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        }
+      ],
+      "feature_video_checked_at": "2026-10-21",
+      "feature_video_status": "ok",
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1300s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      }
+    },
+    {
+      "name": "山里宝",
+      "category": "大学生",
+      "team": "亜細亜大学",
+      "position": "内野手（遊撃手）",
+      "height": 174,
+      "weight": 78,
+      "hand": "右投左打",
+      "date_birth": "2004-10-23",
+      "birth_source_url": "https://web.playerapp.tokyo/athlete/45160",
+      "achievement": "神戸国際大学附属高校 → 亜細亜大学",
+      "features": "遠投115mの肩を持つ遊撃手。2026年WCBCでは6試合に遊撃手として先発。長打も持ち味で、捕手の練習経験もある。",
+      "sources": [
+        "https://web.playerapp.tokyo/athlete/45160",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw",
+        "https://www.japan-baseball.jp/jp/profile/202604015.html",
+        "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+        "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1710s"
+      ],
+      "predictions": [],
+      "attention_grade": "D",
+      "attention_reason": "紹介動画で2026年の注目候補として掲載。確認できた実績から指名候補として評価（アプリ独自）。指名順位・獲得球団の予想根拠は未確認。",
+      "attention_source": "https://www.youtube.com/watch?v=tjC8fvX94Fw",
+      "attention_as_of": "2026-10-21",
+      "career_facts": [
+        {
+          "kind": "national_team",
+          "year": 2026,
+          "label": "2026年大学日本代表（WCBC）",
+          "source": "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html",
+          "checked_at": "2026-10-21"
+        }
+      ],
+      "feature_evaluation": {
+        "checked_at": "2026-10-21",
+        "summary": "遠投115mの肩を持つ遊撃手。2026年WCBCでは6試合に遊撃手として先発。長打も持ち味で、捕手の練習経験もある。",
+        "sources": [
+          "https://web.playerapp.tokyo/athlete/45160",
+          "https://www.youtube.com/watch?v=tjC8fvX94Fw",
+          "https://www.japan-baseball.jp/jp/profile/202604015.html",
+          "https://www.japan-baseball.jp/jp/team/univ/2026/wcbc/player.html"
+        ]
+      },
+      "feature_videos": [
+        {
+          "video_id": "tjC8fvX94Fw",
+          "title": "知っておきたい2026年ドラフト注目選手28人を紹介！",
+          "publisher": "キッタプロ野球研究所",
+          "view_count": 397615,
+          "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1710s",
+          "start_seconds": 1710,
+          "thumbnail_url": "https://i.ytimg.com/vi/tjC8fvX94Fw/hqdefault.jpg",
+          "checked_at": "2026-10-21",
+          "is_short": false,
+          "is_reference": true
+        }
+      ],
+      "feature_video_checked_at": "2026-10-21",
+      "feature_video_status": "ok",
+      "video_profile_source": {
+        "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1710s",
+        "checked_at": "2026-10-21",
+        "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
       }
     }
   ],

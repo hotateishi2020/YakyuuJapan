@@ -1,3 +1,4 @@
+import '../widgets/collapsible_menu.dart';
 import 'high_school_records_board.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -11,9 +12,9 @@ class OtherBaseballBoard extends StatelessWidget {
   Widget build(BuildContext context) => DefaultTabController(
       length: 2,
       child: Column(children: [
-        const TabBar(
+        const MenuBand(level: 1, child: TabBar(
             labelColor: Colors.black,
-            tabs: [Tab(text: '高校野球'), Tab(text: '国際シリーズ')]),
+            tabs: [Tab(text: '高校野球'), Tab(text: '国際シリーズ')])),
         Expanded(
             child: TabBarView(children: [
           HighSchoolBoard(year: year),
@@ -30,7 +31,7 @@ class HighSchoolBoard extends StatelessWidget {
       length: 4,
       initialIndex: 1,
       child: Column(children: [
-        const TabBar(
+        const MenuBand(level: 2, child: TabBar(
             labelColor: Colors.black,
             isScrollable: true,
             tabAlignment: TabAlignment.start,
@@ -39,7 +40,7 @@ class HighSchoolBoard extends StatelessWidget {
               Tab(text: 'ブロック大会'),
               Tab(text: '地区大会'),
               Tab(text: '記録')
-            ]),
+            ])),
         Expanded(
             child: TabBarView(children: [
           HighSchoolRecordsBoard(
@@ -48,13 +49,13 @@ class HighSchoolBoard extends StatelessWidget {
               length: highSchoolBlocks.length,
               initialIndex: 9,
               child: Column(children: [
-                TabBar(
+                MenuBand(level: 3, child: TabBar(
                     labelColor: Colors.black,
                     isScrollable: true,
                     tabAlignment: TabAlignment.start,
                     tabs: [
                       for (final region in highSchoolBlocks) Tab(text: region)
-                    ]),
+                    ])),
                 Expanded(
                     child: TabBarView(children: [
                   for (final region in highSchoolBlocks)

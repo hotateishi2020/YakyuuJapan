@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:Yakyuu_Japan/widgets/collapsible_menu.dart';
+import 'package:Yakyuu_Japan/config/app_design.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -24,9 +26,9 @@ void main() {
       'contracts':[{'player_key':'npb:$i','salary_history':[{'year':2026,'amount':10000000,'currency':'JPY'}]}],
     }];
     await http.runWithClient(() async {
-      await t.pumpWidget(MaterialApp(home: Scaffold(body: TeamStrengthBoard(
+      await t.pumpWidget(MaterialApp(home: Scaffold(body: MenuScope(child: TeamStrengthBoard(
         org: OrgConfig.npb, year: 2026, initialView:4, favoriteTeamId:2, providedTeams:teams,
-      ))));
+      )))));
       await t.pumpAndSettle();
       expect(find.byKey(const ValueKey('strength-comparison-false')), findsNothing);
       expect(find.byKey(const ValueKey('strength-team-2')), findsNothing);
@@ -34,6 +36,20 @@ void main() {
       await t.tap(find.byKey(const ValueKey('strength-view-8')));
       await t.pumpAndSettle();
       final hub = find.byType(ClubHubBoard);
+      final sectionTab = find.byKey(const ValueKey('team-section-segment-6'));
+      final teamTab = find.byKey(const ValueKey('team-tab-segment-2'));
+      final toggle = find.byKey(const ValueKey('menu-visibility-toggle'));
+      expect(toggle, findsOneWidget);
+      expect(t.getSize(sectionTab).height, TAB_BAR_H);
+      expect(t.getSize(teamTab).height, TAB_BAR_H);
+      expect(t.getTopLeft(toggle).dy, greaterThan(t.getBottomLeft(sectionTab).dy));
+      await t.tap(toggle);
+      await t.pumpAndSettle();
+      expect(sectionTab.hitTestable(), findsNothing);
+      expect(teamTab.hitTestable(), findsNothing);
+      await t.tap(toggle);
+      await t.pumpAndSettle();
+      expect(sectionTab.hitTestable(), findsOneWidget);
       await t.tap(find.byKey(const ValueKey('team-section-segment-6')));
       await t.pumpAndSettle();
       final contracts = find.descendant(of:hub, matching:find.byType(StrengthContracts));
@@ -43,6 +59,10 @@ void main() {
       await t.tap(find.byKey(const ValueKey('team-tab-segment-2')));
       await t.pumpAndSettle();
       expect(t.widget<StrengthContracts>(contracts).team['id_team'], 2);
+      final bands = find.descendant(of: hub, matching: find.byType(TeamSalaryShareBands));
+      expect(bands, findsOneWidget);
+      expect(t.widget<TeamSalaryShareBands>(bands).teams.map((team) => team['id_team']), [2]);
+      expect(find.descendant(of: hub, matching: find.byKey(const ValueKey('salary-share-band-2-JPY'))), findsOneWidget);
       expect(t.takeException(), isNull);
       await t.tap(find.byKey(const ValueKey('strength-view-4')));
       await t.pumpAndSettle();

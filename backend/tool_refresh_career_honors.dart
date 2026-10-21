@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:html/parser.dart' as html;
 import 'package:http/http.dart' as http;
 import 'app/CareerEvidence.dart';
+import 'app/YouthCareers.dart';
 import 'app/PlayerAchievements.dart';
 import 'app/StrengthUsage.dart';
 import 'tools/Postgres.dart';
@@ -323,6 +324,7 @@ Future<void> main(List<String> args) async {
       final badges = {
         for (final b in [...usageMaps(p['additional_achievements']), ...usageMaps(update['additional_achievements'])]) '${b['id']}': b
       };
+      update['career_history'] = withYouthCareers(p, [...usageMaps(p['career_history']).where((c) => ['リトル', 'シニア'].contains(c['category'])), ...usageMaps(update['career_history'] ?? p['career_history'])]);
       update['additional_achievements'] = badges.values.toList();
       update['career_honors_checked_at'] = DateTime.now().toIso8601String();
       payloads.add({'key': key, 'payload': update});

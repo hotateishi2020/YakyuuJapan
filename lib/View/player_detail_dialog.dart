@@ -1,3 +1,5 @@
+import '../logic/home_run_video.dart';
+import '../tools/open_home_run_link.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -60,6 +62,7 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
   Map<String, dynamic> data = {};
   bool loading = true;
   String? error;
+  final Map<String, Uri> _homeRunLinks = {};
   @override
   void initState() {
     super.initState();
@@ -77,7 +80,10 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
       final r = await http.get(Env.api('/player-detail').replace(queryParameters: q)).timeout(const Duration(seconds: 15));
       if (r.statusCode != 200) throw Exception('HTTP ${r.statusCode}');
       final d = jsonDecode(utf8.decode(r.bodyBytes));
-      if (mounted) setState(() => data = Map<String, dynamic>.from(d));
+      if (mounted) {
+        setState(() => data = Map<String, dynamic>.from(d));
+        prepareHomeRunVideos();
+      }
     } catch (_) {
       if (mounted) setState(() => error = '選手情報を取得できませんでした。');
     } finally {
@@ -89,15 +95,20 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
   Widget heading(String s) => Padding(padding: const EdgeInsets.only(top: 20, bottom: 8), child: Text(s, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)));
   String hand(dynamic v) => switch ('$v') { '0' => '右', '1' => '左', '2' => '両', _ => '未確認' };
 
-  Widget facts(Map<String, dynamic> values, {Key? key, bool stretch = false}) {
-    final style = DefaultTextStyle.of(context).style.copyWith(fontWeight: FontWeight.bold, fontSize: stretch ? 14 : null);
+  double factsHeaderWidth(Iterable<String> labels) {
+    final style = DefaultTextStyle.of(context).style.copyWith(fontWeight: FontWeight.bold, fontSize: 14);
     var headerWidth = 110.0;
-    for (final label in values.keys) {
+    for (final label in labels) {
       final painter = TextPainter(text: TextSpan(text: label, style: style),
         textDirection: Directionality.of(context), textScaler: MediaQuery.textScalerOf(context))..layout();
       if (painter.width + 20 > headerWidth) headerWidth = painter.width + 20;
       painter.dispose();
     }
+    return headerWidth;
+  }
+
+  Widget facts(Map<String, dynamic> values, {Key? key, bool stretch = false, double? labelWidth}) {
+    final headerWidth = labelWidth ?? factsHeaderWidth(values.keys);
     if (stretch) {
       return Column(key: key ?? const ValueKey('player-profile-grid'),
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -121,7 +132,7 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
       border: TableBorder.all(color: Colors.black12),
       defaultVerticalAlignment: TableCellVerticalAlignment.middle,
       children: [
-        for (final e in values.entries) TableRow(children: [TableCell(verticalAlignment: TableCellVerticalAlignment.fill, child: Container(color: const Color(0xffeceff1), padding: const EdgeInsets.all(8), alignment: Alignment.centerLeft, child: Text(e.key, softWrap: false, style: const TextStyle(fontWeight: FontWeight.bold)))), Padding(padding: const EdgeInsets.all(8), child: e.value is Widget ? e.value as Widget : Text(e.value == null || '${e.value}'.isEmpty ? '未確認' : '${e.value}'))])
+        for (final e in values.entries) TableRow(children: [TableCell(verticalAlignment: TableCellVerticalAlignment.fill, child: Container(color: const Color(0xffeceff1), padding: const EdgeInsets.all(8), alignment: Alignment.centerLeft, child: Text(e.key, softWrap: false, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)))), Padding(padding: const EdgeInsets.all(8), child: e.value is Widget ? e.value as Widget : Text(e.value == null || '${e.value}'.isEmpty ? '未確認' : '${e.value}'))])
       ]);
   }
 
@@ -146,10 +157,11 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
             decoration: BoxDecoration(
               color: rank == 1 ? const Color(0xffffd700) : null,
               image: rank == 1 ? const DecorationImage(
-                image: AssetImage('backend/assets/images/analysis_grade_gold.jpg'), fit: BoxFit.cover) : null,
+                image: AssetImage('backend/assets/images/analysis_grade_gold.jpg'), fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(Color(0x66FFF2B0), BlendMode.screen)) : null,
               gradient: rank == 1 ? null : LinearGradient(
                 begin: Alignment.topLeft, end: Alignment.bottomRight, colors: colors),
-              border: Border.all(color: rank == 1 ? const Color(0xffaa791b) : colors.first),
+              border: Border.all(color: rank == 1 ? const Color(0xffd6aa38) : colors.first),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text('リーグ$rank位', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
@@ -174,6 +186,7 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
       final upper = Map<String, dynamic>.fromEntries(split < 0 ? entries : entries.take(split));
       final lower = Map<String, dynamic>.fromEntries(split < 0 ? [] : entries.skip(split));
       final url = map(data['character_image'])['url'];
+      final sharedHeaderWidth = factsHeaderWidth([...values.keys, ...season.keys]);
       return SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: SizedBox(width: width, child: Column(children: [
@@ -188,11 +201,11 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
                   errorBuilder: (_, __, ___) => const Center(child: Icon(Icons.person_outline, color: Colors.grey))),
               ))]),
             ),
-            Expanded(child: facts(upper, stretch: true)),
-            SizedBox(width: width * .3, child: facts(season, stretch: true,
+            Expanded(child: facts(upper, stretch: true, labelWidth: sharedHeaderWidth)),
+            Expanded(child: facts(season, stretch: true, labelWidth: sharedHeaderWidth,
               key: const ValueKey('player-season-stats-grid'))),
           ])),
-          if (lower.isNotEmpty) facts(lower, key: const ValueKey('player-profile-links-honors')),
+          if (lower.isNotEmpty) facts(lower, labelWidth: sharedHeaderWidth, key: const ValueKey('player-profile-links-honors')),
         ])),
       );
     });
@@ -241,9 +254,9 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
                 child: image(),
               ))]),
             ),
-            Expanded(child: facts(upper)),
+            Expanded(child: facts(upper, labelWidth: factsHeaderWidth(values.keys))),
           ])),
-          if (lower.isNotEmpty) facts(lower, key: const ValueKey('player-profile-links-honors')),
+          if (lower.isNotEmpty) facts(lower, labelWidth: factsHeaderWidth(values.keys), key: const ValueKey('player-profile-links-honors')),
         ]));
     });
   }
@@ -431,11 +444,8 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
         ]),
         SizedBox(
           key: const ValueKey('recent-appearances-viewport'),
-          height: rowHeight * games.length.clamp(0, 5),
-          child: SingleChildScrollView(
-            key: const ValueKey('recent-appearances-scroll'),
-            primary: false,
-            child: Table(
+          height: rowHeight * games.length,
+          child: Table(
               key: const ValueKey('recent-appearances-rows'),
               columnWidths: widths,
               defaultVerticalAlignment: TableCellVerticalAlignment.middle,
@@ -445,15 +455,103 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
                 children: [
                   bodyCell(Text('${entry.$2['datetime_start']}'.split(RegExp('[ T]')).first, style: const TextStyle(fontSize: 12))),
                   bodyCell(Text(recentOpponent(entry.$2), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600))),
-                  bodyCell(GamePlayerAppearance(lines: listMapFromJson(entry.$2['lines']), plays: listMapFromJson(entry.$2['plays']))),
+                  bodyCell(appearanceWithVideo(entry.$2)),
                 ],
               )],
             ),
-          ),
         ),
       ],
     ));
   }
+
+  Future<void> prepareHomeRunVideos() async {
+    final games = listMapFromJson(data['recent_games']).where(hasHomeRun).toList();
+    if (games.isEmpty) return;
+    List<dynamic> channels = [];
+    try {
+      final response = await http.get(Env.api('/videos').replace(queryParameters: {'org': widget.org}))
+          .timeout(const Duration(seconds: 8));
+      if (response.statusCode == 200) {
+        final feed = map(jsonDecode(utf8.decode(response.bodyBytes)));
+        channels = feed['channels'] is List ? feed['channels'] as List : [];
+      }
+    } catch (_) {}
+    // Resolve ahead of the click so browser user activation is preserved.
+    for (final game in games) {
+      if (!mounted) return;
+      final uri = await resolveHomeRunVideo(game, channels);
+      if (mounted && uri != null) setState(() => _homeRunLinks['${game['datetime_start']}'] = uri);
+    }
+  }
+
+  Future<Uri?> resolveHomeRunVideo(Map<String, dynamic> game, List<dynamic> channels) async {
+    final profile = map(data['profile']);
+    final name = '${profile['name_full'] ?? widget.player['name'] ?? ''}';
+    final date =
+        DateTime.tryParse('${game['datetime_start']}'.split(' ').first);
+    if (name.isEmpty || date == null) return null;
+    final pacific =
+        '${profile['id_league'] ?? widget.player['id_league']}' == '2';
+    final cachedId = matchingHomeRunVideo(channels, name, date, pacific: pacific);
+    if (cachedId != null) return Uri.https('www.youtube.com', '/watch', {'v': cachedId});
+    try {
+      final response = await http
+          .get(Env.api('/home-run-video').replace(queryParameters: {
+            'name': name,
+            'date': date.toIso8601String().split('T').first,
+            'opponent': recentOpponent(game),
+            'pacific': pacific ? '1' : '0',
+          }))
+          .timeout(const Duration(seconds: 12));
+      if (response.statusCode == 200) {
+        final result = map(jsonDecode(utf8.decode(response.bodyBytes)));
+        final id = matchingHomeRunVideo(
+            result['channels'] is List ? result['channels'] as List : [],
+            name,
+            date,
+            pacific: pacific);
+        if (id != null) return Uri.https('www.youtube.com', '/watch', {'v': id});
+      }
+    } catch (_) {
+      /* Open a precise search when a unique match cannot be verified. */
+    }
+    final uri = homeRunVideoSearch(
+        name: name,
+        date: date,
+        opponent: recentOpponent(game),
+        pacific: pacific);
+    return uri;
+  }
+
+  Widget appearanceWithVideo(Map<String, dynamic> game) =>
+      Row(mainAxisSize: MainAxisSize.min, children: [
+        Flexible(
+            child: GamePlayerAppearance(
+                lines: listMapFromJson(game['lines']),
+                plays: listMapFromJson(game['plays']))),
+        if (hasHomeRun(game))
+          Padding(
+              padding: const EdgeInsets.only(left: 6),
+              child: Tooltip(
+                  message: _homeRunLinks['${game['datetime_start']}'] == null ? 'ホームラン動画を確認中…' : 'この試合のホームラン動画を開く',
+                  child: Material(
+                      color: const Color(0xffff0000),
+                      borderRadius: BorderRadius.circular(5),
+                      child: InkWell(
+                        key: ValueKey(
+                            'home-run-video-${game['datetime_start']}'),
+                        borderRadius: BorderRadius.circular(5),
+                        onTap: _homeRunLinks['${game['datetime_start']}'] == null ? null : () async {
+                          final opened = await openHomeRunLink(_homeRunLinks['${game['datetime_start']}']!);
+                          if (!opened && mounted) ScaffoldMessenger.maybeOf(context)?.showSnackBar(const SnackBar(content: Text('動画を開けませんでした。')));
+                        },
+                        child: SizedBox(
+                            width: 36, height: 24,
+                            child: _homeRunLinks['${game['datetime_start']}'] == null
+                                ? const Center(child: SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)))
+                                : const Icon(Icons.play_arrow, size: 20, color: Colors.white)),
+                      )))),
+      ]);
 
   Future<void> showRecentBatting(String name, List<Map<String, dynamic>> games) => showDialog<void>(
       context: context,
@@ -541,10 +639,10 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
                                   }, pitching: pitching),
                                   heading('今シーズンの起用'),
                                   usageBands(batting: batting, pitching: pitching),
-                                  Row(children: [Expanded(child: heading('直近25試合の出場成績')),
+                                  Row(children: [Expanded(child: heading('直近の試合の出場成績')),
                                     IconButton(tooltip: '直近25試合を表示', onPressed: () => showRecentBatting(name, games.take(25).toList()), icon: const Icon(Icons.more_horiz))]),
                                   if (games.isEmpty) const Text('取得済みの出場成績がありません。')
-                                  else recentTable(games.take(25).toList()),
+                                  else recentTable(games.take(10).toList()),
                                   history(batting: batting, pitching: pitching),
                                   const SizedBox(height: 20),
 

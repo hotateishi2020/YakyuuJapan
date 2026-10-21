@@ -723,6 +723,49 @@ class HistoricalBaseballImporter {
     }
   }
 
+  /// Import CS and its 2004–2006 Pacific League predecessor independently.
+  Future<PostseasonImportResult> importNpbClimax(int year) async {
+    if (year < 2004) return const PostseasonImportResult(0, 'not_applicable');
+    final games = <HistoricalGame>[];
+    if (year == 2004) {
+      games.addAll(parseNpb2004Playoffs(await _getHtml(Uri.parse(npb2004PlayoffUrl))));
+    }
+    for (final url in year == 2004 ? <String>[] : npbClimaxCalendarUrls(year)) {
+      try {
+        final body = await _getHtml(Uri.parse(url));
+        games.addAll(year == 2004 ? parseNpb2004Playoffs(body) : parseNpbClimaxCalendar(body, expectedYear: year, sourceUrl: url));
+      } on HistoricalHttpException catch (e) {
+        if (e.statusCode != 404) rethrow;
+      }
+    }
+    if (games.isEmpty) return const PostseasonImportResult(0, 'no_data');
+    return PostseasonImportResult(await _loadPostseasonGames(games), 'complete');
+  }
+
+  static const npb2004PlayoffUrl = 'https://www.seibulions.jp/expansion/history/cs/2004game.html';
+
+  static List<HistoricalGame> parseNpb2004Playoffs(String source) {
+    final games = <HistoricalGame>[];
+    for (final table in html_parser.parse(source).querySelectorAll('table.pl_scoreBoad02')) {
+      final match = RegExp(r'2004年(\d+)月(\d+)日.*第([12])ステージ').firstMatch(table.querySelector('.pl_gameInfo')?.text ?? '');
+      if (match == null) continue;
+      final rows = table.querySelectorAll('tbody tr').where((r) => r.querySelector('td.pl_scoreR') != null).toList();
+      if (rows.length != 2) throw StateError('Invalid 2004 playoff score');
+      final date = DateTime(2004, int.parse(match[1]!), int.parse(match[2]!));
+      games.add(HistoricalGame(
+        sourceKey: 'npb', externalId: 'lions-playoff-2004-${match[1]}-${match[2]}',
+        codeGame: match[3] == '1' ? 'CS1' : 'CSF', start: date,
+        homeTeamKey: rows[1].querySelector('th')!.text.replaceAll(RegExp(r'\s+'), ''),
+        awayTeamKey: rows[0].querySelector('th')!.text.replaceAll(RegExp(r'\s+'), ''),
+        scoreHome: int.parse(rows[1].querySelector('td.pl_scoreR')!.text.trim()),
+        scoreAway: int.parse(rows[0].querySelector('td.pl_scoreR')!.text.trim()),
+        state: '試合終了',
+      ));
+    }
+    if (games.length != 8) throw StateError('Incomplete 2004 playoff source');
+    return games;
+  }
+
   static String npbClimaxCalendarUrl(int year) => 'https://npb.jp/bis/$year/calendar/index_10.html';
 
   static List<String> npbClimaxCalendarUrls(int year) => [
@@ -801,7 +844,7 @@ class HistoricalBaseballImporter {
       );
     }
 
-    if (year < 2007 || year == 2020) {
+    if (year < 2004) {
       await _runPostseasonDataset(
         org: 'npb',
         year: year,
@@ -813,7 +856,7 @@ class HistoricalBaseballImporter {
       );
       return;
     }
-    final urls = npbClimaxCalendarUrls(year);
+    final urls = year == 2004 ? [npb2004PlayoffUrl] : npbClimaxCalendarUrls(year);
     await _runPostseasonDataset(
       org: 'npb',
       year: year,
@@ -827,7 +870,7 @@ class HistoricalBaseballImporter {
           for (final url in urls) {
             try {
               final body = await _getHtml(Uri.parse(url));
-              games.addAll(parseNpbClimaxCalendar(body, expectedYear: year, sourceUrl: url));
+              games.addAll(year == 2004 ? parseNpb2004Playoffs(body) : parseNpbClimaxCalendar(body, expectedYear: year, sourceUrl: url));
             } on HistoricalHttpException catch (error) {
               if (error.statusCode != 404) rethrow;
             }
@@ -2038,16 +2081,14 @@ class HistoricalBaseballImporter {
     validateNpbSeason(source, expectedYear);
     final document = html_parser.parse(source);
     final games = <HistoricalGame>[];
-    for (final cell in document.querySelectorAll('.stschedule')) {
-      final container = cell.querySelector('.stvsteam');
-      if (container == null) continue;
+    for (final container in document.querySelectorAll('.stschedule .stvsteam')) {
       String? code;
       for (final child in container.children) {
         final heading = child.text.replaceAll(RegExp(r'\s+'), '');
         if (child.classes.contains('tescheaten')) {
           // 2007-2010 official calendars say 第1S/第2S; later years use
           // ファースト/ファイナル. Japan Series cells are imported separately.
-          code = (heading.contains('ファイナル') || heading.contains('第2S'))
+          code = (heading.contains('ファイナル') || heading.contains('第2S') || (expectedYear == 2020 && heading.contains('クライマックス')))
               ? 'CSF'
               : (heading.contains('ファースト') || heading.contains('第1S'))
                   ? 'CS1'

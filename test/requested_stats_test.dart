@@ -1,9 +1,96 @@
 import 'package:flutter/material.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:Yakyuu_Japan/View/SeasonTable.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/View/player_stats_grid.dart';
 
 void main() {
+  testWidgets('MLBの長い名前は10pxまで縮小し1行で省略する', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: Scaffold(body: Center(
+      child: PlayerStatCell(width: 260, showJapanFlag: true, row: {
+        'name_player': 'クリストフェル・アレクサンダー・サンチェス',
+        'name_team': 'PHI', 'stats': '2.50', 'title': '防御率', 'int_rank': 1,
+      }),
+    ))));
+    final auto = tester.widget<AutoSizeText>(find.byType(AutoSizeText));
+    expect(auto.minFontSize, 10);
+    expect(auto.maxLines, 1);
+    expect(auto.overflow, TextOverflow.ellipsis);
+    final text = tester.widget<Text>(find.descendant(of: find.byType(AutoSizeText), matching: find.byType(Text)).first);
+    expect(text.style!.fontSize! * text.textScaleFactor!, closeTo(10, .01));
+    expect(tester.takeException(), isNull);
+  });
+
+  test('詳細は上位50人に日本人MLB選手を追加し規定未達も成績順に保持する', () {
+    final rows = <Map<String,dynamic>>[for(var i=1;i<=60;i++) {
+      'id_player':i,'title':'本塁打','stats':100-i,'int_rank':i,
+      'flg_japan': i==55,
+    }, {'id_player':99,'title':'本塁打','stats':95.5,'int_rank':1000,'flg_japan':true,'name_player':'対象(65.0%)'}];
+    sortPersonalStatRows(rows,limitToThirty:false);
+    final detail = personalStatRankingDetail(rows,includeJapanese:true);
+    expect(detail,hasLength(52));
+    expect(detail[4]['id_player'],99);
+    expect(detail[4]['name_player'],'対象(65.0%)');
+    expect(detail.last['id_player'],55);
+    expect(detail.any((r)=>r['id_player']==50),isTrue);
+    expect(detail.any((r)=>r['id_player']==60),isFalse);
+    expect(personalStatRankingDetail(rows),hasLength(50));
+  });
+
+  testWidgets('ランキング詳細は50人までを既存サイズのスクロール枠で表示する', (tester) async {
+    final rows = <Map<String,dynamic>>[for(var i=1;i<=60;i++) {
+      'id_player':900000+i,'name_player':'選手$i','title':'最多勝','stats':100-i,'int_rank':i,
+    }];
+    await tester.pumpWidget(MaterialApp(home:Scaffold(body:ScrollLeaguePersonalStats(rows:rows,batting:false))));
+    await tester.tap(find.byTooltip('最多勝の全ランキング'));
+    await tester.pumpAndSettle();
+    final ranking = find.byKey(const ValueKey('personal-stat-ranking-最多勝'));
+    final list = tester.widget<ListView>(ranking);
+    expect(list.childrenDelegate.estimatedChildCount,50);
+    expect((tester.widget<Dialog>(find.byType(Dialog)).child as SizedBox).height!,lessThanOrEqualTo(600*.8));
+    await tester.scrollUntilVisible(find.text('選手50'),500,scrollable:find.descendant(of:ranking,matching:find.byType(Scrollable)));
+    expect(find.text('選手50'),findsOneWidget);
+    expect(find.text('選手51'),findsNothing);
+    expect(tester.takeException(),isNull);
+  });
+
+  test('長押し選手を予想表示の有無にかかわらず最後の枠に入れる', () {
+    final rows = <Map<String,dynamic>>[for (var i=1;i<=40;i++) {
+      'id_player': i, 'title':'奪三振', 'int_rank':i, 'stats':100-i,
+    }];
+    sortPersonalStatRows(rows, limitToThirty: false);
+    for (final predictions in [true,false]) {
+      final shown = personalStatPreview(rows, showPredictions: predictions, isHighlighted: (r) => r['id_player']==35);
+      expect(shown, hasLength(10));
+      expect(shown.last['int_rank'],35);
+      expect(shown.take(9).map((r)=>r['id_player']),List.generate(9,(i)=>i+1));
+    }
+    expect(personalStatPreview(rows).last['int_rank'],10);
+    expect(personalStatPreview(rows,isHighlighted:(r)=>r['id_player']==3).where((r)=>r['id_player']==3),hasLength(1));
+  });
+  testWidgets('長押しで別スタッツの12位を末尾に表示し解除で元に戻す', (tester) async {
+    tester.view.physicalSize = const Size(900,800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final rows = <Map<String,dynamic>>[
+      {'id_player':800012,'name_player':'対象選手','title':'最多勝','stats':20,'int_rank':1},
+      for(var i=1;i<=12;i++) {'id_player':800000+i,'name_player': i==12?'対象選手':'選手$i','title':'奪三振率','stats':20-i,'int_rank':i},
+    ];
+    await tester.pumpWidget(MaterialApp(home:Scaffold(body:ScrollLeaguePersonalStats(rows:rows,batting:false))));
+    final panel = find.byKey(const ValueKey('personal-stat-panel-奪三振率'));
+    List<PlayerStatCell> cells() => tester.widgetList<PlayerStatCell>(find.descendant(of:panel,matching:find.byType(PlayerStatCell))).toList();
+    expect(cells().last.row['int_rank'],10);
+    await tester.longPress(find.text('対象選手'));
+    await tester.pump();
+    expect(cells(),hasLength(10));
+    expect(cells().last.row['int_rank'],12);
+    await tester.longPress(find.text('対象選手').first);
+    await tester.pump();
+    expect(cells().last.row['int_rank'],10);
+    expect(tester.takeException(),isNull);
+  });
+
   test('予想対象外の代打起用数は予想色が残っていても差し替えない', () {
     final rows = <Map<String, dynamic>>[
       for (var i = 1; i <= 35; i++) {

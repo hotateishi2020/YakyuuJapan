@@ -20,9 +20,41 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text('交流1位'), findsOneWidget);
         expect(find.byTooltip('福岡ソフトバンクホークス'), findsWidgets);
-        expect(recordTabs.first, '年表');
+        expect(recordTabs.first, '🗓️年表');
+        for (final title in ['日本\nシリーズ\n進出', 'FINAL\nSTAGE\n敗退', '1st\nSTAGE\n敗退']) {
+          expect(find.text(title), findsOneWidget);
+        }
+        final finalColumn = find.byKey(const ValueKey('timeline-cs_final_winner-2025-1'));
+        final firstColumn = find.byKey(const ValueKey('timeline-cs_final_loser-2025-1'));
+        final lostColumn = find.byKey(const ValueKey('timeline-cs_first_loser-2025-1'));
+        expect(find.descendant(of: finalColumn, matching: find.byTooltip('横浜DeNAベイスターズ')), findsOneWidget);
+        expect(find.descendant(of: firstColumn, matching: find.byTooltip('読売ジャイアンツ')), findsOneWidget);
+        expect(find.descendant(of: lostColumn, matching: find.byTooltip('阪神タイガース')), findsOneWidget);
+        expect(find.descendant(of: finalColumn, matching: find.text('横浜DeNAベイスターズ')), findsNothing);
+        expect(find.descendant(of: firstColumn, matching: find.text('読売ジャイアンツ')), findsNothing);
+        expect(tester.getTopLeft(finalColumn).dx, lessThan(tester.getTopLeft(firstColumn).dx));
+        expect(tester.getTopLeft(firstColumn).dx, lessThan(tester.getTopLeft(lostColumn).dx));
         expect(find.byKey(const ValueKey('interleague-rank-2025-11')), findsOneWidget);
         expect(find.text(width < 600 ? '交11位' : '交流戦11位'), findsNothing);
+        final csToggle = find.byKey(const ValueKey('timeline-show-cs'));
+        final rankX = tester.getTopLeft(find.byKey(const ValueKey('interleague-rank-2025-1'))).dx;
+        await tester.tap(csToggle);
+        await tester.pumpAndSettle();
+        for (final column in [finalColumn, firstColumn, lostColumn]) {
+          expect(column, findsNothing);
+        }
+        for (final title in ['日本\nシリーズ\n進出', 'FINAL\nSTAGE\n敗退', '1st\nSTAGE\n敗退']) {
+          expect(find.text(title), findsNothing);
+        }
+        expect(tester.getTopLeft(find.byKey(const ValueKey('interleague-rank-2025-1'))).dx,
+            lessThan(rankX));
+        await tester.tap(csToggle);
+        await tester.pumpAndSettle();
+        for (final column in [finalColumn, firstColumn, lostColumn]) {
+          expect(column, findsOneWidget);
+        }
+        expect(tester.getTopLeft(find.byKey(const ValueKey('interleague-rank-2025-1'))).dx,
+            closeTo(rankX, .01));
         final rowBefore = tester.getSize(find.byKey(const ValueKey('standings-year-2025'))).height;
         await tester.tap(find.byKey(const ValueKey('timeline-show-events')));
         await tester.pumpAndSettle();
@@ -57,7 +89,7 @@ void main() {
                 .height);
         final cell =
             find.byKey(const ValueKey('timeline-cell-scroll-2025-records'));
-        await tester.ensureVisible(cell);
+        await Scrollable.ensureVisible(tester.element(cell), alignment: .5);
         await tester.pumpAndSettle();
         await tester.drag(cell, const Offset(0, -40));
         await tester.pumpAndSettle();
@@ -75,9 +107,13 @@ void main() {
         expect(tester.getTopLeft(find.text('1位')).dy, headerY);
         outer.position.jumpTo(outer.position.maxScrollExtent);
         await tester.pump();
-        final oldHeader = find.byKey(const ValueKey('timeline-header-2004'));
+        final oldHeader = find.byKey(const ValueKey('timeline-header-2025'));
         expect(oldHeader, findsOneWidget);
-        expect(find.descendant(of: oldHeader, matching: find.text('交流1位')), findsNothing);
+        expect(find.byKey(const ValueKey('interleague-rank-2000-12')), findsOneWidget);
+        final oldRank = find.byKey(const ValueKey('interleague-rank-2000-1'));
+        final interleagueHeaderCell = find.ancestor(of: find.descendant(of: oldHeader, matching: find.text('交流1位')), matching: find.byType(Container)).first;
+        expect(tester.getTopLeft(oldRank).dx, closeTo(tester.getTopLeft(interleagueHeaderCell).dx, .01));
+        expect(find.descendant(of: oldHeader, matching: find.text('交流1位')), findsOneWidget);
         expect(find.descendant(of: oldHeader, matching: find.text('6位')), findsOneWidget);
         expect(tester.takeException(), isNull);
       },
@@ -109,7 +145,13 @@ void main() {
                       {
                         'id_league': 1,
                         'name': 'セ・リーグ',
+                        'cs_final_winner': 3,
+                        'cs_final_loser': 1,
+                        'cs_first_winner': 3,
+                        'cs_first_loser': 2,
                         'teams': [
+                          {'id_team': 3, 'name': '横浜DeNAベイスターズ'},
+                          {'id_team': 2, 'name': '阪神タイガース'},
                           {'id_team': 1, 'name': '読売ジャイアンツ', 'champion': true, 'interleague_rank': 11}
                         ]
                       }
@@ -123,7 +165,7 @@ void main() {
                         'id_league': 1,
                         'name': 'セ・リーグ',
                         'teams': [
-                          {'id_team': 1, 'name': '読売ジャイアンツ'}
+                          {'id_team': 1, 'name': '読売ジャイアンツ'},
                         ]
                       }
                     ]

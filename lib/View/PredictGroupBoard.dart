@@ -580,39 +580,6 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
     return [for (final row in indexed) row.$2];
   }
 
-  Color? _teamPaint(dynamic name) => parseColorNameOrNull('${name ?? ''}');
-
-  Color _mutedTeamColor(Color color) => Color.lerp(color, Colors.white, 0.72)!;
-
-  bool _tiedLeaders(Map<String, dynamic> row) {
-    final current = '${row['current'] ?? ''}'.trim();
-    return current.contains('、');
-  }
-
-  List<Color> _leaderColors(Map<String, dynamic> row) {
-    final raw = row['color_backs'];
-    if (raw is! List) return const [];
-    return [
-      for (final item in raw)
-        if (_teamPaint(item) != null) _mutedTeamColor(_teamPaint(item)!),
-    ];
-  }
-
-  Color? _resultBack(Map<String, dynamic> row) {
-    if (_tiedLeaders(row)) {
-      final colors = _leaderColors(row);
-      if (colors.length == 1) return colors.first;
-      if (colors.isEmpty) return Colors.white;
-      return null;
-    }
-    final color = _teamPaint(row['color_back']);
-    return color == null ? null : _mutedTeamColor(color);
-  }
-
-  Color? _resultFont(Map<String, dynamic> row) {
-    return const Color(0xFF253449);
-  }
-
   Widget _waiverNotice(Map<String, dynamic> group) {
     final waiver = group['waiver'];
     if (waiver is! Map || waiver['active'] != true) return const SizedBox.shrink();
@@ -803,36 +770,28 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
     Color? Function(Map<String, dynamic> row)? titleColor,
   }) {
     const gridLine = Color(0xFF9E9E9E);
-    const headerBackground = Color(0xFFE0E0E0);
+    const headerBackground = Color(0xFF616161);
     Widget cell(
       String text, {
       bool hit = false,
+      List<Map<String, dynamic>> players = const [],
       Color? color,
       Color? background,
-      List<Color>? gradient,
       List<Color?>? nameColors,
       bool names = false,
     }) {
-      final style = TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: hit ? const Color(0xFF315C46) : (color ?? const Color(0xFF334155)), height: 1.2);
-      final paints = gradient ?? const <Color>[];
-      final useGradient = !hit && paints.length >= 2;
-      final fill = hit ? const Color(0xFFE4EFE7) : (background ?? const Color(0xFFFFFFFF));
+      final foreground = background == headerBackground
+          ? (color == null ? Colors.white : Color.lerp(color, Colors.white, .75)!)
+          : color ?? const Color(0xFF334155);
+      final style = TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: foreground, height: 1.2);
+      final fill = hit ? const Color(0xFFFFFF66) : (background ?? const Color(0xFFFFFFFF));
       return TableCell(
         verticalAlignment: TableCellVerticalAlignment.intrinsicHeight,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 9),
           alignment: Alignment.center,
-          color: useGradient ? null : fill,
-          decoration: useGradient
-              ? BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: paints,
-                  ),
-                )
-              : null,
-          child: names ? _fitNames(text, style, colors: nameColors) : Text(text.isEmpty ? '—' : text, textAlign: TextAlign.center, style: style),
+          color: fill,
+          child: players.isNotEmpty ? predictPlayerLabels(players, style) : names ? _fitNames(text, style, colors: nameColors) : Text(text.isEmpty ? '—' : text, textAlign: TextAlign.center, style: style),
         ),
       );
     }
@@ -896,13 +855,12 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
             cell(titleOf(row), color: titleColor?.call(row), background: headerBackground),
             cell(
               centerOf(row),
-              background: _resultBack(row),
-              color: _resultFont(row),
-              gradient: _leaderColors(row),
+              background: headerBackground,
 
               names: true,
+              players: _maps(row['current_players']),
             ),
-            for (final user in users) cell(pickName(row, user), hit: pickHit(row, user), names: true),
+            for (final user in users) cell(pickName(row, user), hit: pickHit(row, user), players: _maps(row['picks']).where((p) => _asInt(p['id_user']) == _asInt(user['id']) && '${p['team_shortest'] ?? ''}'.isNotEmpty).toList(), names: true),
           ]),
       ],
       ),
@@ -945,6 +903,26 @@ Widget _fitLine(String text, TextStyle style) {
     ),
   );
 }
+
+Widget predictPlayerLabels(List<Map<String, dynamic>> players, TextStyle style) => Column(
+  mainAxisSize: MainAxisSize.min,
+  children: [for (final player in players)
+    Padding(padding: const EdgeInsets.symmetric(vertical: 1), child: FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        if ('${player['team_shortest'] ?? ''}'.isNotEmpty) ...[
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            decoration: BoxDecoration(color: parseColorNameOrNull('${player['color_back'] ?? ''}') ?? Colors.blueGrey, borderRadius: BorderRadius.circular(3)),
+            child: Text('${player['team_shortest']}', style: style.copyWith(fontSize: 11, color: parseColorNameOrNull('${player['color_font'] ?? ''}') ?? Colors.white)),
+          ),
+          const SizedBox(width: 4),
+        ],
+        Text('${player['player_name'] ?? player['name'] ?? ''}', style: style),
+      ]),
+    )),
+  ],
+);
 
 Widget _fitNames(String text, TextStyle style, {List<Color?>? colors}) {
   final lines = _nameLines(text);

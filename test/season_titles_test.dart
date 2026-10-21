@@ -21,6 +21,34 @@ class _HighlightLauncher extends UrlLauncherPlatform {
 }
 
 void main() {
+  for (final size in [const Size(390, 844), const Size(1440, 900)]) {
+    testWidgets('MLB titles use league grids at $size', (tester) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(const MaterialApp(home: Scaffold(body: SeasonTitlesGrid(
+        org: OrgConfig.mlb, year: 2026, data: {
+          'season_awards': {'pages': {'test': [
+            {'key': 'league_mvp', 'name': 'AL選手', 'detail': 'アメリカン・リーグ', 'confirmed': true},
+            {'key': 'league_mvp', 'name': 'NL選手', 'detail': 'ナ・リーグ', 'confirmed': true},
+            {'key': 'major', 'name': 'タイトル選手', 'detail': 'ナショナル・リーグ 本塁打王', 'confirmed': true},
+            {'key': 'monthly', 'name': '月間選手', 'detail': 'AL 5月 野手', 'confirmed': true},
+            {'key': 'glove', 'name': '未分類選手', 'detail': '外野手', 'confirmed': true},
+          ]}}
+        },
+      ))));
+      expect(find.byKey(const ValueKey('mlb-titles-grid-league')), findsOneWidget);
+      for (final name in ['AL選手', 'NL選手', 'タイトル選手', '月間選手', '未分類選手']) {
+        expect(find.text(name), findsOneWidget);
+      }
+      expect(find.text('セ'), findsNothing);
+      expect(find.text('沢村栄治賞'), findsNothing);
+      expect(find.text('ワールドシリーズ'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('サヨナラ賞の再生ボタンで登録済みの該当動画を開く', (tester) async {
     final previous = UrlLauncherPlatform.instance;
     final launcher = _HighlightLauncher();

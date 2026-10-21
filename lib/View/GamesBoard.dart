@@ -749,6 +749,14 @@ Map<String, String> _todaysOrgStates(List<Map<String, dynamic>> games, String to
   return states;
 }
 
+/// 当日の対象団体に進行中の試合があるか。終了・中止は点滅対象外。
+bool orgGamesInProgress(List<Map<String, dynamic>> games, String today, Set<int> leagueIds) {
+  return _todaysOrgStates(games, today, leagueIds).values.any((state) {
+    if (RegExp('試合終了|コールド|中止|延期|サスペンデッド').hasMatch(state)) return false;
+    return state.contains('試合中') || RegExp(r'[0-9０-９]+\s*回').hasMatch(state);
+  });
+}
+
 /// 当日の対象リーグ全試合が「試合終了」または「試合中止」。試合が1件もない日は false。
 bool orgGamesAreSettled(List<Map<String, dynamic>> games, String today, Set<int> leagueIds) {
   final states = _todaysOrgStates(games, today, leagueIds);
@@ -5474,27 +5482,34 @@ class _TableGameCard extends StatelessWidget {
   }
 
   String _compactPlay(String label, String kind, String direction) {
-    var stripped = label.replaceAll(RegExp(r'先制|同点|逆転|勝ち越し|サヨナラ|決勝'), '');
+    final text = _compactStatLabel(label).replaceAll(RegExp(r'先制|同点|逆転|勝ち越し|サヨナラ|決勝'), '');
+    // Both the game board and recent appearances use this two-character form.
+    // Resolve non-directional outcomes before looking for 三/二 (strikeouts/doubles).
+    if (RegExp(r'振逃|振り逃げ').hasMatch(text)) return '振逃';
+    if (text.contains('三振')) return '三振';
+    if (kind == 'walk' || RegExp(r'四球|敬遠|故意四').hasMatch(text)) return '四球';
+    if (kind == 'dead' || text.contains('死球')) return '死球';
+    if (RegExp(r'打撃妨害|打妨').hasMatch(text)) return '打妨';
+    if (kind == 'sacbunt' || RegExp(r'犠打|犠$|バント').hasMatch(text)) return '犠打';
+    if (kind == 'sacfly' || text.contains('犠飛')) return '犠飛';
     var dir = direction;
     if (dir.isEmpty) {
-      final lead = RegExp(r'[左中右遊一二三投捕]').firstMatch(stripped);
-      if (lead != null) dir = lead.group(0)!;
+      final candidate = RegExp(r'^[左中右遊一二三投捕]').firstMatch(text)?.group(0);
+      if (candidate != null && !RegExp(r'^[二三]塁打').hasMatch(text)) dir = candidate;
     }
-    if (kind == 'hr') return dir.isEmpty ? '本' : '$dir本';
-    if (kind == 'timely') {
-      final hit = stripped.contains('スリーベース')
-          ? '３'
-          : stripped.contains('ツーベース')
-              ? '２'
-              : '安';
-      return dir.isEmpty ? hit : '$dir$hit';
-    }
-    stripped = stripped.replaceAll('ヒット', '安').replaceAll('タイムリー', '安');
-    var result = _fullwidthHitDigits(stripped.replaceAll('打撃妨害', '打妨').replaceAll('野選', '選').replaceAll('邪飛', '邪').replaceAll('ポップ', '邪').replaceAll('ゴロ', 'ゴ').replaceAll('フライ', '飛').replaceAll('ライナー', '直').replaceAll('併殺', '併'));
-    if (dir.isNotEmpty && !result.contains(dir)) {
-      result = '$dir$result';
-    }
-    return result;
+    String directed(String suffix, String fallback) => dir.isEmpty ? fallback : '$dir$suffix';
+    if (kind == 'hr' || RegExp(r'ホームラン|本塁打|本$|HR', caseSensitive: false).hasMatch(text)) return directed('本', '本塁');
+    if (kind == 'triple' || RegExp(r'三塁打|スリーベース|[３3]$').hasMatch(text)) return directed('３', '三塁');
+    if (kind == 'double' || RegExp(r'二塁打|ツーベース|[２2]$').hasMatch(text)) return directed('２', '二塁');
+    if (kind == 'timely' || kind == 'single' || RegExp(r'安|ヒット|タイムリー').hasMatch(text)) return directed('安', '安打');
+    if (kind == 'error' || RegExp(r'失|エラー').hasMatch(text)) return directed('失', '失策');
+    if (kind == 'fc' || text.contains('野選')) return directed('選', '野選');
+    if (RegExp(r'併|ゲッツー').hasMatch(text)) return directed('併', '併殺');
+    if (RegExp(r'邪|ポップ').hasMatch(text)) return directed('邪', '邪飛');
+    if (RegExp(r'ゴ|ゴロ').hasMatch(text)) return directed('ゴ', 'ゴロ');
+    if (RegExp(r'飛|フライ').hasMatch(text)) return directed('飛', '飛球');
+    if (RegExp(r'直|ライナー').hasMatch(text)) return directed('直', '直飛');
+    return text.characters.length == 2 ? text : '不明';
   }
 
   // 中継ぎ/ホールド=黄っぽいオレンジ、抑え/セーブ=赤っぽいオレンジ、外野=黄緑。

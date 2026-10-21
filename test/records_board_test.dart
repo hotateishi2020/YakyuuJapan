@@ -304,7 +304,7 @@ void main() {
             home:
                 Scaffold(body: RecordsBoard(org: OrgConfig.npb, year: 2026))));
         await tester.pumpAndSettle();
-        expect(recordTabs, ['優勝チーム', '個人タイトル', 'シーズン記録', '通算記録', '連続記録', '功績']);
+        expect(recordTabs, ['🗓️年表', '👑個人タイトル', '⚾️シーズン記録', '👣通算記録', '🚥連続記録', '🏆功績', '🌱新人ドラフト', '🏢球団記録', '🍁現役ドラフト', '🔢背番号', '⚜️殿堂入り・名球会', '👴年齢記録', '📶回数記録', '😎レギュラー', '⭐️オールスター']);
         expect(find.text('日本一'), findsOneWidget);
         expect(find.text('1位'), findsOneWidget);
         expect(find.text('優勝略称'), findsOneWidget);

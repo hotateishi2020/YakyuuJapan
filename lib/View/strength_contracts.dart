@@ -466,6 +466,153 @@ class TeamSalaryChart extends StatelessWidget {
   }
 }
 
+/// Selected-year, recorded salaries only; currencies are never mixed.
+Map<String, List<Map<String, dynamic>>> teamSalaryShares(Map<String, dynamic> team, int year) {
+  final groups = <String, List<Map<String, dynamic>>>{};
+  final seen = <String>{};
+  for (final player in listMapFromJson(team['contracts'])) {
+    if (!seen.add(usagePlayerKey(player))) continue;
+    final salary = listMapFromJson(player['salary_history']).where((s) => usageInt(s['year']) == year && s['amount'] != null).firstOrNull;
+    if (salary == null || usageInt(salary['amount']) <= 0) continue;
+    final currency = '${salary['currency'] ?? 'JPY'}';
+    (groups[currency] ??= []).add({'player': player, 'amount': usageInt(salary['amount'])});
+  }
+  for (final players in groups.values) {
+    players.sort((a, b) => (b['amount'] as int).compareTo(a['amount'] as int));
+    final total = players.fold<int>(0, (sum, p) => sum + (p['amount'] as int));
+    for (final player in players) {
+      player['share'] = (player['amount'] as int) / total;
+    }
+  }
+  return groups;
+}
+
+class TeamSalaryShareBands extends StatelessWidget {
+  const TeamSalaryShareBands({super.key, required this.teams, required this.year});
+  final List<Map<String, dynamic>> teams;
+  final int year;
+
+  String _label(Map<String, dynamic> p, String currency) =>
+      '${p['player']['name']}  ${salaryAmount(p['amount'] as int, currency)}  ${((p['share'] as double) * 100).toStringAsFixed(1)}%';
+
+  void _details(BuildContext context, Map<String, dynamic> team, String currency, List<Map<String, dynamic>> players) {
+    showDialog<void>(context: context, builder: (context) => AlertDialog(
+      title: Text('${team['name_team']}・$year年 年俸内訳'),
+      content: SizedBox(width: 440, child: ListView.separated(
+        shrinkWrap: true,
+        itemCount: players.length,
+        separatorBuilder: (_, __) => const Divider(height: 1),
+        itemBuilder: (_, i) => ListTile(dense: true,
+          title: Text('${players[i]['player']['name']}', style: const TextStyle(fontWeight: FontWeight.bold)),
+          subtitle: Text(salaryAmount(players[i]['amount'] as int, currency)),
+          trailing: Text('${((players[i]['share'] as double) * 100).toStringAsFixed(1)}%'),
+        ),
+      )),
+      actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('閉じる'))],
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final maxima = <String, int>{};
+    for (final row in teamSalaryTotals(teams, year)) {
+      for (final entry in (row['totals'] as Map<String, int>).entries) {
+        maxima[entry.key] = math.max(maxima[entry.key] ?? 0, entry.value);
+      }
+    }
+    return Padding(
+    padding: const EdgeInsets.fromLTRB(8, 16, 8, 16),
+    child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Text('$year年度 球団総年俸の選手別割合', style: const TextStyle(fontWeight: FontWeight.bold)),
+      const Padding(padding: EdgeInsets.symmetric(vertical: 6), child: Text('帯の長さは球団総年俸、中の区画は選手別の割合です。通貨ごとに最大額の球団を基準に比較します。取得済みの推定額のみ集計。帯を押すと全選手の内訳を表示します。', style: TextStyle(fontSize: 11))),
+      for (final team in teams) ...[
+        Builder(builder: (context) {
+          final groups = teamSalaryShares(team, year);
+          final color = parseColorName('${team['color_back'] ?? ''}', Colors.blueGrey);
+          return Column(children: [
+            if (groups.isEmpty) Padding(padding: const EdgeInsets.all(8), child: Text('${team['name_team']}：年俸未取得')),
+            for (final entry in groups.entries)
+              Padding(padding: const EdgeInsets.only(bottom: 8), child: LayoutBuilder(builder: (context, constraints) {
+                final compact = constraints.maxWidth < 600;
+                final total = entry.value.fold<int>(0, (sum, p) => sum + (p['amount'] as int));
+                final ratio = total / maxima[entry.key]!;
+                final availableWidth = constraints.maxWidth - (compact ? 0 : 136);
+                final noteWidth = math.min(58.0, availableWidth);
+                final bandWidth = (availableWidth - noteWidth) * ratio + noteWidth;
+                final heading = Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  decoration: BoxDecoration(color: Color.lerp(color, Colors.white, .55), borderRadius: BorderRadius.circular(5)),
+                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    Text('${team['name_team']}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text(salaryAmount(total, entry.key), style: const TextStyle(fontSize: 11)),
+                  ]),
+                );
+                final band = Semantics(button: true, label: '${team['name_team']} 年俸内訳', child: InkWell(
+                  onTap: () => _details(context, team, entry.key, entry.value),
+                  child: SizedBox(key: ValueKey('salary-share-band-${team['id_team']}-${entry.key}'), width: bandWidth, height: 64, child: Row(children: [
+                    Expanded(child: ClipRRect(borderRadius: const BorderRadius.horizontal(left: Radius.circular(5)), child: CustomPaint(
+                      foregroundPainter: const _SalaryStackTexture(),
+                      child: Row(children: [
+                        for (var i = 0; i < entry.value.length; i++)
+                          Expanded(flex: entry.value[i]['amount'] as int, child: Tooltip(
+                            message: _label(entry.value[i], entry.key),
+                            child: Container(height: 64, alignment: Alignment.center,
+                              decoration: BoxDecoration(color: Color.lerp(const Color(0xFFB8A77A), const Color(0xFFEDE4C9), const [0.15, 0.80, 0.40, 1.0, 0.60][i % 5]), border: const Border(right: BorderSide(color: Colors.white54))),
+                              child: LayoutBuilder(builder: (_, box) => box.maxWidth < 42 ? const SizedBox.shrink() : Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 3),
+                                child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                  FittedBox(fit: BoxFit.scaleDown, child: Text(salaryAmount(entry.value[i]['amount'] as int, entry.key), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold))),
+                                  Text('${entry.value[i]['player']['name']}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                  Text('${((entry.value[i]['share'] as double) * 100).toStringAsFixed(1)}%', style: const TextStyle(fontSize: 11)),
+                                ]),
+                              )),
+                            ),
+                          )),
+                      ]),
+                    ))),
+                    SizedBox(key: ValueKey('salary-banknote-${team['id_team']}-${entry.key}'), width: noteWidth, height: 64, child: ClipRect(child: CustomPaint(painter: _SalaryBanknoteTip(entry.key)))),
+                  ])),
+                ));
+                return compact ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [heading, const SizedBox(height: 4), Align(alignment: Alignment.centerLeft, child: band)]) : Row(children: [SizedBox(width: 128, height: 64, child: heading), const SizedBox(width: 8), band]);
+              })),
+          ]);
+        }),
+      ],
+    ]),
+  );
+  }
+}
+
+class _SalaryStackTexture extends CustomPainter {
+  const _SalaryStackTexture();
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = const Color(0x12645835)..strokeWidth = .6;
+    for (double y = 2; y < size.height; y += 4) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+  }
+  @override
+  bool shouldRepaint(_SalaryStackTexture old) => false;
+}
+
+class _SalaryBanknoteTip extends CustomPainter {
+  const _SalaryBanknoteTip(this.currency);
+  final String currency;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
+    canvas.drawRRect(RRect.fromRectAndRadius(rect, const Radius.circular(4)), Paint()..color = const Color(0xFFE5DCBC));
+    canvas.drawRRect(RRect.fromRectAndRadius(rect.deflate(4), const Radius.circular(3)), Paint()..color = const Color(0xFF9C8D64)..style = PaintingStyle.stroke..strokeWidth = 1.2);
+    canvas.drawOval(Rect.fromCenter(center: rect.center, width: 33, height: 43), Paint()..color = const Color(0xFFD0C59E));
+    final text = TextPainter(text: TextSpan(text: currency == 'USD' ? '\$' : '¥', style: const TextStyle(color: Color(0xFF675A3B), fontSize: 25, fontWeight: FontWeight.bold)), textDirection: TextDirection.ltr)..layout();
+    text.paint(canvas, rect.center - Offset(text.width / 2, text.height / 2));
+    text.dispose();
+  }
+  @override
+  bool shouldRepaint(_SalaryBanknoteTip old) => old.currency != currency;
+}
+
 class StrengthContracts extends StatefulWidget {
   const StrengthContracts({super.key, required this.team, required this.year, this.comparisonTeams, this.colorTeams});
   final Map<String, dynamic> team;
@@ -593,6 +740,16 @@ class _StrengthContractsState extends State<StrengthContracts> {
           ]);
         }
 
+        Widget salaryHeader(String title) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            color: const Color(0xFF455A64),
+            child: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+          ),
+        );
+
         final nameWidth = compactBaseballLayout(context) ? 80.0 : 160.0;
         final yearWidth = compact && constraints.maxWidth.isFinite ? (constraints.maxWidth - nameWidth).clamp(1.0, double.infinity) : StrengthContracts.yearWidth;
         final chartWidth = (last - first + 1) * yearWidth;
@@ -605,11 +762,19 @@ class _StrengthContractsState extends State<StrengthContracts> {
               if (!compact) ChoiceChip(label: const Text('生涯年俸順'), selected: _sortByCareer, onSelected: (_) => setState(() => _sortByCareer = true)),
             ]),
           ),
+          if (widget.comparisonTeams == null && TeamSectionLayout.embedded(context))
+            TeamSalaryShareBands(teams: [widget.team], year: year),
           SectionExpanded(
               child: _ContractScroll(
                   key: const ValueKey('contract-vertical-scroll'),
                   headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                        if (widget.comparisonTeams != null) SliverToBoxAdapter(child: TeamSalaryChart(teams: teams, year: year)),
+                        if (widget.comparisonTeams != null) ...[
+                          SliverToBoxAdapter(child: salaryHeader('球団別年俸')),
+                          SliverToBoxAdapter(child: TeamSalaryChart(teams: teams, year: year)),
+                          SliverToBoxAdapter(child: TeamSalaryShareBands(teams: teams, year: year)),
+                          SliverToBoxAdapter(child: salaryHeader('選手別年俸')),
+                        ] else
+                          SliverToBoxAdapter(child: TeamSalaryShareBands(teams: [widget.team], year: year)),
                       ],
                   body: SingleChildScrollView(
                       key: const ValueKey('contract-horizontal-scroll'),

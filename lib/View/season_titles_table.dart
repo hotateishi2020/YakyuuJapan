@@ -68,7 +68,7 @@ class SeasonTitlesTable extends StatelessWidget {
                               : ink)),
           color: color));
 
-  Widget winners(List<Map<String, dynamic>> values, {String empty = '未定', bool showLogo = false, bool showStatus = true, bool showVideo = false, String? side}) {
+  Widget winners(List<Map<String, dynamic>> values, {String empty = '未定', bool showLogo = false, bool showStatus = true, bool showVideo = false, String? side, Color? background}) {
     return cell(values.isEmpty
         ? Text(empty, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, color: muted))
         : Column(mainAxisSize: MainAxisSize.min, children: [
@@ -133,11 +133,11 @@ class SeasonTitlesTable extends StatelessWidget {
                         ]),
                         if (showStatus && row['confirmed'] != true) Text(row['statistical'] == true ? '指標首位（表彰対象外を含む）' : '現在首位（暫定）', style: const TextStyle(fontSize: 10, color: Color(0xffa64b00))),
                       ]))),
-          ]), color: side == 'セ'
+          ]), color: background ?? (side == 'セ'
               ? Color.lerp(central, Colors.white, 0.55)!
               : side == 'パ'
                   ? Color.lerp(pacific, Colors.white, 0.55)!
-                  : Colors.white);
+                  : Colors.white));
   }
 
   Widget line(List<Widget> cells, {List<int>? weights}) => IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [for (var i = 0; i < cells.length; i++) Expanded(flex: weights?[i] ?? 1, child: cells[i])]));

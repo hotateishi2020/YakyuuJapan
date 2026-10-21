@@ -337,8 +337,8 @@
   {
     "name": "近畿グレートリング",
     "short_name": "南海",
-    "color_back": "#006B3F",
-    "color_font": "#111111",
+    "color_back": "#000080",
+    "color_font": "#FFFFFF",
     "logo_url": "asset:backend/assets/images/history_great_ring.png",
     "source": "User-provided グレート・リング大阪ロゴ.png"
   },
@@ -384,7 +384,9 @@
     "name": "急映フライヤーズ",
     "short_name": "急映",
     "color_back": "#C5472B",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_kyuei_flyers.png",
+    "source": "User-provided 翼付き黒い柱のミニマルロゴ.png"
   },
   {
     "name": "東映フライヤーズ",
@@ -463,7 +465,9 @@
     "name": "太陽ロビンス",
     "short_name": "松竹",
     "color_back": "#973847",
-    "color_font": "#111111"
+    "color_font": "#111111",
+    "logo_url": "asset:backend/assets/images/history_taiyo_robins.png",
+    "source": "User-provided 赤地に映える白いRobinsロゴ.png"
   },
   {
     "name": "大陽ロビンス",
@@ -510,5 +514,58 @@
     "color_font": "#111111",
     "logo_url": "asset:backend/assets/images/history_nishinippon.png",
     "source": "https://commons.wikimedia.org/wiki/File:Nishi_Nippon_Pirates_insignia.png"
+  },
+  {
+    "name": "大東京",
+    "logo_url": "asset:backend/assets/images/history_daitokyo.png",
+    "source": "User-provided 桜花紋章と野球ボールのTロゴ.png"
+  },
+  {
+    "name": "大東京軍",
+    "logo_url": "asset:backend/assets/images/history_daitokyo.png",
+    "source": "User-provided 桜花紋章と野球ボールのTロゴ.png"
+  },
+  {
+    "name": "ライオン",
+    "logo_url": "asset:backend/assets/images/history_lion.png",
+    "logo_from_year": 1937,
+    "logo_until_year": 1940,
+    "source": "User-provided 赤い紋章ライオンと金色のLIONロゴ.png"
+  },
+  {
+    "name": "ライオン軍",
+    "logo_url": "asset:backend/assets/images/history_lion.png",
+    "logo_from_year": 1937,
+    "logo_until_year": 1940,
+    "source": "User-provided 赤い紋章ライオンと金色のLIONロゴ.png"
+  },
+  {
+    "name": "朝日",
+    "logo_url": "asset:backend/assets/images/history_asahi.png",
+    "logo_from_year": 1941,
+    "logo_until_year": 1944,
+    "source": "User-provided 紺碧の朝日紋章ロゴ.png"
+  },
+  {
+    "name": "朝日軍",
+    "logo_url": "asset:backend/assets/images/history_asahi.png",
+    "logo_from_year": 1941,
+    "logo_until_year": 1944,
+    "source": "User-provided 紺碧の朝日紋章ロゴ.png"
+  },
+  {
+    "name": "東京セネタース",
+    "logo_url": "asset:backend/assets/images/history_tokyo_senators.png",
+    "source": "User-provided セネターズ・トキオ獅子マーク.png"
+  },
+  {
+    "name": "名古屋金鯱",
+    "logo_url": "asset:backend/assets/images/history_nagoya_kinko.png",
+    "source": "User-provided 紺と金のスパイクマスコットロゴ.png"
+  },
+  {
+    "name": "金星スターズ",
+    "logo_url": "asset:backend/assets/images/history_kinsei_stars.png",
+    "source": "User-provided ネイビーのGと金色の星ロゴ.png"
   }
 ]

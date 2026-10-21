@@ -122,7 +122,10 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
     final payload = {'channels': [
       {'id': channelId(1), 'name': '動画一覧', 'category': 'league',
-       'status': 'ok', 'display_mode': 'all', 'videos': videos(0, 200, '動画')},
+       'status': 'ok', 'display_mode': 'all', 'videos': [for (final video in videos(0, 200, '【ドラフト2026】球団の最新情報と選手インタビュー・長い動画タイトル')) {
+         ...video, 'source_name': '長いチャンネル名【野球解説・インタビュー】',
+         'published_at': null, 'published_label': '10月19日(月) 19:15から配信中・長い配信日時',
+       }]},
     ]};
     await http.runWithClient(() async {
       await tester.pumpWidget(MaterialApp(

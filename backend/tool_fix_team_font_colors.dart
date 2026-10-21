@@ -1,9 +1,10 @@
 import 'dart:io';
 import 'tools/Postgres.dart';
 
-Future<void> main() async {
-  const names = [
+Future<void> main(List<String> args) async {
+  final names = args.isNotEmpty ? args : [
     '西鉄ライオンズ',
+    'ロッキーズ', 'コロラド・ロッキーズ', 'コロラドロッキーズ',
     'オリックス・バファローズ', 'オリックスバファローズ',
     'オリックス・ブルーウェーブ', 'オリックスブルーウェーブ',
   ];

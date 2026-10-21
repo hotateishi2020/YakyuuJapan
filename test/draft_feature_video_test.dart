@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,6 +15,24 @@ class _Launcher extends UrlLauncherPlatform {
   Future<bool> launchUrl(String url, LaunchOptions options) async {opened=url; return true;}
 }
 void main() {
+  test('紹介された28選手が重複なく登録され、紹介位置から動画を開ける', () {
+    final data = jsonDecode(File('backend/assets/data/draft_2026.json').readAsStringSync());
+    final players = (data['players'] as List).cast<Map<String, dynamic>>();
+    final featured = players.where((p) => (p['feature_videos'] as List? ?? []).any((v) => v['video_id'] == 'tjC8fvX94Fw')).toList();
+    expect(featured, hasLength(28));
+    expect(players.map((p) => p['name']).toSet().length, players.length);
+    for (final player in featured) {
+      final first = draftRelatedVideos(player).first;
+      expect(first['video_id'], 'tjC8fvX94Fw');
+      expect(first['start_seconds'], inInclusiveRange(0, 2416));
+    }
+    for (final name in ['平田玲翔', '宮原廉', '角田楓斗', '星野世那', '猪俣駿太', '山里宝']) {
+      final player = players.singleWhere((p) => p['name'] == name);
+      for (final key in ['team', 'category', 'position', 'height', 'weight', 'hand', 'date_birth', 'achievement', 'features', 'birth_source_url']) {
+        expect('${player[key] ?? ''}', isNotEmpty, reason: '$name: $key');
+      }
+    }
+  });
   test('関連動画は重複とショートを除いて再生数順に最大4件', () {
     final videos = draftRelatedVideos({'feature_videos': [
       for (var i = 0; i < 6; i++) {'video_id': 'abcdefghij$i', 'view_count': i * 100},
@@ -66,6 +86,7 @@ void main() {
     await tester.tap(thumbnail);
     await tester.pumpAndSettle();
     expect(launcher.opened,startsWith('https://www.youtube.com/watch?v='));
+    expect(Uri.parse(launcher.opened!).queryParameters['t'], '130s');
     expect(tester.takeException(),isNull);
     await tester.pumpWidget(const SizedBox());
   });

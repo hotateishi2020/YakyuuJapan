@@ -1,3 +1,4 @@
+import '../widgets/collapsible_menu.dart';
 import 'compact_layout.dart';
 import '../logic/favorite_team.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
@@ -42,7 +43,7 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
   String? _selected;
   String? _selectedStaff;
   int _teamSection = 0;
-  static const _teamSections = ['分析', '首脳陣', '主力選手', '貢献度', '選手起用', '選手一覧', '契約'];
+  static const _teamSections = ['📈分析', '🧠首脳陣', '😎主力選手', '🕊️貢献度', '👉選手起用', '📰選手一覧', '💼契約'];
   int _request = 0;
   @override
   void initState() {
@@ -128,7 +129,6 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
           ])),
     ];
     final children = <Widget>[
-      if (!compact) explanation else const SizedBox.shrink(),
       compact ? const SizedBox.shrink() : Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: Wrap(key: const ValueKey('analysis-grade-legend'), spacing: 6, runSpacing: 4, children: [
         for (final entry in clubAnalysisGradeColors.entries)
           Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
@@ -211,7 +211,7 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
             widths: [for (final c in columns.skip(1)) bodyWidth * weight(c) / totalWeight],
             teamCells: [for (final row in table.rows) row.cells.first.child],
             cells: [for (final row in table.rows) [for (final cell in row.cells.skip(1)) cell.child]],
-            footer: Column(children: [if (compact) explanation, if (compact) ...notes]),
+            footer: Column(children: [explanation, ...notes]),
           );
         }
         final width = math.max(1240.0, constraints.maxWidth);
@@ -220,13 +220,12 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
           scrollDirection: Axis.horizontal,
           child: fitTable(SizedBox(width: width, child: table)));
       }),
-      if (!compact) ...notes,
+      if (!compact && team != null) ...[explanation, ...notes],
     ];
     if (team != null) return SectionList(children: children);
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      ...children.take(2),
-      Expanded(child: children[2]),
-      ...children.skip(3),
+      children[0],
+      Expanded(child: children[1]),
     ]);
   }
 
@@ -347,7 +346,7 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
     final foreground = parseColorNameOrNull('${team['color_font']}') ?? Colors.white;
     return LayoutBuilder(builder: (context, constraints) {
       Widget section(String title, Widget Function() builder, {double? minWidth, Key? key}) => _TeamSection(
-        key: key, title: title, background: background, foreground: foreground,
+        key: key,
         builder: () => minWidth == null ? builder() : SingleChildScrollView(
           key: ValueKey('team-section-horizontal-$title'), scrollDirection: Axis.horizontal,
           child: SizedBox(width: math.max(constraints.maxWidth, minWidth), child: builder())),
@@ -355,10 +354,20 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
       Widget usage(int index, String title, {double? minWidth}) => section(title,
         () => widget.teamSection(index, team), minWidth: minWidth, key: ValueKey('${team['id_team']}-$index'));
       return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Padding(padding: const EdgeInsets.fromLTRB(8, 0, 8, 8), child: LayoutBuilder(builder: (context, constraints) {
+          MenuBand(level: 3, child: Padding(padding: const EdgeInsets.only(bottom: ALL_SPACE_BLOCK), child: LayoutBuilder(builder: (context, constraints) {
             final compact = compactBaseballLayout(context);
             final columns = compact ? widget.teams.length : (constraints.maxWidth / 100).floor().clamp(1, widget.teams.length);
-            final segmentWidth = compact ? math.max(24.0, (constraints.maxWidth - (columns - 1) * 4) / columns) : (constraints.maxWidth - (columns - 1) * 4) / columns;
+            final segmentWidth = compact ? math.max(64.0, (constraints.maxWidth - (columns - 1) * ALL_SPACE_BLOCK) / columns) : (constraints.maxWidth - (columns - 1) * ALL_SPACE_BLOCK) / columns;
+            Widget teamLabel(Map<String, dynamic> option) {
+              final logo = teamLogoVisual('${option['name_team']}', abbrev: '${option['name_shortest'] ?? ''}', mlb: widget.org.kind == OrgKind.mlb);
+              return Row(mainAxisSize: MainAxisSize.min, children: [
+                SizedBox(width: 20, height: 20, child: teamLogoImage(asset: logo.asset, networkUrl: logo.networkUrl)),
+                const SizedBox(width: 4),
+                Text(compact ? '${option['name_shortest'] ?? option['name_team']}' : '${option['name_team']}', style: TextStyle(fontWeight: FontWeight.bold,
+                  color: option['id_team'] == team['id_team']
+                      ? parseColorNameOrNull('${option['color_font']}') ?? Colors.white : Colors.black87)),
+              ]);
+            }
             final segments = <Widget>[
               for (final option in widget.teams) SizedBox(width: segmentWidth,
                 child: Semantics(button: true, selected: option['id_team'] == team['id_team'],
@@ -373,9 +382,7 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
                       child: SizedBox(height: TAB_BAR_H, child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: compact ? 2 : 8),
                         child: Center(child: FittedBox(fit: BoxFit.scaleDown,
-                          child: Text(compact ? '${option['name_shortest'] ?? option['name_team']}' : '${option['name_team']}', style: TextStyle(fontWeight: FontWeight.bold,
-                            color: option['id_team'] == team['id_team']
-                                ? parseColorNameOrNull('${option['color_font']}') ?? Colors.white : Colors.black87)))),
+                          child: teamLabel(option))),
                       )),
                     ),
                   ),
@@ -385,39 +392,40 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
             if (compact) { return SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(children: [for (final entry in segments.indexed) ...[
-                if (entry.$1 > 0) const SizedBox(width: 4), entry.$2,
+                if (entry.$1 > 0) const SizedBox(width: ALL_SPACE_BLOCK), entry.$2,
               ]]),
             );
             }
-            return Wrap(spacing: 4, runSpacing: 4, children: segments);
-          })),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
-            child: Row(children: [
+            return Wrap(spacing: ALL_SPACE_BLOCK, runSpacing: ALL_SPACE_BLOCK, children: segments);
+          }))),
+          MenuBand(level: 4, child: Padding(
+            padding: EdgeInsets.zero,
+            child: SizedBox(height: TAB_BAR_H, child: Row(children: [
               for (var i = 0; i < _teamSections.length; i++) ...[
-                if (i > 0) const SizedBox(width: 2),
-                Expanded(
-                  child: ChoiceChip(
-                    key: ValueKey('team-section-segment-$i'),
-                    label: SizedBox(
-                      width: double.infinity,
-                      child: FittedBox(fit: BoxFit.scaleDown,
-                        child: Text(_teamSections[i], maxLines: 1, softWrap: false))),
-                    padding: EdgeInsets.zero,
-                    labelPadding: const EdgeInsets.symmetric(horizontal: 2),
-                    visualDensity: VisualDensity.compact,
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    selected: _teamSection == i,
-                    selectedColor: background,
-                    backgroundColor: Color.lerp(background, Colors.white, .9),
-                    labelStyle: TextStyle(fontSize: 12, color: _teamSection == i ? foreground : Colors.black87),
-                    showCheckmark: false,
-                    onSelected: (_) => setState(() => _teamSection = i),
+                if (i > 0) const SizedBox(width: ALL_SPACE_BLOCK),
+                Expanded(child: Semantics(
+                  button: true, selected: _teamSection == i,
+                  child: Material(
+                    color: _teamSection == i ? background : Color.lerp(background, Colors.white, .9),
+                    borderRadius: BorderRadius.circular(TAB_RADIUS),
+                    child: InkWell(
+                      key: ValueKey('team-section-segment-$i'),
+                      borderRadius: BorderRadius.circular(TAB_RADIUS),
+                      onTap: () => setState(() => _teamSection = i),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                        child: Center(child: FittedBox(fit: BoxFit.scaleDown,
+                          child: Text(_teamSections[i], maxLines: 1, softWrap: false,
+                            style: TextStyle(fontSize: 12, height: 1,
+                              fontWeight: _teamSection == i ? FontWeight.bold : FontWeight.normal,
+                              color: _teamSection == i ? foreground : Colors.black87)))),
+                      ),
+                    ),
                   ),
-                ),
+                )),
               ],
-            ]),
-          ),
+            ])),
+          )),
           Expanded(child: SingleChildScrollView(
             key: ValueKey('team-page-vertical-scroll-${team['id_team']}-$_teamSection'),
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -451,22 +459,11 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
 }
 
 class _TeamSection extends StatelessWidget {
-  const _TeamSection({super.key, required this.title, required this.builder, required this.background, required this.foreground});
-  final String title;
-  final Color background, foreground;
+  const _TeamSection({super.key, required this.builder});
   final Widget Function() builder;
 
   @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      Semantics(header: true, child: Container(
-        width: double.infinity, color: background, padding: const EdgeInsets.all(10),
-        child: Text(title, textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, color: foreground)),
-      )),
-      TeamSectionLayout(child: builder()),
-    ],
-  );
+  Widget build(BuildContext context) => TeamSectionLayout(child: builder());
 }
 
 

@@ -367,7 +367,7 @@ class PredictGroup {
       'leaders': '''
         SELECT src.int_year, src.id_league, src.id_stats, src.id_player,
                replace(replace(COALESCE(pl.name_full, ''), ' ', ''), '　', '') AS player_name,
-               tm.color_back, tm.color_font
+               tm.color_back, tm.color_font, tm.name_shortest AS team_shortest
         FROM (
           SELECT EXTRACT(YEAR FROM CURRENT_DATE)::int AS int_year, id_league, id_stats, id_player, id_team
           FROM t_stats_player_latest
@@ -393,11 +393,13 @@ class PredictGroup {
         SELECT p.year AS int_year, p.id_predict_setting, p.id_user, p.id_league, p.id_stats, p.id_player,
                lg.name_short AS league_name,
                st.title, st.int_index, st.flg_pitcher,
-               replace(replace(COALESCE(pl.name_full, ''), ' ', ''), '　', '') AS player_name
+               replace(replace(COALESCE(pl.name_full, ''), ' ', ''), '　', '') AS player_name,
+               tm.name_shortest AS team_shortest, tm.color_back, tm.color_font
         FROM t_predict_player p
         LEFT JOIN m_league lg ON lg.id = p.id_league
         LEFT JOIN m_stats st ON st.id = p.id_stats
         LEFT JOIN m_player pl ON pl.id = p.id_player
+        LEFT JOIN m_team tm ON tm.id = COALESCE(p.id_team, pl.id_team)
         WHERE p.id_predict_setting IS NOT NULL AND ($playerYearFilter)
           AND COALESCE(p.flg_delete, FALSE) = FALSE
         ORDER BY p.id_league, st.int_index, p.id_user
@@ -541,6 +543,7 @@ class PredictGroup {
           'title': '${row['title'] ?? ''}',
           'pitcher': row['flg_pitcher'] == true,
           'current': names.join('、'),
+          'current_players': [for (final name in names) matched.firstWhere((p) => '${p['player_name'] ?? ''}'.trim() == name)],
           'color_backs': backs,
           'color_fonts': fonts,
           'color_back': names.length > 1 ? 'white' : _singlePaint(matched, 'color_back'),
@@ -551,6 +554,9 @@ class PredictGroup {
       (bucket['picks'] as List<Map<String, dynamic>>).add({
         'id_user': _asInt(row['id_user']),
         'name': '${row['player_name'] ?? ''}',
+        'team_shortest': row['team_shortest'],
+        'color_back': row['color_back'],
+        'color_font': row['color_font'],
         'hit': row['hit'] == true,
       });
     }
@@ -727,6 +733,7 @@ class PredictGroup {
       'title': title,
       'pitcher': pitcher,
       'current': names.join('、'),
+          'current_players': [for (final name in names) matched.firstWhere((p) => '${p['player_name'] ?? ''}'.trim() == name)],
       'color_backs': backs,
       'color_fonts': fonts,
       'color_back': names.length > 1 ? 'white' : _singlePaint(matched, 'color_back'),

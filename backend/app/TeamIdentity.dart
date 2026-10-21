@@ -30,11 +30,11 @@ class TeamIdentity {
     var updated = 0;
     for (final v in jsonDecode(await file.readAsString()) as List) {
       final rows = await conn.execute(r'''UPDATE m_team_season_identity
-        SET name_short=$1,color_back=$2,color_font=$3,
-            logo_url=CASE WHEN $7::integer IS NULL OR int_year<=$7
+        SET name_short=COALESCE($1,name_short),color_back=COALESCE($2,color_back),color_font=COALESCE($3,color_font),
+            logo_url=CASE WHEN ($7::integer IS NULL OR int_year<=$7) AND ($8::integer IS NULL OR int_year>=$8)
               THEN COALESCE($4,logo_url) ELSE logo_url END,updated_at=now()
         WHERE name_full=$5 AND ($6::integer IS NULL OR int_year=$6)
-        RETURNING id_franchise''', parameters: [v['short_name'],v['color_back'],v['color_font'],v['logo_url'],v['name'],year,v['logo_until_year']]);
+        RETURNING id_franchise''', parameters: [v['short_name'],v['color_back'],v['color_font'],v['logo_url'],v['name'],year,v['logo_until_year'],v['logo_from_year']]);
       updated += rows.length;
     }
     return updated;

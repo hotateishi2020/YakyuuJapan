@@ -1,3 +1,5 @@
+import '../widgets/collapsible_menu.dart';
+import '../widgets/game_info_tab_label.dart';
 import '../View/season_titles_board.dart';
 import '../View/japanese_mlb_board.dart';
 import '../View/other_baseball_board.dart';
@@ -1520,8 +1522,12 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     Color? selectedColor,
     Color? selectedForeground,
     Map<int, String>? leadingAssets,
+    bool highlightGames = false,
     double height = TAB_BAR_H,
   }) {
+    Widget tabLabel((String, int) tab, [TextStyle? style]) => tab.$2 == 0 && highlightGames
+        ? GameInfoTabLabel(style: style)
+        : Text(tab.$1, textAlign: TextAlign.center, maxLines: 1, softWrap: false, style: style);
     final assets = leadingAssets ?? const <int, String>{};
     final Color active = selectedColor ?? ALL_COLOR_APP;
     final Color activeFg = selectedForeground ?? TAB_COLOR_FONT;
@@ -1529,22 +1535,22 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       final cellWidth = (bounds.maxWidth - (tabs.length - 1) * ALL_SPACE_BLOCK) / tabs.length;
       final fits = tabs.every((tab) {
         final painter = TextPainter(text: TextSpan(text: tab.$1, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)), textDirection: Directionality.of(context), textScaler: MediaQuery.textScalerOf(context), maxLines: 1)..layout();
-        final needed = painter.width + 4 + (assets.containsKey(tab.$2) ? height * .72 + 6 : 0);
+        final needed = painter.width + 4 + (highlightGames && tab.$2 == 0 ? 12 : 0) + (assets.containsKey(tab.$2) ? height * .72 + 6 : 0);
         painter.dispose();
         return needed <= cellWidth;
       });
       if (!fits) { return Container(height: height,
-        margin: const EdgeInsets.only(top: 4),
+        margin: const EdgeInsets.only(top: ALL_SPACE_BLOCK),
         decoration: BoxDecoration(color: active, borderRadius: BorderRadius.circular(height / 2)),
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: DropdownButtonHideUnderline(child: DropdownButton<int>(value: selectedIndex, isExpanded: true, isDense: true,
           dropdownColor: active, iconEnabledColor: activeFg,
           style: TextStyle(color: activeFg, fontSize: 12, fontWeight: FontWeight.bold),
-          selectedItemBuilder: (_) => [for (final tab in tabs) Center(child: Text(tab.$1))],
-          items: [for (final tab in tabs) DropdownMenuItem(value: tab.$2, child: Text(tab.$1))],
+          selectedItemBuilder: (_) => [for (final tab in tabs) Center(child: tabLabel(tab))],
+          items: [for (final tab in tabs) DropdownMenuItem(value: tab.$2, child: tabLabel(tab))],
           onChanged: (i) { if (i != null) onSelected(i); }))); }
       return Padding(
-      padding: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.only(top: ALL_SPACE_BLOCK),
       child: SizedBox(
       height: height,
       child: Row(
@@ -1572,12 +1578,9 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                               LeagueLogo(asset: asset, height: height * 0.72),
                               const SizedBox(width: 6),
                             ],
-                            Text(
-                              tabs[i].$1,
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              softWrap: false,
-                              style: TextStyle(
+                            tabLabel(
+                              tabs[i],
+                              TextStyle(
                                 fontSize: 12,
                                 height: 1.0,
                                 leadingDistribution: TextLeadingDistribution.even,
@@ -1661,10 +1664,10 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
 
   /// Info と項目タブのあいだ。選択時は団体色＋ロゴ、非選択は薄いグレー。
   Widget _orgTabBar() => SizedBox(
-    height: TAB_BAR_H + 4,
+    height: TAB_BAR_H,
     child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      for (final entry in [('predict', '予想対決'), ('npb', 'NPB'), ('mlb', 'MLB'), ('other', 'その他')])
-        Expanded(child: Padding(padding: const EdgeInsets.all(2), child: Builder(builder: (context) {
+      for (final entry in [('predict', '🎯予想対決'), ('npb', 'NPB'), ('mlb', 'MLB'), ('other', '⚾️その他')])
+        Expanded(child: Padding(padding: EdgeInsets.only(left: entry.$1 == 'predict' ? 0 : ALL_SPACE_BLOCK), child: Builder(builder: (context) {
           final selected = entry.$1 == 'other' ? _otherOpen : !_otherOpen &&
             (entry.$1 == 'predict' ? _predictGroupsOpen : !_predictGroupsOpen && entry.$1 == _orgKind.name);
           final org = entry.$1 == 'npb' ? OrgConfig.npb : entry.$1 == 'mlb' ? OrgConfig.mlb : null;
@@ -1700,16 +1703,18 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         Expanded(
           child: _portraitTabBar(
             tabs: [
-              ('日程', 5),
-              if (_orgKind == OrgKind.mlb) ('日本人', 7),
-              ('試合情報', 0),
-              ('チーム順位', 1),
-              ('個人成績', 2),
-              ('タイトル', 8),
-              ('戦力', 3),
-              ('記録', 4),
-              ('動画', 6),
+              ('📅日程', 5),
+              if (_orgKind == OrgKind.mlb) ('🇯🇵日本人', 7),
+              ('💥試合情報', 0),
+              ('⚾️チーム順位', 1),
+              ('🥇個人成績', 2),
+              ('🏆タイトル', 8),
+              ('💪戦力', 3),
+              ('📝記録', 4),
+              ('🎥動画', 6),
             ],
+            highlightGames: _seasonYear == DateTime.now().year && orgGamesInProgress(
+              [...postseasonGames, ...games], DateFormatUtil.ymdWithOffset(0), _org.leagueIds),
             selectedIndex: _itemTab,
             onSelected: (i) {
               if (i == _itemTab) return;
@@ -2304,18 +2309,23 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => MenuScope(
+    color: _otherOpen || _predictGroupsOpen ? Colors.black : _org.tabColor,
+    foreground: _otherOpen || _predictGroupsOpen ? Colors.white : _org.tabForeground,
+    child: Builder(builder: _buildPage));
+
+  Widget _buildPage(BuildContext context) {
     // 初回のみ全画面グルグル。エラー時もヘッダー〜団体タブは出す。
     if (isLoading && !_shellReady) {
       return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Headers.globalHeader(context, HEADER_GLOBAL_H, ALL_COLOR_APP, HEADER_TITLE,
-          HEADER_PAD_VERTICAL, ALL_MARGIN_LEFT, showRightActions: false),
+        MenuBand(level: 0, toggle: false, child: Headers.globalHeader(context, HEADER_GLOBAL_H, ALL_COLOR_APP, HEADER_TITLE,
+          HEADER_PAD_VERTICAL, ALL_MARGIN_LEFT, showRightActions: false)),
         Padding(padding: const EdgeInsets.symmetric(horizontal: ALL_MARGIN_LEFT),
           child: Column(children: [
-            const SizedBox(height: ALL_SPACE_BLOCK),
-            _orgTabBar(),
+            const MenuGap(height: ALL_SPACE_BLOCK),
+            MenuBand(level: 0, toggle: true, child: _orgTabBar()),
             if (!_predictGroupsOpen && !_otherOpen) ...[
-              _boardTabBar(),
+              MenuBand(level: 1, toggle: true, child: _boardTabBar()),
             ],
           ])),
         Expanded(child: _otherOpen ? OtherBaseballBoard(year: _seasonYear) : const Center(child: BaseballLoading())),
@@ -2337,8 +2347,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: ALL_SPACE_BLOCK),
-            _orgTabBar(),
+            const MenuGap(height: ALL_SPACE_BLOCK),
+            MenuBand(level: 0, toggle: true, child: _orgTabBar()),
           ],
         );
 
@@ -2367,8 +2377,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _boardTabBar(),
-                  const SizedBox(height: ALL_SPACE_BLOCK),
+                  MenuBand(level: 1, toggle: true, child: _boardTabBar()),
+                  const MenuGap(height: ALL_SPACE_BLOCK),
                   Expanded(
                     flex: isPortrait ? 1 : ALL_RATIO_BLOCK_H[1] * 2,
                     child: RetainedTabBody(
@@ -2383,7 +2393,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                                 : _itemBoard(wideLayout: !isPortrait),
                     ),
                   ),
-                  if (isPortrait) const SizedBox(height: ALL_SPACE_BLOCK),
+                  if (isPortrait) const MenuGap(height: ALL_SPACE_BLOCK),
                 ],
               );
 
@@ -2410,7 +2420,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Headers.globalHeader(
+                      MenuBand(level: 0, toggle: false, child: Headers.globalHeader(
                         context,
                         HEADER_GLOBAL_H,
                         ALL_COLOR_APP,
@@ -2427,7 +2437,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                           _infoButton(),
                           const SizedBox(width: 4),
                         ],
-                      ),
+                      )),
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.only(bottom: ALL_SPACE_BLOCK, left: ALL_MARGIN_LEFT, right: ALL_MARGIN_LEFT),

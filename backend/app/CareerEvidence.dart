@@ -5,6 +5,8 @@ import 'PlayerAchievements.dart';
 String evidenceName(String s) => usageName(s).replaceAll('髙', '高').replaceAll('﨑', '崎').replaceAll('海', '海');
 
 String? careerCategory(String name) {
+  if (name.contains('シニア')) return 'シニア';
+  if (name.contains('リトル')) return 'リトル';
   if (RegExp(r'^(四国|BC|日本海|関西|北海道|九州|ベイサイド|さわかみ|ルートイン)・').hasMatch(name)) {
     return '独立';
   }

@@ -155,6 +155,14 @@ String watch(String id, DateTime date) =>
         })};';
 
 void main() {
+  test('キッタプロ野球研究所をNPBの野球解説動画に含める', () {
+    final channel = videoChannels.singleWhere((c) => c.id == 'UCZPbHQ7hbtpnrR9bZ6Q0hBA');
+    expect(channel.name, 'キッタプロ野球研究所');
+    expect(channel.category, 'media');
+    expect(channel.videoOrg, 'npb');
+    expect(channel.limit, 10);
+  });
+
   test('WBC always takes priority over MLB names and league tags', () {
     for (final title in [
       '【WBC】大谷翔平とドジャースのMLB選手',

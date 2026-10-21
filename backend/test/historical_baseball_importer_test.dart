@@ -773,6 +773,34 @@ void main() {
     );
   });
 
+  test('same-day separate stage containers are both imported', () {
+    final games = HistoricalBaseballImporter.parseNpbClimaxCalendar(
+      '<h2>2010年度</h2><div class="stschedule">'
+      '<div class="stvsteam"><div class="tescheaten">CS ファイナルS</div>'
+      '<div><a href="s2010101601746.html">ソ 1 - 0 ロ</a></div></div>'
+      '<div class="stvsteam"><div class="tescheaten">CS ファーストS</div>'
+      '<div><a href="s2010101601745.html">神 1 - 3 巨</a></div></div></div>',
+      expectedYear: 2010, sourceUrl: 'https://npb.jp/bis/2010/calendar/index_10.html');
+    expect(games.map((g) => g.codeGame), ['CSF', 'CS1']);
+  });
+
+  test('2004 official playoff tables preserve home/away scores and stages', () {
+    final source = List.generate(8, (i) => """
+      <table class="pl_scoreBoad02"><tbody>
+      <tr><th>西武ライオンズ</th><td class="pl_scoreR">4</td></tr>
+      <tr><th>福岡ダイエー<br>ホークス</th><td class="pl_scoreR">3</td></tr>
+      <tr><td class="pl_gameInfo">2004年10月${i + 1}日 プレーオフ第${i < 3 ? 1 : 2}ステージ第1戦</td></tr>
+      </tbody></table>""").join();
+    final games = HistoricalBaseballImporter.parseNpb2004Playoffs(source);
+    expect(games, hasLength(8));
+    expect(games.where((g) => g.codeGame == 'CS1'), hasLength(3));
+    expect(games.where((g) => g.codeGame == 'CSF'), hasLength(5));
+    expect(games.last.homeTeamKey, '福岡ダイエーホークス');
+    expect(games.last.scoreHome, 3);
+    expect(games.last.scoreAway, 4);
+    expect(() => HistoricalBaseballImporter.parseNpb2004Playoffs(''), throwsStateError);
+  });
+
   test('checkpoint keys uniquely identify a dataset', () {
     expect(
       HistoricalBaseballImporter.checkpointKey(

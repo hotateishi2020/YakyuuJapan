@@ -1,3 +1,5 @@
+import '../widgets/collapsible_menu.dart';
+import '../config/app_design.dart';
 import 'strength_age_grid.dart';
 import 'player_detail_dialog.dart';
 import 'adaptive_section_selector.dart';
@@ -62,7 +64,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
   int _selectedView = 1;
   double get _bandHeaderWidth => compactBaseballLayout(context) && (_selectedView == 0 || TeamSectionLayout.embedded(context) && _selectedView == 1) ? 52.8 : 105.6;
   double get _bandSideWidth => _bandHeaderWidth + 8 + 48;
-  static const _views = ['貢献度', '選手起用', '主力選手', '選手一覧', '契約', 'ドラフト', '功績', '経歴', 'チーム', '首脳', '自主トレ', '分析', '移籍', '球場', '年齢'];
+  static const _views = ['🕊️貢献度', '選手起用', '😎主力選手', '📰選手一覧', '💼契約', '🌱ドラフト', '功績', '🏫経歴', '⚾️チーム', '首脳', '🏋️自主トレ', '📈分析', '↔️移籍', '🏟️球場', '👨‍🦰年齢'];
 
   @override
   void initState() {
@@ -73,7 +75,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
       final view => view,
     };
     if (widget.providedTeams == null) {
-      _selectedView = readSavedTab('strength_${widget.org.kind.name}', const [11, 8, 3, 2, 0, 1, 4, 5, 12, 7, 10, 13, 14], fallback: _selectedView);
+      _selectedView = readSavedTab('strength_${widget.org.kind.name}', const [11, 8, 3, 2, 0, 1, 4, 5, 12, 7, 10, 14, 13], fallback: _selectedView);
       if ([1, 3, 6, 9].contains(_selectedView)) _selectedView = 8;
     }
     _load();
@@ -129,7 +131,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _viewTabs(),
-            SizedBox(height: _selectedView == 8 ? 2 : 6),
+            const MenuGap(height: ALL_SPACE_BLOCK),
             Expanded(
                 child: RetainedTabBody(
               key: ValueKey('${widget.org.kind.name}-${widget.year}-${identityHashCode(_teams)}'),
@@ -143,7 +145,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
         pickerKey: const ValueKey('strength-picker'),
         itemKeyPrefix: 'strength-view-',
         labels: {
-          for (final i in [if (_selectedView == 1) 1, 11, 8, 2, 0, 4, 5, 12, 7, 10, 13, 14]) i: _views[i]
+          for (final i in [if (_selectedView == 1) 1, 11, 8, 2, 0, 4, 5, 12, 7, 10, 14, 13]) i: _views[i]
         },
         value: _selectedView,
         background: widget.org.tabColor,
@@ -326,20 +328,22 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
         selected: _int(row['id_team']) == _selectedTeam,
         child: Material(
           color: _int(row['id_team']) == _selectedTeam ? parseColorNameOrNull('${row['color_back']}') ?? widget.org.tabColor : Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(TAB_RADIUS),
           child: InkWell(
             key: ValueKey('strength-team-${row['id_team']}'),
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(TAB_RADIUS),
             onTap: () => setState(() => _selectedTeam = _int(row['id_team'])),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Container(
+              height: TAB_BAR_H,
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
               child: FittedBox(fit: BoxFit.scaleDown, child: Text('${row['name_team'] ?? row['name_shortest'] ?? ''}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _int(row['id_team']) == _selectedTeam ? parseColorNameOrNull('${row['color_font']}') ?? Colors.white : Colors.black87))),
             ),
           ),
         ),
       );
 
-  Widget _teamSegments() => LayoutBuilder(builder: (context, constraints) {
+  Widget _teamSegments() => MenuBand(level: 3, child: LayoutBuilder(builder: (context, constraints) {
         var requiredWidth = 0.0;
         for (final row in _teams) {
           final painter = TextPainter(text: TextSpan(text: '${row['name_team'] ?? row['name_shortest'] ?? ''}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)), textDirection: Directionality.of(context), textScaler: MediaQuery.textScalerOf(context))..layout();
@@ -351,14 +355,14 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
           return Column(children: [
             for (final league in [1, 2])
               Padding(
-                  padding: EdgeInsets.only(bottom: league == 1 ? 4 : 0),
+                  padding: EdgeInsets.only(bottom: league == 1 ? ALL_SPACE_BLOCK : 0),
                   child: Row(children: [
-                    for (final team in _teams.where((t) => _int(t['id_league']) == league)) Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 2), child: _teamButton(team))),
+                    for (final team in _teams.where((t) => _int(t['id_league']) == league)) Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: ALL_SPACE_BLOCK / 2), child: _teamButton(team))),
                   ])),
           ]);
         }
-        return ConstrainedBox(constraints: const BoxConstraints(maxHeight: 132), child: SingleChildScrollView(child: Wrap(spacing: 4, runSpacing: 4, children: [for (final team in _teams) _teamButton(team)])));
-      });
+        return ConstrainedBox(constraints: const BoxConstraints(maxHeight: 132), child: SingleChildScrollView(child: Wrap(spacing: ALL_SPACE_BLOCK, runSpacing: ALL_SPACE_BLOCK, children: [for (final team in _teams) _teamButton(team)])));
+      }));
 
   Widget _bandDetailsButton(Map<String, dynamic> row, Map<String, Color> colors) => IconButton(key: ValueKey('strength-detail-${row['unit'] ?? 'starts'}-${row['slot']}'), tooltip: '${row['label'] ?? row['slot']}の詳細', constraints: const BoxConstraints.tightFor(width: 32, height: 36), padding: EdgeInsets.zero, icon: const Icon(Icons.bar_chart, size: 20), onPressed: () => _showBandDetails(row, colors));
 

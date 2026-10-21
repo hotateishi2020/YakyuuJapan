@@ -3236,6 +3236,32 @@ class FetchURL {
       }
 
       final table = tables.first;
+      final rankingRows = table.querySelectorAll('tr').toList();
+      final seenRows = rankingRows.map((r) => r.text.trim()).toSet();
+      // Follow the provider's own page links when fewer than 50 players are on
+      // the first page. Keep requests bounded and within the same ranking URL.
+      final baseUri = Uri.parse(url);
+      final pages = <Uri>{};
+      for (final link in doc.querySelectorAll('a[href]')) {
+        final candidate = baseUri.resolve(link.attributes['href']!);
+        final page = int.tryParse(candidate.queryParameters['page'] ?? '');
+        if (candidate.origin == baseUri.origin && candidate.path == baseUri.path &&
+            page != null && page > 1 && page <= 5 &&
+            baseUri.queryParameters.entries.where((e) => e.key != 'page')
+              .every((e) => candidate.queryParameters[e.key] == e.value)) pages.add(candidate);
+      }
+      final orderedPages = pages.toList()..sort((a,b) => int.parse(a.queryParameters['page']!).compareTo(int.parse(b.queryParameters['page']!)));
+      for (final page in orderedPages) {
+        if (rankingRows.where((r) => r.querySelectorAll('td').isNotEmpty).length >= 50) break;
+        try {
+          final next = await http.get(page).timeout(const Duration(seconds: 15));
+          if (next.statusCode != 200) break;
+          final nextRows = parse(_decodeHtml(next)).querySelectorAll('#js-playerTable tr');
+          for (final row in nextRows) {
+            if (row.querySelectorAll('td').isNotEmpty && seenRows.add(row.text.trim())) rankingRows.add(row);
+          }
+        } catch (_) { break; }
+      }
       List<t_stats_player> listStats = [];
       final colIdx = title == 'ホールド'
           ? table.querySelectorAll('thead th').indexWhere((th) => th.text.replaceAll(RegExp(r'\s|　'), '') == 'ホールド')
@@ -3248,7 +3274,7 @@ class FetchURL {
           : int.tryParse('${stat['int_idx_col']}') ?? 0;
       final isPitcherTable = url.contains('/pitcher');
 
-      for (final tr in table.querySelectorAll('tr')) {
+      for (final tr in rankingRows) {
         try {
           final tds = tr.querySelectorAll('td');
           if (tds.isEmpty) continue;
@@ -3424,6 +3450,7 @@ class FetchURL {
     final statsPlayerMap = Postgres.toMap(resultStatsPlayer);
     final leagueIdSet = leagueIds.toSet();
 
+    final supplementalPages = <String, Document>{};
     if (statsPlayerMap.isNotEmpty) {
       for (final stats_player in statsPlayerMap) {
         final rowLeague = int.tryParse('${stats_player['id_league']}') ?? 0;
@@ -3433,13 +3460,13 @@ class FetchURL {
           var url = '${stats_player['url'] ?? ''}';
           if (url.isEmpty) continue;
 
-          final res = await http.get(Uri.parse(url));
-          if (res.statusCode != 200) {
-            print('ランク外選手HTTP ${res.statusCode}: $url');
-            continue;
+          var doc = supplementalPages[url];
+          if (doc == null) {
+            final res = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 20));
+            if (res.statusCode != 200) continue;
+            doc = parse(_decodeHtml(res));
+            supplementalPages[url] = doc;
           }
-
-          final doc = parse(_decodeHtml(res));
           final rows = doc.querySelectorAll('#js-tabDom01 table.bb-playerStatsTable tbody tr');
           if (rows.isEmpty) {
             print('ランク外選手テーブルなし: $url');
@@ -3457,7 +3484,9 @@ class FetchURL {
           statsPlayer.id_team = stats_player['id_team'] as int;
           statsPlayer.id_league = stats_player['id_league'] as int;
           statsPlayer.id_stats = stats_player['id_stats'] as int;
-          statsPlayer.stats = double.tryParse(detailCols[idxCol].text.trim()) ?? 0;
+          final supplementalValue = double.tryParse(detailCols[idxCol].text.trim());
+          if (supplementalValue == null) continue;
+          statsPlayer.stats = supplementalValue;
           statsPlayer.int_rank = 1000;
           statsPlayer.playerName = '${stats_player['name_full'] ?? ''}';
           statsPlayer.teamName = '${stats_player['name_shortest'] ?? ''}';

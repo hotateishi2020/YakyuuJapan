@@ -118,6 +118,13 @@ List<Map<String, dynamic>> parseSeasonAwardPage(String body, String path, int ye
       }
       if (key != null) {
         add(farmLeague != null ? 'farm_major' : key, name, team: team, detail: '${farmLeague ?? league} $label'.trim());
+        if (key == 'glove') {
+          final comment = _text(card);
+          final count = RegExp(r'(\d+)[回度]目').firstMatch(comment)?[1];
+          final playerId = RegExp(r'/players/(\d+)\.html').firstMatch(card.outerHtml)?[1];
+          if (count != null || comment.contains('初受賞')) rows.last['career_count'] = int.tryParse(count ?? '') ?? 1;
+          if (playerId != null) rows.last['source_player_id'] = playerId;
+        }
         if (farmLeague != null && rows.isNotEmpty) rows.last.addAll({'farm_league': farmLeague, 'award_label': label});
         final stat = card.querySelectorAll('.comment').map(_text).where((t) => RegExp(r'^(打率|安打|本塁打|打点|盗塁|出塁率|防御率|勝率|勝利|セーブ|ホールドポイント|奪三振)\s').hasMatch(t)).firstOrNull;
         if (stat != null && rows.isNotEmpty) rows.last['value'] = stat;

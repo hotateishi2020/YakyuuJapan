@@ -145,6 +145,9 @@ dynamic _channelContent(String html, String channelId,
   return selected['content'];
 }
 
+List<Map<String, dynamic>> parseVideoSearchPage(String html) =>
+    _parseVideos(_initialData(html)['contents']?['twoColumnSearchResultsRenderer']);
+
 List<Map<String, dynamic>> parseVideoChannelPage(
         String html, String channelId) =>
     _parseVideos(_channelContent(html, channelId));

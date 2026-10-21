@@ -1,3 +1,4 @@
+import 'app/HomeRunVideoSearch.dart';
 import 'app/AdminNews.dart';
 import 'app/PlayerArt.dart';
 import 'app/PlayerArtSchedule.dart';
@@ -1124,6 +1125,18 @@ void main() async {
         _printRequestError(request,error,stack);
         return Response.internalServerError(body:jsonEncode({'error':'日程を取得できませんでした'}),headers:headers);
       }
+    });
+
+    app.get('/home-run-video', (Request request) async {
+      final q = request.url.queryParameters;
+      final name = (q['name'] ?? '').trim(), opponent = q['opponent'] ?? '';
+      final date = DateTime.tryParse(q['date'] ?? '');
+      if (name.length < 2 || name.length > 80 || opponent.length > 80 || date == null ||
+          date.year < 2000 || date.year > DateTime.now().year + 1) {
+        return Response.badRequest(body: 'Invalid search');
+      }
+      final channels = await searchHomeRunVideos(name, date, opponent, q['pacific'] == '1');
+      return Response.ok(jsonEncode({'channels': channels}), headers: {'content-type':'application/json; charset=utf-8'});
     });
 
     app.get('/videos', (Request request) async {

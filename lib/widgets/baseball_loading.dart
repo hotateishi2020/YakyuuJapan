@@ -6,7 +6,8 @@ enum BaseballLoadingScene {
   fielding('ノックを受けて捕球・送球する守備練習'),
   longThrow('遠投の弧線で読み込み状況を表示'),
   catchBall('二人の選手がキャッチボール'),
-  pitching('ピッチャーからキャッチャーへの投球');
+  pitching('ピッチャーからキャッチャーへの投球'),
+  homeRun('投球を打ち返してホームラン');
   const BaseballLoadingScene(this.label);
   final String label;
 }
@@ -75,22 +76,32 @@ class _BaseballLoadingState extends State<BaseballLoading>
     return Semantics(
       label: _scene.label,
       value: '${estimated ? 'Loading... ' : ''}$percent%',
-      child: SizedBox(
-          width: widget.compact ? 140 : 280,
-          height: widget.compact ? 100 : 200,
+      child: LayoutBuilder(builder: (context, constraints) {
+        final longThrow = _scene == BaseballLoadingScene.longThrow;
+        final width = longThrow
+            ? (constraints.hasBoundedWidth ? constraints.maxWidth : 420.0)
+            : widget.compact ? 140.0 : math.min(constraints.maxWidth, 420.0);
+        final sceneWidth = longThrow ? width : 280.0;
+        final height = math.min(constraints.maxHeight, longThrow ? (widget.compact ? 100.0 : 200.0) : width * 200 / sceneWidth);
+        return Center(widthFactor: 1, heightFactor: 1, child: SizedBox(
+          key: const ValueKey('baseball-loading-area'),
+          width: width,
+          height: height,
           child: FittedBox(
               fit: BoxFit.contain,
               child: SizedBox(
-                  width: 280,
+                  width: sceneWidth,
                   height: 200,
                   child: Column(children: [
                     Flexible(
                         child: SizedBox(
-                            width: 280,
+                            width: sceneWidth,
                             height: 168,
                             child: CustomPaint(
                                 painter: _scene == BaseballLoadingScene.fielding
                                   ? _InfieldPainter(_motion, widget.color, _reduced)
+                                  : _scene == BaseballLoadingScene.homeRun
+                                  ? _HomeRunPainter(_motion, widget.color, _reduced)
                                   : _ThrowPainter(_motion, widget.color, _reduced,
                                       _scene, estimated ? null : percent / 100)))),
                     ExcludeSemantics(
@@ -101,7 +112,8 @@ class _BaseballLoadingState extends State<BaseballLoading>
                                 fontWeight: FontWeight.w800,
                                 color:
                                     Theme.of(context).colorScheme.onSurface))),
-                  ])))),
+                  ])))));
+      }),
     );
   }
 }
@@ -118,21 +130,22 @@ class _ThrowPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     canvas.save();
-    canvas.scale(size.width / 280, size.height / 168);
+    final logicalWidth = scene == BaseballLoadingScene.longThrow ? size.width : 280.0;
+    canvas.scale(size.width / logicalWidth, size.height / 168);
     final phase = reduced ? .3 : (motion.value * 4) % 1;
     final pitching = scene == BaseballLoadingScene.pitching;
     final longThrow = scene == BaseballLoadingScene.longThrow;
     final returning = !longThrow && phase >= .5;
     final flight = longThrow ? (progress ?? phase) : (phase * 2) % 1;
     final t = ((flight - .15) / .7).clamp(0.0, 1.0);
-    final from = returning ? const Offset(227, 100) : const Offset(53, 94);
-    final to = returning ? const Offset(53, 94) : const Offset(227, 100);
+    final from = returning ? Offset(logicalWidth - 53, 100) : const Offset(53, 94);
+    final to = returning ? const Offset(53, 94) : Offset(logicalWidth - 53, 100);
     final path = Path()..moveTo(from.dx, from.dy)
-      ..quadraticBezierTo(140, longThrow ? -35 : pitching && !returning ? 78 : 36, to.dx, to.dy);
+      ..quadraticBezierTo(logicalWidth / 2, longThrow ? -35 : pitching && !returning ? 78 : 36, to.dx, to.dy);
     final metric = path.computeMetrics().first;
     final fraction = longThrow ? flight : t;
     final ball = metric.getTangentForOffset(metric.length * fraction)!.position;
-    canvas.drawOval(const Rect.fromLTWH(15, 119, 250, 34), Paint()..color = const Color(0xffdcebd7));
+    canvas.drawOval(Rect.fromLTWH(15, 119, logicalWidth - 30, 34), Paint()..color = const Color(0xffdcebd7));
     if (pitching) {
       canvas.drawOval(const Rect.fromLTWH(20, 127, 65, 18), Paint()..color = const Color(0xffeacb97));
       canvas.drawLine(const Offset(36, 135), const Offset(59, 135), Paint()..color = Colors.white..strokeWidth = 3);
@@ -171,7 +184,7 @@ class _ThrowPainter extends CustomPainter {
       canvas.restore();
     }
     player(const Offset(40, 102), catcher: false, throwing: !returning, faceLeft: false);
-    player(const Offset(240, 102), catcher: pitching, throwing: returning, faceLeft: true);
+    player(Offset(logicalWidth - 40, 102), catcher: pitching, throwing: returning, faceLeft: true);
     canvas.drawCircle(ball, 5.5, Paint()..color = uniform);
     canvas.drawCircle(ball, 4.5, Paint()..color = Colors.white);
     canvas.drawArc(Rect.fromCircle(center: ball + const Offset(-3, 0), radius: 3), -.9, 1.8, false,
@@ -383,4 +396,90 @@ class _InfieldPainter extends CustomPainter {
   @override
   bool shouldRepaint(_InfieldPainter old) =>
       old.uniform != uniform || old.reduced != reduced;
+}
+
+
+class _HomeRunPainter extends CustomPainter {
+  _HomeRunPainter(this.motion, this.uniform, this.reduced) : super(repaint: motion);
+  final Animation<double> motion;
+  final Color uniform;
+  final bool reduced;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.scale(size.width / 280, size.height / 168);
+    final phase = reduced ? .72 : (motion.value * 2) % 1;
+    double interval(double start, double end) => ((phase - start) / (end - start)).clamp(0.0, 1.0);
+    final swing = Curves.easeInOut.transform(interval(.29, .39));
+    final field = Paint()..color = const Color(0xffdcebd7);
+    canvas.drawOval(const Rect.fromLTWH(6, 113, 268, 43), field);
+    canvas.drawOval(const Rect.fromLTWH(28, 127, 60, 16), Paint()..color = const Color(0xffeacb97));
+    canvas.drawLine(const Offset(42, 133), const Offset(59, 133), Paint()..color = Colors.white..strokeWidth = 3);
+    canvas.drawRect(const Rect.fromLTWH(212, 139, 18, 5), Paint()..color = Colors.white);
+    // Outfield fence behind the home-run arc.
+    final fence = Paint()..color = const Color(0xff719d86)..strokeWidth = 2;
+    canvas.drawLine(const Offset(12, 52), const Offset(140, 52), fence);
+    for (double x = 12; x <= 140; x += 16) {
+      canvas.drawLine(Offset(x, 52), Offset(x, 66), fence);
+    }
+    void player(Offset position, bool batter) {
+      canvas.save();
+      canvas.translate(position.dx, position.dy);
+      final action = math.sin(interval(.04, .28) * math.pi);
+      final limb = Paint()..color = uniform..strokeWidth = 7..strokeCap = StrokeCap.round;
+      canvas.drawLine(const Offset(-5, 15), Offset(-12 - (batter ? swing * 4 : action * 5), 33), limb);
+      canvas.drawLine(const Offset(5, 15), Offset(13 + (batter ? swing * 3 : action * 8), 33), limb);
+      canvas.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTWH(-12, -5, 24, 25), const Radius.circular(7)), Paint()..color = Colors.white);
+      canvas.drawLine(const Offset(0, -3), const Offset(0, 17), limb..strokeWidth = 2);
+      canvas.drawCircle(const Offset(0, -20), 16, Paint()..color = const Color(0xffffd5ad));
+      canvas.drawArc(const Rect.fromLTWH(-17, -37, 34, 31), math.pi, math.pi, true, Paint()..color = uniform);
+      canvas.drawLine(const Offset(-19, -23), const Offset(18, -23), limb..strokeWidth = 5);
+      canvas.drawCircle(Offset(batter ? -6 : 6, -17), 2, Paint()..color = const Color(0xff273444));
+      if (batter) {
+        final grip = Offset(-14 + swing * 7, 0);
+        final angle = -1.1 - swing * 2.5;
+        canvas.drawLine(grip, grip + Offset(math.cos(angle), math.sin(angle)) * 37,
+          Paint()..color = const Color(0xffad7139)..strokeWidth = 6..strokeCap = StrokeCap.round);
+        canvas.drawLine(const Offset(8, 0), grip, limb..strokeWidth = 7);
+        canvas.drawCircle(grip, 5, Paint()..color = const Color(0xffffd5ad));
+      } else {
+        final hand = Offset(15 + action * 11, -4 - action * 23);
+        canvas.drawLine(const Offset(9, 0), hand, limb..strokeWidth = 7);
+        canvas.drawCircle(hand, 5, Paint()..color = const Color(0xffffd5ad));
+        canvas.drawOval(const Rect.fromLTWH(-25, -2, 16, 18), Paint()..color = const Color(0xffac6f39));
+      }
+      canvas.restore();
+    }
+    player(const Offset(52, 103), false);
+    player(const Offset(233, 108), true);
+    const contact = Offset(205, 103);
+    final arc = Path()..moveTo(contact.dx, contact.dy)..quadraticBezierTo(135, -10, 20, 32);
+    final metric = arc.computeMetrics().first;
+    final flight = interval(.36, .82);
+    final ball = phase < .36
+      ? Offset.lerp(const Offset(76, 82), contact, interval(.12, .36))!
+      : metric.getTangentForOffset(metric.length * flight)!.position;
+    if (phase >= .36) {
+      canvas.drawPath(metric.extractPath(0, metric.length * flight), Paint()..color = const Color(0xffe7b64a)..strokeWidth = 2..style = PaintingStyle.stroke);
+    }
+    if (phase >= .34 && phase < .45) {
+      for (var i = 0; i < 8; i++) {
+        final direction = Offset(math.cos(i * math.pi / 4), math.sin(i * math.pi / 4));
+        canvas.drawLine(contact + direction * 8, contact + direction * 16, Paint()..color = Colors.orange..strokeWidth = 2);
+      }
+    }
+    canvas.drawCircle(ball, 5.5, Paint()..color = uniform);
+    canvas.drawCircle(ball, 4.5, Paint()..color = Colors.white);
+    canvas.drawArc(Rect.fromCircle(center: ball + const Offset(-3, 0), radius: 3), -.9, 1.8, false,
+      Paint()..color = const Color(0xffd8544d)..style = PaintingStyle.stroke..strokeWidth = 1);
+    if (phase >= .72) {
+      final text = TextPainter(text: const TextSpan(text: 'HOME RUN!', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xffc47812))), textDirection: TextDirection.ltr)..layout();
+      text.paint(canvas, Offset((280 - text.width) / 2, 7));
+      text.dispose();
+    }
+    canvas.restore();
+  }
+  @override
+  bool shouldRepaint(_HomeRunPainter old) => old.uniform != uniform || old.reduced != reduced;
 }

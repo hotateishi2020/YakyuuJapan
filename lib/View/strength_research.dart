@@ -230,7 +230,7 @@ class _StrengthDraftState extends State<StrengthDraft> {
                                         child: InkWell(
                                           key: ValueKey(entry.$1 == 0 ? 'draft-video-${player['name']}' : 'draft-video-${player['name']}-${video['video_id']}'),
                                           onTap: () async {
-                                            final opened = await openYoutube('${video['video_id']}');
+                                            final opened = await openYoutube('${video['video_id']}', startSeconds: (video['start_seconds'] as num?)?.toInt());
                                             if (!opened && context.mounted) {
                                               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('動画を開けませんでした。')));
                                             }
@@ -342,7 +342,12 @@ class _StrengthDraftState extends State<StrengthDraft> {
 }
 
 List<Map<String, dynamic>> draftRelatedVideos(Map<String, dynamic> player) {
-  final videos = listMapFromJson(player['feature_videos']).where((v) => RegExp(r'^[A-Za-z0-9_-]{11}$').hasMatch('${v['video_id']}') && v['view_count'] is num && v['is_short'] != true).toList()..sort(compareDraftVideos);
+  final videos = listMapFromJson(player['feature_videos']).where((v) => RegExp(r'^[A-Za-z0-9_-]{11}$').hasMatch('${v['video_id']}') && v['view_count'] is num && v['is_short'] != true).toList()
+    ..sort((a, b) {
+      // Keep explicitly supplied source videos visible alongside related clips.
+      final reference = (b['is_reference'] == true ? 1 : 0).compareTo(a['is_reference'] == true ? 1 : 0);
+      return reference != 0 ? reference : compareDraftVideos(a, b);
+    });
   final seen = <String>{};
   return videos.where((video) => seen.add('${video['video_id']}')).take(4).toList();
 }

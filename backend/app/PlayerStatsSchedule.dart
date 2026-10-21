@@ -7,6 +7,7 @@ import 'FetchMLB.dart';
 import 'FetchURL.dart';
 import 'OrgLeague.dart';
 import 'PredictionSnapshot.dart';
+import 'DisplaySnapshot.dart';
 
 /// 個人成績ランキングは画面の初期表示では取らない。サーバーが定期的に登録する。
 class PlayerStatsSchedule {
@@ -56,7 +57,10 @@ class PlayerStatsSchedule {
   static Future<void> _runAll() async {
     await _runNpb();
     await _runMlb();
-    await Postgres.withConnection(PredictionSnapshot.refresh);
+    await Postgres.withConnection((conn) async {
+      await DisplaySnapshot.refreshPlayers(conn, DateTime.now().year);
+      await PredictionSnapshot.refresh(conn);
+    });
   }
 
   static Future<void> _runNpb() async {

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'QualifiedPitchingMetrics.dart';
+import 'GoldenGloveStats.dart';
 import 'package:postgres/postgres.dart';
 import 'ClubData.dart';
 import 'StrengthUsage.dart';
@@ -64,7 +65,6 @@ Future<void> attachOfficialIdentity(Connection conn, int year, List<Map<String, 
 
 Future<List<Map<String, dynamic>>> extraStatRows(Connection conn, int year, List<int> leagues, {List<Map<String, dynamic>>? knownPeople}) async {
   final data = readClubFile('player-metrics-$year.json');
-  if (data.isEmpty) return [];
   final people = knownPeople ?? (await conn.execute('SELECT p.id,p.name_full,p.url,p.date_birth::date::text,p.id_team,p.txt_position,t.id_league,t.name_shortest AS name_team,t.color_back,t.color_font FROM m_player p JOIN m_team t ON t.id=p.id_team WHERE t.id_league=ANY(\$1::int[]) AND NOT COALESCE(p.flg_delete,false)', parameters: [leagues])).map((r) => r.toColumnMap()).toList();
   if (knownPeople == null) await attachOfficialIdentity(conn, year, people);
   final bySource = <String, List<Map<String, dynamic>>>{};
@@ -86,12 +86,19 @@ Future<List<Map<String, dynamic>>> extraStatRows(Connection conn, int year, List
       rows.add({...match, 'id_player': match['id'], 'name_player': match['name_full'], 'int_year': year, ...s, if (s['title'] == '盗塁阻止数') 'catcher_metric': true, 'id_users': null, 'colors_user': null, 'colors': null, 'id_stats': null, 'int_rank': 1000, 'source': s['source'] ?? p['source'], 'checked_at': data['checked_at']});
     }
   }
+  if (leagues.any((league) => league == 1 || league == 2)) {
+    final activePlayers = await goldenGloveSeasonPlayers(conn, year, leagues);
+    rows.addAll(goldenGloveRows(year, activePlayers));
+    rows.addAll(goldenGloveRows(year, activePlayers, pitching: true));
+  }
   final qualificationGames = await readQualificationGames(conn, year);
   retainQualifiedPitchingRates(rows, qualificationGames);
   retainCatcherCounts(rows);
   for (final title in rows.map((r) => '${r['title']}').toSet())
-    for (final league in leagues) {
-      final group = rows.where((r) => r['title'] == title && r['id_league'] == league).toList();
+    for (final league in leagues)
+    for (final role in title == 'GG受賞回数' ? <bool?>[false, true] : <bool?>[null]) {
+      final group = rows.where((r) => r['title'] == title && r['id_league'] == league &&
+        (role == null || r['flg_pitcher'] == role)).toList();
       group.sort((a, b) {
         final av = num.tryParse('${a['numeric_value']}'), bv = num.tryParse('${b['numeric_value']}');
         if (av == null) return bv == null ? 0 : 1;

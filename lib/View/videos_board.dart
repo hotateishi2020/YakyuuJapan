@@ -529,26 +529,31 @@ class _VideosBoardState extends State<VideosBoard> {
   // during scrolling. Respect accessibility text scaling as well.
   double _videoRowHeight(BuildContext context, double width,
       List<Map<String, dynamic>> videos) {
-    double textHeight(double size, int lines, {FontWeight? weight}) {
+    double textHeight(String text, TextStyle style, int lines) {
       final painter = TextPainter(
-        text: TextSpan(
-          text: List.filled(lines, '動画').join('\n'),
-          style: DefaultTextStyle.of(context).style.copyWith(
-              fontSize: size, fontWeight: weight ?? FontWeight.normal),
-        ),
+        text: TextSpan(text: text, style: DefaultTextStyle.of(context).style.merge(style)),
         textDirection: Directionality.of(context),
         textScaler: MediaQuery.textScalerOf(context),
-      )..layout();
-      final height = painter.height;
+        locale: Localizations.maybeLocaleOf(context),
+        maxLines: lines,
+        ellipsis: '…',
+      )..layout(maxWidth: math.max(1, width - 12));
+      final height = painter.height.ceilToDouble();
       painter.dispose();
       return height;
     }
 
-    final hasSource = videos.any((video) => video['source_name'] != null);
-    return width * 9 / 16 +
-        textHeight(12, 2, weight: FontWeight.w600) +
-        textHeight(10, 1) * (hasSource ? 2 : 1) +
-        (hasSource ? 26 : 20) + 2;
+    double maximum = 0;
+    for (final video in videos) {
+      final label = video['published_at'] != null
+          ? _date(video['published_at']) : '${video['published_label'] ?? ''}';
+      final height = width * 9 / 16 + 20 +
+          textHeight('${video['title']}', const TextStyle(fontSize: 12, fontWeight: FontWeight.w600), 2) +
+          textHeight(label, const TextStyle(fontSize: 10, color: Colors.black54), 1) +
+          (video['source_name'] == null ? 0 : 6 + textHeight('${video['source_name']}', const TextStyle(fontSize: 10, color: Colors.black54), 1));
+      maximum = math.max(maximum, height);
+    }
+    return maximum.ceilToDouble() + 2;
   }
 
   String _date(dynamic raw) {
@@ -614,6 +619,8 @@ class _VideosBoardState extends State<VideosBoard> {
                   Padding(
                       padding: const EdgeInsets.all(6),
                       child: Text(label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                               fontSize: 10, color: Colors.black54))),
                 ]),

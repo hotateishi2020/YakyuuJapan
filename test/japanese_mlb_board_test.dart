@@ -17,6 +17,8 @@ void main() {
       expect(find.text('野手'),findsOneWidget);
       expect(find.text('二刀流'),findsNWidgets(2));
       expect(find.byType(DataTable),findsNWidgets(2));
+      final tables = find.byType(DataTable);
+      expect(tester.getSize(tables.first).width, tester.getSize(tables.last).width);
       expect(tester.takeException(),isNull);
     },()=>MockClient((request) async {
       expect(request.url.path,endsWith('/mlb-japanese-stats'));

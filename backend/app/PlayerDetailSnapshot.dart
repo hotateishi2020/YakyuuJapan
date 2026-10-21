@@ -5,6 +5,7 @@ import '../tools/Postgres.dart';
 import 'PlayerDetail.dart';
 import 'PlayerArt.dart';
 import 'ScheduledLog.dart';
+import 'SnapshotWork.dart';
 
 /// Request path reads one indexed JSON snapshot. All aggregation and upstream
 /// requests belong to refresh(), never to opening a player dialog.
@@ -104,8 +105,8 @@ class PlayerDetailSnapshot {
   }
 
   static Future<Map<String, dynamic>> refresh(int year,
-      {Set<int>? playerIds}) async {
-    if (_busy) return {'skipped': true};
+      {Set<int>? playerIds, int? maxPlayers}) async {
+    if (_busy || !SnapshotWork.tryStart()) return {'skipped': true};
     _busy = true;
     var count = 0, failed = 0;
     try {
@@ -136,7 +137,7 @@ class PlayerDetailSnapshot {
               playerIds != null ||
               DateTime.tryParse('${p['snapshot_updated']}')?.isAfter(cutoff) !=
                   true)
-          .toList();
+          .take(maxPlayers ?? people.length).toList();
       if (selected.isEmpty) {
         return {
           'year': year,
@@ -181,8 +182,8 @@ class PlayerDetailSnapshot {
           }
 
           // Shared season/game inputs mean prepare() performs no DB queries.
-          for (var i = 0; i < group.length; i += 4) {
-            await Future.wait(group.skip(i).take(4).map(prepare));
+          for (final person in group) {
+            await prepare(person);
           }
           await conn.execute('''INSERT INTO t_player_detail_snapshot
             (int_year,id_player,id_league,id_team,source_player_id,normalized_name,payload)
@@ -199,6 +200,7 @@ class PlayerDetailSnapshot {
       return {'year': year, 'updated': count, 'failed': failed};
     } finally {
       _busy = false;
+      SnapshotWork.finish();
     }
   }
 
@@ -215,7 +217,7 @@ class PlayerDetailSnapshot {
     Future<void> tick() async {
       try {
         await ScheduledLog.run(
-            'player_detail_snapshot', () => refresh(DateTime.now().year));
+            'player_detail_snapshot', () => refresh(DateTime.now().year, maxPlayers: 80));
       } catch (e) {
         print('選手詳細定期集計: $e');
       }
@@ -223,6 +225,6 @@ class PlayerDetailSnapshot {
 
     // Keep stored data available while the background worker fills missing / stale players.
     Timer(const Duration(minutes: 2), () => unawaited(tick()));
-    _timer = Timer.periodic(const Duration(hours: 1), (_) => unawaited(tick()));
+    _timer = Timer.periodic(const Duration(minutes: 2), (_) => unawaited(tick()));
   }
 }

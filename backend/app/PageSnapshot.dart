@@ -7,6 +7,7 @@ import 'DisplaySnapshot.dart';
 import 'OrgLeague.dart';
 import 'Records.dart';
 import 'ScheduledLog.dart';
+import 'SnapshotWork.dart';
 
 /// Persistent, atomically published page results. HTTP readers never aggregate.
 class PageSnapshot {
@@ -79,7 +80,7 @@ class PageSnapshot {
   }
 
   static Future<void> tick() async {
-    if (_busy) return;
+    if (_busy || !SnapshotWork.tryStart()) return;
     _busy = true;
     try {
       final year = DateTime.now().toUtc().add(const Duration(hours: 9)).year;
@@ -120,7 +121,7 @@ class PageSnapshot {
       }
       // Workload is now calculated only here / when source standings are saved.
       await ScheduledLog.run('standings_snapshot', () => Postgres.withConnection((conn) => DisplaySnapshot.refreshTeams(conn, year)));
-    } finally { _busy = false; }
+    } finally { _busy = false; SnapshotWork.finish(); }
   }
 
   static void start() {

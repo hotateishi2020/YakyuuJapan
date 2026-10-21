@@ -4,8 +4,13 @@ import 'StrengthUsage.dart';
 
 final _recentMlbCache = <String, ({DateTime expires, Future<List<Map<String, dynamic>>> value})>{};
 Future<List<Map<String, dynamic>>> mlbRecentGames(String id, int year) {
+  final now = DateTime.now();
+  _recentMlbCache.removeWhere((_, entry) => !entry.expires.isAfter(now));
   final key = '$id:$year', old = _recentMlbCache[key];
   if (old != null && old.expires.isAfter(DateTime.now())) return old.value;
+  while (_recentMlbCache.length >= 32) {
+    _recentMlbCache.remove(_recentMlbCache.keys.first);
+  }
   final value = _fetch(id, year);
   _recentMlbCache[key] = (expires: DateTime.now().add(const Duration(minutes: 15)), value: value);
   return value;

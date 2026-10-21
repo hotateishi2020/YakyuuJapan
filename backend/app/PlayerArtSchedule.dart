@@ -1,3 +1,4 @@
+import 'SnapshotWork.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -191,7 +192,7 @@ class PlayerArtSchedule {
   }
 
   static Future<Map<String, dynamic>> run() async {
-    if (_busy) return {'skipped': 'busy'};
+    if (_busy || !SnapshotWork.tryStart()) return {'skipped': 'busy'};
     _busy = true;
     final client = http.Client();
     var completed = 0, failed = 0;
@@ -264,6 +265,7 @@ class PlayerArtSchedule {
     } finally {
       client.close();
       _busy = false;
+      SnapshotWork.finish();
     }
   }
 

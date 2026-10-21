@@ -1,3 +1,4 @@
+import 'SnapshotWork.dart';
 import 'ScheduledLog.dart';
 import 'dart:async';
 
@@ -32,7 +33,7 @@ class PlayerStatsSchedule {
   }
 
   static Future<void> tick({required void Function() onUpdated}) async {
-    if (_busy) {
+    if (_busy || !SnapshotWork.tryStart()) {
       print('個人成績定期取得: 前回が残っているのでスキップ');
       return;
     }
@@ -50,6 +51,7 @@ class PlayerStatsSchedule {
       print('個人成績定期取得失敗: $e\n$st');
     } finally {
       _busy = false;
+      SnapshotWork.finish();
     }
     if (updated) onUpdated();
   }

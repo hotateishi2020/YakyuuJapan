@@ -1,3 +1,4 @@
+import 'SnapshotWork.dart';
 import 'NpbResearchEvents.dart';
 import 'ScheduledLog.dart';
 import 'RosterBirthplaces.dart';
@@ -88,6 +89,7 @@ class TeamStrength {
     if (year < 2005 || year > DateTime.now().year) {
       throw ArgumentError.value(year, 'year', '2005年以降の表示年を指定してください');
     }
+    if (!SnapshotWork.tryStart()) return {'registered': 0, 'busy': true, 'errors': <String>[]};
     _busy = true;
     final client = http.Client();
     final errors = <String>[];
@@ -158,6 +160,7 @@ class TeamStrength {
     } finally {
       client.close();
       _busy = false;
+      SnapshotWork.finish();
     }
   }
 

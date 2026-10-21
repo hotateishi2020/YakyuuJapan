@@ -253,7 +253,7 @@ class PlayerDetailBatch {
     final people = (await conn.execute("SELECT p.id,p.name_full,p.url,p.id_team,p.txt_position,p.date_birth::text,p.height,p.weight,p.pitching,p.batting,p.uniform_number,c.name AS birth_country,b.name AS birth_place,t.name_short AS name_team,t.color_back,t.color_font,t.id_league FROM m_player p JOIN m_team t ON t.id=p.id_team LEFT JOIN m_country c ON c.id=p.id_country LEFT JOIN m_place_birth b ON b.id=p.id_place_birth WHERE t.id_league IN (1,2,3,4) AND NOT COALESCE(p.flg_delete,false) AND p.id=ANY(\$1::int[])", parameters: [playerIds])).map((r) => r.toColumnMap()).toList();
     await attachOfficialIdentity(conn, year, people);
     final careers = <Map<String, dynamic>>[];
-    final stats = (await conn.execute('SELECT payload FROM v_stats_player WHERE int_year=\$1 ORDER BY row_no', parameters: [year])).map((r) => detailMap(r[0])).toList();
+    final stats = (await conn.execute('SELECT payload FROM v_stats_player WHERE int_year=\$1 AND (payload->>\'id_player\')::int=ANY(\$2::int[]) ORDER BY row_no', parameters: [year, playerIds])).map((r) => detailMap(r[0])).toList();
     final teams = (await conn.execute("SELECT jsonb_build_object('id_team',id_team,'roster',payload->'roster','positions',payload->'positions','pitching_workload',payload->'pitching_workload','batting_stats',payload->'batting_stats','pitching_stats',payload->'pitching_stats','contracts',payload->'contracts') FROM t_team_strength WHERE int_year=\$1", parameters: [year])).map((r) => detailMap(r[0])).toList();
     final extra = await extraStatRows(conn, year, [1, 2, 3, 4], knownPeople: people);
     return PlayerDetailBatch(people, careers, stats, extra, teams)

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:shelf/shelf.dart';
 import 'Auth.dart';
 import '../tools/Postgres.dart';
@@ -36,6 +37,7 @@ class ScheduledLog {
 
   static Future<T> run<T>(String action, Future<T> Function() task) async {
     final started = DateTime.now();
+    print('worker start $action rss=${ProcessInfo.currentRss ~/ (1024 * 1024)}MB');
     Object? failure;
     StackTrace? trace;
     try {
@@ -45,6 +47,7 @@ class ScheduledLog {
       trace = stack;
       rethrow;
     } finally {
+      print('worker end $action rss=${ProcessInfo.currentRss ~/ (1024 * 1024)}MB peak=${ProcessInfo.maxRss ~/ (1024 * 1024)}MB');
       await record(action,
           error: failure,
           stack: trace,

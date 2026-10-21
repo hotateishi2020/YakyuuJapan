@@ -102,7 +102,11 @@ class Records {
     ''', parameters: [year]);
     final gameIds = games.map((r) => r[0]).whereType<int>().toList();
     final summaries = gameIds.isEmpty ? <Map<String, dynamic>>[] : (await conn.execute('''
-      SELECT s.*, p.name_full AS name FROM t_game_summary s JOIN m_player p ON p.id=s.id_player
+      SELECT s.id_game,s.id_player,s.code_result_pitcher,s.int_pitch,
+        s.double_inning_pitch,s.int_runs,s.int_hit1,s.int_hit2,s.int_hit3,
+        s.int_homerun,s.int_batting,s.int_fourball,s.int_dead_batting,
+        s.int_sacrifice,p.name_full AS name
+      FROM t_game_summary s JOIN m_player p ON p.id=s.id_player
       WHERE s.id_game=ANY(\$1::int[]) AND NOT COALESCE(s.flg_delete,false)
       ORDER BY s.id_game,s.id_player
     ''', parameters: [gameIds])).map((r) => r.toColumnMap()).toList();
@@ -202,7 +206,7 @@ class Records {
       ],
     };
     _cache.clear(); // Background historical builds must not retain every full season in memory.
-    _cache[key] = (at: DateTime.now(), data: data);
+    if (!force) _cache[key] = (at: DateTime.now(), data: data);
     return data;
   }
 }

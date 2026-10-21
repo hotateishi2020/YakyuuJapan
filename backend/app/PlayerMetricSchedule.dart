@@ -1,3 +1,4 @@
+import 'SnapshotWork.dart';
 import '../tools/Postgres.dart';
 import 'MlbSeasonPositions.dart';
 import 'dart:async';
@@ -12,7 +13,7 @@ class PlayerMetricSchedule {
   static void start({void Function()? onUpdated}) {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(hours: 6), (_) async {
-      if (_busy) return;
+      if (_busy || !SnapshotWork.tryStart()) return;
       _busy = true;
       try {
         await ScheduledLog.run('player_extended_metrics', () async {
@@ -28,6 +29,7 @@ class PlayerMetricSchedule {
         print('追加個人指標更新: $e');
       } finally {
         _busy = false;
+        SnapshotWork.finish();
       }
     });
   }

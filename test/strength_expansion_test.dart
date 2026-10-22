@@ -137,22 +137,18 @@ void main() {
         2);
   });
 
-  testWidgets('予想ロゴは根拠を開き出典URLを表示しない', (t) async {
+  testWidgets('会議終了後は予想に代わって公式の指名結果を表示する', (t) async {
     await t.binding.setSurfaceSize(const Size(1200, 800));
     addTearDown(() => t.binding.setSurfaceSize(null));
     await t.runAsync(() => rootBundle.loadString('backend/assets/data/draft_2026.json'));
     await t.pumpWidget(const MaterialApp(home: Scaffold(body: StrengthDraft(year: 2026))));
     await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
     await t.pumpAndSettle();
-    final logo = find.byKey(const ValueKey('draft-prediction-菰田陽生-巨人'));
-    await t.tap(logo);
-    await t.pumpAndSettle();
-    expect(find.text('https://www.hb-nippon.com/articles/18340'), findsNothing);
-    expect(find.text('https://www.youtube.com/watch?v=oOYEfvW9xOk'), findsNothing);
-    expect(find.textContaining('予想者：AIデータ二刀流'), findsNothing);
-    await t.tap(find.text('閉じる'));
-    await t.pumpAndSettle();
-    expect(t.getBottomRight(find.byKey(const ValueKey('draft-cell-菰田陽生-12'))).dx, closeTo(1232, .1));
+    expect(find.byKey(const ValueKey('draft-prediction-菰田陽生-巨人')), findsNothing);
+    expect(find.byKey(const ValueKey('draft-result-菰田陽生')), findsOneWidget);
+    expect(find.text('指名結果'), findsOneWidget);
+    expect(t.getBottomRight(find.byKey(const ValueKey('draft-cell-菰田陽生-12'))).dx,
+        t.getBottomRight(find.byKey(const ValueKey('draft-cell-織田翔希-12'))).dx);
     final age = find.byKey(const ValueKey('draft-cell-菰田陽生-4'));
     expect(find.descendant(of: age, matching: find.text('18')), findsOneWidget);
     expect(find.byTooltip('2027年3月31日時点'), findsOneWidget);
@@ -471,7 +467,7 @@ void main() {
     expect(find.text('織田翔希'), findsOneWidget);
     expect(find.byType(ChoiceChip), findsNothing);
     expect(find.byIcon(Icons.info_outline), findsNothing);
-    for (final header in ['注目度', '選手名', '所属', 'チーム', '年齢', '身長', '体重', '投打', 'ポジション', '経歴', '特徴', '獲得予想', '特集動画']) {
+    for (final header in ['注目度', '選手名', '所属', 'チーム', '年齢', '身長', '体重', '投打', 'ポジション', '経歴', '特徴', '指名結果', '特集動画']) {
       expect(find.text(header), findsOneWidget);
     }
     expect(find.text('高校生'), findsWidgets);
@@ -489,8 +485,8 @@ void main() {
     expect(t.getTopLeft(age).dx, lessThan(initialAge.dx));
     await t.tap(find.text('菰田陽生'));
     await t.pumpAndSettle();
-    expect(find.text('閉じる'), findsOneWidget);
-    await t.tap(find.text('閉じる'));
+    expect(find.byTooltip('閉じる'), findsOneWidget);
+    await t.tap(find.byTooltip('閉じる'));
     await t.pumpAndSettle();
     expect(t.takeException(), isNull);
     await t.pumpWidget(const MaterialApp(

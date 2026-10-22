@@ -1,6 +1,6 @@
 {
   "year": 2026,
-  "checked_at": "2026-10-21",
+  "checked_at": "2026-10-23",
   "players": [
     {
       "category": "高校生",
@@ -279,6 +279,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=130s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "巨人",
+        "type": "支配下",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_g.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -384,6 +391,13 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20080014/"
         ]
+      },
+      "draft_result": {
+        "team": "巨人",
+        "type": "支配下",
+        "rank": "4",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_g.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -707,6 +721,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=270s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "日本ハム",
+        "type": "支配下",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_f.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -913,6 +934,13 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20080003/"
         ]
+      },
+      "draft_result": {
+        "team": "日本ハム",
+        "type": "支配下",
+        "rank": "3",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_f.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -1235,6 +1263,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=360s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "ロッテ",
+        "type": "支配下",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_m.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -1288,6 +1323,13 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20080025/"
         ]
+      },
+      "draft_result": {
+        "team": "中日",
+        "type": "支配下",
+        "rank": "4",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_d.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -1659,6 +1701,13 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20090002/"
         ]
+      },
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "育成",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -2029,6 +2078,13 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20080023/"
         ]
+      },
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "育成",
+        "rank": "6",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -2449,6 +2505,13 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20080020/"
         ]
+      },
+      "draft_result": {
+        "team": "中日",
+        "type": "支配下",
+        "rank": "5",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_d.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -2622,6 +2685,13 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20080017/"
         ]
+      },
+      "draft_result": {
+        "team": "ロッテ",
+        "type": "支配下",
+        "rank": "5",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_m.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -2758,6 +2828,13 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20080022/"
         ]
+      },
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "育成",
+        "rank": "9",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -3108,6 +3185,13 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20080026/"
         ]
+      },
+      "draft_result": {
+        "team": "西武",
+        "type": "育成",
+        "rank": "3",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_l.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -3344,6 +3428,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=500s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "巨人",
+        "type": "支配下",
+        "rank": "3",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_g.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -3514,6 +3605,13 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20080011/"
         ]
+      },
+      "draft_result": {
+        "team": "日本ハム",
+        "type": "支配下",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_f.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -3740,6 +3838,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=580s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "支配下",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -4080,6 +4185,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1390s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "楽天",
+        "type": "支配下",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_e.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -4343,6 +4455,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1020s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "支配下",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -4564,6 +4683,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=940s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "西武",
+        "type": "支配下",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_l.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -4782,6 +4908,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1200s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "オリックス",
+        "type": "支配下",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_b.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -4969,6 +5102,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=640s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "ロッテ",
+        "type": "支配下",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_m.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -5560,6 +5700,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=770s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "支配下",
+        "rank": "3",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -6060,6 +6207,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1100s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "阪神",
+        "type": "支配下",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_t.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -6233,6 +6387,13 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20040158/"
         ]
+      },
+      "draft_result": {
+        "team": "DeNA",
+        "type": "支配下",
+        "rank": "5",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_db.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -6414,6 +6575,13 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20040149/"
         ]
+      },
+      "draft_result": {
+        "team": "巨人",
+        "type": "支配下",
+        "rank": "6",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_g.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -6654,6 +6822,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1550s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "中日",
+        "type": "支配下",
+        "rank": "3",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_d.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -6859,6 +7034,13 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20040145/"
         ]
+      },
+      "draft_result": {
+        "team": "ヤクルト",
+        "type": "支配下",
+        "rank": "3",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_s.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -7136,6 +7318,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1470s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "広島",
+        "type": "支配下",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_c.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -7366,6 +7555,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1630s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "楽天",
+        "type": "支配下",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_e.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -7565,6 +7761,13 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20040050/"
         ]
+      },
+      "draft_result": {
+        "team": "広島",
+        "type": "支配下",
+        "rank": "5",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_c.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -7993,6 +8196,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=2000s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "ロッテ",
+        "type": "支配下",
+        "rank": "4",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_m.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -8199,6 +8409,13 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20040147/"
         ]
+      },
+      "draft_result": {
+        "team": "ヤクルト",
+        "type": "支配下",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_s.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -8423,6 +8640,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1900s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "オリックス",
+        "type": "支配下",
+        "rank": "3",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_b.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -8885,6 +9109,13 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20050057/"
         ]
+      },
+      "draft_result": {
+        "team": "広島",
+        "type": "支配下",
+        "rank": "6",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_c.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -9286,6 +9517,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=2140s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "西武",
+        "type": "支配下",
+        "rank": "3",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_l.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -9477,6 +9715,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=2080s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "西武",
+        "type": "支配下",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_l.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -9670,6 +9915,13 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20020242/"
         ]
+      },
+      "draft_result": {
+        "team": "楽天",
+        "type": "支配下",
+        "rank": "3",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_e.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -10274,6 +10526,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=2230s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "ヤクルト",
+        "type": "支配下",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_s.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -10462,6 +10721,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=2320s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "中日",
+        "type": "支配下",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_d.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -10822,6 +11088,13 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20020195/"
         ]
+      },
+      "draft_result": {
+        "team": "西武",
+        "type": "支配下",
+        "rank": "5",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_l.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -11401,6 +11674,13 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20060059/"
         ]
+      },
+      "draft_result": {
+        "team": "西武",
+        "type": "育成",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_l.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -11647,6 +11927,13 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20020251/"
         ]
+      },
+      "draft_result": {
+        "team": "楽天",
+        "type": "支配下",
+        "rank": "6",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_e.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -11850,6 +12137,13 @@
         "sources": [
           "https://sp.baseball.findfriends.jp/player/20040127/"
         ]
+      },
+      "draft_result": {
+        "team": "楽天",
+        "type": "育成",
+        "rank": "3",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_e.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -12588,6 +12882,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=430s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "巨人",
+        "type": "支配下",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_g.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -12653,6 +12954,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=710s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "中日",
+        "type": "支配下",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_d.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -12718,6 +13026,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=820s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "オリックス",
+        "type": "支配下",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_b.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -12783,6 +13098,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=880s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "DeNA",
+        "type": "支配下",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_db.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -12848,6 +13170,13 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1300s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "支配下",
+        "rank": "5",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
       }
     },
     {
@@ -12913,6 +13242,1277 @@
         "url": "https://www.youtube.com/watch?v=tjC8fvX94Fw&t=1710s",
         "checked_at": "2026-10-21",
         "note": "紹介画面を10秒間隔で確認した位置。各数値は資料掲載時点。"
+      },
+      "draft_result": {
+        "team": "広島",
+        "type": "支配下",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_c.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "萩原義輝",
+      "category": "—",
+      "team": "東芝",
+      "position": "捕手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_e.html"
+      ],
+      "draft_result": {
+        "team": "楽天",
+        "type": "支配下",
+        "rank": "4",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_e.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "高義博",
+      "category": "—",
+      "team": "オイシックス新潟アルビレックス・ベースボール・クラブ",
+      "position": "内野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_e.html"
+      ],
+      "draft_result": {
+        "team": "楽天",
+        "type": "支配下",
+        "rank": "5",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_e.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "根本剛希",
+      "category": "—",
+      "team": "富山GRNサンダーバーズ",
+      "position": "外野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_e.html"
+      ],
+      "draft_result": {
+        "team": "楽天",
+        "type": "育成",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_e.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "藤原佑",
+      "category": "—",
+      "team": "徳島インディゴソックス",
+      "position": "外野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_e.html"
+      ],
+      "draft_result": {
+        "team": "楽天",
+        "type": "育成",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_e.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "寺井広大",
+      "category": "—",
+      "team": "徳島インディゴソックス",
+      "position": "内野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_e.html"
+      ],
+      "draft_result": {
+        "team": "楽天",
+        "type": "育成",
+        "rank": "4",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_e.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "清水智裕",
+      "category": "—",
+      "team": "ヤマハ",
+      "position": "捕手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_d.html"
+      ],
+      "draft_result": {
+        "team": "中日",
+        "type": "支配下",
+        "rank": "6",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_d.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "内藤崚",
+      "category": "—",
+      "team": "上田西高",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_d.html"
+      ],
+      "draft_result": {
+        "team": "中日",
+        "type": "育成",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_d.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "中西佳虎",
+      "category": "—",
+      "team": "大阪桐蔭高",
+      "position": "外野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_d.html"
+      ],
+      "draft_result": {
+        "team": "中日",
+        "type": "育成",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_d.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "長屋竣大",
+      "category": "—",
+      "team": "ENEOS",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_m.html"
+      ],
+      "draft_result": {
+        "team": "ロッテ",
+        "type": "支配下",
+        "rank": "3",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_m.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "田中皐晴",
+      "category": "—",
+      "team": "日南学園高",
+      "position": "外野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_m.html"
+      ],
+      "draft_result": {
+        "team": "ロッテ",
+        "type": "支配下",
+        "rank": "6",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_m.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "若藤芽空",
+      "category": "—",
+      "team": "高川学園高",
+      "position": "内野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_m.html"
+      ],
+      "draft_result": {
+        "team": "ロッテ",
+        "type": "育成",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_m.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "佐々木十央真",
+      "category": "—",
+      "team": "花巻東高",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_m.html"
+      ],
+      "draft_result": {
+        "team": "ロッテ",
+        "type": "育成",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_m.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "内田心温",
+      "category": "—",
+      "team": "関根学園高",
+      "position": "内野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_m.html"
+      ],
+      "draft_result": {
+        "team": "ロッテ",
+        "type": "育成",
+        "rank": "3",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_m.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "高田瑛大",
+      "category": "—",
+      "team": "都城高",
+      "position": "内野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_s.html"
+      ],
+      "draft_result": {
+        "team": "ヤクルト",
+        "type": "支配下",
+        "rank": "4",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_s.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "川平真也",
+      "category": "—",
+      "team": "茨城アストロプラネッツ",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_s.html"
+      ],
+      "draft_result": {
+        "team": "ヤクルト",
+        "type": "支配下",
+        "rank": "5",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_s.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "石澤大和",
+      "category": "—",
+      "team": "日本製鉄室蘭シャークス",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_s.html"
+      ],
+      "draft_result": {
+        "team": "ヤクルト",
+        "type": "支配下",
+        "rank": "6",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_s.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "渡邊隼輔",
+      "category": "—",
+      "team": "徳島インディゴソックス",
+      "position": "内野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_s.html"
+      ],
+      "draft_result": {
+        "team": "ヤクルト",
+        "type": "支配下",
+        "rank": "7",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_s.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "西野日向",
+      "category": "—",
+      "team": "愛媛マンダリンパイレーツ",
+      "position": "内野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_s.html"
+      ],
+      "draft_result": {
+        "team": "ヤクルト",
+        "type": "育成",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_s.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "髙橋将大",
+      "category": "—",
+      "team": "創価高",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_s.html"
+      ],
+      "draft_result": {
+        "team": "ヤクルト",
+        "type": "育成",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_s.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "尾﨑完太",
+      "category": "—",
+      "team": "セガサミー",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_s.html"
+      ],
+      "draft_result": {
+        "team": "ヤクルト",
+        "type": "育成",
+        "rank": "3",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_s.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "近藤琉唯斗",
+      "category": "—",
+      "team": "小樽双葉高",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_b.html"
+      ],
+      "draft_result": {
+        "team": "オリックス",
+        "type": "支配下",
+        "rank": "4",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_b.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "野村亮輔",
+      "category": "大学生",
+      "team": "佛教大学",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_b.html"
+      ],
+      "draft_result": {
+        "team": "オリックス",
+        "type": "支配下",
+        "rank": "5",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_b.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "千葉汐凱",
+      "category": "—",
+      "team": "Honda",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_b.html"
+      ],
+      "draft_result": {
+        "team": "オリックス",
+        "type": "支配下",
+        "rank": "6",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_b.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "黒川凌大",
+      "category": "—",
+      "team": "花咲徳栄高",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_b.html"
+      ],
+      "draft_result": {
+        "team": "オリックス",
+        "type": "育成",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_b.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "井尻琉斗",
+      "category": "大学生",
+      "team": "仙台大学",
+      "position": "捕手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_b.html"
+      ],
+      "draft_result": {
+        "team": "オリックス",
+        "type": "育成",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_b.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "吉田健吾",
+      "category": "—",
+      "team": "栃木ゴールデンブレーブス",
+      "position": "捕手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_b.html"
+      ],
+      "draft_result": {
+        "team": "オリックス",
+        "type": "育成",
+        "rank": "3",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_b.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "河田ハウエルエバン盛児",
+      "category": "大学生",
+      "team": "上武大学",
+      "position": "内野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_b.html"
+      ],
+      "draft_result": {
+        "team": "オリックス",
+        "type": "育成",
+        "rank": "4",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_b.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "若藤季柊",
+      "category": "大学生",
+      "team": "同朋大学",
+      "position": "内野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_b.html"
+      ],
+      "draft_result": {
+        "team": "オリックス",
+        "type": "育成",
+        "rank": "5",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_b.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "菅原大奨",
+      "category": "—",
+      "team": "鮮ど市場",
+      "position": "外野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_b.html"
+      ],
+      "draft_result": {
+        "team": "オリックス",
+        "type": "育成",
+        "rank": "6",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_b.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "野原元気",
+      "category": "大学生",
+      "team": "京都産業大学",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_c.html"
+      ],
+      "draft_result": {
+        "team": "広島",
+        "type": "支配下",
+        "rank": "3",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_c.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "𠮷川凌平",
+      "category": "大学生",
+      "team": "千葉商科大学",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_c.html"
+      ],
+      "draft_result": {
+        "team": "広島",
+        "type": "支配下",
+        "rank": "4",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_c.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "車谷仁",
+      "category": "—",
+      "team": "茨城アストロプラネッツ",
+      "position": "内野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_c.html"
+      ],
+      "draft_result": {
+        "team": "広島",
+        "type": "育成",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_c.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "田代旭",
+      "category": "大学生",
+      "team": "筑波大学",
+      "position": "捕手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_c.html"
+      ],
+      "draft_result": {
+        "team": "広島",
+        "type": "育成",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_c.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "皆吉海翔",
+      "category": "大学生",
+      "team": "長崎国際大学",
+      "position": "内野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_c.html"
+      ],
+      "draft_result": {
+        "team": "広島",
+        "type": "育成",
+        "rank": "3",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_c.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "加藤宇",
+      "category": "大学生",
+      "team": "明星大学",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_f.html"
+      ],
+      "draft_result": {
+        "team": "日本ハム",
+        "type": "支配下",
+        "rank": "4",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_f.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "岡本翔斗",
+      "category": "—",
+      "team": "香里丘高",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_f.html"
+      ],
+      "draft_result": {
+        "team": "日本ハム",
+        "type": "支配下",
+        "rank": "5",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_f.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "岡田光平",
+      "category": "大学生",
+      "team": "大阪工業大学",
+      "position": "外野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_f.html"
+      ],
+      "draft_result": {
+        "team": "日本ハム",
+        "type": "育成",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_f.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "藤井悠貴",
+      "category": "—",
+      "team": "新宮高",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_f.html"
+      ],
+      "draft_result": {
+        "team": "日本ハム",
+        "type": "育成",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_f.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "半杭奏太",
+      "category": "—",
+      "team": "東京農業大學第二高",
+      "position": "内野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_f.html"
+      ],
+      "draft_result": {
+        "team": "日本ハム",
+        "type": "育成",
+        "rank": "3",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_f.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "小島慎也",
+      "category": "大学生",
+      "team": "東北福祉大学",
+      "position": "内野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_f.html"
+      ],
+      "draft_result": {
+        "team": "日本ハム",
+        "type": "育成",
+        "rank": "4",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_f.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "今津慶介",
+      "category": "大学生",
+      "team": "慶應義塾大学",
+      "position": "内野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_f.html"
+      ],
+      "draft_result": {
+        "team": "日本ハム",
+        "type": "育成",
+        "rank": "5",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_f.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "保西雅則",
+      "category": "—",
+      "team": "日本航空石川高",
+      "position": "内野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_db.html"
+      ],
+      "draft_result": {
+        "team": "DeNA",
+        "type": "支配下",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_db.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "杉本寛斎",
+      "category": "大学生",
+      "team": "ブリティッシュ　コロンビア大学",
+      "position": "外野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_db.html"
+      ],
+      "draft_result": {
+        "team": "DeNA",
+        "type": "支配下",
+        "rank": "3",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_db.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "小金井凌生",
+      "category": "大学生",
+      "team": "青森大学",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_db.html"
+      ],
+      "draft_result": {
+        "team": "DeNA",
+        "type": "支配下",
+        "rank": "4",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_db.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "神里陸",
+      "category": "—",
+      "team": "ENEOS",
+      "position": "捕手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_db.html"
+      ],
+      "draft_result": {
+        "team": "DeNA",
+        "type": "支配下",
+        "rank": "6",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_db.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "坂口渉",
+      "category": "—",
+      "team": "Honda",
+      "position": "外野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_db.html"
+      ],
+      "draft_result": {
+        "team": "DeNA",
+        "type": "支配下",
+        "rank": "7",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_db.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "田中諒",
+      "category": "大学生",
+      "team": "日本大学第三高",
+      "position": "捕手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_l.html"
+      ],
+      "draft_result": {
+        "team": "西武",
+        "type": "支配下",
+        "rank": "4",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_l.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "川島謙心",
+      "category": "大学生",
+      "team": "龍谷大学付属平安高",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_l.html"
+      ],
+      "draft_result": {
+        "team": "西武",
+        "type": "育成",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_l.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "伊藤櫂人",
+      "category": "大学生",
+      "team": "中央大学",
+      "position": "内野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_g.html"
+      ],
+      "draft_result": {
+        "team": "巨人",
+        "type": "支配下",
+        "rank": "5",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_g.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "谷渕瑛仁",
+      "category": "—",
+      "team": "大阪桐蔭高",
+      "position": "捕手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_g.html"
+      ],
+      "draft_result": {
+        "team": "巨人",
+        "type": "育成",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_g.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "柳井球汰",
+      "category": "—",
+      "team": "宇部工業高",
+      "position": "内野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_g.html"
+      ],
+      "draft_result": {
+        "team": "巨人",
+        "type": "育成",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_g.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "嶋武仁",
+      "category": "—",
+      "team": "北越高",
+      "position": "外野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_g.html"
+      ],
+      "draft_result": {
+        "team": "巨人",
+        "type": "育成",
+        "rank": "3",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_g.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "松田陸斗",
+      "category": "—",
+      "team": "マツゲン箕島",
+      "position": "内野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_g.html"
+      ],
+      "draft_result": {
+        "team": "巨人",
+        "type": "育成",
+        "rank": "4",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_g.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "関蓮太郎",
+      "category": "—",
+      "team": "川崎市立向丘中学校",
+      "position": "捕手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_g.html"
+      ],
+      "draft_result": {
+        "team": "巨人",
+        "type": "育成",
+        "rank": "5",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_g.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "藤森康淳",
+      "category": "大学生",
+      "team": "法政大学",
+      "position": "外野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_h.html"
+      ],
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "支配下",
+        "rank": "4",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "小坪碧人",
+      "category": "—",
+      "team": "柳川高",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_h.html"
+      ],
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "支配下",
+        "rank": "6",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "中川大雅",
+      "category": "大学生",
+      "team": "至学館大学",
+      "position": "内野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_h.html"
+      ],
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "支配下",
+        "rank": "7",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "深見一騎",
+      "category": "大学生",
+      "team": "国立台湾体育運動大学",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_h.html"
+      ],
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "支配下",
+        "rank": "8",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "佐藤幻瑛",
+      "category": "大学生",
+      "team": "ペンシルベニア州立大学",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_h.html"
+      ],
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "支配下",
+        "rank": "9",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "管田彪翔",
+      "category": "—",
+      "team": "敦賀気比高",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_h.html"
+      ],
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "育成",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "杉本幸基",
+      "category": "—",
+      "team": "KTウィズ",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_h.html"
+      ],
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "育成",
+        "rank": "3",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "田本聖貴",
+      "category": "大学生",
+      "team": "駒澤大学",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_h.html"
+      ],
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "育成",
+        "rank": "4",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "亀田優次郎",
+      "category": "—",
+      "team": "山村学園高",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_h.html"
+      ],
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "育成",
+        "rank": "5",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "辻󠄀村大我",
+      "category": "大学生",
+      "team": "東北福祉大学",
+      "position": "外野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_h.html"
+      ],
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "育成",
+        "rank": "7",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "村山勇太",
+      "category": "大学生",
+      "team": "関西国際大学",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_h.html"
+      ],
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "育成",
+        "rank": "8",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "根鈴風大",
+      "category": "—",
+      "team": "フレズノシティカレッジ",
+      "position": "内野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_h.html"
+      ],
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "育成",
+        "rank": "10",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "神谷虎之介",
+      "category": "—",
+      "team": "千葉スカイセイラーズ",
+      "position": "外野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_h.html"
+      ],
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "育成",
+        "rank": "11",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "鶴川内陽",
+      "category": "大学生",
+      "team": "大阪商業大学",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_h.html"
+      ],
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "育成",
+        "rank": "12",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "松林幸紀",
+      "category": "大学生",
+      "team": "大阪商業大学",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_h.html"
+      ],
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "育成",
+        "rank": "13",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "村雲脩吾",
+      "category": "—",
+      "team": "敦賀気比高",
+      "position": "捕手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_h.html"
+      ],
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "育成",
+        "rank": "14",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "平山護",
+      "category": "—",
+      "team": "東筑高",
+      "position": "捕手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_h.html"
+      ],
+      "draft_result": {
+        "team": "ソフトバンク",
+        "type": "育成",
+        "rank": "15",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_h.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "榊󠄀原七斗",
+      "category": "大学生",
+      "team": "明治大学",
+      "position": "外野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_t.html"
+      ],
+      "draft_result": {
+        "team": "阪神",
+        "type": "支配下",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_t.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "常深颯大",
+      "category": "大学生",
+      "team": "大阪経済大学",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_t.html"
+      ],
+      "draft_result": {
+        "team": "阪神",
+        "type": "支配下",
+        "rank": "3",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_t.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "相羽寛太",
+      "category": "—",
+      "team": "ヤマハ",
+      "position": "内野手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_t.html"
+      ],
+      "draft_result": {
+        "team": "阪神",
+        "type": "支配下",
+        "rank": "4",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_t.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "的場吏玖",
+      "category": "大学生",
+      "team": "天理大学",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_t.html"
+      ],
+      "draft_result": {
+        "team": "阪神",
+        "type": "支配下",
+        "rank": "5",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_t.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "越川海翔",
+      "category": "—",
+      "team": "東京ガス",
+      "position": "捕手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_t.html"
+      ],
+      "draft_result": {
+        "team": "阪神",
+        "type": "支配下",
+        "rank": "6",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_t.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "石井康輝",
+      "category": "—",
+      "team": "徳島インディゴソックス",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_t.html"
+      ],
+      "draft_result": {
+        "team": "阪神",
+        "type": "支配下",
+        "rank": "7",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_t.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "山下健信",
+      "category": "—",
+      "team": "徳島インディゴソックス",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_t.html"
+      ],
+      "draft_result": {
+        "team": "阪神",
+        "type": "育成",
+        "rank": "1",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_t.html",
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "name": "荒木誠也",
+      "category": "—",
+      "team": "徳島インディゴソックス",
+      "position": "投手",
+      "sources": [
+        "https://draft.npb.jp/draft/2026/draftlist_t.html"
+      ],
+      "draft_result": {
+        "team": "阪神",
+        "type": "育成",
+        "rank": "2",
+        "source": "https://draft.npb.jp/draft/2026/draftlist_t.html",
+        "date": "2026-10-22"
       }
     }
   ],
@@ -13087,5 +14687,11 @@
     "scope": "YouTube再生数順検索。氏名がタイトルにある通常動画の取得結果内で比較。"
   },
   "professional_amateur_awards_checked_at": "2026-10-19",
-  "features_checked_at": "2026-10-21"
+  "features_checked_at": "2026-10-21",
+  "results_complete": true,
+  "results_date": "2026-10-22",
+  "result_counts": {
+    "regular": 76,
+    "development": 51
+  }
 }

@@ -7,9 +7,32 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/View/draft_history_board.dart';
 
 void main() {
+  testWidgets('2026年の競合3件と再指名の色・抽選履歴を表示する', (t) async {
+    await t.binding.setSurfaceSize(const Size(1800, 900));
+    addTearDown(() => t.binding.setSurfaceSize(null));
+    await t.runAsync(() => rootBundle.loadString('backend/assets/data/draft_history.json'));
+    await t.pumpWidget(const MaterialApp(home: Scaffold(body: DraftHistoryBoard(year: 2026))));
+    await t.runAsync(() async { await Future<void>.delayed(const Duration(milliseconds: 20)); });
+    await t.pumpAndSettle();
+    for (final name in ['渡部 海', '鈴木 泰成', '宮原 廉']) {
+      final label = find.text('$name　2球団競合');
+      expect(label, findsOneWidget);
+      final containers = t.widgetList<Container>(find.ancestor(of: label, matching: find.byType(Container)));
+      expect(containers.any((c) => c.color == Colors.orange.shade50), isTrue);
+    }
+    expect(find.text('抽選・備考：渡部海×・○2'), findsOneWidget);
+    expect(find.text('抽選・備考：鈴木泰成×・宮原廉×'), findsOneWidget);
+    expect(find.byTooltip('楽天（2026年・競合）'), findsOneWidget);
+    expect(find.byTooltip('ソフトバンク（2026年・競合）'), findsOneWidget);
+    expect(find.byTooltip('中日（2026年・競合）'), findsNWidgets(2));
+    expect(find.byTooltip('ロッテ（2026年・競合）'), findsNWidgets(2));
+    final losers = t.widgetList<Container>(find.ancestor(of: find.text('米沢 友翔'), matching: find.byType(Container)));
+    expect(losers.any((c) => c.color == Colors.blue.shade50), isTrue);
+    expect(t.takeException(), isNull);
+  });
   test('historical data covers all completed drafts and preserves split rounds', () {
     final years = jsonDecode(File('backend/assets/data/draft_history.json').readAsStringSync())['years'] as Map;
-    expect(years.length, 61);
+    expect(years.length, 62);
     for (final entry in years.entries) {
       final picks = entry.value['picks'] as List;
       expect(picks.map((p) => p['team']).toSet().length, entry.key == '1978' ? 11 : 12, reason: '${entry.key}');

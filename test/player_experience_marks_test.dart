@@ -21,12 +21,9 @@ void main() {
       for (final label in ['NPB', 'WBC']) {
         final expected = playerExperienceLabels(flags).contains(label);
         expect(find.text(label), expected ? findsOneWidget : findsNothing);
-        if (expected)
-          expect(
-              tester.getCenter(find.text(label)).dx,
-              greaterThan(tester
-                  .getCenter(find.text('選手', findRichText: true).last)
-                  .dx));
+        if (expected) {
+          expect(tester.getCenter(find.text(label)).dx, greaterThan(tester.getCenter(find.text('選手', findRichText: true).last).dx));
+        }
       }
       expect(tester.takeException(), isNull);
     });

@@ -25,6 +25,12 @@ void showStrengthSource(BuildContext context, String title, String detail, List<
         ])),
         actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('閉じる'))]));
 
+String draftResultLabel(Map<String, dynamic> player) {
+  final result = player['draft_result'];
+  if (result is! Map) return '指名なし';
+  return '${result['team']} ${result['type'] == '育成' ? '育成' : ''}${result['rank']}位';
+}
+
 class StrengthDraft extends StatefulWidget {
   const StrengthDraft({super.key, required this.year});
   final int year;
@@ -183,7 +189,8 @@ class _StrengthDraftState extends State<StrengthDraft> {
                   return result == 0 ? a.$1.compareTo(b.$1) : result;
                 });
               final frozenColumns = compactBaseballLayout(context) ? 3 : 4;
-              const headers = ['注目度', '選手名', '所属', 'チーム', '年齢', '身長', '体重', '投打', 'ポジション', '経歴', '特徴', '獲得予想', '特集動画'];
+              final completed = data['results_complete'] == true;
+              final headers = ['注目度', '選手名', '所属', 'チーム', '年齢', '身長', '体重', '投打', 'ポジション', '経歴', '特徴', completed ? '指名結果' : '獲得予想', '特集動画'];
               final videoCount = players.fold<int>(1, (max, p) => draftRelatedVideos(p.$2).length > max ? draftRelatedVideos(p.$2).length : max);
               final minimumWidths = [42.0, 72.0, 50.0, 100.0, 42.0, 52.0, 50.0, 76.0, 68.0, 180.0, 240.0, 140.0, videoCount * 168.0 + (videoCount - 1) * 8 + 16];
               final minimumWidth = minimumWidths.reduce((a, b) => a + b);
@@ -204,7 +211,8 @@ class _StrengthDraftState extends State<StrengthDraft> {
                   [
                     if (draftTopVideo(p.$2) != null) 94.0 + textHeight('${draftTopVideo(p.$2)!['view_count']}回再生', widths[12], 12) else 48.0,
                     for (var i = 0; i < 11; i++) textHeight(_values(p.$2)[i], widths[i], i),
-                    ((listMapFromJson(p.$2['predictions']).length / logosPerRow).ceil() * 38 + 12).toDouble(),
+                    if (completed) textHeight(draftResultLabel(p.$2), widths[11], 11)
+                    else ((listMapFromJson(p.$2['predictions']).length / logosPerRow).ceil() * 38 + 12).toDouble(),
                   ].reduce((a, b) => a > b ? a : b)
               ];
               Widget cell(int index, double height, {Map<String, dynamic>? player}) {
@@ -251,6 +259,8 @@ class _StrengthDraftState extends State<StrengthDraft> {
                                       );
                                     }))),
                         ]);
+                } else if (index == 11 && completed) {
+                  child = Text(draftResultLabel(player), key: ValueKey('draft-result-${player['name']}'), style: style.copyWith(fontWeight: FontWeight.bold));
                 } else if (index == 11) {
                   child = Wrap(spacing: 2, runSpacing: 2, children: [
                     for (final prediction in listMapFromJson(player['predictions']))
@@ -305,8 +315,10 @@ class _StrengthDraftState extends State<StrengthDraft> {
 
               return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                 Row(children: [
-                  Expanded(child: Padding(padding: const EdgeInsets.all(8), child: Text('${widget.year}年 NPBドラフト注目選手（計${players.length}人）', style: const TextStyle(fontWeight: FontWeight.bold)))),
+                  Expanded(child: Padding(padding: const EdgeInsets.all(8), child: Text('${widget.year}年 NPBドラフト${completed ? '結果・注目選手' : '注目選手'}（計${players.length}人）', style: const TextStyle(fontWeight: FontWeight.bold)))),
                 ]),
+                if (completed)
+                  Padding(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), child: Text('${data['results_date']} 指名結果：支配下${data['result_counts']['regular']}人・育成${data['result_counts']['development']}人（交渉権獲得）', style: const TextStyle(fontSize: 12))),
                 Row(children: [
                   for (var i = 0; i < frozenColumns; i++) cell(i, 40),
                   Expanded(child: SingleChildScrollView(controller: _header, physics: const NeverScrollableScrollPhysics(), scrollDirection: Axis.horizontal, child: Row(children: [for (var i = frozenColumns; i < headers.length; i++) cell(i, 40)]))),

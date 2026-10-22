@@ -620,9 +620,9 @@ class SeasonTableBlock extends StatelessWidget {
   // 元の色を白とブレンドして淡くする
   Color _paleOf(Color base, [double t = 0.88]) {
     t = t.clamp(0.0, 1.0);
-    final r = (base.value >> 16) & 0xFF;
-    final g = (base.value >> 8) & 0xFF;
-    final b = base.value & 0xFF;
+    final r = (base.toARGB32() >> 16) & 0xFF;
+    final g = (base.toARGB32() >> 8) & 0xFF;
+    final b = base.toARGB32() & 0xFF;
     final rr = (r + (255 - r) * t).round();
     final gg = (g + (255 - g) * t).round();
     final bb = (b + (255 - b) * t).round();
@@ -1525,29 +1525,30 @@ class PlayerStatCell extends StatelessWidget {
   Widget build(BuildContext context) => row['preview_separator'] == true
       ? _buildPreviewSeparator()
       : ValueListenableBuilder<Set<String>>(
-        valueListenable: DisplaySettings.instance,
-        builder: (context, _, child) => ValueListenableBuilder<Set<String>>(
-          valueListenable: _highlightedStatPlayers,
-          builder: (context, selected, _) => GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onLongPress: () {
-              final key = _statHighlightKey(row);
-              _highlightedStatPlayers.value = selected.contains(key) ? {} : {key};
-            },
-            child: _buildCell(context),
+          valueListenable: DisplaySettings.instance,
+          builder: (context, _, child) => ValueListenableBuilder<Set<String>>(
+            valueListenable: _highlightedStatPlayers,
+            builder: (context, selected, _) => GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onLongPress: () {
+                final key = _statHighlightKey(row);
+                _highlightedStatPlayers.value = selected.contains(key) ? {} : {key};
+              },
+              child: _buildCell(context),
+            ),
           ),
-        ),
-      );
+        );
 
   Widget _buildPreviewSeparator() {
     Widget dash({bool rank = false}) => ColoredBox(
           color: rank ? const Color(0xFF424242) : const Color(0xFFE0E0E0),
           child: Center(
-            child: Text('-', style: TextStyle(
-              color: rank ? Colors.white : Colors.black,
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
-            )),
+            child: Text('-',
+                style: TextStyle(
+                  color: rank ? Colors.white : Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                )),
           ),
         );
     const divider = VerticalDivider(width: .5, thickness: .5, color: Colors.black26);
@@ -1606,8 +1607,7 @@ class PlayerStatCell extends StatelessWidget {
       if ((DisplaySettings.instance.shows('flg_retired') && isTrue(row['flg_retired']))) '💐',
       if ((DisplaySettings.instance.shows('flg_injury') && isTrue(row['flg_injury']))) '🤕',
     ];
-    final positionBg = personalStatPositionColor('${row['txt_position'] ?? ''}') ??
-        (isTrue(row['flg_pitcher']) ? personalStatPositionColor('投手') : null);
+    final positionBg = personalStatPositionColor('${row['txt_position'] ?? ''}') ?? (isTrue(row['flg_pitcher']) ? personalStatPositionColor('投手') : null);
     final compacted = compactPersonalStatName(name);
     final paren = compacted.indexOf('(');
     final label = paren >= 0 ? compacted.substring(0, paren) : compacted;

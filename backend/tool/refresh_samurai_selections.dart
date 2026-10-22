@@ -9,12 +9,14 @@ Future<void> main(List<String> args) async {
   final client = http.Client();
   Future<String> fetch(String url) async {
     final cache = File('/tmp/koko-samurai-cache/${Uri.encodeComponent(url)}');
-    if (args.contains('--cached') && cache.existsSync())
+    if (args.contains('--cached') && cache.existsSync()) {
       return cache.readAsStringSync();
+    }
     final response =
         await client.get(Uri.parse(url)).timeout(const Duration(seconds: 40));
-    if (response.statusCode != 200)
+    if (response.statusCode != 200) {
       throw StateError('$url: ${response.statusCode}');
+    }
     final body = utf8.decode(response.bodyBytes);
     cache.parent.createSync(recursive: true);
     cache.writeAsStringSync(body);
@@ -62,8 +64,9 @@ Future<void> main(List<String> args) async {
                 ?.text
                 .trim();
         if (name == null ||
-            !const ['投手', '捕手', '内野手', '外野手', '指名打者'].contains(position))
+            !const ['投手', '捕手', '内野手', '外野手', '指名打者'].contains(position)) {
           continue;
+        }
         final profile =
             Uri.parse(url).resolve(a.attributes['href']!.trim()).toString();
         if (!seen.add(profile)) continue;
@@ -77,8 +80,9 @@ Future<void> main(List<String> args) async {
         });
       }
       print('$event: ${seen.length}');
-      if (seen.isEmpty && category != 'other')
+      if (seen.isEmpty && category != 'other') {
         throw StateError('Empty roster: $url');
+      }
     }));
   }
   final profiles = records.map((r) => r['profile'] as String).toSet().toList();
@@ -116,8 +120,9 @@ Future<void> main(List<String> args) async {
         r['birth_source'] = extra['source'];
       }
     }
-    if (r['birth_date'] == null)
+    if (r['birth_date'] == null) {
       throw StateError('Unresolved birthday: ${r['name']}');
+    }
   }
   for (final entry in {
     'https://npb.jp/wbc/2006/roster.html': (2006, 'wbc'),

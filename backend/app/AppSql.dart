@@ -1794,12 +1794,12 @@ ORDER BY mt.id_league, tpt.int_rank
         WHERE m_team.name_shortest = '${stat.teamName}'
           AND NOT COALESCE(m_player.flg_delete, FALSE)
           AND (
-            ('${yahooId}' <> '' AND substring(m_player.url from '/mlb/player/([0-9]+)') = '${yahooId}')
+            ('$yahooId' <> '' AND substring(m_player.url from '/mlb/player/([0-9]+)') = '$yahooId')
             OR m_player.name_full = '${stat.playerName}'
             OR COALESCE(m_player.name_last, '') || COALESCE(m_player.name_first, '') LIKE '%${stat.playerName}%'
             OR m_player.name_last = '${stat.playerName}'
           )
-        ORDER BY CASE WHEN '${yahooId}' <> '' AND substring(m_player.url from '/mlb/player/([0-9]+)') = '${yahooId}' THEN 0 ELSE 1 END,
+        ORDER BY CASE WHEN '$yahooId' <> '' AND substring(m_player.url from '/mlb/player/([0-9]+)') = '$yahooId' THEN 0 ELSE 1 END,
           length(COALESCE(m_player.name_full, '')) DESC, m_player.id
         LIMIT 1
       )''';

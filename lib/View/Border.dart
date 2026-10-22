@@ -53,7 +53,7 @@ class _BlinkBorderState extends State<BlinkBorder> with SingleTickerProviderStat
         if (widget.fillUseColor) {
           // 前面に半透明オーバーレイを重ねる（子の背景の上に載る）
           final double bgAlpha = (0.12 + 0.23 * _t.value).clamp(0.0, 1.0);
-          overlay = widget.color.withOpacity(bgAlpha);
+          overlay = widget.color.withValues(alpha: bgAlpha);
           bg = null;
         } else if (widget.baseBgColor != null) {
           // 背景色そのものをブレンド（子の背景として使う）
@@ -67,7 +67,7 @@ class _BlinkBorderState extends State<BlinkBorder> with SingleTickerProviderStat
         return Container(
           decoration: BoxDecoration(
             color: bg,
-            border: Border.all(color: widget.color.withOpacity(alpha), width: widget.width),
+            border: Border.all(color: widget.color.withValues(alpha: alpha), width: widget.width),
             borderRadius: BorderRadius.circular(widget.radius),
           ),
           foregroundDecoration: overlay != null

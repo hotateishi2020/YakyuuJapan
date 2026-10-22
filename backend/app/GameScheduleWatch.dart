@@ -1,3 +1,4 @@
+import 'SnapshotWork.dart';
 import 'dart:async';
 import 'FetchMLB.dart';
 import 'FetchURL.dart';
@@ -26,7 +27,7 @@ class GameScheduleWatch {
           'mlb': FetchMLB.refreshNearSchedule,
         }.entries) {
           try {
-            await ScheduledLog.run('${task.key}_schedule_next_10_days', task.value);
+            await SnapshotWork.run(() => ScheduledLog.run('${task.key}_schedule_next_10_days', task.value));
             onUpdated();
           } catch (e) {
             print('${task.key}当日〜10日後の日程の再確認失敗（次回再試行）: $e');

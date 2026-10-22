@@ -1,3 +1,4 @@
+import 'SnapshotWork.dart';
 import 'QualifiedBattingMetrics.dart';
 import 'SamuraiSelections.dart';
 import 'PlayerCountry.dart';
@@ -301,7 +302,7 @@ class PredictionSnapshotSchedule {
   }
 
   static Future<void> tick({required void Function() onUpdated}) async {
-    if (_busy) return;
+    if (_busy || !SnapshotWork.tryStart()) return;
     _busy = true;
     try {
       await ScheduledLog.run('prediction_snapshot',
@@ -311,6 +312,7 @@ class PredictionSnapshotSchedule {
       print('予想スナップショット定期登録失敗: $e\n$st');
     } finally {
       _busy = false;
+      SnapshotWork.finish();
     }
   }
 }

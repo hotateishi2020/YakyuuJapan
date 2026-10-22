@@ -1,3 +1,4 @@
+import 'app/SnapshotWork.dart';
 import 'app/HomeRunVideoSearch.dart';
 import 'app/AdminNews.dart';
 import 'app/AdminBilling.dart';
@@ -1622,7 +1623,7 @@ void main() async {
 
     app.get('/fetchGamesNPB', (Request request) async {
       print('fetchGamesNPB');
-      final response = await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.GAMES, GamesFetch.npb);
+      final response = await SnapshotWork.run(() => tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.GAMES, GamesFetch.npb));
       if (response.statusCode == 200 && response.headers['x-offseason'] != '1') _clearPredictionsCache();
       return response;
     });
@@ -1661,7 +1662,7 @@ void main() async {
 
     app.get('/fetchGamesMLB', (Request request) async {
       print('fetchGamesMLB');
-      final response = await tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.GAMES, GamesFetch.mlb);
+      final response = await SnapshotWork.run(() => tryCatchAPI(request, log.Fetch.NAME, log.Fetch.Codes.GAMES, GamesFetch.mlb));
       if (response.statusCode == 200) _clearPredictionsCache();
       return response;
     });

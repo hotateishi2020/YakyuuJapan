@@ -1,3 +1,4 @@
+import 'SnapshotWork.dart';
 import 'ScheduledLog.dart';
 
 /// 明日以降の日程カードは 10 分に 1 回だけ取る。
@@ -91,7 +92,7 @@ class GameFetchSchedule {
       _todayBusy[org] = true;
       var keep = true;
       try {
-        keep = await ScheduledLog.run('games_today_$org', fetch);
+        keep = await SnapshotWork.run(() => ScheduledLog.run('games_today_$org', fetch));
       } catch (e, st) {
         print('今日の試合再取得失敗 ($org): $e');
         print(st);
@@ -131,7 +132,7 @@ class GameFetchSchedule {
       }
       _futureBusy[org] = true;
       try {
-        await ScheduledLog.run('games_future_$org', fetch);
+        await SnapshotWork.run(() => ScheduledLog.run('games_future_$org', fetch));
       } catch (e, st) {
         print('未来の試合確認に失敗しました ($org): $e');
         print(st);

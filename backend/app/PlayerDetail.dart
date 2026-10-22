@@ -269,7 +269,7 @@ class PlayerDetailBatch {
     await attachOfficialIdentity(conn, year, people);
     final careers = <Map<String, dynamic>>[];
     final stats = (await conn.execute('SELECT payload FROM v_stats_player WHERE int_year=\$1 AND (payload->>\'id_player\')::int=ANY(\$2::int[]) ORDER BY row_no', parameters: [year, playerIds])).map((r) => detailMap(r[0])).toList();
-    final teams = (await conn.execute("SELECT jsonb_build_object('id_team',id_team,'roster',payload->'roster','positions',payload->'positions','pitching_workload',payload->'pitching_workload','batting_stats',payload->'batting_stats','pitching_stats',payload->'pitching_stats','contracts',payload->'contracts') FROM t_team_strength WHERE int_year=\$1", parameters: [year])).map((r) => detailMap(r[0])).toList();
+    final teams = (await conn.execute("SELECT jsonb_build_object('id_team',id_team,'roster',payload->'roster','positions',payload->'positions','pitching_workload',payload->'pitching_workload','batting_stats',payload->'batting_stats','pitching_stats',payload->'pitching_stats','contracts',payload->'contracts') FROM t_team_strength WHERE int_year=\$1 AND id_team=ANY(\$2::int[])", parameters: [year, people.map((p) => p['id_team']).whereType<int>().toSet().toList()])).map((r) => detailMap(r[0])).toList();
     // Rank against the full leagues before restricting the detail batch.
     final ids = playerIds.toSet();
     final extra = (await extraStatRows(conn, year, [1, 2, 3, 4]))

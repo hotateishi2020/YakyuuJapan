@@ -217,7 +217,7 @@ class PlayerDetailSnapshot {
     Future<void> tick() async {
       try {
         await ScheduledLog.run(
-            'player_detail_snapshot', () => refresh(DateTime.now().year, maxPlayers: 80));
+            'player_detail_snapshot', () => refresh(DateTime.now().year, maxPlayers: 20));
       } catch (e) {
         print('選手詳細定期集計: $e');
       }

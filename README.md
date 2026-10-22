@@ -14,7 +14,7 @@ sh tool/build_web.sh
 
 git add . 
 
-git commit -m "サーバーのメモリをアッパックする処理を改善しました。" 
+git commit -m "サーバーが落ちる不具合を修正しました。" 
 
 git push 
 

@@ -83,7 +83,7 @@ class Records {
     // Holds are not a title ranking in t_stats_player_latest. Reuse the
     // official regular-season pitching snapshots refreshed by TeamStrength.
     final pitchingSnapshots = await conn.execute('''
-      SELECT s.id_team,s.payload,t.name_short AS team,t.color_back,t.color_font
+      SELECT s.id_team,jsonb_build_object('pitchers',s.payload->'pitchers') AS payload,t.name_short AS team,t.color_back,t.color_font
       FROM t_team_strength s JOIN m_team t ON t.id=s.id_team
       WHERE s.int_year = \$1 AND s.code_org = \$2
     ''', parameters: [year, org.code]);
@@ -116,10 +116,25 @@ class Records {
       ORDER BY s.id_game,s.id_player
     ''', parameters: [gameIds])).map((r) => r.toColumnMap()).toList();
     final streaks = buildSummaryStreaks(games.map((r) => r.toColumnMap()).toList(), summaries, year);
-    final events = gameIds.isEmpty ? <Map<String, dynamic>>[] : (await conn.execute('''
-      SELECT d.id_game,d.id_batter,d.id_pitcher,d.id_player_enter,d.flg_bottom,d.code_result FROM t_game_details d WHERE d.id_game=ANY(\$1::int[]) AND NOT COALESCE(d.flg_delete,false) ORDER BY d.id_game,d.id
-    ''', parameters: [gameIds])).map((r) => r.toColumnMap()).toList();
-    streaks.addAll(buildEventStreaks(games.map((r) => r.toColumnMap()).toList(), summaries, events, year));
+    final eventStreaks = EventStreakAccumulator(year);
+    // A full MLB season contains hundreds of thousands of events. Decode only
+    // 20 games at a time, retaining streak state across chronological batches.
+    final summaryByGame = <int, List<Map<String, dynamic>>>{};
+    for (final row in summaries) {
+      summaryByGame.putIfAbsent(usageInt(row['id_game']), () => []).add(row);
+    }
+    for (var offset = 0; offset < games.length; offset += 20) {
+      final batch = games.skip(offset).take(20).map((r) => r.toColumnMap()).toList();
+      final ids = batch.map((g) => g['id'] as int).toList();
+      final events = (await conn.execute('''
+        SELECT d.id_game,d.id_batter,d.id_pitcher,d.id_player_enter,d.flg_bottom,d.code_result
+        FROM t_game_details d WHERE d.id_game=ANY(\$1::int[])
+          AND NOT COALESCE(d.flg_delete,false) ORDER BY d.id_game,d.id
+      ''', parameters: [ids])).map((r) => r.toColumnMap()).toList();
+      eventStreaks.addGames(batch,
+          [for (final id in ids) ...?summaryByGame[id]], events);
+    }
+    streaks.addAll(eventStreaks.result());
     final currentSnapshot = usageMap(usageMap(baseline['current_streaks'])['$year']);
     final officialStreaks = usageMap(currentSnapshot['records']);
     for (final entry in officialStreaks.entries) {

@@ -14,6 +14,26 @@ Map<String, dynamic> team(int year, int id, int rank) => {'year': year, 'id_team
 Map<String, dynamic> game(int id, {bool loaded = true}) => {'id': id, 'id_team_home': 1, 'id_team_away': 2, 'flg_stats_loaded': loaded};
 Map<String, dynamic> box(int game, int player, {String decision = '', int runs = 0, int hits = 0, int walks = 0, int ab = 1}) => {'id_game': game, 'id_player': player, 'name': '選手$player', 'int_batting': ab, 'int_hit1': hits, 'int_fourball': walks, 'int_pitch': decision.isEmpty ? 0 : 20, 'int_runs': runs, 'code_result_pitcher': decision};
 void main() {
+  test('event streak batches preserve cross-batch runs and missing-game resets', () {
+    final games = [for (var i = 1; i <= 7; i++) game(i, loaded: i != 4)];
+    final boxes = [for (final i in [1, 2, 3, 5, 6, 7]) box(i, 1, hits: 1)];
+    final events = [for (final i in [1, 2, 3, 5, 6, 7])
+      {'id_game': i, 'id_batter': 1, 'id_pitcher': 2,
+       'flg_bottom': true, 'code_result': 'HIT1'}];
+    final expected = buildEventStreaks(games, boxes, events, 2026);
+    expect(expected['hit_pa']!.single['value'], 3);
+    for (final size in [1, 2, 3, 5]) {
+      final accumulator = EventStreakAccumulator(2026);
+      for (var offset = 0; offset < games.length; offset += size) {
+        final batch = games.skip(offset).take(size).toList();
+        final ids = batch.map((g) => g['id']).toSet();
+        accumulator.addGames(batch,
+            boxes.where((r) => ids.contains(r['id_game'])).toList(),
+            events.where((r) => ids.contains(r['id_game'])).toList());
+      }
+      expect(accumulator.result(), expected);
+    }
+  });
   test('近鉄の監督はオリックスや近畿日本と区別して全55年度を照合する', () {
     final catalog = jsonDecode(File('data/timeline-managers-npb.json').readAsStringSync())['clubs'];
     for (final name in ['近鉄パールス', '近鉄バファロー', '近鉄バファローズ', '大阪近鉄バファローズ']) {

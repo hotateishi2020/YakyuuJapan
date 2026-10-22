@@ -43,6 +43,13 @@ void main() {
       await tester.pumpWidget(const MaterialApp(
           home: Scaffold(body: HallOfFameBoard(org: 'npb', year: 2026))));
       await tester.pumpAndSettle();
+      expect(find.text('髙橋 会員'), findsNothing);
+      expect(find.text('古い殿堂'), findsNothing);
+      expect(find.text('超過'), findsOneWidget);
+      await tester.tap(find.text('殿堂入り'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('名球会会員'));
+      await tester.pumpAndSettle();
       expect(find.text('髙橋 会員'), findsOneWidget);
       expect(find.text('平岡 熈'), findsOneWidget);
       expect(find.textContaining('臣の左がにすい'), findsNothing);

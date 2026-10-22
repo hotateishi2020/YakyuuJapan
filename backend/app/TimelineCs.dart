@@ -15,8 +15,7 @@ void addTimelineCs(List<Map<String, dynamic>> seasons, List<Map<String, dynamic>
       final ids = teams.map((t) => n(t['id_team'])).toSet();
       // Japan Series participation is independent of whether CS was held.
       final japanSeriesTeams = {
-        for (final g in games.where((g) => n(g['year']) == year && g['code_game'] == 'JS' && played(g)))
-          ...[n(g['id_team_home']), n(g['id_team_away'])],
+        for (final g in games.where((g) => n(g['year']) == year && g['code_game'] == 'JS' && played(g))) ...[n(g['id_team_home']), n(g['id_team_away'])],
       };
       final finalist = japanSeriesTeams.where(ids.contains).firstOrNull;
       if (finalist != null) league['cs_final_winner'] = finalist;
@@ -27,8 +26,8 @@ void addTimelineCs(List<Map<String, dynamic>> seasons, List<Map<String, dynamic>
       final finalStage = pool.where((g) => ['CSF', 'CS2', 'CS'].contains(g['code_game'])).toList();
       int rank(int id) => n(teams.firstWhere((t) => n(t['id_team']) == id)['rank']);
       Set<int> entrants(List<Map<String, dynamic>> rows) => {
-        for (final g in rows.where(played)) ...[n(g['id_team_home']), n(g['id_team_away'])],
-      };
+            for (final g in rows.where(played)) ...[n(g['id_team_home']), n(g['id_team_away'])],
+          };
       int? winner(List<Map<String, dynamic>> rows, {required bool finalRound}) {
         final pair = entrants(rows).toList()..sort((a, b) => rank(a).compareTo(rank(b)));
         if (pair.length != 2) return null;
@@ -43,7 +42,13 @@ void addTimelineCs(List<Map<String, dynamic>> seasons, List<Map<String, dynamic>
           final behind = ((n(a['wins']) - n(b['wins'])) + (n(b['losses']) - n(a['losses']))) / 2;
           if (behind >= 10 || n(b['wins']) < n(b['losses'])) advantage = 2;
         }
-        final target = !finalRound ? 2 : year <= 2007 || year == 2020 ? 3 : advantage == 2 ? 5 : 4;
+        final target = !finalRound
+            ? 2
+            : year <= 2007 || year == 2020
+                ? 3
+                : advantage == 2
+                    ? 5
+                    : 4;
         final maximum = target * 2 - 1 - advantage;
         var upperWins = advantage, lowerWins = 0, completed = 0;
         for (final g in rows.where(finished)) {
@@ -52,7 +57,11 @@ void addTimelineCs(List<Map<String, dynamic>> seasons, List<Map<String, dynamic>
           final h = n(g['score_home']), a = n(g['score_away']);
           if (h == a) continue;
           final id = n(g[h > a ? 'id_team_home' : 'id_team_away']);
-          if (id == upper) upperWins++; else lowerWins++;
+          if (id == upper) {
+            upperWins++;
+          } else {
+            lowerWins++;
+          }
         }
         if (completed == 0) return null;
         final remaining = (maximum - completed).clamp(0, maximum);
@@ -60,6 +69,7 @@ void addTimelineCs(List<Map<String, dynamic>> seasons, List<Map<String, dynamic>
         if (lowerWins >= target || lowerWins > upperWins + remaining) return lower;
         return null;
       }
+
       final firstEntrants = entrants(first);
       final advanced = entrants(finalStage).where(firstEntrants.contains).firstOrNull;
       final firstWinner = advanced ?? winner(first, finalRound: false);

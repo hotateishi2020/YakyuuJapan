@@ -43,7 +43,7 @@ class Auth {
           AND (SELECT COUNT(*) FROM information_schema.columns
             WHERE table_schema = 'public' AND table_name = 'm_user'
               AND column_name IN ('nickname', 'name_handle', 'id_team_fav', 'id_player_fav',
-                'flg_notify_news', 'flg_notify_event', 'flg_admin')) = 7
+                'flg_notify_news', 'flg_notify_event', 'flg_admin', 'favorite_high_school')) = 8
       ''');
       if (existing.isNotEmpty && existing.first[0] == true) {
         _schemaReady = true;
@@ -61,6 +61,8 @@ class Auth {
       await conn.execute("ALTER TABLE m_user ADD COLUMN IF NOT EXISTS nickname VARCHAR(100) DEFAULT ''");
       await conn.execute("ALTER TABLE m_user ADD COLUMN IF NOT EXISTS name_handle VARCHAR(100) DEFAULT ''");
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS id_team_fav INTEGER');
+      await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS favorite_high_school TEXT');
+      await conn.execute("UPDATE m_user SET favorite_high_school='佐賀北' WHERE id=1 AND favorite_high_school IS NULL");
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS id_player_fav INTEGER');
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS flg_notify_news BOOLEAN DEFAULT TRUE');
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS flg_notify_event BOOLEAN DEFAULT TRUE');
@@ -160,6 +162,7 @@ class Auth {
         'name_handle': row['name_handle'] ?? '',
         'mailaddress': row['mailaddress'] ?? '',
         'code_color': row['code_color'] ?? '',
+        'favorite_high_school': row['favorite_high_school'],
         'id_team_fav': row['id_team_fav'],
         'id_player_fav': row['id_player_fav'],
         'name_team_fav': row['name_team_fav'] ?? '',
@@ -173,7 +176,7 @@ class Auth {
 
   static const _userSelect = '''
     SELECT u.id, u.name_last, u.name_first, u.nickname, u.name_handle, u.mailaddress, u.code_color,
-           u.id_team_fav, u.id_player_fav,
+           u.id_team_fav, u.id_player_fav, u.favorite_high_school,
            COALESCE(u.flg_notify_news, TRUE) AS flg_notify_news,
            COALESCE(u.flg_notify_event, TRUE) AS flg_notify_event,
            COALESCE(u.flg_read_news, TRUE) AS flg_read_news,
@@ -596,10 +599,11 @@ class Auth {
             mailaddress = \$2::text,
             id_team_fav = \$3::int,
             id_player_fav = \$4::int,
+            favorite_high_school = COALESCE(\$6::text, favorite_high_school),
             updat = NOW()
           WHERE id = \$5::int
         ''',
-        parameters: [nameLast, mail, teamFav, playerFav, userId],
+        parameters: [nameLast, mail, teamFav, playerFav, userId, body.containsKey('favorite_high_school') ? '${body['favorite_high_school']}'.trim() : null],
       );
       final user = await _userById(conn, userId);
       return _json(200, {'ok': true, 'user': _publicUser(user!)});

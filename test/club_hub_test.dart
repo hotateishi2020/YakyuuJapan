@@ -389,6 +389,12 @@ void main() {
     expect(clubRequests, 1);
   });
   testWidgets('首脳と自主トレは出典リンクなしで内容を表示', (t) async {
+    t.view.devicePixelRatio = 1;
+    t.view.physicalSize = const Size(390, 800);
+    addTearDown(t.view.resetPhysicalSize);
+    addTearDown(t.view.resetDevicePixelRatio);
+    await t.binding.setSurfaceSize(const Size(390, 800));
+    addTearDown(() => t.binding.setSurfaceSize(null));
     final data = {
       'clubs': [
         {
@@ -416,6 +422,16 @@ void main() {
       await t.pumpWidget(board(8));
       await t.pumpAndSettle();
       expect(find.text('登録監督'), findsOneWidget);
+      final army = find.byKey(const ValueKey('staff-pinned-1軍'));
+      expect(t.widget<Text>(army).data, '1\n軍');
+      expect(find.text('巨人　1軍'), findsNothing);
+      final before = t.getTopLeft(army);
+      final personBefore = t.getTopLeft(find.text('登録監督'));
+      await t.drag(find.byKey(const ValueKey('staff-horizontal-scroll')), const Offset(-300, 0));
+      await t.pumpAndSettle();
+      expect(t.getTopLeft(army), before);
+      expect(t.getTopLeft(find.text('登録監督')).dx, lessThan(personBefore.dx));
+
       expect(find.textContaining('スカウト'), findsOneWidget);
       expect(t.takeException(), isNull);
       await t.pumpWidget(board(9));

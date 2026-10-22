@@ -195,7 +195,6 @@ class InterleagueStandings extends StatelessWidget {
           standings: standings,
           stats: const [],
           onlyLeagueId: 0,
-          showPredictionColumns: false,
           showNpbLeagueColumn: true,
           pane: SeasonPane.standings,
           portraitLayout: true,

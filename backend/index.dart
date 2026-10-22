@@ -1,5 +1,6 @@
 import 'app/HomeRunVideoSearch.dart';
 import 'app/AdminNews.dart';
+import 'app/AdminBilling.dart';
 import 'app/PlayerArt.dart';
 import 'app/PlayerArtSchedule.dart';
 import 'app/NpbResearch.dart';
@@ -1789,6 +1790,11 @@ void main() async {
         return Response.ok(bytes, headers: {'content-type': 'image/png', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff'});
       });
     });
+
+    app.get('/admin/billing', (Request request) async =>
+        tryCatchAPI(request, 'ADMIN', 'BILLING_READ', (conn) => AdminBilling.read(conn, request)));
+    app.post('/admin/billing', (Request request) async =>
+        tryCatchAPI(request, 'ADMIN', 'BILLING_SAVE', (conn) => AdminBilling.save(conn, request)));
 
     app.get('/admin/news', (Request request) async =>
         tryCatchAPI(request, 'ADMIN', 'NEWS_READ', (conn) => AdminNews.read(conn, request)));

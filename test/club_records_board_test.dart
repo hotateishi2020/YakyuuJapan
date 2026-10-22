@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/collapsible_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/View/club_records_board.dart';
@@ -39,6 +40,10 @@ void main() {
       expect(tester.getBottomLeft(find.byKey(const ValueKey('club-bar-本塁打-1-record-0'))).dy, lessThan(tester.getTopLeft(find.byKey(const ValueKey('club-bar-本塁打-1-current-0'))).dy));
       expect(find.text('球団12'), findsOneWidget);
       expect(find.text('未取得'), findsWidgets);
+      final left = tester.getTopLeft(find.text('本塁打'));
+      await tester.drag(find.byType(SingleChildScrollView), const Offset(-500, 0));
+      await tester.pump();
+      expect(tester.getTopLeft(find.text('本塁打')), left);
       expect(tester.takeException(), isNull);
     });
   }
@@ -132,4 +137,58 @@ void main() {
     expect(find.text('通算安打'), findsNothing);
     expect(t.takeException(), isNull);
   });
+  testWidgets('縦画面の12球団タブは表示非表示バーの上で球団を切り替える', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: MenuScope(child: Column(children: [
+      const MenuBand(level: 2, child: Text('球団記録タブ')),
+      Expanded(child: ClubRecordsBoard(data: {
+        'year': 2026,
+        'teams': [for (var id = 1; id <= 12; id++) {'id_team': id, 'name': '球団$id'}],
+        'metrics': [for (final group in ['season', 'career']) {
+          'group': group, 'label': '本塁打', 'unit': '本',
+          'cells': [for (var id = 1; id <= 12; id++) {
+            'id_team': id, 'current': [{'name': '選手$id', 'value': 10}],
+          }],
+        }],
+      })),
+    ])))));
+    await tester.pumpAndSettle();
+    final toggle = find.byKey(const ValueKey('menu-visibility-toggle'));
+    expect(toggle, findsOneWidget);
+    for (var id = 1; id <= 12; id++) {
+      final tab = find.byKey(ValueKey('club-records-team-$id'));
+      expect(tab.hitTestable(), findsOneWidget);
+      expect(tester.getTopLeft(tab).dy, greaterThanOrEqualTo(tester.getBottomLeft(find.text('球団記録タブ')).dy));
+      expect(tester.getBottomLeft(tab).dy, lessThan(tester.getTopLeft(toggle).dy));
+    }
+    expect(find.text('選手1\n10本'), findsOneWidget);
+    expect(find.text('選手12\n10本'), findsNothing);
+    await tester.tap(find.byKey(const ValueKey('club-records-team-12')));
+    await tester.pumpAndSettle();
+    expect(find.text('選手1\n10本'), findsNothing);
+    expect(find.text('選手12\n10本'), findsOneWidget);
+    await tester.tap(find.text('通算記録'));
+    await tester.pumpAndSettle();
+    expect(find.text('選手12\n10本'), findsOneWidget);
+    await tester.tap(toggle);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('club-records-team-12')).hitTestable(), findsNothing);
+    expect(find.text('選手12\n10本'), findsOneWidget);
+    await tester.tap(toggle);
+    await tester.pumpAndSettle();
+    tester.view.physicalSize = const Size(1200, 800);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('club-records-team-12')), findsNothing);
+    expect(find.text('選手1\n10本'), findsOneWidget);
+    expect(find.text('選手12\n10本'), findsOneWidget);
+    tester.view.physicalSize = const Size(390, 844);
+    await tester.pumpAndSettle();
+    expect(find.text('選手1\n10本'), findsNothing);
+    expect(find.text('選手12\n10本'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
 }

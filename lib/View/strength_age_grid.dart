@@ -1,3 +1,4 @@
+import 'pinned_horizontal_row.dart';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../tools/color_parse.dart';
@@ -90,14 +91,13 @@ class _StrengthAgeGridState extends State<StrengthAgeGrid> {
           final width = sideWidth + teamWidths.fold<double>(0, (a, b) => a + b);
           Widget cell(Widget child, {Color color = Colors.white, Alignment alignment = Alignment.center}) => Container(
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 6),
-            color: color, alignment: alignment, child: child);
-          Widget row(List<Widget> cells, {Key? key}) => Table(
-            key: key,
-            columnWidths: {0: FixedColumnWidth(sideWidth),
-              for (var i = 0; i < widget.teams.length; i++) i + 1: FixedColumnWidth(teamWidths[i])},
-            defaultVerticalAlignment: TableCellVerticalAlignment.intrinsicHeight,
-            border: TableBorder.all(color: const Color(0xFFE2E8F0), width: .5),
-            children: [TableRow(children: cells)],
+            decoration: BoxDecoration(color: color, border: Border.all(color: const Color(0xFFE2E8F0), width: .5)),
+            alignment: alignment, child: child);
+          Widget row(List<Widget> cells, {Key? key}) => PinnedHorizontalRow(
+            key: key, controller: _horizontal, pinnedWidth: sideWidth,
+            children: [cells.first,
+              for (var i = 1; i < cells.length; i++) SizedBox(width: teamWidths[i - 1], child: cells[i]),
+            ],
           );
           return Align(alignment: Alignment.topCenter,
             child: SizedBox(width: math.min(width, constraints.maxWidth),

@@ -1,0 +1,6 @@
+{
+  "players": [
+    {"source_player_id":"676760","names":["R.マリナチオ","ロン・マリナチオ"],"source":"https://statsapi.mlb.com/api/v1/people/676760"},
+    {"source_player_id":"621381","names":["M.ストラーム","マット・ストラーム"],"source":"https://statsapi.mlb.com/api/v1/people/621381"}
+  ]
+}

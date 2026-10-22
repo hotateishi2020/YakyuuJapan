@@ -1,3 +1,4 @@
+import 'pinned_horizontal_row.dart';
 import 'player_detail_dialog.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -161,6 +162,9 @@ class StadiumsBoard extends StatefulWidget {
 }
 
 class _StadiumsBoardState extends State<StadiumsBoard> {
+  final _horizontal = ScrollController();
+  @override
+  void dispose() { _horizontal.dispose(); super.dispose(); }
   String? sortField;
   String stadiumLevel = 'first';
   bool ascending = true;
@@ -177,10 +181,10 @@ class _StadiumsBoardState extends State<StadiumsBoard> {
           ..sort((a, b) => compareStadiumRows(a, b, sortField, ascending));
         final showDimensions = stadiumLevel == 'first' || stadiumLevel == 'all';
         final fields = [
+          'name',
           'team',
           'image_outside',
           'image',
-          'name',
           'category',
           'address',
           'completed',
@@ -193,10 +197,10 @@ class _StadiumsBoardState extends State<StadiumsBoard> {
           'station_distance'
         ];
         final labels = [
+          '球場名',
           'ホームチーム',
           '外観',
           '内観',
-          '球場名',
           '球場カテゴリ',
           '所在地',
           '完成日',
@@ -231,6 +235,7 @@ class _StadiumsBoardState extends State<StadiumsBoard> {
               Expanded(
                   child: SingleChildScrollView(
                       key: const ValueKey('stadium-grid-scroll'),
+                      controller: _horizontal,
                       scrollDirection: Axis.horizontal,
                       child: SizedBox(
                           width: 1905 + (showDimensions ? 360 : 0),
@@ -239,7 +244,7 @@ class _StadiumsBoardState extends State<StadiumsBoard> {
                               for (var i = 0; i < labels.length; i++)
                                 InkWell(
                                   key: ValueKey('stadium-sort-${fields[i]}'),
-                                  onTap: (i > 0 && i < 5 ||
+                                  onTap: (['name', 'image_outside', 'image', 'category'].contains(fields[i]) ||
                                           ['outfield_distance', 'fence_height']
                                               .contains(fields[i]))
                                       ? null
@@ -252,7 +257,7 @@ class _StadiumsBoardState extends State<StadiumsBoard> {
                                   child: SizedBox.expand(
                                       child: Center(
                                           child: Text(
-                                    '${labels[i]}${(i > 0 && i < 5 || [
+                                    '${labels[i]}${(['name', 'image_outside', 'image', 'category'].contains(fields[i]) || [
                                           'outfield_distance',
                                           'fence_height'
                                         ].contains(fields[i])) ? '' : sortField == fields[i] ? ascending ? ' ▲' : ' ▼' : ' ↕'}',
@@ -266,8 +271,15 @@ class _StadiumsBoardState extends State<StadiumsBoard> {
                             ], header: true),
                             Expanded(
                                 child: ListView.builder(
-                                    itemCount: rows.length,
+                                    itemCount: rows.length + 1,
                                     itemBuilder: (context, i) {
+                                      if (i == rows.length) {
+                                        return const Padding(
+                                        padding: EdgeInsets.all(8),
+                                        child: Text(
+                                        '距離は本塁から左翼・中堅・右翼の外野フェンスまで。フェンス高は外野のもので、内野の防球ネットとは区別しています。完成日は新築時の完成年月（確認できた精度）で表示し、竣工式の場合は明記しています。未確認の項目は「未収録」。開場日と完成日、球団売上と球場収入は区別しています。空港は定期便のある空港が対象。直線距離は移動距離と異なります。見出しで昇順・降順を切り替えます（未収録は末尾、距離と徒歩時間・通貨は別々に比較）。',
+                                        style: TextStyle(fontSize: 11)));
+                                      }
                                       final row = rows[i];
                                       return _stadiumRow([
                                         for (final field in fields)
@@ -312,24 +324,19 @@ class _StadiumsBoardState extends State<StadiumsBoard> {
                                       ]);
                                     })),
                           ])))),
-              const Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Text(
-                      '距離は本塁から左翼・中堅・右翼の外野フェンスまで。フェンス高は外野のもので、内野の防球ネットとは区別しています。完成日は新築時の完成年月（確認できた精度）で表示し、竣工式の場合は明記しています。未確認の項目は「未収録」。開場日と完成日、球団売上と球場収入は区別しています。空港は定期便のある空港が対象。直線距離は移動距離と異なります。見出しで昇順・降順を切り替えます（未収録は末尾、距離と徒歩時間・通貨は別々に比較）。',
-                      style: TextStyle(fontSize: 11))),
             ]);
       });
   Widget _stadiumRow(List<Widget> cells, {bool header = false}) => SizedBox(
       height: header ? 48 : 100,
-      child: Row(children: [
+      child: PinnedHorizontalRow(controller: _horizontal, pinnedWidth: 240, minHeight: header ? 48 : 100, children: [
         for (var i = 0; i < cells.length; i++)
           Container(
               width: i == 0
-                  ? 90
-                  : i == 1 || i == 2
+                  ? 240
+                  : i == 2 || i == 3
                       ? 180
-                      : i == 3
-                          ? 240
+                      : i == 1
+                          ? 90
                           : (stadiumLevel == 'first' ||
                                       stadiumLevel == 'all') &&
                                   (i == 8 || i == 9)
@@ -623,46 +630,53 @@ class HallOfFameBoard extends StatelessWidget {
             ('hall', '殿堂入り'),
             ('members', '名球会会員'),
             ('candidates', '名球会の基準達成候補（達成割合順）')
-          ]) ...[
-            Container(
-                color: Colors.black87,
-                padding: const EdgeInsets.all(10),
-                child: Text(section.$2,
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold))),
-            if (section.$1 == 'candidates')
-              const Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Text(
-                      '2000安打・200勝・250セーブ。各基準に対する通算記録の達成割合で比較。殿堂入りは投票によるため到達予測は行いません。',
-                      style: TextStyle(fontSize: 12))),
-            if (sectionRows(section.$1).isEmpty)
-              const ListTile(title: Text('該当する登録データがありません')),
-            Padding(
-              padding: const EdgeInsets.all(6),
-              child: LayoutBuilder(builder: (context, constraints) {
-                const gap = 6.0;
-                final columns =
-                    ((constraints.maxWidth + gap) / 180).floor().clamp(1, 1000);
-                final width =
-                    (constraints.maxWidth - gap * (columns - 1)) / columns;
-                final rows = sectionRows(section.$1);
-                return Wrap(
-                    spacing: gap,
-                    runSpacing: gap,
-                    crossAxisAlignment: WrapCrossAlignment.start,
-                    children: [
-                      for (var i = 0; i < rows.length; i++)
-                        SizedBox(
-                          key: ValueKey('hall-card-${section.$1}-$i'),
-                          width: width,
-                          child: _playerCard(rows[i],
-                              candidate: section.$1 == 'candidates'),
-                        ),
-                    ]);
-              }),
+          ])
+            ExpansionTile(
+              key: ValueKey('hall-section-$org-$year-${section.$1}'),
+              initiallyExpanded: section.$1 == 'candidates',
+              backgroundColor: Colors.black87,
+              collapsedBackgroundColor: Colors.black87,
+              iconColor: Colors.white,
+              collapsedIconColor: Colors.white,
+              title: Text(section.$2,
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              children: [ColoredBox(color: Colors.white,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                  if (section.$1 == 'candidates')
+                    const Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Text(
+                            '2000安打・200勝・250セーブ。各基準に対する通算記録の達成割合で比較。殿堂入りは投票によるため到達予測は行いません。',
+                            style: TextStyle(fontSize: 12))),
+                  if (sectionRows(section.$1).isEmpty)
+                    const ListTile(title: Text('該当する登録データがありません')),
+                  Padding(
+                    padding: const EdgeInsets.all(6),
+                    child: LayoutBuilder(builder: (context, constraints) {
+                      const gap = 6.0;
+                      final columns =
+                          ((constraints.maxWidth + gap) / 180).floor().clamp(1, 1000);
+                      final width =
+                          (constraints.maxWidth - gap * (columns - 1)) / columns;
+                      final rows = sectionRows(section.$1);
+                      return Wrap(
+                          spacing: gap,
+                          runSpacing: gap,
+                          crossAxisAlignment: WrapCrossAlignment.start,
+                          children: [
+                            for (var i = 0; i < rows.length; i++)
+                              SizedBox(
+                                key: ValueKey('hall-card-${section.$1}-$i'),
+                                width: width,
+                                child: _playerCard(rows[i],
+                                    candidate: section.$1 == 'candidates'),
+                              ),
+                          ]);
+                    }),
+                  ),
+                ])),
+              ],
             ),
-          ],
           Padding(
               padding: const EdgeInsets.all(8),
               child: Text('${data['note'] ?? ''}',

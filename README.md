@@ -1,8 +1,10 @@
 # README【YakyuuJapan】
 
-【neon利用状況】
+【Neon・Renderの請求】
 
 [https://console.neon.tech/app/org-empty-fog-22600075/billing](https://console.neon.tech/app/org-empty-fog-22600075/billing)
+
+[https://dashboard.render.com/billing](https://dashboard.render.com/billing)
 
 【コミット&デプロイ記述】
 
@@ -12,7 +14,7 @@ sh tool/build_web.sh
 
 git add . 
 
-git commit -m "大幅な表示修正を追加しました。" 
+git commit -m "サーバーのメモリをアッパックする処理を改善しました。" 
 
 git push 
 

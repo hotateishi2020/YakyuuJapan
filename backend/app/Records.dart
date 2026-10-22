@@ -14,6 +14,11 @@ import 'RecordCatalog.dart';
 import 'RecordStreaks.dart';
 import 'StrengthUsage.dart';
 
+String timelineManagerClubKey(Map<String, dynamic> row) {
+  if ('${row['name'] ?? row['manager_team_name'] ?? ''}'.contains('近鉄')) return 'bu';
+  return clubKey({'url_npb_players': row['manager_team_url'], 'name_team': row['manager_team_name']});
+}
+
 /// Read-only records endpoint. Official historical baselines are refreshed offline.
 class Records {
   static final _cache = <String, ({DateTime at, Map<String, dynamic> data})>{};
@@ -126,7 +131,7 @@ class Records {
         ? usageMap(readClubFile('timeline-managers-npb.json')['clubs']) : <String, dynamic>{};
     final standings = buildRecordStandings(standingRows.map((r) {
       final row = r.toColumnMap();
-      final code = clubKey({'url_npb_players': row['manager_team_url'], 'name_team': row['manager_team_name']});
+      final code = timelineManagerClubKey(row);
       final entry = usageMap(managerCatalog[code]);
       final manager = usageMap(entry['years'])['${row['year']}'];
       return {...row, if (manager != null) 'manager': manager};

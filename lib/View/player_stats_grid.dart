@@ -216,6 +216,14 @@ List<Map<String, dynamic>> personalStatPreview(List<Map<String, dynamic>> ranked
       result[result.length - 1] = highlighted;
     }
   }
+  // Reserve the row just above the appended players as an omission marker.
+  final outsideStart = result.indexWhere((row) => (positions[row] ?? 0) >= 10);
+  if (outsideStart > 0) {
+    result[outsideStart - 1] = {
+      ...result[outsideStart - 1],
+      'preview_separator': true,
+    };
+  }
   return result;
 }
 

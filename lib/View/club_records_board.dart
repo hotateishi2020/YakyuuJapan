@@ -1,3 +1,7 @@
+import '../widgets/collapsible_menu.dart';
+import '../config/app_design.dart';
+import '../logic/favorite_team.dart';
+import 'pinned_horizontal_row.dart';
 import 'player_detail_dialog.dart';
 import 'package:flutter/material.dart';
 import '../tools/json_utils.dart';
@@ -12,14 +16,23 @@ class ClubRecordsBoard extends StatefulWidget {
 
 class _ClubRecordsBoardState extends State<ClubRecordsBoard> {
   String _group = 'season';
+  String? _selectedTeam;
+  final _horizontal = ScrollController();
+  @override
+  void dispose() { _horizontal.dispose(); super.dispose(); }
   Map<String, dynamic> get data => widget.data;
   @override
   Widget build(BuildContext context) {
-    final teams = listMapFromJson(data['teams']);
+    final allTeams = listMapFromJson(data['teams']);
     final metrics = listMapFromJson(data['metrics'])
         .where((m) => (m['group'] ?? 'season') == _group)
         .toList();
-    if (teams.isEmpty) return const Center(child: Text('球団記録を取得できませんでした。'));
+    if (allTeams.isEmpty) return const Center(child: Text('球団記録を取得できませんでした。'));
+    final portrait = MediaQuery.orientationOf(context) == Orientation.portrait;
+    String teamKey(Map<String, dynamic> team) => '${team['id_team'] ?? team['name']}';
+    final selected = allTeams.firstWhere((team) => teamKey(team) == _selectedTeam,
+      orElse: () => favoriteTeamRow(allTeams) ?? allTeams.first);
+    final teams = portrait ? [selected] : allTeams;
     Widget cell(Widget child, double width, {Color color = Colors.white}) =>
         Container(
             width: width,
@@ -73,6 +86,37 @@ class _ClubRecordsBoardState extends State<ClubRecordsBoard> {
                 )),
         ]);
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      if (portrait) MenuBand(level: 3, child: LayoutBuilder(builder: (context, constraints) {
+        final columns = allTeams.length < 6 ? allTeams.length : 6;
+        final tabWidth = (constraints.maxWidth - (columns - 1) * ALL_SPACE_BLOCK) / columns;
+        return Wrap(spacing: ALL_SPACE_BLOCK, runSpacing: ALL_SPACE_BLOCK, children: [
+          for (final team in allTeams)
+            SizedBox(width: tabWidth, height: TAB_BAR_H,
+              child: Semantics(button: true, selected: teamKey(team) == teamKey(selected),
+                child: Material(
+                  color: teamKey(team) == teamKey(selected)
+                    ? parseColorNameOrNull('${team['color_back']}') ?? Colors.blueGrey
+                    : Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(TAB_RADIUS),
+                  child: InkWell(
+                    key: ValueKey('club-records-team-${teamKey(team)}'),
+                    borderRadius: BorderRadius.circular(TAB_RADIUS),
+                    onTap: () {
+                      if (_horizontal.hasClients) _horizontal.jumpTo(0);
+                      setState(() => _selectedTeam = teamKey(team));
+                    },
+                    child: Padding(padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Center(child: FittedBox(fit: BoxFit.scaleDown,
+                        child: Text('${team['name_shortest'] ?? team['short_name'] ?? team['name']}',
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold,
+                            color: teamKey(team) == teamKey(selected)
+                              ? parseColorNameOrNull('${team['color_font']}') ?? Colors.white
+                              : Colors.black87))))),
+                  ),
+                ),
+              )),
+        ]);
+      })),
       Wrap(spacing: 6, children: [
         for (final entry
             in {'season': 'シーズン記録', 'career': '通算記録', 'streak': '連続記録'}.entries)
@@ -89,17 +133,17 @@ class _ClubRecordsBoardState extends State<ClubRecordsBoard> {
           }[_group]}',
           style: const TextStyle(fontWeight: FontWeight.bold)),
       Expanded(child: LayoutBuilder(builder: (context, constraints) {
-        final width = ((constraints.maxWidth - 100) / teams.length)
+        final width = portrait ? (constraints.maxWidth - 100).clamp(1.0, double.infinity)
+            : ((constraints.maxWidth - 100) / teams.length)
             .clamp(190.0, 300.0)
             .toDouble();
         return SingleChildScrollView(
+            controller: _horizontal,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
                 width: 100 + width * teams.length,
                 child: Column(children: [
-                  IntrinsicHeight(
-                      child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                  PinnedHorizontalRow(controller: _horizontal, pinnedWidth: 100,
                           children: [
                         cell(
                             const Text('記録',
@@ -118,17 +162,14 @@ class _ClubRecordsBoardState extends State<ClubRecordsBoard> {
                               color: parseColorNameOrNull(
                                       '${team['color_back']}') ??
                                   Colors.blueGrey),
-                      ])),
+                      ]),
                   Expanded(
                       child: ListView.builder(
                           itemCount: metrics.length,
                           itemBuilder: (context, index) {
                             final metric = metrics[index];
                             final cells = listMapFromJson(metric['cells']);
-                            return IntrinsicHeight(
-                                child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
+                            return PinnedHorizontalRow(controller: _horizontal, pinnedWidth: 100,
                                     children: [
                                   cell(
                                       Text('${metric['label']}',
@@ -223,7 +264,7 @@ class _ClubRecordsBoardState extends State<ClubRecordsBoard> {
                                                 Colors.blueGrey,
                                             Colors.white,
                                             .94)!),
-                                ]));
+                                ]);
                           })),
                 ])));
       })),

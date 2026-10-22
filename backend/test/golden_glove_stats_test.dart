@@ -20,6 +20,7 @@ void main() {
     final pitchers = goldenGloveRows(2026,people,awards:awards,pitching:true);
     expect(pitchers.map((p)=>p['id_player']),[1,3]);
     expect(pitchers.every((p)=>p['flg_pitcher']==true),isTrue);
+    expect(pitchers.every((p)=>p['txt_position']=='投手'),isTrue);
     expect(goldenGloveRows(2027,people,awards:awards,pitching:true),isEmpty);
   });
 

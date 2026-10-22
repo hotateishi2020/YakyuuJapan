@@ -24,7 +24,7 @@ INSERT INTO t_nortification (
     updpgm,
     updenv
 ) VALUES 
-('選手の契約情報を参照できる機能を追加しました。', '選手の契約情報を参照できる機能を追加しました。', 1, false, 'SYS', 'UPD', '', 0, 'SQLCreator', 'SQLCreator', 0, 'SQLCreator', 'SQLCreator') 
+('選手情報のポップアップを表示する様にしました。', '選手情報のポップアップを表示する様にしました。', 1, false, 'SYS', 'UPD', '', 0, 'SQLCreator', 'SQLCreator', 0, 'SQLCreator', 'SQLCreator') 
 RETURNING id;
 ''';
 

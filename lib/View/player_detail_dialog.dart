@@ -63,6 +63,7 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
   bool loading = true;
   String? error;
   final Map<String, Uri> _homeRunLinks = {};
+  final Set<String> _homeRunChecked = {};
   @override
   void initState() {
     super.initState();
@@ -480,7 +481,13 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
     for (final game in games) {
       if (!mounted) return;
       final uri = await resolveHomeRunVideo(game, channels);
-      if (mounted && uri != null) setState(() => _homeRunLinks['${game['datetime_start']}'] = uri);
+      if (mounted) {
+        setState(() {
+          final key = '${game['datetime_start']}';
+          _homeRunChecked.add(key);
+          if (uri != null) _homeRunLinks[key] = uri;
+        });
+      }
     }
   }
 
@@ -513,29 +520,27 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
         if (id != null) return Uri.https('www.youtube.com', '/watch', {'v': id});
       }
     } catch (_) {
-      /* Open a precise search when a unique match cannot be verified. */
+      // No verified direct video: leave playback unavailable.
     }
-    final uri = homeRunVideoSearch(
-        name: name,
-        date: date,
-        opponent: recentOpponent(game),
-        pacific: pacific);
-    return uri;
+    return null;
   }
 
   Widget appearanceWithVideo(Map<String, dynamic> game) =>
       Row(mainAxisSize: MainAxisSize.min, children: [
         Flexible(
             child: GamePlayerAppearance(
+                org: widget.org,
                 lines: listMapFromJson(game['lines']),
                 plays: listMapFromJson(game['plays']))),
         if (hasHomeRun(game))
           Padding(
               padding: const EdgeInsets.only(left: 6),
               child: Tooltip(
-                  message: _homeRunLinks['${game['datetime_start']}'] == null ? 'ホームラン動画を確認中…' : 'この試合のホームラン動画を開く',
+                  message: _homeRunLinks['${game['datetime_start']}'] != null
+                      ? 'この試合のホームラン動画を開く'
+                      : _homeRunChecked.contains('${game['datetime_start']}') ? 'このホームランの動画を特定できませんでした' : 'ホームラン動画を確認中…',
                   child: Material(
-                      color: const Color(0xffff0000),
+                      color: _homeRunChecked.contains('${game['datetime_start']}') && !_homeRunLinks.containsKey('${game['datetime_start']}') ? Colors.grey : const Color(0xffff0000),
                       borderRadius: BorderRadius.circular(5),
                       child: InkWell(
                         key: ValueKey(
@@ -547,9 +552,9 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
                         },
                         child: SizedBox(
                             width: 36, height: 24,
-                            child: _homeRunLinks['${game['datetime_start']}'] == null
+                            child: !_homeRunChecked.contains('${game['datetime_start']}')
                                 ? const Center(child: SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)))
-                                : const Icon(Icons.play_arrow, size: 20, color: Colors.white)),
+                                : Icon(_homeRunLinks.containsKey('${game['datetime_start']}') ? Icons.play_arrow : Icons.videocam_off_outlined, size: 20, color: Colors.white)),
                       )))),
       ]);
 

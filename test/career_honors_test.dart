@@ -162,6 +162,8 @@ void main() {
         }
       ],
     }))));
+    await t.tap(find.text('選手'));
+    await t.pumpAndSettle();
     await t.tap(find.byTooltip('2025年 沢村賞\n公式受賞'));
     await t.pumpAndSettle();
     expect(find.textContaining('公式受賞'), findsWidgets);

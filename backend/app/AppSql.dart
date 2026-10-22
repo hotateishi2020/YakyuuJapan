@@ -1700,6 +1700,9 @@ ORDER BY mt.id_league, tpt.int_rank
         LEFT JOIN m_user    ON m_user.id = t_predict_player.id_user
         LEFT JOIN (SELECT id_pitcher_home FROM t_game WHERE datetime_start::date = CURRENT_DATE) AS t_game_home ON t_game_home.id_pitcher_home = t_predict_player.id_player
         LEFT JOIN (SELECT id_pitcher_away FROM t_game WHERE datetime_start::date = CURRENT_DATE) AS t_game_away ON t_game_away.id_pitcher_away = t_predict_player.id_player
+      WHERE m_stats.title <> '得点圏打率'
+        OR (t_stats_team.int_game > 0
+          AND tsp.cnt_play >= FLOOR(t_stats_team.int_game * 3.1))
       GROUP BY
         m_stats.title,
         tsp.int_rank,
@@ -1774,6 +1777,7 @@ ORDER BY mt.id_league, tpt.int_rank
     int cnt = 1;
 
     for (final stat in stats) {
+      final yahooId = RegExp(r'/mlb/player/(\d+)').firstMatch(stat.playerUrl)?[1] ?? '';
       // 文字列補間を使用して値を直接埋め込み
       sql += '''(
         SELECT 
@@ -1788,12 +1792,15 @@ ORDER BY mt.id_league, tpt.int_rank
         FROM m_player
         LEFT OUTER JOIN m_team ON m_team.id = m_player.id_team
         WHERE m_team.name_shortest = '${stat.teamName}'
+          AND NOT COALESCE(m_player.flg_delete, FALSE)
           AND (
-            m_player.name_full = '${stat.playerName}'
+            ('${yahooId}' <> '' AND substring(m_player.url from '/mlb/player/([0-9]+)') = '${yahooId}')
+            OR m_player.name_full = '${stat.playerName}'
             OR COALESCE(m_player.name_last, '') || COALESCE(m_player.name_first, '') LIKE '%${stat.playerName}%'
             OR m_player.name_last = '${stat.playerName}'
           )
-        ORDER BY m_player.name_last ASC
+        ORDER BY CASE WHEN '${yahooId}' <> '' AND substring(m_player.url from '/mlb/player/([0-9]+)') = '${yahooId}' THEN 0 ELSE 1 END,
+          length(COALESCE(m_player.name_full, '')) DESC, m_player.id
         LIMIT 1
       )''';
 

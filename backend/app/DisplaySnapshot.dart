@@ -1,3 +1,6 @@
+import 'QualifiedBattingMetrics.dart';
+import 'SamuraiSelections.dart';
+import 'PlayerCountry.dart';
 import 'TeamScoringRates.dart';
 import 'dart:convert';
 
@@ -97,6 +100,9 @@ class DisplaySnapshot {
   static Future<void> _refreshPlayers(Connection conn, int year) async {
     await ensure(conn);
     final rows = Postgres.toJson(await Postgres.execute(conn, AppSql.selectStatsPlayer(), data: [year]));
+    retainQualifiedRisp(rows);
+    await attachPlayerCountries(conn, year, rows);
+    await attachSamuraiSelections(conn, year, rows);
     for (final row in rows) {
       if (_asInt(row['int_rank']) != 1) {
         row.remove('prediction_name');
@@ -208,7 +214,9 @@ class DisplaySnapshot {
 
   static Future<List<Map<String, dynamic>>> players(Connection conn, int year) async {
     // 読み出しで再集計や登録は行わない。未登録年は空のまま返す。
-    return _readYear(conn, 'v_stats_player', year);
+    final rows = await _readYear(conn, 'v_stats_player', year);
+    retainQualifiedRisp(rows);
+    return rows;
   }
 
   static Future<PlayerDisplay> playerPart(Connection conn, int year, List<int> leagueIds) {

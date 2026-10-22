@@ -50,7 +50,9 @@ List<Map<String, dynamic>> championshipSummary(List<Map<String, dynamic>> season
       final matches = teams(season).where((t) => key(t) == key(team));
       for (final t in matches) {
         if (official is! Map && (t['league_champion'] == true ||
-            (!mlb && t['league_champion'] == null && '${t['rank']}' == '1'))) leagueWins.add(y);
+            (!mlb && t['league_champion'] == null && '${t['rank']}' == '1'))) {
+          leagueWins.add(y);
+        }
         if (t['champion'] == true) seriesWins.add(y);
         if (!mlb && y >= 2005 && y != 2020) {
           final winner = season['interleague_champion'];

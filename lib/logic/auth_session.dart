@@ -96,6 +96,7 @@ class AuthUser {
   final String nameHandle;
   final String mailaddress;
   final String codeColor;
+  final String favoriteHighSchool;
   final int? idTeamFav;
   final int? idPlayerFav;
   final String nameTeamFav;
@@ -118,6 +119,7 @@ class AuthUser {
     required this.nameHandle,
     required this.mailaddress,
     required this.codeColor,
+    this.favoriteHighSchool = '',
     this.idTeamFav,
     this.idPlayerFav,
     this.nameTeamFav = '',
@@ -156,6 +158,7 @@ class AuthUser {
         nameHandle: '${json['name_handle'] ?? ''}',
         mailaddress: '${json['mailaddress'] ?? ''}',
         codeColor: '${json['code_color'] ?? ''}',
+        favoriteHighSchool: '${json['favorite_high_school'] ?? (int.tryParse('${json['id']}') == 1 ? '佐賀北' : '')}',
         idTeamFav: int.tryParse('${json['id_team_fav'] ?? ''}'),
         idPlayerFav: int.tryParse('${json['id_player_fav'] ?? ''}'),
         nameTeamFav: '${json['name_team_fav'] ?? ''}',
@@ -175,6 +178,7 @@ class AuthUser {
         'name_handle': nameHandle,
         'mailaddress': mailaddress,
         'code_color': codeColor,
+        'favorite_high_school': favoriteHighSchool,
         'id_team_fav': idTeamFav,
         'id_player_fav': idPlayerFav,
         'name_team_fav': nameTeamFav,
@@ -428,6 +432,7 @@ class AuthSession {
     required String mailaddress,
     int? idTeamFav,
     int? idPlayerFav,
+    String? favoriteHighSchool,
   }) async {
     try {
       final res = await http
@@ -437,6 +442,7 @@ class AuthSession {
             body: jsonEncode({
               'name_last': nameLast,
               'mailaddress': mailaddress,
+              if (favoriteHighSchool != null) 'favorite_high_school': favoriteHighSchool,
               'id_team_fav': idTeamFav,
               'id_player_fav': idPlayerFav,
             }),
@@ -448,6 +454,7 @@ class AuthSession {
       }
       if (map['user'] is Map) {
         user = AuthUser.fromJson(Map<String, dynamic>.from(map['user'] as Map));
+        _persistSession();
       }
       return null;
     } catch (e) {

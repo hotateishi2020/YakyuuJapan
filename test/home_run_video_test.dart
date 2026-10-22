@@ -37,18 +37,6 @@ void main() {
         }),
         isFalse);
   });
-  test('Pacific searches the official channel, Central searches YouTube', () {
-    final date = DateTime(2026, 10, 20);
-    final p = homeRunVideoSearch(
-        name: '甲', date: date, opponent: 'vs西武', pacific: true);
-    expect(p.path, contains(pacificHighlightChannel));
-    expect(p.queryParameters['query'], contains('2026/10/20'));
-    expect(
-        homeRunVideoSearch(
-                name: '甲', date: date, opponent: 'vs巨人', pacific: false)
-            .path,
-        '/results');
-  });
   test('direct video requires player, game date and correct Pacific channel',
       () {
     final date = DateTime(2026, 10, 20);

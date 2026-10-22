@@ -102,6 +102,42 @@ void main() {
     });
   }
 
+  for (final layout in PersonalStatsLayout.values) {
+    testWidgets('MLB縦画面は保存設定${layout.name}でもリーグタブで打者と投手を切り替える', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(390, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(body: BothLeaguePersonalStats(
+          org: OrgConfig.mlb,
+          segmentOnly: true,
+          layout: layout,
+          stats: [
+            for (final league in [3, 4]) ...[
+              {'id_league': '$league', 'title': '打率', 'stats': '.300', 'int_rank': 1, 'name_player': '打者$league', 'flg_pitcher': false},
+              {'id_league': league, 'title': '防御率', 'stats': '2.00', 'int_rank': 1, 'name_player': '投手$league', 'flg_pitcher': true},
+            ],
+          ],
+        )),
+      ));
+      expect(find.text('打者3'), findsOneWidget);
+      expect(find.text('打者4'), findsNothing);
+      expect(tester.widget<SegmentedLeaguePersonalStats>(find.byType(SegmentedLeaguePersonalStats)).showJapanFlag, isTrue);
+      await tester.tap(find.byTooltip('ナ・リーグ'));
+      await tester.pumpAndSettle();
+      expect(find.text('打者4'), findsOneWidget);
+      expect(find.text('打者3'), findsNothing);
+      await tester.tap(find.byWidgetPredicate((widget) => widget is StatsSegmentControl && widget.labels.contains('防御率')));
+      await tester.pumpAndSettle();
+      expect(find.text('投手4'), findsOneWidget);
+      expect(find.text('投手3'), findsNothing);
+      await tester.tap(find.byTooltip('ア・リーグ'));
+      await tester.pumpAndSettle();
+      expect(find.text('打者3'), findsOneWidget);
+      expect(find.text('投手4'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('横画面のMLB個人成績をリーグタブで切り替える', (tester) async {
     await tester.binding.setSurfaceSize(const Size(1400, 800));
     addTearDown(() => tester.binding.setSurfaceSize(null));

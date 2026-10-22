@@ -105,7 +105,7 @@ void main() {
             body: StrengthRosterGrid(team: {
       'roster': [player]
     }, year: 2026))));
-    expect(find.text('国内FA'), findsOneWidget);
+    expect(find.text('今オフ 国内FA'), findsOneWidget);
     expect(t.takeException(), isNull);
     await t.pumpWidget(const MaterialApp(
         home: Scaffold(

@@ -162,7 +162,6 @@ class FetchURL {
     try {
       await Postgres.withConnection((c) async {
         await StadiumImages.seed(c);
-
       }, urgent: true);
     } catch (e, st) {
       _imageSeedStarted = false;
@@ -1004,15 +1003,17 @@ class FetchURL {
       print('NPB明日以降は${GameFetchSchedule.futureInterval.inMinutes}分以内のためスキップ');
     }
     final today = DateTime(now.year, now.month, now.day);
-    final listDate = nearDaysOnly ? GameFetchSchedule.recheckDates(now) : futureOnly
-        ? [for (var i = 1; i <= 10; i++) today.add(Duration(days: i))]
-        : todayOnly
-            ? [today]
-            : [
-                now,
-                for (var i = -2; i <= 10; i++)
-                  if (i != 0 && (includeFuture || i <= 0)) now.add(Duration(days: i)),
-              ];
+    final listDate = nearDaysOnly
+        ? GameFetchSchedule.recheckDates(now)
+        : futureOnly
+            ? [for (var i = 1; i <= 10; i++) today.add(Duration(days: i))]
+            : todayOnly
+                ? [today]
+                : [
+                    now,
+                    for (var i = -2; i <= 10; i++)
+                      if (i != 0 && (includeFuture || i <= 0)) now.add(Duration(days: i)),
+                  ];
 
     for (var date in listDate) {
       final formatter = DateFormat('yyyy-MM-dd');
@@ -1673,18 +1674,26 @@ class FetchURL {
     required String awayShortest,
     required String awayShort,
   }) async {
-    final notes = parsed == null ? <LivePlateNote>[] : boxLiveNotes(
-      parsed,
-      idTeamHome: idTeamHome,
-      idTeamAway: idTeamAway,
-      idPitcherHome: idPitcherHome,
-      idPitcherAway: idPitcherAway,
-      playerId: playerId,
-      resolveScore: (event, bottom, home, away) => _resolvedLiveScore(
-        event, homeShortest, homeShort, awayShortest, awayShort,
-        bottom: bottom, beforeHome: home, beforeAway: away,
-      ),
-    );
+    final notes = parsed == null
+        ? <LivePlateNote>[]
+        : boxLiveNotes(
+            parsed,
+            idTeamHome: idTeamHome,
+            idTeamAway: idTeamAway,
+            idPitcherHome: idPitcherHome,
+            idPitcherAway: idPitcherAway,
+            playerId: playerId,
+            resolveScore: (event, bottom, home, away) => _resolvedLiveScore(
+              event,
+              homeShortest,
+              homeShort,
+              awayShortest,
+              awayShort,
+              bottom: bottom,
+              beforeHome: home,
+              beforeAway: away,
+            ),
+          );
 
     final placed = attachLiveNotes(boxPlates, notes);
     applyBoxPlateScoring(boxPlates);
@@ -3107,7 +3116,8 @@ class FetchURL {
     ''');
   }
 
-  /// The provider's RISP ranking includes qualified batters only.
+  /// Register RISP rankings; qualification is checked against PA and team games
+  /// when building and reading the display snapshot, including supplemental rows.
   static Future<void> ensureRispStat(Connection conn) async {
     await conn.execute("""
       INSERT INTO m_stats (title,flg_pitcher,flg_positive,flg_delete,int_index,
@@ -3245,12 +3255,11 @@ class FetchURL {
       for (final link in doc.querySelectorAll('a[href]')) {
         final candidate = baseUri.resolve(link.attributes['href']!);
         final page = int.tryParse(candidate.queryParameters['page'] ?? '');
-        if (candidate.origin == baseUri.origin && candidate.path == baseUri.path &&
-            page != null && page > 1 && page <= 5 &&
-            baseUri.queryParameters.entries.where((e) => e.key != 'page')
-              .every((e) => candidate.queryParameters[e.key] == e.value)) pages.add(candidate);
+        if (candidate.origin == baseUri.origin && candidate.path == baseUri.path && page != null && page > 1 && page <= 5 && baseUri.queryParameters.entries.where((e) => e.key != 'page').every((e) => candidate.queryParameters[e.key] == e.value)) {
+          pages.add(candidate);
+        }
       }
-      final orderedPages = pages.toList()..sort((a,b) => int.parse(a.queryParameters['page']!).compareTo(int.parse(b.queryParameters['page']!)));
+      final orderedPages = pages.toList()..sort((a, b) => int.parse(a.queryParameters['page']!).compareTo(int.parse(b.queryParameters['page']!)));
       for (final page in orderedPages) {
         if (rankingRows.where((r) => r.querySelectorAll('td').isNotEmpty).length >= 50) break;
         try {
@@ -3260,18 +3269,20 @@ class FetchURL {
           for (final row in nextRows) {
             if (row.querySelectorAll('td').isNotEmpty && seenRows.add(row.text.trim())) rankingRows.add(row);
           }
-        } catch (_) { break; }
+        } catch (_) {
+          break;
+        }
       }
       List<t_stats_player> listStats = [];
       final colIdx = title == 'ホールド'
           ? table.querySelectorAll('thead th').indexWhere((th) => th.text.replaceAll(RegExp(r'\s|　'), '') == 'ホールド')
           : title == 'HP'
-          ? table.querySelectorAll('thead th').indexWhere((th) => th.text.replaceAll(RegExp(r'\s|　'), '').replaceAll('Ｈ', 'H').replaceAll('Ｐ', 'P') == 'HP')
-          : title == '勝率'
-          ? table.querySelectorAll('thead th').indexWhere((th) => th.text.replaceAll(RegExp(r'\s'), '') == '勝率')
-          : title == '得点圏打率'
-          ? table.querySelectorAll('thead th').indexWhere((th) => th.text.replaceAll(RegExp(r'\s'), '').contains('得点圏'))
-          : int.tryParse('${stat['int_idx_col']}') ?? 0;
+              ? table.querySelectorAll('thead th').indexWhere((th) => th.text.replaceAll(RegExp(r'\s|　'), '').replaceAll('Ｈ', 'H').replaceAll('Ｐ', 'P') == 'HP')
+              : title == '勝率'
+                  ? table.querySelectorAll('thead th').indexWhere((th) => th.text.replaceAll(RegExp(r'\s'), '') == '勝率')
+                  : title == '得点圏打率'
+                      ? table.querySelectorAll('thead th').indexWhere((th) => th.text.replaceAll(RegExp(r'\s'), '').contains('得点圏'))
+                      : int.tryParse('${stat['int_idx_col']}') ?? 0;
       final isPitcherTable = url.contains('/pitcher');
 
       for (final tr in rankingRows) {
@@ -3581,7 +3592,8 @@ class FetchURL {
         WHERE id_team = \$1::int
           AND COALESCE(flg_delete, FALSE) = FALSE
           AND (
-            name_full = \$2::text
+            (\$3::text <> '' AND substring(url from '/mlb/player/([0-9]+)') = \$3::text)
+            OR name_full = \$2::text
             OR name_last = \$2::text
             OR COALESCE(name_last, '') || COALESCE(name_first, '') = \$2::text
             OR name_full LIKE \$2::text || '%'
@@ -3611,6 +3623,7 @@ class FetchURL {
             )
           )
         ORDER BY
+          CASE WHEN \$3::text <> '' AND substring(url from '/mlb/player/([0-9]+)') = \$3::text THEN 0 ELSE 1 END,
           CASE
             WHEN name_full = \$2::text THEN 0
             WHEN COALESCE(name_last, '') || COALESCE(name_first, '') = \$2::text THEN 1
@@ -3622,7 +3635,7 @@ class FetchURL {
           length(COALESCE(name_full, '')) DESC
         LIMIT 1
       ''',
-      parameters: [teamId, name],
+      parameters: [teamId, name, RegExp(r'/mlb/player/(\d+)').firstMatch(playerUrl ?? '')?[1] ?? ''],
     );
     var playerId = 0;
     var needsCountry = true;

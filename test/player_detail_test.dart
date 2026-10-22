@@ -8,8 +8,36 @@ import 'package:Yakyuu_Japan/View/player_detail_dialog.dart';
 import 'package:Yakyuu_Japan/View/player_stats_grid.dart';
 import 'package:Yakyuu_Japan/View/SeasonTable.dart';
 import 'package:Yakyuu_Japan/View/GamesBoard.dart' show GameBattingResult, GamePlayerAppearance;
+import 'package:Yakyuu_Japan/View/BlinkBg.dart';
 
 void main() {
+  for (final matched in [false, true]) {
+    testWidgets('ホームラン動画は特定できた直接動画だけ再生可能 $matched', (t) async {
+      await http.runWithClient(() async {
+        await t.pumpWidget(const MaterialApp(home: Scaffold(body: PlayerDetailDialog(
+          player: {'name': '佐藤太郎'}, org: 'npb', year: 2026,
+        ))));
+        await t.pumpAndSettle();
+        final button = find.byKey(const ValueKey('home-run-video-2026-10-20'));
+        await t.scrollUntilVisible(button, 300, scrollable: find.byType(Scrollable).first);
+        expect(t.widget<InkWell>(button).onTap, matched ? isNotNull : isNull);
+        expect(find.descendant(of: button, matching: find.byType(CircularProgressIndicator)), findsNothing);
+        expect(find.descendant(of: button, matching: find.byIcon(matched ? Icons.play_arrow : Icons.videocam_off_outlined)), findsOneWidget);
+      }, () => MockClient((request) async {
+        final Object payload;
+        if (request.url.path.endsWith('/videos') || request.url.path.endsWith('/home-run-video')) {
+          payload = {'channels': [{'id': 'official', 'videos': matched ? [
+            {'id': 'abcdefghijk', 'title': '佐藤太郎 ホームラン 2026/10/20'},
+          ] : []}]};
+        } else {
+          payload = {'found': true, 'profile': {'name_full': '佐藤太郎', 'id_league': 1},
+            'recent_games': [{'datetime_start': '2026-10-20', 'plays': [{'result': '左本', 'bases': 4}]}]};
+        }
+        return http.Response(jsonEncode(payload), 200, headers: {'content-type': 'application/json; charset=utf-8'});
+      }));
+    });
+  }
+
   for (final portrait in [false, true]) {
     testWidgets('本塁打がある試合だけ出場成績の横に再生ボタンを表示する', (t) async {
     await http.runWithClient(() async {
@@ -64,6 +92,40 @@ void main() {
       expect(find.text(label), findsOneWidget);
     }
     expect(t.takeException(), isNull);
+  });
+
+  testWidgets('出場記録は勝敗HSを投球ブロック左に置きHQSと球速を表示', (t) async {
+    for (final mark in ['勝', '負', 'H', 'S']) {
+      await t.pumpWidget(MaterialApp(home: Scaffold(body: GamePlayerAppearance(
+        lines: [{'code_result_pitcher': mark, 'double_inning_pitch': 7,
+          'starter': true, 'int_runs': 2, 'int_runs_earned': 2, 'int_velo_max': 160,
+          'int_hit': 4, 'int_four': 0, 'int_dead_pitching': 0, 'int_strike_out': 10,
+          'txt_achieve': 'QS|qs HQS|hqs'}], plays: [],
+      ))));
+      await t.pump();
+      expect(find.text(mark), findsOneWidget);
+      expect(find.text('HQS'), findsOneWidget);
+      expect(find.ancestor(of: find.text('HQS'), matching: find.byType(BlinkBg)), findsOneWidget);
+      expect(find.text('QS'), findsNothing);
+      expect(find.text('160km'), findsOneWidget);
+      expect(t.getTopLeft(find.text(mark)).dx, lessThan(t.getTopLeft(find.text('7回2失点')).dx));
+      expect(t.takeException(), isNull);
+    }
+  });
+
+  testWidgets('出場記録は猛打賞と5タコを表示し四球なら5タコにしない', (t) async {
+    await t.pumpWidget(const MaterialApp(home: Scaffold(body: GamePlayerAppearance(
+      lines: [{'int_batting': 4, 'int_hit1': 3}], plays: [],
+    ))));
+    expect(find.text('猛打賞'), findsOneWidget);
+    expect(find.ancestor(of: find.text('猛打賞'), matching: find.byType(BlinkBg)), findsOneWidget);
+    for (final walk in [false, true]) {
+      await t.pumpWidget(MaterialApp(home: Scaffold(body: GamePlayerAppearance(
+        lines: [{'int_batting': walk ? 4 : 5, 'int_hit1': 0}],
+        plays: [for (var i = 0; i < 5; i++) {'result': walk && i == 0 ? '四球' : '空三振'}],
+      ))));
+      expect(find.text('5タコ'), walk ? findsNothing : findsOneWidget);
+    }
   });
 
   testWidgets('今季スタッツとリーグ順位を${portrait ? '功績の下' : 'プロフィール右側'}に表示', (t) async {
@@ -180,7 +242,14 @@ void main() {
     expect(find.descendant(of: find.byType(GamePlayerAppearance), matching: find.byType(FittedBox)), findsNothing);
     final row = t.widget<Row>(find.descendant(of: find.byType(GamePlayerAppearance),
       matching: find.byType(Row)).first);
-    final heights = row.children.map((child) => t.getSize(find.byWidget(child)).height).toList();
+    final divider = find.byKey(const ValueKey('appearance-pitching-batting-divider'));
+    expect(divider, findsOneWidget);
+    expect(t.getSize(divider).width, 1);
+    expect(t.getTopLeft(divider).dx, greaterThan(t.getTopRight(find.text('57球')).dx));
+    expect(t.getTopRight(divider).dx, lessThan(t.getTopLeft(find.text('中安')).dx));
+    final heights = row.children
+      .where((child) => !(child is Padding && child.child?.key == const ValueKey('appearance-pitching-batting-divider')))
+      .map((child) => t.getSize(find.byWidget(child)).height).toList();
     expect(heights, hasLength(6));
     expect(heights.every((height) => height == heights.first), isTrue,
       reason: '投球回、被安打、四死球、奪三振、球数、打撃結果の高さを統一する');

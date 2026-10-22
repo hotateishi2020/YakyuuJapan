@@ -29,8 +29,7 @@ class _SeasonTitlesBoardState extends State<SeasonTitlesBoard> {
   @override
   void didUpdateWidget(SeasonTitlesBoard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.year != widget.year ||
-        oldWidget.org.kind != widget.org.kind) {
+    if (oldWidget.year != widget.year || oldWidget.org.kind != widget.org.kind) {
       load();
     }
   }
@@ -42,13 +41,9 @@ class _SeasonTitlesBoardState extends State<SeasonTitlesBoard> {
       failed = false;
     });
     try {
-      final response = await http
-          .get(Env.api(
-              '/records?org=${widget.org.kind.name}&year=${widget.year}&section=titles'))
-          .timeout(const Duration(seconds: 60));
+      final response = await http.get(Env.api('/records?org=${widget.org.kind.name}&year=${widget.year}&section=titles')).timeout(const Duration(seconds: 60));
       if (response.statusCode != 200) throw const FormatException();
-      final parsed = Map<String, dynamic>.from(
-          jsonDecode(utf8.decode(response.bodyBytes)));
+      final parsed = Map<String, dynamic>.from(jsonDecode(utf8.decode(response.bodyBytes)));
       if (mounted && token == request) setState(() => data = parsed);
     } catch (_) {
       if (mounted && token == request) setState(() => failed = true);
@@ -58,33 +53,28 @@ class _SeasonTitlesBoardState extends State<SeasonTitlesBoard> {
   @override
   Widget build(BuildContext context) {
     if (failed) {
-      return Center(
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-        const Text('タイトル情報を取得できませんでした'),
-        TextButton(onPressed: load, child: const Text('再読み込み'))
-      ]));
+      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [const Text('タイトル情報を取得できませんでした'), TextButton(onPressed: load, child: const Text('再読み込み'))]));
     }
     if (data == null) return const Center(child: BaseballLoading());
-    if (data!['pending'] == true) return Center(child: Column(
-      mainAxisSize: MainAxisSize.min, children: [
+    if (data!['pending'] == true) {
+      return Center(
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
         Text('${data!['message']}'),
         TextButton(onPressed: load, child: const Text('再読み込み')),
       ]));
+    }
     return SeasonTitlesGrid(data: data!, year: widget.year, org: widget.org);
   }
 }
 
 class SeasonTitlesGrid extends StatelessWidget {
-  const SeasonTitlesGrid(
-      {super.key, required this.data, required this.year, required this.org});
+  const SeasonTitlesGrid({super.key, required this.data, required this.year, required this.org});
   final Map<String, dynamic> data;
   final int year;
   final OrgConfig org;
   @override
   Widget build(BuildContext context) {
     final groups = buildSeasonTitles(data, year);
-    return org.kind == OrgKind.mlb
-        ? MlbSeasonTitlesTable(groups: groups, year: year)
-        : SeasonTitlesTable(groups: groups, year: year);
+    return org.kind == OrgKind.mlb ? MlbSeasonTitlesTable(groups: groups, year: year) : SeasonTitlesTable(groups: groups, year: year);
   }
 }

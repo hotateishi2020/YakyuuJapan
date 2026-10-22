@@ -36,7 +36,14 @@ Map<String, dynamic>? matchPlayer(Map<String, dynamic> wanted, List<Map<String, 
   final id = usageInt(wanted['id_player']);
   if (id > 0) return players.where((p) => usageInt(p['id']) == id).firstOrNull;
   final source = '${wanted['source_player_id'] ?? ''}';
-  final hits = players.where((p) => source.isNotEmpty ? officialPlayerId(p) == source : normalizedPlayerName(p['name_full']) == normalizedPlayerName(wanted['name'])).where((p) => wanted['id_team'] == null || '${wanted['id_team']}' == '${p['id_team']}').toList();
+  var hits = players.where((p) => source.isNotEmpty ? officialPlayerId(p) == source : normalizedPlayerName(p['name_full']) == normalizedPlayerName(wanted['name'])).where((p) => wanted['id_team'] == null || '${wanted['id_team']}' == '${p['id_team']}').toList();
+  if (source.isEmpty && hits.length > 1) {
+    final uri = Uri.tryParse('${wanted['source'] ?? ''}');
+    final code = uri?.host == 'npb.jp'
+        ? (RegExp(r'/stats/id[bpf]1_([a-z]+)\.html$').firstMatch(uri!.path)?[1])
+        : null;
+    if (code != null) hits = hits.where((p) => clubKey({...p, 'name_team': p['name_short'] ?? p['name_team']}) == code).toList();
+  }
   return hits.length == 1 ? hits.single : null;
 }
 
@@ -63,10 +70,10 @@ Future<void> attachOfficialIdentity(Connection conn, int year, List<Map<String, 
   }
 }
 
-Future<List<Map<String, dynamic>>> extraStatRows(Connection conn, int year, List<int> leagues, {List<Map<String, dynamic>>? knownPeople}) async {
+Future<List<Map<String, dynamic>>> extraStatRows(Connection conn, int year, List<int> leagues) async {
   final data = readClubFile('player-metrics-$year.json');
-  final people = knownPeople ?? (await conn.execute('SELECT p.id,p.name_full,p.url,p.date_birth::date::text,p.id_team,p.txt_position,t.id_league,t.name_shortest AS name_team,t.color_back,t.color_font FROM m_player p JOIN m_team t ON t.id=p.id_team WHERE t.id_league=ANY(\$1::int[]) AND NOT COALESCE(p.flg_delete,false)', parameters: [leagues])).map((r) => r.toColumnMap()).toList();
-  if (knownPeople == null) await attachOfficialIdentity(conn, year, people);
+  final people = (await conn.execute('SELECT p.id,p.name_full,p.url,p.date_birth::date::text,p.id_team,p.txt_position,t.id_league,t.name_shortest AS name_team,t.name_short,t.url_npb_players,t.color_back,t.color_font FROM m_player p JOIN m_team t ON t.id=p.id_team WHERE t.id_league=ANY(\$1::int[]) AND NOT COALESCE(p.flg_delete,false)', parameters: [leagues])).map((r) => r.toColumnMap()).toList();
+  await attachOfficialIdentity(conn, year, people);
   final bySource = <String, List<Map<String, dynamic>>>{};
   final byName = <String, List<Map<String, dynamic>>>{};
   for (final p in people) {
@@ -95,24 +102,24 @@ Future<List<Map<String, dynamic>>> extraStatRows(Connection conn, int year, List
   retainQualifiedPitchingRates(rows, qualificationGames);
   retainCatcherCounts(rows);
   for (final title in rows.map((r) => '${r['title']}').toSet())
-    for (final league in leagues)
-    for (final role in title == 'GG受賞回数' ? <bool?>[false, true] : <bool?>[null]) {
-      final group = rows.where((r) => r['title'] == title && r['id_league'] == league &&
-        (role == null || r['flg_pitcher'] == role)).toList();
-      group.sort((a, b) {
-        final av = num.tryParse('${a['numeric_value']}'), bv = num.tryParse('${b['numeric_value']}');
-        if (av == null) return bv == null ? 0 : 1;
-        if (bv == null) return -1;
-        return ['BB/9', '四球/9', '四死球/9'].contains(title) ? av.compareTo(bv) : bv.compareTo(av);
-      });
-      num? prev;
-      var rank = 0;
-      for (var i = 0; i < group.length; i++) {
-        final value = num.tryParse('${group[i]['numeric_value']}');
-        if (value == null) continue;
-        if (value != prev) rank = i + 1;
-        group[i]['int_rank'] = rank;
-        prev = value;
+    for (final league in leagues) {
+      for (final role in title == 'GG受賞回数' ? <bool?>[false, true] : <bool?>[null]) {
+        final group = rows.where((r) => r['title'] == title && r['id_league'] == league && (role == null || r['flg_pitcher'] == role)).toList();
+        group.sort((a, b) {
+          final av = num.tryParse('${a['numeric_value']}'), bv = num.tryParse('${b['numeric_value']}');
+          if (av == null) return bv == null ? 0 : 1;
+          if (bv == null) return -1;
+          return ['BB/9', '四球/9', '四死球/9'].contains(title) ? av.compareTo(bv) : bv.compareTo(av);
+        });
+        num? prev;
+        var rank = 0;
+        for (var i = 0; i < group.length; i++) {
+          final value = num.tryParse('${group[i]['numeric_value']}');
+          if (value == null) continue;
+          if (value != prev) rank = i + 1;
+          group[i]['int_rank'] = rank;
+          prev = value;
+        }
       }
     }
   return rows;
@@ -136,7 +143,7 @@ Future<Map<String, dynamic>> readPlayerDetail(Connection conn, {required int yea
   addMissingRequestedMetrics(stats);
   final games = batch?.games?[id]?.map((r) => Map<String, dynamic>.from(r)).toList() ?? (batch?.games != null ? <Map<String, dynamic>>[] : (await conn.execute('''
  WITH recent AS MATERIALIZED (
- SELECT g.id,g.datetime_start,g.code_game,g.state,g.score_home,g.score_away,h.name_short AS home,a.name_short AS away,jsonb_agg(to_jsonb(s) ORDER BY s.id) AS lines
+ SELECT g.id,g.datetime_start,g.code_game,g.state,g.score_home,g.score_away,h.name_short AS home,a.name_short AS away,jsonb_agg(to_jsonb(s) || jsonb_build_object('starter',s.id_player IN (g.id_pitcher_home,g.id_pitcher_away),'int_velo_max',(SELECT MAX(d.int_velo) FROM t_game_details d WHERE d.id_game=g.id AND d.id_pitcher=s.id_player AND NOT COALESCE(d.flg_delete,false))) ORDER BY s.id) AS lines
  FROM t_game_summary s JOIN t_game g ON g.id=s.id_game JOIN m_team h ON h.id=g.id_team_home JOIN m_team a ON a.id=g.id_team_away
  WHERE s.id_player=\$1 AND g.datetime_start<make_date(\$2+1,1,1) AND (g.state LIKE '%終了%' OR g.state LIKE '%コールド%') AND NOT COALESCE(g.flg_delete,false) AND NOT COALESCE(s.flg_delete,false)
  GROUP BY g.id,h.name_short,a.name_short ORDER BY g.datetime_start DESC,g.id DESC LIMIT 25
@@ -148,6 +155,10 @@ Future<Map<String, dynamic>> readPlayerDetail(Connection conn, {required int yea
   if (!leagues.contains(3) && officialPlayerId(person) != null) {
     final official = officialNpbRecentGames(officialPlayerId(person)!, year, snapshot: batch?.npbRecent);
     final dates = official.map((g) => '${g['datetime_start']}'.substring(0, 10)).toSet();
+    for (final game in official) {
+      final matches = games.where((g) => '${g['datetime_start']}'.substring(0, 10) == '${game['datetime_start']}'.substring(0, 10)).toList();
+      if (matches.length == 1) mergeRecentPitchingMetadata(game, matches.single);
+    }
     games.removeWhere((g) => dates.contains('${g['datetime_start']}'.substring(0, 10)));
     games.addAll(official);
     games.sort((a, b) => '${b['datetime_start']}'.compareTo('${a['datetime_start']}'));
@@ -157,6 +168,10 @@ Future<Map<String, dynamic>> readPlayerDetail(Connection conn, {required int yea
     try {
       final official = await mlbRecentGames(officialPlayerId(person)!, year);
       if (official.isNotEmpty) {
+        for (final game in official) {
+          final matches = games.where((g) => '${g['datetime_start']}'.substring(0, 10) == '${game['datetime_start']}'.substring(0, 10)).toList();
+          if (matches.length == 1) mergeRecentPitchingMetadata(game, matches.single);
+        }
         games.clear();
         games.addAll(official);
       }
@@ -229,7 +244,7 @@ class PlayerDetailBatch {
   Future<void> loadRecentGames(Connection conn, int year, List<int> ids) async {
     final rows = await conn.execute('''WITH grouped AS (
       SELECT s.id_player,g.id,g.datetime_start,g.code_game,g.state,g.score_home,g.score_away,
-      h.name_short AS home,a.name_short AS away,jsonb_agg(to_jsonb(s) ORDER BY s.id) AS lines,
+      h.name_short AS home,a.name_short AS away,jsonb_agg(to_jsonb(s) || jsonb_build_object('starter',s.id_player IN (g.id_pitcher_home,g.id_pitcher_away),'int_velo_max',(SELECT MAX(d.int_velo) FROM t_game_details d WHERE d.id_game=g.id AND d.id_pitcher=s.id_player AND NOT COALESCE(d.flg_delete,false))) ORDER BY s.id) AS lines,
       row_number() OVER (PARTITION BY s.id_player ORDER BY g.datetime_start DESC,g.id DESC) AS rn
       FROM t_game_summary s JOIN t_game g ON g.id=s.id_game
       JOIN m_team h ON h.id=g.id_team_home JOIN m_team a ON a.id=g.id_team_away
@@ -255,7 +270,10 @@ class PlayerDetailBatch {
     final careers = <Map<String, dynamic>>[];
     final stats = (await conn.execute('SELECT payload FROM v_stats_player WHERE int_year=\$1 AND (payload->>\'id_player\')::int=ANY(\$2::int[]) ORDER BY row_no', parameters: [year, playerIds])).map((r) => detailMap(r[0])).toList();
     final teams = (await conn.execute("SELECT jsonb_build_object('id_team',id_team,'roster',payload->'roster','positions',payload->'positions','pitching_workload',payload->'pitching_workload','batting_stats',payload->'batting_stats','pitching_stats',payload->'pitching_stats','contracts',payload->'contracts') FROM t_team_strength WHERE int_year=\$1", parameters: [year])).map((r) => detailMap(r[0])).toList();
-    final extra = await extraStatRows(conn, year, [1, 2, 3, 4], knownPeople: people);
+    // Rank against the full leagues before restricting the detail batch.
+    final ids = playerIds.toSet();
+    final extra = (await extraStatRows(conn, year, [1, 2, 3, 4]))
+        .where((row) => ids.contains(row['id_player'])).toList();
     return PlayerDetailBatch(people, careers, stats, extra, teams)
       ..npbRecent = readClubFile('npb-recent-games-$year.json')
       ..profiles = readClubFile('player-profiles-$year.json');

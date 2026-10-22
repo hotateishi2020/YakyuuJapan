@@ -6,6 +6,15 @@ import '../app/TverFeed.dart';
 import '../app/VideoFeed.dart';
 
 void main() {
+  test('文藝春秋PLUSは野球のみを取得しNPBとMLBに振り分ける', () {
+    final channel = videoChannels.singleWhere((c) => c.id == 'UCTcJVDgfw411rqWCHb-16lg');
+    expect(channel.category, 'media');
+    expect(channel.contentFilter, 'baseball');
+    expect(matchesVideoContent(channel.contentFilter, 'プロ野球の未来を語る'), isTrue);
+    expect(matchesVideoContent(channel.contentFilter, '国際情勢と日本経済'), isFalse);
+    expect(mlbVideoChannels.singleWhere((c) => c.id == channel.id).videoOrg, 'mlb');
+  });
+
   test('TVer team episodes move to teams and general episodes join programs', () {
     final team = videoChannels.firstWhere((c) => c.tabLabel == '阪神');
     final tver = videoChannels.singleWhere((c) => c.id == 'tver');

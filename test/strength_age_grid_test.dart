@@ -42,9 +42,11 @@ void main() {
       expect(find.descendant(of: find.byKey(const ValueKey('strength-age-row-unknown')),
           matching: find.text('不明選手')), findsOneWidget);
       final headerY = tester.getTopLeft(find.text('球団1')).dy;
+      final ageX = tester.getTopLeft(find.text('2000年度\n（26歳）')).dx;
       await tester.drag(find.byKey(const ValueKey('strength-age-horizontal')), const Offset(-800, 0));
       await tester.pumpAndSettle();
       expect(tester.getTopLeft(find.text('球団1')).dy, headerY);
+      expect(tester.getTopLeft(find.text('2000年度\n（26歳）')).dx, ageX);
       expect(tester.takeException(), isNull);
     });
   }

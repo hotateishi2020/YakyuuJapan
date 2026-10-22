@@ -14,6 +14,19 @@ Map<String, dynamic> team(int year, int id, int rank) => {'year': year, 'id_team
 Map<String, dynamic> game(int id, {bool loaded = true}) => {'id': id, 'id_team_home': 1, 'id_team_away': 2, 'flg_stats_loaded': loaded};
 Map<String, dynamic> box(int game, int player, {String decision = '', int runs = 0, int hits = 0, int walks = 0, int ab = 1}) => {'id_game': game, 'id_player': player, 'name': '選手$player', 'int_batting': ab, 'int_hit1': hits, 'int_fourball': walks, 'int_pitch': decision.isEmpty ? 0 : 20, 'int_runs': runs, 'code_result_pitcher': decision};
 void main() {
+  test('近鉄の監督はオリックスや近畿日本と区別して全55年度を照合する', () {
+    final catalog = jsonDecode(File('data/timeline-managers-npb.json').readAsStringSync())['clubs'];
+    for (final name in ['近鉄パールス', '近鉄バファロー', '近鉄バファローズ', '大阪近鉄バファローズ']) {
+      expect(timelineManagerClubKey({'name': name, 'manager_team_url': 'https://npb.jp/bis/teams/rst_b.html'}), 'bu');
+    }
+    expect(timelineManagerClubKey({'name': '近畿日本', 'manager_team_name': 'ソフトバンク'}), 'h');
+    expect(timelineManagerClubKey({'name': 'オリックス・バファローズ', 'manager_team_name': 'オリックス'}), 'b');
+    final years = catalog['bu']['years'] as Map;
+    expect(years.keys.toSet(), {for (var year = 1950; year <= 2004; year++) '$year'});
+    expect(years['1979'], '西本幸雄');
+    expect(years['1989'], '仰木彬');
+    expect(years['2001'], '梨田昌孝');
+  });
   test('年表の順位セル用にその年度の監督名を保持する', () {
     final result = buildRecordStandings([
       {...team(2025, 1, 1), 'manager': '当年監督'},

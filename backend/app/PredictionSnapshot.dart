@@ -1,3 +1,6 @@
+import 'QualifiedBattingMetrics.dart';
+import 'SamuraiSelections.dart';
+import 'PlayerCountry.dart';
 import 'ScheduledLog.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -203,7 +206,10 @@ class PredictionSnapshot {
     }
     stats.removeWhere((r) => r['title'] == '盗塁阻止率');
     stats.addAll(await extraStatRows(conn, year, leagueIds));
+    await attachPlayerCountries(conn, year, stats);
+    await attachSamuraiSelections(conn, year, stats);
     retainCatcherCounts(stats);
+    retainQualifiedRisp(stats);
     addMissingRequestedMetrics(stats);
     return PlayerDisplay(stats: stats, predictions: picks);
   }

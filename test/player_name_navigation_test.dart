@@ -21,7 +21,7 @@ void main() {
     ),
     'オールスター': (
       const AllStarHistoryGrid(throughYear: 2026, data: {
-        'players': const [
+        'players': [
           {...person, 'year': 2026, 'league': 'セ・リーグ', 'position': '先発投手'}
         ]
       }),
@@ -50,10 +50,10 @@ void main() {
         {
           'id_team': 1,
           'name_team': '球団',
-          'roster': const [
+          'roster': [
             {
               ...person,
-              'career_history': const [
+              'career_history': [
                 {'category': '高校', 'team': '出身高校'}
               ]
             }
@@ -67,7 +67,7 @@ void main() {
         {
           'id_team': 1,
           'name_team': '球団',
-          'roster': const [
+          'roster': [
             {...person, 'fa_rights_type': 'domestic', 'fa_rights_year': 2026, 'contract_end_year': 2026}
           ]
         }

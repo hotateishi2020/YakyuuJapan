@@ -27,15 +27,23 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
-      await tester.pumpWidget(const MaterialApp(home: Scaffold(body: SeasonTitlesGrid(
-        org: OrgConfig.mlb, year: 2026, data: {
-          'season_awards': {'pages': {'test': [
-            {'key': 'league_mvp', 'name': 'AL選手', 'detail': 'アメリカン・リーグ', 'confirmed': true},
-            {'key': 'league_mvp', 'name': 'NL選手', 'detail': 'ナ・リーグ', 'confirmed': true},
-            {'key': 'major', 'name': 'タイトル選手', 'detail': 'ナショナル・リーグ 本塁打王', 'confirmed': true},
-            {'key': 'monthly', 'name': '月間選手', 'detail': 'AL 5月 野手', 'confirmed': true},
-            {'key': 'glove', 'name': '未分類選手', 'detail': '外野手', 'confirmed': true},
-          ]}}
+      await tester.pumpWidget(const MaterialApp(
+          home: Scaffold(
+              body: SeasonTitlesGrid(
+        org: OrgConfig.mlb,
+        year: 2026,
+        data: {
+          'season_awards': {
+            'pages': {
+              'test': [
+                {'key': 'league_mvp', 'name': 'AL選手', 'detail': 'アメリカン・リーグ', 'confirmed': true},
+                {'key': 'league_mvp', 'name': 'NL選手', 'detail': 'ナ・リーグ', 'confirmed': true},
+                {'key': 'major', 'name': 'タイトル選手', 'detail': 'ナショナル・リーグ 本塁打王', 'confirmed': true},
+                {'key': 'monthly', 'name': '月間選手', 'detail': 'AL 5月 野手', 'confirmed': true},
+                {'key': 'glove', 'name': '未分類選手', 'detail': '外野手', 'confirmed': true},
+              ]
+            }
+          }
         },
       ))));
       expect(find.byKey(const ValueKey('mlb-titles-grid-league')), findsOneWidget);
@@ -57,9 +65,9 @@ void main() {
     await tester.pumpWidget(const MaterialApp(
         home: Scaffold(
             body: SeasonTitlesGrid(data: {
-      'season_awards': const {
-        'pages': const {
-          'test': const [
+      'season_awards': {
+        'pages': {
+          'test': [
             {'key': 'sayonara', 'name': '受賞選手', 'team': '阪神', 'detail': 'セントラル・リーグ 5月度', 'confirmed': true, 'highlight_video_id': 'abcdefghijk'},
           ]
         }
@@ -126,21 +134,21 @@ void main() {
     await tester.pumpWidget(const MaterialApp(
         home: Scaffold(
       body: SeasonTitlesGrid(data: {
-        'standings': const [
+        'standings': [
           {
             'year': 2026,
-            'leagues': const [
+            'leagues': [
               {
-                'teams': const [
+                'teams': [
                   {'name': 'ソフトバンク', 'name_shortest': 'ソ', 'color_back': '#ffcc00', 'color_font': '#000000'},
                 ]
               },
             ]
           },
         ],
-        'season_awards': const {
-          'pages': const {
-            'test': const [
+        'season_awards': {
+          'pages': {
+            'test': [
               {'key': 'league_mvp', 'name': 'とても長い名前のタイトル受賞選手A', 'team': '福岡ソフトバンク', 'detail': 'パ・リーグ', 'confirmed': true},
               {'key': 'weekly', 'name': '週投手', 'team': '阪神', 'detail': '2026/04/01発表 セ・リーグ 投手', 'confirmed': true},
             ]

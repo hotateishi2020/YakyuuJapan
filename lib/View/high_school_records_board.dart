@@ -1,3 +1,6 @@
+import '../tools/tab_preferences.dart';
+import '../widgets/app_section_tabs.dart';
+import '../widgets/collapsible_menu.dart';
 import 'player_detail_dialog.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -6,6 +9,9 @@ import 'package:flutter/foundation.dart';
 import '../widgets/baseball_loading.dart';
 
 Future<Map<String, dynamic>>? _highSchoolCatalog;
+Future<Map<String,dynamic>> loadHighSchoolCatalog() => _highSchoolCatalog ??= rootBundle
+      .loadString('backend/assets/data/high_school_records.json')
+      .then((s) => compute(_decodeHighSchoolCatalog, s));
 Map<String, dynamic> _decodeHighSchoolCatalog(String raw) =>
     jsonDecode(raw) as Map<String, dynamic>;
 
@@ -38,9 +44,7 @@ class HighSchoolRecordsBoard extends StatefulWidget {
 }
 
 class _HighSchoolRecordsBoardState extends State<HighSchoolRecordsBoard> {
-  late final future = _highSchoolCatalog ??= rootBundle
-      .loadString('backend/assets/data/high_school_records.json')
-      .then((s) => compute(_decodeHighSchoolCatalog, s));
+  late final future = loadHighSchoolCatalog();
   @override
   Widget build(BuildContext context) => FutureBuilder<Map<String, dynamic>>(
         future: future,
@@ -65,19 +69,11 @@ class _HighSchoolRecordsBoardState extends State<HighSchoolRecordsBoard> {
           }
           return DefaultTabController(
               length: 4,
+              initialIndex: readSavedTab('other_high_school_records',[0,1,2,3],fallback:0),
               child: Column(children: [
-                const TabBar(
-                    isScrollable: true,
-                    tabAlignment: TabAlignment.start,
-                    labelColor: Colors.black,
-                    tabs: [
-                      Tab(text: '通算記録'),
-                      Tab(text: '全国大会'),
-                      Tab(text: 'ブロック大会'),
-                      Tab(text: '地区大会')
-                    ]),
+                const MenuBand(level: 3, child: ControlledSectionTabs(preferenceScope: 'other_high_school_records', labels: ['通算記録','全国大会','ブロック大会','地区大会'])),
                 Expanded(
-                    child: TabBarView(children: [
+                    child: TabBarView(physics: const NeverScrollableScrollPhysics(), children: [
                   _CareerRecords(
                       records: records, data: data, year: widget.year),
                   _TournamentHistory(

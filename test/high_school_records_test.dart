@@ -46,32 +46,38 @@ void main() {
     expect((data['home_runs'] as List).first['value'], 13);
   });
   testWidgets('九州の組合せを維持し、記録の4タブへ移動できる', (tester) async {
-    tester.view.physicalSize = const Size(390, 844);
+    tester.view.physicalSize = const Size(1100, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(const MaterialApp(
         home: Scaffold(body: OtherBaseballBoard(year: 2026))));
-    await tester.pumpAndSettle();
+    await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 600)));
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.text('ブロック大会').hitTestable().first);
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 400));
     expect(find.byType(AutumnKyushuBracket), findsOneWidget);
     expect(highSchoolBlocks, hasLength(10));
-    await tester.tap(find.widgetWithText(Tab, '記録').hitTestable());
+    await tester.tap(find.text('記録').hitTestable());
     await tester.pump(const Duration(seconds: 1));
     await tester.runAsync(() async {
       await Future<void>.delayed(const Duration(milliseconds: 500));
     });
     for (var attempt = 0;
-        attempt < 20 && find.widgetWithText(Tab, '通算記録').evaluate().isEmpty;
+        attempt < 20 && find.text('通算記録').evaluate().isEmpty;
         attempt++) {
       await tester.runAsync(() async {
         await Future<void>.delayed(const Duration(milliseconds: 100));
       });
       await tester.pump(const Duration(milliseconds: 100));
     }
-    expect(find.widgetWithText(Tab, '通算記録'), findsOneWidget);
+    expect(find.text('通算記録'), findsOneWidget);
     expect(find.text('春夏の優勝回数（2026年まで）'), findsOneWidget);
     expect(tester.takeException(), isNull);
-    final national = find.widgetWithText(Tab, '全国大会').hitTestable().last;
+    final national = find.text('全国大会').hitTestable().last;
     await tester.tap(national);
     await tester.pumpAndSettle();
     expect(find.text('ベスト16'), findsOneWidget);

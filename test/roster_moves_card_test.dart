@@ -36,7 +36,7 @@ void main() {
     };
     await tester.pumpWidget(MaterialApp(
         home: Scaffold(body: StrengthRosterGrid(team: team, year: 2026))));
-    expect(find.text('新戦力'), findsOneWidget);
+    expect(find.text('今季 新戦力'), findsOneWidget);
     expect(find.text('LAD'), findsOneWidget);
     final card =
         tester.widget<Container>(find.byKey(const ValueKey('roster-card-old')));

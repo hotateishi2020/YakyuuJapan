@@ -1,3 +1,4 @@
+import '../widgets/collapsible_menu.dart';
 import 'player_detail_dialog.dart';
 import 'dart:convert';
 import 'dart:math' as math;
@@ -130,6 +131,7 @@ class AllStarHistoryGrid extends StatefulWidget {
 
 class _AllStarHistoryGridState extends State<AllStarHistoryGrid> {
   String league = '';
+  int? selectedYear;
   final years = ScrollController(),
       body = ScrollController(),
       horizontal = ScrollController();
@@ -168,7 +170,14 @@ class _AllStarHistoryGridState extends State<AllStarHistoryGrid> {
   @override
   Widget build(BuildContext context) =>
       LayoutBuilder(builder: (context, constraints) {
-        final rows = allStarYearRows(widget.data, widget.throughYear, league);
+        final portrait = MediaQuery.orientationOf(context) == Orientation.portrait;
+        final availableYears = allStarYearRows(widget.data, widget.throughYear, '')
+            .map((row) => row['year'] as int).toSet().toList()..sort((a, b) => b.compareTo(a));
+        final year = availableYears.contains(selectedYear)
+            ? selectedYear! : availableYears.firstOrNull ?? widget.throughYear;
+        final shownLeague = portrait && league.isEmpty ? 'セ・リーグ' : league;
+        final rows = allStarYearRows(widget.data, widget.throughYear, shownLeague)
+            .where((row) => !portrait || row['year'] == year).toList();
         final grouped = <int, List<Map<String, dynamic>>>{};
         for (final row in rows) {
           grouped.putIfAbsent(row['year'] as int, () => []).add(row);
@@ -202,6 +211,9 @@ class _AllStarHistoryGridState extends State<AllStarHistoryGrid> {
                   (p, 1, const Color(0xffecd68e), const Color(0xfffffcf3)));
             }
           }
+        }
+        if (portrait && !columns.any((column) => column.$1 == '守備位置未確認')) {
+          columns.add(('守備位置未確認', 1, const Color(0xffecd68e), const Color(0xfffffcf3)));
         }
         final scale =
             math.max(1.0, MediaQuery.textScalerOf(context).scale(14) / 14);
@@ -251,6 +263,82 @@ class _AllStarHistoryGridState extends State<AllStarHistoryGrid> {
                       fontWeight: FontWeight.w600,
                       color: white ? Colors.white : _allStarInk)),
             );
+        if (portrait) {
+          final tableWidth = math.max(0.0, constraints.maxWidth - 24);
+          final playerWidth = tableWidth / 4;
+          final roster = rows.expand((row) => listMapFromJson(row['players'])).toList();
+          final cancelled = rows.any((row) => row['cancelled'] == true);
+          return ColoredBox(color: const Color(0xfff6f8fb), child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              MenuBand(level: 3, child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Row(children: [
+                  SizedBox(width: 92, child: DropdownButtonHideUnderline(child: DropdownButton<int>(
+                    key: const ValueKey('allstar-year-picker'),
+                    value: year,
+                    isExpanded: true,
+                    style: const TextStyle(fontSize: 13, color: _allStarInk),
+                    items: [for (final option in availableYears.isEmpty ? [year] : availableYears)
+                      DropdownMenuItem(value: option, child: Text('$option年'))],
+                    onChanged: (value) {
+                      if (value == null || value == year) return;
+                      if (body.hasClients) body.jumpTo(0);
+                      setState(() => selectedYear = value);
+                    },
+                  ))),
+                  for (final value in ['セ・リーグ', 'パ・リーグ'])
+                    Expanded(child: Padding(padding: const EdgeInsets.only(left: 4),
+                      child: ChoiceChip(
+                        key: ValueKey('allstar-league-$value'),
+                        showCheckmark: false,
+                        selectedColor: const Color(0xffedeafa),
+                        backgroundColor: Colors.white,
+                        side: BorderSide(color: shownLeague == value ? const Color(0xffcbbfe6) : _allStarBorder),
+                        shape: const StadiumBorder(),
+                        labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+                        label: FittedBox(fit: BoxFit.scaleDown, child: Text(value)),
+                        labelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600,
+                          color: shownLeague == value ? const Color(0xff65519c) : _allStarInk),
+                        selected: shownLeague == value,
+                        onSelected: (_) => select(value),
+                      ))),
+                ]),
+              )),
+              Expanded(child: Padding(padding: const EdgeInsets.fromLTRB(12, 6, 12, 0),
+                child: DecoratedBox(decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: _allStarBorder),
+                  boxShadow: const [BoxShadow(color: Color(0x080f172a), blurRadius: 12, offset: Offset(0, 3))],
+                ), child: ClipRRect(borderRadius: BorderRadius.circular(12),
+                  child: cancelled ? const Center(child: Text('開催中止'))
+                    : roster.isEmpty ? const Center(child: Text('この年度・リーグの名簿は未取得です'))
+                    : ListView(controller: body, key: const ValueKey('allstar-portrait-body'),
+                        padding: EdgeInsets.zero, children: [
+                          for (final column in columns) Builder(builder: (context) {
+                            final members = roster.where((player) => position(player) == column.$1).toList();
+                            final rowCount = math.max(1, (members.length / 4).ceil());
+                            return Column(key: ValueKey('allstar-position-${column.$1}'), children: [
+                              cell(column.$1, tableWidth, 32 * scale, column.$3),
+                              for (var r = 0; r < rowCount; r++) Row(children: [
+                                for (var c = 0; c < 4; c++)
+                                  if (r * 4 + c < members.length)
+                                    _AllStarPlayerCell(player: members[r * 4 + c], width: playerWidth,
+                                      height: cellHeight, color: column.$4)
+                                  else cell('', playerWidth, cellHeight, column.$4),
+                              ]),
+                            ]);
+                          }),
+                        ]),
+                )),
+              )),
+              Padding(padding: const EdgeInsets.all(8), child: Text(
+                '${widget.data['first_year'] ?? 1951}年以降の名簿。2001年以前は歴代資料、2002年以降はNPB公式。守備位置未確認の選手は区分未確認欄に表示します。選手名をタップすると球団・選出方法・辞退情報を確認できます。内野手は同年度の守備成績・オールスター出場記録などをもとに各守備位置へ表示します。',
+                style: const TextStyle(fontSize: 11, color: Colors.black54))),
+            ],
+          ));
+        }
+
         Widget leagueBlock(Map<String, dynamic> row) {
           if (row['cancelled'] == true) {
             return cell('開催中止', tableWidth, rowHeight(row), Colors.white);

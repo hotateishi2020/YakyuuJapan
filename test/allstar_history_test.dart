@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/collapsible_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/View/allstar_history_board.dart';
@@ -96,7 +97,7 @@ void main() {
     expect(bodyList.controller!.offset, greaterThan(0));
     expect(tester.takeException(), isNull);
   });
-  testWidgets('narrow table shows player details and pinned year/header',
+  testWidgets('縦画面は年度とリーグで切り替え年度ヘッダーを表示しない',
       (tester) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
@@ -105,7 +106,11 @@ void main() {
     await tester.pumpWidget(MaterialApp(
         home:
             Scaffold(body: AllStarHistoryGrid(data: data, throughYear: 2026))));
-    expect(find.text('2026'), findsOneWidget);
+    expect(find.text('2026年'), findsOneWidget);
+    expect(find.text('両リーグ'), findsNothing);
+    expect(find.text('選手 A'), findsOneWidget);
+    expect(find.text('選手 B'), findsNothing);
+    expect(find.text('選手 C'), findsNothing);
     expect(find.text('投手'), findsOneWidget);
     expect(find.text('先発投手'), findsNothing);
     await tester.tap(find.text('ファン投票')); 
@@ -113,16 +118,60 @@ void main() {
     expect(find.textContaining('ファン投票\n選手間投票\n出場辞退'), findsOneWidget);
     Tooltip.dismissAllToolTips();
     await tester.pumpAndSettle();
-    final yearX = tester.getTopLeft(find.text('年度')).dx;
-    await tester.drag(find.byKey(const ValueKey('allstar-horizontal')),
-        const Offset(-500, 0));
-    await tester.pumpAndSettle();
-    expect(tester.getTopLeft(find.text('年度')).dx, yearX);
-    expect(tester.takeException(), isNull);
+    expect(find.text('年度'), findsNothing);
+    expect(find.byKey(const ValueKey('allstar-horizontal')), findsNothing);
     await tester.tap(find.text('パ・リーグ').first);
     await tester.pumpAndSettle();
     expect(find.text('選手 B'), findsOneWidget);
     expect(find.text('選手 A'), findsNothing);
+    await tester.tap(find.byKey(const ValueKey('allstar-year-picker')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('2025年').last);
+    await tester.pumpAndSettle();
+    expect(find.text('選手 B'), findsNothing);
+    expect(find.text('この年度・リーグの名簿は未取得です'), findsOneWidget);
+    await tester.tap(find.text('セ・リーグ').first);
+    await tester.pumpAndSettle();
+    expect(find.text('選手 C'), findsOneWidget);
+    expect(find.descendant(of: find.byKey(const ValueKey('allstar-position-二塁手')),
+      matching: find.text('選手 C')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('allstar-year-picker')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('2020年').last);
+    await tester.pumpAndSettle();
+    expect(find.text('開催中止'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+  testWidgets('縦画面は守備位置見出しの下に4列で選手を配置する', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: MenuScope(child:
+      AllStarHistoryGrid(throughYear: 2026, data: {'players': [
+        for (var i = 0; i < 5; i++) {'year': 2026, 'league': 'セ・リーグ',
+          'position': '投手', 'name': '投手$i', 'selections': ['監督選抜']},
+        {'year': 2026, 'league': 'セ・リーグ', 'position': '捕手', 'name': '捕手選手'},
+      ]}),
+    ))));
+    await tester.pumpAndSettle();
+    final picker = find.byKey(const ValueKey('allstar-year-picker'));
+    final central = find.byKey(const ValueKey('allstar-league-セ・リーグ'));
+    final pacific = find.byKey(const ValueKey('allstar-league-パ・リーグ'));
+    expect(tester.getRect(picker).right, lessThanOrEqualTo(tester.getRect(central).left));
+    expect(tester.getRect(central).right, lessThanOrEqualTo(tester.getRect(pacific).left));
+    expect(tester.getBottomLeft(central).dy,
+      lessThan(tester.getTopLeft(find.byKey(const ValueKey('menu-visibility-toggle'))).dy));
+    final first = tester.getTopLeft(find.text('投手0'));
+    for (var i = 1; i < 4; i++) {
+      expect(tester.getTopLeft(find.text('投手$i')).dy, first.dy);
+      expect(tester.getTopLeft(find.text('投手$i')).dx, greaterThan(first.dx));
+    }
+    expect(tester.getTopLeft(find.text('投手4')).dx, first.dx);
+    expect(tester.getTopLeft(find.text('投手4')).dy, greaterThan(first.dy));
+    expect(tester.getTopLeft(find.text('捕手')).dy,
+      greaterThan(tester.getBottomLeft(find.text('投手4')).dy));
+    expect(tester.takeException(), isNull);
+  });
+
 }

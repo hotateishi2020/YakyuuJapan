@@ -10,13 +10,32 @@ import '../app/PinchMetrics.dart';
 import '../app/RecentPlayerGames.dart';
 
 void main() {
+  test('公式球団ページで移籍前の同名選手と区別する', () {
+    final people = <Map<String, dynamic>>[
+      {'id': 4935, 'name_full': '松本剛', 'name_short': '巨人'},
+      {'id': 1152, 'name_full': '松本剛', 'name_short': '日本ハム'},
+      {'id': 26513, 'name_full': '松本　剛', 'name_short': '日本ハム'},
+    ];
+    final wanted = <String, dynamic>{'name': '松本剛', 'source': 'https://npb.jp/bis/2026/stats/idb1_g.html'};
+    expect(matchPlayer(wanted, people)?['id'], 4935);
+    expect(matchPlayer({'name': '松本剛'}, people), isNull);
+    expect(matchPlayer({...wanted, 'source': 'https://npb.jp/bis/2026/stats/idb1_f.html'}, people), isNull);
+  });
+
   test('旧投手キャッシュは再取得し失点ゼロの新データは保持する', () {
     final line = <String, dynamic>{'double_inning_pitch': '4.0', 'int_runs_earned': 0};
     final game = {'players': {'1': {'lines': [line]}}};
     expect(needsNpbPitchingRefresh(null), isTrue);
     expect(needsNpbPitchingRefresh(game), isTrue);
-    line.addAll({'int_runs': 0, 'int_four': 0, 'int_dead_pitching': 0, 'starter': false});
+    line.addAll({'int_runs': 0, 'int_four': 0, 'int_dead_pitching': 0, 'starter': false, 'code_result_pitcher': ''});
     expect(needsNpbPitchingRefresh(game), isFalse);
+  });
+  test('公式出場記録を優先し不足する球速と勝敗だけ補完する', () {
+    final official = <String,dynamic>{'lines': [{'double_inning_pitch': 7, 'code_result_pitcher': '勝', 'int_runs': 1}]};
+    mergeRecentPitchingMetadata(official, {'lines': [{'double_inning_pitch': 7, 'code_result_pitcher': '負', 'int_runs': 9, 'int_velo_max': 160}]});
+    expect(official['lines'].single['code_result_pitcher'], '勝');
+    expect(official['lines'].single['int_runs'], 1);
+    expect(official['lines'].single['int_velo_max'], 160);
   });
   test('補完スタッツに別スタッツの予想色を引き継がない', () {
     final rows = <Map<String, dynamic>>[{'id_player': 1, 'title': '本塁打', 'colors_user': '/red/', 'id_users': '/1/'}];
@@ -139,12 +158,13 @@ void main() {
   });
   test('公式試合ログは投打両方の記録を保持する', () {
     final row = parseNpbRecentGame(
-        '<p class="game_info">試合終了</p><div id="table_top_b"><table><thead><tr><th class="inn">1</th></tr></thead><tbody><tr><td>9</td><td>投</td><td><a href="/bis/players/1.html">甲</a></td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>中前安</td></tr></tbody></table></div><div id="table_top_p"><table><tbody><tr><td></td><td><a href="/bis/players/1.html">甲</a></td><td>10</td><td>3</td><td>0.2</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td></tr></tbody></table></div>',
+        '<p class="game_info">試合終了</p><div id="table_top_b"><table><thead><tr><th class="inn">1</th></tr></thead><tbody><tr><td>9</td><td>投</td><td><a href="/bis/players/1.html">甲</a></td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>中前安</td></tr></tbody></table></div><div id="table_top_p"><table><tbody><tr><td>勝</td><td><a href="/bis/players/1.html">甲</a></td><td>10</td><td>3</td><td>0.2</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td></tr></tbody></table></div>',
         'https://npb.jp/scores/2026/0327/g-t-01/box.html');
     expect(row!['players']['1']['lines'], hasLength(2));
     expect(row['players']['1']['plays'].single['result'], '中前安');
     final pitcher = row['players']['1']['lines'].last;
     expect(pitcher['starter'], true);
+    expect(pitcher['code_result_pitcher'], '勝');
     expect(pitcher['int_runs'], 0);
     expect(pitcher['int_four'], 0);
     expect(pitcher['int_dead_pitching'], 0);

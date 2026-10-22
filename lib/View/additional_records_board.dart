@@ -1,3 +1,4 @@
+import '../widgets/collapsible_menu.dart';
 import 'player_detail_dialog.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -139,6 +140,7 @@ class _CountRecordsBoardState extends State<CountRecordsBoard> {
   final _ranks = ScrollController();
   final _body = ScrollController();
   bool _syncing = false;
+  String? _selectedLabel;
 
   void _sync(ScrollController from, ScrollController to) {
     if (_syncing || !from.hasClients || !to.hasClients) return;
@@ -165,104 +167,130 @@ class _CountRecordsBoardState extends State<CountRecordsBoard> {
 
   @override
   Widget build(BuildContext context) {
-    final records = widget.records
+    final availableRecords = widget.records
         .where((record) => !const {
               '新人王',
               '最優秀新人',
               '最優秀新人賞',
             }.contains('${record['label']}'.trim()))
         .toList();
-    if (records.isEmpty) {
+    if (availableRecords.isEmpty) {
       return const Center(child: Text('回数記録は未取得です'));
     }
-    final ranked = [
-      for (final record in records)
-        [
-          for (var rank = 1; rank <= 20; rank++) listMapFromJson(record['leaders']).where((p) => int.tryParse('${p['rank']}') == rank && (num.tryParse('${p['value']}') ?? 0) >= 3).toList(),
-        ].where((players) => players.isNotEmpty).toList(),
-    ];
-    final rowCount = ranked.fold<int>(0, (count, groups) => groups.length > count ? groups.length : count);
-    const playerStyle = TextStyle(fontSize: 13, color: Colors.black87);
-    const headerStyle = TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
-    final scaler = MediaQuery.textScalerOf(context);
-    final direction = Directionality.of(context);
-    double textHeight(String text, TextStyle style, double width) {
-      final painter = TextPainter(text: TextSpan(text: text, style: DefaultTextStyle.of(context).style.merge(style)), textDirection: direction, textScaler: scaler)..layout(maxWidth: width);
-      final height = painter.height;
-      painter.dispose();
-      return height;
-    }
+    final portrait = MediaQuery.orientationOf(context) == Orientation.portrait;
+    final selected = availableRecords.any((record) => record['label'] == _selectedLabel)
+        ? _selectedLabel! : '${availableRecords.first['label']}';
+    final records = portrait
+        ? [availableRecords.firstWhere((record) => record['label'] == selected)]
+        : availableRecords;
+    return LayoutBuilder(builder: (context, constraints) {
+      final columnWidth = portrait ? (constraints.maxWidth - 64).clamp(1.0, double.infinity) : 190.0;
+      final textWidth = (columnWidth - 21).clamp(1.0, double.infinity);
+      final ranked = [
+        for (final record in records)
+          [
+            for (var rank = 1; rank <= 20; rank++) listMapFromJson(record['leaders']).where((p) => int.tryParse('${p['rank']}') == rank && (num.tryParse('${p['value']}') ?? 0) >= 3).toList(),
+          ].where((players) => players.isNotEmpty).toList(),
+      ];
+      final rowCount = ranked.fold<int>(0, (count, groups) => groups.length > count ? groups.length : count);
+      const playerStyle = TextStyle(fontSize: 13, color: Colors.black87);
+      const headerStyle = TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
+      final scaler = MediaQuery.textScalerOf(context);
+      final direction = Directionality.of(context);
+      double textHeight(String text, TextStyle style, double width) {
+        final painter = TextPainter(text: TextSpan(text: text, style: DefaultTextStyle.of(context).style.merge(style)), textDirection: direction, textScaler: scaler)..layout(maxWidth: width);
+        final height = painter.height;
+        painter.dispose();
+        return height;
+      }
 
-    String playerLabel(Map<String, dynamic> player, int column) => '${player['name']}　${player['value']}${records[column]['unit'] ?? '回'}';
-    final heights = [
-      for (var rank = 0; rank < rowCount; rank++)
-        ranked.asMap().entries.fold<double>(textHeight('${rank + 1}位', const TextStyle(fontWeight: FontWeight.bold), 43), (height, entry) {
-              final players = rank < entry.value.length ? entry.value[rank] : <Map<String, dynamic>>[];
-              final content = players.fold<double>(0, (sum, player) => sum + textHeight(playerLabel(player, entry.key), playerStyle, 169) + 6);
-              return content > height ? content : height;
-            }) +
-            25,
-    ];
-    final headerHeight = records.fold<double>(textHeight('順位', headerStyle, 43), (height, record) {
-          final content = textHeight('${record['label']}', headerStyle, 169);
-          return content > height ? content : height;
-        }) +
-        25;
-    Widget cell(Widget child, double width, double height, Color color) => Container(width: width, height: height, alignment: Alignment.center, padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12), decoration: BoxDecoration(color: color, border: Border.all(color: const Color(0xffdfe4ec), width: .5)), child: child);
-    Color rowColor(int index) => index.isEven ? Colors.white : const Color(0xfff6f8fb);
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Expanded(
-          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        SizedBox(
-            width: 64,
-            child: Column(children: [
-              cell(const Text('順位', style: headerStyle), 64, headerHeight, const Color(0xff25324b)),
-              Expanded(
-                  child: ListView(
-                key: const ValueKey('count-records-ranks'),
-                controller: _ranks,
-                padding: EdgeInsets.zero,
-                children: [
-                  for (var rank = 0; rank < rowCount; rank++) cell(Text('${rank + 1}位', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xff25324b))), 64, heights[rank], rowColor(rank)),
-                ],
-              )),
-            ])),
+      String playerLabel(Map<String, dynamic> player, int column) => '${player['name']}　${player['value']}${records[column]['unit'] ?? '回'}';
+      final heights = [
+        for (var rank = 0; rank < rowCount; rank++)
+          ranked.asMap().entries.fold<double>(textHeight('${rank + 1}位', const TextStyle(fontWeight: FontWeight.bold), 43), (height, entry) {
+                final players = rank < entry.value.length ? entry.value[rank] : <Map<String, dynamic>>[];
+                final content = players.fold<double>(0, (sum, player) => sum + textHeight(playerLabel(player, entry.key), playerStyle, textWidth) + 6);
+                return content > height ? content : height;
+              }) +
+              25,
+      ];
+      final headerHeight = records.fold<double>(textHeight('順位', headerStyle, 43), (height, record) {
+            final content = textHeight('${record['label']}', headerStyle, textWidth);
+            return content > height ? content : height;
+          }) +
+          25;
+      Widget cell(Widget child, double width, double height, Color color) => Container(width: width, height: height, alignment: Alignment.center, padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12), decoration: BoxDecoration(color: color, border: Border.all(color: const Color(0xffdfe4ec), width: .5)), child: child);
+      Color rowColor(int index) => index.isEven ? Colors.white : const Color(0xfff6f8fb);
+      return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        if (portrait) MenuBand(level: 3, child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: DropdownButtonHideUnderline(child: DropdownButton<String>(
+            key: const ValueKey('count-records-picker'),
+            value: selected,
+            isExpanded: true,
+            items: [for (final record in availableRecords)
+              DropdownMenuItem(value: '${record['label']}', child: Text('${record['label']}'))],
+            onChanged: (value) {
+              if (value == null || value == selected) return;
+              if (_body.hasClients) _body.jumpTo(0);
+              if (_ranks.hasClients) _ranks.jumpTo(0);
+              setState(() => _selectedLabel = value);
+            },
+          )),
+        )),
         Expanded(
-            child: SingleChildScrollView(
-          key: const ValueKey('count-records-horizontal'),
-          scrollDirection: Axis.horizontal,
-          child: SizedBox(
-              width: records.length * 190.0,
+            child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          SizedBox(
+              width: 64,
               child: Column(children: [
-                Row(children: [
-                  for (final record in records) cell(Text('${record['label']}', textAlign: TextAlign.center, style: headerStyle), 190, headerHeight, const Color(0xff25324b)),
-                ]),
+                cell(const Text('順位', style: headerStyle), 64, headerHeight, const Color(0xff25324b)),
                 Expanded(
                     child: ListView(
-                  key: const ValueKey('count-records-body'),
-                  controller: _body,
+                  key: const ValueKey('count-records-ranks'),
+                  controller: _ranks,
                   padding: EdgeInsets.zero,
                   children: [
-                    for (var rank = 0; rank < rowCount; rank++)
-                      Row(children: [
-                        for (var i = 0; i < records.length; i++)
-                          cell(
-                              rank >= ranked[i].length
-                                  ? const Text('—', style: TextStyle(color: Colors.black38))
-                                  : Column(mainAxisSize: MainAxisSize.min, children: [
-                                      for (final player in ranked[i][rank]) Padding(padding: const EdgeInsets.symmetric(vertical: 3), child: PlayerNameLink(player: player, child: Text(playerLabel(player, i), textAlign: TextAlign.center, style: playerStyle))),
-                                    ]),
-                              190,
-                              heights[rank],
-                              rowColor(rank)),
-                      ]),
+                    for (var rank = 0; rank < rowCount; rank++) cell(Text('${rank + 1}位', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xff25324b))), 64, heights[rank], rowColor(rank)),
                   ],
                 )),
               ])),
-        )),
-      ])),
-      const Padding(padding: EdgeInsets.all(8), child: Text('元の順位が20位以内・3回以上の選手を表示。同順位は一つのセルにまとめ、表示上の順位は欠番を詰めています。取得済み年度成績・確定タイトルの集計。規定打席は球団試合数×3.1（端数切捨て）、1957年以降。打率3割は規定打席到達者。未取得年度は回数に含みません。', style: TextStyle(fontSize: 11))),
-    ]);
+          Expanded(
+              child: SingleChildScrollView(
+            key: const ValueKey('count-records-horizontal'),
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+                width: records.length * columnWidth,
+                child: Column(children: [
+                  Row(children: [
+                    for (final record in records) cell(Text('${record['label']}', textAlign: TextAlign.center, style: headerStyle), columnWidth, headerHeight, const Color(0xff25324b)),
+                  ]),
+                  Expanded(
+                      child: ListView(
+                    key: const ValueKey('count-records-body'),
+                    controller: _body,
+                    padding: EdgeInsets.zero,
+                    children: [
+                      for (var rank = 0; rank < rowCount; rank++)
+                        Row(children: [
+                          for (var i = 0; i < records.length; i++)
+                            cell(
+                                rank >= ranked[i].length
+                                    ? const Text('—', style: TextStyle(color: Colors.black38))
+                                    : Column(mainAxisSize: MainAxisSize.min, children: [
+                                        for (final player in ranked[i][rank]) Padding(padding: const EdgeInsets.symmetric(vertical: 3), child: PlayerNameLink(player: player, child: Text(playerLabel(player, i), textAlign: TextAlign.center, style: playerStyle))),
+                                      ]),
+                                columnWidth,
+                                heights[rank],
+                                rowColor(rank)),
+                        ]),
+                    ],
+                  )),
+                ])),
+          )),
+        ])),
+        const Padding(padding: EdgeInsets.all(8), child: Text('元の順位が20位以内・3回以上の選手を表示。同順位は一つのセルにまとめ、表示上の順位は欠番を詰めています。取得済み年度成績・確定タイトルの集計。規定打席は球団試合数×3.1（端数切捨て）、1957年以降。打率3割は規定打席到達者。未取得年度は回数に含みません。', style: TextStyle(fontSize: 11))),
+      ]);
+    });
   }
 }
 
@@ -288,11 +316,11 @@ class _RegularHistoryBoardState extends State<RegularHistoryBoard> {
     final rows = widget.rows.where((r) => '${r['id_team']}' == id).map((r) => {...r, 'name_team': '${r['year']}年'}).toList();
     return Column(children: [
       SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: [for (final e in teams.entries) Padding(padding: const EdgeInsets.all(3), child: ChoiceChip(label: Text(e.value), selected: id == e.key, onSelected: (_) => setState(() => selected = e.key)))])),
-      if (rows.any((r) => r['source_label'] == 'スタメンデータベース')) const Padding(padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4), child: Text('過去年の先発起用はスタメンデータベース、氏名・成績は取得できた年度のNPB公式記録で補完。途中出場や先発・救援別投球回など未確認の項目は「—」で表示します。', style: TextStyle(fontSize: 11, color: Colors.black54))),
       Row(children: [
         for (final e in const {false: 'ポジション', true: '打順'}.entries) TextButton(onPressed: () => setState(() => batting = e.key), child: Text(e.value, style: TextStyle(fontWeight: batting == e.key ? FontWeight.bold : FontWeight.normal)))
       ]),
       Expanded(child: rows.isEmpty ? const Center(child: Text('この球団の年度別起用情報は未取得です')) : StrengthRegularGrid(key: ValueKey('$id:$batting'), teams: rows, battingOrder: batting, teamHeader: '年度')),
+      if (rows.any((r) => r['source_label'] == 'スタメンデータベース')) const Padding(padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4), child: Text('過去年の先発起用はスタメンデータベース、氏名・成績は取得できた年度のNPB公式記録で補完。途中出場や先発・救援別投球回など未確認の項目は「—」で表示します。', style: TextStyle(fontSize: 11, color: Colors.black54))),
     ]);
   }
 }

@@ -1804,13 +1804,12 @@ typedef _PlayerLine = ({String name, String role, String colors, String mark, St
 typedef _LineupSlot = ({int order, List<_PlayerLine> players});
 
 Widget _gameStatChipsRow(List<Widget> children) => Row(
-  mainAxisSize: MainAxisSize.min,
-  crossAxisAlignment: CrossAxisAlignment.center,
-  children: children,
-);
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: children,
+    );
 
-String _compactStatLabel(String label) =>
-    label.replaceAll(r'\u3000', '').replaceAll(RegExp(r'[\s\u3000]+'), '');
+String _compactStatLabel(String label) => label.replaceAll(r'\u3000', '').replaceAll(RegExp(r'[\s\u3000]+'), '');
 
 /// 選手詳細でも試合詳細と同じ打席結果・打点バッジを使用する。
 class GameBattingResult extends StatelessWidget {
@@ -1823,24 +1822,34 @@ class GameBattingResult extends StatelessWidget {
     final circled = RegExp('[①②③④]').firstMatch(rawResult);
     final result = rawResult.replaceAll(RegExp('[①②③④]'), '');
     final bases = num.tryParse('${play['bases']}') ?? 0;
-    final rbi = num.tryParse('${play['rbi']}')?.toInt() ??
-        (circled != null ? '①②③④'.indexOf(circled[0]!) + 1 : -1);
-    final kind = result.contains('|') ? ''
-        : RegExp(r'本塁打|本$|本打|HR', caseSensitive: false).hasMatch(result) || bases == 4 ? 'hr'
-        : RegExp('犠飛').hasMatch(result) ? 'sacfly'
-        : RegExp(r'犠打|犠$').hasMatch(result) ? 'sacbunt'
-        : result.contains('四球') ? 'walk'
-        : result.contains('死球') ? 'dead'
-        : RegExp('失|エラー').hasMatch(result) ? 'error'
-        : RegExp('野選').hasMatch(result) ? 'fc'
-        : rbi > 0 && (bases > 0 || RegExp('安|２|３').hasMatch(result)) ? 'timely'
-        : bases == 3 || result.contains('３') || result.contains('三塁打') ? 'triple'
-        : bases == 2 || result.contains('２') || result.contains('二塁打') ? 'double'
-        : bases > 0 || result.contains('安') ? 'single' : '';
-    final renderer = _TableGameCard(const [],
-        onAllBattersChanged: (_) {}, onStatsExpandedChanged: (_) {});
-    return renderer._playChip(result.contains('|') ? result : '$result|$kind',
-        12, compact: true, rbiOverride: rbi);
+    final rbi = num.tryParse('${play['rbi']}')?.toInt() ?? (circled != null ? '①②③④'.indexOf(circled[0]!) + 1 : -1);
+    final kind = result.contains('|')
+        ? ''
+        : RegExp(r'本塁打|本$|本打|HR', caseSensitive: false).hasMatch(result) || bases == 4
+            ? 'hr'
+            : RegExp('犠飛').hasMatch(result)
+                ? 'sacfly'
+                : RegExp(r'犠打|犠$').hasMatch(result)
+                    ? 'sacbunt'
+                    : result.contains('四球')
+                        ? 'walk'
+                        : result.contains('死球')
+                            ? 'dead'
+                            : RegExp('失|エラー').hasMatch(result)
+                                ? 'error'
+                                : RegExp('野選').hasMatch(result)
+                                    ? 'fc'
+                                    : rbi > 0 && (bases > 0 || RegExp('安|２|３').hasMatch(result))
+                                        ? 'timely'
+                                        : bases == 3 || result.contains('３') || result.contains('三塁打')
+                                            ? 'triple'
+                                            : bases == 2 || result.contains('２') || result.contains('二塁打')
+                                                ? 'double'
+                                                : bases > 0 || result.contains('安')
+                                                    ? 'single'
+                                                    : '';
+    final renderer = _TableGameCard(const [], onAllBattersChanged: (_) {}, onStatsExpandedChanged: (_) {});
+    return renderer._playChip(result.contains('|') ? result : '$result|$kind', 12, compact: true, rbiOverride: rbi);
   }
 }
 
@@ -1848,21 +1857,53 @@ const double _gameStatChipHeight = 14;
 
 /// Recent player appearances reuse the game's exact pitching and batting chips.
 class GamePlayerAppearance extends StatelessWidget {
-  const GamePlayerAppearance({super.key, required this.lines, required this.plays});
+  const GamePlayerAppearance({super.key, required this.lines, required this.plays, this.org = 'npb'});
   final List<Map<String, dynamic>> lines, plays;
+  final String org;
   @override
   Widget build(BuildContext context) {
-    final renderer = _TableGameCard(const [], onAllBattersChanged: (_) {}, onStatsExpandedChanged: (_) {});
+    final renderer = _TableGameCard([{'state': '試合終了', 'id_league_home': org == 'mlb' ? 3 : 1}], onAllBattersChanged: (_) {}, onStatsExpandedChanged: (_) {});
     final children = <Widget>[];
+    final achievements = <String>{};
+    void addAchievement(String encoded) {
+      if (encoded.isNotEmpty) achievements.add(encoded);
+    }
+    for (final line in lines) {
+      for (final part in '${line['txt_achieve'] ?? ''}'.split(' ')) {
+        addAchievement(part);
+      }
+      if (line['double_inning_pitch'] == null) {
+        final hits = num.tryParse('${line['int_hit1']}');
+        if (hits != null && hits >= 3 && !achievements.any((a) => a.contains('猛打賞'))) addAchievement('猛打賞|multihit');
+      }
+    }
     for (final line in lines) {
       if (line['double_inning_pitch'] == null) continue;
       int number(String key) => num.tryParse('${line[key]}')?.toInt() ?? 0;
-      final encoded = renderer._buildPitcherChips(
-        innings: double.tryParse('${line['double_inning_pitch']}') ?? 0,
-        runs: number('int_runs'), hits: number('int_hit'), walks: number('int_four'),
-        hbp: number('int_dead_pitching'), strikeouts: number('int_strike_out'),
-        pitches: number('int_pitch'), starter: line['starter'] == true,
-      ).split(' ');
+      final mark = renderer._resultMark(line['code_result_pitcher']);
+      if (mark.isNotEmpty) children.add(Padding(padding: const EdgeInsets.only(right: 3), child: renderer._resultBadge(mark, 12)));
+      final innings = num.tryParse('${line['double_inning_pitch']}');
+      final earned = num.tryParse('${line['int_runs_earned']}');
+      if (line['starter'] == true && innings != null && earned != null) {
+        if (innings >= 7 && earned <= 2) {
+          addAchievement('HQS|hqs');
+        } else if (innings >= 6 && earned <= 3) {
+          addAchievement('QS|qs');
+        }
+      }
+      if (number('int_strike_out') >= 10) addAchievement('２ケタ奪三振|k10');
+      final encoded = renderer
+          ._buildPitcherChips(
+            innings: double.tryParse('${line['double_inning_pitch']}') ?? 0,
+            runs: number('int_runs'),
+            hits: number('int_hit'),
+            walks: number('int_four'),
+            hbp: number('int_dead_pitching'),
+            strikeouts: number('int_strike_out'),
+            pitches: number('int_pitch'),
+            starter: line['starter'] == true,
+          )
+          .split(' ');
       for (final entry in encoded.indexed) {
         final known = switch (entry.$1) {
           0 => line['int_runs'] != null,
@@ -1871,13 +1912,70 @@ class GamePlayerAppearance extends StatelessWidget {
           3 => line['int_strike_out'] != null,
           _ => true,
         };
-        if (known) children.add(Padding(padding: const EdgeInsets.only(right: 3),
-          child: renderer._metricChip(entry.$2, 12, textScaler: MediaQuery.textScalerOf(context))));
+        if (known) {
+          children.add(Padding(padding: const EdgeInsets.only(right: 3), child: renderer._metricChip(entry.$2, 12, textScaler: MediaQuery.textScalerOf(context))));
+        }
       }
     }
-    for (final play in plays) {
-      children.add(Tooltip(message: '${play['inning'] ?? '—'}回', child: GameBattingResult(play: play)));
+    for (final line in lines) {
+      final velo = renderer._veloChip(line);
+      if (velo.isNotEmpty) children.add(renderer._metricChip(velo, 12, textScaler: MediaQuery.textScalerOf(context)));
     }
+    bool pitchingAchievement(String part) => renderer._isPitcherFeat(part) || part.endsWith('|k10');
+    for (final part in renderer._visibleAchievements(achievements.join(' ')).where(pitchingAchievement)) {
+      children.add(renderer._playChip(part, 12, blink: true));
+    }
+    final battingChildren = <Widget>[];
+    for (final play in plays) {
+      battingChildren.add(Tooltip(message: '${play['inning'] ?? '—'}回', child: GameBattingResult(play: play)));
+    }
+    int hitBases(Map<String, dynamic> play) {
+      final text = '${play['result'] ?? ''}';
+      if (RegExp(r'本塁打|本|HOMERUN|\|hr').hasMatch(text)) return 4;
+      if (RegExp(r'三塁打|３|HIT3|\|triple').hasMatch(text)) return 3;
+      if (RegExp(r'二塁打|２|HIT2|\|double').hasMatch(text)) return 2;
+      if (RegExp(r'安|HIT1|\|single').hasMatch(text)) return 1;
+      return num.tryParse('${play['bases']}')?.toInt() ?? 0;
+    }
+    final bases = plays.map(hitBases).toSet();
+    if (bases.containsAll([1, 2, 3, 4])) addAchievement('サイクル安打|cycle');
+    if (plays.length >= 4) {
+      if (plays.every((p) => hitBases(p) > 0)) {
+        addAchievement('全打席安打|allhit');
+      } else if (plays.every((p) => hitBases(p) > 0 || RegExp(r'四球|死球|失|WALK|ERROR').hasMatch('${p['result']}'))) {
+        addAchievement('全打席出塁|allreach');
+      }
+    }
+    for (final part in renderer._visibleAchievements(achievements.join(' ')).where((part) => !pitchingAchievement(part))) {
+      battingChildren.add(renderer._playChip(part, 12, blink: true));
+    }
+    final battingLines = lines.where((l) => l['double_inning_pitch'] == null);
+    final fiveOuts = plays.length == 5 && plays.every((p) {
+      final result = '${p['result'] ?? ''}';
+      return !result.contains('振逃') &&
+          RegExp(r'三振|ゴロ|フライ|ライナー|併殺|飛|直|邪|犠|\|out|STRIKE_OUT|OUT_').hasMatch(result) &&
+          !RegExp(r'安|本|四球|死球|失|野選').hasMatch(result);
+    });
+    if (fiveOuts && battingLines.any((l) => num.tryParse('${l['int_batting']}') == 5 && num.tryParse('${l['int_hit1']}') == 0)) {
+      battingChildren.add(BlinkBg(
+        base: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(2)),
+        color: const Color(0xFFFFF176),
+        radius: 2,
+        child: renderer._fiveTakoChip(12, paintBackground: false),
+      ));
+    }
+    if (children.isNotEmpty && battingChildren.isNotEmpty) {
+      children.add(Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6),
+        child: Container(
+          key: const ValueKey('appearance-pitching-batting-divider'),
+          width: 1,
+          height: 18 * MediaQuery.textScalerOf(context).scale(12) / 12,
+          color: Colors.grey.shade500,
+        ),
+      ));
+    }
+    children.addAll(battingChildren);
     if (children.isEmpty) return const Text('出場成績は未取得です。', style: TextStyle(fontSize: 12, color: Colors.grey));
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -2483,8 +2581,7 @@ class _TableGameCard extends StatelessWidget {
       ...rows,
       ...listMapFromJson(game['player_hands']),
       if (pitching)
-        for (final side in ['home', 'away'])
-          {'name_full_summary': game['name_pitcher_$side'], 'pitching_hand': game['pitching_hand_$side']},
+        for (final side in ['home', 'away']) {'name_full_summary': game['name_pitcher_$side'], 'pitching_hand': game['pitching_hand_$side']},
     ]) {
       if (!samePlayerStatName(name, '${row['name_full_summary'] ?? ''}')) continue;
       final value = row[pitching ? 'pitching_hand' : 'batting_hand'];
@@ -2507,8 +2604,7 @@ class _TableGameCard extends StatelessWidget {
       const SizedBox(width: _playerMarkGap),
       Tooltip(message: hand.isEmpty ? '左右未取得' : '$hand${pitching ? '投げ' : '打ち'}', child: PlayerHandBadge(hand: hand, size: size)),
       const SizedBox(width: _playerMarkGap),
-      Tooltip(message: form == null || level == null ? '普通（仮表示・判定データ不足）\n今季成績または比較期間の記録を確認できないため、黄色で表示しています。' : '${form['label']}（参考）\n${form['note']}\nシーズン ${form['season'] ?? '—'} / 比較期間 ${form['postseason'] ?? '—'}',
-        child: PlayerConditionFace(level: level, size: size)),
+      Tooltip(message: form == null || level == null ? '普通（仮表示・判定データ不足）\n今季成績または比較期間の記録を確認できないため、黄色で表示しています。' : '${form['label']}（参考）\n${form['note']}\nシーズン ${form['season'] ?? '—'} / 比較期間 ${form['postseason'] ?? '—'}', child: PlayerConditionFace(level: level, size: size)),
       const SizedBox(width: _playerMarkGap),
     ]);
   }
@@ -2520,18 +2616,20 @@ class _TableGameCard extends StatelessWidget {
     bool showAce = false,
     bool pitching = false,
   }) {
-    final identity = rows.where((r)=>samePlayerStatName(player.name,'${r['name_full_summary']??''}')).firstOrNull;
+    final identity = rows.where((r) => samePlayerStatName(player.name, '${r['name_full_summary'] ?? ''}')).firstOrNull;
     return Row(mainAxisSize: MainAxisSize.min, children: [
-      PlayerNameLink(player:{'name':player.name,if(identity?['id_team_summary']!=null)'id_team':identity!['id_team_summary'],if(identity?['id_player']!=null)'id_player':identity!['id_player']},child:_pitcherNameBox(
-        name: player.name,
-        colorsRaw: player.colors,
-        baseSize: baseSize,
-        minSize: _minPlayerNameSize,
-        alignLeft: alignLeft,
-        showAce: showAce,
-        showCrown: _isSeasonStatLeader(player.name),
-        showJapan: _showJapanFlag(player.name),
-      )),
+      PlayerNameLink(
+          player: {'name': player.name, if (identity?['id_team_summary'] != null) 'id_team': identity!['id_team_summary'], if (identity?['id_player'] != null) 'id_player': identity!['id_player']},
+          child: _pitcherNameBox(
+            name: player.name,
+            colorsRaw: player.colors,
+            baseSize: baseSize,
+            minSize: _minPlayerNameSize,
+            alignLeft: alignLeft,
+            showAce: showAce,
+            showCrown: _isSeasonStatLeader(player.name),
+            showJapan: _showJapanFlag(player.name),
+          )),
     ]);
   }
 
@@ -3695,19 +3793,19 @@ class _TableGameCard extends StatelessWidget {
     final parts = _orderedPlays(plays, includeOuts: includeOuts, rbi: rbi);
     final extraAt = _extraRbiIndex(parts, rbi);
     return _gameStatChipsRow([
-        for (var i = 0; i < parts.length; i++) _playChip(parts[i], statSize, compact: includeOuts, rbiOverride: extraAt == i ? rbi : -1),
-        for (final part in achievements) _playChip(part, statSize, blink: true),
-        if (pinchNames.isNotEmpty) _pinchCaptionsRow(pinchNames, statSize),
-        if (predict.isNotEmpty) ...[
-          if (plays.isNotEmpty || achievements.isNotEmpty) const SizedBox(width: 2),
-          for (final part in predict.split(','))
-            if (part.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(right: 2),
-                child: _predictBadge(part, statSize),
-              ),
-        ],
-        if (showFiveTako) _fiveTakoChip(statSize),
+      for (var i = 0; i < parts.length; i++) _playChip(parts[i], statSize, compact: includeOuts, rbiOverride: extraAt == i ? rbi : -1),
+      for (final part in achievements) _playChip(part, statSize, blink: true),
+      if (pinchNames.isNotEmpty) _pinchCaptionsRow(pinchNames, statSize),
+      if (predict.isNotEmpty) ...[
+        if (plays.isNotEmpty || achievements.isNotEmpty) const SizedBox(width: 2),
+        for (final part in predict.split(','))
+          if (part.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(right: 2),
+              child: _predictBadge(part, statSize),
+            ),
+      ],
+      if (showFiveTako) _fiveTakoChip(statSize),
     ]);
   }
 
@@ -5200,7 +5298,7 @@ class _TableGameCard extends StatelessWidget {
     });
   }
 
-  Widget _fiveTakoChip(double fontSize) {
+  Widget _fiveTakoChip(double fontSize, {bool paintBackground = true}) {
     return Padding(
       padding: const EdgeInsets.only(right: 3),
       child: Container(
@@ -5209,7 +5307,7 @@ class _TableGameCard extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(3, 0, 3, 0),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: paintBackground ? Colors.black : null,
           borderRadius: BorderRadius.circular(2),
         ),
         child: Text(

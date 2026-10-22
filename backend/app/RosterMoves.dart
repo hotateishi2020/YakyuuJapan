@@ -109,7 +109,7 @@ void applyRosterMoves(List<Map<String, dynamic>> teams,
       ('${p['player_key']}'.startsWith('move:') || p['move_added'] == true ||
        previous.where((t)=>t['id_team'] != team['id_team']).expand((t)=>usageMaps(t['roster'])).any((other)=>other['player_key']==p['player_key'])));
     for(final p in roster.where((p)=>p['status_source']==rosterMovesUrl && !relevant.any((e)=>_same(p,e)))) {
-      for(final key in ['status_source','status_as_of','departure_confirmed','departure_type','departure_reason','new_arrival','arrival_year','previous_team']) {p.remove(key);}
+      for(final key in ['status_source','status_as_of','departure_confirmed','departure_type','departure_reason','new_arrival','arrival_year','arrival_as_of','departure_as_of','move_method_as_of','previous_team']) {p.remove(key);}
     }
     for (final event in relevant) {
       var player = roster.where((p) => _same(p, event)).firstOrNull;
@@ -166,11 +166,13 @@ void applyRosterMoves(List<Map<String, dynamic>> teams,
       if (event['move_method'] != null) {
         player['move_method'] = event['move_method'];
         player['move_method_year'] = year;
+        player['move_method_as_of'] = event['status_as_of'];
       }
       if (event['destination_team_name'] != null) player['destination_team_name'] = event['destination_team_name'];
       if (event['kind'] == 'departure') {
         player.addAll({
           'departure_confirmed': true,
+          'departure_as_of': event['status_as_of'],
           'departure_type': event['departure_type'],
           'departure_reason': event['departure_reason'],
           'new_arrival': false
@@ -188,7 +190,8 @@ void applyRosterMoves(List<Map<String, dynamic>> teams,
         player.addAll({
           'departure_confirmed': false,
           'new_arrival': true,
-          'arrival_year': year
+          'arrival_year': year,
+          'arrival_as_of': event['status_as_of']
         });
         final previousName = '${event['previous_team_name'] ?? ''}';
         final matches = identities

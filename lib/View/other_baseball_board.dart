@@ -1,3 +1,7 @@
+import '../tools/tab_preferences.dart';
+import '../widgets/app_section_tabs.dart';
+import '../logic/auth_session.dart';
+import 'favorite_high_school_board.dart';
 import '../widgets/collapsible_menu.dart';
 import 'high_school_records_board.dart';
 import 'dart:convert';
@@ -6,78 +10,79 @@ import 'package:flutter/services.dart';
 import '../widgets/baseball_loading.dart';
 
 class OtherBaseballBoard extends StatelessWidget {
-  const OtherBaseballBoard({super.key, required this.year});
+  const OtherBaseballBoard({super.key, required this.year, this.user});
   final int year;
+  final AuthUser? user;
   @override
   Widget build(BuildContext context) => DefaultTabController(
       length: 2,
+      initialIndex: readSavedTab('other_main', [0,1], fallback: 0),
       child: Column(children: [
-        const MenuBand(level: 1, child: TabBar(
-            labelColor: Colors.black,
-            tabs: [Tab(text: '高校野球'), Tab(text: '国際シリーズ')])),
+        const MenuBand(
+            level: 1, child: ControlledSectionTabs(preferenceScope: 'other_main', labels: ['高校野球', '国際シリーズ'])),
         Expanded(
-            child: TabBarView(children: [
-          HighSchoolBoard(year: year),
-          const Center(child: Text('国際シリーズの大会情報はまだ登録されていません。')),
-        ])),
+            child: TabBarView(
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+              HighSchoolBoard(year: year, user: user),
+              const Center(child: Text('国際シリーズの大会情報はまだ登録されていません。')),
+            ])),
       ]));
 }
 
 class HighSchoolBoard extends StatelessWidget {
-  const HighSchoolBoard({super.key, required this.year});
+  const HighSchoolBoard({super.key, required this.year, this.user});
   final int year;
+  final AuthUser? user;
   @override
   Widget build(BuildContext context) => DefaultTabController(
-      length: 4,
-      initialIndex: 1,
+      length: 5,
+      initialIndex: readSavedTab('other_high_school', [0,1,2,3,4], fallback: 0),
       child: Column(children: [
-        const MenuBand(level: 2, child: TabBar(
-            labelColor: Colors.black,
-            isScrollable: true,
-            tabAlignment: TabAlignment.start,
-            tabs: [
-              Tab(text: '全国大会'),
-              Tab(text: 'ブロック大会'),
-              Tab(text: '地区大会'),
-              Tab(text: '記録')
-            ])),
+        const MenuBand(
+            level: 2,
+            child: ControlledSectionTabs(
+                preferenceScope: 'other_high_school', labels: ['推し高校', '全国大会', 'ブロック大会', '地区大会', '記録'])),
         Expanded(
-            child: TabBarView(children: [
-          HighSchoolRecordsBoard(
-              year: year, scope: 'national', currentOnly: true),
-          DefaultTabController(
-              length: highSchoolBlocks.length,
-              initialIndex: 9,
-              child: Column(children: [
-                MenuBand(level: 3, child: TabBar(
-                    labelColor: Colors.black,
-                    isScrollable: true,
-                    tabAlignment: TabAlignment.start,
-                    tabs: [
-                      for (final region in highSchoolBlocks) Tab(text: region)
-                    ])),
-                Expanded(
-                    child: TabBarView(children: [
-                  for (final region in highSchoolBlocks)
-                    if (region == '九州')
-                      AutumnKyushuBracket(year: year)
-                    else
-                      HighSchoolRecordsBoard(
-                          year: year,
-                          scope: 'block',
-                          region: region,
-                          currentOnly: true),
-                ])),
-              ])),
-          HighSchoolRecordsBoard(
-              year: year, scope: 'district', currentOnly: true),
-          HighSchoolRecordsBoard(year: year),
-        ])),
+            child: TabBarView(
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+              FavoriteHighSchoolBoard(year: year, user: user),
+              HighSchoolRecordsBoard(
+                  year: year, scope: 'national', currentOnly: true),
+              DefaultTabController(
+                  length: highSchoolBlocks.length,
+                  initialIndex: readSavedTab('other_high_school_block', List.generate(highSchoolBlocks.length,(i)=>i), fallback:9),
+                  child: Column(children: [
+                    const MenuBand(
+                        level: 3,
+                        child: ControlledSectionTabs(preferenceScope: 'other_high_school_block', labels: highSchoolBlocks)),
+                    Expanded(
+                        child: TabBarView(
+                            physics: const NeverScrollableScrollPhysics(),
+                            children: [
+                          for (final region in highSchoolBlocks)
+                            if (region == '九州')
+                              AutumnKyushuBracket(year: year)
+                            else
+                              HighSchoolRecordsBoard(
+                                  year: year,
+                                  scope: 'block',
+                                  region: region,
+                                  currentOnly: true),
+                        ])),
+                  ])),
+              HighSchoolRecordsBoard(
+                  year: year, scope: 'district', currentOnly: true),
+              HighSchoolRecordsBoard(year: year),
+            ])),
       ]));
 }
 
 class AutumnKyushuBracket extends StatefulWidget {
-  const AutumnKyushuBracket({super.key, required this.year});
+  const AutumnKyushuBracket(
+      {super.key, required this.year, this.highlightSchool});
+  final String? highlightSchool;
   final int year;
   @override
   State<AutumnKyushuBracket> createState() => _AutumnKyushuBracketState();
@@ -152,12 +157,25 @@ class _AutumnKyushuBracketState extends State<AutumnKyushuBracket> {
                                                   padding:
                                                       const EdgeInsets.all(6),
                                                   decoration: BoxDecoration(
-                                                      color: Colors.white,
-                                                      border: Border.all(
-                                                          color:
-                                                              Colors.blueGrey)),
-                                                  child: Builder(
-                                                      builder: (context) {
+                                                      color: matches.any((m) =>
+                                                              m['round'] ==
+                                                                  round &&
+                                                              m['slot'] == i &&
+                                                              widget.highlightSchool !=
+                                                                  null &&
+                                                              [
+                                                                'home',
+                                                                'away'
+                                                              ].any((side) =>
+                                                                  '${m[side]}'
+                                                                      .split(
+                                                                          RegExp('[（(]'))
+                                                                      .first ==
+                                                                  widget.highlightSchool))
+                                                          ? const Color(0xFFFFF2C6)
+                                                          : Colors.white,
+                                                      border: Border.all(color: Colors.blueGrey)),
+                                                  child: Builder(builder: (context) {
                                                     final m = matches
                                                         .where((m) =>
                                                             m['round'] ==

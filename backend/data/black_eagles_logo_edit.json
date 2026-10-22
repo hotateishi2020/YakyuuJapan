@@ -1,0 +1,5 @@
+{
+  "tool": "built-in image_gen",
+  "asset": "backend/assets/images/history_black_eagles.png",
+  "prompt": "Edit target: attached black eagle logo. Change ONLY the background OUTSIDE the beige diamond to uniform solid pure black (#000000). Remove ALL glow, halo, gradient, shading, haze, texture and color variation outside the diamond, right up to its crisp straight edges. The four exterior corner regions must be perfectly flat black. Preserve the existing beige diamond and black eagle inside it, their shapes, positions, scale, aspect ratio, and details. Do not add any effects. This is a flat logo, not an illuminated object. Output a high resolution PNG matching the existing landscape composition."
+}

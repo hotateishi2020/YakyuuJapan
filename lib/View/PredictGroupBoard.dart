@@ -791,7 +791,7 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 9),
           alignment: Alignment.center,
           color: fill,
-          child: players.isNotEmpty ? predictPlayerLabels(players, style) : names ? _fitNames(text, style, colors: nameColors) : Text(text.isEmpty ? '—' : text, textAlign: TextAlign.center, style: style),
+          child: players.isNotEmpty ? predictPlayerLabels(players, style) : names ? _fitNames(text, style, colors: nameColors) : Text(text.isEmpty ? '—' : text, textAlign: TextAlign.center, style: style, softWrap: background != headerBackground),
         ),
       );
     }
@@ -819,7 +819,25 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
       );
     }
 
-    return Container(
+    double headerWidth(String text) {
+      final painter = TextPainter(
+        text: TextSpan(text: text, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, height: 1.2)),
+        textDirection: Directionality.of(context), textScaler: MediaQuery.textScalerOf(context),
+      )..layout();
+      final width = painter.width.ceilToDouble() + 14;
+      painter.dispose();
+      return width;
+    }
+    final minimumWidths = [
+      rows.fold<double>(32, (width, row) => headerWidth(titleOf(row)) > width ? headerWidth(titleOf(row)) : width),
+      headerWidth(resultHeader),
+      for (final user in users) headerWidth(_userName(user)),
+    ];
+    final minimumWidth = minimumWidths.fold<double>(0, (sum, width) => sum + width);
+    return LayoutBuilder(builder: (context, constraints) {
+      final width = constraints.maxWidth > minimumWidth ? constraints.maxWidth : minimumWidth;
+      final extra = (width - minimumWidth) / (minimumWidths.length - 1);
+      return SingleChildScrollView(scrollDirection: Axis.horizontal, child: SizedBox(width: width, child: Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: gridLine, width: 0.5),
@@ -832,9 +850,8 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
       ),
       defaultVerticalAlignment: TableCellVerticalAlignment.middle,
       columnWidths: {
-        0: FractionColumnWidth(1.5 / (3 + 2 * (users.length + 1))),
-        1: const FlexColumnWidth(2),
-        for (var i = 0; i < users.length; i++) i + 2: const FlexColumnWidth(2),
+        for (var i = 0; i < minimumWidths.length; i++)
+          i: FixedColumnWidth(minimumWidths[i] + (i == 0 ? 0 : extra)),
       },
       children: [
         line(
@@ -864,7 +881,8 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
           ]),
       ],
       ),
-    );
+    )));
+    });
   }
 
   static String _name(Map<String, dynamic> group) {

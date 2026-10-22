@@ -299,7 +299,7 @@ String? rosterDepartureLabel(Map<String, dynamic> player) {
 /// Confirmed routes and unsettled FA statuses are deliberately separate labels.
 List<String> rosterMoveLabels(Map<String, dynamic> player, int year) {
   final labels = <String>[];
-  if (usageInt(player['move_method_year']) == year && '${player['move_method'] ?? ''}'.isNotEmpty) {
+  if ([year - 1, year].contains(usageInt(player['move_method_year'])) && '${player['move_method'] ?? ''}'.isNotEmpty) {
     labels.add('${player['move_method']}');
   }
   if (player['departure_confirmed'] != true && usageInt(player['move_status_year']) == year && '${player['move_status'] ?? ''}'.isNotEmpty) {
@@ -308,4 +308,39 @@ List<String> rosterMoveLabels(Map<String, dynamic> player, int year) {
     labels.add('FA権保有');
   }
   return labels;
+}
+
+/// Relative to the displayed season. Winter spans the calendar-year boundary;
+/// March–September is treated as the playing season, October–February as off.
+String rosterMovePeriod(Map<String, dynamic> player, int year,
+    {String? dateField, int? eventYear, bool offseason = false}) {
+  final date = DateTime.tryParse(
+      '${player[dateField ?? 'status_as_of'] ?? player['status_as_of'] ?? ''}');
+  if (offseason) {
+    return (eventYear ?? year) < year ? '昨オフ' : '今オフ';
+  }
+  if (date != null) {
+    final arrivalYear = usageInt(player['arrival_year']);
+    if (player['new_arrival'] == true && arrivalYear > date.year && date.month >= 9) {
+      return arrivalYear <= year ? '昨オフ' : '今オフ';
+    }
+    if (date.month <= 2) return date.year <= year ? '昨オフ' : '今オフ';
+    if (date.month >= 10) return date.year < year ? '昨オフ' : '今オフ';
+    return date.year < year ? '昨季' : '今季';
+  }
+  return (eventYear ?? year) < year ? '昨季' : '今季';
+}
+
+String rosterTimedMoveLabel(String label, Map<String, dynamic> player, int year) {
+  if (label == '外国人適用除外') return label;
+  final method = label == player['move_method'];
+  final offseason = !method && const [
+    '国内FA', '海外FA', 'FA宣言', 'FA宣言（移籍先未定）',
+    'ポスティング？', 'ポスティング容認',
+  ].contains(label);
+  final eventYear = usageInt(player[method ? 'move_method_year' : 'move_status_year']);
+  final period = rosterMovePeriod(player, year,
+      dateField: method ? 'move_method_as_of' : 'status_as_of',
+      eventYear: eventYear > 0 ? eventYear : year, offseason: offseason);
+  return '$period $label';
 }

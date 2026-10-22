@@ -668,7 +668,7 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
                         size: 12)),
                     if (newArrival)
                       Wrap(spacing: 3, runSpacing: 3, children: [
-                        _NewArrivalBadge(child: Container(padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1), color: Colors.red.shade700, child: _fitRosterText('新戦力', bold: true, color: Colors.white))),
+                        _NewArrivalBadge(child: Container(padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1), color: Colors.red.shade700, child: _fitRosterText('${rosterMovePeriod(p, year, dateField: 'arrival_as_of', eventYear: usageInt(p['arrival_year']))} 新戦力', bold: true, color: Colors.white))),
                         if ('${former['label'] ?? ''}'.isNotEmpty)
                           Tooltip(message: '前所属：${former['name']}', child: Container(padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1), color: formerColor, child: _fitRosterText('${former['label']}', bold: true, color: formerText))),
                       ]),
@@ -676,10 +676,10 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
                       Padding(padding: const EdgeInsets.only(top: 2), child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
                         color: label.contains('未定') || label.contains('権保有') ? Colors.amber.shade100 : Colors.blue.shade50,
-                        child: _fitRosterText(label, bold: true, color: Colors.black87),
+                        child: _fitRosterText(rosterTimedMoveLabel(label, p, year), bold: true, color: Colors.black87),
                       )),
                     if (departure != null)
-                      _fitRosterText(departure, color: Colors.red, bold: true),
+                      _fitRosterText('${rosterMovePeriod(p, year, dateField: 'departure_as_of')} $departure', color: Colors.red, bold: true),
                     if (rosterUsageUnknown(p, team)) _fitRosterText('（起用不明）'),
                     if (!firstTeamRow) _fitRosterText(rosterLevel(p)),
                     if (_usageOrder)

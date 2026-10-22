@@ -239,8 +239,10 @@ void main() {
     final rects = [for (var i = 0; i < 3; i++) t.getRect(badges.at(i))];
     expect(rects[0].width, greaterThan(rects[1].width));
     expect(rects[1].width, greaterThan(rects[2].width));
-    expect(rects[0].right, lessThanOrEqualTo(rects[1].left));
-    expect(rects[1].right, lessThanOrEqualTo(rects[2].left));
+    expect(rects[0].overlaps(rects[1]), isFalse);
+    expect(rects[1].overlaps(rects[2]), isFalse);
+    await t.tap(find.text('選手'));
+    await t.pumpAndSettle();
     await t.tap(find.byTooltip('2022年 三冠王'));
     await t.pumpAndSettle();
     expect(find.text('選手：三冠王'), findsOneWidget);
@@ -263,14 +265,17 @@ void main() {
         }
       ]
     }))));
-    expect(find.text('2000'), findsOneWidget);
-    expect(find.text('2025'), findsNWidgets(2));
-    final badges = find.byType(AchievementBadge);
+    await t.tap(find.text('選手'));
+    await t.pumpAndSettle();
+    final dialog = find.byKey(const ValueKey('achievement-player-dialog'));
+    expect(find.descendant(of: dialog, matching: find.text('2000')), findsOneWidget);
+    expect(find.descendant(of: dialog, matching: find.text('2025')), findsNWidgets(2));
+    final badges = find.descendant(of: dialog, matching: find.byType(AchievementBadge));
     final rects = [for (var i = 0; i < 27; i++) t.getRect(badges.at(i))];
     expect(rects.first.width, 96);
     expect(rects.last.top, greaterThan(rects[1].top));
     for (final rect in rects) {
-      expect(rect.left, greaterThanOrEqualTo(120));
+      expect(rect.left, greaterThanOrEqualTo(12));
       expect(rect.right, lessThanOrEqualTo(375));
     }
     expect(find.byWidgetPredicate((w) => w is SingleChildScrollView && w.scrollDirection == Axis.horizontal), findsNothing);
@@ -313,7 +318,9 @@ void main() {
         {'label': '規定打席到達', 'kind': 'qualification', 'year': 2025, 'detail': '規定443打席に到達'}
       ]}]
     }))));
-    final badge = find.byType(AchievementBadge);
+    await t.tap(find.text('選手'));
+    await t.pumpAndSettle();
+    final badge = find.descendant(of: find.byKey(const ValueKey('achievement-player-dialog')), matching: find.byType(AchievementBadge));
     final mouse = await t.createGesture(kind: PointerDeviceKind.mouse);
     await mouse.addPointer();
     await mouse.moveTo(t.getCenter(badge));
@@ -498,12 +505,14 @@ void main() {
         }
       ]
     }))));
+    await t.tap(find.text('選手'));
+    await t.pumpAndSettle();
     await t.tap(find.byTooltip('2023年 WBC優勝\n確認済み'));
     await t.pumpAndSettle();
     expect(find.text('https://example.com'), findsNothing);
     expect(t.takeException(), isNull);
   });
-  testWidgets('功績は表示年度内の件数順でアイコンのみ表示しホバーで内容を確認', (t) async {
+  testWidgets('功績は評価値順の正方形で並べ全画面で内容を確認', (t) async {
     await t.pumpWidget(const MaterialApp(
         home: Scaffold(
             body: StrengthAchievements(year: 2026, team: {
@@ -525,8 +534,9 @@ void main() {
         },
       ]
     }))));
-    expect(t.getTopLeft(find.text('多い選手')).dy, lessThan(t.getTopLeft(find.text('少ない選手')).dy));
-    expect(find.byType(IconButton), findsNWidgets(3));
+    expect(t.getTopLeft(find.text('多い選手')).dx, lessThan(t.getTopLeft(find.text('少ない選手')).dx));
+    await t.tap(find.text('多い選手'));
+    await t.pumpAndSettle();
     expect(find.text('2024年 優勝の功績'), findsNothing);
     final tooltip = t.state<TooltipState>(find.byTooltip('2024年 優勝の功績'));
     tooltip.ensureTooltipVisible();

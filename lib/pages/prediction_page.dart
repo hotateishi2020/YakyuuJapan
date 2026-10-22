@@ -1,3 +1,4 @@
+import '../widgets/app_section_tabs.dart';
 import '../widgets/collapsible_menu.dart';
 import '../widgets/game_info_tab_label.dart';
 import '../View/season_titles_board.dart';
@@ -30,7 +31,6 @@ import '../View/EventCalendar.dart';
 import '../View/season_schedule_board.dart';
 import '../View/Headers.dart';
 import '../View/GamesBoard.dart';
-import '../View/LeagueLogo.dart';
 import '../View/SeasonTable.dart';
 import '../View/team_strength_board.dart';
 import '../View/MlbPostseasonBracket.dart';
@@ -1524,84 +1524,11 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     Map<int, String>? leadingAssets,
     bool highlightGames = false,
     double height = TAB_BAR_H,
-  }) {
-    Widget tabLabel((String, int) tab, [TextStyle? style]) => tab.$2 == 0 && highlightGames
-        ? GameInfoTabLabel(style: style)
-        : Text(tab.$1, textAlign: TextAlign.center, maxLines: 1, softWrap: false, style: style);
-    final assets = leadingAssets ?? const <int, String>{};
-    final Color active = selectedColor ?? ALL_COLOR_APP;
-    final Color activeFg = selectedForeground ?? TAB_COLOR_FONT;
-    return LayoutBuilder(builder: (context, bounds) {
-      final cellWidth = (bounds.maxWidth - (tabs.length - 1) * ALL_SPACE_BLOCK) / tabs.length;
-      final fits = tabs.every((tab) {
-        final painter = TextPainter(text: TextSpan(text: tab.$1, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)), textDirection: Directionality.of(context), textScaler: MediaQuery.textScalerOf(context), maxLines: 1)..layout();
-        final needed = painter.width + 4 + (highlightGames && tab.$2 == 0 ? 12 : 0) + (assets.containsKey(tab.$2) ? height * .72 + 6 : 0);
-        painter.dispose();
-        return needed <= cellWidth;
-      });
-      if (!fits) { return Container(height: height,
-        margin: const EdgeInsets.only(top: ALL_SPACE_BLOCK),
-        decoration: BoxDecoration(color: active, borderRadius: BorderRadius.circular(height / 2)),
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: DropdownButtonHideUnderline(child: DropdownButton<int>(value: selectedIndex, isExpanded: true, isDense: true,
-          dropdownColor: active, iconEnabledColor: activeFg,
-          style: TextStyle(color: activeFg, fontSize: 12, fontWeight: FontWeight.bold),
-          selectedItemBuilder: (_) => [for (final tab in tabs) Center(child: tabLabel(tab))],
-          items: [for (final tab in tabs) DropdownMenuItem(value: tab.$2, child: tabLabel(tab))],
-          onChanged: (i) { if (i != null) onSelected(i); }))); }
-      return Padding(
-      padding: const EdgeInsets.only(top: ALL_SPACE_BLOCK),
-      child: SizedBox(
-      height: height,
-      child: Row(
-        children: [
-          for (int i = 0; i < tabs.length; i++) ...[
-            if (i > 0) const SizedBox(width: ALL_SPACE_BLOCK),
-            Expanded(
-              child: Material(
-                color: selectedIndex == tabs[i].$2 ? active : Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(TAB_RADIUS),
-                child: InkWell(
-                  onTap: () => onSelected(tabs[i].$2),
-                  borderRadius: BorderRadius.circular(TAB_RADIUS),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 2),
-                    child: Center(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            if (assets[tabs[i].$2] case final asset?) ...[
-                              LeagueLogo(asset: asset, height: height * 0.72),
-                              const SizedBox(width: 6),
-                            ],
-                            tabLabel(
-                              tabs[i],
-                              TextStyle(
-                                fontSize: 12,
-                                height: 1.0,
-                                leadingDistribution: TextLeadingDistribution.even,
-                                fontWeight: selectedIndex == tabs[i].$2 ? FontWeight.bold : FontWeight.normal,
-                                color: selectedIndex == tabs[i].$2 ? activeFg : Colors.black87,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-    ));
-    });
-  }
+  }) => AppSectionTabs(tabs: tabs, selectedIndex: selectedIndex,
+    onSelected: onSelected, selectedColor: selectedColor,
+    selectedForeground: selectedForeground, leadingAssets: leadingAssets,
+    highlightGames: highlightGames, height: height,
+    specialLabel: (style) => GameInfoTabLabel(style: style));
 
   String _gamesInitialDate() {
     final now = DateTime.now();
@@ -2328,7 +2255,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
               MenuBand(level: 1, toggle: true, child: _boardTabBar()),
             ],
           ])),
-        Expanded(child: _otherOpen ? OtherBaseballBoard(year: _seasonYear) : const Center(child: BaseballLoading())),
+        Expanded(child: _otherOpen ? OtherBaseballBoard(year: _seasonYear, user: AuthSession.instance.user) : const Center(child: BaseballLoading())),
       ]);
     }
 
@@ -2353,7 +2280,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         );
 
         // 取れたデータがあるときはエラー表示で消さない
-        final Widget orgBody = _otherOpen ? OtherBaseballBoard(year: _seasonYear) : _predictGroupsOpen
+        final Widget orgBody = _otherOpen ? OtherBaseballBoard(year: _seasonYear, user: AuthSession.instance.user) : _predictGroupsOpen
             ? (!AuthSession.instance.isLoggedIn
                 ? const Center(child: Text('ログインすると予想を見られます'))
                 : PredictGroupBoard(

@@ -162,6 +162,28 @@ void main() {
             200,
             headers: {'content-type': 'application/json; charset=utf-8'})));
   });
+  testWidgets('球場名は左端固定で説明は表の末尾に含める', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await http.runWithClient(() async {
+      await tester.pumpWidget(const MaterialApp(home: Scaffold(body: StadiumsBoard(org: 'npb'))));
+      await tester.pumpAndSettle();
+      final name = find.text('確認球場');
+      final before = tester.getTopLeft(name);
+      expect(before.dx, lessThan(tester.getTopLeft(find.byKey(const ValueKey('stadium-sort-team'))).dx));
+      await tester.drag(find.byKey(const ValueKey('stadium-grid-scroll')), const Offset(-700, 0));
+      await tester.pumpAndSettle();
+      expect(tester.getTopLeft(name), before);
+      final note = find.textContaining('距離は本塁から');
+      expect(find.ancestor(of: note, matching: find.byType(ListView)), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }, () => MockClient((_) async => http.Response(jsonEncode({'stadiums': [
+      {'name': '確認球場', 'team': '球団'},
+    ]}), 200, headers: {'content-type': 'application/json; charset=utf-8'})));
+  });
+
   testWidgets('other tab renders official bracket and international section',
       (tester) async {
     await tester.pumpWidget(const MaterialApp(

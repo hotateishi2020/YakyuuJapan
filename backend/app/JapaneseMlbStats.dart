@@ -79,9 +79,10 @@ Map<String, dynamic> buildJapaneseMlbStats(List<Map<String, dynamic>> careers,
       put(row, false, '打席', sum('int_appearance'));
       put(row, false, '打数', sum('int_batting'));
       // A multi-team average cannot be obtained by averaging rounded averages.
-      if (teams.length == 1)
+      if (teams.length == 1) {
         put(row, false, '打率',
             number(row['double_average_batting']).toStringAsFixed(3));
+      }
     }
     if (sum('int_pitching') > 0) {
       for (final entry in {
@@ -99,9 +100,10 @@ Map<String, dynamic> buildJapaneseMlbStats(List<Map<String, dynamic>> careers,
             ((innings - innings.floor()) * 10).round();
       });
       put(row, true, '投球回', '${outs ~/ 3}.${outs % 3}');
-      if (teams.length == 1)
+      if (teams.length == 1) {
         put(row, true, '防御率',
             number(row['double_average_earned_runs']).toStringAsFixed(2));
+      }
     }
   }
   const aliases = {
@@ -112,8 +114,9 @@ Map<String, dynamic> buildJapaneseMlbStats(List<Map<String, dynamic>> careers,
     '投球回数': '投球回'
   };
   for (final row in stats) {
-    if (!yes(row['flg_japan']) || ![3, 4].contains(number(row['id_league'])))
+    if (!yes(row['flg_japan']) || ![3, 4].contains(number(row['id_league']))) {
       continue;
+    }
     final title = '${row['title']}';
     put(row, yes(row['flg_pitcher']), aliases[title] ?? title, row['stats']);
   }
@@ -147,19 +150,22 @@ Map<String, dynamic> buildJapaneseMlbStats(List<Map<String, dynamic>> careers,
   final people = <String, Map<String, dynamic>>{};
   for (final r in [...careers, ...stats]) {
     final key = '${r['id_player']}';
-    if (!people.containsKey(key) || full(r).length > full(people[key]!).length)
+    if (!people.containsKey(key) || full(r).length > full(people[key]!).length) {
       people[key] = r;
+    }
   }
   final aliases = <String, Map<String, dynamic>>{};
   for (final entry in people.entries) {
     final r = entry.value, name = full(entry.value);
     final matches = people.values.where((other) {
-      if (other['id_player'] == r['id_player'] || !sameTeam(r, other))
+      if (other['id_player'] == r['id_player'] || !sameTeam(r, other)) {
         return false;
+      }
       final birth = clean(r['date_birth']),
           otherBirth = clean(other['date_birth']);
-      if (birth.isNotEmpty && otherBirth.isNotEmpty && birth != otherBirth)
+      if (birth.isNotEmpty && otherBirth.isNotEmpty && birth != otherBirth) {
         return false;
+      }
       final otherName = full(other);
       final malformedFamily = clean(other['name_first']).isEmpty &&
           clean(other['name_last']) == otherName;

@@ -92,8 +92,9 @@ class _MenuBandState extends State<MenuBand> {
     if (model?.visible != false) collapsed = false;
     final current = model;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted)
+      if (mounted) {
         current?.update(this, widget.toggle && active ? widget.level : null);
+      }
     });
   }
 
@@ -127,11 +128,13 @@ class _MenuBandState extends State<MenuBand> {
                   excluding: !state.visible,
                   child: RepaintBoundary(
                     child: AnimatedSlide(
-                      offset: state.visible ? Offset.zero : const Offset(0, -.3),
-                      duration: reduced ? Duration.zero : const Duration(milliseconds: 120),
+                      offset: state.visible ? Offset.zero : const Offset(0, -.12),
+                      duration: reduced ? Duration.zero : const Duration(milliseconds: 320),
+                      curve: Curves.easeInOutCubic,
                       child: AnimatedOpacity(
                         opacity: state.visible ? 1 : 0,
-                        duration: reduced ? Duration.zero : const Duration(milliseconds: 120),
+                        duration: reduced ? Duration.zero : const Duration(milliseconds: 320),
+                        curve: Curves.easeInOutCubic,
                         onEnd: () {
                           if (mounted && model?.visible == false && !collapsed) {
                             setState(() => collapsed = true);

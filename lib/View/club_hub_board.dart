@@ -42,6 +42,13 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
   String? _error;
   String? _selected;
   String? _selectedStaff;
+  final _staffHorizontal = ScrollController();
+
+  @override
+  void dispose() {
+    _staffHorizontal.dispose();
+    super.dispose();
+  }
   int _teamSection = 0;
   static const _teamSections = ['📈分析', '🧠首脳陣', '😎主力選手', '🕊️貢献度', '👉選手起用', '📰選手一覧', '💼契約'];
   int _request = 0;
@@ -129,12 +136,6 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
           ])),
     ];
     final children = <Widget>[
-      compact ? const SizedBox.shrink() : Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: Wrap(key: const ValueKey('analysis-grade-legend'), spacing: 6, runSpacing: 4, children: [
-        for (final entry in clubAnalysisGradeColors.entries)
-          Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-            decoration: BoxDecoration(color: entry.value, borderRadius: BorderRadius.circular(4)),
-            child: Text(entry.key, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold))),
-      ])),
       LayoutBuilder(builder: (context, constraints) {
         final rowHeight = 88 * MediaQuery.textScalerOf(context).scale(12) / 12;
         Widget fitTable(Widget child) => team == null || compact ? child : FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.topLeft, child: child);
@@ -172,8 +173,9 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
                             image: row['grades'][c] == 'S' ? const DecorationImage(
                               image: AssetImage('backend/assets/images/analysis_grade_gold.jpg'),
                               fit: BoxFit.cover,
+                              colorFilter: ColorFilter.mode(Color(0x99FFF2B0), BlendMode.screen),
                             ) : null,
-                            border: Border.all(color: row['grades'][c] == 'S' ? const Color(0xFFAA791B) : Colors.transparent),
+                            border: Border.all(color: row['grades'][c] == 'S' ? const Color(0xFFE5B82E) : Colors.transparent),
                             borderRadius: BorderRadius.circular(4)),
                           child: Text('${row['grades'][c]}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black))),
                         // Reserve the same caption line for every grade.
@@ -224,8 +226,7 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
     ];
     if (team != null) return SectionList(children: children);
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      children[0],
-      Expanded(child: children[1]),
+      Expanded(child: children.first),
     ]);
   }
 
@@ -277,20 +278,51 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
         ),
       ),
       const Padding(padding: EdgeInsets.all(8), child: Text('公式登録の軍・担当別。兼任は各担当列に表示。— は未収録。')),
-      sectionScrollView(sectionContext ?? context, scrollDirection: Axis.horizontal, child: Table(
-        defaultColumnWidth: onlyClub == null ? const FixedColumnWidth(150) : const FlexColumnWidth(), border: TableBorder.all(color: Colors.black26),
-        children: [
-          TableRow(decoration: BoxDecoration(color: widget.org.tabColor.withValues(alpha: .15)), children: [
-            for (final title in ['球団・軍', ...roles]) Padding(padding: const EdgeInsets.all(8), child: Text(title)),
-          ]),
-          for (final club in displayedClubs)
-            for (var army = 1; army <= 4; army++) TableRow(children: [
-              Padding(padding: const EdgeInsets.all(8), child: Text('${club['name']}　$army軍')),
-              for (final duty in roles) people(listMapFromJson(club['staff']).where((p) =>
-                !['オーナー','球団社長','スカウト'].contains(p['category']) && level(p) == army && duties(p).contains(duty))),
-            ]),
-        ],
-      )),
+      LayoutBuilder(builder: (context, constraints) {
+        final compact = compactBaseballLayout(context);
+        final scale = MediaQuery.textScalerOf(context).scale(14) / 14;
+        final pinnedWidth = (compact ? 28.0 : 52.0) * scale;
+        final columnWidth = math.max(150.0 * scale, (constraints.maxWidth - pinnedWidth) / roles.length);
+        final headerColor = Color.lerp(Colors.white, widget.org.tabColor, .15)!;
+        Widget cell(Widget child, {bool header = false}) => Container(
+          alignment: Alignment.centerLeft,
+          decoration: BoxDecoration(color: header ? headerColor : null,
+            border: Border.all(color: Colors.black26, width: .5)),
+          child: child,
+        );
+        Widget row(String label, List<Widget> cells, {bool header = false}) => Stack(children: [
+          ConstrainedBox(constraints: BoxConstraints(minHeight: (compact && !header ? 54 : 36) * scale),
+            child: IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            SizedBox(width: pinnedWidth),
+            for (final content in cells) SizedBox(width: columnWidth, child: cell(content, header: header)),
+          ]))),
+          Positioned(left: 0, top: 0, bottom: 0,
+            child: AnimatedBuilder(
+              animation: _staffHorizontal,
+              builder: (context, child) => Transform.translate(
+                offset: Offset(_staffHorizontal.hasClients ? _staffHorizontal.offset : 0, 0), child: child),
+              child: SizedBox(width: pinnedWidth, child: cell(
+                Center(child: Padding(padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(compact ? label.split('').join('\n') : label,
+                    key: ValueKey('staff-pinned-$label'), textAlign: TextAlign.center,
+                    style: const TextStyle(fontWeight: FontWeight.bold)))), header: true)),
+            )),
+        ]);
+        return SingleChildScrollView(
+          key: const ValueKey('staff-horizontal-scroll'),
+          controller: _staffHorizontal,
+          scrollDirection: Axis.horizontal,
+          child: SizedBox(width: pinnedWidth + roles.length * columnWidth,
+            child: Column(children: [
+              row('軍', [for (final role in roles) Padding(padding: const EdgeInsets.all(8), child: Text(role))], header: true),
+              for (final club in displayedClubs)
+                for (var army = 1; army <= 4; army++) row('$army軍', [
+                  for (final duty in roles) people(listMapFromJson(club['staff']).where((p) =>
+                    !['オーナー','球団社長','スカウト'].contains(p['category']) && level(p) == army && duties(p).contains(duty))),
+                ]),
+            ])),
+        );
+      }),
       for (final club in displayedClubs) ...[
         Padding(padding: const EdgeInsets.all(8), child: Text('${club['name']}　オーナー・球団社長・スカウト')),
         people(listMapFromJson(club['staff']).where((p) => ['オーナー','球団社長','スカウト'].contains(p['category']))),
@@ -430,7 +462,7 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
             key: ValueKey('team-page-vertical-scroll-${team['id_team']}-$_teamSection'),
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           if (_teamSection == 0) section('分析', () => Builder(builder: (sectionContext) => _analysis(team: team, sectionContext: sectionContext)), minWidth: null),
-          if (_teamSection == 1) section('首脳陣', () => club == null ? const Padding(padding: EdgeInsets.all(12), child: Text('この年度の首脳情報は未収録です。')) : Builder(builder: (sectionContext) => _staff(onlyClub: club, sectionContext: sectionContext)), minWidth: compactBaseballLayout(context) ? 1500 : null),
+          if (_teamSection == 1) section('首脳陣', () => club == null ? const Padding(padding: EdgeInsets.all(12), child: Text('この年度の首脳情報は未収録です。')) : Builder(builder: (sectionContext) => _staff(onlyClub: club, sectionContext: sectionContext)), minWidth: null),
           if (_teamSection == 2) usage(2, '主力選手', minWidth: compactBaseballLayout(context) ? null : regularWidth),
           if (_teamSection == 3) usage(0, '貢献度'),
           if (_teamSection == 4) usage(1, '選手起用'),

@@ -334,13 +334,15 @@ class FetchMLB {
           WHERE id_team = \$1::int
             AND COALESCE(flg_delete, FALSE) = FALSE
             AND (
-              name_full = \$2::text
+              (\$3::text <> '' AND substring(url from '/mlb/player/([0-9]+)') = \$3::text)
+              OR name_full = \$2::text
               OR name_last = \$2::text
               OR COALESCE(name_last, '') || COALESCE(name_first, '') = \$2::text
               OR \$2::text LIKE name_full || '%'
               OR name_full LIKE \$2::text || '%'
             )
           ORDER BY
+            CASE WHEN \$3::text <> '' AND substring(url from '/mlb/player/([0-9]+)') = \$3::text THEN 0 ELSE 1 END,
             CASE
               WHEN name_full = \$2::text THEN 0
               WHEN COALESCE(name_last, '') || COALESCE(name_first, '') = \$2::text THEN 1
@@ -350,7 +352,7 @@ class FetchMLB {
             length(COALESCE(name_full, '')) DESC
           LIMIT 3
         ''',
-        parameters: [teamId, name],
+        parameters: [teamId, name, RegExp(r'/mlb/player/(\d+)').firstMatch(profileUrl)?[1] ?? ''],
       );
 
       var playerId = 0;

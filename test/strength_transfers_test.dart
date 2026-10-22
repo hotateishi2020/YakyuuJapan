@@ -9,6 +9,7 @@ void main() {
   final team = <String, dynamic>{
     'id_team': 7,
     'name_team': '西武',
+    'name_shortest': '西',
     'id_league': 2,
     'roster': [
       {
@@ -105,6 +106,10 @@ void main() {
         hasLength(1));
   });
   testWidgets('狭い画面の移籍一覧に引退表明済み選手を表示しない', (t) async {
+    t.view.physicalSize = const Size(390, 844);
+    t.view.devicePixelRatio = 1;
+    addTearDown(t.view.resetPhysicalSize);
+    addTearDown(t.view.resetDevicePixelRatio);
     await t.binding.setSurfaceSize(const Size(390, 844));
     addTearDown(() => t.binding.setSurfaceSize(null));
     await t.pumpWidget(MaterialApp(
@@ -132,6 +137,12 @@ void main() {
     expect(find.text('平良 海馬'), findsOneWidget);
     expect(find.text('栗山 巧'), findsNothing);
     expect(find.byKey(const ValueKey('transfer-grid')), findsOneWidget);
+    final before = t.getTopLeft(find.text('平良 海馬'));
+    expect(find.text('西武'), findsNothing);
+    expect(find.text('西'), findsWidgets);
+    await t.drag(find.byKey(const ValueKey('transfer-horizontal-scroll')), const Offset(-300, 0));
+    await t.pumpAndSettle();
+    expect(t.getTopLeft(find.text('平良 海馬')), before);
     expect(t.takeException(), isNull);
   });
 }

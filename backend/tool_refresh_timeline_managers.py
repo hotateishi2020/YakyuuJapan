@@ -39,5 +39,10 @@ if __name__ == '__main__':
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
         clubs = dict(pool.map(fetch, CODES))
     path = Path(__file__).parent / 'data/timeline-managers-npb.json'
+    # Defunct clubs have no current NPB franchise-history endpoint.
+    # Preserve their separately sourced historical records on refresh.
+    if path.exists():
+        archived = json.loads(path.read_text())['clubs']
+        clubs.update({code: entry for code, entry in archived.items() if code not in CODES})
     path.write_text(json.dumps({'checked_at': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'clubs': clubs}, ensure_ascii=False, indent=2) + '\n')
     print(f'Saved {sum(len(c["years"]) for c in clubs.values())} club-seasons')

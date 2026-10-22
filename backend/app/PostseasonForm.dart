@@ -1,3 +1,4 @@
+import 'PlayerCountry.dart';
 import 'dart:convert';
 import 'package:postgres/postgres.dart';
 import 'StrengthUsage.dart';
@@ -43,6 +44,7 @@ Future<void> attachPostseasonForm(Connection conn, List<Map<String, dynamic>> ga
   final rows = (await conn.execute('''SELECT s.*,p.name_full,p.id_team AS current_team,g.datetime_start::text AS start,g.code_game FROM t_game_summary s JOIN t_game g ON g.id=s.id_game JOIN m_player p ON p.id=s.id_player WHERE g.datetime_start>=make_date(\$1,1,1) AND g.datetime_start<make_date(\$1+1,1,1) AND (g.state LIKE '%終了%' OR g.state LIKE '%コールド%') AND NOT COALESCE(g.flg_delete,false) AND NOT COALESCE(s.flg_delete,false) AND (cardinality(\$2::int[])=0 OR p.id_team=ANY(\$2::int[]))''', parameters: [year, teamIds])).map((r) => r.toColumnMap()).toList();
   final stats = (await conn.execute("SELECT payload FROM v_stats_player WHERE int_year=\$1 AND payload->>'title' IN ('打率','防御率')", parameters: [year])).map((r) => detailMap(r[0])).toList();
   final people = (await conn.execute('SELECT id AS id_player,id_team,url,name_full AS name_full_summary,pitching AS pitching_hand,batting AS batting_hand FROM m_player WHERE id_team=ANY(\$1::int[]) AND NOT COALESCE(flg_delete,false)', parameters: [teamIds])).map((r) => r.toColumnMap()).toList();
+  await attachPlayerCountries(conn, year, people);
   for (final game in games) {
     game['player_hands'] = people.where((p) => p['id_team'] == game['id_team_home'] || p['id_team'] == game['id_team_away']).toList();
   }

@@ -1,6 +1,5 @@
 import '../tools/browser_cookie.dart';
 import '../widgets/collapsible_menu.dart';
-import 'LeagueLogo.dart';
 import 'player_detail_dialog.dart';
 import 'allstar_history_board.dart';
 import '../logic/record_awards.dart';
@@ -76,7 +75,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
 
   int tab = 0;
   List<int> get _tabs => widget.org.kind == OrgKind.npb ? [0, 1, 14, 2, 3, 4, 7, 11, 12, 13, 5, 6, 8, 9, 10] : [0, 1, 2, 3, 4, 11, 12, 13, 5, 9, 10];
-  int _standingsLeague = 0;
+  final Set<int> _visibleStandingsLeagues = {};
   int _titlesLeague = 0;
   String? _selectedTeam;
   String _teamKey(Map<String, dynamic> team) => team['id_team'] != null ? 'id:${team["id_team"]}' : 'name:${team["name"]}';
@@ -121,10 +120,15 @@ class _RecordsBoardState extends State<RecordsBoard> {
       if (value is! Map<String, dynamic>) {
         throw const FormatException('記録データの形式が不正です');
       }
-      if (mounted && id == request) setState(() {
-        if (value['pending'] == true) { error = '${value['message']}'; }
-        else { data = value; }
-      });
+      if (mounted && id == request) {
+        setState(() {
+          if (value['pending'] == true) {
+            error = '${value['message']}';
+          } else {
+            data = value;
+          }
+        });
+      }
     } catch (e) {
       if (mounted && id == request) {
         setState(() => error = networkErrorMessage(e, fallback: '記録を取得できませんでした。'));
@@ -181,90 +185,91 @@ class _RecordsBoardState extends State<RecordsBoard> {
 
   void _restoreStandingsLeague() {
     _titlesLeague = readSavedTab('titles_league_${widget.org.kind.name}', [0, ...widget.org.leagueIds], fallback: 0);
-    _standingsLeague = readSavedTab('standings_league_${widget.org.kind.name}', [0, ...widget.org.leagueIds], fallback: 0);
+    _visibleStandingsLeagues
+      ..clear()
+      ..addAll(widget.org.leagueIds.where((id) => readBrowserCookie('timeline-league-${widget.org.kind.name}-$id') != 'false'));
   }
 
   Widget standings() => Column(children: [
-        MenuBand(level: 3, child: Padding(
-            padding: const EdgeInsets.only(bottom: 6),
-            child: Row(children: [
-              for (final option in [(0, '両リーグ'), ...widget.org.leagues.map((l) => (l.id, l.name))])
-                Expanded(
-                    child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  child: Material(
-                    color: _standingsLeague == option.$1
-                        ? (option.$1 == 0 ? widget.org.tabColor : widget.org.leagueById(option.$1)!.color)
-                        : option.$1 == 0 ? Colors.grey.shade300
-                          : Color.lerp(Colors.white, widget.org.leagueById(option.$1)!.color, .15),
-                    borderRadius: BorderRadius.circular(TAB_RADIUS),
-                    child: InkWell(
-                      key: ValueKey('standings-league-${option.$1}'),
-                      onTap: () {
-                        saveTab('standings_league_${widget.org.kind.name}', option.$1);
-                        setState(() => _standingsLeague = option.$1);
-                      },
-                      child: SizedBox(height: TAB_BAR_H, child: Center(child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (option.$1 != 0 && widget.org.leagueById(option.$1)!.logoAsset != null) ...[
-                            ClipRect(child: ExcludeSemantics(child: LeagueLogo(
-                              asset: widget.org.leagueById(option.$1)!.logoAsset!,
-                              height: TAB_BAR_H - 4))),
-                            const SizedBox(width: 6),
-                          ],
-                          Text(option.$2, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold,
-                            color: _standingsLeague == option.$1 ? Colors.white : Colors.black87)),
-                        ],
-                      ))),
-                    ),
-                  ),
-                )),
-            ]))),
+        MenuBand(
+          level: 3,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: _timelineOptions(),
+          ),
+        ),
         Expanded(child: _standingsTable()),
       ]);
 
-  Widget _timelineOptions() => Wrap(
-        spacing: 4, crossAxisAlignment: WrapCrossAlignment.center, children: [
-          for (final option in [
-            ('timeline-show-events', '出来事を表示する', _showTimelineEvents),
-            if (widget.org.kind == OrgKind.npb) ('timeline-show-interleague', '交流戦順位を表示する', _showInterleagueRanks),
-            if (widget.org.kind == OrgKind.npb) ('timeline-show-cs', 'CS関連列を表示する', _showCs),
-            ('timeline-show-managers', '監督を表示する', _showManagers),
-          ]) Row(mainAxisSize: MainAxisSize.min, children: [
+  Widget _timelineOptions() => Wrap(spacing: 4, crossAxisAlignment: WrapCrossAlignment.center, children: [
+        for (final league in widget.org.leagues)
+          Row(mainAxisSize: MainAxisSize.min, children: [
             Checkbox(
-              key: ValueKey(option.$1), value: option.$3,
+              key: ValueKey('timeline-league-${league.id}'),
+              value: _visibleStandingsLeagues.contains(league.id),
+              visualDensity: VisualDensity.compact,
+              onChanged: (value) => setState(() {
+                final checked = value ?? false;
+                if (checked) {
+                  _visibleStandingsLeagues.add(league.id);
+                } else {
+                  _visibleStandingsLeagues.remove(league.id);
+                }
+                writeBrowserCookie('timeline-league-${widget.org.kind.name}-${league.id}', '$checked');
+              }),
+            ),
+            Text(league.name, style: const TextStyle(fontSize: 12)),
+          ]),
+        for (final option in [
+          ('timeline-show-events', '出来事を表示する', _showTimelineEvents),
+          if (widget.org.kind == OrgKind.npb) ('timeline-show-interleague', '交流戦順位を表示する', _showInterleagueRanks),
+          if (widget.org.kind == OrgKind.npb) ('timeline-show-cs', 'CS関連列を表示する', _showCs),
+          ('timeline-show-managers', '監督を表示する', _showManagers),
+        ])
+          Row(mainAxisSize: MainAxisSize.min, children: [
+            Checkbox(
+              key: ValueKey(option.$1),
+              value: option.$3,
               visualDensity: VisualDensity.compact,
               onChanged: (value) => setState(() {
                 final checked = value ?? false;
                 writeBrowserCookie(option.$1, '$checked');
-                if (option.$1 == 'timeline-show-events') _showTimelineEvents = checked;
-                else if (option.$1 == 'timeline-show-interleague') _showInterleagueRanks = checked;
-                else if (option.$1 == 'timeline-show-cs') _showCs = checked;
-                else _showManagers = checked;
+                if (option.$1 == 'timeline-show-events') {
+                  _showTimelineEvents = checked;
+                } else if (option.$1 == 'timeline-show-interleague') {
+                  _showInterleagueRanks = checked;
+                } else if (option.$1 == 'timeline-show-cs') {
+                  _showCs = checked;
+                } else {
+                  _showManagers = checked;
+                }
               }),
             ),
             Text(option.$2, style: const TextStyle(fontSize: 12)),
           ]),
-          const Text('気になる球団を押してみてね！', style: TextStyle(fontSize: 12)),
-        ]);
-
+        const Padding(
+          padding: EdgeInsets.only(left: 12),
+          child: Text('気になる球団を押してみてね！', style: TextStyle(fontSize: 12)),
+        ),
+      ]);
 
   Widget _standingsTable() {
     List<Map<String, dynamic>> visibleLeagues(Map<String, dynamic> season) {
       final leagues = listMapFromJson(season['leagues']);
-      if (_standingsLeague == 0) return leagues;
-      // リーグ別表示は1958年以降を対象にする。
-      if ((int.tryParse('${season['year']}') ?? 0) < 1958) return [];
-      final selected = widget.org.leagueById(_standingsLeague)!;
-      return leagues.where((l) => '${l['id_league']}' == '${selected.id}' || l['name'] == selected.name).toList();
+      if (_visibleStandingsLeagues.isEmpty) return [];
+      // The pre-1950 single league is shared history, not a C/P league row.
+      if (widget.org.kind == OrgKind.npb && (int.tryParse('${season['year']}') ?? 0) < 1950) return leagues;
+      return leagues.where((l) => widget.org.leagues.any((selected) =>
+          _visibleStandingsLeagues.contains(selected.id) &&
+          ('${l['id_league']}' == '${selected.id}' || l['name'] == selected.name))).toList();
     }
 
-    final seasons = listMapFromJson(data!['standings']).where((s) => visibleLeagues(s).isNotEmpty).toList();
-    if (seasons.isEmpty) return const Center(child: Text('歴代順位はまだ登録されていません。'));
-    final mlbCount = seasons.expand((s) => listMapFromJson(s['leagues'])).map((l) => listMapFromJson(l['teams']).length).fold<int>(1, math.max);
+    final allSeasons = listMapFromJson(data!['standings']);
+    final seasons = allSeasons.where((s) => visibleLeagues(s).isNotEmpty).toList();
+    if (allSeasons.isEmpty && listMapFromJson(data!['championship_summary']).isEmpty) return const Center(child: Text('歴代順位はまだ登録されていません。'));
+    final mlbCount = allSeasons.expand((s) => listMapFromJson(s['leagues'])).map((l) => listMapFromJson(l['teams']).length).fold<int>(1, math.max);
     int columnsFor(Map<String, dynamic> season) => widget.org.kind == OrgKind.npb ? ((int.tryParse('${season['year']}') ?? 0) < 1958 ? 9 : 6) : mlbCount;
-    final singleLeague = _standingsLeague != 0;
+    final singleLeague = _visibleStandingsLeagues.length == 1;
     final compact = compactBaseballLayout(context);
     final platform = Theme.of(context).platform;
     final tapToShowName = compact || (kIsWeb && (platform == TargetPlatform.android || platform == TargetPlatform.iOS));
@@ -301,25 +306,35 @@ class _RecordsBoardState extends State<RecordsBoard> {
     final timeline = listMapFromJson(data!['timeline']);
     List<Map<String, dynamic>> eventsFor(Map<String, dynamic> season, String category) => timeline.where((event) => '${event['year']}' == '${season['year']}' && event['category'] == category).toList();
     final leagueRows = seasons.fold<int>(1, (count, season) => math.max(count, visibleLeagues(season).length));
-    final timelineRowHeight = (_showManagers ? leagueRows * 56.0 : _showTimelineEvents ? math.max(72.0, leagueRows * 32.0) : leagueRows * 28.0) * math.max(1.0, MediaQuery.textScalerOf(context).scale(12) / 12);
+    final timelineRowHeight = (_showManagers
+            ? leagueRows * 56.0
+            : _showTimelineEvents
+                ? math.max(72.0, leagueRows * 32.0)
+                : leagueRows * 28.0) *
+        math.max(1.0, MediaQuery.textScalerOf(context).scale(12) / 12);
     double seasonHeight(Map<String, dynamic> _) => timelineRowHeight;
-    final csColumns = widget.org.kind == OrgKind.npb && _showCs ? const {
-      'cs_final_winner': '日本\nシリーズ\n進出',
-      'cs_final_loser': 'FINAL\nSTAGE\n敗退',
-      'cs_first_loser': '1st\nSTAGE\n敗退',
-    } : const <String, String>{};
+    final csColumns = widget.org.kind == OrgKind.npb && _showCs
+        ? const {
+            'cs_final_winner': '日本\nシリーズ\n進出',
+            'cs_final_loser': 'FINAL\nSTAGE\n敗退',
+            'cs_first_loser': '1st\nSTAGE\n敗退',
+          }
+        : const <String, String>{};
     final csWidth = compact ? 64.0 : 80.0;
     final headerHeight = csColumns.isEmpty ? 26.0 : 52.0 * math.max(1.0, MediaQuery.textScalerOf(context).scale(11) / 11);
     final fixedWidth = yearWidth + championWidth + csColumns.length * csWidth + (singleLeague ? 0 : leagueWidth);
     return LayoutBuilder(builder: (context, constraints) {
       Widget cell(Widget child, double w, double h, {Color color = Colors.white, Gradient? gradient}) => Container(width: w, height: h, alignment: Alignment.center, decoration: BoxDecoration(color: gradient == null ? color : null, gradient: gradient, border: const Border(right: BorderSide(color: Color(0xFFDDDDDD), width: .5), bottom: BorderSide(color: Color(0xFFDDDDDD), width: .5))), child: child);
       Widget label(String text, {Color color = Colors.black, bool bold = false}) => Padding(padding: const EdgeInsets.symmetric(horizontal: 3), child: Text(text, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: color, fontWeight: bold ? FontWeight.bold : FontWeight.normal)));
-      Widget teamCell(Map<String, dynamic> team, double w, double h, {bool logo = false, bool logoOnly = false, Color rankBackground = Colors.white, Color? backgroundOverride, Object? year}) {
+      Widget teamCell(Map<String, dynamic> team, double w, double h, {bool logo = false, bool logoOnly = false, bool showManager = true, bool selectableLogo = false, Color rankBackground = Colors.white, Color? backgroundOverride, Object? year}) {
         final name = logo ? '${team['name'] ?? '—'}' : '${team['short_name'] ?? team['name'] ?? '—'}';
         final teamKey = _teamKey(team);
-        final highlighted = !logo && _selectedTeam == teamKey;
-        final background = backgroundOverride ?? (logo || highlighted ? parseColorName('${team['color_back'] ?? ''}', Colors.white) : rankBackground);
-        final fg = backgroundOverride != null
+        final canSelect = (!logo || selectableLogo) && name != '—';
+        final highlighted = canSelect && _selectedTeam == teamKey;
+        final background = highlighted
+            ? parseColorName('${team['color_back'] ?? ''}', Colors.white)
+            : backgroundOverride ?? (logo ? parseColorName('${team['color_back'] ?? ''}', Colors.white) : rankBackground);
+        final fg = backgroundOverride != null && !highlighted
             ? Colors.black
             : logo || highlighted
                 ? parseColorName('${team['color_font'] ?? ''}', background.computeLuminance() > .45 ? Colors.black : Colors.white)
@@ -339,13 +354,13 @@ class _RecordsBoardState extends State<RecordsBoard> {
             : visual.networkUrl != null
                 ? Image.network(visual.networkUrl!, cacheWidth: 112, fit: BoxFit.contain, errorBuilder: (_, __, ___) => fallback())
                 : null;
-        final manager = _showManagers && !logo ? '${team['manager'] ?? ''}' : '';
-        Widget withManager(Widget child) => manager.isEmpty ? child : Column(
-          mainAxisAlignment: MainAxisAlignment.center, children: [child,
-            Padding(padding: const EdgeInsets.only(top: 3), child: Text(manager,
-              textAlign: TextAlign.center, maxLines: 2,
-              style: TextStyle(fontSize: 10, height: 1.1, color: fg))),
-          ]);
+        final manager = _showManagers && showManager && !logo ? '${team['manager'] ?? ''}' : '';
+        Widget withManager(Widget child) => manager.isEmpty
+            ? child
+            : Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                child,
+                Padding(padding: const EdgeInsets.only(top: 3), child: Text(manager, textAlign: TextAlign.center, maxLines: 2, style: TextStyle(fontSize: 10, height: 1.1, color: fg))),
+              ]);
         final content = Tooltip(
             message: '${team['name'] ?? name}',
             child: Semantics(
@@ -374,7 +389,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
             child: content,
           );
         }
-        if (logo) return content;
+        if (!canSelect) return content;
         return MouseRegion(
           key: ValueKey('rank-team-$year-$teamKey'),
           cursor: SystemMouseCursors.click,
@@ -396,20 +411,23 @@ class _RecordsBoardState extends State<RecordsBoard> {
       // Keep the year in the same vertical sliver as its row. Compensate only
       // for horizontal movement so row heights and vertical scrolling stay shared.
       Widget pinnedYearRow({Key? key, Key? yearKey, required List<Widget> children}) => Stack(
-        key: key,
-        children: [
-          Row(children: [SizedBox(width: yearWidth), ...children.skip(1)]),
-          Positioned(left: 0, top: 0, bottom: 0,
-            child: AnimatedBuilder(
-              animation: _timelineHorizontal,
-              builder: (context, child) => Transform.translate(
-                offset: Offset(_timelineHorizontal.hasClients ? _timelineHorizontal.offset : 0, 0),
-                child: child,
-              ),
-              child: KeyedSubtree(key: yearKey, child: children.first),
-            )),
-        ],
-      );
+            key: key,
+            children: [
+              Row(children: [SizedBox(width: yearWidth), ...children.skip(1)]),
+              Positioned(
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: AnimatedBuilder(
+                    animation: _timelineHorizontal,
+                    builder: (context, child) => Transform.translate(
+                      offset: Offset(_timelineHorizontal.hasClients ? _timelineHorizontal.offset : 0, 0),
+                      child: child,
+                    ),
+                    child: KeyedSubtree(key: yearKey, child: children.first),
+                  )),
+            ],
+          );
 
       Widget header(int count, double teamWidth, bool interleague) => pinnedYearRow(children: [
             cell(label('年度', bold: true, color: Colors.white), yearWidth, headerHeight, color: Colors.grey.shade800),
@@ -417,13 +435,14 @@ class _RecordsBoardState extends State<RecordsBoard> {
             for (final title in csColumns.values) Tooltip(message: '2004〜2006年はパ・リーグのプレーオフ、2007年以降はCSの結果。未開催・未確定・未収録は —。', child: cell(Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)), csWidth, headerHeight, color: const Color(0xFFFFF0BF))),
             if (!singleLeague) cell(label('リーグ', bold: true), leagueWidth, headerHeight, color: Colors.grey.shade200),
             for (var rank = 1; rank <= count; rank++) cell(label('$rank位', bold: true), teamWidth, headerHeight, color: Colors.grey.shade200),
-            if (count < maxColumns) SizedBox(width: (maxColumns - count) * teamWidth, height: headerHeight),
-            if (interleague) for (var rank = 1; rank <= 12; rank++) cell(label('交流$rank位', bold: true), interleagueWidth, headerHeight, color: const Color(0xFFFFF0BF)),
+            if (interleague)
+              for (var rank = 1; rank <= 12; rank++) cell(label('交流$rank位', bold: true), interleagueWidth, headerHeight, color: const Color(0xFFFFF0BF)),
             for (final title in historyColumns.values) cell(label(title, bold: true), historyColumnWidth, headerHeight, color: Colors.grey.shade200),
           ]);
       final savedSummary = listMapFromJson(data!['championship_summary']);
-      final intervals = singleLeague ? <Map<String, dynamic>>[] : savedSummary.isNotEmpty
-          ? savedSummary : championshipIntervals(seasons, widget.year, mlb: widget.org.kind == OrgKind.mlb);
+      final intervals = savedSummary.isNotEmpty
+          ? savedSummary
+          : championshipIntervals(allSeasons, widget.year, mlb: widget.org.kind == OrgKind.mlb);
       final recordColumns = <String, String>{
         'champion_count': widget.org.kind == OrgKind.npb ? '日本一回数' : 'WS優勝回数',
         'champion_streak': widget.org.kind == OrgKind.npb ? '連続日本一記録' : 'WS連覇記録',
@@ -433,30 +452,36 @@ class _RecordsBoardState extends State<RecordsBoard> {
         if (widget.org.kind == OrgKind.npb) 'interleague_streak': '交流戦連覇記録',
       };
       final mostRecords = {
-        for (final field in recordColumns.keys)
-          field: intervals.map((team) => team[field]).whereType<num>().fold<num?>(
-              null, (most, value) => most == null ? value : math.max(most, value)),
+        for (final field in recordColumns.keys) field: intervals.map((team) => team[field]).whereType<num>().fold<num?>(null, (most, value) => most == null ? value : math.max(most, value)),
       };
       final longestIntervals = {
         for (final field in ['league_years', 'champion_years']) field: intervals.map((team) => team[field]).whereType<int>().fold<int?>(null, (longest, years) => longest == null ? years : math.max(longest, years)),
       };
       final summaryHeight = intervals.isEmpty ? 0.0 : (intervals.length + 1) * 32.0 + 22;
       double measure(String text) {
-          final painter = TextPainter(text: TextSpan(text: text, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-            textDirection: Directionality.of(context), textScaler: MediaQuery.textScalerOf(context))..layout();
-          final value = painter.width; painter.dispose(); return value;
-        }
-        final summaryWidths = [
-          intervals.fold<double>(60, (w, t) => math.max(w, measure('${t['name'] ?? ''}') + 56)),
-          measure('最後のリーグ優勝から') + 14,
-          measure('最後のリーグ優勝から') + 14,
-          for (final title in recordColumns.values) measure(title) + 20,
-        ];
+        final painter = TextPainter(text: TextSpan(text: text, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)), textDirection: Directionality.of(context), textScaler: MediaQuery.textScalerOf(context))..layout();
+        final value = painter.width;
+        painter.dispose();
+        return value;
+      }
+
+      final summaryWidths = [
+        intervals.fold<double>(60, (w, t) => math.max(w, measure('${t['name'] ?? ''}') + 56)),
+        measure('最後のリーグ優勝から') + 14,
+        measure('最後のリーグ優勝から') + 14,
+        for (final title in recordColumns.values) measure(title) + 20,
+      ];
       Widget summary(double width) {
         Widget summaryRow(List<String> texts, {bool heading = false}) => Row(children: [
               for (final entry in texts.indexed) cell(label(entry.$2, color: heading ? Colors.white : Colors.black, bold: heading), summaryWidths[entry.$1], 32, color: heading ? Colors.black : Colors.white),
             ]);
         String years(Object? value) => value == null ? '—' : '$value年';
+        String recordLabel(Map<String, dynamic> team, String field) {
+          final value = team[field] as num?;
+          if (value == null) return '—';
+          if (field.endsWith('_streak')) return value < 2 ? 'ー' : '$value連覇';
+          return '$value回';
+        }
         Color teamBackground(Map<String, dynamic> team) => Color.lerp(parseColorName('${team['color_back'] ?? ''}', Colors.white), Colors.white, .88)!;
         Widget intervalCell(Map<String, dynamic> team, String field) {
           final value = team[field];
@@ -466,31 +491,31 @@ class _RecordsBoardState extends State<RecordsBoard> {
 
         final gridWidth = summaryWidths.reduce((a, b) => a + b);
         return Padding(
-          padding: EdgeInsets.only(top: 12, left: math.max(0, (constraints.maxWidth - gridWidth) / 2)),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          SizedBox(width: gridWidth, child: DecoratedBox(
-            position: DecorationPosition.foreground,
-            decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade700, width: 2)),
-            child: Column(children: [
-          summaryRow(['球団', widget.org.kind == OrgKind.npb ? '最後の日本一から' : '最後のWS優勝から', '最後のリーグ優勝から', ...recordColumns.values], heading: true),
-          for (final team in intervals)
-            Row(children: [
-              teamCell(team, summaryWidths[0], 32, logo: true, backgroundOverride: teamBackground(team)),
-              intervalCell(team, 'champion_years'),
-              intervalCell(team, 'league_years'),
-              for (final entry in recordColumns.keys.indexed)
-                cell(label(team[entry.$2] == null ? '—' : '${team[entry.$2]}${entry.$2.endsWith('_count') || (team[entry.$2] as num) < 2 ? '回' : '連覇'}',
-                    bold: team[entry.$2] != null && team[entry.$2] == mostRecords[entry.$2]),
-                  summaryWidths[entry.$1 + 3], 32, color: teamBackground(team)),
-            ]),
-          ]))),
-          const Padding(padding: EdgeInsets.symmetric(vertical: 4), child: Text('選択年度までの登録記録。連覇は最長記録。NPBは1950年以降（交流戦は2005年以降、2020年は開催なし）。— は未集計または優勝記録なし。', style: TextStyle(fontSize: 11))),
-        ]));
+            padding: EdgeInsets.only(top: 12, left: math.max(0, (constraints.maxWidth - gridWidth) / 2)),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              SizedBox(
+                  width: gridWidth,
+                  child: DecoratedBox(
+                      position: DecorationPosition.foreground,
+                      decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade700, width: 2)),
+                      child: Column(children: [
+                        summaryRow(['球団', widget.org.kind == OrgKind.npb ? '最後の日本一から' : '最後のWS優勝から', '最後のリーグ優勝から', ...recordColumns.values], heading: true),
+                        for (final team in intervals)
+                          Row(children: [
+                            teamCell(team, summaryWidths[0], 32, logo: true, backgroundOverride: teamBackground(team)),
+                            intervalCell(team, 'champion_years'),
+                            intervalCell(team, 'league_years'),
+                            for (final entry in recordColumns.keys.indexed) cell(label(recordLabel(team, entry.$2), bold: team[entry.$2] != null && team[entry.$2] == mostRecords[entry.$2]), summaryWidths[entry.$1 + 3], 32, color: teamBackground(team)),
+                          ]),
+                      ]))),
+              const Padding(padding: EdgeInsets.symmetric(vertical: 4), child: Text('選択年度までの登録記録。連覇は最長記録。NPBは1950年以降（交流戦は2005年以降、2020年は開催なし）。— は未集計または優勝記録なし。', style: TextStyle(fontSize: 11))),
+            ]));
       }
 
       final standingsWidth = fixedWidth + maxColumns * rankWidth;
       final width = math.max(standingsWidth + interleagueWidth * 12 + historyColumns.length * historyColumnWidth, summaryWidths.reduce((a, b) => a + b));
-      double teamWidthFor(Map<String, dynamic> season) => rankWidth;
+      double teamWidthFor(Map<String, dynamic> season) =>
+          maxColumns * rankWidth / columnsFor(season);
       Widget seasonRow(int i) {
         final season = seasons[i];
         final seasonKey = season['phase'] == null ? '${season['year']}' : '${season['year']}-${season['phase']}';
@@ -501,8 +526,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
         final interleagueTeams = listMapFromJson(season['leagues']).expand((l) => listMapFromJson(l['teams'])).toList();
         final height = seasonHeight(season);
         final leagueHeight = height / math.max(1, leagues.length);
-        return pinnedYearRow(key: ValueKey('standings-year-$seasonKey'),
-          yearKey: ValueKey('timeline-fixed-year-$seasonKey'), children: [
+        return pinnedYearRow(key: ValueKey('standings-year-$seasonKey'), yearKey: ValueKey('timeline-fixed-year-$seasonKey'), children: [
           cell(
               FittedBox(
                   fit: BoxFit.scaleDown,
@@ -511,14 +535,12 @@ class _RecordsBoardState extends State<RecordsBoard> {
                     if (season['phase_label'] != null) label('${season['phase_label']}', bold: true, color: Colors.white),
                   ])),
               yearWidth,
-              height, color: Colors.grey.shade800),
+              height,
+              color: Colors.grey.shade800),
           teamCell(champion ?? {'name': season['champion'] ?? '—'}, championWidth, height, logo: true, logoOnly: championLogoOnly),
           for (final field in csColumns.keys)
             Column(children: [
-              for (final league in leagues)
-                KeyedSubtree(key: ValueKey('timeline-$field-$seasonKey-${league['id_league']}'),
-                  child: teamCell(listMapFromJson(league['teams']).where((t) => league[field] != null && '${t['id_team']}' == '${league[field]}').firstOrNull ?? {'name': '—'},
-                    csWidth, leagueHeight, logo: true, logoOnly: true, backgroundOverride: leagueBackground(league))),
+              for (final league in leagues) KeyedSubtree(key: ValueKey('timeline-$field-$seasonKey-${league['id_league']}'), child: teamCell(listMapFromJson(league['teams']).where((t) => league[field] != null && '${t['id_team']}' == '${league[field]}').firstOrNull ?? {'name': '—'}, csWidth, leagueHeight, logo: true, logoOnly: true, selectableLogo: true, year: 'cs-$field-$seasonKey-${league['id_league']}', backgroundOverride: leagueBackground(league))),
             ]),
           Column(children: [
             for (final league in leagues)
@@ -528,11 +550,8 @@ class _RecordsBoardState extends State<RecordsBoard> {
                 for (var n = listMapFromJson(league['teams']).length; n < count; n++) cell(const SizedBox.shrink(), teamWidth, leagueHeight, color: leagueBackground(league)),
               ])
           ]),
-          if (count < maxColumns) SizedBox(width: (maxColumns - count) * rankWidth, height: height),
           if (hasInterleague(season))
-            for (var rank = 1; rank <= 12; rank++)
-              KeyedSubtree(key: ValueKey('interleague-rank-$seasonKey-$rank'), child: teamCell(interleagueTeams.where((team) => int.tryParse('${team['interleague_rank']}') == rank).firstOrNull ?? (rank == 1 && season['interleague_champion'] is Map ? Map<String, dynamic>.from(season['interleague_champion']) : {'name': '—'}),
-                interleagueWidth, height, year: 'interleague-$seasonKey-$rank')),
+            for (var rank = 1; rank <= 12; rank++) KeyedSubtree(key: ValueKey('interleague-rank-$seasonKey-$rank'), child: teamCell(interleagueTeams.where((team) => int.tryParse('${team['interleague_rank']}') == rank).firstOrNull ?? (rank == 1 && season['interleague_champion'] is Map ? Map<String, dynamic>.from(season['interleague_champion']) : {'name': '—'}), interleagueWidth, height, showManager: false, year: 'interleague-$seasonKey-$rank')),
           for (final category in historyColumns.keys)
             cell(
                 Padding(
@@ -585,13 +604,9 @@ class _RecordsBoardState extends State<RecordsBoard> {
               width: width,
               height: constraints.maxHeight,
               child: CustomScrollView(
-                key: PageStorageKey('standings-vertical-scroll-${widget.org.kind.name}-$_standingsLeague'),
+                key: PageStorageKey('standings-vertical-scroll-${widget.org.kind.name}-${widget.org.leagueIds.where(_visibleStandingsLeagues.contains).join('-')}'),
                 slivers: [
                   if (summaryHeight > 0) SliverToBoxAdapter(child: summary(width)),
-                  SliverToBoxAdapter(child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: SizedBox(width: constraints.maxWidth, child: _timelineOptions()),
-                  )),
                   for (final section in sections)
                     SliverMainAxisGroup(slivers: [
                       SliverPersistentHeader(pinned: true, delegate: _TimelineHeaderDelegate(KeyedSubtree(key: ValueKey('timeline-header-${seasons[section.$1]['year']}'), child: header(columnsFor(seasons[section.$1]), teamWidthFor(seasons[section.$1]), hasInterleague(seasons[section.$1]))), height: headerHeight)),
@@ -603,27 +618,29 @@ class _RecordsBoardState extends State<RecordsBoard> {
   }
 
   Widget titles() => Column(children: [
-        MenuBand(level: 3, child: Padding(
-            padding: const EdgeInsets.only(bottom: 6),
-            child: Row(children: [
-              for (final option in [(0, '両リーグ'), ...widget.org.leagues.map((l) => (l.id, l.name))])
-                Expanded(
-                    child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  child: Material(
-                    color: _titlesLeague == option.$1 ? widget.org.tabColor : Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(TAB_RADIUS),
-                    child: InkWell(
-                      key: ValueKey('titles-league-${option.$1}'),
-                      onTap: () {
-                        saveTab('titles_league_${widget.org.kind.name}', option.$1);
-                        setState(() => _titlesLeague = option.$1);
-                      },
-                      child: SizedBox(height: TAB_BAR_H, child: Center(child: Text(option.$2, style: TextStyle(color: _titlesLeague == option.$1 ? Colors.white : Colors.black87)))),
-                    ),
-                  ),
-                )),
-            ]))),
+        MenuBand(
+            level: 3,
+            child: Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Row(children: [
+                  for (final option in [(0, '両リーグ'), ...widget.org.leagues.map((l) => (l.id, l.name))])
+                    Expanded(
+                        child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: Material(
+                        color: _titlesLeague == option.$1 ? widget.org.tabColor : Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(TAB_RADIUS),
+                        child: InkWell(
+                          key: ValueKey('titles-league-${option.$1}'),
+                          onTap: () {
+                            saveTab('titles_league_${widget.org.kind.name}', option.$1);
+                            setState(() => _titlesLeague = option.$1);
+                          },
+                          child: SizedBox(height: TAB_BAR_H, child: Center(child: Text(option.$2, style: TextStyle(color: _titlesLeague == option.$1 ? Colors.white : Colors.black87)))),
+                        ),
+                      ),
+                    )),
+                ]))),
         Expanded(child: _titlesTable()),
       ]);
 
@@ -664,9 +681,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
     Widget cell(Widget child, double width, {bool header = false, bool yearHeader = false, Key? key, Color? background, double? height}) => Container(key: key, width: width, height: height ?? (header ? 28 : rowHeight), padding: header || yearHeader ? const EdgeInsets.symmetric(horizontal: 3, vertical: 2) : EdgeInsets.zero, decoration: BoxDecoration(color: background ?? (header || yearHeader ? Colors.black : Colors.white), border: Border.all(color: Colors.grey.shade400, width: .5)), child: child);
     final years = seasons.map((s) => int.tryParse('${s['year']}') ?? 0).toSet().toList()..sort((a, b) => b.compareTo(a));
     final leagueNames = selectedLeagues.map((l) => l.name).toList();
-    Color leagueColor(String name) => widget.org.leagues
-        .where((league) => leagueKey(league.name) == leagueKey(name))
-        .firstOrNull?.color ?? Colors.blueGrey;
+    Color leagueColor(String name) => widget.org.leagues.where((league) => leagueKey(league.name) == leagueKey(name)).firstOrNull?.color ?? Colors.blueGrey;
     Color playerBackground(String name) => Color.lerp(leagueColor(name), Colors.white, .88)!;
     final grouped = <int, Map<String, List<Map<String, dynamic>>>>{};
     for (final season in seasons) {
@@ -714,8 +729,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
       yearWidth: yearWidth,
       contentWidth: columnWidth * selectedLeagues.length * categories.length,
       rowHeight: rowHeight,
-      yearHeader: cell(text('年度', bold: true, color: Colors.white), yearWidth,
-          header: true, height: 56, key: const ValueKey('title-merged-year-header')),
+      yearHeader: cell(text('年度', bold: true, color: Colors.white), yearWidth, header: true, height: 56, key: const ValueKey('title-merged-year-header')),
       header: Row(children: [
         for (final category in categories)
           Column(children: [

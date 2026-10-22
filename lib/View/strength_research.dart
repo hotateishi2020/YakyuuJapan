@@ -4,6 +4,7 @@ import 'compact_layout.dart';
 import '../tools/open_youtube.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'dart:convert';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../tools/json_utils.dart';
@@ -417,65 +418,102 @@ class StrengthAchievements extends StatelessWidget {
   final Map<String, dynamic> team;
   final int year;
   final List<Map<String, dynamic>>? comparisonTeams;
+
+  void _openPlayer(BuildContext context, Map<String, dynamic> player,
+      Map<String, dynamic> club, List<Map<String, dynamic>> badges) {
+    showDialog<void>(context: context, useSafeArea: false, builder: (context) => Dialog.fullscreen(
+      key: const ValueKey('achievement-player-dialog'),
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(tooltip: '閉じる', icon: const Icon(Icons.close),
+            onPressed: () => Navigator.of(context).pop()),
+          title: Text('${player['name']}'),
+        ),
+        body: SafeArea(child: SingleChildScrollView(padding: const EdgeInsets.all(12),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Text('${club['name_team'] ?? ''}　$year年まで・${badges.length}件',
+              style: const TextStyle(fontSize: 12, color: Colors.black54)),
+            const SizedBox(height: 8),
+            if (badges.isEmpty) const Text('登録されている功績はありません。'),
+            AchievementLayout(sizes: [for (final a in badges) math.max(44, achievementBadgeSize(a) + 8)], children: [
+              for (final a in badges)
+                IconButton(
+                  tooltip: '${a['year']}年 ${a['label']}'
+                    '${(a['detail'] ?? '').toString().isEmpty ? '' : '\n${a['detail']}'}',
+                  padding: const EdgeInsets.all(4),
+                  iconSize: achievementBadgeSize(a),
+                  icon: AchievementBadge(achievement: a),
+                  onPressed: () => showStrengthSource(context, '${player['name']}：${a['label']}',
+                    '${a['year']}年\n${a['detail'] ?? ''}\n表示評価値：${achievementValue(a)}（リーグMVP=100、面積比例・アプリ独自）',
+                    [if (a['source'] != null) '${a['source']}']),
+                ),
+            ]),
+          ])),
+        ),
+      ),
+    ));
+  }
+
+  Widget _preview(List<Map<String, dynamic>> badges) {
+    // Keep the overview light; the fullscreen view contains every achievement.
+    final shown = badges.take(12).toList();
+    if (shown.isEmpty) return const Icon(Icons.sports_baseball_outlined, color: Colors.black26);
+    final sizes = [for (final a in shown) achievementBadgeSize(a) + 8];
+    final width = math.max(sizes.reduce(math.max), math.sqrt(sizes.fold<double>(0, (sum, size) => sum + size * size)) * 1.2);
+    final rects = packAchievementBadges(sizes, width);
+    final height = rects.fold<double>(0, (h, rect) => math.max(h, rect.bottom));
+    return FittedBox(fit: BoxFit.contain, child: SizedBox(width: width, height: height,
+      child: AchievementLayout(sizes: sizes, children: [
+        for (final a in shown) Padding(padding: const EdgeInsets.all(4), child: AchievementBadge(achievement: a)),
+      ])));
+  }
+
   @override
   Widget build(BuildContext context) {
     final roster = [
       for (final t in comparisonTeams ?? [team])
         for (final player in listMapFromJson(t['roster'])) (team: t, player: player),
-    ]
-        .indexed
-        .map((entry) => (
-              team: entry.$2.team,
-              player: entry.$2.player,
-              order: entry.$1,
-              badges: groupAchievementHonors(consolidateCareerMilestones(playerHonors(entry.$2.player).where((a) => usageInt(a['year']) <= year).toList())),
-            ))
-        .toList()
-      ..sort((a, b) {
-        final countOrder = b.badges.length.compareTo(a.badges.length);
-        return countOrder != 0 ? countOrder : a.order.compareTo(b.order);
-      });
-    return ListView.builder(
-      key: ValueKey('achievement-list-${comparisonTeams == null ? team['id_team'] : 'comparison'}-$year'),
-      itemCount: roster.length + 2,
-      itemBuilder: (context, index) {
-        if (index == 0) {
-          return const Padding(padding: EdgeInsets.all(8), child: Text('選手は功績の多い順。評価の高い功績から左に並べ、空きを詰めて表示します。\nホバーで内容、クリックで詳細を表示します。'));
-        }
-        if (index == roster.length + 1) {
-          return const Padding(padding: EdgeInsets.all(8), child: Text('取得・照合できた記録のみ表示。通算記録はNPBとMLBを別集計。優勝時のレギュラー認定は根拠を確認できた場合のみ付与します。代表選出は大会名簿、招集は強化試合等の名簿を根拠とします。レギュラー級の基準は各アイコンの詳細に表示します。ドラフト指名は入団確定を意味しません。未取得の受賞・記録があります。面積はアプリ独自の評価値に比例します（リーグMVP=100、個人タイトル=56.25、月間MVP=9、規定到達=4、三冠王=225、トリプルスリー=400）。公式な価値の比較ではありません。', style: TextStyle(fontSize: 11, color: Colors.black54)));
-        }
-        final entry = roster[index - 1];
-        final color = parseColorNameOrNull('${entry.team['color_back']}') ?? Colors.blueGrey;
-        return Container(
-          key: ValueKey('achievement-player-${entry.team['id_team']}-${usagePlayerKey(entry.player)}'),
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-          decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.black26))),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            SizedBox(
-                width: 120,
-                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  if (comparisonTeams != null) Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3), color: color, child: Text('${entry.team['name_team']}', style: TextStyle(fontSize: 11, color: parseColorNameOrNull('${entry.team['color_font']}') ?? (color.computeLuminance() > .45 ? Colors.black : Colors.white)))),
-                  PlayerNameLink(player: {...entry.player, 'id_team': entry.team['id_team']}, child: Text('${entry.player['name']}', style: const TextStyle(fontWeight: FontWeight.bold))),
-                ])),
-            Expanded(
-                child: AchievementLayout(sizes: [
-              for (final a in entry.badges) achievementBadgeSize(a) + 8
-            ], children: [
-              for (final a in entry.badges)
-                IconButton(
-                  tooltip: '${a['year']}年 ${a['label']}'
-                      '${(a['detail'] ?? '').toString().isEmpty ? '' : '\n${a['detail']}'}',
-                  padding: const EdgeInsets.all(4),
-                  constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
-                  iconSize: achievementBadgeSize(a),
-                  icon: AchievementBadge(achievement: a),
-                  onPressed: () => showStrengthSource(context, '${entry.player['name']}：${a['label']}', '${a['year']}年\n${a['detail'] ?? ''}\n表示評価値：${achievementValue(a)}（リーグMVP=100、面積比例・アプリ独自）', [if (a['source'] != null) '${a['source']}']),
-                ),
-            ])),
+    ].indexed.map((entry) {
+      final badges = groupAchievementHonors(consolidateCareerMilestones(
+        playerHonors(entry.$2.player).where((a) => usageInt(a['year']) <= year).toList()));
+      return (team: entry.$2.team, player: entry.$2.player, order: entry.$1, badges: badges,
+        value: badges.fold<double>(0, (sum, a) => sum + achievementValue(a)));
+    }).toList()..sort((a, b) {
+      final order = b.value.compareTo(a.value);
+      return order != 0 ? order : a.order.compareTo(b.order);
+    });
+    return LayoutBuilder(builder: (context, constraints) {
+      final maxValue = roster.fold<double>(1, (value, entry) => math.max(value, entry.value));
+      final largestSide = math.min(180.0, constraints.maxWidth * .45);
+      final sizes = [for (final entry in roster) largestSide * math.sqrt(math.max(1, entry.value) / maxValue)];
+      return SingleChildScrollView(
+        key: ValueKey('achievement-list-${comparisonTeams == null ? team['id_team'] : 'comparison'}-$year'),
+        padding: const EdgeInsets.all(4),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          AchievementLayout(sizes: sizes, children: [
+            for (final entry in roster)
+              Material(
+                key: ValueKey('achievement-player-${entry.team['id_team']}-${usagePlayerKey(entry.player)}'),
+                color: Color.lerp(parseColorNameOrNull('${entry.team['color_back']}') ?? Colors.blueGrey, Colors.white, .92),
+                shape: RoundedRectangleBorder(side: BorderSide(color: Colors.grey.shade400), borderRadius: BorderRadius.circular(4)),
+                clipBehavior: Clip.antiAlias,
+                child: Tooltip(message: '${entry.player['name']}・${entry.badges.length}件',
+                  child: InkWell(onTap: () => _openPlayer(context, entry.player, entry.team, entry.badges),
+                    child: Semantics(button: true, label: '${entry.player['name']}の功績を表示',
+                      child: Column(children: [
+                        Expanded(flex: 2, child: FittedBox(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: Text('${entry.player['name']}', style: const TextStyle(fontWeight: FontWeight.bold))))),
+                        Expanded(flex: 8, child: IgnorePointer(child: ExcludeSemantics(child: _preview(entry.badges)))),
+                        Expanded(child: FittedBox(child: Text('${comparisonTeams == null ? '' : '${entry.team['name_shortest'] ?? entry.team['name_team'] ?? ''}・'}${entry.badges.length}件'))),
+                      ])),
+                  )),
+              ),
           ]),
-        );
-      },
-    );
+          const Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Text(
+            '正方形をタップすると全功績を表示。面積は取得済みの功績評価値の合計に比例します。評価値はアプリ独自のもので、公式な順位ではありません。未取得の受賞・記録があります。',
+            style: TextStyle(fontSize: 11, color: Colors.black54))),
+        ]),
+      );
+    });
   }
 }

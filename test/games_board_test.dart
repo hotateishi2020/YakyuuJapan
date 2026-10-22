@@ -1,3 +1,5 @@
+import 'package:Yakyuu_Japan/View/player_condition.dart';
+import 'package:Yakyuu_Japan/View/player_country_flag.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -3361,7 +3363,7 @@ void main() {
     expect(find.text('四球'), findsOneWidget);
   });
 
-  testWidgets('MLB game cards put Japan flag to the right of Japanese names', (tester) async {
+  testWidgets('MLB game cards put the country flag to the right of condition marks', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Center(
@@ -3414,7 +3416,67 @@ void main() {
     expect(find.text('予想先発'), findsNothing);
     expect(find.textContaining('S.今永'), findsOneWidget);
     expect(find.textContaining('🇯🇵'), findsOneWidget);
-    expect(tester.getTopLeft(find.textContaining('🇯🇵')).dx, greaterThan(tester.getTopLeft(find.textContaining('S.今永')).dx));
+    expect(tester.getTopLeft(find.textContaining('🇯🇵')).dx, greaterThan(tester.getTopLeft(find.byType(PlayerConditionFace).first).dx));
+  });
+
+  testWidgets('MLB game cards prefer WBC country over birthplace', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 420,
+            height: 220,
+            child: GamesBoardYahooStyle(
+              initialStatsExpanded: true,
+              games: [
+                {
+                  'date_game': '2026-10-08',
+                  'time_game': '🌙 05:00',
+                  'name_team_home': 'ホワイトソックス',
+                  'name_team_away': 'ガーディアンズ',
+                  'name_stadium': 'ギャランティドレートフィールド',
+                  'name_pitcher_home': 'S.今永',
+                  'name_pitcher_away': '先発相手',
+                  'score_home': -1,
+                  'score_away': -1,
+                  'state': '予想先発',
+                  'code_game': 'DS',
+                  'id_team_home': 201,
+                  'id_team_away': 202,
+                  'id_league_home': 3,
+                  'id_league_away': 3,
+                  'color_back_home': '#000000',
+                  'color_back_away': '#E31937',
+                  'color_font_home': 'white',
+                  'color_font_away': 'white',
+                },
+              ],
+              playerStats: [
+                {
+                  'title': '防御率',
+                  'name_player': '今永昇太',
+                  'int_rank': 4,
+                  'id_league': 3,
+                  'emoji_country': '🇺🇸',
+                  'emoji_display_country': '🇮🇹',
+                  'country_flag_basis': 'WBC 2023',
+                },
+              ],
+              horizontal: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.textContaining('🌙 05:00'), findsOneWidget);
+    expect(find.text('試合前'), findsOneWidget);
+    expect(find.text('予想先発'), findsNothing);
+    expect(find.textContaining('S.今永'), findsOneWidget);
+    expect(find.textContaining('🇮🇹'), findsOneWidget);
+    expect(find.textContaining('🇺🇸'), findsNothing);
+    expect(find.byType(PlayerCountryFlag), findsWidgets);
+    expect(tester.getTopLeft(find.textContaining('🇮🇹')).dx, greaterThan(tester.getTopLeft(find.byType(PlayerConditionFace).first).dx));
   });
 
   testWidgets('postseason game cards put a crown on season stat leaders', (tester) async {
@@ -3467,7 +3529,7 @@ void main() {
     await tester.pump();
     expect(find.textContaining('👑'), findsOneWidget);
     expect(find.textContaining('🇯🇵'), findsOneWidget);
-    expect(tester.getTopLeft(find.textContaining('🇯🇵')).dx, greaterThan(tester.getTopLeft(find.textContaining('山本由伸')).dx));
+    expect(tester.getTopLeft(find.textContaining('🇯🇵')).dx, greaterThan(tester.getTopLeft(find.byType(PlayerConditionFace).first).dx));
     expect(tester.getTopLeft(find.textContaining('👑')).dx, greaterThan(tester.getTopLeft(find.textContaining('🇯🇵')).dx));
   });
 

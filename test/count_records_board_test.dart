@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/widgets/collapsible_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/View/additional_records_board.dart';
@@ -77,4 +78,54 @@ void main() {
     expect(ranks.offset, body.offset);
     expect(tester.takeException(), isNull);
   });
+  testWidgets('縦画面は表示非表示バーの上のPickerで1項目ずつ切り替える', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(const MaterialApp(home: Scaffold(body: MenuScope(
+      child: Column(children: [
+        MenuBand(level: 2, child: Text('回数記録')),
+        Expanded(child: CountRecordsBoard(records: [
+          {'label': '打率3割', 'leaders': [{'rank': 1, 'name': '打率選手', 'value': 5}]},
+          {'label': '首位打者', 'leaders': [{'rank': 1, 'name': 'タイトル選手', 'value': 4}]},
+          {'label': '新人王', 'leaders': [{'rank': 1, 'name': '除外選手', 'value': 3}]},
+        ])),
+      ]),
+    ))));
+    await tester.pumpAndSettle();
+    final picker = find.byKey(const ValueKey('count-records-picker'));
+    final toggle = find.byKey(const ValueKey('menu-visibility-toggle'));
+    expect(toggle, findsOneWidget);
+    expect(tester.getBottomLeft(picker).dy, lessThan(tester.getTopLeft(toggle).dy));
+    expect(find.text('打率選手　5回'), findsOneWidget);
+    expect(find.text('タイトル選手　4回'), findsNothing);
+    await tester.tap(picker);
+    await tester.pumpAndSettle();
+    expect(find.text('新人王'), findsNothing);
+    await tester.tap(find.text('首位打者').last);
+    await tester.pumpAndSettle();
+    expect(find.text('打率選手　5回'), findsNothing);
+    expect(find.text('タイトル選手　4回'), findsOneWidget);
+    final horizontal = tester.stateList<ScrollableState>(find.byType(Scrollable))
+        .where((state) => state.axisDirection == AxisDirection.right);
+    expect(horizontal.every((state) => state.position.maxScrollExtent == 0), isTrue);
+    await tester.tap(toggle);
+    await tester.pumpAndSettle();
+    expect(picker.hitTestable(), findsNothing);
+    expect(find.text('タイトル選手　4回'), findsOneWidget);
+    await tester.tap(toggle);
+    await tester.pumpAndSettle();
+    expect(tester.widget<DropdownButton<String>>(picker).value, '首位打者');
+    tester.view.physicalSize = const Size(1200, 800);
+    await tester.pumpAndSettle();
+    expect(picker, findsNothing);
+    expect(find.text('打率選手　5回'), findsOneWidget);
+    expect(find.text('タイトル選手　4回'), findsOneWidget);
+    tester.view.physicalSize = const Size(390, 844);
+    await tester.pumpAndSettle();
+    expect(tester.widget<DropdownButton<String>>(picker).value, '首位打者');
+    expect(tester.takeException(), isNull);
+  });
+
 }

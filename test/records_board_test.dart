@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:Yakyuu_Japan/View/records_board.dart';
 import 'package:Yakyuu_Japan/config/org_config.dart';
+import 'package:Yakyuu_Japan/widgets/collapsible_menu.dart';
 
 final fixture = {
   'standings': [
@@ -96,6 +97,31 @@ final fixture = {
   ],
 };
 void main() {
+  testWidgets('年表のチェック群は表示バーの上にあり折りたたんでも設定を保持する', (tester) async {
+    await http.runWithClient(() async {
+      await tester.pumpWidget(const MaterialApp(home: Scaffold(body: MenuScope(
+        child: RecordsBoard(org: OrgConfig.npb, year: 2026),
+      ))));
+      await tester.pumpAndSettle();
+      final option = find.byKey(const ValueKey('timeline-show-managers'));
+      final toggle = find.byKey(const ValueKey('menu-visibility-toggle'));
+      expect(toggle, findsOneWidget);
+      expect(tester.getBottomLeft(option).dy, lessThan(tester.getTopLeft(toggle).dy));
+      await tester.tap(option);
+      await tester.pumpAndSettle();
+      final checked = tester.widget<Checkbox>(option).value;
+      await tester.tap(toggle);
+      await tester.pumpAndSettle();
+      expect(option.hitTestable(), findsNothing);
+      await tester.tap(toggle);
+      await tester.pumpAndSettle();
+      expect(option.hitTestable(), findsOneWidget);
+      expect(tester.widget<Checkbox>(option).value, checked);
+      expect(tester.takeException(), isNull);
+    }, () => MockClient((_) async => http.Response(jsonEncode(fixture), 200,
+        headers: {'content-type': 'application/json; charset=utf-8'})));
+  });
+
   testWidgets('年表の出来事チェックで5列と行の高さを切り替える', (tester) async {
     await tester.binding.setSurfaceSize(const Size(2400, 850));
     addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -140,7 +166,7 @@ void main() {
     }, () => MockClient((_) async => http.Response(jsonEncode(fixture), 200,
         headers: {'content-type': 'application/json; charset=utf-8'})));
   });
-  testWidgets('携帯では球団名をタップしたセルに3秒表示する', (tester) async {
+  testWidgets('携帯でも球団ロゴをタップして文字に置き換えない', (tester) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -148,7 +174,7 @@ void main() {
     final payload = {'standings': [{'year': 2025, 'leagues': [
       {'id_league': 1, 'name': 'セ・リーグ', 'teams': [
         {'id_team': 1, 'name': '東京読売ジャイアンツ', 'champion': true,
-          'historical_identity': true}
+          'historical_identity': true, 'logo_url': 'asset:backend/assets/images/team_g.png'}
       ]}
     ]}]};
     await http.runWithClient(() async {
@@ -156,13 +182,23 @@ void main() {
         body: RecordsBoard(org: OrgConfig.npb, year: 2026))));
       await tester.pumpAndSettle();
       final cell = find.byKey(const ValueKey('rank-team-2025-id:1'));
+      final summary = find.byKey(const ValueKey('timeline-summary-grid'));
+      final summaryLogo = find.descendant(of: summary, matching: find.byType(Image)).first;
+      final logoX = tester.getTopLeft(summaryLogo).dx;
+      expect(find.descendant(of: summary, matching: find.text('東京読売ジャイアンツ')), findsNothing);
+
       await tester.tap(cell);
       await tester.pump();
-      expect(find.byKey(const ValueKey('tapped-team-name')), findsOneWidget);
+      expect(find.byKey(const ValueKey('tapped-team-name')), findsNothing);
+      expect(find.descendant(of: cell, matching: find.byType(Image)), findsOneWidget);
       await tester.pump(const Duration(seconds: 2));
-      expect(find.byKey(const ValueKey('tapped-team-name')), findsOneWidget);
+      expect(find.byKey(const ValueKey('tapped-team-name')), findsNothing);
+      expect(find.descendant(of: cell, matching: find.byType(Image)), findsOneWidget);
       await tester.pump(const Duration(seconds: 1));
       expect(find.byKey(const ValueKey('tapped-team-name')), findsNothing);
+      await tester.drag(find.byKey(const ValueKey('standings-horizontal-scroll')), const Offset(-400, 0));
+      await tester.pumpAndSettle();
+      expect(tester.getTopLeft(summaryLogo).dx, logoX);
       expect(tester.takeException(), isNull);
     }, () => MockClient((_) async => http.Response(jsonEncode(payload), 200,
       headers: {'content-type': 'application/json; charset=utf-8'})));
@@ -199,10 +235,10 @@ void main() {
         expect(find.descendant(of: row, matching: find.text(phase == 'spring' ? '春季' : '秋季')), findsOneWidget);
         expect(find.descendant(of: row, matching: find.text(phase == 'spring' ? '春優勝' : '秋優勝')), findsNWidgets(2));
       }
-      await tester.tap(find.byKey(const ValueKey('standings-league-1')));
+      await tester.tap(find.byKey(const ValueKey('timeline-league-1')));
       await tester.pumpAndSettle();
-      expect(find.byKey(const ValueKey('standings-year-1937-spring')), findsNothing);
-      expect(find.byKey(const ValueKey('standings-year-1937-fall')), findsNothing);
+      expect(find.byKey(const ValueKey('standings-year-1937-spring')), findsOneWidget);
+      expect(find.byKey(const ValueKey('standings-year-1937-fall')), findsOneWidget);
       expect(tester.takeException(), isNull);
     }, () => MockClient((_) async => http.Response(jsonEncode(payload), 200, headers: {'content-type': 'application/json; charset=utf-8'})));
   });
@@ -224,24 +260,24 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text('略称0'), findsOneWidget);
         expect(find.text('略称1'), findsOneWidget);
-        await tester.tap(find.byKey(ValueKey('standings-league-${org.leagues.first.id}')));
+        expect(find.byKey(const ValueKey('standings-league-0')), findsNothing);
+        final summaryTitle = org.kind == OrgKind.npb ? '最後の日本一から' : '最後のWS優勝から';
+        expect(find.text(summaryTitle), findsOneWidget);
+        await tester.tap(find.byKey(ValueKey('timeline-league-${org.leagues.last.id}')));
         await tester.pumpAndSettle();
-        expect(find.text('リーグ'), findsNothing);
-        expect(find.text('1位'), findsOneWidget);
-        expect(find.text('リーグ優勝'), findsNothing);
         expect(find.text('略称0'), findsOneWidget);
-        expect(tester.widget<Text>(find.text('略称0')).style!.color, Colors.black87);
-        expect(tester.widgetList<Container>(find.ancestor(of: find.text('略称0'), matching: find.byType(Container)))
-            .any((c) => c.decoration is BoxDecoration && (c.decoration as BoxDecoration).color == Color.lerp(org.leagues.first.color, Colors.white, .88)), isTrue);
         expect(find.text('略称1'), findsNothing);
-        expect(find.text('球団1'), findsOneWidget);
-        expect(find.text('1949'), findsNothing);
-        await tester.tap(find.byKey(ValueKey('standings-league-${org.leagues.last.id}')));
+        expect(find.text(summaryTitle), findsOneWidget);
+        await tester.tap(find.byKey(ValueKey('timeline-league-${org.leagues.first.id}')));
+        await tester.pumpAndSettle();
+        expect(find.byKey(const ValueKey('standings-year-2025')), findsNothing);
+        expect(find.text(summaryTitle), findsOneWidget);
+        await tester.tap(find.byKey(ValueKey('timeline-league-${org.leagues.last.id}')));
         await tester.pumpAndSettle();
         expect(find.text('略称0'), findsNothing);
-        expect(find.text('球団1'), findsOneWidget);
         expect(find.text('略称1'), findsOneWidget);
-        await tester.tap(find.byKey(const ValueKey('standings-league-0')));
+        expect(find.text(summaryTitle), findsOneWidget);
+        await tester.tap(find.byKey(ValueKey('timeline-league-${org.leagues.first.id}')));
         await tester.pumpAndSettle();
         expect(find.text('略称0'), findsOneWidget);
         if (org.kind == OrgKind.npb) expect(find.text('1949'), findsOneWidget);
@@ -393,6 +429,45 @@ void main() {
       }, () => client);
     });
   }
+  for (final width in [390.0, 1200.0]) {
+    testWidgets('年表の6列と9列の順位範囲を幅$widthで揃える', (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = Size(width, 900);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+      await tester.binding.setSurfaceSize(Size(width, 900));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      final history = {'standings': [for (final year in [1958, 1957]) {
+        'year': year,
+        'leagues': [{'id_league': 2, 'name': 'パ・リーグ', 'teams': [
+          for (var rank = 1; rank <= (year == 1958 ? 6 : 9); rank++)
+            {'name': '球団$rank', 'short_name': '球団$rank'},
+        ]}],
+      }]};
+      await http.runWithClient(() async {
+        await tester.pumpWidget(const MaterialApp(home: Scaffold(
+          body: RecordsBoard(org: OrgConfig.npb, year: 2026))));
+        await tester.pumpAndSettle();
+        Rect cellRect(Finder section, String text) {
+          final label = find.descendant(of: section, matching: find.text(text));
+          return tester.getRect(find.ancestor(of: label, matching: find.byType(Container)).first);
+        }
+        for (final header in [true, false]) {
+          final modern = find.byKey(ValueKey(header ? 'timeline-header-1958' : 'standings-year-1958'));
+          final older = find.byKey(ValueKey(header ? 'timeline-header-1957' : 'standings-year-1957'));
+          final modernFirst = cellRect(modern, header ? '1位' : '球団1');
+          final olderFirst = cellRect(older, header ? '1位' : '球団1');
+          expect(modernFirst.left, closeTo(olderFirst.left, .01));
+          expect(modernFirst.width, closeTo(olderFirst.width * 1.5, .01));
+          expect(cellRect(modern, header ? '6位' : '球団6').right,
+            closeTo(cellRect(older, header ? '9位' : '球団9').right, .01));
+        }
+        expect(tester.takeException(), isNull);
+      }, () => MockClient((_) async => http.Response(jsonEncode(history), 200,
+        headers: {'content-type': 'application/json; charset=utf-8'})));
+    });
+  }
+
   testWidgets('NPB順位列は1958年6列・1957年9列、旧球団ロゴは同梱画像', (tester) async {
     await tester.binding.setSurfaceSize(const Size(1200, 800));
     addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -502,7 +577,8 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(1200,800));
     addTearDown(() => tester.binding.setSurfaceSize(null));
     final payload = {'standings': [for (final year in [2005,2004]) {
-      'year':year,'leagues':[{'id_league':2,'name':'パ・リーグ','teams':[
+      'year':year,'leagues':[{'id_league':2,'name':'パ・リーグ',
+        'cs_final_winner':7,'cs_final_loser':7,'cs_first_loser':7,'teams':[
         {'id_team':7,'name':year==2005?'ソフトバンク':'ダイエー','historical_identity':true,'color_back':'#123456','color_font':'#FEDCBA'},
         {'id_team':8,'name':'他球団','historical_identity':true}
       ]}]
@@ -517,6 +593,8 @@ void main() {
           (c.decoration as BoxDecoration).color == const Color(0xFF123456));
       Color? background(Finder f) => tester.widgetList<Container>(find.descendant(of:f,matching:find.byType(Container)))
         .where((c) => c.decoration is BoxDecoration).map((c) => (c.decoration as BoxDecoration).color).first;
+      final csCells = [for (final field in ['cs_final_winner','cs_final_loser','cs_first_loser'])
+        find.byKey(ValueKey('timeline-$field-2005-2'))];
       final originalBackground = background(old);
       final mouse = await tester.createGesture(kind:PointerDeviceKind.mouse);
       await mouse.addPointer(location:Offset.zero);
@@ -532,13 +610,16 @@ void main() {
       await tester.pump();
       expect(highlighted(old),isTrue);
       expect(highlighted(current),isTrue);
+      for (final cs in csCells) { expect(highlighted(cs), isTrue); }
       expect(background(old), const Color(0xFF123456));
       expect(tester.widget<Text>(find.text('ダイエー')).style!.color, const Color(0xFFFEDCBA));
       expect(tester.widgetList<Container>(find.descendant(of: old, matching: find.byType(Container)))
         .every((c) => c.foregroundDecoration == null), isTrue);
       expect(highlighted(find.byKey(const ValueKey('rank-team-2004-id:8'))),isFalse);
-      await tester.tap(current);
+      await tester.tap(csCells.first);
       await tester.pump();
+      for (final cs in csCells) { expect(highlighted(cs), isFalse); }
+      expect(highlighted(current),isFalse);
       expect(highlighted(old),isFalse);
       expect(background(old), originalBackground);
       await mouse.removePointer();

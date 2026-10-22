@@ -34,8 +34,9 @@ List<Map<String, dynamic>> goldenGloveRows(
       }
     }
     if (awards == null) {
-      if (_cachedAwards.length >= 2)
+      if (_cachedAwards.length >= 2) {
         _cachedAwards.remove(_cachedAwards.keys.first);
+      }
       _cachedAwards[year] = (at: DateTime.now(), rows: latest);
     }
   }
@@ -60,6 +61,7 @@ List<Map<String, dynamic>> goldenGloveRows(
       'int_year': year,
       'title': 'GG受賞回数',
       'flg_pitcher': pitching,
+      if (pitching) 'txt_position': '投手',
       'numeric_value': award['career_count'],
       'stats': '${award['career_count']}',
       'id_users': null,

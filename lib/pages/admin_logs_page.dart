@@ -1,4 +1,5 @@
 import 'admin_news_panel.dart';
+import 'admin_billing_panel.dart';
 import 'dart:typed_data';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import '../tools/network_error.dart';
@@ -290,7 +291,8 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
                     ButtonSegment(
                         value: 1,
                         label: Text('News登録'),
-                        icon: Icon(Icons.newspaper))
+                        icon: Icon(Icons.newspaper)),
+                    ButtonSegment(value: 2, label: Text('費用'), icon: Icon(Icons.payments_outlined))
                   ],
                   selected: {_section},
                   onSelectionChanged: (value) =>
@@ -369,6 +371,7 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
             ),
           ]),
           const AdminNewsPanel(),
+          if (_section == 2) const AdminBillingPanel() else const SizedBox.shrink(),
         ])),
       ]),
     );

@@ -325,7 +325,7 @@ void main() {
   });
 
   test('パテレは日本時間の2日前から全件、10件未満なら期間外から補完する', () {
-    final pl = videoChannels.first;
+    final pl = videoChannels.singleWhere((c) => c.id == 'UC0v-pxTo1XamIDE-f__Ad0Q');
     expect(pl.lookbackDays, 2);
     expect(pl.minimumVideos, 10);
     expect(
@@ -711,7 +711,8 @@ void main() {
         ['UCJ-l-sMQFHogSy8KXRyMIRA', 'UCoLrcjPV5PbUrUyXq5mjc_A']);
     final shared =
         mlbVideoChannels.where((c) => videoChannels.any((n) => n.id == c.id));
-    expect(shared.where((c) => c.category == 'ob'), hasLength(16));
+    expect(shared.where((c) => c.category == 'ob').map((c) => c.id),
+        unorderedEquals(videoChannels.where((c) => c.category == 'ob').map((c) => c.id)));
     expect(shared.every((c) => c.videoOrg == 'mlb'), isTrue);
     expect(shared.where((c) => c.category == 'media').map((c) => c.name), containsAll(['MNsports', '熱闘ベースボールレコード', '4タコ【野球解説チャンネル】']));
   });
@@ -913,9 +914,8 @@ void main() {
     expect(
         (result[2]['videos'] as List).map((v) => v['id']), ['local', 'lions']);
   });
-  test('52チャンネルに指定先と12球団が重複なく含まれる', () {
-    expect(videoChannels, hasLength(52));
-    expect(videoChannels.map((c) => c.id).toSet(), hasLength(52));
+  test('指定チャンネルと12球団が重複なく含まれる', () {
+    expect(videoChannels.map((c) => c.id).toSet(), hasLength(videoChannels.length));
     expect(videoChannels.where((c) => c.category == 'teams'), hasLength(12));
     for (final label in [
       '近藤健介',

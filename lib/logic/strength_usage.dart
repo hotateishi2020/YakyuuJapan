@@ -314,6 +314,8 @@ List<String> rosterMoveLabels(Map<String, dynamic> player, int year) {
 /// March–September is treated as the playing season, October–February as off.
 String rosterMovePeriod(Map<String, dynamic> player, int year,
     {String? dateField, int? eventYear, bool offseason = false}) {
+  final explicitPeriod = player[dateField == 'arrival_as_of' ? 'arrival_period' : 'move_method_period'];
+  if (dateField != null && const ['昨オフ', '今季', '今オフ'].contains(explicitPeriod)) return '$explicitPeriod';
   final date = DateTime.tryParse(
       '${player[dateField ?? 'status_as_of'] ?? player['status_as_of'] ?? ''}');
   if (offseason) {

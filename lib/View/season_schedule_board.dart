@@ -10,13 +10,46 @@ import '../tools/json_utils.dart';
 import '../logic/season_schedule.dart';
 import 'EventCalendar.dart';
 
+Future<Map<String, dynamic>> _fetchSeasonSchedule(OrgConfig org, int year) async {
+  final response = await http.get(Env.api('/season-schedule?org=${org.kind.name}&year=$year'))
+      .timeout(const Duration(seconds: 25));
+  if (response.statusCode != 200) throw const FormatException('日程取得失敗');
+  return Map<String, dynamic>.from(jsonDecode(utf8.decode(response.bodyBytes)) as Map);
+}
+
+/// HOME week/month views share successful results for this app session.
+class HomeCalendarCache {
+  static final _saved = <String, Map<String, dynamic>>{};
+  static final _pending = <String, Future<Map<String, dynamic>>>{};
+  static String _key(OrgConfig org, int year) => '${org.kind.name}:$year';
+  static bool contains(OrgConfig org, int year) => _saved.containsKey(_key(org, year));
+  static Future<Map<String, dynamic>> read(OrgConfig org, int year) {
+    final key = _key(org, year);
+    final saved = _saved[key];
+    if (saved != null) return Future.value(saved);
+    return _pending.putIfAbsent(key, () async {
+      try {
+        final data = await _fetchSeasonSchedule(org, year);
+        if (data['pending'] != true) _saved[key] = data;
+        return data;
+      } finally {
+        _pending.remove(key);
+      }
+    });
+  }
+  @visibleForTesting
+  static void clear() { _saved.clear(); _pending.clear(); }
+}
+
 class SeasonScheduleLoader extends StatefulWidget {
   const SeasonScheduleLoader(
       {super.key,
       required this.org,
       required this.year,
       required this.builder,
-      this.calendarBuilder});
+      this.calendarBuilder,
+      this.reuseLoaded = false});
+  final bool reuseLoaded;
   final OrgConfig org;
   final int year;
   final Widget Function(List<Map<String, dynamic>>) builder;
@@ -40,14 +73,22 @@ class _SeasonScheduleLoaderState extends State<SeasonScheduleLoader>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _load();
-    _refreshTimer = Timer.periodic(const Duration(minutes: 1), (_) {
-      if (!_loading) _load(silent: true);
-    });
+    _configureRefresh();
+  }
+
+  void _configureRefresh() {
+    _refreshTimer?.cancel();
+    if (!widget.reuseLoaded) {
+      _refreshTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+        if (!_loading) _load(silent: true);
+      });
+    }
   }
 
   @override
   void didUpdateWidget(covariant SeasonScheduleLoader old) {
     super.didUpdateWidget(old);
+    if (old.reuseLoaded != widget.reuseLoaded) _configureRefresh();
     if (old.org.kind != widget.org.kind || old.year != widget.year) {
       _games = [];
       _events = [];
@@ -64,7 +105,7 @@ class _SeasonScheduleLoaderState extends State<SeasonScheduleLoader>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed && !_loading) _load(silent: true);
+    if (!widget.reuseLoaded && state == AppLifecycleState.resumed && !_loading) _load(silent: true);
   }
 
   Future<void> _load({bool silent = false}) async {
@@ -73,16 +114,13 @@ class _SeasonScheduleLoaderState extends State<SeasonScheduleLoader>
     if (!silent) {
       setState(() {
         _error = null;
-        _showLoading = true;
+        _showLoading = !widget.reuseLoaded || !HomeCalendarCache.contains(widget.org, widget.year);
       });
     }
     try {
-      final response = await http
-          .get(Env.api(
-              '/season-schedule?org=${widget.org.kind.name}&year=${widget.year}'))
-          .timeout(const Duration(seconds: 25));
-      if (response.statusCode != 200) throw const FormatException('日程取得失敗');
-      final data = jsonDecode(utf8.decode(response.bodyBytes));
+      final data = await (widget.reuseLoaded
+          ? HomeCalendarCache.read(widget.org, widget.year)
+          : _fetchSeasonSchedule(widget.org, widget.year));
       if (!mounted || request != _request) return;
       if (data['pending'] == true) {
         setState(() => _error = '${data['message']}');
@@ -154,6 +192,63 @@ class _SeasonCalendarBoardState extends State<SeasonCalendarBoard> {
               if (m.year != _year) setState(() => _year = m.year);
             },
           ));
+}
+
+/// HOMEでは両団体の試合とイベントを同じ月間カレンダーに表示する。
+class HomeSeasonCalendar extends StatefulWidget {
+  const HomeSeasonCalendar({super.key, required this.year, this.weekStart});
+  final int year;
+  final DateTime? weekStart;
+  @override
+  State<HomeSeasonCalendar> createState() => _HomeSeasonCalendarState();
+}
+
+class _HomeSeasonCalendarState extends State<HomeSeasonCalendar> {
+  late int _year = widget.year;
+  late DateTime? _weekStart = widget.weekStart;
+  @override
+  void didUpdateWidget(covariant HomeSeasonCalendar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.year != widget.year || oldWidget.weekStart != widget.weekStart) {
+      _year = widget.year;
+      _weekStart = widget.weekStart;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final years = _weekStart == null ? {_year} : {
+      _weekStart!.year,
+      _weekStart!.add(const Duration(days: 6)).year,
+    };
+    final sources = [for (final year in years)
+      for (final org in [OrgConfig.npb, OrgConfig.mlb]) (year: year, org: org)];
+    Widget load(int index, List<Map<String, dynamic>> games, List<Map<String, dynamic>> events) {
+      if (index < sources.length) {
+        final source = sources[index];
+        return SeasonScheduleLoader(
+          org: source.org, year: source.year, reuseLoaded: true,
+          builder: (_) => const SizedBox.shrink(),
+          calendarBuilder: (nextGames, nextEvents) => load(index + 1,
+              [...games, ...nextGames], [...events, ...nextEvents]),
+        );
+      }
+      return EventCalendar(
+        games: games,
+        weekStart: _weekStart,
+        onWeekChanged: (week) => setState(() => _weekStart = week),
+        events: {
+          for (final event in events)
+            '${event['title_event']}|${event['date_from_temp']}|${event['date_to']}|${event['event_category']}': event,
+        }.values.toList(),
+        initialMonth: DateTime(widget.year, widget.year == DateTime.now().year ? DateTime.now().month : 3),
+        onMonthChanged: (month) {
+          if (month.year != _year) setState(() => _year = month.year);
+        },
+      );
+    }
+    return load(0, [], []);
+  }
 }
 
 class InterleagueStandings extends StatelessWidget {

@@ -43,7 +43,7 @@ class Auth {
           AND (SELECT COUNT(*) FROM information_schema.columns
             WHERE table_schema = 'public' AND table_name = 'm_user'
               AND column_name IN ('nickname', 'name_handle', 'id_team_fav', 'id_player_fav',
-                'flg_notify_news', 'flg_notify_event', 'flg_admin', 'favorite_high_school')) = 8
+                'flg_notify_news', 'flg_notify_event', 'flg_admin', 'favorite_high_school', 'flg_special')) = 9
       ''');
       if (existing.isNotEmpty && existing.first[0] == true) {
         _schemaReady = true;
@@ -67,6 +67,8 @@ class Auth {
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS flg_notify_news BOOLEAN DEFAULT TRUE');
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS flg_notify_event BOOLEAN DEFAULT TRUE');
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS flg_admin BOOLEAN NOT NULL DEFAULT FALSE');
+      await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS flg_special BOOLEAN NOT NULL DEFAULT FALSE');
+      await conn.execute('UPDATE m_user SET flg_special = (id IN (1, 2)) WHERE flg_special IS DISTINCT FROM (id IN (1, 2))');
       await conn.execute('UPDATE m_user SET flg_admin = TRUE WHERE id = 1 AND COALESCE(flg_admin, FALSE) = FALSE');
       await conn.execute('''
         CREATE TABLE IF NOT EXISTS t_auth_code (
@@ -172,6 +174,7 @@ class Auth {
         'flg_read_news': row['flg_read_news'] ?? true,
         'flg_read_event': row['flg_read_event'] ?? true,
         'flg_admin': row['flg_admin'] ?? false,
+        'flg_special': row['flg_special'] ?? false,
       };
 
   static const _userSelect = '''
@@ -183,6 +186,7 @@ class Auth {
            COALESCE(u.flg_read_event, TRUE) AS flg_read_event,
            COALESCE(t.name_short, t.name_shortest, '') AS name_team_fav,
            COALESCE(u.flg_admin, FALSE) AS flg_admin,
+           COALESCE(u.flg_special, FALSE) AS flg_special,
            CASE
              WHEN p.id IS NULL THEN ''
              ELSE COALESCE(p.name_full, COALESCE(p.name_last, '') || COALESCE(p.name_first, ''))

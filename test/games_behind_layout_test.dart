@@ -15,6 +15,9 @@ void main() {
         'int_game': 10,
         'game_behind': behind,
         'pct_win': '.500',
+        'team_name_tateishi': '巨人',
+        'team_name_ejima': '阪神',
+        'runs_per_nine': '4.50',
       };
 
   final standings = [
@@ -49,12 +52,15 @@ void main() {
 
   testWidgets('横幅が広い順位表ではゲーム差を表の右に同じ高さで置く', (tester) async {
     await pump(tester, 1400);
+    for (final title in ['立', '江', '得点率']) {
+      expect(find.text(title), findsNothing);
+    }
     expect(find.byKey(const Key('standings-gb-beside')), findsOneWidget);
     final row = tester.getRect(find.byKey(const Key('standings-gb-beside')));
     final chart = tester.getRect(find.byType(GamesBehindChart));
     final games = tester.getRect(find.text('試合'));
     final era = tester.getRect(find.text('救援'));
-    final name = tester.getRect(find.text('巨人'));
+    final name = tester.getRect(find.text('巨人').first);
     expect(chart.left, greaterThan(row.center.dx));
     expect(chart.right, lessThanOrEqualTo(row.right + 1));
     expect((chart.height - row.height).abs(), lessThan(1));
@@ -128,11 +134,11 @@ void main() {
   });
 
   testWidgets('横幅が狭い順位表ではゲーム差を表の下に置く', (tester) async {
-    await pump(tester, 640);
+    await pump(tester, 375);
     expect(find.byKey(const Key('standings-gb-beside')), findsNothing);
     expect(find.byType(GamesBehindChart), findsOneWidget);
     final chart = tester.getRect(find.byType(GamesBehindChart));
-    final tableTop = tester.getTopLeft(find.text('巨人'));
+    final tableTop = tester.getTopLeft(find.text('巨人').first);
     expect(chart.top, greaterThan(tableTop.dy));
   });
 }

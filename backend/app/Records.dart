@@ -33,7 +33,7 @@ class Records {
       SELECT DISTINCT ON (s.year,s.id_team) s.year, s.id_team, s.id_league, s.int_rank, s.int_win, s.int_lose, s.int_draw,
         COALESCE(h.name_full,NULLIF(s.name_team,''),t.name_short) AS name,
         COALESCE(h.name_short,NULLIF(s.name_team,''),t.name_short) AS short_name,
-        COALESCE(h.name_shortest,s.name_shortest) AS name_shortest,
+        COALESCE(NULLIF(h.name_shortest,''),NULLIF(s.name_shortest,''),t.name_shortest) AS name_shortest,
         t.url_npb_players AS manager_team_url, t.name_short AS manager_team_name,
         CASE WHEN h.name_full='近畿グレートリング' THEN COALESCE(h.color_back,t.color_back) ELSE t.color_back END AS color_back,
         CASE WHEN h.name_full='近畿グレートリング' THEN COALESCE(h.color_font,t.color_font) ELSE t.color_font END AS color_font,h.logo_url,
@@ -461,6 +461,9 @@ List<Map<String, dynamic>> colorRecordTitles(List<Map<String, dynamic>> seasons,
           }
           // 資料ごとの表記ではなく、受賞年度の球団マスターの略称に統一する。
           final identity = seasonTeams.where((t) => t['id_team'] == source!['id_team']).firstOrNull;
+          final shortest = [identity?['name_shortest'], source['name_shortest']]
+              .map((value) => '${value ?? ''}'.trim()).where((value) => value.isNotEmpty).firstOrNull;
+          if (shortest != null) player['name_shortest'] = shortest;
           final displayName = [identity?['short_name'], identity?['name'], source['short_name'], source['team']]
               .map((value) => '${value ?? ''}'.trim()).where((value) => value.isNotEmpty).firstOrNull;
           if (displayName != null) player['team'] = displayName;

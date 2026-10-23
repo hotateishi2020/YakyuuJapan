@@ -138,6 +138,13 @@ void main() {
 
     expect(find.text('2026年　${predictSeasonHeader(2026)}'), findsOneWidget);
     expect(find.text(predictSeasonHeader(2026)), findsNWidgets(4));
+    final grids = tester.widgetList<Table>(find.byType(Table)).where((table) => table.columnWidths?.length == 4).toList();
+    expect(grids, hasLength(4));
+    for (final column in [0, 1]) {
+      final widths = grids.map((grid) => (grid.columnWidths![column] as FixedColumnWidth).value).toSet();
+      expect(widths, hasLength(1), reason: column == 0 ? '順位・スタッツ名の列幅を統一' : '日本一・チーム順位・個人成績の現在列幅を統一');
+    }
+
     expect(tester.getTopLeft(find.text('チーム順位予想')).dy, lessThan(tester.getTopLeft(find.text('個人成績予想')).dy));
     expect(find.text('NPB'), findsOneWidget);
     expect(tester.getTopLeft(find.text('日本一').first).dy, lessThan(tester.getTopLeft(find.text('沢村賞')).dy));

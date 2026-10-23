@@ -6,13 +6,14 @@ bool hasQualifiedBattingAppearances(Object? appearances, Object? games) {
   return pa != null && played != null && played > 0 && pa >= played * 31 ~/ 10;
 }
 
-/// Keep only confirmed qualifiers and re-rank within each league after filtering.
+/// MLB does not display RISP; retain and re-rank confirmed NPB qualifiers.
 void retainQualifiedRisp(List<Map<String, dynamic>> rows) {
   num? value(Map<String, dynamic> r) =>
       num.tryParse('${r['numeric_value'] ?? r['stats']}');
   rows.removeWhere((r) =>
       r['title'] == '得点圏打率' &&
-      (!hasQualifiedBattingAppearances(r['cnt_play'], r['int_game']) ||
+      ([3, 4].contains(int.tryParse('${r['id_league']}')) ||
+          !hasQualifiedBattingAppearances(r['cnt_play'], r['int_game']) ||
           value(r) == null ||
           !value(r)!.isFinite));
   final leagues = rows

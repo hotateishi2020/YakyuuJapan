@@ -524,7 +524,6 @@ class TeamSalaryShareBands extends StatelessWidget {
     padding: const EdgeInsets.fromLTRB(8, 16, 8, 16),
     child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Text('$year年度 球団総年俸の選手別割合', style: const TextStyle(fontWeight: FontWeight.bold)),
-      const Padding(padding: EdgeInsets.symmetric(vertical: 6), child: Text('帯の長さは球団総年俸、中の区画は選手別の割合です。通貨ごとに最大額の球団を基準に比較します。取得済みの推定額のみ集計。帯を押すと全選手の内訳を表示します。', style: TextStyle(fontSize: 11))),
       for (final team in teams) ...[
         Builder(builder: (context) {
           final groups = teamSalaryShares(team, year);
@@ -578,6 +577,7 @@ class TeamSalaryShareBands extends StatelessWidget {
           ]);
         }),
       ],
+      const Padding(padding: EdgeInsets.symmetric(vertical: 6), child: Text('帯の長さは球団総年俸、中の区画は選手別の割合です。通貨ごとに最大額の球団を基準に比較します。取得済みの推定額のみ集計。帯を押すと全選手の内訳を表示します。', style: TextStyle(fontSize: 11))),
     ]),
   );
   }

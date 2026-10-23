@@ -74,6 +74,9 @@ class VideoChannel {
 
 // Official channel identities verified on 2026-10-18. sourceUrl records provenance.
 const videoChannels = <VideoChannel>[
+  VideoChannel('UCWzEh28vj3mQKpe0fzVTOUw', 'パワプロ・プロスピ公式チャンネル', 'program',
+      'https://www.youtube.com/@pawapuroprospi',
+      tabLabel: 'パワプロ・プロスピ', includeStreams: true),
   VideoChannel('UCiLrlqt9mfRGeAugoYqON7g', '工藤公康 official YouTubeチャンネル', 'ob', 'https://www.youtube.com/@kimiyasukudo_official', tabLabel: '工藤公康', videoOrg: 'npb', unknownToNpb: true, contentFilter: 'baseball'),
   VideoChannel('UCwPaG8zQJvsCwiTstXcx8ng', 'B-モレル B桑', 'fan', 'https://www.youtube.com/channel/UCwPaG8zQJvsCwiTstXcx8ng', videoOrg: 'npb', unknownToNpb: true),
   VideoChannel('UCIgvsl9EWxnXzSm9aoXp-lQ', 'ギー太 ホークス応援チャンネル', 'fan', 'https://www.youtube.com/channel/UCIgvsl9EWxnXzSm9aoXp-lQ', videoOrg: 'npb', unknownToNpb: true),
@@ -175,6 +178,10 @@ const videoChannels = <VideoChannel>[
       'https://www.tnc.co.jp/sns/',
       teamIds: ['UCbDAmhyRx9bakv-0Gucglgg'],
       keywords: ['ホークス', 'ソフトバンク', 'ももスポ', 'sbhawks']),
+  VideoChannel('UCtZHY28ItSsyRJ2rnzgZCwQ', '夢スポチャンネル【FBSスポーツ×ホークス×アビスパ】', 'related',
+      'https://www.fbs.co.jp/sns/',
+      tabLabel: '夢スポ', contentFilter: 'baseball', videoOrg: 'npb', unknownToNpb: true,
+      teamIds: ['UCbDAmhyRx9bakv-0Gucglgg']),
   VideoChannel('UC4dDdVZGKxNTUF_jdlinfUA', '鷹BAKA軍団', 'related',
       'https://www.sportslive-plus.com/release/230306/',
       teamIds: ['UCbDAmhyRx9bakv-0Gucglgg']),

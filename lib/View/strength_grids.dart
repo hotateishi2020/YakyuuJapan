@@ -1,4 +1,9 @@
+import 'dart:convert';
+import 'package:flutter/services.dart';
+import '../logic/roster_transfer_status.dart';
+import '../logic/display_settings.dart';
 import 'strength_vertical_label.dart';
+import '../widgets/navigation_picker.dart';
 import 'compact_layout.dart';
 import 'team_section_layout.dart';
 import '../logic/roster_contract_status.dart';
@@ -11,9 +16,11 @@ import '../tools/color_parse.dart';
 import '../tools/json_utils.dart';
 
 class StrengthRegularGrid extends StatefulWidget {
-  const StrengthRegularGrid({super.key, required this.teams, this.battingOrder, this.teamHeader = '球団'});
-  /// 固定表示する場合のモード。球団ページでは両モードを並べる。
+  const StrengthRegularGrid({super.key, required this.teams, this.battingOrder, this.bench = false, this.columnWidth, this.teamHeader = '球団'});
+  /// 固定表示する場合のモード。球団ページでは守備位置・打順・代打代走のグリッドを並べる。
   final bool? battingOrder;
+  final bool bench;
+  final double? columnWidth;
   final String teamHeader;
   final List<Map<String, dynamic>> teams;
   @override
@@ -22,6 +29,8 @@ class StrengthRegularGrid extends StatefulWidget {
 
 class _StrengthRegularGridState extends State<StrengthRegularGrid> {
   bool _selectedBattingOrder = false;
+  bool _selectedBench = false;
+  bool get _bench => widget.bench || (widget.battingOrder == null && _selectedBench);
   bool get _battingOrder => widget.battingOrder ?? _selectedBattingOrder;
   final _horizontal = ScrollController();
   final _header = ScrollController();
@@ -49,14 +58,19 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
     super.dispose();
   }
 
-  Iterable<String> get _slots => _battingOrder
+  Iterable<String> get _slots => _bench
+      ? benchRegularSlots.keys
+      : _battingOrder
       ? [for (var i = 1; i <= 9; i++) '$i']
       : [
           if (widget.teamHeader == '年度' && widget.teams.any((t) => listMapFromJson(t['pitching_workload']).isEmpty && listMapFromJson(t['positions']).any((p) => p['slot'] == 'P'))) 'P',
           ...pitcherAceSlots.keys,
           ...usagePositions.keys.where((slot) => slot != 'P'),
-          ...benchRegularSlots.keys
         ];
+  int get _positionSlotCount => pitcherAceSlots.length + usagePositions.length - 1 +
+      (widget.teamHeader == '年度' && widget.teams.any((t) => listMapFromJson(t['pitching_workload']).isEmpty && listMapFromJson(t['positions']).any((p) => p['slot'] == 'P')) ? 1 : 0);
+  double _commonColumnWidth(double width, bool hideTeam) =>
+      (width / (_positionSlotCount + (hideTeam ? 0 : 1))).clamp(128.0, double.infinity);
   Color _positionColor(String slot) => switch (slot) {
         'PH_L' ||
         'PH_R' ||
@@ -77,22 +91,21 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              for (final battingOrder in [false, true]) ...[
+              for (final mode in [0, 1, 2]) ...[
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Text(battingOrder ? '打順別' : '守備位置別',
+                  child: Text(['守備位置別', '打順別', '代打・代走・代守'][mode],
                       style: const TextStyle(fontWeight: FontWeight.bold)),
                 ),
-                if (battingOrder && !compactBaseballLayout(context))
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: SizedBox(
-                      width: 9 * 128.0,
-                      child: StrengthRegularGrid(teams: widget.teams, battingOrder: true),
-                    ),
-                  )
-                else
-                  StrengthRegularGrid(teams: widget.teams, battingOrder: battingOrder),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: SizedBox(
+                    width: compactBaseballLayout(context) ? constraints.maxWidth :
+                      (mode == 0 ? _positionSlotCount : mode == 1 ? 9 : benchRegularSlots.length) * _commonColumnWidth(constraints.maxWidth, true),
+                    child: StrengthRegularGrid(teams: widget.teams, battingOrder: mode == 1, bench: mode == 2,
+                      columnWidth: _commonColumnWidth(constraints.maxWidth, true)),
+                  ),
+                ),
               ],
             ],
           );
@@ -100,24 +113,36 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
         final compact = compactBaseballLayout(context);
         final hideTeam = TeamSectionLayout.embedded(context);
         final transpose = hideTeam && compact;
-        final teamWidth = compact ? 30.0 : (constraints.maxWidth / (_slots.length + 1)).clamp(128.0, double.infinity);
-        final columnWidth = (constraints.maxWidth / (_slots.length + (hideTeam ? 0 : 1)))
-            .clamp(128.0, double.infinity);
+        final columnWidth = widget.columnWidth ?? _commonColumnWidth(constraints.maxWidth, hideTeam);
+        final teamWidth = compact ? 30.0 : columnWidth;
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) _syncHeader();
         });
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (!TeamSectionLayout.embedded(context) && widget.battingOrder == null) Wrap(spacing: 8, children: [
+            if (!TeamSectionLayout.embedded(context) && widget.battingOrder == null)
+              if (NavigationPickerScope.enabled(context))
+                NavigationPicker(level: 3,
+                  labels: const {0: '守備位置別', 1: '打順別', 2: '代打・代走・代守'},
+                  value: _bench ? 2 : _battingOrder ? 1 : 0,
+                  onChanged: (value) => setState(() {
+                    _selectedBattingOrder = value == 1;
+                    _selectedBench = value == 2;
+                  }), color: Colors.blueGrey, foreground: Colors.white)
+              else Wrap(spacing: 8, children: [
               ChoiceChip(
                   label: const Text('守備位置別'),
-                  selected: !_battingOrder,
-                  onSelected: (_) => setState(() => _selectedBattingOrder = false)),
+                  selected: !_battingOrder && !_bench,
+                  onSelected: (_) => setState(() { _selectedBattingOrder = false; _selectedBench = false; })),
               ChoiceChip(
                   label: const Text('打順別'),
-                  selected: _battingOrder,
-                  onSelected: (_) => setState(() => _selectedBattingOrder = true)),
+                  selected: _battingOrder && !_bench,
+                  onSelected: (_) => setState(() { _selectedBattingOrder = true; _selectedBench = false; })),
+              ChoiceChip(
+                  label: const Text('代打・代走・代守'),
+                  selected: _bench,
+                  onSelected: (_) => setState(() { _selectedBattingOrder = false; _selectedBench = true; })),
             ]),
             if (!hideTeam) Row(children: [
               if (!hideTeam) _fixedCell(widget.teamHeader, Colors.grey.shade200, Colors.black87,
@@ -179,7 +204,7 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
                             controller: _horizontal,
                             scrollDirection: Axis.horizontal,
                             child: Table(
-                              key: ValueKey(transpose ? 'regular-vertical-table-$_battingOrder' : 'regular-table-$_battingOrder'),
+                              key: ValueKey(transpose ? 'regular-vertical-table-${_bench ? 'bench' : _battingOrder}' : 'regular-table-${_bench ? 'bench' : _battingOrder}'),
                               defaultColumnWidth: FixedColumnWidth(columnWidth),
                               columnWidths: transpose ? {0: const FixedColumnWidth(80), for (var i=0;i<widget.teams.length;i++) i+1: const FlexColumnWidth()} : null,
                               border:
@@ -351,20 +376,134 @@ class StrengthRosterGrid extends StatefulWidget {
 class _StrengthRosterGridState extends State<StrengthRosterGrid> {
   Map<String, dynamic> get team => widget.team;
   int get year => widget.year;
-  bool _usageOrder = true;
+  List<Map<String, dynamic>> _draftPicks = [];
+  String? _draftError;
   @override
-  Widget build(BuildContext context) => Column(children: [
+  void initState() {
+    super.initState();
+    _loadTransferDrafts();
+  }
+  @override
+  void didUpdateWidget(covariant StrengthRosterGrid oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.year != year) _loadTransferDrafts();
+  }
+  Future<void> _loadTransferDrafts() async {
+    final requestedYear = year;
+    _draftPicks = [];
+    _draftError = null;
+    try {
+      final sources = await Future.wait([
+        rootBundle.loadString('backend/assets/data/draft_history.json'),
+        rootBundle.loadString('backend/assets/data/active_draft_history.json'),
+      ]);
+      final picks = <Map<String, dynamic>>[];
+      for (final source in sources) {
+        final data = jsonDecode(source) as Map;
+        final entry = (data['years'] as Map?)?['$requestedYear'];
+        if (entry is Map) picks.addAll(listMapFromJson(entry['picks']));
+      }
+      if (mounted && requestedYear == year) setState(() => _draftPicks = picks);
+    } catch (_) {
+      if (mounted && requestedYear == year) setState(() => _draftError = 'ドラフト指名選手を読み込めませんでした');
+    }
+  }
+  int _rosterView = 1;
+  bool get _usageOrder => _rosterView != 0;
+  @override
+  Widget build(BuildContext context) => ValueListenableBuilder<Set<String>>(
+      valueListenable: DisplaySettings.instance,
+      builder: (context, _, child) => Column(children: [
         Row(children: [
-          for (final usage in [false, true])
+          for (final view in [0, 1, 2])
             Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: ChoiceChip(
-                    label: Text(usage ? '起用順' : '年齢順'),
-                    selected: _usageOrder == usage,
-                    onSelected: (_) => setState(() => _usageOrder = usage))),
+                    label: Text(['年齢順', '起用順', '移籍状況'][view]),
+                    selected: _rosterView == view,
+                    onSelected: (_) => setState(() => _rosterView = view))),
         ]),
-        SectionExpanded(child: _grid(context)),
-      ]);
+        SectionExpanded(child: _rosterView == 2 ? _transfers(context) : _grid(context)),
+      ]));
+  Widget _transfers(BuildContext context) {
+    final groups = List.generate(3, (_) => <Map<String, dynamic>>[]);
+    for (final player in rosterWithDraftArrivals(listMapFromJson(team['roster']), _draftPicks, team, year)) {
+      groups[rosterTransferBlock(player, team, year)].add(player);
+    }
+    for (final group in groups) {
+      group.sort((a, b) => compareRosterUsage(a, b, team));
+    }
+    int arrivalOrder(Map<String, dynamic> p) {
+      final pos = rosterPosition(p, team);
+      if (_pitching(pos) || p['position_group'] == '投手') return 0;
+      if (pos == '捕手' || p['position_group'] == '捕手') return 1;
+      if (['一塁', '二塁', '三塁', '遊撃', '内野手'].contains(pos)) return 2;
+      if (['左翼', '中堅', '右翼', '外野手'].contains(pos)) return 3;
+      return 4;
+    }
+    groups[0].sort((a, b) {
+      final transfer = rosterArrivalGroupPriority(a).compareTo(rosterArrivalGroupPriority(b));
+      if (transfer != 0) return transfer;
+      final order = arrivalOrder(a).compareTo(arrivalOrder(b));
+      return order != 0 ? order : compareRosterArrivalDraft(a, b, team);
+    });
+    const positions = ['投手', '捕手', '一塁', '二塁', '三塁', '遊撃', '左翼', '中堅', '右翼'];
+    String residentPosition(Map<String, dynamic> p) {
+      final pos = rosterPosition(p, team);
+      return _pitching(pos) ? '投手' : pos;
+    }
+    Widget residents() => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        for (final pos in positions)
+          Expanded(child: Padding(
+            key: ValueKey('transfer-resident-$pos'),
+            padding: const EdgeInsets.symmetric(horizontal: 2),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              Container(height: 32, alignment: Alignment.center,
+                color: _positionColor(pos),
+                child: Text(pos, style: TextStyle(color: _positionForeground(pos), fontSize: 12))),
+              const SizedBox(height: 4),
+              for (final p in groups[1].where((p) => residentPosition(p) == pos)) _player(p, pos),
+            ]),
+          )),
+      ]),
+      if (groups[1].any((p) => !positions.contains(residentPosition(p)))) ...[
+        const Text('守備位置未確認', style: TextStyle(fontSize: 11)),
+        for (final p in groups[1].where((p) => !positions.contains(residentPosition(p))))
+          _player(p, residentPosition(p)),
+      ],
+    ]);
+    const titles = ['入団選手', '在籍選手', '退団確定'];
+    const descriptions = ['開幕後の加入・翌年度の新戦力', '開幕時の所属選手・移籍未確定', '移籍・引退・戦力外など確定済み'];
+    const colors = [Colors.green, Colors.blue, Colors.grey];
+    return LayoutBuilder(builder: (context, constraints) {
+      final width = constraints.maxWidth.clamp(1352.0, double.infinity);
+      return sectionScrollView(context, child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: SizedBox(width: width, child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [for (var index = 0; index < 3; index++)
+            Expanded(flex: index == 1 ? 9 : 2, child: Container(
+              key: ValueKey('roster-transfer-block-$index'),
+              margin: const EdgeInsets.all(4),
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(color: colors[index].withValues(alpha: .08), borderRadius: BorderRadius.circular(6)),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                Text('${titles[index]}（${groups[index].length}人）', style: TextStyle(fontWeight: FontWeight.bold, color: colors[index])),
+                Text(descriptions[index], style: const TextStyle(fontSize: 11)),
+                const SizedBox(height: 8),
+                if (index == 0 && _draftError != null) Text(_draftError!),
+                if (groups[index].isEmpty) const Text('該当選手なし'),
+                if (index == 1) residents()
+                else for (final player in groups[index]) _player(player, rosterPosition(player, team)),
+              ]),
+            )),
+          ],
+        )),
+      ));
+    });
+  }
+
   static const _minColumnWidth = 104.0 * 0.7;
   Widget _grid(BuildContext context) {
     final roster = listMapFromJson(team['roster']);
@@ -604,6 +743,7 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
   Widget _player(Map<String, dynamic> p, String position) {
     final uniformNumber = '${p['uniform_number'] ?? ''}'.trim();
     final departure = rosterDepartureLabel(p);
+    final muteDeparture = departure != null && _rosterView != 2;
     final moveLabels = <String>{
       ...rosterMoveLabels(p, year).where((label) =>
           !['国内FA権保有', '海外FA権保有', 'FA権保有'].contains(label)),
@@ -616,6 +756,7 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
     final firstTeamRow = _usageOrder && rosterMainLevel(p) == 1;
     final leadership = rosterLeadershipRoles(p, team, year);
     final marks = [
+      if (p['flg_injury'] == true && DisplaySettings.instance.shows('flg_injury')) '🤕',
       if (usageInt(p['contract_end_year']) == year) '契',
       if (p['departure_confirmed'] == true) '退'
     ];
@@ -627,6 +768,7 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
           if (p['status_as_of'] != null) '確認日：${p['status_as_of']}',
           if (newArrival) '前所属：${former['name'] ?? '未確認'}',
           if (p['status_source'] != null) '出典：${p['status_source']}',
+          if (p['arrival_label_source'] != null) '入団情報：${p['arrival_label_source']}',
           if (p['level_appearances'] is Map)
             '出場数：${(p['level_appearances'] as Map).entries.map((e) => '${e.key}軍 ${e.value}').join('／')}',
         ].join('\n'),
@@ -635,13 +777,13 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
           margin: const EdgeInsets.only(bottom: 4),
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-              color: departure != null
+              color: muteDeparture
                   ? Colors.white
                   : Color.lerp(Colors.white, _positionColor(position),
                       rosterCardTint(p)),
               borderRadius: BorderRadius.circular(4)),
           child: DefaultTextStyle.merge(
-              style: TextStyle(color: departure != null ? Colors.grey : null),
+              style: TextStyle(color: muteDeparture ? Colors.grey : null),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -678,6 +820,7 @@ class _StrengthRosterGridState extends State<StrengthRosterGrid> {
                         color: label.contains('未定') || label.contains('権保有') ? Colors.amber.shade100 : Colors.blue.shade50,
                         child: _fitRosterText(rosterTimedMoveLabel(label, p, year), bold: true, color: Colors.black87),
                       )),
+                    if (_rosterView == 2 && p['draft_status'] != null) _fitRosterText('${p['draft_status']}'),
                     if (departure != null)
                       _fitRosterText('${rosterMovePeriod(p, year, dateField: 'departure_as_of')} $departure', color: Colors.red, bold: true),
                     if (rosterUsageUnknown(p, team)) _fitRosterText('（起用不明）'),
@@ -719,7 +862,7 @@ class _WideGridState extends State<_WideGrid> {
         controller: _controller,
         thumbVisibility: true,
         scrollbarOrientation: ScrollbarOrientation.top,
-        child: sectionScrollView(context, 
+        child: SingleChildScrollView(
             controller: _controller,
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.only(top: 12),

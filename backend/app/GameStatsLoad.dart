@@ -5,10 +5,14 @@ import 'GameFetchSchedule.dart';
 
 /// t_game.flg_stats_loaded — 終了試合の選手成績（出場成績＋打席）を取り終えたか。
 class GameStatsLoad {
-  /// 進行中は毎回取る。完了済みは取らない。
-  static bool needsRefresh({required bool live, required bool loaded}) {
-    if (live) return true;
-    return !loaded;
+  /// 全成績は試合終了後、保存が完了するまでだけ取得する。
+  static bool needsRefresh({required bool finished, required bool loaded}) {
+    return finished && !loaded;
+  }
+
+  static Future<bool> canFetchDetails(Connection conn, int gameId) async {
+    final rows = await conn.execute("SELECT state, COALESCE(flg_stats_loaded, FALSE) FROM t_game WHERE id = \$1", parameters: [gameId]);
+    return rows.isNotEmpty && needsRefresh(finished: '${rows.first[0]}'.contains('試合終了'), loaded: rows.first[1] == true);
   }
 
   /// 試合終了で勝利投手がいるのに、出場成績の勝・負・H・Sが一人も無い。
@@ -170,8 +174,15 @@ class GameStatsLoad {
             updat = NOW()
         WHERE g.id = \$1::int
           AND COALESCE(g.flg_stats_loaded, FALSE) = FALSE
-          AND EXISTS (
-            SELECT 1 FROM t_game_summary s WHERE s.id_game = g.id
+          AND NOT EXISTS (
+            SELECT 1 FROM (VALUES (g.id_team_home), (g.id_team_away)) AS teams(id)
+            WHERE NOT EXISTS (
+              SELECT 1 FROM t_game_summary s JOIN m_player p ON p.id = s.id_player
+              WHERE s.id_game = g.id AND p.id_team = teams.id AND s.int_batting > 0
+            ) OR NOT EXISTS (
+              SELECT 1 FROM t_game_summary s JOIN m_player p ON p.id = s.id_player
+              WHERE s.id_game = g.id AND p.id_team = teams.id AND (s.int_pitch > 0 OR s.double_inning_pitch > 0)
+            )
           )
           AND EXISTS (
             SELECT 1 FROM t_game_details d

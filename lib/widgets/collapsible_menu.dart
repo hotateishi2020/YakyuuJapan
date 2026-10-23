@@ -1,3 +1,4 @@
+import 'navigation_picker.dart';
 import 'package:flutter/material.dart';
 import '../config/app_design.dart';
 import 'package:flutter/rendering.dart';
@@ -109,6 +110,9 @@ class _MenuBandState extends State<MenuBand> {
 
   @override
   Widget build(BuildContext context) {
+    if (NavigationPickerScope.enabled(context)) {
+      return NavigationPickerLevel(level: widget.level, child: widget.child);
+    }
     final state = model;
     if (state == null) return widget.child;
     final reduced = MediaQuery.disableAnimationsOf(context);
@@ -274,5 +278,5 @@ class MenuGap extends StatelessWidget {
   const MenuGap({super.key, required this.height});
   final double height;
   @override
-  Widget build(BuildContext context) => MenuBand(toggle: false, child: SizedBox(height: height));
+  Widget build(BuildContext context) => NavigationPickerScope.enabled(context) ? const SizedBox.shrink() : MenuBand(toggle: false, child: SizedBox(height: height));
 }

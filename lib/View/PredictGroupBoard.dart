@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import '../config/org_config.dart';
 import '../logic/predict_groups.dart';
 import '../tools/color_parse.dart';
+import '../widgets/special_media.dart';
+import 'GamesBoard.dart' show teamLogoVisual, teamLogoImage;
 
 const predictSelectLabels = {
   'FREE': '自由選択',
@@ -409,6 +411,12 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
     final japan = group['japan'] is Map ? Map<String, dynamic>.from(group['japan'] as Map) : null;
     final sawamura = players.where((row) => '${row['title'] ?? ''}' == '沢村賞').toList();
     final leaguePlayers = [for (final row in players) if ('${row['title'] ?? ''}' != '沢村賞') row];
+    final labels = ['日本一', for (final row in teams) '${_asInt(row['rank'])}位', for (final row in players) '${row['title'] ?? ''}'];
+    final minimumWidths = [
+      labels.map(_predictionHeaderWidth).fold<double>(32, (width, next) => next > width ? next : width) + 20,
+      _predictionHeaderWidth(resultHeader),
+      for (final user in users) _predictionHeaderWidth(_userName(user)),
+    ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -454,6 +462,7 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
                 const SizedBox(height: 4),
                 _pickTable(
                   users: users,
+                  minimumWidths: minimumWidths,
                   rows: [
                     {
                       'title': '日本一',
@@ -478,6 +487,7 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
                   const SizedBox(height: 8),
                   _leagueSections(
                     users: users,
+                  minimumWidths: minimumWidths,
                     rows: teams,
                     resultHeader: resultHeader,
                     titleOf: (row) => '${_asInt(row['rank'])}位',
@@ -493,6 +503,7 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
             color: const Color(0xFFFFF3E0),
             child: _leagueSections(
               users: users,
+              minimumWidths: minimumWidths,
               rows: leaguePlayers,
               resultHeader: resultHeader,
               titleOf: (row) => '${row['title'] ?? ''}',
@@ -525,6 +536,7 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
   }
 
   Widget _leagueSections({
+    required List<double> minimumWidths,
     required List<Map<String, dynamic>> users,
     required List<Map<String, dynamic>> rows,
     required String resultHeader,
@@ -547,6 +559,7 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
           const SizedBox(height: 4),
           _pickTable(
             users: users,
+            minimumWidths: minimumWidths,
             rows: _mvpFirst([for (final row in rows) if (_leagueLabel(row) == order[i]) row]),
             resultHeader: resultHeader,
             titleOf: titleOf,
@@ -761,7 +774,18 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
   }
 
+  double _predictionHeaderWidth(String text) {
+    final painter = TextPainter(
+      text: TextSpan(text: text, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, height: 1.2)),
+      textDirection: Directionality.of(context), textScaler: MediaQuery.textScalerOf(context),
+    )..layout();
+    final width = painter.width.ceilToDouble() + 14;
+    painter.dispose();
+    return width;
+  }
+
   Widget _pickTable({
+    required List<double> minimumWidths,
     required List<Map<String, dynamic>> users,
     required List<Map<String, dynamic>> rows,
     required String Function(Map<String, dynamic> row) titleOf,
@@ -779,6 +803,7 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
       Color? background,
       List<Color?>? nameColors,
       bool names = false,
+      bool team = false,
     }) {
       final foreground = background == headerBackground
           ? (color == null ? Colors.white : Color.lerp(color, Colors.white, .75)!)
@@ -791,7 +816,7 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 9),
           alignment: Alignment.center,
           color: fill,
-          child: players.isNotEmpty ? predictPlayerLabels(players, style) : names ? _fitNames(text, style, colors: nameColors) : Text(text.isEmpty ? '—' : text, textAlign: TextAlign.center, style: style, softWrap: background != headerBackground),
+          child: team ? predictTeamLabels(text, style) : players.isNotEmpty ? predictPlayerLabels(players, style, showStanding: names && !hit) : names ? _fitNames(text, style, colors: nameColors) : Text(text.isEmpty ? '—' : text, textAlign: TextAlign.center, style: style, softWrap: background != headerBackground),
         ),
       );
     }
@@ -819,20 +844,6 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
       );
     }
 
-    double headerWidth(String text) {
-      final painter = TextPainter(
-        text: TextSpan(text: text, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, height: 1.2)),
-        textDirection: Directionality.of(context), textScaler: MediaQuery.textScalerOf(context),
-      )..layout();
-      final width = painter.width.ceilToDouble() + 14;
-      painter.dispose();
-      return width;
-    }
-    final minimumWidths = [
-      rows.fold<double>(32, (width, row) => headerWidth(titleOf(row)) > width ? headerWidth(titleOf(row)) : width),
-      headerWidth(resultHeader),
-      for (final user in users) headerWidth(_userName(user)),
-    ];
     final minimumWidth = minimumWidths.fold<double>(0, (sum, width) => sum + width);
     return LayoutBuilder(builder: (context, constraints) {
       final width = constraints.maxWidth > minimumWidth ? constraints.maxWidth : minimumWidth;
@@ -875,9 +886,10 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
               background: headerBackground,
 
               names: true,
+              team: row['rank'] != null || row['title'] == '日本一',
               players: _maps(row['current_players']),
             ),
-            for (final user in users) cell(pickName(row, user), hit: pickHit(row, user), players: _maps(row['picks']).where((p) => _asInt(p['id_user']) == _asInt(user['id']) && '${p['team_shortest'] ?? ''}'.isNotEmpty).toList(), names: true),
+            for (final user in users) cell(pickName(row, user), team: row['rank'] != null || row['title'] == '日本一', hit: pickHit(row, user), players: _maps(row['picks']).where((p) => _asInt(p['id_user']) == _asInt(user['id'])).toList(), names: true),
           ]),
       ],
       ),
@@ -922,12 +934,45 @@ Widget _fitLine(String text, TextStyle style) {
   );
 }
 
-Widget predictPlayerLabels(List<Map<String, dynamic>> players, TextStyle style) => Column(
+Widget _predictionLogo(String name, {String? abbrev}) {
+  final logo = teamLogoVisual(name, abbrev: abbrev);
+  if (logo.asset == null && logo.networkUrl == null) return const SizedBox.shrink();
+  return SpecialMedia(child: Padding(
+    padding: const EdgeInsets.only(right: 4),
+    child: SizedBox(width: 24, height: 24,
+      child: teamLogoImage(asset: logo.asset, networkUrl: logo.networkUrl)),
+  ));
+}
+
+Widget predictTeamLabels(String text, TextStyle style) => Column(
+  mainAxisSize: MainAxisSize.min,
+  children: [for (final name in _nameLines(text)) FittedBox(
+    fit: BoxFit.scaleDown,
+    child: Row(mainAxisSize: MainAxisSize.min, children: [
+      _predictionLogo(name), Text(name, style: style),
+    ]),
+  )],
+);
+
+String predictionStandingLabel(Map<String, dynamic> player) {
+  if (player['hit'] == true) return '';
+  final rank = int.tryParse('${player['actual_rank']}');
+  if (rank != null && rank > 0 && rank < 1000) return '（リーグ$rank位）';
+  if (rank == 1000) {
+    final title = '${player['stats_title'] ?? ''}';
+    return ['打率', '防御率', '出塁率', '勝率', '最高出塁率', '最高勝率', '最優秀防御率'].contains(title)
+        ? '（規定未到達）' : '（順位圏外）';
+  }
+  return '';
+}
+
+Widget predictPlayerLabels(List<Map<String, dynamic>> players, TextStyle style, {bool showStanding = false}) => Column(
   mainAxisSize: MainAxisSize.min,
   children: [for (final player in players)
-    Padding(padding: const EdgeInsets.symmetric(vertical: 1), child: FittedBox(
+    Padding(padding: const EdgeInsets.symmetric(vertical: 1), child: Column(mainAxisSize: MainAxisSize.min, children: [FittedBox(
       fit: BoxFit.scaleDown,
       child: Row(mainAxisSize: MainAxisSize.min, children: [
+        _predictionLogo('${player['team_name'] ?? ''}', abbrev: '${player['team_shortest'] ?? ''}'),
         if ('${player['team_shortest'] ?? ''}'.isNotEmpty) ...[
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
@@ -938,7 +983,10 @@ Widget predictPlayerLabels(List<Map<String, dynamic>> players, TextStyle style) 
         ],
         Text('${player['player_name'] ?? player['name'] ?? ''}', style: style),
       ]),
-    )),
+    ),
+      if (showStanding && predictionStandingLabel(player).isNotEmpty)
+        _fitLine(predictionStandingLabel(player), const TextStyle(fontSize: 10, color: Colors.grey, height: 1.3)),
+    ])),
   ],
 );
 

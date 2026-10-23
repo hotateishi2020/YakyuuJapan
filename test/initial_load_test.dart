@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:Yakyuu_Japan/pages/prediction_page.dart';
+import 'package:Yakyuu_Japan/widgets/navigation_picker.dart';
 
 void main() {
   testWidgets('順位の初回応答を待たずに個人成績を取得する', (tester) async {
@@ -24,8 +25,9 @@ void main() {
     });
     await http.runWithClient(() async {
       await tester.pumpWidget(const MaterialApp(home: Scaffold(body: PredictionPage())));
-      await tester.pump();
-      await tester.pump();
+      for (var i = 0; i < 10; i++) {
+        await tester.pump(const Duration(milliseconds: 20));
+      }
       expect(standings.isCompleted, isFalse);
       expect(parts, contains('players'));
       expect(parts.where((part) => part == 'players'), hasLength(1));
@@ -110,22 +112,23 @@ void main() {
 
     await http.runWithClient(() async {
       await tester.pumpWidget(const MaterialApp(home: Scaffold(body: PredictionPage())));
-      await tester.pump();
-      await tester.pump();
+      for (var i = 0; i < 10; i++) {
+        await tester.pump(const Duration(milliseconds: 20));
+      }
 
       expect(games.isCompleted, isFalse);
       expect(requested, containsAll(['games', 'standings', 'players', 'info']));
       expect(requested.where((part) => part == 'standings'), hasLength(1));
-      expect(find.text('チーム順位'), findsOneWidget);
-      expect(find.text('個人成績'), findsOneWidget);
-      await tester.tap(find.text('チーム順位'));
+      final picker = tester.widgetList<NavigationPicker>(find.byType(NavigationPicker)).firstWhere((picker) => picker.labels.values.any((label) => label.contains('チーム順位')));
+      expect(picker.labels.values.any((label) => label.contains('チーム順位')), isTrue);
+      expect(picker.labels.values.any((label) => label.contains('個人成績')), isTrue);
       await tester.pump();
       expect(tester.takeException(), isNull);
 
       // 遅い試合取得が失敗しても、既に表示した順位タブは残す。
       games.complete(http.Response('{}', 503));
       await tester.pump();
-      expect(find.text('チーム順位'), findsOneWidget);
+      expect(find.byKey(const ValueKey('navigation-picker-1')), findsOneWidget);
       expect(find.text('HTTPエラー: 503'), findsNothing);
       expect(tester.takeException(), isNull);
 

@@ -42,13 +42,16 @@ void main() {
       ],
       'players': [
         {'int_year': 2026, 'id_predict_setting': 1, 'id_user': 9, 'id_league': 1, 'id_stats': 5, 'id_player': 100, 'player_name': '一位A', 'team_shortest': 'ヤ', 'title': '打率'},
-        {'int_year': 2026, 'id_predict_setting': 2, 'id_user': 9, 'id_league': 1, 'id_stats': 5, 'id_player': 102, 'player_name': '別選手', 'title': '打率'},
+        {'int_year': 2026, 'id_predict_setting': 2, 'id_user': 9, 'id_league': 1, 'id_stats': 5, 'id_player': 102, 'player_name': '別選手', 'title': '打率', 'actual_rank': 3},
       ],
     });
     final groups = await PredictGroup.aggregate(conn, years: {2026});
     expect(groups, hasLength(2));
     expect((groups[0]['users'] as List).single['hits'], 1);
     expect((groups[1]['users'] as List).single['hits'], 0);
+    final missed = ((groups[1]['players'] as List).single['picks'] as List).single;
+    expect(missed['actual_rank'], 3);
+    expect(missed['stats_title'], '打率');
     final current = (groups[0]['players'] as List).single;
     expect(current['current'], '一位A、一位B');
     expect((current['current_players'] as List).map((p) => p['team_shortest']), ['ヤ', '神']);

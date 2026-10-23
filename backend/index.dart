@@ -1,3 +1,8 @@
+import 'app/AdminLogQuery.dart';
+import 'app/InjuryList.dart';
+import 'app/HomeDashboard.dart';
+import 'app/VisitorSummary.dart';
+import 'app/RequestMetrics.dart';
 import 'app/SnapshotWork.dart';
 import 'app/HomeRunVideoSearch.dart';
 import 'app/AdminNews.dart';
@@ -58,6 +63,36 @@ import 'app/PlayerStatsSchedule.dart';
 import 'app/PredictGroup.dart';
 import 'app/PredictionSnapshot.dart';
 import 'app/GameFetchSchedule.dart';
+
+/// HOME reads existing snapshots and completed box scores; it never starts a fetch.
+Future<Map<String, dynamic>> readHomeDashboard() async {
+  final now = DateTime.now().toUtc().add(const Duration(hours: 9));
+  final today = _ymdOf(now);
+  final until = _ymdOf(now.add(const Duration(days: 6)));
+  final results = await Future.wait([
+    _buildPredictionsPartInfo(OrgKind.npb),
+    _buildPredictionsPartGames(OrgKind.npb, now.year, from: today, to: until),
+    _buildPredictionsPartGames(OrgKind.mlb, now.year, from: today, to: until),
+    Postgres.withConnection((conn) async => <String, dynamic>{'stats_player': await DisplaySnapshot.players(conn, now.year)}),
+  ]);
+  final games = <Map<String, dynamic>>[
+    for (final index in [1, 2])
+      for (final game in results[index]['games'] as List)
+        {...Map<String, dynamic>.from(game as Map), 'org': index == 1 ? 'NPB' : 'MLB'},
+  ];
+  final lines = await Postgres.withConnection((conn) => homeHeroLines(conn, today));
+  return {
+    'today': today,
+    'notification': results[0]['notification'],
+    'events': results[0]['events'],
+    'games': [for (final game in games) {
+      for (final key in ['id_game', 'org', 'date_game', 'time_game', 'state', 'name_team_home', 'name_team_away', 'score_home', 'score_away']) key: game[key],
+    }],
+    'heroes': [for (final game in games.where((g) => g['date_game'] == today))
+      if (homeHero(game, lines) case final hero?) {...hero, 'id_game': game['id_game'], 'org': game['org']}],
+    'leaders': homeLeaders([for (final row in results[3]['stats_player'] as List) Map<String, dynamic>.from(row as Map)]),
+  };
+}
 
 /// /predictions 用の短TTLキャッシュ（同一プロセス内・団体別）
 final Map<String, String> _predictionsCacheBody = {};
@@ -331,6 +366,7 @@ Future<Map<String, dynamic>> _buildPredictionsPartGames(
   final fieldingErrors = fieldingErrorsByGame(snap.batting);
   for (final game in games) {
     game['lineup'] = lineups[_asInt(game['id_game'])] ?? const <Map<String, dynamic>>[];
+    game['batting_summary'] = [for (final line in battingLines.values) if (_asInt(line['id_game']) == _asInt(game['id_game'])) {for (final key in ['id_team', 'name_full', 'int_batting', 'int_hit1', 'int_homerun', 'int_steal_base']) key: line[key]}];
     game['fielding_errors'] = fieldingErrors[_asInt(game['id_game'])] ?? const <Map<String, dynamic>>[];
     _useAnnouncedLineup(game);
   }
@@ -1078,6 +1114,12 @@ void main() async {
 
     // ====== API ======
 
+    app.get('/home', (Request request) async {
+      return tryCatchAPIReadonly(request, 'HOME', 'READ', () async {
+        return Response.ok(jsonEncode(await readHomeDashboard()), headers: {'content-type': 'application/json; charset=utf-8'});
+      });
+    });
+
     app.get('/healthz', (Request _) => Response.ok('ok'));
 
     app.get('/player-art/<filename>', (Request request, String filename) async {
@@ -1236,6 +1278,14 @@ void main() async {
         _printRequestError(request, error, stack);
         return Response.internalServerError(body: jsonEncode({'error': '記録情報を取得できませんでした'}), headers: headers);
       }
+    });
+
+    app.get('/injuries', (Request request) async {
+      return tryCatchAPIReadonly(request, 'INJURIES', 'READ', () async {
+        final org = OrgKind.parse(request.url.queryParameters['org']);
+        final rows = await Postgres.withConnection((conn) => InjuryList.read(conn, leagueIds: org.leagueIds));
+        return Response.ok(jsonEncode({'players': rows}), headers: {'content-type': 'application/json; charset=utf-8'});
+      });
     });
 
     app.get('/team-strength', (Request request) async {
@@ -1717,7 +1767,15 @@ void main() async {
           'http_status': 200,
           'context': '',
         });
-        await Postgres.insert(conn, log);
+        final metrics = RequestMetrics.of(request);
+        if (metrics == null) {
+          await Postgres.insert(conn, log);
+        } else {
+          metrics.onComplete((values) async {
+            log.txt_detail = LogDetail.encode({...LogDetail.decode(log.txt_detail), ...values});
+            await Postgres.withConnection((c) => Postgres.insert(c, log));
+          });
+        }
         return Response.ok('ok');
       });
     });
@@ -1810,20 +1868,15 @@ void main() async {
       return tryCatchAPI(request, 'ADMIN', 'LOGS', (conn) async {
         final adminId = await Auth.adminUserId(conn, request);
         if (adminId == null) return Response(403, body: 'forbidden');
+        final visitorNow = DateTime.now().toUtc();
+        final visitorRows = await conn.execute(
+          "SELECT crtby, crtat, txt_detail FROM t_system_log WHERE category = 'CLIENT' AND code = 'ACTION' AND COALESCE(crtby, 0) NOT IN (1, 2) AND crtat >= \$1",
+          parameters: [visitorNow.subtract(const Duration(days: 30))],
+        );
+        final visitors = visitorSummary(visitorRows.map((row) => row.toColumnMap()), visitorNow);
         final q = (request.url.queryParameters['q'] ?? '').trim();
         final access = await conn.execute(
-          '''
-            SELECT l.id, l.crtat, l.crtby, COALESCE(u.name_last, '') AS name_user,
-                   l.method, l.category, l.code, l.memo, l.url, l.txt_detail
-            FROM t_system_log l
-            LEFT JOIN m_user u ON u.id = l.crtby
-            WHERE \$1::text = ''
-               OR CAST(l.crtby AS text) = \$1::text
-               OR COALESCE(u.name_last, '') ILIKE '%' || \$1::text || '%'
-               OR COALESCE(u.name_first, '') ILIKE '%' || \$1::text || '%'
-            ORDER BY l.crtat DESC
-            LIMIT 200
-          ''',
+          selectAdminOperationLogs,
           parameters: [q],
         );
         final errors = await conn.execute(
@@ -1890,6 +1943,13 @@ void main() async {
             'api_path': textOf(detail, map, 'api_path', 'url'),
             'http_status': '${detail['http_status'] ?? ''}',
             'duration_ms': '${detail['duration_ms'] ?? ''}',
+            'request_bytes': '${detail['request_bytes'] ?? ''}',
+            'response_bytes': '${detail['response_bytes'] ?? ''}',
+            'transfer_bytes': '${detail['transfer_bytes'] ?? ''}',
+            'memory_rss_bytes': '${detail['memory_rss_bytes'] ?? ''}',
+            'memory_delta_bytes': '${detail['memory_delta_bytes'] ?? ''}',
+            'metrics_scope': '${detail['metrics_scope'] ?? ''}',
+
             'context': '${detail['context'] ?? ''}',
             'crtat': stamp(map['crtat']),
             'id_user': map['crtby'] ?? 0,
@@ -1912,6 +1972,8 @@ void main() async {
           jsonEncode({
             'ok': true,
             'logs': logs,
+            'visitors': visitors,
+            'visitors_as_of': visitorNow.toIso8601String(),
             'access': [
               for (final row in logs)
                 if (row['log_type'] != 'エラー') row
@@ -2195,6 +2257,7 @@ void main() async {
         final fieldingErrors = fieldingErrorsByGame(snap.batting);
         for (final game in games) {
           game['lineup'] = lineups[_asInt(game['id_game'])] ?? const <Map<String, dynamic>>[];
+    game['batting_summary'] = [for (final line in battingLines.values) if (_asInt(line['id_game']) == _asInt(game['id_game'])) {for (final key in ['id_team', 'name_full', 'int_batting', 'int_hit1', 'int_homerun', 'int_steal_base']) key: line[key]}];
           game['fielding_errors'] = fieldingErrors[_asInt(game['id_game'])] ?? const <Map<String, dynamic>>[];
           _useAnnouncedLineup(game);
         }
@@ -2270,12 +2333,12 @@ void main() async {
           .add(staticWithSpa) // ← 次に静的（+ SPA fallback）
           .handler;
 
-      handler = const Pipeline().addMiddleware(logRequests()).addMiddleware(corsHeaders()).addHandler(handler);
+      handler = const Pipeline().addMiddleware(logRequests()).addMiddleware(RequestMetrics.middleware()).addMiddleware(corsHeaders()).addHandler(handler);
 
       stdout.writeln('🗂 Serving static from: ${publicDir.path}');
     } else {
       // 静的なし（dev表示）
-      handler = const Pipeline().addMiddleware(logRequests()).addMiddleware(corsHeaders()).addHandler((req) {
+      handler = const Pipeline().addMiddleware(logRequests()).addMiddleware(RequestMetrics.middleware()).addMiddleware(corsHeaders()).addHandler((req) {
         if (req.url.path.isEmpty) {
           return Response.ok('Backend API (dev). Try /predictions', headers: {'content-type': 'text/plain; charset=utf-8'});
         }
@@ -2412,6 +2475,7 @@ Future<void> _saveAccessLog(
   required int durationMs,
   required int httpStatus,
   required String requestId,
+  Map<String, Object> metrics = const {},
 }) async {
   try {
     await Postgres.withConnection((conn) async {
@@ -2450,6 +2514,7 @@ Future<void> _saveAccessLog(
         'api_path': request.requestedUri.path,
         'http_status': httpStatus,
         'duration_ms': durationMs,
+        ...metrics,
         'context': jsonEncode({'method': request.method, 'path': request.requestedUri.path}),
       });
       await Postgres.insert(conn, log);
@@ -2503,14 +2568,21 @@ Future<Response> tryCatchAPIReadonly(
     response = Response.internalServerError(body: 'データベースエラー: $e');
   } finally {
     if (!_skipAccessLog(request.requestedUri.path, readonly: true)) {
-      unawaited(_saveAccessLog(
+      Future<void> save(Map<String, Object> metrics) => _saveAccessLog(
         request,
         user,
         idError,
         durationMs: DateTime.now().difference(started).inMilliseconds,
         httpStatus: response.statusCode,
         requestId: requestId,
-      ));
+        metrics: metrics,
+      );
+      final metrics = RequestMetrics.of(request);
+      if (metrics != null) {
+        metrics.onComplete(save);
+      } else {
+        unawaited(save(const {}));
+      }
     }
     print("🌐Responsed Successfully‼️【${request.requestedUri}】");
   }
@@ -2557,14 +2629,21 @@ Future<Response> tryCatchAPI(Request request, String categorySystem, String code
     response = Response.internalServerError(body: 'データベースエラー: $e');
   } finally {
     if (!_skipAccessLog(request.requestedUri.path, readonly: false)) {
-      unawaited(_saveAccessLog(
+      Future<void> save(Map<String, Object> metrics) => _saveAccessLog(
         request,
         user,
         idError,
         durationMs: DateTime.now().difference(started).inMilliseconds,
         httpStatus: response.statusCode,
         requestId: requestId,
-      ));
+        metrics: metrics,
+      );
+      final metrics = RequestMetrics.of(request);
+      if (metrics != null) {
+        metrics.onComplete(save);
+      } else {
+        unawaited(save(const {}));
+      }
     }
     print("🌐Responsed Successfully‼️【${request.requestedUri}】");
   }

@@ -411,6 +411,26 @@ void main() {
     expect(result['channels'][0]['lookback_days'], 2);
   });
 
+  test('夢スポは野球のみ取得しホークス関連動画へ出典付きで統合する', () {
+    final source = videoChannels.singleWhere((c) => c.id == 'UCtZHY28ItSsyRJ2rnzgZCwQ');
+    final team = videoChannels.singleWhere((c) => c.tabLabel == 'ソフトバンク');
+    expect(source.contentFilter, 'baseball');
+    expect(source.videoOrg, 'npb');
+    expect(source.teamIds, [team.id]);
+    final result = groupVideoChannels([team, source], [
+      {...team.toJson(), 'status': 'ok', 'videos': <Map<String, dynamic>>[]},
+      {...source.toJson(), 'status': 'ok', 'videos': [
+        {'id': 'yumespo0001', 'title': 'ホークス 選手インタビュー', 'published_at': '2026-10-22T00:00:00Z'},
+      ]},
+    ]);
+    expect(result, hasLength(1));
+    expect(result.single['id'], team.id);
+    final video = (result.single['videos'] as List).single;
+    expect(video['id'], 'yumespo0001');
+    expect(video['source_channel_id'], source.id);
+    expect(video['source_name'], source.name);
+  });
+
   test('公式の新着30件があっても鷹BAKAとももスポの最新動画を残す', () {
     final team = videoChannels.firstWhere((c) => c.tabLabel == 'ソフトバンク');
     final related =
@@ -1043,6 +1063,29 @@ void main() {
     expect(result['channels'][0]['videos'], hasLength(2));
     expect(watchCalls, 0);
     expect(result['channels'][0]['status'], 'ok');
+  });
+  test('パテレは日時取得失敗でも確認済み一覧を保持し推定日時を区別する', () async {
+    const daily = VideoChannel('UC1234567890123456789012', 'パテレ', 'league', 'x', daily: true, minimumVideos: 10, lookbackDays: 2);
+    final service = VideoFeedService(channels: [daily], now: () => DateTime.utc(2026,10,23), client: MockClient((r) async =>
+      r.url.path.endsWith('/videos') ? response(regularPage([for (var i=0;i<10;i++) item(i)]),200) : response('unavailable',503)));
+    final result = await service.read();
+    final channel = (result['channels'] as List).single;
+    expect(channel['status'], 'partial');
+    expect(channel['videos'], hasLength(10));
+    expect(channel['videos'][0]['published_at'], isNull);
+    expect(channel['videos'][0]['published_sort_at'], isNotNull);
+  });
+  test('通常動画タブが失敗してもパテレの配信アーカイブを取得する', () async {
+    const daily = VideoChannel('UC1234567890123456789012', 'パテレ', 'league', 'x', daily: true, minimumVideos: 10, includeStreams: true);
+    final now = DateTime.utc(2026,10,23);
+    final service = VideoFeedService(channels: [daily], now: () => now, client: MockClient((r) async {
+      if (r.url.path.endsWith('/streams')) return response(regularPage([item(1)]).replaceAll('/videos', '/streams').replaceAll('動画', 'ライブ'),200);
+      if (r.url.path == '/watch') return response(watch('v0000000001',now),200);
+      return response('unavailable',503);
+    }));
+    final result = await service.read();
+    expect(result['channels'][0]['status'], 'partial');
+    expect(result['channels'][0]['videos'], hasLength(1));
   });
   test('公開日時が取得できない動画は推測で混ぜず一部取得失敗を示す', () async {
     const daily = VideoChannel('UC1234567890123456789012', '日次', 'league', 'x',

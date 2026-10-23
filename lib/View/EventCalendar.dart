@@ -1,3 +1,4 @@
+import '../widgets/special_media.dart';
 import 'GamesBoard.dart' show teamLogoVisual;
 import 'package:flutter/material.dart';
 import '../logic/season_schedule.dart';
@@ -7,13 +8,17 @@ class EventCalendar extends StatefulWidget {
   final List<Map<String, dynamic>> events;
   final List<Map<String, dynamic>> games;
   final DateTime? initialMonth;
+  final DateTime? weekStart;
   final ValueChanged<DateTime>? onMonthChanged;
+  final ValueChanged<DateTime>? onWeekChanged;
 
   const EventCalendar(
       {super.key,
       required this.events,
       this.games = const [],
       this.initialMonth,
+      this.weekStart,
+      this.onWeekChanged,
       this.onMonthChanged});
 
   @override
@@ -92,13 +97,25 @@ class _EventCalendarState extends State<EventCalendar> {
     final lead = first.weekday % 7;
     final days = DateTime(_month.year, _month.month + 1, 0).day;
     final cells = lead + days;
-    final rows = (cells / 7).ceil();
+    final rows = widget.weekStart == null ? (cells / 7).ceil() : 1;
     const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SizedBox(
+        if (widget.weekStart != null)
+          Row(children: [
+            IconButton(tooltip: '前の週',
+              onPressed: widget.onWeekChanged == null ? null : () => widget.onWeekChanged!(widget.weekStart!.subtract(const Duration(days: 7))),
+              icon: const Icon(Icons.chevron_left, size: 18)),
+            Expanded(child: Text(
+              '${scheduleDate(widget.weekStart!)} ～ ${scheduleDate(widget.weekStart!.add(const Duration(days: 6)))}',
+              textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
+            IconButton(tooltip: '次の週',
+              onPressed: widget.onWeekChanged == null ? null : () => widget.onWeekChanged!(widget.weekStart!.add(const Duration(days: 7))),
+              icon: const Icon(Icons.chevron_right, size: 18)),
+          ]),
+        if (widget.weekStart == null) SizedBox(
           height: 28,
           child: Row(
             children: [
@@ -166,6 +183,7 @@ class _EventCalendarState extends State<EventCalendar> {
   }
 
   DateTime? _cellDate(int index, int lead, int days) {
+    if (widget.weekStart != null) return widget.weekStart!.add(Duration(days: index));
     final dayNum = index - lead + 1;
     if (dayNum < 1 || dayNum > days) return null;
     return DateTime(_month.year, _month.month, dayNum);
@@ -375,13 +393,13 @@ class ScheduleGameTile extends StatelessWidget {
             width: 16,
             height: 16,
             child: visual.asset != null
-                ? Image.asset(visual.asset!,
+                ? SpecialMedia(child: Image.asset(visual.asset!,
                     fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) => fallback())
+                    errorBuilder: (_, __, ___) => fallback()))
                 : visual.networkUrl != null
-                    ? Image.network(visual.networkUrl!,
+                    ? SpecialMedia(child: Image.network(visual.networkUrl!,
                         fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) => fallback())
+                        errorBuilder: (_, __, ___) => fallback()))
                     : fallback()));
   }
 

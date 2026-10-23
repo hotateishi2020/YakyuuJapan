@@ -1,3 +1,4 @@
+import '../widgets/special_media.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'package:flutter/material.dart';
 
@@ -155,12 +156,12 @@ class PostseasonBracket extends StatelessWidget {
         child: Align(
           alignment: Alignment.topCenter,
           heightFactor: markFraction,
-          child: Image.asset(
+          child: SpecialMedia(child: Image.asset(
             central ? 'backend/assets/images/k-central.webp' : 'backend/assets/images/k-pacific.webp',
             width: width,
             fit: BoxFit.fitWidth,
             alignment: Alignment.topCenter,
-          ),
+          )),
         ),
       ),
     );
@@ -173,7 +174,7 @@ class PostseasonBracket extends StatelessWidget {
       top: BracketGeom.finC.bottom + 8,
       width: 96,
       height: 84,
-      child: Image(image: AssetImage(asset), fit: BoxFit.contain),
+      child: SpecialMedia(child: Image(image: AssetImage(asset), fit: BoxFit.contain)),
     );
   }
 
@@ -226,7 +227,7 @@ class PostseasonBracket extends StatelessWidget {
                             const SizedBox(width: 2),
                             const SizedBox(width: 140, child: Padding(
                               padding: EdgeInsets.symmetric(vertical: 2),
-                              child: Image(image: AssetImage('backend/assets/images/logo_japan_series.png'), fit: BoxFit.contain),
+                              child: SpecialMedia(child: Image(image: AssetImage('backend/assets/images/logo_japan_series.png'), fit: BoxFit.contain)),
                             )),
                             const SizedBox(width: 2),
                             SizedBox(width: 72, child: pacific == null ? null : _japanFinalist(pacific, wins: board.japan.winsLow, slots: board.japan.slots, alignLeft: false, eliminated: board.eliminated(pacific.id))),

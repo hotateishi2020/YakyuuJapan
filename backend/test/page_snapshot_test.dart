@@ -22,6 +22,21 @@ class FakeConnection implements Connection {
   }
 }
 void main() {
+  test('古いMLB日程にもワールドシリーズ期間帯を補完し既存の変更は優先する', () async {
+    final conn=FakeConnection()..saved=[[{'games':[{'id':7}],'events':[]},'2026-10-21']];
+    final data=await PageSnapshot.read(conn,kind:'schedule',org:OrgKind.mlb,year:2026);
+    final events=data['events'] as List;
+    expect(events.single['title_event'],'ワールドシリーズ');
+    expect(events.single['date_from_temp'],'2026-10-24');
+    expect(events.single['date_to'],'2026-11-01');
+    expect(data['games'],[{'id':7}]);
+    expect(conn.queries,hasLength(1));
+    conn.saved=[[{'events':[{...events.single as Map,'date_to':'2026-11-02'}]},'2026-10-22']];
+    final updated=await PageSnapshot.read(conn,kind:'schedule',org:OrgKind.mlb,year:2026);
+    expect(updated['events'],hasLength(1));
+    expect((updated['events'] as List).single['date_to'],'2026-11-02');
+  });
+
   test('日程と記録は保存JSONを1回のSELECTだけで返す', () async {
     for (final kind in ['schedule','records']) {
       final conn = FakeConnection()..saved = [[{'games': [{'id': 7}], 'titles': []}, '2026-10-21']];

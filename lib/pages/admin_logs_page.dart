@@ -48,7 +48,12 @@ const _columns = <_LogColumn>[
   _LogColumn('line_number', '行', 44),
   _LogColumn('api_path', 'API', 140),
   _LogColumn('http_status', 'HTTP', 52),
-  _LogColumn('duration_ms', '時間', 64),
+  _LogColumn('duration_ms', '処理時間', 86),
+  _LogColumn('request_bytes', '受信本文', 92),
+  _LogColumn('response_bytes', '送信本文', 92),
+  _LogColumn('transfer_bytes', '通信量合計', 100),
+  _LogColumn('memory_rss_bytes', 'サーバーRSS', 108),
+  _LogColumn('memory_delta_bytes', 'RSS増減', 100),
   _LogColumn('request_id', 'リクエストID', 140),
   _LogColumn('session_id', 'セッションID', 120),
   _LogColumn('app_version', 'バージョン', 72),
@@ -60,7 +65,8 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
   int _section = 0;
   bool _showAccess = true;
   List<Map<String, dynamic>> get _visibleLogs =>
-      _logs.where((r) => _showAccess || r['log_type'] == 'エラー').toList();
+      _logs.where((r) => r['log_type'] == 'エラー' || (_showAccess && r['log_type'] == '操作')).toList();
+  Map<String, dynamic> _visitors = {};
   bool _loading = true;
   String? _error;
   List<Map<String, dynamic>> _logs = const [];
@@ -111,6 +117,7 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
       final map = jsonDecode(res.body) as Map<String, dynamic>;
       setState(() {
         _logs = _rowsOf(map);
+        _visitors = Map<String, dynamic>.from(map['visitors'] as Map? ?? {});
         _loading = false;
       });
     } catch (e) {
@@ -195,6 +202,15 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
       final text = '${row['duration_ms'] ?? ''}'.trim();
       if (text.isEmpty || text == 'null') return '';
       return '${text}ms';
+    }
+    if (key.endsWith('_bytes')) {
+      final bytes = int.tryParse('${row[key] ?? ''}');
+      if (bytes == null) return '';
+      final sign = bytes < 0 ? '-' : (key == 'memory_delta_bytes' && bytes > 0 ? '+' : '');
+      final size = bytes.abs();
+      if (size < 1024) return '$sign$size B';
+      if (size < 1024 * 1024) return '$sign${(size / 1024).toStringAsFixed(1)} KiB';
+      return '$sign${(size / (1024 * 1024)).toStringAsFixed(1)} MiB';
     }
     final value = '${row[key] ?? ''}'.trim();
     if (value == 'null') return '';
@@ -301,6 +317,11 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
         Expanded(
             child: IndexedStack(index: _section, children: [
           Column(children: [
+            Padding(padding: const EdgeInsets.symmetric(horizontal: 12), child: Wrap(spacing: 12, runSpacing: 6, children: [
+              for (final period in const {'1': '1日（24時間）', '7': '1週間（7日）', '30': '1ヶ月（30日）'}.entries)
+                Chip(label: Text('${period.value}：${_visitors[period.key] ?? '—'}人')),
+              const Text('来訪者数：ID 1・2を除外。ゲストは同じIP・ブラウザ環境で重複除外。', style: TextStyle(fontSize: 11)),
+            ])),
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
               child: Row(

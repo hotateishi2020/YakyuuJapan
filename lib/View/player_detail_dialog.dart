@@ -1,3 +1,4 @@
+import '../logic/auth_session.dart';
 import '../logic/home_run_video.dart';
 import '../tools/open_home_run_link.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
@@ -186,7 +187,7 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
       final split = entries.indexWhere((e) => e.key == 'Wikipedia');
       final upper = Map<String, dynamic>.fromEntries(split < 0 ? entries : entries.take(split));
       final lower = Map<String, dynamic>.fromEntries(split < 0 ? [] : entries.skip(split));
-      final url = map(data['character_image'])['url'];
+      final url = AuthSession.instance.showSpecialMedia ? map(data['character_image'])['url'] : null;
       final sharedHeaderWidth = factsHeaderWidth([...values.keys, ...season.keys]);
       return SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -213,7 +214,7 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
   }
 
   Widget profileWithImage(String name, Map<String, dynamic> values) {
-    final url = map(data['character_image'])['url'];
+    final url = AuthSession.instance.showSpecialMedia ? map(data['character_image'])['url'] : null;
     if (url is! String) return facts(values);
     final entries = values.entries.toList();
     final wikipediaIndex = entries.indexWhere((e) => e.key == 'Wikipedia');
@@ -574,7 +575,9 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
       });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(listenable: AuthSession.instance, builder: (_, __) => _buildContent(context));
+
+  Widget _buildContent(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final profile = map(data['profile']), roster = map(data['roster']), verified = map(data['verified']);
     final position = '${profile['txt_position'] ?? widget.player['txt_position'] ?? roster['position'] ?? ''}';

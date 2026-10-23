@@ -1,3 +1,5 @@
+import 'package:Yakyuu_Japan/widgets/navigation_picker.dart';
+import 'package:Yakyuu_Japan/View/home_board.dart';
 import 'dart:async';
 import 'package:Yakyuu_Japan/View/Headers.dart';
 import 'package:flutter/material.dart';
@@ -12,19 +14,33 @@ void main() {
     await http.runWithClient(() async {
       await tester.pumpWidget(const MaterialApp(home: Scaffold(body: PredictionPage())));
       await tester.pump(const Duration(milliseconds: 1));
-      for (final label in ['予想対決', 'NPB', 'MLB', 'その他', '日程', '試合情報', 'チーム順位', '個人成績', '戦力', '記録', '動画']) {
-        expect(find.text(label), findsWidgets);
-      }
-      final sizes = ['predict', 'npb', 'mlb', 'other'].map((name) => tester.getSize(find.byKey(ValueKey('org-tab-$name'))).width).toList();
-      expect(sizes.toSet().length, 1);
+      final orgPicker = find.byKey(const ValueKey('navigation-picker-0'));
+      final boardPicker = find.byKey(const ValueKey('navigation-picker-1'));
+      expect(orgPicker, findsOneWidget);
+      expect(boardPicker, findsOneWidget);
+      expect(tester.widgetList<NavigationPicker>(find.byType(NavigationPicker)).any((picker) => picker.labels.values.contains('📅日程')), isFalse);
+      expect(tester.getCenter(orgPicker).dy, tester.getCenter(boardPicker).dy);
+      expect(find.byKey(const ValueKey('menu-visibility-toggle')), findsNothing);
       expect(pending.isCompleted, isFalse);
       expect(find.byType(HeaderAuthAction), findsNothing);
       expect(find.byIcon(Icons.info_outline), findsNothing);
       expect(tester.takeException(), isNull);
-      await tester.tap(find.byKey(const ValueKey('org-tab-other')));
+      await tester.tap(orgPicker);
       await tester.pump();
-      expect(find.text('高校野球'), findsOneWidget);
-      expect(find.text('国際シリーズ'), findsOneWidget);
+      expect(tester.getTopLeft(find.text('🏠HOME').last).dy, lessThan(tester.getTopLeft(find.text('🇯🇵NPB').last).dy));
+      await tester.tap(find.text('🏠HOME').last);
+      await tester.pump();
+      await tester.pump();
+      expect(find.byType(HomeBoard), findsOneWidget);
+      expect(find.byKey(const ValueKey('navigation-picker-1')), findsNothing);
+      await tester.tap(orgPicker);
+      await tester.pump();
+      await tester.tap(find.text('⚾️その他').last);
+      await tester.pump();
+      await tester.pump();
+      expect(find.byKey(const ValueKey('navigation-picker-1')), findsOneWidget);
+      expect(find.byKey(const ValueKey('navigation-picker-2')), findsOneWidget);
+      expect(find.text('高校野球'), findsWidgets);
       await tester.pumpWidget(const SizedBox.shrink());
       pending.complete(http.Response('{}', 200));
       await tester.pump(const Duration(seconds: 21));

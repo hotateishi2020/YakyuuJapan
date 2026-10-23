@@ -1,3 +1,4 @@
+import '../widgets/special_media.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'package:flutter/material.dart';
 
@@ -217,7 +218,7 @@ class MlbPostseasonBracket extends StatelessWidget {
                             const SizedBox(width: 8),
                             const SizedBox(width: 140, child: Padding(
                               padding: EdgeInsets.symmetric(vertical: 2),
-                              child: Image(image: AssetImage('backend/assets/images/logo_world_series_2026.png'), fit: BoxFit.contain),
+                              child: SpecialMedia(child: Image(image: AssetImage('backend/assets/images/logo_world_series_2026.png'), fit: BoxFit.contain)),
                             )),
                             const SizedBox(width: 8),
                             SizedBox(width: 72, child: pacific == null ? null : _worldSeriesFinalist(pacific, wins: board.worldSeries.winsLow, slots: board.worldSeries.slots, alignLeft: false, eliminated: board.eliminated(pacific.id))),
@@ -327,12 +328,12 @@ class MlbPostseasonBracket extends StatelessWidget {
       top: 6,
       width: size,
       height: size,
-      child: Image.asset(
+      child: SpecialMedia(child: Image.asset(
         asset,
         fit: BoxFit.contain,
         filterQuality: FilterQuality.high,
         errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-      ),
+      )),
     );
   }
 

@@ -1,3 +1,4 @@
+import '../widgets/navigation_picker.dart';
 import '../widgets/collapsible_menu.dart';
 import 'player_detail_dialog.dart';
 import 'dart:convert';
@@ -25,6 +26,18 @@ const allStarPositions = [
   '外野手',
   'DH'
 ];
+
+/// Preserve the published order within each selection group.
+List<Map<String, dynamic>> allStarReplacementsLast(
+    Iterable<Map<String, dynamic>> players) {
+  final regular = <Map<String, dynamic>>[], replacements = <Map<String, dynamic>>[];
+  for (final player in players) {
+    final replacement = (player['selections'] as List? ?? [])
+        .any((selection) => '$selection'.contains('補充'));
+    (replacement ? replacements : regular).add(player);
+  }
+  return [...regular, ...replacements];
+}
 
 List<Map<String, dynamic>> allStarYearRows(
     Map<String, dynamic> data, int throughYear, String league) {
@@ -175,7 +188,17 @@ class _AllStarHistoryGridState extends State<AllStarHistoryGrid> {
             .map((row) => row['year'] as int).toSet().toList()..sort((a, b) => b.compareTo(a));
         final year = availableYears.contains(selectedYear)
             ? selectedYear! : availableYears.firstOrNull ?? widget.throughYear;
-        final shownLeague = portrait && league.isEmpty ? 'セ・リーグ' : league;
+        final scoped = NavigationPickerScope.enabled(context);
+        final shownLeague = portrait && !scoped && league.isEmpty ? 'セ・リーグ' : league;
+        Widget leaguePicker() => NavigationPicker(
+          level: 3,
+          pickerKey: const ValueKey('allstar-league-picker'),
+          labels: const {0: '両リーグ', 1: 'セ・リーグ', 2: 'パ・リーグ'},
+          value: const ['', 'セ・リーグ', 'パ・リーグ'].indexOf(shownLeague),
+          onChanged: (value) => select(const ['', 'セ・リーグ', 'パ・リーグ'][value]),
+          color: const Color(0xFFCB0115), foreground: Colors.white,
+          itemColors: const {1: Color(0xFF0E8E2D), 2: Color(0xFF01B1EA)},
+        );
         final rows = allStarYearRows(widget.data, widget.throughYear, shownLeague)
             .where((row) => !portrait || row['year'] == year).toList();
         final grouped = <int, List<Map<String, dynamic>>>{};
@@ -235,9 +258,8 @@ class _AllStarHistoryGridState extends State<AllStarHistoryGrid> {
         final width = tableWidth / columnCount;
         List<Map<String, dynamic>> players(
                 Map<String, dynamic> row, String p) =>
-            listMapFromJson(row['players'])
-                .where((v) => position(v) == p)
-                .toList();
+            allStarReplacementsLast(listMapFromJson(row['players'])
+                .where((v) => position(v) == p));
         int count(Map<String, dynamic> row) => columns.fold<int>(4,
             (n, c) => math.max(n, (players(row, c.$1).length / c.$2).ceil()));
         double rowHeight(Map<String, dynamic> row) => row['cancelled'] == true
@@ -270,6 +292,7 @@ class _AllStarHistoryGridState extends State<AllStarHistoryGrid> {
           final cancelled = rows.any((row) => row['cancelled'] == true);
           return ColoredBox(color: const Color(0xfff6f8fb), child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              if (scoped) leaguePicker(),
               MenuBand(level: 3, child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 child: Row(children: [
@@ -286,7 +309,7 @@ class _AllStarHistoryGridState extends State<AllStarHistoryGrid> {
                       setState(() => selectedYear = value);
                     },
                   ))),
-                  for (final value in ['セ・リーグ', 'パ・リーグ'])
+                  if (!scoped) for (final value in ['セ・リーグ', 'パ・リーグ'])
                     Expanded(child: Padding(padding: const EdgeInsets.only(left: 4),
                       child: ChoiceChip(
                         key: ValueKey('allstar-league-$value'),
@@ -316,7 +339,7 @@ class _AllStarHistoryGridState extends State<AllStarHistoryGrid> {
                     : ListView(controller: body, key: const ValueKey('allstar-portrait-body'),
                         padding: EdgeInsets.zero, children: [
                           for (final column in columns) Builder(builder: (context) {
-                            final members = roster.where((player) => position(player) == column.$1).toList();
+                            final members = allStarReplacementsLast(roster.where((player) => position(player) == column.$1));
                             final rowCount = math.max(1, (members.length / 4).ceil());
                             return Column(key: ValueKey('allstar-position-${column.$1}'), children: [
                               cell(column.$1, tableWidth, 32 * scale, column.$3),
@@ -384,7 +407,8 @@ class _AllStarHistoryGridState extends State<AllStarHistoryGrid> {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Padding(
+                  if (scoped) leaguePicker()
+                  else Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 4),
                       child: Wrap(spacing: 8, runSpacing: 4, children: [

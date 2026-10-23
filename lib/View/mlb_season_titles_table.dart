@@ -5,9 +5,10 @@ import 'season_titles_table.dart';
 
 /// MLB uses the same cells, winner links and surfaces as the NPB title board.
 class MlbSeasonTitlesTable extends StatelessWidget {
-  const MlbSeasonTitlesTable({super.key, required this.groups, required this.year});
+  const MlbSeasonTitlesTable({super.key, required this.groups, required this.year, this.individualOnly = false});
   final Map<String, List<Map<String, dynamic>>> groups;
   final int year;
+  final bool individualOnly;
 
   static final _leaguePrefix = RegExp(r'(?:アメリカン|ナショナル|ア|ナ)[・･]?リーグ|American League|National League|\bAL\b|\bNL\b', caseSensitive: false);
 
@@ -30,9 +31,9 @@ class MlbSeasonTitlesTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final shared = SeasonTitlesTable(groups: groups, year: year);
     return LayoutBuilder(builder: (context, constraints) {
-      final portrait = constraints.maxWidth < 700;
-      final width = math.max(0.0, constraints.maxWidth - 32);
-      Widget result(List<Map<String, dynamic>> values, {int? side, bool logo = false}) => shared.winners(values, showLogo: logo, background: side == null ? Colors.white : Color.lerp(OrgConfig.mlb.leagueColor(side), Colors.white, .92));
+      final portrait = individualOnly || constraints.maxWidth < 700;
+      final width = math.max(0.0, constraints.maxWidth - (individualOnly ? 0 : 32));
+      Widget result(List<Map<String, dynamic>> values, {int? side, bool logo = false}) => shared.winners(values, mlb: true, showLogo: logo, background: side == null ? Colors.white : Color.lerp(OrgConfig.mlb.leagueColor(side), Colors.white, .92));
       Widget leagueHeader(int id) => shared.cell(Text(OrgConfig.mlb.leagueName(id), textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13)), color: OrgConfig.mlb.leagueColor(id));
 
       Widget grid(String key, String title, List<(String, List<Map<String, dynamic>>, bool)> columns) {
@@ -41,12 +42,12 @@ class MlbSeasonTitlesTable extends StatelessWidget {
         final table = Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           shared.label(title, SeasonTitlesTable.red),
           if (portrait) ...[
-            shared.line([shared.label('項目', SeasonTitlesTable.purple), leagueHeader(3), leagueHeader(4)]),
+            shared.line([shared.label('項目', SeasonTitlesTable.purple), leagueHeader(3), leagueHeader(4)], weights: individualOnly ? const [3, 4, 4] : null),
             for (final (heading, values, logo) in effective)
               shared.line([
                 shared.cell(Text(heading, textAlign: TextAlign.center)),
                 for (final id in [3, 4]) result(values.where((r) => league(r) == id).toList(), side: id, logo: logo)
-              ]),
+              ], weights: individualOnly ? const [3, 4, 4] : null),
           ] else ...[
             shared.leagueLine([shared.label('', SeasonTitlesTable.purple), for (final (heading, _, _) in effective) shared.label(heading, SeasonTitlesTable.gold)]),
             for (final id in [3, 4]) shared.leagueLine([leagueHeader(id), for (final (_, values, logo) in effective) result(values.where((r) => league(r) == id).toList(), side: id, logo: logo)]),
@@ -67,6 +68,8 @@ class MlbSeasonTitlesTable extends StatelessWidget {
         }
         return [for (final entry in grouped.entries) (entry.key, entry.value, false)];
       }
+
+      if (individualOnly) return grid('major', '個人タイトル', categories('major'));
 
       return ColoredBox(
           color: const Color(0xfff6f8fb),

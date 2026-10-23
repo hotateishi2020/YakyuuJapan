@@ -5,6 +5,62 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/View/player_stats_grid.dart';
 
 void main() {
+  for (final title in ['打率', '本塁打', '出塁率', 'OPS', '防御率', 'WHIP', '奪三振', 'BB/9', '投球回数']) {
+    test('$title は予想表示なしでもランク外の日本人を下段に残す', () {
+      final lower = ['防御率', 'WHIP', 'BB/9'].contains(title);
+      final rows = <Map<String,dynamic>>[for (var i=1;i<=40;i++) {
+        'id_player':i, 'id_league':3, 'title':title,
+        'int_rank': i==40 ? 1000 : i,
+        'stats':lower ? i : 50-i,
+        'flg_japan':[2,35,40].contains(i),
+      }];
+      sortPersonalStatRows(rows);
+      expect(rows.any((r)=>r['id_player']==35),isTrue);
+      expect(rows.any((r)=>r['id_player']==40),isTrue);
+      final preview=personalStatPreview(rows,includeJapanese:true,showPredictions:false);
+      expect(preview,hasLength(10));
+      expect(preview.where((r)=>r['flg_japan']==true && r['preview_separator']!=true).map((r)=>r['id_player']),[2,35,40]);
+      expect(preview.last['id_player'],40);
+      expect(preview.where((r)=>r['preview_separator']==true),hasLength(1));
+    });
+  }
+
+  test('省略記号で上位の日本人選手を隠さない', () {
+    final rows=<Map<String,dynamic>>[for(var i=1;i<=12;i++) {
+      'id_player':i,'id_league':4,'title':'OPS','stats':20-i,'int_rank':i,
+      'flg_japan':[9,12].contains(i),
+    }];
+    final shown=personalStatPreview(rows,includeJapanese:true,showPredictions:false);
+    expect(shown.where((r)=>r['preview_separator']!=true && r['flg_japan']==true).map((r)=>r['id_player']),[9,12]);
+  });
+
+  testWidgets('MLBの各項目パネルにランク外の日本人を表示する', (tester) async {
+    await tester.pumpWidget(MaterialApp(home:Scaffold(body:ScrollLeaguePersonalStats(
+      batting:true,showJapanFlag:true,
+      rows:[for(var i=1;i<=12;i++) {
+        'id_player':i,'id_league':3,'name_player':i==12?'対象選手':'選手$i',
+        'title':'OPS','stats':20-i,'int_rank':i,'flg_japan':i==12,
+      }],
+    ))));
+    expect(find.textContaining('対象選手'),findsOneWidget);
+    expect(tester.takeException(),isNull);
+  });
+
+  testWidgets('MLBグリッドは得点圏打率を表示せずNPBでは維持する', (tester) async {
+    for (final league in [3, 4, 1]) {
+      await tester.pumpWidget(MaterialApp(home: Scaffold(body: PlayerStatsGrid(
+        batting: true,
+        rows: [
+          {'id_league': league, 'id_player': 1, 'name_player': '野手', 'title': '打率', 'stats': '.300'},
+          {'id_league': league, 'id_player': 1, 'name_player': '野手', 'title': '得点圏打率', 'stats': '.350'},
+        ],
+      ))));
+      expect(find.text('得点圏打率'), league == 1 ? findsOneWidget : findsNothing);
+      expect(find.text('打率'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }
+  });
+
   testWidgets('MLBの長い名前は10pxまで縮小し1行で省略する', (tester) async {
     await tester.pumpWidget(const MaterialApp(home: Scaffold(body: Center(
       child: PlayerStatCell(width: 260, showJapanFlag: true, row: {

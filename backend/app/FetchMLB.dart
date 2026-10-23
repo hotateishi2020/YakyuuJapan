@@ -229,8 +229,7 @@ class FetchMLB {
           if (href.isEmpty) continue;
           final parsed = FetchURL.parseYahooRankingPlayerCell(member.text);
           if (parsed.player.isEmpty || parsed.team.isEmpty) continue;
-          final profileUrl = (href.startsWith('http') ? href : 'https://baseball.yahoo.co.jp$href')
-              .replaceFirst(RegExp(r'/top/?$'), '/');
+          final profileUrl = (href.startsWith('http') ? href : 'https://baseball.yahoo.co.jp$href').replaceFirst(RegExp(r'/top/?$'), '/');
           if (!seenPlayers.add(profileUrl)) continue;
           final name = StringTool.noSpace(parsed.player);
           final team = parsed.team.trim();
@@ -430,9 +429,7 @@ class FetchMLB {
         // チーム列が空でもセル配列の2番目に球団名がある（MLB年は <a> 表記）。
         final cells = tr.querySelectorAll('td.bb-playerStatsTable__data');
         final teamFromCell = cells.length > 1 ? cells[1].text.trim() : '';
-        final teamSource = teamRaw.isNotEmpty
-            ? teamRaw
-            : (teamFromCell.isNotEmpty ? teamFromCell : '');
+        final teamSource = teamRaw.isNotEmpty ? teamRaw : (teamFromCell.isNotEmpty ? teamFromCell : '');
         final teamLabel = YahooTeamNames.normalize(teamSource.replaceAll(RegExp(r'\s'), ''));
         final teamId = FetchURL.matchCareerClubId(
               teamLabel.isEmpty ? teamSource : teamLabel,
@@ -566,11 +563,7 @@ class FetchMLB {
       final npbUrl = '${m['url'] ?? ''}';
       for (final leagueId in _org.leagueIds) {
         final kind = leagueId == 3 ? 1001 : 1002;
-        final mlbUrl = npbUrl.isEmpty
-            ? ''
-            : npbUrl
-                .replaceAll('/npb/stats/', '/mlb/stats/')
-                .replaceAllMapped(RegExp(r'gameKindId=\d+'), (_) => 'gameKindId=$kind');
+        final mlbUrl = npbUrl.isEmpty ? '' : npbUrl.replaceAll('/npb/stats/', '/mlb/stats/').replaceAllMapped(RegExp(r'gameKindId=\d+'), (_) => 'gameKindId=$kind');
         final existing = await conn.execute(
           'SELECT id, int_idx_col FROM m_stats_details WHERE id_stats = \$1 AND id_league = \$2 LIMIT 1',
           parameters: [idStats, leagueId],
@@ -582,8 +575,14 @@ class FetchMLB {
                int_idx_col_details, int_idx_row_details, flg_delete)
             VALUES (\$1,\$2,\$3,\$4,\$5,\$6,\$7,\$8,false)
           ''', parameters: [
-            idStats, leagueId, flgPredict, mlbUrl, intIdxCol, idWebsite,
-            idxColDetails, idxRowDetails,
+            idStats,
+            leagueId,
+            flgPredict,
+            mlbUrl,
+            intIdxCol,
+            idWebsite,
+            idxColDetails,
+            idxRowDetails,
           ]);
         } else {
           await conn.execute('''
@@ -597,8 +596,14 @@ class FetchMLB {
               updat = NOW()
             WHERE id_stats = \$1 AND id_league = \$2
           ''', parameters: [
-            idStats, leagueId, flgPredict, mlbUrl, intIdxCol, idWebsite,
-            idxColDetails, idxRowDetails,
+            idStats,
+            leagueId,
+            flgPredict,
+            mlbUrl,
+            intIdxCol,
+            idWebsite,
+            idxColDetails,
+            idxRowDetails,
           ]);
         }
       }
@@ -616,6 +621,7 @@ class FetchMLB {
         if (offset > 0) return 10 + offset;
         return 20 + offset.abs();
       }
+
       return rank(a).compareTo(rank(b));
     });
     return [
@@ -752,9 +758,11 @@ class FetchMLB {
       print('MLB明日以降は${GameFetchSchedule.futureInterval.inMinutes}分以内のためスキップ');
     }
     final today = DateTime(now.year, now.month, now.day);
-    final dates = nearDaysOnly ? GameFetchSchedule.recheckDates(now) : futureOnly
-        ? [for (var i = 1; i <= 10; i++) today.add(Duration(days: i))]
-        : scheduleDates(now, includeFuture: includeFuture, todayOnly: todayOnly);
+    final dates = nearDaysOnly
+        ? GameFetchSchedule.recheckDates(now)
+        : futureOnly
+            ? [for (var i = 1; i <= 10; i++) today.add(Duration(days: i))]
+            : scheduleDates(now, includeFuture: includeFuture, todayOnly: todayOnly);
     final formatter = DateFormat('yyyy-MM-dd');
     final todayKey = formatter.format(now);
     final clubs = await _careerClubs(conn);
@@ -772,285 +780,290 @@ class FetchMLB {
         lockedToday = true;
       }
       try {
-      if (await GameStatsLoad.skipPastSchedule(
-        conn,
-        org: 'mlb',
-        date: date,
-        now: now,
-        leagueIds: _org.leagueIds,
-      )) {
-        print('MLB $formatted は成績済のためスキップ');
-        continue;
-      }
-      print('MLB $formatted の試合を取得します。');
-      final url = Uri.parse('${_org.scheduleUrlPrefix}$formatted');
-      Document document;
-      try {
-        document = await YahooHtml.fetchDocument(url);
-      } catch (e) {
-        print('MLB日程取得失敗: $e');
-        continue;
-      }
+        if (await GameStatsLoad.skipPastSchedule(
+          conn,
+          org: 'mlb',
+          date: date,
+          now: now,
+          leagueIds: _org.leagueIds,
+        )) {
+          print('MLB $formatted は成績済のためスキップ');
+          continue;
+        }
+        print('MLB $formatted の試合を取得します。');
+        final url = Uri.parse('${_org.scheduleUrlPrefix}$formatted');
+        Document document;
+        try {
+          document = await YahooHtml.fetchDocument(url);
+        } catch (e) {
+          print('MLB日程取得失敗: $e');
+          continue;
+        }
 
-      if (await reconcileMlbSchedule(conn, formatted, document) > 0) reloadedDates?.add(formatted);
-      final cardsRoot = document.querySelector('#gm_card');
-      if (cardsRoot == null) {
-        print('MLB: この日の試合カードはありません。');
+        if (await reconcileMlbSchedule(conn, formatted, document) > 0) reloadedDates?.add(formatted);
+        final cardsRoot = document.querySelector('#gm_card');
+        if (cardsRoot == null) {
+          print('MLB: この日の試合カードはありません。');
+          if (GameFetchSchedule.isPastDay(date, now)) {
+            await GameStatsLoad.rememberPastDateIfSettled(
+              conn,
+              org: 'mlb',
+              date: formatted,
+              leagueIds: _org.leagueIds,
+              emptySchedule: true,
+            );
+          }
+          continue;
+        }
+
+        for (final section in cardsRoot.querySelectorAll('section.bb-score')) {
+          final sectionTitle = section.querySelector('.bb-score__title')?.text.trim() ?? '';
+          for (final card in section.querySelectorAll('li.bb-score__item')) {
+            final link = card.querySelector('a.bb-score__content');
+            final href = link?.attributes['href']?.trim() ?? '';
+            if (href.isEmpty) continue;
+
+            final linkText = card.querySelector('.bb-score__link')?.text.trim() ?? '';
+            final statusText = card.querySelector('.bb-score__status')?.text.trim() ?? '';
+            if (cancelledMlbCard('$linkText $statusText')) continue;
+            final fingerprint = GameFetchSchedule.normalizeCard(href, card.text);
+            final cardKey = 'mlb|$formatted|$href';
+            final futureDay = GameFetchSchedule.isFutureDay(date, now);
+            if (!nearDaysOnly && futureDay && GameFetchSchedule.futureCardUnchanged(cardKey, fingerprint)) continue;
+
+            final homeRaw = card.querySelector('.bb-score__homeLogo')?.text.trim() ?? '';
+            final awayRaw = card.querySelector('.bb-score__awayLogo')?.text.trim() ?? '';
+            final homeName = YahooTeamNames.normalize(homeRaw);
+            final awayName = YahooTeamNames.normalize(awayRaw);
+            if (homeName.isEmpty || awayName.isEmpty) continue;
+
+            final homeTeam = await Postgres.execute(conn, AppSql.selectTeamsWhereName(), data: [homeName]);
+            final awayTeam = await Postgres.execute(conn, AppSql.selectTeamsWhereName(), data: [awayName]);
+            if (homeTeam.isEmpty || awayTeam.isEmpty) {
+              print('MLB試合: 未知の球団 $homeRaw/$awayRaw');
+              continue;
+            }
+            final idTeamHome = homeTeam.first.toColumnMap()['id'] as int;
+            final idTeamAway = awayTeam.first.toColumnMap()['id'] as int;
+            final homeLeague = int.tryParse('${homeTeam.first.toColumnMap()['id_league']}') ?? 0;
+            final awayLeague = int.tryParse('${awayTeam.first.toColumnMap()['id_league']}') ?? 0;
+
+            final scores = card.querySelectorAll('.bb-score__score');
+            var scoreHome = -1;
+            var scoreAway = -1;
+            if (scores.length >= 3) {
+              scoreHome = int.tryParse(scores[0].text.trim()) ?? -1;
+              scoreAway = int.tryParse(scores[2].text.trim()) ?? -1;
+            }
+            final status = linkText.isNotEmpty ? linkText : statusText;
+            final venue = card.querySelector('.bb-score__venue')?.text.trim() ?? '';
+
+            var start = gameStartOn(formatted, statusText);
+            start ??= gameStartOn(formatted, linkText);
+            start ??= DateTime.tryParse('$formatted 00:00:00');
+            if (start == null) continue;
+
+            final cardLive = status.contains('試合中') || statusText.contains('試合中') || RegExp(r'\d+\s*回').hasMatch(status) || RegExp(r'\d+\s*回').hasMatch(statusText);
+            final known = await _gameOnDate(conn, idTeamHome, idTeamAway, formatted);
+            if (!futureDay && (known?.loaded == true && !cardLive)) {
+              print('MLB試合スキップ(成績済): $homeName vs $awayName');
+              continue;
+            }
+
+            var idPitcherHome = 0;
+            var idPitcherAway = 0;
+            var idPitcherWin = 0;
+            var idPitcherLose = 0;
+            var idPitcherSave = 0;
+            var matchState = status;
+            var detailScoreHome = scoreHome;
+            var detailScoreAway = scoreAway;
+            Document? gameTop;
+
+            try {
+              final detailUrl = url.resolve(href.replaceFirst('index', 'top'));
+              final detail = await YahooHtml.fetchDocument(detailUrl);
+              gameTop = detail;
+              final boards = detail.querySelectorAll('#gm_brd');
+              if (boards.isNotEmpty) {
+                final match = boards.first;
+                final info = match.querySelector('#async-gameCard');
+                final timeText = (info?.querySelector('time') ?? match.querySelector('time'))?.text.trim() ?? '';
+                final parsed = gameStartOn(formatted, timeText);
+                if (parsed != null) start = parsed;
+
+                try {
+                  final detailBlock = match.querySelectorAll('#async-gameDetail').first;
+                  final scoreSpans = detailBlock.querySelectorAll('div')[1].querySelectorAll('p')[0].querySelectorAll('span');
+                  if (scoreSpans.length >= 3) {
+                    detailScoreHome = int.tryParse(scoreSpans[0].text.trim()) ?? detailScoreHome;
+                    detailScoreAway = int.tryParse(scoreSpans[2].text.trim()) ?? detailScoreAway;
+                  }
+                  matchState = detailBlock.querySelectorAll('div')[1].querySelectorAll('p')[1].text.trim();
+                } catch (_) {}
+
+                try {
+                  final homePitcher = _starterLink(detail, home: true);
+                  final awayPitcher = _starterLink(detail, home: false);
+                  if (homePitcher.name.isNotEmpty) {
+                    idPitcherHome = await _ensurePlayer(conn, homePitcher.name, idTeamHome);
+                    if (!cardLive && !matchState.contains('試合終了')) {
+                      await _syncStarterSeasonStats(
+                        conn,
+                        playerId: idPitcherHome,
+                        detailUrl: detailUrl,
+                        profileHref: homePitcher.href,
+                        clubs: clubs,
+                      );
+                    }
+                  }
+                  if (awayPitcher.name.isNotEmpty) {
+                    idPitcherAway = await _ensurePlayer(conn, awayPitcher.name, idTeamAway);
+                    if (!cardLive && !matchState.contains('試合終了')) {
+                      await _syncStarterSeasonStats(
+                        conn,
+                        playerId: idPitcherAway,
+                        detailUrl: detailUrl,
+                        profileHref: awayPitcher.href,
+                        clubs: clubs,
+                      );
+                    }
+                  }
+                } catch (e) {
+                  print('MLB先発投手取得スキップ: $e');
+                }
+
+                try {
+                  for (final player in detail.querySelectorAll('#async-resultPitcher table tbody tr')) {
+                    final ths = player.querySelectorAll('th');
+                    final tds = player.querySelectorAll('td');
+                    if (ths.isEmpty || tds.isEmpty) continue;
+                    final result = ths.first.text.trim();
+                    final teamSpan = tds.first.querySelector('span')?.text.trim() ?? '';
+                    final teamName = YahooTeamNames.normalize(teamSpan);
+                    final anchor = tds.first.querySelector('a');
+                    final hrefPlayer = anchor?.attributes['href']?.trim() ?? '';
+                    var namePlayer = StringTool.noSpace(anchor?.text ?? '');
+                    if ((namePlayer.isEmpty && hrefPlayer.isEmpty) || teamName.isEmpty) continue;
+                    final teamResult = await Postgres.execute(conn, AppSql.selectTeamsWhereName(), data: [teamName]);
+                    if (teamResult.isEmpty) continue;
+                    final idTeam = teamResult.first.toColumnMap()['id'] as int;
+                    if (namePlayer.isEmpty && hrefPlayer.isNotEmpty) {
+                      final playerDoc = await YahooHtml.fetchDocument(detailUrl.resolve(hrefPlayer));
+                      namePlayer = playerDoc.querySelectorAll('ruby.bb-profile__ruby').isEmpty ? '' : playerDoc.querySelectorAll('ruby.bb-profile__ruby').first.text.split('（').first.trim();
+                      if (namePlayer.isEmpty) continue;
+                      final idPlayer = await _ensurePlayer(conn, namePlayer, idTeam);
+                      await BirthPlaceRegistry.applyFromProfile(conn, idPlayer, playerDoc);
+                      if (result == '勝利投手') idPitcherWin = idPlayer;
+                      if (result == '敗戦投手') idPitcherLose = idPlayer;
+                      if (result == 'セーブ') idPitcherSave = idPlayer;
+                      continue;
+                    }
+                    if (namePlayer.isEmpty) continue;
+                    final idPlayer = await _ensurePlayer(conn, namePlayer, idTeam);
+                    if (result == '勝利投手') idPitcherWin = idPlayer;
+                    if (result == '敗戦投手') idPitcherLose = idPlayer;
+                    if (result == 'セーブ') idPitcherSave = idPlayer;
+                  }
+                } catch (_) {}
+              }
+            } catch (e) {
+              print('MLB試合詳細スキップ ($homeName vs $awayName): $e');
+            }
+
+            var idStadium = 0;
+            final stadiumName = venue.isEmpty ? 'MLB' : venue;
+            final stadiumRows = await Postgres.execute(conn, AppSql.selectStadium(), data: ['%$stadiumName%']);
+            if (stadiumRows.isEmpty) {
+              final paths = StadiumImages.lookup(stadiumName);
+              final stadium = m_stadium()
+                ..name_short = stadiumName
+                ..id_team = idTeamHome
+                ..path_image_inside = paths.inside
+                ..path_image_outside = paths.outside;
+              idStadium = await Postgres.insert(conn, stadium);
+            } else {
+              idStadium = stadiumRows.first.toColumnMap()['id'] as int;
+            }
+
+            final exists = await conn.execute(AppSql.selectExistsGame(), parameters: [idTeamHome, idTeamAway, start]);
+            final game = t_game()
+              ..id_stadium = idStadium
+              ..id_team_home = idTeamHome
+              ..id_team_away = idTeamAway
+              ..id_pitcher_home = idPitcherHome
+              ..id_pitcher_away = idPitcherAway
+              ..datetime_start = start
+              ..score_home = detailScoreHome
+              ..score_away = detailScoreAway
+              ..state = matchState.isEmpty ? status : matchState
+              ..id_pitcher_win = idPitcherWin
+              ..id_pitcher_lose = idPitcherLose
+              ..id_pitcher_save = idPitcherSave
+              ..code_game = mlbGameCode(sectionTitle, homeLeague, awayLeague);
+
+            if (exists.isNotEmpty) {
+              game.id = exists.first.toColumnMap()['id'] as int;
+              await Postgres.update(conn, game);
+              print('MLB試合更新: $homeName vs $awayName');
+            } else if (known != null) {
+              game.id = known.id;
+              await Postgres.update(conn, game);
+              print('MLB試合更新: $homeName vs $awayName');
+            } else {
+              game.id = await Postgres.insert(conn, game);
+              print('MLB試合新規: $homeName vs $awayName');
+            }
+            reloadedDates?.add(formatted);
+            if (futureDay) GameFetchSchedule.rememberFutureCard(cardKey, fingerprint);
+
+            final live = matchState.contains('試合中') || RegExp(r'\d+\s*回').hasMatch(matchState);
+            final finished = matchState.contains('試合終了');
+            if (gameTop != null) await FetchURL.saveGameTop(conn, gameTop, game.id, idTeamHome, idTeamAway, matchState);
+            final loaded = await GameStatsLoad.isLoaded(conn, game.id);
+            // 日本時間の朝は UTC では前日なので、日付が「明日」でも開始済みなら出場成績を取る。
+            if (GameStatsLoad.needsRefresh(finished: finished, loaded: loaded) && href.isNotEmpty && game.id > 0) {
+              var summarySaved = false;
+              var detailsSaved = false;
+              try {
+                final statsUrl = url.resolve(FetchURL.gamePageHref(href, 'stats'));
+                summarySaved = await saveGameBoxSummary(conn, statsUrl, game.id, idTeamHome, idTeamAway);
+              } catch (e, st) {
+                print('MLB出場成績スキップ ($homeName vs $awayName): $e');
+                print(st);
+              }
+              try {
+                await FetchURL.refreshGameDetails(
+                  conn,
+                  url,
+                  href,
+                  game.id,
+                  idTeamHome,
+                  idTeamAway,
+                  idPitcherHome,
+                  idPitcherAway,
+                  saveMaxVelo: finished,
+                );
+                detailsSaved = true;
+              } catch (e, st) {
+                print('MLB打席・テキスト速報スキップ ($homeName vs $awayName): $e');
+                print(st);
+              }
+              if (summarySaved && detailsSaved) await GameStatsLoad.markIfComplete(conn, game.id, finished: finished);
+            }
+            if (live || formatted == todayKey) {
+              await _publishProgress(conn);
+            }
+          }
+        }
         if (GameFetchSchedule.isPastDay(date, now)) {
           await GameStatsLoad.rememberPastDateIfSettled(
             conn,
             org: 'mlb',
             date: formatted,
             leagueIds: _org.leagueIds,
-            emptySchedule: true,
           );
         }
-        continue;
-      }
-
-      for (final section in cardsRoot.querySelectorAll('section.bb-score')) {
-        final sectionTitle = section.querySelector('.bb-score__title')?.text.trim() ?? '';
-        for (final card in section.querySelectorAll('li.bb-score__item')) {
-          final link = card.querySelector('a.bb-score__content');
-          final href = link?.attributes['href']?.trim() ?? '';
-          if (href.isEmpty) continue;
-
-          final linkText = card.querySelector('.bb-score__link')?.text.trim() ?? '';
-          final statusText = card.querySelector('.bb-score__status')?.text.trim() ?? '';
-          if (cancelledMlbCard('$linkText $statusText')) continue;
-          final fingerprint = GameFetchSchedule.normalizeCard(href, card.text);
-          final cardKey = 'mlb|$formatted|$href';
-          final futureDay = GameFetchSchedule.isFutureDay(date, now);
-          if (!nearDaysOnly && futureDay && GameFetchSchedule.futureCardUnchanged(cardKey, fingerprint)) continue;
-
-          final homeRaw = card.querySelector('.bb-score__homeLogo')?.text.trim() ?? '';
-          final awayRaw = card.querySelector('.bb-score__awayLogo')?.text.trim() ?? '';
-          final homeName = YahooTeamNames.normalize(homeRaw);
-          final awayName = YahooTeamNames.normalize(awayRaw);
-          if (homeName.isEmpty || awayName.isEmpty) continue;
-
-          final homeTeam = await Postgres.execute(conn, AppSql.selectTeamsWhereName(), data: [homeName]);
-          final awayTeam = await Postgres.execute(conn, AppSql.selectTeamsWhereName(), data: [awayName]);
-          if (homeTeam.isEmpty || awayTeam.isEmpty) {
-            print('MLB試合: 未知の球団 $homeRaw/$awayRaw');
-            continue;
-          }
-          final idTeamHome = homeTeam.first.toColumnMap()['id'] as int;
-          final idTeamAway = awayTeam.first.toColumnMap()['id'] as int;
-          final homeLeague = int.tryParse('${homeTeam.first.toColumnMap()['id_league']}') ?? 0;
-          final awayLeague = int.tryParse('${awayTeam.first.toColumnMap()['id_league']}') ?? 0;
-
-          final scores = card.querySelectorAll('.bb-score__score');
-          var scoreHome = -1;
-          var scoreAway = -1;
-          if (scores.length >= 3) {
-            scoreHome = int.tryParse(scores[0].text.trim()) ?? -1;
-            scoreAway = int.tryParse(scores[2].text.trim()) ?? -1;
-          }
-          final status = linkText.isNotEmpty ? linkText : statusText;
-          final venue = card.querySelector('.bb-score__venue')?.text.trim() ?? '';
-
-          var start = gameStartOn(formatted, statusText);
-          start ??= gameStartOn(formatted, linkText);
-          start ??= DateTime.tryParse('$formatted 00:00:00');
-          if (start == null) continue;
-
-          final cardLive = status.contains('試合中') ||
-              statusText.contains('試合中') ||
-              RegExp(r'\d+\s*回').hasMatch(status) ||
-              RegExp(r'\d+\s*回').hasMatch(statusText);
-          final known = await _gameOnDate(conn, idTeamHome, idTeamAway, formatted);
-          if (!futureDay && !GameStatsLoad.needsRefresh(live: cardLive, loaded: known?.loaded == true)) {
-            print('MLB試合スキップ(成績済): $homeName vs $awayName');
-            continue;
-          }
-
-          var idPitcherHome = 0;
-          var idPitcherAway = 0;
-          var idPitcherWin = 0;
-          var idPitcherLose = 0;
-          var idPitcherSave = 0;
-          var matchState = status;
-          var detailScoreHome = scoreHome;
-          var detailScoreAway = scoreAway;
-
-          try {
-            final detailUrl = url.resolve(href.replaceFirst('index', 'top'));
-            final detail = await YahooHtml.fetchDocument(detailUrl);
-            final boards = detail.querySelectorAll('#gm_brd');
-            if (boards.isNotEmpty) {
-              final match = boards.first;
-              final info = match.querySelector('#async-gameCard');
-              final timeText = (info?.querySelector('time') ?? match.querySelector('time'))?.text.trim() ?? '';
-              final parsed = gameStartOn(formatted, timeText);
-              if (parsed != null) start = parsed;
-
-              try {
-                final detailBlock = match.querySelectorAll('#async-gameDetail').first;
-                final scoreSpans = detailBlock.querySelectorAll('div')[1].querySelectorAll('p')[0].querySelectorAll('span');
-                if (scoreSpans.length >= 3) {
-                  detailScoreHome = int.tryParse(scoreSpans[0].text.trim()) ?? detailScoreHome;
-                  detailScoreAway = int.tryParse(scoreSpans[2].text.trim()) ?? detailScoreAway;
-                }
-                matchState = detailBlock.querySelectorAll('div')[1].querySelectorAll('p')[1].text.trim();
-              } catch (_) {}
-
-              try {
-                final homePitcher = _starterLink(detail, home: true);
-                final awayPitcher = _starterLink(detail, home: false);
-                if (homePitcher.name.isNotEmpty) {
-                  idPitcherHome = await _ensurePlayer(conn, homePitcher.name, idTeamHome);
-                  await _syncStarterSeasonStats(
-                    conn,
-                    playerId: idPitcherHome,
-                    detailUrl: detailUrl,
-                    profileHref: homePitcher.href,
-                    clubs: clubs,
-                  );
-                }
-                if (awayPitcher.name.isNotEmpty) {
-                  idPitcherAway = await _ensurePlayer(conn, awayPitcher.name, idTeamAway);
-                  await _syncStarterSeasonStats(
-                    conn,
-                    playerId: idPitcherAway,
-                    detailUrl: detailUrl,
-                    profileHref: awayPitcher.href,
-                    clubs: clubs,
-                  );
-                }
-              } catch (e) {
-                print('MLB先発投手取得スキップ: $e');
-              }
-
-              try {
-                for (final player in detail.querySelectorAll('#async-resultPitcher table tbody tr')) {
-                  final ths = player.querySelectorAll('th');
-                  final tds = player.querySelectorAll('td');
-                  if (ths.isEmpty || tds.isEmpty) continue;
-                  final result = ths.first.text.trim();
-                  final teamSpan = tds.first.querySelector('span')?.text.trim() ?? '';
-                  final teamName = YahooTeamNames.normalize(teamSpan);
-                  final anchor = tds.first.querySelector('a');
-                  final hrefPlayer = anchor?.attributes['href']?.trim() ?? '';
-                  var namePlayer = StringTool.noSpace(anchor?.text ?? '');
-                  if ((namePlayer.isEmpty && hrefPlayer.isEmpty) || teamName.isEmpty) continue;
-                  final teamResult = await Postgres.execute(conn, AppSql.selectTeamsWhereName(), data: [teamName]);
-                  if (teamResult.isEmpty) continue;
-                  final idTeam = teamResult.first.toColumnMap()['id'] as int;
-                  if (namePlayer.isEmpty && hrefPlayer.isNotEmpty) {
-                    final playerDoc = await YahooHtml.fetchDocument(detailUrl.resolve(hrefPlayer));
-                    namePlayer = playerDoc.querySelectorAll('ruby.bb-profile__ruby').isEmpty
-                        ? ''
-                        : playerDoc.querySelectorAll('ruby.bb-profile__ruby').first.text.split('（').first.trim();
-                    if (namePlayer.isEmpty) continue;
-                    final idPlayer = await _ensurePlayer(conn, namePlayer, idTeam);
-                    await BirthPlaceRegistry.applyFromProfile(conn, idPlayer, playerDoc);
-                    if (result == '勝利投手') idPitcherWin = idPlayer;
-                    if (result == '敗戦投手') idPitcherLose = idPlayer;
-                    if (result == 'セーブ') idPitcherSave = idPlayer;
-                    continue;
-                  }
-                  if (namePlayer.isEmpty) continue;
-                  final idPlayer = await _ensurePlayer(conn, namePlayer, idTeam);
-                  if (result == '勝利投手') idPitcherWin = idPlayer;
-                  if (result == '敗戦投手') idPitcherLose = idPlayer;
-                  if (result == 'セーブ') idPitcherSave = idPlayer;
-                }
-              } catch (_) {}
-            }
-          } catch (e) {
-            print('MLB試合詳細スキップ ($homeName vs $awayName): $e');
-          }
-
-          var idStadium = 0;
-          final stadiumName = venue.isEmpty ? 'MLB' : venue;
-          final stadiumRows = await Postgres.execute(conn, AppSql.selectStadium(), data: ['%$stadiumName%']);
-          if (stadiumRows.isEmpty) {
-            final paths = StadiumImages.lookup(stadiumName);
-            final stadium = m_stadium()
-              ..name_short = stadiumName
-              ..id_team = idTeamHome
-              ..path_image_inside = paths.inside
-              ..path_image_outside = paths.outside;
-            idStadium = await Postgres.insert(conn, stadium);
-          } else {
-            idStadium = stadiumRows.first.toColumnMap()['id'] as int;
-          }
-
-          final exists = await conn.execute(AppSql.selectExistsGame(), parameters: [idTeamHome, idTeamAway, start]);
-          final game = t_game()
-            ..id_stadium = idStadium
-            ..id_team_home = idTeamHome
-            ..id_team_away = idTeamAway
-            ..id_pitcher_home = idPitcherHome
-            ..id_pitcher_away = idPitcherAway
-            ..datetime_start = start
-            ..score_home = detailScoreHome
-            ..score_away = detailScoreAway
-            ..state = matchState.isEmpty ? status : matchState
-            ..id_pitcher_win = idPitcherWin
-            ..id_pitcher_lose = idPitcherLose
-            ..id_pitcher_save = idPitcherSave
-            ..code_game = mlbGameCode(sectionTitle, homeLeague, awayLeague);
-
-          if (exists.isNotEmpty) {
-            game.id = exists.first.toColumnMap()['id'] as int;
-            await Postgres.update(conn, game);
-            print('MLB試合更新: $homeName vs $awayName');
-          } else if (known != null) {
-            game.id = known.id;
-            await Postgres.update(conn, game);
-            print('MLB試合更新: $homeName vs $awayName');
-          } else {
-            game.id = await Postgres.insert(conn, game);
-            print('MLB試合新規: $homeName vs $awayName');
-          }
-          reloadedDates?.add(formatted);
-          if (futureDay) GameFetchSchedule.rememberFutureCard(cardKey, fingerprint);
-
-          final live = matchState.contains('試合中') || RegExp(r'\d+\s*回').hasMatch(matchState);
-          final finished = matchState.contains('試合終了');
-          final started = live || finished || matchState.contains('終了');
-          // 日本時間の朝は UTC では前日なので、日付が「明日」でも開始済みなら出場成績を取る。
-          if (started && href.isNotEmpty && game.id > 0) {
-            try {
-              final statsUrl = url.resolve(FetchURL.gamePageHref(href, 'stats'));
-              await _saveGameBoxSummary(conn, statsUrl, game.id, idTeamHome, idTeamAway);
-            } catch (e, st) {
-              print('MLB出場成績スキップ ($homeName vs $awayName): $e');
-              print(st);
-            }
-            try {
-              await FetchURL.refreshGameDetails(
-                conn,
-                url,
-                href,
-                game.id,
-                idTeamHome,
-                idTeamAway,
-                idPitcherHome,
-                idPitcherAway,
-                saveMaxVelo: finished,
-              );
-            } catch (e, st) {
-              print('MLB打席・テキスト速報スキップ ($homeName vs $awayName): $e');
-              print(st);
-            }
-            await GameStatsLoad.markIfComplete(conn, game.id, finished: finished);
-          }
-          if (live || formatted == todayKey) {
-            await _publishProgress(conn);
-          }
-        }
-      }
-      if (GameFetchSchedule.isPastDay(date, now)) {
-        await GameStatsLoad.rememberPastDateIfSettled(
-          conn,
-          org: 'mlb',
-          date: formatted,
-          leagueIds: _org.leagueIds,
-        );
-      }
       } finally {
         if (lockedToday) {
           GameFetchSchedule.markTodayBusy('mlb', false);
@@ -1063,54 +1076,55 @@ class FetchMLB {
   }
 
   /// Yahoo MLB 出場成績から t_game_summary を入れ直す。
-  static Future<void> _saveGameBoxSummary(
+  static Future<bool> saveGameBoxSummary(
     Connection conn,
     Uri statsUrl,
     int gameId,
     int idTeamHome,
-    int idTeamAway,
-  ) async {
-    final doc = await YahooHtml.fetchDocument(statsUrl);
+    int idTeamAway, {
+    Document? document,
+  }) async {
+    final doc = document ?? await YahooHtml.fetchDocument(statsUrl);
     final groups = batterStatsGroups(doc, idTeamAway, idTeamHome);
-    if (groups.every((group) => group.rows.isEmpty)) return;
+    if (groups.every((group) => group.rows.isEmpty)) return false;
 
     final list = <t_game_summary>[];
     for (final group in groups) {
-    var teamId = group.teamId;
-    var switched = false;
-    final battingTracker = BoxBattingOrderTracker();
-    for (final row in group.rows) {
-      if (row.querySelectorAll('th').isNotEmpty) {
-        if (group.switchOnTh && !switched) {
-          teamId = idTeamHome;
-          switched = true;
-          battingTracker.reset();
+      var teamId = group.teamId;
+      var switched = false;
+      final battingTracker = BoxBattingOrderTracker();
+      for (final row in group.rows) {
+        if (row.querySelectorAll('th').isNotEmpty) {
+          if (group.switchOnTh && !switched) {
+            teamId = idTeamHome;
+            switched = true;
+            battingTracker.reset();
+          }
+          continue;
         }
-        continue;
+        final cells = row.querySelectorAll('td');
+        if (cells.length < 14) continue;
+        final name = StringTool.noSpace(cells[1].text);
+        if (name.isEmpty) continue;
+        final battingSlot = battingTracker.take(cells.first.text);
+        final playerId = await _ensurePlayer(conn, cells[1].text.trim(), teamId);
+        if (playerId <= 0) continue;
+        final summary = t_game_summary()
+          ..id_game = gameId
+          ..id_player = playerId
+          ..int_batting = int.tryParse(cells[3].text.trim()) ?? 0
+          ..int_hit1 = int.tryParse(cells[5].text.trim()) ?? 0
+          ..int_rbi = int.tryParse(cells[6].text.trim()) ?? 0
+          ..int_fourball = int.tryParse(cells[8].text.trim()) ?? 0
+          ..int_dead_batting = int.tryParse(cells[9].text.trim()) ?? 0
+          ..int_sacrifice = int.tryParse(cells[10].text.trim()) ?? 0
+          ..int_steal_base = int.tryParse(cells[11].text.trim()) ?? 0
+          ..int_error = int.tryParse(cells[12].text.trim()) ?? 0
+          ..int_homerun = int.tryParse(cells[13].text.trim()) ?? 0
+          ..int_batting_order = battingSlot.originalStarter ? battingSlot.order : 0
+          ..code_position_from = boxBadgePosition(cells.first.text);
+        list.add(summary);
       }
-      final cells = row.querySelectorAll('td');
-      if (cells.length < 14) continue;
-      final name = StringTool.noSpace(cells[1].text);
-      if (name.isEmpty) continue;
-      final battingSlot = battingTracker.take(cells.first.text);
-      final playerId = await _ensurePlayer(conn, cells[1].text.trim(), teamId);
-      if (playerId <= 0) continue;
-      final summary = t_game_summary()
-        ..id_game = gameId
-        ..id_player = playerId
-        ..int_batting = int.tryParse(cells[3].text.trim()) ?? 0
-        ..int_hit1 = int.tryParse(cells[5].text.trim()) ?? 0
-        ..int_rbi = int.tryParse(cells[6].text.trim()) ?? 0
-        ..int_fourball = int.tryParse(cells[8].text.trim()) ?? 0
-        ..int_dead_batting = int.tryParse(cells[9].text.trim()) ?? 0
-        ..int_sacrifice = int.tryParse(cells[10].text.trim()) ?? 0
-        ..int_steal_base = int.tryParse(cells[11].text.trim()) ?? 0
-        ..int_error = int.tryParse(cells[12].text.trim()) ?? 0
-        ..int_homerun = int.tryParse(cells[13].text.trim()) ?? 0
-        ..int_batting_order = battingSlot.originalStarter ? battingSlot.order : 0
-        ..code_position_from = boxBadgePosition(cells.first.text);
-      list.add(summary);
-    }
     }
 
     var pitcherTeam = idTeamAway;
@@ -1170,10 +1184,11 @@ class FetchMLB {
       pitcherTeam = idTeamHome;
     }
 
-    if (list.isEmpty) return;
+    if (list.isEmpty) return false;
     await Postgres.execute(conn, AppSql.deleteGameSummary(), data: [gameId]);
     await Postgres.insertMulti(conn, list);
-    print('MLB出場成績を登録: game=$gameId (${list.length}人)');
+    print('出場成績を登録: game=$gameId (${list.length}人)');
+    return true;
   }
 
   static String mlbGameCode(String sectionTitle, int homeLeague, int awayLeague) {
@@ -1263,43 +1278,10 @@ class FetchMLB {
     final sectionIndex = home ? 0 : 1;
     Element? anchor;
     try {
-      anchor = detail
-          .querySelectorAll('#strt_mem')
-          .first
-          .querySelectorAll('section')
-          .first
-          .querySelectorAll('div')
-          .first
-          .querySelectorAll('section')[sectionIndex]
-          .querySelectorAll('table')
-          .first
-          .querySelectorAll('tbody')
-          .first
-          .querySelectorAll('tr')
-          .first
-          .querySelectorAll('td')[2]
-          .querySelector('a');
+      anchor = detail.querySelectorAll('#strt_mem').first.querySelectorAll('section').first.querySelectorAll('div').first.querySelectorAll('section')[sectionIndex].querySelectorAll('table').first.querySelectorAll('tbody').first.querySelectorAll('tr').first.querySelectorAll('td')[2].querySelector('a');
     } catch (_) {
       try {
-        anchor = detail
-            .querySelectorAll('#strt_pit')
-            .first
-            .querySelectorAll('div')
-            .first
-            .querySelectorAll('div')
-            .first
-            .querySelectorAll('section')[sectionIndex]
-            .querySelectorAll('div')[1]
-            .querySelectorAll('div')
-            .first
-            .querySelectorAll('table')
-            .first
-            .querySelectorAll('tbody')
-            .first
-            .querySelectorAll('tr')
-            .first
-            .querySelectorAll('td')[2]
-            .querySelector('a');
+        anchor = detail.querySelectorAll('#strt_pit').first.querySelectorAll('div').first.querySelectorAll('div').first.querySelectorAll('section')[sectionIndex].querySelectorAll('div')[1].querySelectorAll('div').first.querySelectorAll('table').first.querySelectorAll('tbody').first.querySelectorAll('tr').first.querySelectorAll('td')[2].querySelector('a');
       } catch (_) {
         anchor = null;
       }

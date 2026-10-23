@@ -110,13 +110,27 @@ class _AdminNewsPanelState extends State<AdminNewsPanel> {
     }
   }
 
-  Widget _tag(String code, String label, String selected, ValueChanged<String> change) => DropdownButtonFormField<String>(
-        initialValue: selected,
-        isExpanded: true,
-        decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
-        items: [const DropdownMenuItem(value: '', child: Text('なし')), for (final tag in _tags.where((t) => t['code'] == code)) DropdownMenuItem(value: '${tag['key']}', child: Text('${tag['label']}'))],
-        onChanged: _saving ? null : (value) => setState(() => change(value ?? '')),
-      );
+  Widget _tag(String code, String label, String selected, ValueChanged<String> change) {
+    final choices = _tags.where((t) => t['code'] == code).toList();
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+      const SizedBox(height: 6),
+      Wrap(spacing: 8, runSpacing: 4, children: [
+        for (final tag in [{'key': '', 'label': 'なし'}, ...choices])
+          ChoiceChip(
+            key: ValueKey('news-category-$code-${tag['key']}'),
+            label: Text('${tag['label']}'),
+            selected: selected == '${tag['key']}',
+            onSelected: _saving ? null : (_) => setState(() => change('${tag['key']}')),
+          ),
+      ]),
+      if (choices.isEmpty)
+        Row(children: [
+          const Expanded(child: Text('カテゴリの選択肢を取得できませんでした。')),
+          TextButton(onPressed: _saving ? null : _load, child: const Text('再読み込み')),
+        ]),
+    ]);
+  }
   @override
   Widget build(BuildContext context) {
     if (_loading) return const Center(child: BaseballLoading());
@@ -136,9 +150,9 @@ class _AdminNewsPanelState extends State<AdminNewsPanel> {
                     const SizedBox(height: 12),
                     TextFormField(controller: _body, enabled: !_saving, minLines: 4, maxLines: 10, maxLength: 10000, decoration: const InputDecoration(labelText: '本文', border: OutlineInputBorder())),
                     const SizedBox(height: 12),
-                    _tag('NORTIFICATION', 'メインタグ', _main, (v) => _main = v),
+                    _tag('NORTIFICATION', 'カテゴリ', _main, (v) => _main = v),
                     const SizedBox(height: 12),
-                    _tag('NORTIFICATION_SUB', 'サブタグ', _sub, (v) => _sub = v),
+                    _tag('NORTIFICATION_SUB', 'サブカテゴリ', _sub, (v) => _sub = v),
                     const SizedBox(height: 12),
                     TextFormField(
                         controller: _url,

@@ -140,12 +140,16 @@ void main() {
   testWidgets('会議終了後は予想に代わって公式の指名結果を表示する', (t) async {
     await t.binding.setSurfaceSize(const Size(1200, 800));
     addTearDown(() => t.binding.setSurfaceSize(null));
-    await t.runAsync(() => rootBundle.loadString('backend/assets/data/draft_2026.json'));
+    await t.runAsync(() => Future.wait([rootBundle.loadString('backend/assets/data/draft_2026.json'), rootBundle.loadString('backend/assets/data/draft_history.json')]));
     await t.pumpWidget(const MaterialApp(home: Scaffold(body: StrengthDraft(year: 2026))));
     await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
     await t.pumpAndSettle();
     expect(find.byKey(const ValueKey('draft-prediction-菰田陽生-巨人')), findsNothing);
     expect(find.byKey(const ValueKey('draft-result-菰田陽生')), findsOneWidget);
+    expect(find.byKey(const ValueKey('draft-nomination-菰田陽生-単独指名')), findsOneWidget);
+    expect(find.byKey(const ValueKey('draft-nomination-鈴木泰成-2球団競合')), findsOneWidget);
+    expect(find.byKey(const ValueKey('draft-nomination-宮原廉-ハズレ1位')), findsOneWidget);
+    expect(find.byKey(const ValueKey('draft-nomination-米沢友翔-ハズレハズレ1位')), findsOneWidget);
     expect(find.text('指名結果'), findsOneWidget);
     expect(t.getBottomRight(find.byKey(const ValueKey('draft-cell-菰田陽生-12'))).dx,
         t.getBottomRight(find.byKey(const ValueKey('draft-cell-織田翔希-12'))).dx);
@@ -441,7 +445,7 @@ void main() {
   testWidgets('経歴が多い選手も拡大文字ですべてセル内に収める', (t) async {
     await t.binding.setSurfaceSize(const Size(1200, 800));
     addTearDown(() => t.binding.setSurfaceSize(null));
-    await t.runAsync(() => rootBundle.loadString('backend/assets/data/draft_2026.json'));
+    await t.runAsync(() => Future.wait([rootBundle.loadString('backend/assets/data/draft_2026.json'), rootBundle.loadString('backend/assets/data/draft_history.json')]));
     await t.pumpWidget(const MaterialApp(home: MediaQuery(
       data: MediaQueryData(textScaler: TextScaler.linear(1.5)),
       child: Scaffold(body: StrengthDraft(year: 2026)))));
@@ -460,7 +464,7 @@ void main() {
   testWidgets('ドラフトは固定4列と横スクロール表で詳細を開き出典URLを表示しない', (t) async {
     await t.binding.setSurfaceSize(const Size(375, 700));
     addTearDown(() => t.binding.setSurfaceSize(null));
-    await t.runAsync(() => rootBundle.loadString('backend/assets/data/draft_2026.json'));
+    await t.runAsync(() => Future.wait([rootBundle.loadString('backend/assets/data/draft_2026.json'), rootBundle.loadString('backend/assets/data/draft_history.json')]));
     await t.pumpWidget(const MaterialApp(home: Scaffold(body: StrengthDraft(year: 2026))));
     await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
     await t.pumpAndSettle();
@@ -473,7 +477,7 @@ void main() {
     expect(find.text('高校生'), findsWidgets);
     expect(find.text('大学生'), findsWidgets);
     expect(find.text('社会人'), findsWidgets);
-    expect(find.text('独立'), findsWidgets);
+    expect(find.text('独立リーグ'), findsWidgets);
     expect(find.text('鎌田州真'), findsOneWidget);
     final fixed = find.byKey(const ValueKey('draft-cell-菰田陽生-1'));
     final age = find.byKey(const ValueKey('draft-cell-菰田陽生-4'));

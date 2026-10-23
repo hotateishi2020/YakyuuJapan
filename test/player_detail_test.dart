@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:Yakyuu_Japan/logic/auth_session.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,6 +12,25 @@ import 'package:Yakyuu_Japan/View/GamesBoard.dart' show GameBattingResult, GameP
 import 'package:Yakyuu_Japan/View/BlinkBg.dart';
 
 void main() {
+  for (final special in [false, true]) {
+    testWidgets('選手生成画像は許可ユーザーだけ表示しログアウトで消える $special', (t) async {
+      AuthSession.instance.user = AuthUser.fromJson({'id': special ? 1 : 3, 'flg_special': special});
+      AuthSession.instance.token = 'test';
+      addTearDown(() { AuthSession.instance.user = null; AuthSession.instance.token = null; });
+      await http.runWithClient(() async {
+        await t.pumpWidget(const MaterialApp(home: PlayerDetailDialog(player: {'id_player': 1}, org: 'npb', year: 2026)));
+        await t.pumpAndSettle();
+        final frame = find.byKey(const ValueKey('player-character-frame'));
+        expect(frame, special ? findsOneWidget : findsNothing);
+        AuthSession.instance.user = null;
+        await t.pumpAndSettle();
+        expect(frame, findsNothing);
+      }, () => MockClient((_) async => http.Response(jsonEncode({
+        'found': true, 'profile': {'name_full': '甲'},
+        'character_image': {'url': '/test-character.png'},
+      }), 200, headers: {'content-type': 'application/json; charset=utf-8'})));
+    });
+  }
   for (final matched in [false, true]) {
     testWidgets('ホームラン動画は特定できた直接動画だけ再生可能 $matched', (t) async {
       await http.runWithClient(() async {
@@ -194,6 +214,9 @@ void main() {
     });
 
     testWidgets('今季スタッツとリーグ順位を${portrait ? '功績の下' : 'プロフィール右側'}に表示', (t) async {
+      AuthSession.instance.user = AuthUser.fromJson({'id': 1, 'flg_special': true});
+      AuthSession.instance.token = 'test';
+      addTearDown(() { AuthSession.instance.user = null; AuthSession.instance.token = null; });
       t.view.physicalSize = portrait ? const Size(390, 900) : const Size(1200, 900);
       t.view.devicePixelRatio = 1;
       addTearDown(t.view.resetPhysicalSize);
@@ -329,6 +352,9 @@ void main() {
   });
 
   testWidgets('画像とプロフィールの高さを揃え直近25試合を過去シーズンの前に表示する', (t) async {
+      AuthSession.instance.user = AuthUser.fromJson({'id': 1, 'flg_special': true});
+      AuthSession.instance.token = 'test';
+      addTearDown(() { AuthSession.instance.user = null; AuthSession.instance.token = null; });
     await t.binding.setSurfaceSize(const Size(1200, 1000));
     addTearDown(() => t.binding.setSurfaceSize(null));
     await http.runWithClient(() async {
@@ -404,6 +430,9 @@ void main() {
   });
 
   testWidgets('画像取得失敗でも表示領域を保ちスクロール後に戻れる', (t) async {
+      AuthSession.instance.user = AuthUser.fromJson({'id': 1, 'flg_special': true});
+      AuthSession.instance.token = 'test';
+      addTearDown(() { AuthSession.instance.user = null; AuthSession.instance.token = null; });
     t.view.physicalSize = const Size(390, 900);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.resetPhysicalSize);

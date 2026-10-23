@@ -52,10 +52,10 @@ void main() {
   });
 
   test('完了済みの終了試合は選手成績を取り直さない', () {
-    expect(GameStatsLoad.needsRefresh(live: false, loaded: true), isFalse);
-    expect(GameStatsLoad.needsRefresh(live: false, loaded: false), isTrue);
-    expect(GameStatsLoad.needsRefresh(live: true, loaded: true), isTrue);
-    expect(GameStatsLoad.needsRefresh(live: true, loaded: false), isTrue);
+    expect(GameStatsLoad.needsRefresh(finished: true, loaded: true), isFalse);
+    expect(GameStatsLoad.needsRefresh(finished: true, loaded: false), isTrue);
+    expect(GameStatsLoad.needsRefresh(finished: false, loaded: true), isFalse);
+    expect(GameStatsLoad.needsRefresh(finished: false, loaded: false), isFalse);
   });
 
   test('MLB日程は今日と昨日を先に回す', () {

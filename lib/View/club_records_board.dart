@@ -1,3 +1,4 @@
+import '../widgets/navigation_picker.dart';
 import '../widgets/collapsible_menu.dart';
 import '../config/app_design.dart';
 import '../logic/favorite_team.dart';
@@ -86,7 +87,12 @@ class _ClubRecordsBoardState extends State<ClubRecordsBoard> {
                 )),
         ]);
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      if (portrait) MenuBand(level: 3, child: LayoutBuilder(builder: (context, constraints) {
+      if (portrait && NavigationPickerScope.enabled(context))
+        NavigationPicker(level: 3, labels: {for (var i = 0; i < allTeams.length; i++) i: '${allTeams[i]['name_shortest'] ?? allTeams[i]['short_name'] ?? allTeams[i]['name']}'},
+          value: allTeams.indexWhere((t) => teamKey(t) == teamKey(selected)),
+          onChanged: (i) { if (_horizontal.hasClients) _horizontal.jumpTo(0); setState(() => _selectedTeam = teamKey(allTeams[i])); },
+          color: parseColorNameOrNull('${selected['color_back']}') ?? Colors.blueGrey, foreground: Colors.white)
+      else if (portrait) MenuBand(level: 3, child: LayoutBuilder(builder: (context, constraints) {
         final columns = allTeams.length < 6 ? allTeams.length : 6;
         final tabWidth = (constraints.maxWidth - (columns - 1) * ALL_SPACE_BLOCK) / columns;
         return Wrap(spacing: ALL_SPACE_BLOCK, runSpacing: ALL_SPACE_BLOCK, children: [

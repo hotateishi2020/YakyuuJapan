@@ -1,3 +1,4 @@
+import '../widgets/navigation_picker.dart';
 import '../widgets/collapsible_menu.dart';
 import 'player_detail_dialog.dart';
 import 'dart:convert';
@@ -313,8 +314,20 @@ class _RegularHistoryBoardState extends State<RegularHistoryBoard> {
         : favorite == null
             ? teams.keys.firstOrNull
             : '${favorite['id_team']}';
+    final teamIds = teams.keys.toList();
     final rows = widget.rows.where((r) => '${r['id_team']}' == id).map((r) => {...r, 'name_team': '${r['year']}年'}).toList();
     return Column(children: [
+      if (NavigationPickerScope.enabled(context) && teamIds.isNotEmpty)
+        NavigationPicker(
+          level: 3,
+          pickerKey: const ValueKey('regular-history-team-picker'),
+          labels: {for (var i = 0; i < teamIds.length; i++) i: teams[teamIds[i]]!},
+          value: teamIds.indexOf(id!),
+          onChanged: (value) => setState(() => selected = teamIds[value]),
+          color: const Color(0xFFCB0115),
+          foreground: Colors.white,
+        )
+      else
       SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: [for (final e in teams.entries) Padding(padding: const EdgeInsets.all(3), child: ChoiceChip(label: Text(e.value), selected: id == e.key, onSelected: (_) => setState(() => selected = e.key)))])),
       Row(children: [
         for (final e in const {false: 'ポジション', true: '打順'}.entries) TextButton(onPressed: () => setState(() => batting = e.key), child: Text(e.value, style: TextStyle(fontWeight: batting == e.key ? FontWeight.bold : FontWeight.normal)))

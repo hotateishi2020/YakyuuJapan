@@ -23,11 +23,15 @@ List<Map<String, dynamic>> parseRosterMoves(String source, int year) {
       final cells = row.querySelectorAll('td');
       if (cells.length != 5) continue;
       final date = cells[0].text.trim().split('/');
-      if (date.length != 3 || int.tryParse(date[0]) != year) continue;
+      if (date.length != 3) continue;
       final state = cells[1].text.trim(), reason = cells[4].text.trim();
       if (RegExp('調査|検討|可能性|交渉中|見込み').hasMatch('$state $reason')) continue;
       final incoming = state == '入団';
       if (!incoming && state != '退団') continue;
+      final eventYear = int.tryParse(date[0]);
+      final month = int.tryParse(date[1]) ?? 0;
+      if (eventYear != year &&
+          !(incoming && eventYear == year - 1 && month >= 9)) continue;
       final name = (cells[2].querySelector('a')?.text ?? cells[2].text)
           .replaceAll('※', '')
           .trim();
@@ -42,6 +46,10 @@ List<Map<String, dynamic>> parseRosterMoves(String source, int year) {
             '${date[0]}-${date[1].padLeft(2, '0')}-${date[2].padLeft(2, '0')}',
         'status_source': rosterMovesUrl,
         'departure_reason': reason,
+        if (incoming && RegExp('FA|ＦＡ|トレード|現役ドラフト|新外国人').hasMatch(reason))
+          'move_method': reason.contains('現役ドラフト') ? '現役ドラフト'
+              : reason.contains('トレード') ? 'トレード'
+              : RegExp('FA|ＦＡ').hasMatch(reason) ? 'FA移籍' : '新外国人',
         if (href != null)
           'profile_source': Uri.parse(rosterMovesUrl).resolve(href).toString(),
         if (!incoming)
@@ -88,7 +96,8 @@ bool _appliesToYear(Map<String, dynamic> event, int year) {
 /// Applies only events from this display year; departed players remain in their old team's grid.
 void applyRosterMoves(List<Map<String, dynamic>> teams,
     List<Map<String, dynamic>> events, int year,
-    {List<Map<String, dynamic>> previous = const [],
+    {bool reconcileSource = true,
+    List<Map<String, dynamic>> previous = const [],
     List<Map<String, dynamic>> identities = const []}) {
   for (final team in teams) {
     final roster = usageMaps(team['roster']);
@@ -103,12 +112,13 @@ void applyRosterMoves(List<Map<String, dynamic>> teams,
         .toList()
       ..sort(
           (a, b) => ('${a['status_as_of']}'.compareTo('${b['status_as_of']}') != 0 ? '${a['status_as_of']}'.compareTo('${b['status_as_of']}') : _statusPriority(a).compareTo(_statusPriority(b))));
+    // Only a complete source snapshot can withdraw entries; research is incremental.
     // Remove withdrawn/source-corrected entries without deleting original roster members.
-    roster.removeWhere((p) => p['status_source'] == rosterMovesUrl &&
+    roster.removeWhere((p) => reconcileSource && p['status_source'] == rosterMovesUrl &&
       !relevant.any((e) => _same(p,e)) &&
       ('${p['player_key']}'.startsWith('move:') || p['move_added'] == true ||
        previous.where((t)=>t['id_team'] != team['id_team']).expand((t)=>usageMaps(t['roster'])).any((other)=>other['player_key']==p['player_key'])));
-    for(final p in roster.where((p)=>p['status_source']==rosterMovesUrl && !relevant.any((e)=>_same(p,e)))) {
+    for(final p in roster.where((p)=>reconcileSource && p['status_source']==rosterMovesUrl && !relevant.any((e)=>_same(p,e)))) {
       for(final key in ['status_source','status_as_of','departure_confirmed','departure_type','departure_reason','new_arrival','arrival_year','arrival_as_of','departure_as_of','move_method_as_of','previous_team']) {p.remove(key);}
     }
     for (final event in relevant) {
@@ -223,14 +233,27 @@ class RosterMoves {
   static bool _busy = false;
   static File _file(int year) => File(
       '${Directory('backend/data').existsSync() ? 'backend/' : ''}data/roster-moves-$year.json');
+  static List<Map<String, dynamic>> verified(int year) {
+    final file = File('${Directory('backend/assets').existsSync() ? 'backend/' : ''}assets/data/roster-moves-verified-$year.json');
+    return file.existsSync() ? usageMaps(jsonDecode(file.readAsStringSync())) : [];
+  }
+  static String eventKey(Map<String, dynamic> e) => '${e['team']}:${_name(e['name'])}:${e['kind']}:${e['kind']=='status'?e['move_status']:''}';
   static List<Map<String, dynamic>> cached(int year) {
     final file = _file(year), prior = _file(year - 1);
-    return [
+    final values = [
       if (prior.existsSync())
         ...usageMaps(jsonDecode(prior.readAsStringSync()))
             .where((e) => _appliesToYear(e, year)),
-      if (file.existsSync()) ...usageMaps(jsonDecode(file.readAsStringSync()))
+      if (file.existsSync()) ...usageMaps(jsonDecode(file.readAsStringSync())),
+      ...verified(year),
     ];
+    final merged = <String, Map<String, dynamic>>{};
+    for (final e in values) {
+      final key = eventKey(e);
+      if ('${merged[key]?['status_as_of'] ?? ''}'.compareTo('${e['status_as_of']}') > 0) continue;
+      merged[key] = e;
+    }
+    return merged.values.toList();
   }
 
   static void start() {
@@ -294,8 +317,9 @@ class RosterMoves {
         for (final e in cached(year).where((e) => e['status_source'] != rosterMovesUrl || e['source_team_verified'] == true))
           '${e['team']}:${_name(e['name'])}:${e['kind']}:${e['kind']=='status'?e['move_status']:''}': e
       };
-      for (final e in fetched) {
+      for (final e in [...fetched, ...verified(year)]) {
         final key = '${e['team']}:${_name(e['name'])}:${e['kind']}:${e['kind']=='status'?e['move_status']:''}';
+        if ('${events[key]?['status_as_of'] ?? ''}'.compareTo('${e['status_as_of']}') > 0) continue;
         events[key] = {...?events[key], ...e};
       }
       final values = events.values.toList();

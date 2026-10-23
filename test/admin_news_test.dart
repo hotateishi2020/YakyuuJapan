@@ -19,6 +19,14 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(find.text('News登録').first);
         await tester.pumpAndSettle();
+        expect(find.text('カテゴリ'), findsOneWidget);
+        expect(find.text('サブカテゴリ'), findsOneWidget);
+        expect(find.text('イベント'), findsOneWidget);
+        expect(find.text('シーズン予想'), findsOneWidget);
+        await tester.ensureVisible(find.text('システム'));
+        await tester.tap(find.text('システム'));
+        await tester.ensureVisible(find.text('アップデート'));
+        await tester.tap(find.text('アップデート'));
         await tester.ensureVisible(find.text('Newsを登録'));
         await tester.tap(find.text('Newsを登録'));
         await tester.pumpAndSettle();
@@ -40,6 +48,8 @@ void main() {
         expect(saves, 1);
         expect(sent?['title'], '新しいNews');
         expect(sent?['text_main'], 'お知らせの本文');
+        expect(sent?['code_tag_main'], 'SYS');
+        expect(sent?['code_tag_sub'], 'UPD');
         if (status == 201) {
           expect(find.text('Newsを登録しました'), findsOneWidget);
           final field = tester.widget<TextFormField>(
@@ -73,7 +83,10 @@ void main() {
                       'logs': [],
                       'news': [],
                       'tags': [
-                        {'code': 'NORTIFICATION', 'key': 'SYS', 'label': 'システム'}
+                        {'code': 'NORTIFICATION', 'key': 'SYS', 'label': 'システム'},
+                        {'code': 'NORTIFICATION', 'key': 'EVENT', 'label': 'イベント'},
+                        {'code': 'NORTIFICATION', 'key': 'PRED', 'label': 'シーズン予想'},
+                        {'code': 'NORTIFICATION_SUB', 'key': 'UPD', 'label': 'アップデート'},
                       ]
                     }),
                     200,

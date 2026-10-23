@@ -1,3 +1,6 @@
+import '../widgets/navigation_picker.dart';
+import '../widgets/draft_labels.dart';
+import '../widgets/special_media.dart';
 import 'player_detail_dialog.dart';
 import 'package:http/http.dart' as http;
 import '../tools/Env.dart';
@@ -21,6 +24,7 @@ class DraftHistoryBoard extends StatefulWidget {
 
 class _DraftHistoryBoardState extends State<DraftHistoryBoard> {
   Map<String, dynamic>? _years;
+  final Map<String, String> _schoolCategories = {};
   String? _team;
   int _mode = 0;
   int? _selectedYear;
@@ -45,6 +49,14 @@ class _DraftHistoryBoardState extends State<DraftHistoryBoard> {
           ? 'backend/assets/data/active_draft_history.json'
           : 'backend/assets/data/draft_history.json')) as Map<String, dynamic>;
       final years = Map<String, dynamic>.from(data['years'] as Map);
+      if (!widget.activeDraft) {
+        try {
+          final research = jsonDecode(await rootBundle.loadString('backend/assets/data/draft_2026.json')) as Map;
+          for (final player in research['players'] as List? ?? []) {
+            _schoolCategories['2026:${'${player['name']}'.replaceAll(RegExp(r'[\s　]+'), '')}'] = '${player['category']}';
+          }
+        } catch (_) { /* Historical affiliations still provide a fallback. */ }
+      }
       if (!mounted) return;
       setState(() {
         _years = years;
@@ -154,6 +166,20 @@ class _DraftHistoryBoardState extends State<DraftHistoryBoard> {
     }
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       if (!widget.activeDraft)
+        if (NavigationPickerScope.enabled(context))
+          NavigationPicker(
+            level: 3,
+            pickerKey: const ValueKey('draft-mode-picker'),
+            labels: const {0: '12球団1位指名', 1: 'チーム別全年度', 2: '年度ごと'},
+            value: _mode,
+            onChanged: (mode) => setState(() {
+              _mode = mode;
+              _team = _mode == 1 ? (_team ?? '巨人') : null;
+            }),
+            color: const Color(0xFFCB0115),
+            foreground: Colors.white,
+          )
+        else
         Row(children: [
           for (final entry in ['12球団1位指名', 'チーム別全年度', '年度ごと'].indexed)
             Flexible(
@@ -260,14 +286,15 @@ class _DraftHistoryBoardState extends State<DraftHistoryBoard> {
                       AnimatedBuilder(
                         animation: _horizontal,
                         builder: (context, _) => Stack(children: [
-                          IntrinsicHeight(
-                              child: Row(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                const SizedBox(width: yearWidth),
-                                ...cells,
-                              ])),
+                          Table(
+                            columnWidths: const {0: FixedColumnWidth(yearWidth)},
+                            defaultColumnWidth: FixedColumnWidth(cellWidth),
+                            defaultVerticalAlignment: TableCellVerticalAlignment.intrinsicHeight,
+                            children: [TableRow(children: [
+                              const SizedBox.shrink(),
+                              ...cells,
+                            ])],
+                          ),
                           Positioned(
                               left: _horizontal.hasClients
                                   ? _horizontal.offset
@@ -332,26 +359,12 @@ class _DraftHistoryBoardState extends State<DraftHistoryBoard> {
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.stretch,
                                                 children: [
-                                                    for (final entry
-                                                        in rows[index][i]
-                                                            .indexed)
-                                                      if (entry.$1 ==
-                                                          rows[index][i]
-                                                                  .length -
-                                                              1)
-                                                        Expanded(
-                                                            child: _pick(
-                                                                entry.$2,
-                                                                year: years[
-                                                                    index],
-                                                                fontSize:
-                                                                    fontSize))
-                                                      else
-                                                        _pick(entry.$2,
-                                                            year: years[index],
-                                                            fontSize: fontSize),
+                                                    for (final pick in rows[index][i])
+                                                      _pick(pick, year: years[index], fontSize: fontSize),
                                                   ]),
-                                        width: cellWidth),
+                                        width: cellWidth,
+                                        background: !widget.activeDraft && i < rows[index].length && rows[index][i].isNotEmpty
+                                            ? draftPositionColor('${rows[index][i].last['position'] ?? ''}') : null),
                                 ],
                                 yearCell(Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -363,7 +376,7 @@ class _DraftHistoryBoardState extends State<DraftHistoryBoard> {
                                                   fontSize: fontSize,
                                                   fontWeight:
                                                       FontWeight.bold))),
-                                      TextButton(
+                                      if (widget.activeDraft) TextButton(
                                           style: TextButton.styleFrom(
                                               foregroundColor: Colors.white,
                                               tapTargetSize:
@@ -390,10 +403,10 @@ class _DraftHistoryBoardState extends State<DraftHistoryBoard> {
                   );
                 })),
       if (!widget.activeDraft)
-        const Text('オレンジ：競合抽選で交渉権獲得　青：再指名（抽選落選あり）',
+        const Text('背景色：投手＝赤　捕手＝青　内野手＝黄　外野手＝緑',
             style: TextStyle(fontSize: 11)),
       if (!widget.activeDraft)
-        const Text('当時の球団名・制度を併記。楽天／近鉄列は2004年以前が近鉄（別球団）。',
+        const Text('楽天／近鉄列は2004年以前が近鉄（別球団）。',
             style: TextStyle(fontSize: 11, color: Colors.black54)),
     ]);
   }
@@ -483,7 +496,8 @@ class _DraftHistoryBoardState extends State<DraftHistoryBoard> {
                                                 fontSize:
                                                     width < 120 ? 10 : 12),
                                         ]),
-                                    width: width),
+                                    width: width,
+                                    background: !widget.activeDraft ? picks.where((p) => slot(p) == key && _matches(club == '楽天' && year < 2005 ? '近鉄' : club, '${p['team']}')).map((p) => draftPositionColor('${p['position'] ?? ''}')).firstOrNull : null),
                             ])
                         ],
                       ))),
@@ -591,12 +605,12 @@ class _DraftHistoryBoardState extends State<DraftHistoryBoard> {
               height: 24,
               child: asset == null
                   ? fallback()
-                  : Image.asset(
+                  : SpecialMedia(fallback: fallback(), child: Image.asset(
                       asset,
                       fit: BoxFit.contain,
                       cacheWidth: 72,
                       errorBuilder: (_, __, ___) => fallback(),
-                    )),
+                    ))),
         ));
   }
 
@@ -605,14 +619,12 @@ class _DraftHistoryBoardState extends State<DraftHistoryBoard> {
     final teams =
         (p['competition_teams'] as List?)?.cast<String>() ?? <String>[];
     final note = '${p['note'] ?? ''}';
-    final type = '${p['type'] ?? ''}';
-    final category = type == '-' || type.isEmpty
-        ? ''
-        : (type == '1' || type == '2' ? '第$type回 ' : '$type ');
     final rank = '${p['rank']}';
     return Container(
       padding: const EdgeInsets.all(3),
-      color: count != null
+      color: !widget.activeDraft
+          ? draftPositionColor('${p['position'] ?? ''}')
+          : count != null
           ? Colors.orange.shade50
           : note.contains('×')
               ? Colors.blue.shade50
@@ -621,18 +633,13 @@ class _DraftHistoryBoardState extends State<DraftHistoryBoard> {
           style: TextStyle(fontSize: fontSize),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            if (!widget.activeDraft)
-              Text(
-                  '${p['team']}　$category${int.tryParse(rank) != null ? '$rank位' : rank}',
-                  style: TextStyle(fontSize: fontSize)),
             PlayerNameLink(
                 player: Map<String, dynamic>.from(p),
-                child: Text('${p['name']}${count == null ? '' : '　$count球団競合'}',
-                    style: TextStyle(
+                child: Text('${p['name']}',
+                    style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: count != null
-                            ? Colors.deepOrange.shade800
-                            : null))),
+                        color: Colors.black87))),
+            if (!widget.activeDraft) Padding(padding: const EdgeInsets.symmetric(vertical: 3), child: DraftLabels(player: {...p, if (_schoolCategories['$year:${'${p['name']}'.replaceAll(RegExp(r'[\s　]+'), '')}'] case final category?) 'category': category})),
             if (count != null) ...[
               if (teams.isEmpty)
                 Text('競合球団：未確認', style: TextStyle(fontSize: fontSize))
@@ -668,7 +675,8 @@ class _DraftHistoryBoardState extends State<DraftHistoryBoard> {
                   ]),
             ] else
               Text('${p['position']}・${p['from']}'),
-            if ('${p['status'] ?? ''}'.isNotEmpty)
+            if ('${p['status'] ?? ''}'.isNotEmpty &&
+                (widget.activeDraft || rank != '1' || p['status'] != '交渉権獲得'))
               Text('${p['status']}', style: TextStyle(fontSize: fontSize)),
             if (note.isNotEmpty)
               Text('抽選・備考：$note', style: TextStyle(fontSize: fontSize)),

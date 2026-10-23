@@ -321,22 +321,21 @@ List<Map<String, dynamic>> selectChannelVideos(
     return sortVideosByPublishedAt(videos).take(channel.limit).toList();
   }
   final start = videoWindowStart(now, lookbackDays: channel.lookbackDays);
+  DateTime? published(Map<String, dynamic> video) =>
+      DateTime.tryParse('${video['published_at']}') ??
+      (channel.minimumVideos > 0 ? DateTime.tryParse('${video['published_sort_at']}') : null);
   final dated = videos.where((v) {
-    final published = DateTime.tryParse('${v['published_at']}');
-    return published != null && !published.isAfter(now);
-  }).toList()
-    ..sort((a, b) => DateTime.parse('${b['published_at']}')
-        .compareTo(DateTime.parse('${a['published_at']}')));
-  final recent = dated
-      .where((v) => !DateTime.parse('${v['published_at']}').isBefore(start))
-      .toList();
+    final date = published(v);
+    return date != null && !date.isAfter(now);
+  }).toList()..sort((a, b) => published(b)!.compareTo(published(a)!));
+  final recent = dated.where((v) => !published(v)!.isBefore(start)).toList();
   return recent.length < channel.minimumVideos
       ? dated.take(channel.minimumVideos).toList()
       : recent;
 }
 
-// Relative labels only decide when it is safe to stop paging. Inclusion always
-// uses the exact publication time from Atom or the watch page.
+// Relative labels also preserve a minimum feed when exact dates are unavailable.
+// Estimated sort times remain separate from confirmed publication dates.
 bool _olderThanWindow(Map<String, dynamic> video, {int lookbackDays = 1}) {
   final label = '${video['published_label'] ?? ''}';
   if (RegExp(r'週間前|か月前|ヶ月前|年前|weeks? ago|months? ago|years? ago')
@@ -772,7 +771,7 @@ class VideoFeedService {
             return await _dated(channel, v);
           } catch (_) {
             complete = false;
-            return null;
+            return channel.minimumVideos > 0 ? withVideoSortTime(v, _now()) : null;
           }
         }));
         videos.addAll(dated.whereType<Map<String, dynamic>>());
@@ -966,12 +965,20 @@ class VideoFeedService {
         videos = parseTverSearch(
             Map<String, dynamic>.from(jsonDecode(body)), _now());
       } else if (channel.daily) {
-        final recent = await _recent(channel);
-        videos = recent.videos;
-        complete = recent.complete;
+        videos = [];
+        var readAnyTab = false;
+        try {
+          final recent = await _recent(channel);
+          videos = recent.videos;
+          complete = recent.complete;
+          readAnyTab = true;
+        } catch (_) {
+          complete = false;
+        }
         if (channel.includeStreams) {
           try {
             final streams = await _recent(channel, tab: 'streams');
+            readAnyTab = true;
             final merged = {
               for (final v in [...videos, ...streams.videos]) '${v['id']}': v
             };
@@ -981,6 +988,7 @@ class VideoFeedService {
             complete = false;
           }
         }
+        if (!readAnyTab) throw const FormatException('Video tabs unavailable');
       } else {
         if (channel.category == 'broadcast' || channel.contentFilter != null) {
           final result = await _broadcastVideos(channel);

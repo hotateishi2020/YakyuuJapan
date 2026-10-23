@@ -3,6 +3,69 @@ import 'OverseasContracts.dart';
 
 // Individually verified alternate sources. Never derive terms from salary alone.
 const contractSupplements = <Map<String, dynamic>>[
+  // MLB contract seasons verified against the linked club/MLB reports.
+  {
+    'org': 'mlb', 'player_key': 'mlb:673513', 'team': 'SD',
+    'start_year': 2024, 'end_year': 2028, 'signed_date': '2023-12-23',
+    'source_url': 'https://www.mlb.com/ja/news/yuki-matsui-would-become-free-agent-if-he-exercises-opt-out-rights',
+  },
+  {
+    'org': 'mlb', 'player_key': 'mlb:672960', 'team': 'TOR',
+    'start_year': 2026, 'end_year': 2029, 'signed_date': '2026-01-04',
+    'source_url': 'https://www.mlb.com/ja/news/blue-jays-sign-kazuma-okamoto',
+  },
+  {
+    'org': 'mlb', 'player_key': 'mlb:808959', 'team': 'CWS',
+    'start_year': 2026, 'end_year': 2027, 'signed_date': '2025-12-21',
+    'source_url': 'https://www.mlb.com/amp/news/munetaka-murakami-white-sox-contract.html',
+  },
+  {
+    'org': 'mlb', 'player_key': 'mlb:579328', 'team': 'LAA',
+    'start_year': 2025, 'end_year': 2027, 'signed_date': '2024-11-27',
+    'source_url': 'https://www.mlb.com/press-release/press-release-angels-sign-lhp-yusei-kikuchi',
+    'detail': '契約総額 USD 63000000',
+  },
+  {
+    'org': 'mlb', 'player_key': 'mlb:807799', 'team': 'BOS',
+    'start_year': 2023, 'end_year': 2027, 'signed_date': '2022-12-15',
+    'source_url': 'https://www.mlb.com/press-release/press-release-masataka-yoshida-signs-contract-with-red-sox',
+  },
+  {
+    'org': 'mlb', 'player_key': 'mlb:684007', 'team': 'CHC',
+    'start_year': 2026, 'end_year': 2026, 'signed_date': '2025-11-18',
+    'source_url': 'https://www.mlb.com/cubs/news/shota-imanaga-accepts-qualifying-offer-from-cubs',
+  },
+  {
+    'org': 'mlb', 'player_key': 'mlb:673548', 'team': 'CHC',
+    'start_year': 2022, 'end_year': 2026, 'signed_date': '2022-03-18',
+    'source_url': 'https://www.mlb.com/cubs/news/seiya-suzuki-signs-5-year-deal-with-cubs',
+  },
+  {
+    'org': 'mlb', 'player_key': 'mlb:608372', 'team': 'COL',
+    'start_year': 2026, 'end_year': 2026, 'signed_date': '2026-02-10',
+    'source_url': 'https://www.mlb.com/news/tomoyuki-sugano-throws-rockies-spring-training',
+  },
+  {
+    'org': 'mlb', 'player_key': 'mlb:837227', 'team': 'HOU',
+    'start_year': 2026, 'end_year': 2028, 'signed_date': '2026-01-02',
+    'source_url': 'https://www.mlb.com/amp/news/tatsuya-imai-astros-deal.html',
+  },
+  {
+    'org': 'mlb', 'player_key': 'mlb:808967', 'team': 'LAD',
+    'start_year': 2024, 'end_year': 2035, 'signed_date': '2023-12-27',
+    'source_url': 'https://www.mlb.com/news/yoshinobu-yamamoto-dodgers-free-agent-deal',
+  },
+  {
+    'org': 'mlb', 'player_key': 'mlb:673540', 'team': 'NYM',
+    'start_year': 2023, 'end_year': 2027, 'signed_date': '2022-12-17',
+    'source_url': 'https://www.mlb.com/news/kodai-senga-s-future-uncertain-entering-offseason',
+  },
+  {
+    'org': 'mlb', 'player_key': 'mlb:506433', 'team': 'SD',
+    'start_year': 2023, 'end_year': 2028, 'signed_date': '2023-02-09',
+    'source_url': 'https://www.mlb.com/news/yu-darvish-padres-extension',
+    'detail': '契約総額 USD 108000000',
+  },
   {
     'org': 'npb',
     'name': '坂本勇人',

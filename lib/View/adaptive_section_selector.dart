@@ -1,3 +1,4 @@
+import '../widgets/navigation_picker.dart';
 import '../widgets/collapsible_menu.dart';
 import 'package:flutter/material.dart';
 import '../config/app_design.dart';
@@ -13,6 +14,7 @@ class AdaptiveSectionSelector extends StatelessWidget {
       required this.foreground,
       this.pickerKey,
       this.fitLabels = false,
+      this.alwaysPicker = false,
       this.itemKeyPrefix});
   final Map<int, String> labels;
   final int value;
@@ -21,10 +23,15 @@ class AdaptiveSectionSelector extends StatelessWidget {
   final Key? pickerKey;
   /// Allocate width by label length and shrink modestly before using a picker.
   final bool fitLabels;
+  final bool alwaysPicker;
   final String? itemKeyPrefix;
   @override
-  Widget build(BuildContext context) =>
-      MenuBand(level: 2, child: LayoutBuilder(builder: (context, bounds) {
+  Widget build(BuildContext context) {
+    if (NavigationPickerScope.enabled(context)) {
+      return NavigationPicker(level: 2, labels: labels, value: value, onChanged: onChanged,
+        color: background, foreground: foreground, pickerKey: pickerKey, alwaysPicker: alwaysPicker);
+    }
+    return MenuBand(level: 2, child: LayoutBuilder(builder: (context, bounds) {
         var textStyle = const TextStyle(fontSize: 12, fontWeight: FontWeight.bold);
         final available = bounds.maxWidth - (labels.length - 1) * ALL_SPACE_BLOCK;
         List<double> measure(TextStyle style) => labels.values.map((label) {
@@ -54,7 +61,7 @@ class AdaptiveSectionSelector extends StatelessWidget {
           if (next != value) onChanged(next);
         }
 
-        if (fits) {
+        if (fits && !alwaysPicker) {
           return SizedBox(
               height: TAB_BAR_H,
               child: Row(children: [
@@ -133,4 +140,5 @@ class AdaptiveSectionSelector extends StatelessWidget {
                   if (v != null) select(v);
                 })));
       }));
+  }
 }

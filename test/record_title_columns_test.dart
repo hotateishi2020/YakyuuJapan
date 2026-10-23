@@ -9,6 +9,7 @@ import 'package:Yakyuu_Japan/logic/record_awards.dart';
 
 void main() {
   test('equivalent titles share columns but distinct awards and seasons remain separate', () {
+    expect(recordAwardLabel('沢村栄治賞'), '沢村賞');
     expect(recordAwardLabel('MVP'), 'リーグMVP');
     expect(recordAwardLabel('最優秀選手'), 'リーグMVP');
     expect(recordAwardLabel('最優秀新人'), '新人王');
@@ -43,6 +44,7 @@ void main() {
       await tester.pumpAndSettle();
       tester.widget<DropdownButton<int>>(find.byKey(const ValueKey('records-picker-npb'))).onChanged!(1);
       await tester.pumpAndSettle();
+      expect(find.text('沢村賞'),findsOneWidget);
       expect(find.text('リーグMVP'),findsOneWidget);
       expect(tester.getTopLeft(find.text('神').first).dx, lessThan(tester.getTopLeft(find.text('受賞者2026')).dx));
       expect(find.text('阪神タイガース'), findsNothing);

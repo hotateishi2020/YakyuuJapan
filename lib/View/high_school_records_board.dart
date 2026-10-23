@@ -304,8 +304,7 @@ class _CareerRecords extends StatelessWidget {
             ]));
     return ListView(children: [
       ListTile(
-          title: Text('春夏の優勝回数（$year年まで）'),
-          subtitle: const Text('春＝選抜、夏＝全国選手権。旧校名を統合して集計（1950年の松山東は松山商に含む）。')),
+          title: Text('春夏の優勝回数（$year年まで）')),
       grid([
         '学校',
         '都道府県',
@@ -322,10 +321,8 @@ class _CareerRecords extends StatelessWidget {
             '${r['total']}'
           ]
       ]),
-      ListTile(
-          title: const Text('甲子園・春夏通算本塁打'),
-          subtitle: Text(
-              '${data['through_year']}年までの上位${hrs.length}人。練習試合・地方大会の本塁打は含みません。')),
+      const Padding(padding: EdgeInsets.all(8), child: Text('春＝選抜、夏＝全国選手権。旧校名を統合して集計（1950年の松山東は松山商に含む）。')),
+      const ListTile(title: Text('甲子園・春夏通算本塁打')),
       grid([
         '順位',
         '選手',
@@ -340,9 +337,8 @@ class _CareerRecords extends StatelessWidget {
             '${hrs[i]['value']}'
           ]
       ]),
-      const ListTile(
-          title: Text('主な高校通算本塁打（練習試合を含む）'),
-          subtitle: Text('報道による参考記録。公式戦のみの記録ではありません。')),
+      Padding(padding: const EdgeInsets.all(8), child: Text('${data['through_year']}年までの上位${hrs.length}人。練習試合・地方大会の本塁打は含みません。')),
+      const ListTile(title: Text('主な高校通算本塁打（練習試合を含む）')),
       grid([
         '選手',
         '学校',
@@ -355,7 +351,7 @@ class _CareerRecords extends StatelessWidget {
       const Padding(
           padding: EdgeInsets.all(8),
           child: SelectableText(
-              '出典：日刊スポーツ（2023/4/1）、デイリースポーツ（2023/8/8）。佐々木麟太郎は後日の140本に更新。',
+              '報道による参考記録。公式戦のみの記録ではありません。\n出典：日刊スポーツ（2023/4/1）、デイリースポーツ（2023/8/8）。佐々木麟太郎は後日の140本に更新。',
               style: TextStyle(fontSize: 10))),
       const Padding(
           padding: EdgeInsets.all(8),

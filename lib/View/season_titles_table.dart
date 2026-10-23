@@ -1,10 +1,11 @@
+import '../widgets/special_media.dart';
 import 'player_detail_dialog.dart';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../logic/record_awards.dart';
 import '../tools/color_parse.dart';
 import '../tools/open_youtube.dart';
-import 'GamesBoard.dart' show teamLogoVisual;
+import 'GamesBoard.dart' show teamLogoVisual, mlbTeamAbbrev;
 
 /// Spreadsheet-style NPB awards board. Unknown winners remain explicitly empty.
 class SeasonTitlesTable extends StatelessWidget {
@@ -68,7 +69,21 @@ class SeasonTitlesTable extends StatelessWidget {
                               : ink)),
           color: color));
 
-  Widget winners(List<Map<String, dynamic>> values, {String empty = '未定', bool showLogo = false, bool showStatus = true, bool showVideo = false, String? side, Color? background}) {
+  String teamLabel(Map<String, dynamic> row, {required bool mlb}) {
+    if (mlb) {
+      // Cached records can contain Japanese names (or LA) in name_shortest.
+      // Resolve the actual team before trusting those display labels.
+      for (final field in ['team', 'name_shortest', 'team_shortest']) {
+        final value = '${row[field] ?? ''}'.trim();
+        final abbreviation = mlbTeamAbbrev(value);
+        if (abbreviation != null) return abbreviation;
+      }
+      return recordShortestTeam(row);
+    }
+    return recordShortestTeam(row, preferCanonical: true);
+  }
+
+  Widget winners(List<Map<String, dynamic>> values, {bool mlb = false, String empty = '未定', bool showLogo = false, bool showStatus = true, bool showVideo = false, String? side, Color? background}) {
     return cell(values.isEmpty
         ? Text(empty, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, color: muted))
         : Column(mainAxisSize: MainAxisSize.min, children: [
@@ -85,9 +100,9 @@ class SeasonTitlesTable extends StatelessWidget {
                             return SizedBox(
                                 height: 36,
                                 child: visual.asset != null
-                                    ? Image.asset(visual.asset!, fit: BoxFit.contain)
+                                    ? SpecialMedia(child: Image.asset(visual.asset!, fit: BoxFit.contain))
                                     : visual.networkUrl != null
-                                        ? Image.network(visual.networkUrl!, fit: BoxFit.contain)
+                                        ? SpecialMedia(child: Image.network(visual.networkUrl!, fit: BoxFit.contain))
                                         : const SizedBox.shrink());
                           })(),
                           const SizedBox(height: 4),
@@ -99,7 +114,7 @@ class SeasonTitlesTable extends StatelessWidget {
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                                   decoration: BoxDecoration(color: parseColorName(row['color_back']?.toString(), const Color(0xffedf1f6)), borderRadius: BorderRadius.circular(4)),
-                                  child: Text(recordShortestTeam(row, preferCanonical: true), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: parseColorName(row['color_font']?.toString(), parseColorName(row['color_back']?.toString(), const Color(0xffedf1f6)).computeLuminance() > .179 ? Colors.black : Colors.white))),
+                                  child: Text(teamLabel(row, mlb: mlb), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: parseColorName(row['color_font']?.toString(), parseColorName(row['color_back']?.toString(), const Color(0xffedf1f6)).computeLuminance() > .179 ? Colors.black : Colors.white))),
                                 )),
                           Flexible(child: FittedBox(fit: BoxFit.scaleDown, child: PlayerNameLink(player: row, enabled: !showLogo && !['fresh_champion', 'allstar_champion', 'series_champion', 'interleague_champion', 'league_champion', 'cs_champion', 'series_entrants'].any((key) => (groups[key] ?? []).contains(row)), child: Text('${row['name'] ?? '—'}', maxLines: 1, softWrap: false, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ink))))),
                           if (showVideo) const SizedBox(width: 8),

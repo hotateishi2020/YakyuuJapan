@@ -95,21 +95,24 @@
       background: linear-gradient(to right,#e10600,#ff9800); }
     #startup-brand { position: relative; overflow: hidden; width: 170.96px; height: 29.4px; transform: translateY(1.5px); }
     #startup-brand img { position: absolute; width: 185.84px; height: 61.89px; max-width: none; left: -11.07px; top: -14.88px; }
-    .startup-tabs { display: flex; gap: 5px; margin: 8px 8px 0; height: 26px; }
-    #startup-org-tabs { height: 30px; margin-top: 5px; gap: 0; box-sizing: border-box;
-      background: #e8e8ed; border: .5px solid #d0d0d6; border-radius: 16px; }
-    #startup-board-tabs[hidden] { display: none; }
-    .startup-tab { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center;
-      text-align: center; border-radius: 16px; background: #e0e0e0; padding: 0 2px;
-      white-space: nowrap; font-size: 12px; color: #222; box-sizing: border-box; }
-    #startup-org-tabs .startup-tab { margin: 2px; border: .5px solid #d0d0d6;
-      border-radius: 14px; background: #e8e8ed; font-size: 13px; font-weight: 600; color: #666; }
-    #startup-org-tabs .startup-tab { flex: 1 1 0; min-width: 0; }
-    #startup-org-tabs img { width: 18px; height: 18px; object-fit: contain; margin-right: 4px; }
-    #startup-org-tabs [data-org="npb"] img { width: 22px; }
-    .startup-tab.selected, #startup-org-tabs .selected { color: white; background: #cb0115; font-weight: bold; }
-    #startup-shell[data-org="mlb"] .selected { background: #002d72; }
-    #startup-shell[data-org="predict"] #startup-org-tabs .selected, #startup-shell[data-org="other"] #startup-org-tabs .selected { background: black; }
+    #startup-navigation { display: flex; align-items: center; height: 40px;
+      margin: 5px 8px 0; overflow-x: auto; white-space: nowrap;
+      font-size: 13px; font-weight: 700; }
+    .startup-picker, .startup-tab { height: 34px; box-sizing: border-box;
+      flex: 0 0 auto; display: inline-flex; align-items: center;
+      border-radius: 8px; white-space: nowrap; }
+    .startup-picker { min-width: 110px; max-width: 220px; padding: 0 10px;
+      color: white; background: var(--nav-color); }
+    .startup-picker-label { overflow: hidden; text-overflow: ellipsis; flex: 1; }
+    .startup-picker::after { content: ''; margin-left: 10px;
+      border-left: 5px solid transparent; border-right: 5px solid transparent;
+      border-top: 5px solid white; }
+    .startup-separator { flex: 0 0 auto; margin: 0 6px; }
+    .startup-options { display: flex; flex: 0 0 auto; gap: 4px; }
+    .startup-tab { justify-content: center; min-width: 48px; padding: 0 14px;
+      background: var(--nav-pale); color: #222; }
+    .startup-tab.selected { background: var(--nav-color); color: white; }
+    #startup-navigation [hidden] { display: none; }
     #startup-status { text-align: center; padding: 40px 12px; color: #666; }
 
     main {
@@ -128,17 +131,7 @@
 <body>
   <div id="startup-shell" aria-busy="true">
     <header id="startup-header"><span id="startup-brand"><img src="assets/backend/assets/images/logo_yakyuu_japan.png" alt="Yakyuu! Japan"></span></header>
-    <div class="startup-tabs" id="startup-org-tabs" aria-label="団体タブ（起動中）">
-      <span class="startup-tab" data-org="predict">予想対決</span>
-      <span class="startup-tab selected" data-org="npb"><img src="assets/backend/assets/images/logo_npb.png" alt="">NPB</span>
-      <span class="startup-tab" data-org="mlb"><img src="assets/backend/assets/images/logo_mlb.webp" alt="">MLB</span>
-      <span class="startup-tab" data-org="other">その他</span>
-    </div>
-    <div class="startup-tabs" id="startup-board-tabs" aria-label="情報タブ（起動中）">
-      <span class="startup-tab" data-board="5">日程</span><span class="startup-tab selected" data-board="0">試合情報</span>
-      <span class="startup-tab" data-board="1">チーム順位</span><span class="startup-tab" data-board="2">個人成績</span><span class="startup-tab" data-board="8">タイトル</span>
-      <span class="startup-tab" data-board="3">戦力</span><span class="startup-tab" data-board="4">記録</span><span class="startup-tab" data-board="6">動画</span>
-    </div>
+    <nav id="startup-navigation" aria-label="階層ナビゲーション（起動中）"></nav>
     <div id="startup-status" role="status">読み込んでいます…</div>
   </div>
   <script>
@@ -150,31 +143,76 @@
           return cookie ? decodeURIComponent(cookie.slice(name.length + 1)) : localStorage.getItem('koko_cookie_' + name);
         } catch (_) { return null; }
       };
-      let org = 'npb';
+      const orgs = [['home', '🏠HOME'], ['predict', '🎯予想対決'], ['npb', '🇯🇵NPB'], ['mlb', '🇺🇸MLB'], ['other', '⚾️その他']];
       const saved = readSaved('koko_org');
-      if (['npb', 'mlb', 'predict', 'other'].includes(saved)) org = saved;
+      const org = orgs.some(([value]) => value === saved) ? saved : 'npb';
+      const color = org === 'npb' ? '#cb0115' : org === 'mlb' ? '#002d72' : '#000000';
+      const pale = org === 'npb' ? '#f8dbde' : org === 'mlb' ? '#dbe2eb' : '#dbdbdb';
       shell.dataset.org = org;
-      shell.querySelectorAll('[data-org]').forEach(tab => tab.classList.toggle('selected', tab.dataset.org === org));
-      if (org === 'mlb') {
-        const japanese = document.createElement('span');
-        japanese.className = 'startup-tab';
-        japanese.dataset.board = '7';
-        japanese.textContent = '日本人';
-        document.querySelector('[data-board="0"]').before(japanese);
+      shell.style.setProperty('--nav-color', color);
+      shell.style.setProperty('--nav-pale', pale);
+      const navigation = document.getElementById('startup-navigation');
+      const groups = [{labels: orgs, value: org}];
+      if (org === 'npb' || org === 'mlb') {
+        const labels = [
+          ...(org === 'mlb' ? [['7', '🇯🇵日本人']] : []),
+          ['0', '💥試合情報'], ['1', '⚾️チーム順位'], ['2', '🥇個人成績'],
+          ['8', '🏆タイトル'], ['3', '💪戦力'], ['4', '📝記録'], ['6', '🎥動画'],
+        ];
+        const savedBoard = readSaved('koko_tab_main_' + org);
+        groups.push({labels, value: labels.some(([value]) => value === savedBoard) ? savedBoard : '0'});
+      } else if (org === 'other') {
+        const value = readSaved('koko_tab_other_main') === '1' ? '1' : '0';
+        groups.push({labels: [['0', '高校野球'], ['1', '国際シリーズ']], value});
       }
-      if (org === 'other') document.getElementById('startup-board-tabs').innerHTML = '<span class="startup-tab selected">高校野球</span><span class="startup-tab">国際シリーズ</span>';
-      if (org === 'predict') document.getElementById('startup-board-tabs').hidden = true;
-      const savedBoard = readSaved('koko_tab_main_' + org);
-      const board = (/^[0-68]$/.test(savedBoard || '') || (org === 'mlb' && savedBoard === '7')) ? savedBoard : '0';
-      shell.querySelectorAll('[data-board]').forEach(tab => tab.classList.toggle('selected', tab.dataset.board === board));
-      const fitTabs = () => shell.querySelectorAll('[data-board]').forEach(tab => {
-        tab.style.fontSize = '12px';
-        let size = 12;
-        while (tab.scrollWidth > tab.clientWidth && size > 6) tab.style.fontSize = (--size) + 'px';
+      const pickers = [];
+      groups.forEach((group, index) => {
+        if (index) {
+          const separator = document.createElement('span');
+          separator.className = 'startup-separator';
+          separator.textContent = '>';
+          navigation.append(separator);
+        }
+        const picker = document.createElement('span');
+        picker.className = 'startup-picker';
+        picker.dataset.level = index;
+        const label = document.createElement('span');
+        label.className = 'startup-picker-label';
+        label.textContent = group.labels.find(([value]) => value === group.value)[1];
+        picker.append(label);
+        navigation.append(picker);
+        pickers.push(picker);
       });
-      fitTabs();
-      window.addEventListener('resize', fitTabs);
-      window.addEventListener('flutter-first-frame', () => { window.removeEventListener('resize', fitTabs); shell.remove(); }, {once: true});
+      const last = groups[groups.length - 1];
+      const options = document.createElement('div');
+      options.className = 'startup-options';
+      last.labels.forEach(([value, label]) => {
+        const tab = document.createElement('span');
+        tab.className = 'startup-tab' + (value === last.value ? ' selected' : '');
+        tab.textContent = label;
+        options.append(tab);
+      });
+      navigation.append(options);
+      const measure = document.createElement('span');
+      measure.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;pointer-events:none';
+      navigation.append(measure);
+      const textWidth = text => { measure.textContent = text; return Math.ceil(measure.getBoundingClientRect().width); };
+      const fitNavigation = () => {
+        if (!shell.isConnected) return;
+        const widths = groups.map(group => Math.min(220, Math.max(110, Math.max(...group.labels.map(([, label]) => textWidth(label))) + 56)));
+        pickers.forEach((picker, index) => { picker.style.width = widths[index] + 'px'; });
+        const optionWidths = last.labels.map(([, label]) => Math.max(48, textWidth(label) + 28));
+        Array.from(options.children).forEach((tab, index) => { tab.style.width = optionWidths[index] + 'px'; });
+        const required = widths.slice(0, -1).reduce((a, b) => a + b, 0) +
+          (textWidth('>') + 12) * (groups.length - 1) + optionWidths.reduce((a, b) => a + b, 0) + (optionWidths.length - 1) * 4;
+        const expanded = required <= navigation.clientWidth;
+        pickers[pickers.length - 1].hidden = expanded;
+        options.hidden = !expanded;
+      };
+      fitNavigation();
+      document.fonts?.ready.then(fitNavigation);
+      window.addEventListener('resize', fitNavigation);
+      window.addEventListener('flutter-first-frame', () => { window.removeEventListener('resize', fitNavigation); shell.remove(); }, {once: true});
     })();
   </script>
   <main>

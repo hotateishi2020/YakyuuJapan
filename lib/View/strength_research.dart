@@ -1,3 +1,5 @@
+import '../logic/draft_competition.dart';
+import '../widgets/special_media.dart';
 import 'player_detail_dialog.dart';
 import '../logic/draft_video_priority.dart';
 import 'compact_layout.dart';
@@ -43,7 +45,20 @@ class _StrengthDraftState extends State<StrengthDraft> {
   final _horizontal = ScrollController();
   final _header = ScrollController();
   final _vertical = ScrollController();
-  Future<Map<String, dynamic>> load() async => Map<String, dynamic>.from(jsonDecode(await rootBundle.loadString('backend/assets/data/draft_${widget.year}.json')) as Map);
+  Future<Map<String, dynamic>> load() async {
+    final data = Map<String, dynamic>.from(jsonDecode(await rootBundle.loadString('backend/assets/data/draft_${widget.year}.json')) as Map);
+    final history = jsonDecode(await rootBundle.loadString('backend/assets/data/draft_history.json')) as Map;
+    final picks = draftPicksWithCompetition(((history['years'] as Map?)?['${widget.year}']?['picks'] as List? ?? []).cast<Map>());
+    for (final player in data['players'] as List) {
+      final result = player['draft_result'];
+      if (result is! Map) continue;
+      final match = picks.where((p) => p['team'] == result['team'] && '${p['rank']}' == '${result['rank']}' && (p['type'] == '育成') == (result['type'] == '育成')).firstOrNull;
+      if (match != null) {
+        player['draft_result'] = {...result, 'note': match['note'], 'competition': match['competition']};
+      }
+    }
+    return data;
+  }
 
   void _syncHeader() {
     if (_header.hasClients && _horizontal.hasClients) {
@@ -104,10 +119,12 @@ class _StrengthDraftState extends State<StrengthDraft> {
   }
 
   Color _categoryColor(String category) => switch (category) {
+        '中学生' => Colors.purple.shade700,
         '高校生' => Colors.red.shade700,
         '大学生' => Colors.blue.shade700,
         '社会人' => Colors.green.shade700,
-        _ => Colors.orange.shade800,
+        '独立リーグ' => Colors.orange.shade800,
+        _ => Colors.grey.shade600,
       };
 
   String _careerText(Map<String, dynamic> player) => draftCareerText(player);
@@ -156,7 +173,7 @@ class _StrengthDraftState extends State<StrengthDraft> {
   List<String> _values(Map<String, dynamic> p) => [
         '${p['attention_grade'] ?? '—'}',
         '${p['name'] ?? ''}',
-        '${p['category'] == '独立リーグ' ? '独立' : p['category']}',
+        '${p['category'] ?? '—'}',
         '${p['team'] ?? ''}',
         draftAgeOnMarch31(p['date_birth'], widget.year + 1)?.toString() ?? '—',
         p['height'] == null ? '—' : '${p['height']}cm',
@@ -184,7 +201,7 @@ class _StrengthDraftState extends State<StrengthDraft> {
                 ..sort((a, b) {
                   final gradeOrder = draftAttentionRank(a.$2).compareTo(draftAttentionRank(b.$2));
                   if (gradeOrder != 0) return gradeOrder;
-                  const order = {'高校生': 0, '大学生': 1, '社会人': 2, '独立リーグ': 3};
+                  const order = {'中学生': -1, '高校生': 0, '大学生': 1, '社会人': 2, '独立リーグ': 3};
                   final result = (order[a.$2['category']] ?? 4).compareTo(order[b.$2['category']] ?? 4);
                   return result == 0 ? a.$1.compareTo(b.$1) : result;
                 });
@@ -192,7 +209,7 @@ class _StrengthDraftState extends State<StrengthDraft> {
               final completed = data['results_complete'] == true;
               final headers = ['注目度', '選手名', '所属', 'チーム', '年齢', '身長', '体重', '投打', 'ポジション', '経歴', '特徴', completed ? '指名結果' : '獲得予想', '特集動画'];
               final videoCount = players.fold<int>(1, (max, p) => draftRelatedVideos(p.$2).length > max ? draftRelatedVideos(p.$2).length : max);
-              final minimumWidths = [42.0, 72.0, 50.0, 100.0, 42.0, 52.0, 50.0, 76.0, 68.0, 180.0, 240.0, 140.0, videoCount * 168.0 + (videoCount - 1) * 8 + 16];
+              final minimumWidths = [42.0, 72.0, 90.0, 100.0, 42.0, 52.0, 50.0, 76.0, 68.0, 300.0, 240.0, 140.0, videoCount * 168.0 + (videoCount - 1) * 8 + 16];
               final minimumWidth = minimumWidths.reduce((a, b) => a + b);
               final scale = constraints.maxWidth > minimumWidth ? constraints.maxWidth / minimumWidth : 1.0;
               final widths = [for (final width in minimumWidths) width * scale];
@@ -200,7 +217,7 @@ class _StrengthDraftState extends State<StrengthDraft> {
               const style = TextStyle(inherit: false, fontSize: 12, height: 1.4, color: Colors.black87);
               double textHeight(String text, double width, int column) {
                 // Match the rendered font and the space inside padding + border.
-                final painter = TextPainter(text: TextSpan(text: text, style: style.copyWith(fontWeight: column <= 2 ? FontWeight.bold : FontWeight.normal)), textDirection: Directionality.of(context), textScaler: MediaQuery.textScalerOf(context))..layout(maxWidth: width - 13);
+                final painter = TextPainter(text: TextSpan(text: text, style: style.copyWith(fontWeight: (column <= 2 || column == 11) ? FontWeight.bold : FontWeight.normal)), textDirection: Directionality.of(context), textScaler: MediaQuery.textScalerOf(context))..layout(maxWidth: width - 13);
                 final height = painter.height;
                 painter.dispose();
                 return height.ceilToDouble() + 14;
@@ -210,11 +227,12 @@ class _StrengthDraftState extends State<StrengthDraft> {
                 for (final p in players)
                   [
                     if (draftTopVideo(p.$2) != null) 94.0 + textHeight('${draftTopVideo(p.$2)!['view_count']}回再生', widths[12], 12) else 48.0,
-                    for (var i = 0; i < 11; i++) textHeight(_values(p.$2)[i], widths[i], i),
-                    if (completed) textHeight(draftResultLabel(p.$2), widths[11], 11)
+                    for (var i = 0; i < 11; i++) textHeight(_values(p.$2)[i], widths[i] - (i == 2 ? 12 : 0), i) + (i == 2 ? 6 : 0),
+                    if (completed) textHeight(draftResultLabel(p.$2), widths[11], 11) + (p.$2['draft_result'] is Map ? draftNominationLabels(p.$2['draft_result'] as Map).fold<double>(0, (sum, label) => sum + textHeight(label, widths[11] - 12, 11) + 4) : 0)
                     else ((listMapFromJson(p.$2['predictions']).length / logosPerRow).ceil() * 38 + 12).toDouble(),
                   ].reduce((a, b) => a > b ? a : b)
               ];
+              final headerHeight = [for (var i = 0; i < headers.length; i++) textHeight(headers[i], widths[i], 11)].fold<double>(40, math.max);
               Widget cell(int index, double height, {Map<String, dynamic>? player}) {
                 Widget child;
                 if (player == null) {
@@ -260,7 +278,17 @@ class _StrengthDraftState extends State<StrengthDraft> {
                                     }))),
                         ]);
                 } else if (index == 11 && completed) {
-                  child = Text(draftResultLabel(player), key: ValueKey('draft-result-${player['name']}'), style: style.copyWith(fontWeight: FontWeight.bold));
+                  child = Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(draftResultLabel(player), key: ValueKey('draft-result-${player['name']}'), style: style.copyWith(fontWeight: FontWeight.bold)),
+                    if (player['draft_result'] is Map)
+                      for (final label in draftNominationLabels(player['draft_result'] as Map))
+                        Padding(padding: const EdgeInsets.only(top: 4), child: Container(
+                          key: ValueKey('draft-nomination-${player['name']}-$label'),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                          decoration: BoxDecoration(color: label.contains('競合') ? Colors.deepOrange.shade700 : label.startsWith('ハズレ') ? Colors.blue.shade700 : Colors.green.shade700, borderRadius: BorderRadius.circular(4)),
+                          child: Text(label, style: style.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
+                        )),
+                  ]);
                 } else if (index == 11) {
                   child = Wrap(spacing: 2, runSpacing: 2, children: [
                     for (final prediction in listMapFromJson(player['predictions']))
@@ -272,15 +300,22 @@ class _StrengthDraftState extends State<StrengthDraft> {
                           child: SizedBox(
                             width: 36,
                             height: 36,
-                            child: Image.asset('${prediction['logo_asset']}', semanticLabel: '${prediction['team']}', errorBuilder: (_, __, ___) => Center(child: Text('${prediction['team']}', style: style))),
+                            child: SpecialMedia(child: Image.asset('${prediction['logo_asset']}', semanticLabel: '${prediction['team']}', errorBuilder: (_, __, ___) => Center(child: Text('${prediction['team']}', style: style)))),
                           ),
                         ),
                       ),
                   ]);
+                } else if (index == 2) {
+                  final category = '${player['category'] ?? '—'}';
+                  child = Container(
+                    key: ValueKey('draft-category-${player['name']}'),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    decoration: BoxDecoration(color: _categoryColor(category), borderRadius: BorderRadius.circular(4)),
+                    child: Text(category, style: style.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
+                  );
                 } else {
                   child = Text(_values(player)[index],
                       style: style.copyWith(
-                        color: index == 2 ? _categoryColor('${player['category']}') : null,
                         fontWeight: index <= 2 ? FontWeight.bold : FontWeight.normal,
                       ));
                   if (index == 1) {
@@ -320,8 +355,8 @@ class _StrengthDraftState extends State<StrengthDraft> {
                 if (completed)
                   Padding(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), child: Text('${data['results_date']} 指名結果：支配下${data['result_counts']['regular']}人・育成${data['result_counts']['development']}人（交渉権獲得）', style: const TextStyle(fontSize: 12))),
                 Row(children: [
-                  for (var i = 0; i < frozenColumns; i++) cell(i, 40),
-                  Expanded(child: SingleChildScrollView(controller: _header, physics: const NeverScrollableScrollPhysics(), scrollDirection: Axis.horizontal, child: Row(children: [for (var i = frozenColumns; i < headers.length; i++) cell(i, 40)]))),
+                  for (var i = 0; i < frozenColumns; i++) cell(i, headerHeight),
+                  Expanded(child: SingleChildScrollView(controller: _header, physics: const NeverScrollableScrollPhysics(), scrollDirection: Axis.horizontal, child: Row(children: [for (var i = frozenColumns; i < headers.length; i++) cell(i, headerHeight)]))),
                 ]),
                 Expanded(
                     child: SingleChildScrollView(

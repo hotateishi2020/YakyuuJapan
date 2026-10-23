@@ -1,0 +1,128 @@
+[
+  {
+    "team": "西武",
+    "name": "シンクレア",
+    "player_key": "npb:01905159",
+    "kind": "departure",
+    "position_group": "投手",
+    "status_as_of": "2026-10-01",
+    "status_source": "https://www.seibulions.jp/news/detail/202600726484.html",
+    "departure_type": "non_tender",
+    "departure_reason": "来季契約を結ばない旨を通告",
+    "source_team_verified": true
+  },
+  {
+    "team": "西武",
+    "name": "奥村光一",
+    "player_key": "npb:51555159",
+    "kind": "departure",
+    "position_group": "外野手",
+    "status_as_of": "2026-10-01",
+    "status_source": "https://www.seibulions.jp/news/detail/202600726484.html",
+    "departure_type": "non_tender",
+    "departure_reason": "来季契約を結ばない旨を通告",
+    "source_team_verified": true
+  },
+  {
+    "team": "ロッテ",
+    "name": "本前郁也",
+    "player_key": "npb:13115151",
+    "kind": "departure",
+    "position_group": "投手",
+    "status_as_of": "2026-10-04",
+    "status_source": "https://www.marines.co.jp/news/detail/202600941132.html",
+    "departure_type": "non_tender",
+    "departure_reason": "来季契約を結ばない旨を通告",
+    "source_team_verified": true
+  },
+  {
+    "team": "ロッテ",
+    "name": "永島田輝斗",
+    "player_key": "npb:71475155",
+    "kind": "departure",
+    "position_group": "投手",
+    "status_as_of": "2026-10-04",
+    "status_source": "https://www.marines.co.jp/news/detail/202600941132.html",
+    "departure_type": "non_tender",
+    "departure_reason": "来季契約を結ばない旨を通告",
+    "source_team_verified": true
+  },
+  {
+    "team": "ロッテ",
+    "name": "勝又琉偉",
+    "player_key": "npb:61365157",
+    "kind": "departure",
+    "position_group": "内野手",
+    "status_as_of": "2026-10-04",
+    "status_source": "https://www.marines.co.jp/news/detail/202600941132.html",
+    "departure_type": "non_tender",
+    "departure_reason": "来季契約を結ばない旨を通告",
+    "source_team_verified": true
+  },
+  {
+    "team": "ロッテ",
+    "name": "髙野光海",
+    "player_key": "npb:01705159",
+    "kind": "departure",
+    "position_group": "外野手",
+    "status_as_of": "2026-10-04",
+    "status_source": "https://www.marines.co.jp/news/detail/202600941132.html",
+    "departure_type": "non_tender",
+    "departure_reason": "来季契約を結ばない旨を通告",
+    "source_team_verified": true
+  },
+  {
+    "team": "ロッテ",
+    "name": "中村奨吾",
+    "player_key": "npb:51455130",
+    "kind": "departure",
+    "position_group": "内野手",
+    "status_as_of": "2026-09-30",
+    "status_source": "https://www.marines.co.jp/news/detail/202600938267.html",
+    "departure_type": "non_tender",
+    "departure_reason": "来季契約を結ばない旨を通告",
+    "source_team_verified": true
+  },
+  {
+    "team": "阪神",
+    "name": "長坂拳弥",
+    "player_key": "npb:91495134",
+    "kind": "departure",
+    "position_group": "捕手",
+    "status_as_of": "2026-10-23",
+    "status_source": "https://baseballking.jp/ns/710802/",
+    "departure_type": "non_tender",
+    "departure_reason": "来季契約を結ばない旨を通告",
+    "source_team_verified": true
+  },
+  {
+    "team": "西武",
+    "name": "カナリオ",
+    "aliases": [
+      "Ａ．カナリオ",
+      "アレクサンダー・カナリオ"
+    ],
+    "kind": "arrival",
+    "position_group": "外野手",
+    "status_as_of": "2025-12-22",
+    "status_source": "https://www.seibulions.co.jp/detail/00000658.html",
+    "move_method": "新外国人",
+    "previous_team_name": "パイレーツ",
+    "source_team_verified": true
+  },
+  {
+    "team": "楽天",
+    "name": "マッカスカー",
+    "aliases": [
+      "Ｃ．マッカスカー",
+      "カーソン・マッカスカー"
+    ],
+    "kind": "arrival",
+    "position_group": "外野手",
+    "status_as_of": "2025-12-14",
+    "status_source": "https://www.rakuteneagles.jp/news/detail/202500968398.html",
+    "move_method": "新外国人",
+    "previous_team_name": "ツインズ",
+    "source_team_verified": true
+  }
+]

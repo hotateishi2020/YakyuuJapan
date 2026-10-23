@@ -1,3 +1,5 @@
+import '../View/home_board.dart';
+import '../widgets/navigation_picker.dart';
 import '../widgets/app_section_tabs.dart';
 import '../widgets/collapsible_menu.dart';
 import '../widgets/game_info_tab_label.dart';
@@ -137,11 +139,12 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   static const _bracketCookie = 'koko_bracket_open';
   bool _bracketOpen = true;
   static const _orgCookie = 'koko_org';
+  bool _homeOpen = false;
   bool _otherOpen = false;
   OrgKind _orgKind = OrgKind.npb;
   final Map<OrgKind, _OrgBundle> _orgCache = {};
   final Map<OrgKind, Future<void>> _orgLoadFutures = {};
-  int _itemTab = 0;
+  int _itemTab = 1;
   int _seasonYear = DateTime.now().year;
   final Map<String, int> _loadedPartYears = {};
   PersonalStatsLayout _personalStatsLayout = PersonalStatsLayout.segment;
@@ -179,6 +182,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     bindPageVisibility(_onPageBecameVisible);
     // cookie のタブをそのまま初回表示（predict / npb / mlb）
     final savedTab = readBrowserCookie(_orgCookie);
+    _homeOpen = savedTab == 'home';
     _otherOpen = savedTab == 'other';
     if (savedTab == 'mlb') {
       _orgKind = OrgKind.mlb;
@@ -189,7 +193,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     } else {
       _orgKind = OrgKind.npb;
     }
-    _itemTab = readSavedTab('main_${_orgKind.name}', [0, 1, 2, 3, 4, 5, 6, 8, if (_orgKind == OrgKind.mlb) 7], fallback: 0);
+    _itemTab = readSavedTab('main_${_orgKind.name}', [1, 2, 3, 4, 6, 8, if (_orgKind == OrgKind.mlb) 7], fallback: 1);
     _personalStatsLayout = readPersonalStatsLayout();
     if (readBrowserCookie(_bracketCookie) == '0') _bracketOpen = false;
     // First paint contains only the header/tabs; cache decoding and requests follow.
@@ -839,7 +843,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   Future<void> _openPredictGroups() async {
-    setState(() => _otherOpen = false);
+    setState(() { _homeOpen = false; _otherOpen = false; });
     writeBrowserCookie(_orgCookie, 'predict');
     if (_predictGroupsOpen && _predictGroups.isNotEmpty) return;
     setState(() {
@@ -864,7 +868,11 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     }
   }
 
-  Future<void> _changeOrg(OrgKind kind) async {
+  Future<void> _changeOrg(OrgKind kind, {bool stayOnHome = false}) async {
+    if (_homeOpen && !stayOnHome) {
+      writeBrowserCookie(_orgCookie, kind.name);
+      setState(() => _homeOpen = false);
+    }
     if (_otherOpen) {
       writeBrowserCookie(_orgCookie, kind.name);
       setState(() => _otherOpen = false);
@@ -877,7 +885,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       return;
     }
     unawaited(AuthSession.instance.reportAction(kind == OrgKind.npb ? 'npbタブを開いた' : 'mlbタブを開いた'));
-    writeBrowserCookie(_orgCookie, OrgConfig.of(kind).label.toLowerCase());
+    if (!stayOnHome) writeBrowserCookie(_orgCookie, OrgConfig.of(kind).label.toLowerCase());
     // 離れる団体の表示内容を必ず保持
     _storeCache(_orgKind, _snapshotCurrent());
     final cached = _orgCache[kind];
@@ -885,7 +893,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     setState(() {
       _predictGroupsOpen = false;
       _orgKind = kind;
-      _itemTab = readSavedTab('main_${kind.name}', [0, 1, 2, 3, 4, 5, 6, 8, if (kind == OrgKind.mlb) 7], fallback: 0);
+      _itemTab = readSavedTab('main_${kind.name}', [1, 2, 3, 4, 6, 8, if (kind == OrgKind.mlb) 7], fallback: 1);
       error = null;
       if (usable) {
         _applyBundle(cached, kind: kind);
@@ -957,34 +965,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         ),
         Expanded(child: _newsEventsRow(portrait: false, popup: true)),
       ],
-    );
-  }
-
-  Widget _infoButton() {
-    final unread = AuthSession.instance.showNewsNew || AuthSession.instance.showEventNew || AuthSession.instance.showInfoNew;
-    return SizedBox(
-      width: TAB_BAR_H,
-      height: TAB_BAR_H,
-      child: Material(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(TAB_RADIUS),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: _openInfoPopup,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              const Icon(Icons.newspaper, color: Colors.white, size: 16),
-              if (unread)
-                const Positioned(
-                  top: 3,
-                  right: 3,
-                  child: BlinkNewMark(fontSize: 8),
-                ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 
@@ -1215,7 +1195,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       _seasonYear = year;
       _invalidateYearParts();
     });
-    if (_itemTab >= 3) return;
+    if (_itemTab >= 3 && !_homeOpen) return;
     await _ensureSeasonYearLoaded();
     await WidgetsBinding.instance.endOfFrame;
     if (!mounted || year != _seasonYear) return;
@@ -1524,7 +1504,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     Map<int, String>? leadingAssets,
     bool highlightGames = false,
     double height = TAB_BAR_H,
-  }) => AppSectionTabs(tabs: tabs, selectedIndex: selectedIndex,
+  }) => AppSectionTabs(alwaysPicker: true, tabs: tabs, selectedIndex: selectedIndex,
     onSelected: onSelected, selectedColor: selectedColor,
     selectedForeground: selectedForeground, leadingAssets: leadingAssets,
     highlightGames: highlightGames, height: height,
@@ -1542,12 +1522,25 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     return DateFormatUtil.ymd(latest ?? DateTime(_seasonYear, 10, 15));
   }
 
+  Widget _navigationRow() => Row(
+    key: const ValueKey('page-navigation-row'),
+    children: [
+      const Expanded(child: NavigationPickerBar()),
+      if (!_homeOpen && !_otherOpen && !_predictGroupsOpen &&
+          const [1, 2, 8].contains(_itemTab)) ...[
+        const SizedBox(width: 8),
+        _yearPicker(),
+      ],
+    ],
+  );
+
   Widget _yearPicker() {
     final selected = _seasonYear;
     final first = _orgKind == OrgKind.mlb ? 1876 : 1936;
     return SizedBox(
-      width: 56,
-      height: TAB_BAR_H,
+      key: const ValueKey('page-year-picker'),
+      width: 68,
+      height: 34,
       child: Material(
         color: Colors.black,
         borderRadius: BorderRadius.circular(TAB_RADIUS),
@@ -1590,38 +1583,29 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   /// Info と項目タブのあいだ。選択時は団体色＋ロゴ、非選択は薄いグレー。
-  Widget _orgTabBar() => SizedBox(
-    height: TAB_BAR_H,
-    child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      for (final entry in [('predict', '🎯予想対決'), ('npb', 'NPB'), ('mlb', 'MLB'), ('other', '⚾️その他')])
-        Expanded(child: Padding(padding: EdgeInsets.only(left: entry.$1 == 'predict' ? 0 : ALL_SPACE_BLOCK), child: Builder(builder: (context) {
-          final selected = entry.$1 == 'other' ? _otherOpen : !_otherOpen &&
-            (entry.$1 == 'predict' ? _predictGroupsOpen : !_predictGroupsOpen && entry.$1 == _orgKind.name);
-          final org = entry.$1 == 'npb' ? OrgConfig.npb : entry.$1 == 'mlb' ? OrgConfig.mlb : null;
-          return Material(color: selected ? org?.tabColor ?? Colors.black : OrgConfig.tabIdleColor,
-            borderRadius: BorderRadius.circular(TAB_RADIUS),
-            child: InkWell(key: ValueKey('org-tab-${entry.$1}'),
-              onTap: () {
-                if (entry.$1 == 'other') {
-                  writeBrowserCookie(_orgCookie, 'other');
-                  setState(() { _otherOpen = true; _predictGroupsOpen = false; });
-                } else if (entry.$1 == 'predict') {
-                  unawaited(_openPredictGroups());
-                } else { _changeOrg(org!.kind); }
-              },
-              child: Center(child: FittedBox(fit: BoxFit.scaleDown, child: Row(mainAxisSize: MainAxisSize.min, children: [
-                if (org != null) ...[
-                  Image.asset(org.logoAsset, width: 18, height: 18, errorBuilder: (_, __, ___) => const SizedBox(width: 18)),
-                  const SizedBox(width: 4),
-                ],
-                Text(entry.$2, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600,
-                  color: selected ? org?.tabForeground ?? Colors.white : Colors.black54)),
-                if (entry.$1 == 'predict' && _predictInvites.isNotEmpty)
-                  const Icon(Icons.circle, size: 6, color: Colors.red),
-              ]))),
-            ));
-        }))),
-    ]),
+  Widget _orgTabBar() => AppSectionTabs(
+    tabs: [('🏠HOME', 4), ('🎯予想対決${_predictInvites.isNotEmpty ? ' ●' : ''}', 0), ('🇯🇵NPB', 1), ('🇺🇸MLB', 2), ('⚾️その他', 3)],
+    selectedIndex: _homeOpen ? 4 : _otherOpen ? 3 : _predictGroupsOpen ? 0 : _orgKind == OrgKind.npb ? 1 : 2,
+    selectedColor: _homeOpen || _otherOpen || _predictGroupsOpen ? Colors.black : _org.tabColor,
+    selectedForeground: _homeOpen || _otherOpen || _predictGroupsOpen ? Colors.white : _org.tabForeground,
+    onSelected: (value) {
+      if (value == 4) {
+        writeBrowserCookie(_orgCookie, 'home');
+        setState(() { _homeOpen = true; _otherOpen = false; _predictGroupsOpen = false; });
+        unawaited(_ensureSharedInfo());
+        unawaited(_loadThenWatchGames());
+        unawaited(AuthSession.instance.reportAction('HOMEタブを開いた'));
+        return;
+      }
+      if (value == 3) {
+        writeBrowserCookie(_orgCookie, 'other');
+        setState(() { _homeOpen = false; _otherOpen = true; _predictGroupsOpen = false; });
+      } else if (value == 0) {
+        unawaited(_openPredictGroups());
+      } else {
+        _changeOrg(value == 1 ? OrgKind.npb : OrgKind.mlb);
+      }
+    },
   );
 
   Widget _boardTabBar() {
@@ -1630,9 +1614,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         Expanded(
           child: _portraitTabBar(
             tabs: [
-              ('📅日程', 5),
               if (_orgKind == OrgKind.mlb) ('🇯🇵日本人', 7),
-              ('💥試合情報', 0),
               ('⚾️チーム順位', 1),
               ('🥇個人成績', 2),
               ('🏆タイトル', 8),
@@ -1698,9 +1680,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     if (_itemTab == 8) return SeasonTitlesBoard(key: ValueKey("titles-${_orgKind.name}-$_seasonYear"), org: _org, year: _seasonYear);
     if (_itemTab == 7 && _orgKind == OrgKind.mlb) return JapaneseMlbBoard(key: ValueKey('japanese-$_seasonYear'), year: _seasonYear);
     if (_itemTab == 6) return VideosBoard(key: ValueKey(_orgKind), org: _orgKind, color: _org.tabColor);
-    if (_itemTab == 5) {
-      return SeasonCalendarBoard(org: _org, year: _seasonYear, events: events);
-    }
     if (_itemTab == 4) {
       return RecordsBoard(org: _org, year: _seasonYear);
     }
@@ -1716,43 +1695,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       if (!_partReady(_LoadPart.players)) {
         return const Center(child: BaseballLoading());
       }
-      // 横長は打者・投手のタブ切り替え。
-      if (wideLayout) {
-        return DualBandBothLeaguePersonalStats(
-          stats: npbPlayerStatsActual,
-          org: _org,
-        );
-      }
-      return BothLeaguePersonalStats(
-        segmentOnly: true,
-        stats: npbPlayerStatsActual,
-        org: _org,
-        layout: _personalStatsLayout,
-        onLayoutChanged: _setPersonalStatsLayout,
-      );
-    }
-    if (_itemTab == 0) {
-      final showBracket = _showPostseasonNow;
-      if (!_partReady(_LoadPart.games) && !showBracket) {
-        return const Center(child: BaseballLoading());
-      }
-      return BothLeagueGameDay(
-        key: ValueKey('both-${_orgKind.name}-$_seasonYear-${_gamesInitialDate()}'),
-        games: games,
-        seriesGames: postseasonGames,
-        playerStats: npbPlayerStatsActual,
-        standings: standings,
-        initialDate: _gamesInitialDate(),
-        trailing: showBracket ? [const SizedBox(height: 12), _postseasonBracket()] : const [],
-        leagues: [
-          for (final league in _org.leagues) (id: league.id, name: league.name, color: league.color),
-        ],
-        onNeedGameDate: _loadGameDate,
-        shouldLoadGameDate: _shouldLoadGameDate,
-        loadingGameDate: _loadingGameDate,
-        loadingGames: !_partReady(_LoadPart.games),
-        dateOffset: _gameDateOffset,
-        onDateOffsetChanged: _setGameDateOffset,
+      return LeagueRolePersonalStats(
+        stats: npbPlayerStatsActual, org: _org, wideLayout: wideLayout,
       );
     }
     if (!_partReady(_LoadPart.standings)) {
@@ -1771,6 +1715,49 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
               ],
             ));
   }
+
+  Widget _homeGameInformation() => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Wrap(spacing: 8, children: [
+        for (final org in [OrgConfig.npb, OrgConfig.mlb])
+          ChoiceChip(
+            key: ValueKey('home-games-${org.kind.name}'),
+            label: Text(org.label),
+            selected: _orgKind == org.kind,
+            onSelected: (_) => unawaited(_changeOrg(org.kind, stayOnHome: true)),
+          ),
+      ]),
+      const SizedBox(height: 8),
+      _gameInformation(),
+    ],
+  );
+
+  Widget _gameInformation() {
+      final showBracket = _showPostseasonNow;
+      if (!_partReady(_LoadPart.games) && !showBracket) {
+        return const SizedBox(height: 200, child: Center(child: BaseballLoading()));
+      }
+      return BothLeagueGameDay(
+        embedded: true,
+        key: ValueKey('both-${_orgKind.name}-$_seasonYear-${_gamesInitialDate()}'),
+        games: games,
+        seriesGames: postseasonGames,
+        playerStats: npbPlayerStatsActual,
+        standings: standings,
+        initialDate: _gamesInitialDate(),
+        trailing: showBracket ? [const SizedBox(height: 12), _postseasonBracket()] : const [],
+        leagues: [
+          for (final league in _org.leagues) (id: league.id, name: league.name, color: league.color),
+        ],
+        onNeedGameDate: _loadGameDate,
+        shouldLoadGameDate: _shouldLoadGameDate,
+        loadingGameDate: _loadingGameDate,
+        loadingGames: !_partReady(_LoadPart.games),
+        dateOffset: _gameDateOffset,
+        onDateOffsetChanged: _setGameDateOffset,
+      );
+    }
 
   static const _mlbPostseasonCodes = {
     'WC',
@@ -1929,13 +1916,13 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   // 上部: News + イベント日程（NPB/MLB 共通。団体タブでは内容を切り替えない）
-  Widget _newsEventsRow({required bool portrait, bool popup = false}) {
+  Widget _newsEventsRow({required bool portrait, bool popup = false, bool homeNewsOnly = false}) {
     final infoLoading = !_sharedInfoReady;
 
     Widget miniSpinner({double size = 18}) => SizedBox(
           width: size,
           height: size,
-          child: const BaseballLoading(),
+          child: const CircularProgressIndicator(strokeWidth: 2),
         );
 
     Widget newsBox({bool hideHeader = false, double? boxHeight, bool fill = false}) {
@@ -1997,6 +1984,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
 
       final h = boxHeight ?? 120.0;
       return Container(
+        key: homeNewsOnly ? const ValueKey('home-news') : null,
         height: fill ? null : h,
         decoration: BoxDecoration(
           color: Colors.white,
@@ -2014,7 +2002,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                 child: InkWell(
                   onTap: AuthSession.instance.showNewsNew ? () => unawaited(_markRead('news')) : null,
                   borderRadius: BorderRadius.circular(3),
-                  child: Padding(
+                  child: Container(
+                    height: homeNewsOnly ? 28 : null,
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     child: Row(
                       children: [
@@ -2047,6 +2036,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                                   child: SizedBox(
                                     height: constraints.maxHeight,
                                     child: SingleChildScrollView(
+                                      key: homeNewsOnly ? const ValueKey('home-news-scroll') : null,
                                       primary: false,
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2158,6 +2148,9 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       return content;
     }
 
+    // 28px header + 15px padding/divider + five 22px news rows + borders.
+    if (homeNewsOnly) return newsBox(boxHeight: 155);
+
     if (popup) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2172,8 +2165,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                saveTab('main_${_orgKind.name}', 5);
-                setState(() => _itemTab = 5);
+                writeBrowserCookie(_orgCookie, 'home');
+                setState(() { _homeOpen = true; _otherOpen = false; _predictGroupsOpen = false; });
               },
               child: const Text("イベント・試合日程を開く")),
         ],
@@ -2236,10 +2229,10 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   @override
-  Widget build(BuildContext context) => MenuScope(
-    color: _otherOpen || _predictGroupsOpen ? Colors.black : _org.tabColor,
-    foreground: _otherOpen || _predictGroupsOpen ? Colors.white : _org.tabForeground,
-    child: Builder(builder: _buildPage));
+  Widget build(BuildContext context) => NavigationPickerScope(child: MenuScope(
+    color: _homeOpen || _otherOpen || _predictGroupsOpen ? Colors.black : _org.tabColor,
+    foreground: _homeOpen || _otherOpen || _predictGroupsOpen ? Colors.white : _org.tabForeground,
+    child: Builder(builder: _buildPage)));
 
   Widget _buildPage(BuildContext context) {
     // 初回のみ全画面グルグル。エラー時もヘッダー〜団体タブは出す。
@@ -2251,11 +2244,12 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           child: Column(children: [
             const MenuGap(height: ALL_SPACE_BLOCK),
             MenuBand(level: 0, toggle: true, child: _orgTabBar()),
-            if (!_predictGroupsOpen && !_otherOpen) ...[
+            _navigationRow(),
+            if (!_homeOpen && !_predictGroupsOpen && !_otherOpen) ...[
               MenuBand(level: 1, toggle: true, child: _boardTabBar()),
             ],
           ])),
-        Expanded(child: _otherOpen ? OtherBaseballBoard(year: _seasonYear, user: AuthSession.instance.user) : const Center(child: BaseballLoading())),
+        Expanded(child: _homeOpen ? HomeBoard(year: _seasonYear, news: _newsEventsRow(portrait: true, homeNewsOnly: true), gameInformation: _homeGameInformation()) : _otherOpen ? OtherBaseballBoard(year: _seasonYear, user: AuthSession.instance.user) : const Center(child: BaseballLoading())),
       ]);
     }
 
@@ -2276,11 +2270,12 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           children: [
             const MenuGap(height: ALL_SPACE_BLOCK),
             MenuBand(level: 0, toggle: true, child: _orgTabBar()),
+            _navigationRow(),
           ],
         );
 
         // 取れたデータがあるときはエラー表示で消さない
-        final Widget orgBody = _otherOpen ? OtherBaseballBoard(year: _seasonYear, user: AuthSession.instance.user) : _predictGroupsOpen
+        final Widget orgBody = _homeOpen ? HomeBoard(year: _seasonYear, news: _newsEventsRow(portrait: true, homeNewsOnly: true), gameInformation: _homeGameInformation()) : _otherOpen ? OtherBaseballBoard(year: _seasonYear, user: AuthSession.instance.user) : _predictGroupsOpen
             ? (!AuthSession.instance.isLoggedIn
                 ? const Center(child: Text('ログインすると予想を見られます'))
                 : PredictGroupBoard(
@@ -2357,13 +2352,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                         onAuthChanged: _onAuthChanged,
                         authReady: _authEntryReady,
                         showRightActions: _authEntryReady,
-                        actions: [
-                          const SizedBox(width: 4),
-                          _yearPicker(),
-                          const SizedBox(width: 4),
-                          _infoButton(),
-                          const SizedBox(width: 4),
-                        ],
                       )),
                       Expanded(
                         child: Padding(

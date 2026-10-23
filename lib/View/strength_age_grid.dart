@@ -65,9 +65,6 @@ class _StrengthAgeGridState extends State<StrengthAgeGrid> {
     if (years.isEmpty) return const Center(child: Text('選手名簿は未取得です。'));
     return PlayerDetailScope(org: widget.org, year: widget.year,
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Padding(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          child: Text('4月2日〜翌4月1日生まれを同じ学年として表示。年齢は${widget.year + 1}年4月1日時点。',
-              style: const TextStyle(fontSize: 11, color: Colors.black54))),
         Expanded(child: LayoutBuilder(builder: (context, constraints) {
           double textWidth(String text, {bool bold = false}) {
             final painter = TextPainter(
@@ -117,8 +114,11 @@ class _StrengthAgeGridState extends State<StrengthAgeGrid> {
                   Expanded(child: Scrollbar(controller: _vertical,
                     child: ListView.builder(controller: _vertical,
                       key: const ValueKey('strength-age-vertical'),
-                      itemCount: years.length,
+                      itemCount: years.length + 1,
                       itemBuilder: (context, index) {
+                        if (index == years.length) { return Align(alignment: Alignment.centerLeft, child: SizedBox(width: math.min(width, constraints.maxWidth), child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          child: Text('4月2日〜翌4月1日生まれを同じ学年として表示。年齢は${widget.year + 1}年4月1日時点。',
+              style: const TextStyle(fontSize: 11, color: Colors.black54))))); }
                         final cohort = years[index];
                         return row(key: ValueKey('strength-age-row-${cohort ?? 'unknown'}'), [
                           cell(Text(cohort == null ? '生年月日不明' : '$cohort年度\n（${widget.year - cohort}歳）',

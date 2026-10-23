@@ -1,9 +1,22 @@
+import 'package:Yakyuu_Japan/widgets/navigation_picker.dart';
 import 'package:Yakyuu_Japan/widgets/collapsible_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/View/allstar_history_board.dart';
 
 void main() {
+  test('補充選手を末尾にし、通常選出・補充それぞれの元の順序を保つ', () {
+    final players = <Map<String, dynamic>>[
+      {'name': '補充A', 'selections': ['補充選出']},
+      {'name': '通常A', 'selections': ['ファン投票'], 'withdrawn': true},
+      {'name': '補充B', 'selections': ['監督選抜', '補充選出']},
+      {'name': '通常B', 'selections': ['プラスワン投票']},
+      {'name': '未確認'},
+    ];
+    expect(allStarReplacementsLast(players).map((p) => p['name']),
+        ['通常A', '通常B', '未確認', '補充A', '補充B']);
+    expect(players.first['name'], '補充A');
+  });
   final data = <String, dynamic>{
     'first_year': 2002,
     'cancelled_years': [2020],
@@ -36,6 +49,32 @@ void main() {
       },
     ]
   };
+  for (final size in [const Size(1200, 800), const Size(375, 800)]) {
+    testWidgets('階層pickerで両リーグと各リーグを切り替える $size', (tester) async {
+      await tester.binding.setSurfaceSize(size);
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester.pumpWidget(MaterialApp(home: Scaffold(body: NavigationPickerScope(
+        child: Column(children: [const NavigationPickerBar(), Expanded(child:
+          AllStarHistoryGrid(data: data, throughYear: 2026))]),
+      ))));
+      await tester.pumpAndSettle();
+      expect(find.byType(ChoiceChip), findsNothing);
+      NavigationPicker picker() => tester.widget<NavigationPicker>(find.byType(NavigationPicker));
+      expect(picker().level, 3);
+      expect(picker().labels.values, ['両リーグ', 'セ・リーグ', 'パ・リーグ']);
+      expect(find.text('選手 A'), findsOneWidget);
+      expect(find.text('選手 B'), findsOneWidget);
+      picker().onChanged(2);
+      await tester.pumpAndSettle();
+      expect(find.text('選手 A'), findsNothing);
+      expect(find.text('選手 B'), findsOneWidget);
+      picker().onChanged(1);
+      await tester.pumpAndSettle();
+      expect(find.text('選手 A'), findsOneWidget);
+      expect(find.text('選手 B'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
   test('years, leagues, positions and cancellation remain separate', () {
     final rows = allStarYearRows(data, 2025, 'セ・リーグ');
     expect(rows.map((r) => r['year']), [2025, 2020]);

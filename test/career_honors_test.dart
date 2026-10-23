@@ -49,6 +49,28 @@ final teams = <Map<String, dynamic>>[
   }
 ];
 void main() {
+  test('経歴の各ブロックは球団の表示順、同球団内は選手名順に並ぶ', () {
+    Map<String, dynamic> player(String name) => {
+      'player_key': name,
+      'name': name,
+      'birth_country': '日本',
+      'birth_place': '東京都',
+      'career_history': [
+        for (final category in careerCategories.where((c) => c != '出身地'))
+          {'category': category, 'team': '共通の所属先'},
+      ],
+    };
+    final orderedTeams = <Map<String, dynamic>>[
+      {'id_team': 9, 'roster': [player('D'), player('B')]},
+      {'id_team': 2, 'roster': [player('C'), player('A')]},
+    ];
+    for (final category in careerCategories) {
+      final members = careerGroups(orderedTeams, category).single['players'] as List;
+      expect(members.map((e) => e['player']['name']), ['B', 'D', 'A', 'C'],
+          reason: category);
+    }
+  });
+
   test('リトル・シニアは重複と引退選手を除き現役2人以上に限定', () {
     for (final category in ['リトル', 'シニア']) {
       Map<String, dynamic> player(String key, String club, {bool active = true}) => {

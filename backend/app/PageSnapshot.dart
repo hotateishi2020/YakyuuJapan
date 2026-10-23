@@ -1,3 +1,4 @@
+import 'SeasonCalendarEvents.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:postgres/postgres.dart';
@@ -48,8 +49,18 @@ class PageSnapshot {
         'message': '表示データを事前集計しています。少し待って再読み込みしてください。'};
     }
     final raw = rows.single[0];
-    return {...Map<String,dynamic>.from(raw is String ? jsonDecode(raw) : raw as Map),
-      'updated_at': rows.single[1]};
+    final data = Map<String,dynamic>.from(raw is String ? jsonDecode(raw) : raw as Map);
+    if (kind == 'schedule') {
+      // Enrich old snapshots too, without source queries or waiting for refresh.
+      final events = data['events'];
+      data['events'] = seasonCalendarEvents(
+        org: org.code, year: year, legacy: const [],
+        researched: events is List
+            ? events.whereType<Map>().map((e) => Map<String,dynamic>.from(e)).toList()
+            : [],
+      );
+    }
+    return {...data, 'updated_at': rows.single[1]};
   }
 
   static Duration interval(String kind, int year, int currentYear) =>

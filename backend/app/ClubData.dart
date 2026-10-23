@@ -1,3 +1,5 @@
+import 'AppSql.dart';
+import 'SeasonCalendarEvents.dart';
 import 'CalendarResearch.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -49,7 +51,7 @@ Future<Map<String, dynamic>> readSeasonSchedule(Connection conn, OrgKind org, in
     confirmations['${row[0]}']=usageMaps(raw is String ? jsonDecode(raw) : raw)
       .map((c)=>c.map((k,v)=>MapEntry(k,'$v'))).toList();
   }
-  return {'org': org.code, 'year': year, 'checked_at': snapshot['checked_at'], 'events': CalendarResearch.display(await CalendarResearch.entries(conn), org.code, year), 'games': applyScheduleConfirmations(games, confirmations)};
+  return {'org': org.code, 'year': year, 'checked_at': snapshot['checked_at'], 'events': seasonCalendarEvents(org: org.code, year: year, legacy: (await conn.execute(AppSql.selectEventsDetails())).map((r) => r.toColumnMap()).toList(), researched: CalendarResearch.display(await CalendarResearch.entries(conn), org.code, year)), 'games': applyScheduleConfirmations(games, confirmations)};
 }
 
 /// Match official fixtures first. Never invent a second game from a timezone shift.

@@ -32,6 +32,7 @@ void main() {
       ))));
       await tester.pumpAndSettle();
       expect(find.byType(StrengthAgeGrid), findsOneWidget);
+      expect(find.descendant(of: find.byKey(const ValueKey('strength-age-vertical')), matching: find.textContaining('4月2日〜')), findsOneWidget);
       for (var i = 1; i <= 12; i++) {
         expect(find.text('球団$i'), findsOneWidget);
       }

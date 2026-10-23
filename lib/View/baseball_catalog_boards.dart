@@ -1,3 +1,4 @@
+import '../widgets/special_media.dart';
 import 'pinned_horizontal_row.dart';
 import 'player_detail_dialog.dart';
 import 'dart:convert';
@@ -77,12 +78,12 @@ Widget catalogLogo(Map<String, dynamic> team) {
           width: 54,
           height: 34,
           child: visual.asset != null
-              ? Image.asset(visual.asset!,
-                  fit: BoxFit.contain, errorBuilder: (_, __, ___) => fallback())
+              ? SpecialMedia(fallback: fallback(), child: Image.asset(visual.asset!,
+                  fit: BoxFit.contain, errorBuilder: (_, __, ___) => fallback()))
               : visual.networkUrl != null
-                  ? Image.network(visual.networkUrl!,
+                  ? SpecialMedia(fallback: fallback(), child: Image.network(visual.networkUrl!,
                       fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => fallback())
+                      errorBuilder: (_, __, ___) => fallback()))
                   : fallback()));
 }
 

@@ -14,6 +14,7 @@ String recordAwardLabel(Object? value) {
     return label.replaceFirst('ベストDH賞', 'ベストDH');
   }
   return const {
+        '沢村栄治賞': '沢村賞',
         'MVP': 'リーグMVP',
         '最優秀選手': 'リーグMVP',
         '最優秀選手賞': 'リーグMVP',

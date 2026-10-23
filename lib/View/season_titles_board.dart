@@ -9,7 +9,8 @@ import 'season_titles_table.dart';
 import 'mlb_season_titles_table.dart';
 
 class SeasonTitlesBoard extends StatefulWidget {
-  const SeasonTitlesBoard({super.key, required this.org, required this.year});
+  const SeasonTitlesBoard({super.key, required this.org, required this.year, this.individualOnly = false});
+  final bool individualOnly;
   final OrgConfig org;
   final int year;
   @override
@@ -63,18 +64,24 @@ class _SeasonTitlesBoardState extends State<SeasonTitlesBoard> {
         TextButton(onPressed: load, child: const Text('再読み込み')),
       ]));
     }
-    return SeasonTitlesGrid(data: data!, year: widget.year, org: widget.org);
+    return SeasonTitlesGrid(data: data!, year: widget.year, org: widget.org, individualOnly: widget.individualOnly);
   }
 }
 
 class SeasonTitlesGrid extends StatelessWidget {
-  const SeasonTitlesGrid({super.key, required this.data, required this.year, required this.org});
+  const SeasonTitlesGrid({super.key, required this.data, required this.year, required this.org, this.individualOnly = false});
+  final bool individualOnly;
   final Map<String, dynamic> data;
   final int year;
   final OrgConfig org;
   @override
   Widget build(BuildContext context) {
     final groups = buildSeasonTitles(data, year);
+    if (individualOnly) {
+      if (org.kind == OrgKind.mlb) return MlbSeasonTitlesTable(groups: groups, year: year, individualOnly: true);
+      final table = SeasonTitlesTable(groups: groups, year: year);
+      return table.surface(table.statistical(portrait: true));
+    }
     return org.kind == OrgKind.mlb ? MlbSeasonTitlesTable(groups: groups, year: year) : SeasonTitlesTable(groups: groups, year: year);
   }
 }

@@ -1,3 +1,4 @@
+import 'PersonalStatIdentity.dart';
 import 'QualifiedBattingMetrics.dart';
 import 'SamuraiSelections.dart';
 import 'PlayerCountry.dart';
@@ -40,7 +41,7 @@ class DisplaySnapshot {
           SELECT 1 FROM information_schema.columns
           WHERE table_schema = 'public' AND table_name = 't_game'
             AND column_name = 'txt_lineup_announced'
-        ) AS ready
+        ) AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 't_game' AND column_name = 'txt_live_brief') AS ready
     ''');
     if (schema.isNotEmpty && schema.first[0] == true) {
       _ensured = true;
@@ -83,6 +84,7 @@ class DisplaySnapshot {
       ON v_games_details (int_year, code, date_game)
     ''');
       await conn.execute("ALTER TABLE t_game ADD COLUMN IF NOT EXISTS txt_lineup_announced TEXT NOT NULL DEFAULT ''");
+      await conn.execute("ALTER TABLE t_game ADD COLUMN IF NOT EXISTS txt_live_brief TEXT NOT NULL DEFAULT '{}'");
       _ensured = true;
     } finally {
       try {
@@ -99,7 +101,7 @@ class DisplaySnapshot {
 
   static Future<void> _refreshPlayers(Connection conn, int year) async {
     await ensure(conn);
-    final rows = Postgres.toJson(await Postgres.execute(conn, AppSql.selectStatsPlayer(), data: [year]));
+    final rows = canonicalMlbPersonalStats(Postgres.toJson(await Postgres.execute(conn, AppSql.selectStatsPlayer(), data: [year])));
     retainQualifiedRisp(rows);
     await attachPlayerCountries(conn, year, rows);
     await attachSamuraiSelections(conn, year, rows);

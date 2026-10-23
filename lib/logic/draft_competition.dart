@@ -20,3 +20,16 @@ List<Map> draftPicksWithCompetition(List<Map> picks) {
     };
   })()];
 }
+
+/// 競合数と抽選落選回数は別情報。再入札でも競合した場合は両方を表示する。
+List<String> draftNominationLabels(Map result) {
+  if ('${result['rank']}' != '1' || result['type'] == '育成') return const [];
+  if (!result.containsKey('note') && !result.containsKey('competition')) return const [];
+  final count = int.tryParse('${result['competition']}') ?? 0;
+  final losses = '${result['note'] ?? ''}'.split('・').where((part) => part.trim().endsWith('×')).length;
+  return [
+    if (count > 1) '$count球団競合',
+    if (losses == 0 && count <= 1) '単独指名',
+    if (losses > 0) '${List.filled(losses, 'ハズレ').join()}1位',
+  ];
+}

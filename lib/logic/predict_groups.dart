@@ -71,6 +71,9 @@ const _npbCalendar = <int, Map<String, String>>{
   },
 };
 
+/// 登録済みのNPB公式開幕日。
+DateTime? npbSeasonOpeningDate(int year) => DateTime.tryParse(_npbCalendar[year]?['nm_first'] ?? '');
+
 /// 期限の候補。開幕前・終了前はその前日、月中はその月末。
 List<({String label, String date})> predictDeadlineOptions(int year, [Map<String, dynamic>? marks]) {
   final merged = <String, String>{..._npbCalendar[year] ?? const {}};

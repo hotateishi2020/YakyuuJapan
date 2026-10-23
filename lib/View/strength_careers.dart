@@ -1,3 +1,4 @@
+import '../widgets/navigation_picker.dart';
 import '../widgets/collapsible_menu.dart';
 import 'player_detail_dialog.dart';
 import '../logic/favorite_team.dart';
@@ -16,6 +17,7 @@ const careerCategories = ['出身地', 'リトル', 'シニア', '高校', '大�
 List<Map<String, dynamic>> careerGroups(
     List<Map<String, dynamic>> teams, String category) {
   final groups = <String, Map<String, dynamic>>{};
+  final teamOrder = {for (var i = 0; i < teams.length; i++) teams[i]: i};
   for (final team in teams) {
     for (final p in listMapFromJson(team['roster'])) {
       if (p['active'] == false ||
@@ -84,8 +86,12 @@ List<Map<String, dynamic>> careerGroups(
         'players': (group['players'] as Map<String, Map<String, dynamic>>)
             .values
             .toList()
-          ..sort((a, b) =>
-              '${a['player']['name']}'.compareTo('${b['player']['name']}')),
+          ..sort((a, b) {
+            final order = teamOrder[a['team']]!.compareTo(teamOrder[b['team']]!);
+            return order != 0
+                ? order
+                : '${a['player']['name']}'.compareTo('${b['player']['name']}');
+          }),
       }
   ]..sort((a, b) {
       final count = (b['players'] as List)
@@ -247,6 +253,11 @@ class _StrengthCareersState extends State<StrengthCareers> {
         : careerGroups(visibleTeams, category);
     return Column(children: [
       if (!TeamSectionLayout.embedded(context))
+        if (NavigationPickerScope.enabled(context))
+          NavigationPicker(level: 3, labels: {for (var i = 0; i < careerCategories.length; i++) i: careerCategories[i]},
+            value: careerCategories.indexOf(category), onChanged: (i) => setState(() => category = careerCategories[i]),
+            color: widget.org.tabColor, foreground: widget.org.tabForeground)
+        else
         MenuBand(level: 3, child: Row(children: [
           for (final value in careerCategories)
             Expanded(

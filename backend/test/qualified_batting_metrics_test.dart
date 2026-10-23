@@ -33,6 +33,8 @@ void main() {
           'int_rank': 99
         },
       {'title': '得点圏打率', 'stats': '.500'},
+      for (final league in [3, '4'])
+        {'title': '得点圏打率', 'id_league': league, 'cnt_play': 600, 'int_game': 162, 'stats': '.400'},
     ];
     retainQualifiedRisp(rows);
     expect(rows.length, 5);

@@ -44,6 +44,15 @@ Map<String, List<Map<String, dynamic>>> buildSeasonTitles(
   };
   void add(String key, Map<String, dynamic> row) {
     final rows = result.putIfAbsent(key, () => []);
+    // CS winners can arrive from both the series page and supplemental data.
+    // Their identity is the team, not the source's detail or redundant team field.
+    if (key == 'series_entrants') {
+      String teamIdentity(Map<String, dynamic> value) => recordShortestTeam(
+          {'team': value['name'] ?? value['team'] ?? ''}, preferCanonical: true)
+          .replaceAll(RegExp(r'[\s　]'), '').toLowerCase();
+      final team = teamIdentity(row);
+      if (team.isNotEmpty && rows.any((p) => teamIdentity(p) == team)) return;
+    }
     final identity =
         '${row['detail'] ?? ''}:${row['name']}:${row['team'] ?? ''}'
             .replaceAll(RegExp(r'[\s　]'), '');
@@ -201,7 +210,7 @@ Map<String, List<Map<String, dynamic>>> buildSeasonTitles(
       rows[i] = {
         ...row,
         for (final field in ['color_back', 'color_font', 'name_shortest'])
-          if (row[field] == null && team[field] != null) field: team[field],
+          if ('${row[field] ?? ''}'.trim().isEmpty && team[field] != null) field: team[field],
       };
     }
   }

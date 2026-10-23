@@ -1,3 +1,4 @@
+import 'RosterInjuries.dart';
 import 'SnapshotWork.dart';
 import 'NpbResearchEvents.dart';
 import 'ScheduledLog.dart';
@@ -51,10 +52,32 @@ class TeamStrength {
       WHERE int_year = \$1 AND code_org = \$2
       ORDER BY id_team
     ''', parameters: [year, org]);
+    final teams = [for (final row in rows) _map(row[0])];
+    final ids = teams.map((t) => _int(t['id_team'])).toList();
+    if (ids.isNotEmpty) {
+      final openings = await conn.execute('''
+        SELECT team_id, to_char(MIN(datetime_start), 'YYYY-MM-DD') AS opening_date
+        FROM t_game CROSS JOIN LATERAL
+          unnest(ARRAY[id_team_home, id_team_away]) AS participants(team_id)
+        WHERE team_id=ANY(\$1::int[]) AND code_game='NM'
+          AND NOT COALESCE(flg_delete, false)
+          AND datetime_start >= make_date(\$2::int, 1, 1)
+          AND datetime_start < make_date(\$2::int, 5, 1)
+        GROUP BY team_id
+      ''', parameters: [ids, year]);
+      final dates = {for (final row in openings) _int(row[0]): row[1]};
+      for (final team in teams) {
+        team['opening_date'] = dates[_int(team['id_team'])];
+      }
+    }
+    final players = ids.isEmpty ? <Map<String, dynamic>>[] : (await conn.execute('''
+      SELECT id AS id_player, id_team, name_full AS name_player, COALESCE(flg_injury, false) AS flg_injury
+      FROM m_player WHERE id_team=ANY(\$1::int[]) AND NOT COALESCE(flg_delete, false)
+    ''', parameters: [ids])).map((r) => r.toColumnMap()).toList();
     return {
       'org': org,
       'year': year,
-      'teams': [for (final row in rows) _map(row[0])],
+      'teams': withRosterInjuries(teams, players),
     };
   }
 

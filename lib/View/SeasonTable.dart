@@ -1,3 +1,5 @@
+import '../widgets/special_media.dart';
+import '../widgets/navigation_picker.dart';
 import '../widgets/collapsible_menu.dart';
 import '../widgets/periodic_hint_icon.dart';
 import '../widgets/baseball_action_icon.dart';
@@ -16,7 +18,6 @@ import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import '../config/app_design.dart';
 import '../config/org_config.dart';
-import '../logic/auth_session.dart';
 import '../logic/display_settings.dart';
 import '../logic/show_user_predictions.dart';
 import '../tools/browser_cookie.dart';
@@ -522,7 +523,7 @@ class _GbLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final visual = teamLogoVisual(name, abbrev: abbrev);
-    final image = teamLogoImage(asset: visual.asset, networkUrl: visual.networkUrl);
+    final image = teamLogoImage(asset: visual.asset, networkUrl: visual.networkUrl, fallback: Center(child: Text(abbrev.isNotEmpty ? abbrev : name, style: const TextStyle(fontSize: 11))));
     return SizedBox(
       key: ValueKey('gb-mark-$name'),
       width: size,
@@ -562,6 +563,13 @@ class SeasonTableBlock extends StatelessWidget {
   final List<Map<String, dynamic>> scheduleGames;
   final bool showScheduleColumns;
   final bool showPredictionColumns;
+  final bool standingsChartBeside;
+  final bool standingsChartBelow;
+  final double? standingsChartHeight;
+  final bool standingsNamesOnly;
+  final bool useFullStandingsTeamNames;
+  final double? standingsTeamNameWidth;
+  final bool includeMlbWildcard;
   final bool showNpbLeagueColumn;
   final int? onlyLeagueId; // 団体内リーグ ID。null: 両方
   final String? gamesDateFilter; // "YYYY-MM-DD"（nullなら今日）
@@ -589,6 +597,13 @@ class SeasonTableBlock extends StatelessWidget {
     this.scheduleGames = const [],
     this.showScheduleColumns = false,
     this.showPredictionColumns = true,
+    this.standingsChartBeside = false,
+    this.standingsChartBelow = false,
+    this.standingsChartHeight,
+    this.standingsNamesOnly = false,
+    this.useFullStandingsTeamNames = false,
+    this.standingsTeamNameWidth,
+    this.includeMlbWildcard = true,
     this.showNpbLeagueColumn = false,
     this.onlyLeagueId,
     this.gamesDateFilter,
@@ -631,7 +646,7 @@ class SeasonTableBlock extends StatelessWidget {
 
   int get _seasonYear => seasonYear > 0 ? seasonYear : DateTime.now().year;
 
-  bool get _showMlbWildcard => showMlbWildcardStandings(seasonYear: _seasonYear);
+  bool get _showMlbWildcard => includeMlbWildcard && showMlbWildcardStandings(seasonYear: _seasonYear);
 
   // 文字→数値(表示用)
   String _num(dynamic v) => (v == null || '$v'.isEmpty) ? '—' : '$v';
@@ -709,10 +724,14 @@ class SeasonTableBlock extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (logoAsset != null) ...[
-            Image.asset(logoAsset, height: 22, fit: BoxFit.contain),
+            SpecialMedia(child: Image.asset(logoAsset, height: 22, fit: BoxFit.contain)),
             const SizedBox(width: 8),
           ],
-          Text(label, style: TextStyle(color: foreground, fontWeight: FontWeight.bold)),
+          if (standingsNamesOnly)
+            Flexible(child: FittedBox(fit: BoxFit.scaleDown,
+              child: Text(label, style: TextStyle(color: foreground, fontWeight: FontWeight.bold))))
+          else
+            Text(label, style: TextStyle(color: foreground, fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -819,13 +838,6 @@ class SeasonTableBlock extends StatelessWidget {
                     if ((int.tryParse('${row['id_league']}') ?? 0) <= 2) row,
                 ]
               : [for (final section in sections) ...section.rows];
-          bool predictFilled(Map<String, dynamic> row) {
-            final tateishi = '${row['team_name_tateishi'] ?? ''}'.trim();
-            final ejima = '${row['team_name_ejima'] ?? ''}'.trim();
-            return (tateishi.isNotEmpty && tateishi != '—') || (ejima.isNotEmpty && ejima != '—');
-          }
-
-          final bool showPredictCols = showPredictionColumns && ShowUserPredictions.of(context) && widthRows.any(predictFilled);
           // スクロール側（試合〜防御率）の基準幅。余りはチーム名ではなくこちらに足す。
           final opponents = showScheduleColumns ? {for (final r in standings) '${r['id_team']}': r}.values.toList() : <Map<String, dynamic>>[];
           final dates = showScheduleColumns ? scheduleWindow(DateTime.now()) : <DateTime>[];
@@ -841,19 +853,25 @@ class SeasonTableBlock extends StatelessWidget {
               wChar2 + // 打点
               wChar2 + // 盗塁
               wChar3 + // 失策率
-              wChar2 * 4 +
-              wChar3; // 得点率＋防御率3列＋先発負担率
-          final double pinnedBaseW = (showPredictCols ? wChar2 * 3 : wChar2) + (showNpbLeagueColumn ? wChar2 : 0); // 順位(+立・江)
-          final double wName = _standingsTeamNameWidth([
+              wChar2 * 3 +
+              wChar3; // 防御率3列＋先発負担率
+          final double pinnedBaseW = wChar2 + (showNpbLeagueColumn ? wChar2 : 0); // 順位
+          final double naturalNameWidth = standingsTeamNameWidth ?? _standingsTeamNameWidth([
             (
               label: '',
               rows: [
-                for (final row in widthRows) {...row, if (compactBaseballLayout(context)) 'name_team': row['name_shortest'] ?? row['name_team']}
+                for (final row in widthRows) {...row, if (!useFullStandingsTeamNames && compactBaseballLayout(context)) 'name_team': row['name_shortest'] ?? row['name_team']}
               ]
             )
           ], showJapan: org.kind == OrgKind.mlb);
+          // HOME shares its width with adjacent leagues/divisions and the chart.
+          final double wName = standingsNamesOnly && standingsChartBelow && lb.maxWidth.isFinite
+              ? math.max(0.0, lb.maxWidth - pinnedBaseW)
+              : standingsNamesOnly && standingsChartBeside && lb.maxWidth.isFinite
+              ? math.min(naturalNameWidth, math.max(0.0, lb.maxWidth * .65 - pinnedBaseW - 8))
+              : naturalNameWidth;
           final double pinnedW = pinnedBaseW + wName;
-          final double naturalTable = pinnedW + scrollColsW;
+          final double naturalTable = pinnedW + (standingsNamesOnly ? 0 : scrollColsW);
           final double parentW = lb.maxWidth.isFinite ? lb.maxWidth : naturalTable;
           final double gridBodyH = showScheduleColumns ? 38.0 : 20.0;
 
@@ -885,12 +903,8 @@ class SeasonTableBlock extends StatelessWidget {
           Widget pinnedHeader() {
             return Row(children: [
               SizedBox(width: wChar2, child: gridCell('順位', h: ALL_HEADER_H, bg: leagueColor, fg: leagueForeground, weight: FontWeight.bold)),
-              if (showPredictCols) ...[
-                SizedBox(width: wChar2, child: gridCell('立', h: ALL_HEADER_H, bg: leagueColor, fg: leagueForeground, weight: FontWeight.bold)),
-                SizedBox(width: wChar2, child: gridCell('江', h: ALL_HEADER_H, bg: leagueColor, fg: leagueForeground, weight: FontWeight.bold)),
-              ],
               if (showNpbLeagueColumn) SizedBox(width: wChar2, child: gridCell('所属', h: ALL_HEADER_H, bg: leagueColor, fg: leagueForeground, weight: FontWeight.bold)),
-              SizedBox(width: wName, child: gridCell('チーム', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: leagueForeground)),
+              SizedBox(key: const ValueKey('standings-team-name-header'), width: wName, child: gridCell('チーム', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: leagueForeground)),
             ]);
           }
 
@@ -907,7 +921,6 @@ class SeasonTableBlock extends StatelessWidget {
               SizedBox(width: cols.rbi, child: gridCell('打点', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: leagueForeground)),
               SizedBox(width: cols.sb, child: gridCell('盗塁', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: leagueForeground)),
               SizedBox(width: cols.field, child: gridCell('失策率', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: leagueForeground)),
-              SizedBox(width: cols.era, child: Tooltip(message: '攻撃9イニングあたりの得点数', child: gridCell('得点率', weight: FontWeight.bold, h: ALL_HEADER_H, bg: leagueColor, fg: leagueForeground))),
               SizedBox(
                 width: cols.era * 3,
                 child: Column(children: [
@@ -941,41 +954,13 @@ class SeasonTableBlock extends StatelessWidget {
             final affiliationColor = sourceLeague == 1 || sourceLeague == 2 ? OrgConfig.npb.leagueColor(sourceLeague!) : Colors.grey;
             final Color? teamBg = _parseColorName(row['color_back']);
             final Color? teamFg = _parseColorName(row['color_font']);
-            final Color? teamBgTateishi = _parseColorName(row['team_color_back_tateishi']);
-            final Color? teamFgTateishi = _parseColorName(row['team_color_font_tateishi']);
-            final Color? teamBgEjima = _parseColorName(row['team_color_back_ejima']);
-            final Color? teamFgEjima = _parseColorName(row['team_color_font_ejima']);
-            Widget predictCell(String text, {required bool hit, Color? bg, Color? fg}) {
-              return gridCell(text, h: gridBodyH, bg: bg, fg: fg, weight: hit ? FontWeight.bold : null);
-            }
-
             return Row(children: [
               SizedBox(width: wChar2, child: gridCell('$rk', h: gridBodyH, bg: leagueColor, fg: leagueForeground, weight: FontWeight.bold)),
-              if (showPredictCols) ...[
-                SizedBox(
-                  width: wChar2,
-                  child: predictCell(
-                    _num(row['team_name_tateishi']),
-                    hit: isTrue(row['flg_atari_tateishi']),
-                    bg: teamBgTateishi,
-                    fg: isTrue(row['flg_atari_tateishi']) ? Colors.blueAccent : teamFgTateishi,
-                  ),
-                ),
-                SizedBox(
-                  width: wChar2,
-                  child: predictCell(
-                    _num(row['team_name_ejima']),
-                    hit: isTrue(row['flg_atari_ejima']),
-                    bg: teamBgEjima,
-                    fg: isTrue(row['flg_atari_ejima']) ? Colors.redAccent : teamFgEjima,
-                  ),
-                ),
-              ],
               if (showNpbLeagueColumn) SizedBox(width: wChar2, child: gridCell(leagueLabel, h: gridBodyH, bg: affiliationColor, fg: Colors.white, weight: FontWeight.bold)),
               SizedBox(
                 width: wName,
                 child: teamNameCell(
-                  _num(compactBaseballLayout(context) ? row['name_shortest'] ?? row['name_team'] : row['name_team']),
+                  _num(!useFullStandingsTeamNames && compactBaseballLayout(context) ? row['name_shortest'] ?? row['name_team'] : row['name_team']),
                   h: gridBodyH,
                   bg: teamBg,
                   fg: teamFg,
@@ -1056,7 +1041,6 @@ class SeasonTableBlock extends StatelessWidget {
               SizedBox(width: cols.rbi, child: gridCell(_num(row['int_rbi']), h: gridBodyH, bg: paleBg, fg: fgRbi, weight: wtRbi)),
               SizedBox(width: cols.sb, child: gridCell(_num(row['int_sh']), h: gridBodyH, bg: paleBg, fg: fgSb, weight: wtSb)),
               SizedBox(width: cols.field, child: gridCell(_num(row['num_avg_fielding']), h: gridBodyH, bg: paleBg, fg: fgFld, weight: wtFld)),
-              SizedBox(width: cols.era, child: gridCell(_num(row['runs_per_nine']), h: gridBodyH, bg: paleBg)),
               SizedBox(width: cols.era, child: gridCell(_num(row['num_era_total']), h: gridBodyH, bg: paleBg, fg: fgEraT, weight: wtEraT)),
               SizedBox(width: cols.era, child: gridCell(_num(row['num_era_starter']), h: gridBodyH, bg: paleBg, fg: fgEraS, weight: wtEraS)),
               SizedBox(width: cols.era, child: gridCell(_num(row['num_era_relief']), h: gridBodyH, bg: paleBg, fg: fgEraR, weight: wtEraR)),
@@ -1149,6 +1133,7 @@ class SeasonTableBlock extends StatelessWidget {
                 for (var i = 0; i < section.rows.length; i++) pinnedBodyRow(section.rows[i], i + 1),
               ],
             );
+            if (standingsNamesOnly) return pinned;
             final Widget scroll = Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1201,8 +1186,11 @@ class SeasonTableBlock extends StatelessWidget {
             final tableH = ALL_HEADER_H + section.rows.length * gridBodyH;
             const chartGap = 8.0;
             final roomForChart = parentW - naturalTable - chartGap;
-            final beside = showGamesBehind && (roomForChart >= 200 || (MediaQuery.sizeOf(context).width > MediaQuery.sizeOf(context).height && parentW >= 600));
-            final chartW = beside ? math.min(340.0, math.max(200.0, parentW * .23)) : 0.0;
+            final beside = showGamesBehind && !standingsChartBelow && (standingsChartBeside || roomForChart >= 200 || (MediaQuery.sizeOf(context).width > MediaQuery.sizeOf(context).height && parentW >= 600));
+            final chartW = beside
+                ? (standingsNamesOnly ? math.max(0.0, parentW - pinnedW - chartGap)
+                    : math.min(340.0, math.max(200.0, parentW * .23)))
+                : 0.0;
             final areaW = beside ? parentW - chartW - chartGap : parentW;
             final cols = statCols(areaW);
             if (beside) {
@@ -1219,8 +1207,8 @@ class SeasonTableBlock extends StatelessWidget {
                       const SizedBox(width: chartGap),
                       SizedBox(
                         width: chartW,
-                        height: tableH,
-                        child: GamesBehindChart(rows: section.rows, fitHeight: tableH),
+                        height: standingsChartHeight ?? tableH,
+                        child: GamesBehindChart(rows: section.rows, fitHeight: standingsChartHeight ?? tableH),
                       ),
                     ],
                   ),
@@ -1235,7 +1223,7 @@ class SeasonTableBlock extends StatelessWidget {
                 sectionTable(section, cols),
                 if (showGamesBehind) ...[
                   const SizedBox(height: 4),
-                  GamesBehindChart(rows: section.rows),
+                  GamesBehindChart(rows: section.rows, fitHeight: standingsChartHeight),
                 ],
               ],
             );
@@ -1834,20 +1822,11 @@ List<String> _titlesInOrder(List<Map<String, dynamic>> rows, List<String> prefer
   return ordered;
 }
 
-bool _loggedInPredictedTitle(List<Map<String, dynamic>> rows, String title) {
-  if (extraBattingTitles.contains(title) || extraPitchingTitles.contains(title)) return false;
-  final id = AuthSession.instance.user?.id ?? 0;
-  if (id <= 0) return false;
-  final needle = '/$id/';
-  for (final row in rows) {
-    final t = '${row['title'] ?? ''}'.trim();
-    if (t != title && _normalizePersonalTitle(t) != _normalizePersonalTitle(title)) {
-      continue;
-    }
-    if ('${row['id_users'] ?? ''}'.contains(needle)) return true;
-  }
-  return false;
-}
+// 打者6冠・投手6冠。予想の有無やログイン状態には依存しない。
+bool _isSixCrownTitle(String title) => const {
+  '打率', '本塁打', '打点', '盗塁', '最多安打', '出塁率',
+  '防御率', '最多勝', '勝率', '奪三振', 'HP', 'セーブ',
+}.contains(_normalizePersonalTitle(title.trim()));
 
 Widget _verticalStatLabel(String text, {required Color color, required FontWeight weight, double fontSize = 10, bool starred = false}) {
   final chars = text.characters.toList();
@@ -1989,10 +1968,12 @@ class _DualStatsSegmentBars extends StatelessWidget {
   final List<String> pitchingTitles;
   final Set<String> starredTitles;
   final bool battingSelected;
+  final bool showRoleTabs;
   final int titleIndex;
   final ValueChanged<({bool batting, int index})> onSelected;
 
   const _DualStatsSegmentBars({
+    this.showRoleTabs = true,
     required this.battingTitles,
     required this.pitchingTitles,
     this.starredTitles = const {},
@@ -2003,6 +1984,18 @@ class _DualStatsSegmentBars extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (NavigationPickerScope.enabled(context)) {
+      final titles = battingSelected ? battingTitles : pitchingTitles;
+      return Column(children: [
+        if (showRoleTabs) NavigationPicker(level: 3,
+          labels: {if (battingTitles.isNotEmpty) 0: '打者スタッツ', if (pitchingTitles.isNotEmpty) 1: '投手スタッツ'},
+          value: battingSelected ? 0 : 1, onChanged: (i) => onSelected((batting: i == 0, index: 0)),
+          color: battingSelected ? statsBattingHeaderColor : statsPitchingHeaderColor, foreground: Colors.white),
+        NavigationPicker(level: showRoleTabs ? 4 : 3, labels: {for (var i = 0; i < titles.length; i++) i: '${starredTitles.contains(titles[i]) ? '⭐️ ' : ''}${titles[i]}'},
+          value: titleIndex, onChanged: (i) => onSelected((batting: battingSelected, index: i)),
+          color: battingSelected ? statsBattingHeaderColor : statsPitchingHeaderColor, foreground: Colors.white),
+      ]);
+    }
     // 打者・投手で文字数が違っても、二段の高さを揃える。
     final sharedH = [
           _statsSegmentHeightFor(battingTitles),
@@ -2390,6 +2383,7 @@ class _FillScrollLeaguePersonalStats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final rows = canonicalMlbPersonalStats(this.rows).where((r) => hasPersonalStatValue(r) && personalStatPlayerMatchesRole(r, batting: batting)).toList();
     final cols = batting ? _battingCols : _pitchingCols;
     final titles = _titlesInOrder(rows, cols);
     if (titles.isEmpty) return const SizedBox.shrink();
@@ -2423,7 +2417,7 @@ class _FillScrollLeaguePersonalStats extends StatelessWidget {
                           height: 40,
                           child: Row(children: [
                             const SizedBox(width: 40),
-                            Expanded(child: _horizontalTitleLabel(titles[i], starred: _loggedInPredictedTitle(rows, titles[i]), child: Text(titles[i], textAlign: TextAlign.center, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white)))),
+                            Expanded(child: _horizontalTitleLabel(titles[i], starred: _isSixCrownTitle(titles[i]), child: Text(titles[i], textAlign: TextAlign.center, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white)))),
                             SizedBox(
                                 width: 40,
                                 child: IconButton(
@@ -2437,7 +2431,7 @@ class _FillScrollLeaguePersonalStats extends StatelessWidget {
                           builder: (context, highlighted, _) => Column(
                                 key: ValueKey('personal-stat-panel-${titles[i]}'),
                                 children: [
-                                  for (final row in personalStatPreview(grouped[i], showPredictions: ShowUserPredictions.of(context), isHighlighted: (row) => highlighted.contains(_statHighlightKey(row)))) PlayerStatCell(row: row, allRows: rows, width: colW, showJapanFlag: showJapanFlag),
+                                  for (final row in personalStatPreview(grouped[i], includeJapanese: showJapanFlag, showPredictions: ShowUserPredictions.of(context), isHighlighted: (row) => highlighted.contains(_statHighlightKey(row)))) PlayerStatCell(row: row, allRows: rows, width: colW, showJapanFlag: showJapanFlag),
                                   for (var empty = grouped[i].length; empty < 10; empty++) _EmptyStatCell(width: colW, showJapanFlag: showJapanFlag),
                                 ],
                               )),
@@ -2460,7 +2454,10 @@ Widget _personalStatsTypeTabs() => MenuBand(
       ];
       return AnimatedBuilder(
         animation: controller,
-        builder: (context, _) => SizedBox(
+        builder: (context, _) => NavigationPickerScope.enabled(context)
+          ? NavigationPicker(labels: {for (var i = 0; i < tabs.length; i++) i: tabs[i].$1}, value: controller.index,
+              onChanged: (i) => controller.animateTo(i, duration: Duration.zero), color: tabs[controller.index].$2, foreground: Colors.white)
+          : SizedBox(
           height: TAB_BAR_H,
           child: Row(children: [
             for (var i = 0; i < tabs.length; i++) ...[
@@ -2496,7 +2493,10 @@ Widget _personalLeagueTabs(OrgConfig org) => MenuBand(
       final controller = DefaultTabController.of(context);
       return AnimatedBuilder(
           animation: controller,
-          builder: (context, _) => SizedBox(
+          builder: (context, _) => NavigationPickerScope.enabled(context)
+              ? NavigationPicker(labels: {for (var i = 0; i < org.leagues.length; i++) i: org.leagues[i].name}, value: controller.index,
+                  onChanged: (i) => controller.animateTo(i, duration: Duration.zero), color: org.tabColor, foreground: org.tabForeground)
+              : SizedBox(
                 height: TAB_BAR_H,
                 child: Row(children: [
                   for (var i = 0; i < org.leagues.length; i++) ...[
@@ -2531,6 +2531,45 @@ Widget _personalLeagueTabs(OrgConfig org) => MenuBand(
     }));
 
 /// 横長・項目ごと表示。NPB・MLBともリーグタブで切り替える。
+/// A single selector combines league and batting/pitching for personal stats.
+class LeagueRolePersonalStats extends StatefulWidget {
+  const LeagueRolePersonalStats({super.key, required this.stats, required this.org, this.wideLayout = false});
+  final List<Map<String, dynamic>> stats;
+  final OrgConfig org;
+  final bool wideLayout;
+  @override
+  State<LeagueRolePersonalStats> createState() => _LeagueRolePersonalStatsState();
+}
+
+class _LeagueRolePersonalStatsState extends State<LeagueRolePersonalStats> {
+  int selected = 0;
+  @override
+  Widget build(BuildContext context) {
+    final league = widget.org.leagues[selected ~/ 2];
+    final batting = selected.isEven;
+    final rows = canonicalMlbPersonalStats(widget.stats).where((row) =>
+      '${row['id_league']}' == '${league.id}' &&
+      _personalRowIsPitcher(row) != batting &&
+      hasPersonalStatValue(row) && personalStatPlayerMatchesRole(row, batting: batting) &&
+      (widget.org.kind != OrgKind.npb || row['title'] != 'ボール球見極め率')).toList();
+    final labels = {for (var i = 0; i < widget.org.leagues.length * 2; i++)
+      i: '${widget.org.leagues[i ~/ 2].name}${i.isEven ? '打者' : '投手'}'};
+    return Column(children: [
+      NavigationPicker(level: 2, alwaysTabs: true, labels: labels, value: selected,
+        onChanged: (value) => setState(() => selected = value),
+        color: league.color, foreground: Colors.white,
+        itemColors: {for (final i in labels.keys) i: widget.org.leagues[i ~/ 2].color}),
+      Expanded(child: rows.isEmpty ? const Center(child: Text('成績はありません'))
+        : widget.wideLayout
+          ? ScrollLeaguePersonalStats(rows: rows, batting: batting, showJapanFlag: widget.org.kind == OrgKind.mlb)
+          : SegmentedLeaguePersonalStats(
+              key: ValueKey('personal-role-${widget.org.kind.name}-$selected'),
+              batting: batting ? rows : const [], pitching: batting ? const [] : rows,
+              showJapanFlag: widget.org.kind == OrgKind.mlb, showRoleTabs: false)),
+    ]);
+  }
+}
+
 class DualBandBothLeaguePersonalStats extends StatelessWidget {
   final List<Map<String, dynamic>> stats;
   final OrgConfig org;
@@ -2612,7 +2651,7 @@ class ScrollBothLeaguePersonalStats extends StatelessWidget {
             height: 38,
             child: _horizontalTitleLabel(
               title,
-              starred: _loggedInPredictedTitle(rows, title),
+              starred: _isSixCrownTitle(title),
               child: Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
             ),
           ),
@@ -2694,12 +2733,14 @@ class SegmentedLeaguePersonalStats extends StatefulWidget {
   final List<Map<String, dynamic>> batting;
   final List<Map<String, dynamic>> pitching;
   final bool showJapanFlag;
+  final bool showRoleTabs;
 
   const SegmentedLeaguePersonalStats({
     super.key,
     required this.batting,
     required this.pitching,
     this.showJapanFlag = false,
+    this.showRoleTabs = true,
   });
 
   @override
@@ -2728,7 +2769,7 @@ class _SegmentedLeaguePersonalStatsState extends State<SegmentedLeaguePersonalSt
     final pitTitles = _titlesInOrder(widget.pitching, _pitchingCols);
     final starred = {
       for (final title in [...batTitles, ...pitTitles])
-        if (_loggedInPredictedTitle([...widget.batting, ...widget.pitching], title)) title,
+        if (_isSixCrownTitle(title)) title,
     };
     if (batTitles.isEmpty && pitTitles.isEmpty) {
       return const Center(child: Text('成績はありません', style: TextStyle(fontSize: 12)));
@@ -2750,6 +2791,7 @@ class _SegmentedLeaguePersonalStatsState extends State<SegmentedLeaguePersonalSt
         MenuBand(
             level: 3,
             child: _DualStatsSegmentBars(
+              showRoleTabs: widget.showRoleTabs,
               battingTitles: batTitles,
               pitchingTitles: pitTitles,
               starredTitles: starred,
@@ -2827,7 +2869,7 @@ class _BothLeaguePersonalStatsState extends State<BothLeaguePersonalStats> {
     final pitTitles = _titlesInOrder(pitchingRows, _pitchingCols);
     final starred = {
       for (final title in [...batTitles, ...pitTitles])
-        if (_loggedInPredictedTitle(widget.stats, title)) title,
+        if (_isSixCrownTitle(title)) title,
     };
     if (batTitles.isEmpty && pitTitles.isEmpty) {
       return const Center(child: Text('成績はありません', style: TextStyle(fontSize: 12)));

@@ -4,6 +4,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/logic/draft_competition.dart';
 
 void main() {
+  test('1位の単独・競合・再入札を区別する', () {
+    Map pick(String note, {int? competition}) => {'rank': '1', 'type': '支配下', 'note': note, 'competition': competition};
+    expect(draftNominationLabels(pick('')), ['単独指名']);
+    expect(draftNominationLabels(pick('○3', competition: 3)), ['3球団競合']);
+    expect(draftNominationLabels(pick('甲×')), ['ハズレ1位']);
+    expect(draftNominationLabels(pick('甲×・○2', competition: 2)), ['2球団競合', 'ハズレ1位']);
+    expect(draftNominationLabels(pick('甲×・乙×')), ['ハズレハズレ1位']);
+    expect(draftNominationLabels({...pick(''), 'rank': '2'}), isEmpty);
+    expect(draftNominationLabels({...pick(''), 'type': '育成'}), isEmpty);
+    expect(draftNominationLabels({'rank': '1'}), isEmpty);
+  });
+
   final years = jsonDecode(File('backend/assets/data/draft_history.json').readAsStringSync())['years'] as Map;
   test('2026年は初回と再入札の3抽選・ロッテの2回落選を保持する', () {
     final picks = draftPicksWithCompetition((years['2026']['picks'] as List).cast<Map>());

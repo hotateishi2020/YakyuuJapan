@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/View/mlb_season_titles_table.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -21,6 +22,43 @@ class _HighlightLauncher extends UrlLauncherPlatform {
 }
 
 void main() {
+  testWidgets('HOMEのMLB個人タイトルは年度の球団最短名を空欄ラベルにも補完する', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: Scaffold(body: SingleChildScrollView(
+      child: SeasonTitlesGrid(year: 2026, org: OrgConfig.mlb, individualOnly: true, data: {
+        'season_awards': {'pages': {'mlb': [
+          {'key': 'major', 'name': '選手A', 'team': 'Los Angeles Dodgers', 'id_team': 40,
+            'id_league': 4, 'detail': '本塁打王', 'name_shortest': '', 'confirmed': true},
+        ]}},
+        'standings': [{'year': 2026, 'leagues': [{'teams': [
+          {'id_team': 40, 'name': 'ドジャース', 'name_shortest': 'LAD'},
+        ]}]}],
+      }),
+    ))));
+    expect(find.text('LAD'), findsOneWidget);
+    expect(find.text('Los Angeles Dodgers'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final home in [false, true]) {
+    testWidgets('MLBのチームラベルは古い最短名より英字略称を優先する home=$home', (tester) async {
+      await tester.pumpWidget(MaterialApp(home: Scaffold(body: SingleChildScrollView(
+        child: MlbSeasonTitlesTable(year: 2026, individualOnly: home, groups: const {
+          'major': [
+            {'name': '選手A', 'team': 'ドジャース', 'id_league': 4, 'detail': '本塁打王', 'name_shortest': 'LA'},
+            {'name': '選手B', 'team': 'ヤンキース', 'id_league': 3, 'detail': '本塁打王', 'name_shortest': 'ヤンキース'},
+          ],
+        }),
+      ))));
+      await tester.pumpAndSettle();
+      expect(find.text('LAD'), findsOneWidget);
+      expect(find.text('LA'), findsNothing);
+      expect(find.text('NYY'), findsOneWidget);
+      expect(find.text('ドジャース'), findsNothing);
+      expect(find.text('ヤンキース'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   for (final size in [const Size(390, 844), const Size(1440, 900)]) {
     testWidgets('MLB titles use league grids at $size', (tester) async {
       tester.view.physicalSize = size;

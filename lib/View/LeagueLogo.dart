@@ -1,3 +1,4 @@
+import '../widgets/special_media.dart';
 import 'package:flutter/material.dart';
 
 /// リーグ見出しの横に置くロゴ。
@@ -11,7 +12,9 @@ class LeagueLogo extends StatelessWidget {
   bool get _markOnly => asset.contains('k-central') || asset.contains('k-pacific');
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => SpecialMedia(child: _logo());
+
+  Widget _logo() {
     final image = Image.asset(
       asset,
       height: _markOnly ? height / 0.58 : height,

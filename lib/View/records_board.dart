@@ -1,3 +1,7 @@
+import '../logic/record_sawamura.dart';
+import 'LeagueLogo.dart';
+import '../widgets/special_media.dart';
+import '../widgets/navigation_picker.dart';
 import '../tools/browser_cookie.dart';
 import '../widgets/collapsible_menu.dart';
 import 'player_detail_dialog.dart';
@@ -350,9 +354,9 @@ class _RecordsBoardState extends State<RecordsBoard> {
         final hasLogo = visual.asset != null || visual.networkUrl != null;
         Widget fallback() => label(logoOnly ? '—' : name, color: fg, bold: logo);
         final image = visual.asset != null
-            ? Image.asset(visual.asset!, cacheWidth: 112, fit: BoxFit.contain, errorBuilder: (_, __, ___) => fallback())
+            ? SpecialMedia(fallback: label(name, color: fg), child: Image.asset(visual.asset!, cacheWidth: 112, fit: BoxFit.contain, errorBuilder: (_, __, ___) => fallback()))
             : visual.networkUrl != null
-                ? Image.network(visual.networkUrl!, cacheWidth: 112, fit: BoxFit.contain, errorBuilder: (_, __, ___) => fallback())
+                ? SpecialMedia(fallback: label(name, color: fg), child: Image.network(visual.networkUrl!, cacheWidth: 112, fit: BoxFit.contain, errorBuilder: (_, __, ___) => fallback()))
                 : null;
         final manager = _showManagers && showManager && !logo ? '${team['manager'] ?? ''}' : '';
         Widget withManager(Widget child) => manager.isEmpty
@@ -618,6 +622,13 @@ class _RecordsBoardState extends State<RecordsBoard> {
   }
 
   Widget titles() => Column(children: [
+        if (NavigationPickerScope.enabled(context))
+          NavigationPicker(level: 3, labels: {0: '両リーグ', for (final league in widget.org.leagues) league.id: league.name}, value: _titlesLeague,
+            onChanged: (value) { saveTab('titles_league_${widget.org.kind.name}', value); setState(() => _titlesLeague = value); },
+            color: widget.org.tabColor, foreground: widget.org.tabForeground,
+            itemColors: {for (final league in widget.org.leagues) league.id: league.color},
+            logoAssets: {0: widget.org.logoAsset, for (final league in widget.org.leagues) if (league.logoAsset != null) league.id: league.logoAsset!})
+        else
         MenuBand(
             level: 3,
             child: Padding(
@@ -628,7 +639,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
                         child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 2),
                       child: Material(
-                        color: _titlesLeague == option.$1 ? widget.org.tabColor : Colors.grey.shade300,
+                        color: _titlesLeague == option.$1 ? (widget.org.leagueById(option.$1)?.color ?? widget.org.tabColor) : Color.lerp(Colors.white, widget.org.leagueById(option.$1)?.color ?? widget.org.tabColor, .15),
                         borderRadius: BorderRadius.circular(TAB_RADIUS),
                         child: InkWell(
                           key: ValueKey('titles-league-${option.$1}'),
@@ -636,7 +647,11 @@ class _RecordsBoardState extends State<RecordsBoard> {
                             saveTab('titles_league_${widget.org.kind.name}', option.$1);
                             setState(() => _titlesLeague = option.$1);
                           },
-                          child: SizedBox(height: TAB_BAR_H, child: Center(child: Text(option.$2, style: TextStyle(color: _titlesLeague == option.$1 ? Colors.white : Colors.black87)))),
+                          child: SizedBox(height: TAB_BAR_H, child: Center(child: Row(mainAxisSize: MainAxisSize.min, children: [
+                            LeagueLogo(asset: widget.org.leagueById(option.$1)?.logoAsset ?? widget.org.logoAsset, height: TAB_BAR_H - 4),
+                            const SizedBox(width: 6),
+                            Text(option.$2, style: TextStyle(color: _titlesLeague == option.$1 ? Colors.white : Colors.black87)),
+                          ]))),
                         ),
                       ),
                     )),
@@ -647,7 +662,8 @@ class _RecordsBoardState extends State<RecordsBoard> {
   Widget _titlesTable() {
     String leagueKey(Object? value) => '$value'.replaceAll(RegExp(r'[・\s]'), '');
     final selectedLeagues = widget.org.leagues.where((l) => _titlesLeague == 0 || l.id == _titlesLeague).toList();
-    final seasons = listMapFromJson(data!['titles']).map((s) => <String, dynamic>{...s, 'categories': normalizeRecordAwards(listMapFromJson(s['categories']))}).where((s) => _titlesLeague == 0 || selectedLeagues.any((l) => leagueKey(l.name) == leagueKey(s['league']))).toList();
+    final rawSeasons = listMapFromJson(data!['titles']);
+    final seasons = (widget.org.kind == OrgKind.npb ? withRecordSawamura(rawSeasons) : rawSeasons).map((s) => <String, dynamic>{...s, 'categories': normalizeRecordAwards(listMapFromJson(s['categories']))}).where((s) => _titlesLeague == 0 || selectedLeagues.any((l) => leagueKey(l.name) == leagueKey(s['league']))).toList();
     if (seasons.isEmpty) {
       return const Center(child: Text('個人タイトルはまだ登録されていません。'));
     }
@@ -655,6 +671,11 @@ class _RecordsBoardState extends State<RecordsBoard> {
       for (final s in seasons)
         for (final c in listMapFromJson(s['categories'])) '${c['label']}'
     }.toList();
+    if (widget.org.kind == OrgKind.npb) {
+      categories.remove('沢村賞');
+      final mvp = categories.indexOf('リーグMVP');
+      categories.insert(mvp < 0 ? 0 : mvp + 1, '沢村賞');
+    }
     if (categories.contains('最多安打') && categories.contains('盗塁王')) {
       categories.remove('最多安打');
       categories.insert(categories.indexOf('盗塁王') + 1, '最多安打');

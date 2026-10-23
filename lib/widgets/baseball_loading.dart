@@ -81,7 +81,7 @@ class _BaseballLoadingState extends State<BaseballLoading>
         final width = longThrow
             ? (constraints.hasBoundedWidth ? constraints.maxWidth : 420.0)
             : widget.compact ? 140.0 : math.min(constraints.maxWidth, 420.0);
-        final sceneWidth = longThrow ? width : 280.0;
+        final sceneWidth = longThrow ? math.max(140.0, width) : 280.0;
         final height = math.min(constraints.maxHeight, longThrow ? (widget.compact ? 100.0 : 200.0) : width * 200 / sceneWidth);
         return Center(widthFactor: 1, heightFactor: 1, child: SizedBox(
           key: const ValueKey('baseball-loading-area'),

@@ -1,3 +1,6 @@
+import 'injuries_board.dart';
+import '../logic/foreign_arrival_labels.dart';
+import '../widgets/navigation_picker.dart';
 import '../widgets/collapsible_menu.dart';
 import '../config/app_design.dart';
 import 'strength_age_grid.dart';
@@ -64,7 +67,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
   int _selectedView = 1;
   double get _bandHeaderWidth => compactBaseballLayout(context) && (_selectedView == 0 || TeamSectionLayout.embedded(context) && _selectedView == 1) ? 52.8 : 105.6;
   double get _bandSideWidth => _bandHeaderWidth + 8 + 48;
-  static const _views = ['🕊️貢献度', '選手起用', '😎主力選手', '📰選手一覧', '💼契約', '🌱ドラフト', '功績', '🏫経歴', '⚾️チーム', '首脳', '🏋️自主トレ', '📈分析', '↔️移籍', '🏟️球場', '👨‍🦰年齢'];
+  static const _views = ['🕊️貢献度', '選手起用', '😎主力選手', '📰選手一覧', '💼契約', '🌱ドラフト', '功績', '🏫経歴', '⚾️チーム', '首脳', '🏋️自主トレ', '📈分析', '↔️移籍', '🏟️球場', '👨‍🦰年齢', '🤕怪我人'];
 
   @override
   void initState() {
@@ -75,7 +78,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
       final view => view,
     };
     if (widget.providedTeams == null) {
-      _selectedView = readSavedTab('strength_${widget.org.kind.name}', const [11, 8, 3, 2, 0, 1, 4, 5, 12, 7, 10, 14, 13], fallback: _selectedView);
+      _selectedView = readSavedTab('strength_${widget.org.kind.name}', const [11, 8, 3, 2, 0, 1, 4, 5, 12, 7, 10, 14, 13, 15], fallback: _selectedView);
       if ([1, 3, 6, 9].contains(_selectedView)) _selectedView = 8;
     }
     _load();
@@ -98,7 +101,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
       _error = null;
     });
     if (widget.providedTeams != null) {
-      _teams = widget.providedTeams!;
+      _teams = withForeignArrivalLabels(widget.providedTeams!, widget.year, npb: widget.org.kind == OrgKind.npb);
       _loading = false;
       return;
     }
@@ -111,7 +114,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
       if (data is! Map) throw const FormatException('戦力情報を取得できませんでした');
       if (!mounted || request != _request) return;
       setState(() {
-        _teams = listMapFromJson(data['teams']);
+        _teams = withForeignArrivalLabels(listMapFromJson(data['teams']), widget.year, npb: widget.org.kind == OrgKind.npb);
         if (!_teams.any((team) => _int(team['id_team']) == _selectedTeam)) {
           _selectedTeam = _teams.isEmpty ? null : _int(_teams.first['id_team']);
         }
@@ -142,10 +145,11 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
         );
 
   Widget _viewTabs() => AdaptiveSectionSelector(
+        alwaysPicker: true,
         pickerKey: const ValueKey('strength-picker'),
         itemKeyPrefix: 'strength-view-',
         labels: {
-          for (final i in [if (_selectedView == 1) 1, 11, 8, 2, 0, 4, 5, 12, 7, 10, 14, 13]) i: _views[i]
+          for (final i in [if (_selectedView == 1) 1, 11, 8, 2, 15, 0, 4, 5, 12, 7, 10, 14, 13]) i: _views[i]
         },
         value: _selectedView,
         background: widget.org.tabColor,
@@ -159,6 +163,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
       );
 
   Widget _content(BuildContext context) {
+    if (_selectedView == 15) return InjuriesBoard(org: widget.org.kind.name);
     if (_selectedView == 13) return StadiumsBoard(org: widget.org.kind.name);
     if (_loading) return const Center(child: BaseballLoading());
     if (_error != null) {
@@ -343,7 +348,10 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
         ),
       );
 
-  Widget _teamSegments() => MenuBand(level: 3, child: LayoutBuilder(builder: (context, constraints) {
+  Widget _teamSegments() => NavigationPickerScope.enabled(context) && _teams.isNotEmpty
+      ? NavigationPicker(level: 3, labels: {for (final team in _teams) _int(team['id_team']): '${team['name_team'] ?? team['name_shortest']}'},
+          value: _selectedTeam ?? _int(_teams.first['id_team']), onChanged: (id) => setState(() => _selectedTeam = id), color: widget.org.tabColor, foreground: widget.org.tabForeground)
+      : MenuBand(level: 3, child: LayoutBuilder(builder: (context, constraints) {
         var requiredWidth = 0.0;
         for (final row in _teams) {
           final painter = TextPainter(text: TextSpan(text: '${row['name_team'] ?? row['name_shortest'] ?? ''}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)), textDirection: Directionality.of(context), textScaler: MediaQuery.textScalerOf(context))..layout();

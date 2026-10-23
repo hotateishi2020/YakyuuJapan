@@ -5,8 +5,42 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/View/BlinkBg.dart';
 import 'package:Yakyuu_Japan/config/org_config.dart';
 import 'package:Yakyuu_Japan/View/SeasonTable.dart';
+import 'package:Yakyuu_Japan/logic/auth_session.dart';
 
 void main() {
+  testWidgets('6冠の星はログイン・予想に依存せず、HPとホールドを区別する', (tester) async {
+    final session = AuthSession.instance;
+    final original = session.user;
+    addTearDown(() => session.user = original);
+    const batting = ['打率', '本塁打', '打点', '盗塁', '最多安打', '出塁率'];
+    const pitching = ['防御率', '最多勝', '勝率', '奪三振', 'HP', 'セーブ'];
+    for (final loggedIn in [false, true]) {
+      session.user = loggedIn ? AuthUser.fromJson({'id': 42}) : null;
+      await tester.pumpWidget(MaterialApp(home: Scaffold(body: SegmentedLeaguePersonalStats(
+        batting: [
+          for (final title in [...batting, 'OPS', '長打率'])
+            {'title': title, 'name_player': '打者', 'stats': 1, 'id_users': title == 'OPS' ? '/42/' : ''},
+        ],
+        pitching: [
+          for (final title in [...pitching, 'ホールド', 'WHIP'])
+            {'title': title, 'name_player': '投手', 'stats': 1, 'id_users': title == 'ホールド' ? '/42/' : ''},
+        ],
+      ))));
+      await tester.pumpAndSettle();
+      for (final control in tester.widgetList<StatsSegmentControl>(find.byType(StatsSegmentControl))) {
+        expect(control.starredTitles, {...batting, ...pitching});
+      }
+      expect(find.text('⭐️'), findsNWidgets(12));
+    }
+    for (final entry in {'最多安打': true, '勝率': true, 'ホールドポイント': true, 'ＨＰ': true, 'ホールド': false, 'OPS': false}.entries) {
+      await tester.pumpWidget(MaterialApp(home: Scaffold(body: DualBandLeaguePersonalStats(
+        batting: [{'title': entry.key, 'name_player': '選手', 'stats': 1, 'id_users': '/42/'}],
+        pitching: const [],
+      ))));
+      await tester.pumpAndSettle();
+      expect(find.text('⭐️'), entry.value ? findsNWidgets(2) : findsNothing, reason: entry.key);
+    }
+  });
   for (final org in [OrgConfig.npb, OrgConfig.mlb]) {
     testWidgets('${org.label}の列は表全体で縦スクロールする', (tester) async {
       await tester.binding.setSurfaceSize(const Size(1200, 500));

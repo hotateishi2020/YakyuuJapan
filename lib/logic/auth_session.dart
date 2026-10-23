@@ -110,6 +110,7 @@ class AuthUser {
   /// false のときイベント日程に New を出す
   final bool readEvent;
   final bool admin;
+  final bool special;
 
   const AuthUser({
     required this.id,
@@ -129,6 +130,7 @@ class AuthUser {
     this.readNews = true,
     this.readEvent = true,
     this.admin = false,
+    this.special = false,
   });
 
   /// ヘッダー等の表示名は name_last（ニックネーム）のみ
@@ -168,6 +170,7 @@ class AuthUser {
         readNews: _asBool(json['flg_read_news']),
         readEvent: _asBool(json['flg_read_event']),
         admin: _asBool(json['flg_admin'], fallback: false),
+        special: _asBool(json['flg_special'], fallback: false),
       );
 
   Map<String, dynamic> toJson() => {
@@ -188,15 +191,21 @@ class AuthUser {
         'flg_read_news': readNews,
         'flg_read_event': readEvent,
         'flg_admin': admin,
+        'flg_special': special,
       };
 }
 
-class AuthSession {
+class AuthSession extends ChangeNotifier {
   AuthSession._();
   static final AuthSession instance = AuthSession._();
 
-  AuthUser? user;
-  String? token;
+  AuthUser? _user;
+  String? _token;
+  AuthUser? get user => _user;
+  set user(AuthUser? value) { if (identical(value, _user)) return; _user = value; notifyListeners(); }
+  String? get token => _token;
+  set token(String? value) { if (value == _token) return; _token = value; notifyListeners(); }
+  bool get showSpecialMedia => isLoggedIn && (user?.special ?? false);
 
   bool get isLoggedIn => user != null && (token?.isNotEmpty ?? false);
 

@@ -25,6 +25,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
       await tester.pumpWidget(MaterialApp(home: Scaffold(body: SingleChildScrollView(child: TeamSalaryShareBands(teams: [team, {'id_team': 2, 'name_team': '半額球団', 'contracts': [player(6, 200000000)]}], year: 2026)))));
+      expect(tester.getTopLeft(find.textContaining('帯の長さは')).dy, greaterThan(tester.getBottomLeft(find.byKey(const ValueKey('salary-share-band-2-JPY'))).dy));
       expect(tester.takeException(), isNull);
       final fullWidth = tester.getSize(find.byKey(const ValueKey('salary-share-band-1-JPY'))).width;
       final halfWidth = tester.getSize(find.byKey(const ValueKey('salary-share-band-2-JPY'))).width;

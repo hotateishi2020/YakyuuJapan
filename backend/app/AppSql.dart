@@ -528,6 +528,11 @@ class AppSql {
         team_away.color_back AS color_back_away,
         t_game.code_game,
         COALESCE(t_game.txt_lineup_announced, '') AS txt_lineup_announced,
+        COALESCE(NULLIF(t_game.txt_live_brief, ''), '{}')::jsonb ->> 'name_current_pitcher_home' AS name_current_pitcher_home,
+        COALESCE(NULLIF(t_game.txt_live_brief, ''), '{}')::jsonb ->> 'name_current_pitcher_away' AS name_current_pitcher_away,
+        COALESCE(NULLIF(t_game.txt_live_brief, ''), '{}')::jsonb ->> 'name_homerun_home' AS name_homerun_home,
+        COALESCE(NULLIF(t_game.txt_live_brief, ''), '{}')::jsonb ->> 'name_homerun_away' AS name_homerun_away,
+
         CONCAT_WS('・',
           CASE WHEN t_game.code_game = 'NM' AND EXTRACT(MONTH FROM t_game.datetime_start) <= 4 AND t_game.id = boundary_home.first_id THEN 'シーズン開幕戦' END,
           CASE WHEN t_game.code_game = 'NM' AND EXTRACT(MONTH FROM t_game.datetime_start) >= 9 AND t_game.id = boundary_home.last_id THEN 'シーズン最終戦' END,
@@ -800,6 +805,7 @@ class AppSql {
         s.int_hit2,
         s.int_hit3,
         s.int_homerun,
+        s.int_steal_base,
         s.int_fourball,
         s.int_dead_batting,
         s.int_sacrifice,
@@ -1336,7 +1342,7 @@ class AppSql {
         JOIN m_country c ON c.id=p.id_country
         JOIN m_stats_details d ON d.id_league=t.id_league
         JOIN m_stats s ON s.id=d.id_stats
-        WHERE t.id_league IN (3,4) AND c.name='日本'
+        WHERE t.id_league IN (3,4) AND (c.name='日本' OR p.url LIKE '%/mlb/player/2102188/%')
           AND NOT COALESCE(p.flg_delete,false)
           AND NOT COALESCE(d.flg_delete,false) AND NOT COALESCE(s.flg_delete,false)
       )
@@ -1351,6 +1357,7 @@ class AppSql {
         m_team.color_back,
         m_team.color_font,
         m_stats.flg_pitcher,
+        m_stats.title,
         m_stats_details.int_idx_col_details,
         m_stats_details.int_idx_row_details
       FROM supplemental_targets t_predict_player
@@ -1367,6 +1374,22 @@ class AppSql {
       WHERE t_predict_player.year = \$1 
       AND t_stats_player_latest.id_player IS NULL
       AND m_player.url IS NOT NULL
+      AND NOT (
+        t_predict_player.id_league IN (3,4)
+        AND COALESCE(m_stats.flg_pitcher,false)
+        AND COALESCE(m_player.txt_position,'') ~ '(野手|捕手|指名打者)'
+        AND COALESCE(m_player.txt_position,'') !~ '(投手|二刀流)'
+      )
+      AND NOT (
+        NOT COALESCE(m_stats.flg_pitcher,false)
+        AND COALESCE(m_player.txt_position,'') LIKE '%投手%'
+        AND COALESCE(m_player.txt_position,'') !~ '(二刀流|指名打者|野手)'
+        AND NOT EXISTS (
+          SELECT 1 FROM m_player_career c
+          WHERE c.id_player=m_player.id AND c.int_year=\$1
+            AND NOT COALESCE(c.flg_delete,false) AND c.int_batting >= 100
+        )
+      )
     ''';
   }
 
@@ -1604,6 +1627,7 @@ ORDER BY mt.id_league, tpt.int_rank
         COALESCE(BOOL_OR(m_player.flg_injury), FALSE) AS flg_injury,
         COALESCE(MAX(m_player.txt_injury), '') AS txt_injury,
         COALESCE(NULLIF(MAX(m_player.txt_position), ''), '') AS txt_position,
+        (COALESCE(MAX(m_player.txt_position), '') LIKE '%投手%' AND EXISTS (SELECT 1 FROM m_player_career c WHERE c.id_player=tsp.id_player AND c.int_year=\$1 AND NOT COALESCE(c.flg_delete,false) AND c.int_batting >= 100)) AS flg_two_way,
         COALESCE((SELECT groups FROM t_player_season_usage u WHERE u.int_year = \$1 AND u.id_player = tsp.id_player), '[]'::jsonb) AS season_position_groups,
         tsp.id_league,
         tsp.cnt_play,
@@ -1700,9 +1724,28 @@ ORDER BY mt.id_league, tpt.int_rank
         LEFT JOIN m_user    ON m_user.id = t_predict_player.id_user
         LEFT JOIN (SELECT id_pitcher_home FROM t_game WHERE datetime_start::date = CURRENT_DATE) AS t_game_home ON t_game_home.id_pitcher_home = t_predict_player.id_player
         LEFT JOIN (SELECT id_pitcher_away FROM t_game WHERE datetime_start::date = CURRENT_DATE) AS t_game_away ON t_game_away.id_pitcher_away = t_predict_player.id_player
-      WHERE m_stats.title <> '得点圏打率'
-        OR (t_stats_team.int_game > 0
-          AND tsp.cnt_play >= FLOOR(t_stats_team.int_game * 3.1))
+      WHERE (m_stats.title <> '得点圏打率'
+        OR (tsp.id_league NOT IN (3,4)
+          AND t_stats_team.int_game > 0
+          AND tsp.cnt_play >= FLOOR(t_stats_team.int_game * 3.1)))
+        -- 投手専任の打撃データは全種目で除外。二刀流は年度の打撃実績で判定する。
+        AND NOT (
+          NOT COALESCE(m_stats.flg_pitcher, false)
+          AND COALESCE(m_player.txt_position, '') LIKE '%投手%'
+          AND COALESCE(m_player.txt_position, '') !~ '(二刀流|指名打者|野手)'
+          AND NOT EXISTS (
+            SELECT 1 FROM m_player_career c
+            WHERE c.id_player=tsp.id_player AND c.int_year=\$1
+              AND NOT COALESCE(c.flg_delete,false) AND c.int_batting >= 100
+          )
+        )
+        -- 野手専任は投手の全指標から除外。投手・二刀流の本来の投球成績は残す。
+        AND NOT (
+          tsp.id_league IN (3,4)
+          AND COALESCE(m_stats.flg_pitcher,false)
+          AND COALESCE(m_player.txt_position,'') ~ '(野手|捕手|指名打者)'
+          AND COALESCE(m_player.txt_position,'') !~ '(投手|二刀流)'
+        )
       GROUP BY
         m_stats.title,
         tsp.int_rank,

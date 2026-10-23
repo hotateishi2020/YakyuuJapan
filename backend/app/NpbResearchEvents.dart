@@ -87,7 +87,7 @@ class NpbResearchEvents {
                   .toList()
             })
         .toList();
-    applyRosterMoves(teams, moves, year, previous: before);
+    applyRosterMoves(teams, moves, year, previous: before, reconcileSource: false);
     for (final team in teams) {
       final contracts = usageMaps(team['contracts']);
       final roster = usageMaps(team['roster']);

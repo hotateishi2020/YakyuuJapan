@@ -1,3 +1,4 @@
+import '../widgets/navigation_picker.dart';
 import '../widgets/collapsible_menu.dart';
 import 'compact_layout.dart';
 import '../logic/favorite_team.dart';
@@ -116,7 +117,7 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
     final logo = teamLogoVisual('${team['name_team']}', abbrev: '${team['name_shortest'] ?? ''}', mlb: widget.org.kind == OrgKind.mlb);
     return Container(key: ValueKey('analysis-team-${team['id_team']}'),
       height: height, width: double.infinity, padding: const EdgeInsets.symmetric(horizontal: 8),
-      color: background, child: compactBaseballLayout(context) ? Center(child: SizedBox(width: 30, height: 30, child: teamLogoImage(asset: logo.asset, networkUrl: logo.networkUrl))) : Row(children: [
+      color: background, child: compactBaseballLayout(context) ? Center(child: SizedBox(width: 60, height: 30, child: teamLogoImage(asset: logo.asset, networkUrl: logo.networkUrl, fallback: Text('${team['name_team']}', style: TextStyle(color: foreground, fontSize: 11))))) : Row(children: [
         SizedBox(width: 30, height: 30, child: teamLogoImage(asset: logo.asset, networkUrl: logo.networkUrl)),
         const SizedBox(width: 6),
         Expanded(child: Text('${team['name_team']}', style: TextStyle(color: foreground, fontWeight: FontWeight.bold))),
@@ -336,7 +337,6 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
       final columns = (constraints.maxWidth / 320).floor().clamp(1, 6);
       final width = (constraints.maxWidth - (columns - 1) * 8) / columns;
       return SingleChildScrollView(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Padding(padding: const EdgeInsets.all(8), child: Text('${widget.year}年シーズン前の自主トレ。公式発表・報道で確認できた参加者を人数順に表示しています。所属は当時の球団です。参加者は確認できた範囲です。')),
         if (groups.isEmpty) const Padding(padding: EdgeInsets.all(16), child: Text('この年度の自主トレ情報はまだ収録されていません。')),
         CompactCardLayout(columns: columns, children: [
           for (final group in groups)
@@ -360,6 +360,7 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
               subtitle: Text('${group['location'] ?? ''} ${group['period'] ?? ''}', style: const TextStyle(fontSize: 11)),
             ),
         ]),
+        Padding(padding: const EdgeInsets.all(8), child: Text('${widget.year}年シーズン前の自主トレ。公式発表・報道で確認できた参加者を人数順に表示しています。所属は当時の球団です。参加者は確認できた範囲です。')),
       ]));
     });
   }
@@ -368,12 +369,7 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
     if (widget.teams.isEmpty) return const Center(child: Text('戦力情報がありません'));
     final team = widget.teams.firstWhere((t) => '${t['id_team']}' == _selected, orElse: () => favoriteTeamRow(widget.teams) ?? widget.teams.first);
     final club = _clubs.where((c) => c['code'] == npbClubKey(team)).firstOrNull;
-    final roster = listMapFromJson(team['roster']);
-    final positions = <String>{'先発', '中継ぎ', '捕手', '一塁', '二塁', '三塁', '遊撃', '左翼', '中堅', '右翼',
-      for (final p in roster) rosterPosition(p, team) == '抑え' ? '中継ぎ' : rosterPosition(p, team)};
-    final rosterColumns = positions.fold<int>(1, (count, position) => count + 2 +
-      (roster.any((p) => rosterPosition(p, team) == position && p[['先発', '中継ぎ', '投手'].contains(position) ? 'throws' : 'bats'] == '両') ? 1 : 0));
-    final regularWidth = (pitcherAceSlots.length + usagePositions.length - 1 + benchRegularSlots.length) * 128.0;
+    final regularWidth = (pitcherAceSlots.length + usagePositions.length - 1) * 128.0;
     final background = parseColorNameOrNull('${team['color_back']}') ?? widget.org.tabColor;
     final foreground = parseColorNameOrNull('${team['color_font']}') ?? Colors.white;
     return LayoutBuilder(builder: (context, constraints) {
@@ -386,6 +382,11 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
       Widget usage(int index, String title, {double? minWidth}) => section(title,
         () => widget.teamSection(index, team), minWidth: minWidth, key: ValueKey('${team['id_team']}-$index'));
       return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          if (NavigationPickerScope.enabled(context))
+            NavigationPicker(level: 3, labels: {for (var i = 0; i < widget.teams.length; i++) i: '${widget.teams[i]['name_team'] ?? widget.teams[i]['name_shortest']}'},
+              value: widget.teams.indexWhere((t) => t['id_team'] == team['id_team']),
+              onChanged: (i) => setState(() => _selected = '${widget.teams[i]['id_team']}'), color: background, foreground: foreground)
+          else
           MenuBand(level: 3, child: Padding(padding: const EdgeInsets.only(bottom: ALL_SPACE_BLOCK), child: LayoutBuilder(builder: (context, constraints) {
             final compact = compactBaseballLayout(context);
             final columns = compact ? widget.teams.length : (constraints.maxWidth / 100).floor().clamp(1, widget.teams.length);
@@ -430,6 +431,10 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
             }
             return Wrap(spacing: ALL_SPACE_BLOCK, runSpacing: ALL_SPACE_BLOCK, children: segments);
           }))),
+          if (NavigationPickerScope.enabled(context))
+            NavigationPicker(level: 4, labels: {for (var i = 0; i < _teamSections.length; i++) i: _teamSections[i]}, value: _teamSection,
+              onChanged: (i) => setState(() => _teamSection = i), color: background, foreground: foreground)
+          else
           MenuBand(level: 4, child: Padding(
             padding: EdgeInsets.zero,
             child: SizedBox(height: TAB_BAR_H, child: Row(children: [
@@ -466,7 +471,7 @@ class _ClubHubBoardState extends State<ClubHubBoard> {
           if (_teamSection == 2) usage(2, '主力選手', minWidth: compactBaseballLayout(context) ? null : regularWidth),
           if (_teamSection == 3) usage(0, '貢献度'),
           if (_teamSection == 4) usage(1, '選手起用'),
-          if (_teamSection == 5) usage(3, '選手一覧', minWidth: rosterColumns * 104 * .7),
+          if (_teamSection == 5) usage(3, '選手一覧'),
           if (_teamSection == 6) usage(4, '契約'),
           ]))),
         ]);

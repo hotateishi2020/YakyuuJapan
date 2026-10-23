@@ -1,3 +1,5 @@
+import '../logic/personal_stat_identity.dart';
+export '../logic/personal_stat_identity.dart' show canonicalMlbPersonalStats;
 import 'personal_stats_style.dart';
 import '../tools/color_parse.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +22,40 @@ const metricNotes = {
 String statPlayerKey(Map<String, dynamic> r) => r['id_player'] != null
     ? 'id:${r['id_player']}'
     : '${r['id_team']}:${r['name_player'] ?? r['player_name']}';
+
+/// Legacy MLB snapshots incorrectly marked Japanese batters as pitchers.
+/// Resolve those established identities before consulting cached position fields.
+String? knownMlbStatRole(Map<String, dynamic> row) {
+  if (![3,4].contains(int.tryParse('${row['id_league']}'))) return null;
+  final name = '${row['name_player'] ?? row['name_full'] ?? ''}'
+      .replaceAll(RegExp(r'\([^)]*\)|（[^）]*）|[\s　・.]'), '');
+  if (const ['大谷', '大谷翔平', 'ShoheiOhtani'].contains(name)) return 'both';
+  if (const ['吉田正尚', '西田陸浮', '岡本和真', '村上宗隆', '鈴木誠也',
+    'ラーズヌートバー', 'ヌートバー'].contains(name)) return 'batter';
+  return null;
+}
+
+bool isPitcherOnlyStatPlayer(Map<String, dynamic> row) {
+  final known = knownMlbStatRole(row);
+  if (known != null) return known == 'pitcher';
+  if (['true', 't', '1'].contains('${row['flg_two_way']}'.toLowerCase())) return false;
+  final position = '${row['txt_position'] ?? ''}';
+  final groups = '${row['season_position_groups'] ?? ''}';
+  if (RegExp('二刀流|指名打者|内野手|外野手|捕手|DH|TWP', caseSensitive: false)
+      .hasMatch('$position $groups')) return false;
+  return position.contains('投手') || RegExp(r'\b(SP|RP|P)\b').hasMatch(position) ||
+      (groups.contains('投手') && !groups.contains('野手'));
+}
+
+bool personalStatPlayerMatchesRole(Map<String, dynamic> row, {required bool batting}) {
+  final known = knownMlbStatRole(row);
+  if (known == 'both') return true;
+  if (known == 'batter') return batting;
+  if (batting) return !isPitcherOnlyStatPlayer(row);
+  final position = '${row['txt_position'] ?? ''}';
+  if (RegExp('投手|二刀流|TWP|SP|RP').hasMatch(position)) return true;
+  return !RegExp('野手|捕手|指名打者|DH|OF|IF|C|1B|2B|3B|SS').hasMatch(position);
+}
 
 /// A missing source metric stays unknown; never substitute zero for missing data.
 List<Map<String, dynamic>> withHrStealStats(List<Map<String, dynamic>> rows) {
@@ -85,17 +121,19 @@ class _PlayerStatsGridState extends State<PlayerStatsGrid> {
   bool ascending = false;
   @override
   Widget build(BuildContext context) {
+    final rows = canonicalMlbPersonalStats(widget.rows).where((r) => hasPersonalStatValue(r) && personalStatPlayerMatchesRole(r, batting: widget.batting)).toList();
+    final mlb = rows.any((row) => [3, 4].contains(int.tryParse('${row['id_league']}')));
     final columns = <String>{
-      for (final r in withHrStealStats(widget.rows))
+      for (final r in withHrStealStats(rows))
         if ('${r['title'] ?? ''}'.isNotEmpty && !['盗塁成功率', '代打打率'].contains(r['title'])) '${r['title']}',
       ...(widget.batting ? extraBattingTitles : extraPitchingTitles)
-    }.where((title) => widget.showBallSelection || title != 'ボール球見極め率').toList();
+    }.where((title) => (widget.showBallSelection || title != 'ボール球見極め率') && (!mlb || title != '得点圏打率')).toList();
     if (columns.contains('GG受賞回数') && columns.remove('盗塁阻止数')) {
       columns.insert(columns.indexOf('GG受賞回数') + 1, '盗塁阻止数');
     }
     final people = <String, Map<String, dynamic>>{};
     final values = <String, Map<String, Map<String, dynamic>>>{};
-    for (final r in withHrStealStats(widget.rows)) {
+    for (final r in withHrStealStats(rows)) {
       final key = statPlayerKey(r);
       people.putIfAbsent(key, () => r);
       values.putIfAbsent(key, () => {})['${r['title']}'] = r;
@@ -113,13 +151,9 @@ class _PlayerStatsGridState extends State<PlayerStatsGrid> {
     }
     if (keys.isEmpty) return const Center(child: Text('成績はありません'));
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      const Padding(
-          padding: EdgeInsets.all(4),
-          child: Text('指標をクリックして並び替え。— は未取得・計算不能（0とは区別）。',
-              style: TextStyle(fontSize: 11))),
       Expanded(
           child: SingleChildScrollView(
-              child: SingleChildScrollView(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DecoratedBox(
                     decoration: widget.batting ? statsBattingHeaderDecoration : statsPitchingHeaderDecoration,
@@ -179,7 +213,12 @@ class _PlayerStatsGridState extends State<PlayerStatsGrid> {
                                   child: Text(
                                       personalStatDisplay(values[key]?[title] ?? {}, values[key]!.values))))
                           ])
-                      ])))))
+                      ]))),
+                const Padding(
+          padding: EdgeInsets.all(4),
+          child: Text('指標をクリックして並び替え。— は未取得・計算不能（0とは区別）。',
+              style: TextStyle(fontSize: 11)))
+              ])))
     ]);
   }
 }
@@ -194,14 +233,29 @@ bool isPredictedStatPlayer(Map<String, dynamic> row) =>
     '${row['id_users'] ?? ''}'.split('/').any((id) => (int.tryParse(id) ?? 0) > 0) ||
     '${row['colors_user'] ?? ''}'.split('/').any((color) => color.trim().isNotEmpty));
 
+bool isJapaneseMlbStatPlayer(Map<String, dynamic> row) =>
+    [3, 4].contains(int.tryParse('${row['id_league']}')) &&
+    ['true', 't', '1'].contains('${row['flg_japan']}'.toLowerCase());
+
+bool hasPersonalStatValue(Map<String, dynamic> row) {
+  final value = '${row['stats'] ?? ''}'.trim();
+  return value.isNotEmpty && !RegExp(
+      r'^(?:[-ー―—–−－]+(?:\s*[（(].*[）)])?|null|N/A|NaN)$',
+      caseSensitive: false).hasMatch(value);
+}
+
 /// Keep the preview at ten rows, replacing the lowest non-predicted players.
 List<Map<String, dynamic>> personalStatPreview(List<Map<String, dynamic>> ranked,
-    {bool showPredictions = true, bool Function(Map<String, dynamic>)? isHighlighted}) {
+    {bool showPredictions = true, bool includeJapanese = false, bool Function(Map<String, dynamic>)? isHighlighted}) {
+  ranked = ranked.where(hasPersonalStatValue).toList();
   final result = ranked.take(10).toList();
-  final outside = showPredictions ? ranked.skip(10).where(isPredictedStatPlayer).toList() : <Map<String, dynamic>>[];
+  bool retained(Map<String, dynamic> row) =>
+      showPredictions && isPredictedStatPlayer(row) ||
+      includeJapanese && isJapaneseMlbStatPlayer(row);
+  final outside = ranked.skip(10).where(retained).toList();
   var slot = result.length - 1;
   for (final player in outside) {
-    while (slot >= 0 && isPredictedStatPlayer(result[slot])) { slot--; }
+    while (slot >= 0 && retained(result[slot])) { slot--; }
     if (slot < 0) break;
     result[slot--] = player;
   }
@@ -219,8 +273,13 @@ List<Map<String, dynamic>> personalStatPreview(List<Map<String, dynamic>> ranked
   // Reserve the row just above the appended players as an omission marker.
   final outsideStart = result.indexWhere((row) => (positions[row] ?? 0) >= 10);
   if (outsideStart > 0) {
-    result[outsideStart - 1] = {
-      ...result[outsideStart - 1],
+    var separator = outsideStart - 1;
+    while (separator >= 0 && (retained(result[separator]) ||
+        isHighlighted?.call(result[separator]) == true)) {
+      separator--;
+    }
+    if (separator >= 0) result[separator] = {
+      ...result[separator],
       'preview_separator': true,
     };
   }
@@ -243,7 +302,7 @@ void sortPersonalStatRows(List<Map<String, dynamic>> rows, {bool limitToThirty =
         .compareTo(int.tryParse('${b['int_rank']}') ?? 1000);
   });
   if (limitToThirty && rows.length > 30) {
-    final predicted = rows.skip(30).where(isPredictedStatPlayer).toList();
+    final predicted = rows.skip(30).where((row) => isPredictedStatPlayer(row) || isJapaneseMlbStatPlayer(row)).toList();
     rows.removeRange(30, rows.length);
     rows.addAll(predicted);
   }
@@ -251,6 +310,7 @@ void sortPersonalStatRows(List<Map<String, dynamic>> rows, {bool limitToThirty =
 
 /// Japanese MLB players remain available beyond the normal popup cutoff.
 List<Map<String, dynamic>> personalStatRankingDetail(List<Map<String, dynamic>> ranked, {bool includeJapanese = false}) {
+  ranked = ranked.where(hasPersonalStatValue).toList();
   bool japanese(Map<String, dynamic> row) => ['true', 't', '1'].contains('${row['flg_japan']}'.toLowerCase());
   final top = (includeJapanese
       ? ranked.where((row) => int.tryParse('${row['int_rank']}') != 1000)

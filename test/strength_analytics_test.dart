@@ -489,14 +489,19 @@ void main() {
     expect(opsValue(null), '—');
     expect(battingMetricLabel({'ops': 0.85, 'home_runs': 12}), 'OPS .850  12本');
   });
-  test('塁打貢献は打撃結果ごとの塁打数と四球を合計する', () {
+  test('塁打貢献は打撃結果・四球・盗塁を合計する', () {
     final bands = contributionBands({
       'batting_stats': [
-        {'player_key': 'a', 'name': 'A', 'home_runs': 2, 'triples': 1, 'doubles': 3, 'singles': 5, 'walks': 4, 'total_bases_walks': 26, 'rbi': 7}
+        {'player_key': 'a', 'name': 'A', 'home_runs': 2, 'triples': 1, 'doubles': 3, 'singles': 5, 'walks': 4, 'total_bases_walks': 26, 'stolen_bases': 3, 'rbi': 7},
+        {'player_key': 'b', 'name': 'B', 'stolen_bases': 2}
       ]
     });
-    expect(bands[1]['total'], 26);
-    expect((bands[1]['players'] as List).single['parts'].map((p) => p['count']).toList(), [8, 3, 6, 5, 4]);
+    expect(bands[1]['total'], 31);
+    expect(bands[0]['total'], 2);
+    expect(bands[2]['total'], 7);
+    expect((bands[1]['players'] as List).first['count'], 29);
+    expect((bands[1]['players'] as List).last['count'], 2);
+    expect((bands[1]['players'] as List).first['parts'].map((p) => p['count']).toList(), [8, 3, 6, 5, 4, 3]);
   });
   test('左右の投球回・打席は実数で集計し両打と不明を保持する', () {
     final team = {

@@ -1,3 +1,9 @@
+/// Category choices come from saved history, independently of the visible page.
+const selectAdminLogCategories = r'''
+  SELECT DISTINCT BTRIM(category) AS category FROM t_system_log
+  WHERE NULLIF(BTRIM(category), '') IS NOT NULL ORDER BY category
+''';
+
 /// Apply the visible log type before LIMIT so background traffic cannot evict clicks.
 /// Untyped legacy records retain the API's existing operation fallback.
 const selectAdminOperationLogs = r'''
@@ -11,6 +17,7 @@ const selectAdminOperationLogs = r'''
       OR CAST(l.crtby AS text) = $1::text
       OR COALESCE(u.name_last, '') ILIKE '%' || $1::text || '%'
       OR COALESCE(u.name_first, '') ILIKE '%' || $1::text || '%')
+    AND ($2::text = '' OR BTRIM(l.category) = $2::text)
   ORDER BY l.crtat DESC, l.id DESC
   LIMIT 200
 ''';

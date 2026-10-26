@@ -61,7 +61,7 @@ void main() {
     }
   });
 
-  testWidgets('MLBの長い名前は10pxまで縮小し1行で省略する', (tester) async {
+  testWidgets('MLBの長い名前は左右に余白を残し12pxを下限に1行で省略する', (tester) async {
     await tester.pumpWidget(const MaterialApp(home: Scaffold(body: Center(
       child: PlayerStatCell(width: 260, showJapanFlag: true, row: {
         'name_player': 'クリストフェル・アレクサンダー・サンチェス',
@@ -69,11 +69,14 @@ void main() {
       }),
     ))));
     final auto = tester.widget<AutoSizeText>(find.byType(AutoSizeText));
-    expect(auto.minFontSize, 10);
+    expect(auto.minFontSize, 12);
     expect(auto.maxLines, 1);
     expect(auto.overflow, TextOverflow.ellipsis);
     final text = tester.widget<Text>(find.descendant(of: find.byType(AutoSizeText), matching: find.byType(Text)).first);
-    expect(text.style!.fontSize! * text.textScaleFactor!, closeTo(10, .01));
+    expect(text.style!.fontSize! * text.textScaleFactor!, closeTo(12, .01));
+    final padding = tester.widget<Padding>(find.ancestor(
+      of: find.byType(AutoSizeText), matching: find.byType(Padding)).first);
+    expect(padding.padding, const EdgeInsets.symmetric(horizontal: 6));
     expect(tester.takeException(), isNull);
   });
 

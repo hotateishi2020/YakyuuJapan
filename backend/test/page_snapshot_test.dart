@@ -22,6 +22,16 @@ class FakeConnection implements Connection {
   }
 }
 void main() {
+  test('歴代タイトルは全年度を保ち無関係な大型データを転送しない', () async {
+    final conn = FakeConnection();
+    await PageSnapshot.read(conn, kind: 'records', org: OrgKind.mlb,
+        year: 2026, section: 'record_titles');
+    expect(conn.queries, hasLength(1));
+    expect(conn.queries.single, contains("payload->'titles'"));
+    expect(conn.queries.single, isNot(contains("payload->'standings'")));
+    expect(conn.queries.single, isNot(contains("payload->'career'")));
+    expect(conn.queries.single, isNot(contains('jsonb_path_query_array')));
+  });
   test('古いMLB日程にもワールドシリーズ期間帯を補完し既存の変更は優先する', () async {
     final conn=FakeConnection()..saved=[[{'games':[{'id':7}],'events':[]},'2026-10-21']];
     final data=await PageSnapshot.read(conn,kind:'schedule',org:OrgKind.mlb,year:2026);

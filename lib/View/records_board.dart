@@ -1,3 +1,4 @@
+import '../logic/auth_session.dart';
 import '../logic/record_sawamura.dart';
 import 'LeagueLogo.dart';
 import '../widgets/special_media.dart';
@@ -20,7 +21,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'dart:math' as math;
 import '../tools/color_parse.dart';
-import 'GamesBoard.dart' show teamLogoVisual;
+import 'GamesBoard.dart' show teamLogoVisual, mlbTeamAbbrev, mlbHistoricalTeamLogoAsset;
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
@@ -32,6 +33,35 @@ import '../tools/network_error.dart';
 import 'strength_research.dart';
 
 const recordTabs = ['🗓️年表', '👑個人タイトル', '⚾️シーズン記録', '👣通算記録', '🚥連続記録', '🏆功績', '🌱新人ドラフト', '🏢球団記録', '🍁現役ドラフト', '🔢背番号', '⚜️殿堂入り・名球会', '👴年齢記録', '📶回数記録', '😎レギュラー', '⭐️オールスター'];
+
+/// Timeline rank cells use the explicitly requested account IDs, independently
+/// of the general special-media flag. Rebuild immediately on login/logout.
+class MlbTimelineTeamVisual extends StatelessWidget {
+  const MlbTimelineTeamVisual({super.key, required this.team, this.logo, this.color = Colors.black87});
+  final Map<String, dynamic> team;
+  final Widget? logo;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: AuthSession.instance,
+    builder: (context, _) {
+      final session = AuthSession.instance;
+      if (session.isLoggedIn && [1, 2].contains(session.user?.id) && logo != null) {
+        return SizedBox(height: 28, child: logo);
+      }
+      String? abbreviation;
+      for (final field in ['name', 'abbreviation', 'name_shortest', 'short_name']) {
+        abbreviation = mlbTeamAbbrev('${team[field] ?? ''}');
+        if (abbreviation != null) break;
+      }
+      return Padding(padding: const EdgeInsets.symmetric(horizontal: 3),
+        child: Text(abbreviation ?? '${team['name_shortest'] ?? team['short_name'] ?? team['name'] ?? '—'}',
+          maxLines: 1, overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontSize: 11, color: color)));
+    },
+  );
+}
 
 /// Franchise IDs keep former team names in the same championship history.
 List<Map<String, dynamic>> championshipIntervals(List<Map<String, dynamic>> seasons, int year, {bool mlb = false}) {
@@ -86,6 +116,8 @@ class _RecordsBoardState extends State<RecordsBoard> {
   Map<String, dynamic>? data;
   String? error;
   int request = 0;
+  final _loadedSections = <String, Map<String, dynamic>>{};
+  String _dataSection(int tab) => tab == 0 ? 'timeline' : tab == 1 ? 'record_titles' : 'all';
   bool _showTimelineEvents = readBrowserCookie('timeline-show-events') != 'false';
   bool _showInterleagueRanks = readBrowserCookie('timeline-show-interleague') != 'false';
   bool _showCs = readBrowserCookie('timeline-show-cs') != 'false';
@@ -102,6 +134,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
   void didUpdateWidget(RecordsBoard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.org.kind != widget.org.kind || oldWidget.year != widget.year) {
+      _loadedSections.clear();
       _selectedTeam = null;
       _restoreStandingsLeague();
       tab = readSavedTab('records_${widget.org.kind.name}', _tabs, fallback: 0);
@@ -111,12 +144,20 @@ class _RecordsBoardState extends State<RecordsBoard> {
 
   Future<void> load() async {
     final id = ++request;
+    final section = _dataSection(tab);
+    final cached = _loadedSections[section];
+    if (cached != null) {
+      setState(() { data = cached; error = null; });
+      return;
+    }
     setState(() {
       data = null;
       error = null;
     });
     try {
-      final response = await http.get(Env.api('/records?org=${widget.org.kind.name}&year=${widget.year}${tab == 0 ? '&section=timeline' : ''}')).timeout(const Duration(seconds: 30));
+      final response = await http.get(Env.api('/records?org=${widget.org.kind.name}&year=${widget.year}${section == 'all' ? '' : '&section=$section'}')).timeout(const Duration(seconds: 30));
+      // Obsolete responses should not spend browser CPU decoding large payloads.
+      if (!mounted || id != request) return;
       if (response.statusCode != 200) {
         throw const FormatException('記録を取得できませんでした');
       }
@@ -130,6 +171,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
             error = '${value['message']}';
           } else {
             data = value;
+            _loadedSections[section] = value;
           }
         });
       }
@@ -152,7 +194,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
             foreground: widget.org.tabForeground,
             onChanged: (i) {
               saveTab('records_${widget.org.kind.name}', i);
-              final reload = (tab == 0) != (i == 0);
+              final reload = _dataSection(tab) != _dataSection(i);
               setState(() => tab = i);
               if (reload) load();
             }),
@@ -344,11 +386,18 @@ class _RecordsBoardState extends State<RecordsBoard> {
                 ? parseColorName('${team['color_font'] ?? ''}', background.computeLuminance() > .45 ? Colors.black : Colors.white)
                 : Colors.black87;
         final savedLogo = '${team['logo_url'] ?? ''}';
-        final visual = savedLogo.startsWith('asset:')
+        final historicalAsset = widget.org.kind == OrgKind.mlb
+            ? mlbHistoricalTeamLogoAsset('${team['name'] ?? name}', abbrev: '${team['name_shortest'] ?? ''}')
+            : null;
+        final visual = historicalAsset != null
+            ? (asset: historicalAsset, networkUrl: null)
+            : savedLogo.startsWith('asset:')
             ? (asset: savedLogo.substring(6).replaceFirst('images/history_', 'images/thumb_history_'), networkUrl: null)
             : savedLogo.isNotEmpty
                 ? (asset: null, networkUrl: savedLogo)
-                : team['historical_identity'] == true
+                    : team['historical_identity'] == true &&
+                        !(widget.org.kind == OrgKind.mlb &&
+                          mlbTeamAbbrev('${team['name_shortest'] ?? ''}') != null)
                     ? (asset: null, networkUrl: null)
                     : teamLogoVisual('${team['name'] ?? name}', abbrev: '${team['name_shortest'] ?? ''}', mlb: widget.org.kind == OrgKind.mlb);
         final hasLogo = visual.asset != null || visual.networkUrl != null;
@@ -370,10 +419,17 @@ class _RecordsBoardState extends State<RecordsBoard> {
             child: Semantics(
                 label: '${team['name'] ?? name}',
                 child: cell(
-                    withManager(Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      if (hasLogo) SizedBox(width: logo ? 28 : math.min(w - 6, 54), height: 28, child: image),
-                      if ((!logoOnly && logo) || !hasLogo) Flexible(child: fallback()),
-                    ])),
+                    withManager(widget.org.kind == OrgKind.mlb && !logo
+                        ? MlbTimelineTeamVisual(team: team, color: fg,
+                            logo: visual.asset != null
+                                ? Image.asset(visual.asset!, cacheWidth: 112, fit: BoxFit.contain, errorBuilder: (_, __, ___) => fallback())
+                                : visual.networkUrl != null
+                                    ? Image.network(visual.networkUrl!, cacheWidth: 112, fit: BoxFit.contain, errorBuilder: (_, __, ___) => fallback())
+                                    : null)
+                        : Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                            if (hasLogo) SizedBox(width: logo ? 28 : math.min(w - 6, 54), height: 28, child: image),
+                            if ((!logoOnly && logo) || !hasLogo) Flexible(child: fallback()),
+                          ])),
                     w,
                     h,
                     color: background)));
@@ -695,7 +751,13 @@ class _RecordsBoardState extends State<RecordsBoard> {
         for (final c in listMapFromJson(s['categories']))
           for (final p in listMapFromJson(c['players'])) compact(p['name']),
     ];
-    final columnWidth = (names.map(textWidth).fold<double>(0, math.max) + 12).clamp(88.0, 140.0);
+    // Once the capped column width is reached, measuring older names cannot
+    // change the layout. Avoid thousands of synchronous browser text layouts.
+    var columnWidth = 88.0;
+    for (final name in names.toSet()) {
+      columnWidth = math.max(columnWidth, (textWidth(name) + 12).clamp(88.0, 140.0));
+      if (columnWidth >= 140) break;
+    }
     const yearWidth = 88.0;
     const rowHeight = 60.0;
     Widget text(String value, {bool bold = false, Color color = Colors.black}) => FittedBox(fit: BoxFit.scaleDown, child: Text(value, maxLines: 1, style: style.copyWith(color: color, fontWeight: bold ? FontWeight.bold : FontWeight.normal)));
@@ -712,6 +774,15 @@ class _RecordsBoardState extends State<RecordsBoard> {
     }
     Color titleFont(Map<String, dynamic> p) => parseColorName(p['color_font']?.toString(), parseColorName(p['color_back']?.toString(), Colors.white).computeLuminance() > .45 ? Colors.black : Colors.white);
     String titleValue(Map<String, dynamic> p) => '${p['value'] ?? ''}'.trim() == '受賞' ? '' : '${p['value'] ?? ''}${p['unit'] ?? ''}';
+    String titleTeamLabel(Map<String,dynamic> player) {
+      if (widget.org.kind == OrgKind.mlb) {
+        for (final field in ['team', 'name_shortest', 'team_shortest']) {
+          final code = mlbTeamAbbrev('${player[field] ?? ''}');
+          if (code != null) return code;
+        }
+      }
+      return recordShortestTeam(player);
+    }
     Widget winners(int year, String league, String category, double width) {
       final players = [
         for (final c in grouped[year]?[leagueKey(league)] ?? <Map<String, dynamic>>[])
@@ -734,7 +805,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
                                 child: FittedBox(
                                     fit: BoxFit.scaleDown,
                                     child: Row(mainAxisSize: MainAxisSize.min, children: [
-                                      if (recordShortestTeam(p).isNotEmpty) Container(margin: const EdgeInsets.only(right: 4), padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1), color: parseColorName(p['color_back']?.toString(), Colors.white), child: Text(recordShortestTeam(p), style: style.copyWith(color: titleFont(p)))),
+                                      if (titleTeamLabel(p).isNotEmpty) Container(margin: const EdgeInsets.only(right: 4), padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1), color: parseColorName(p['color_back']?.toString(), Colors.white), child: Text(titleTeamLabel(p), style: style.copyWith(color: titleFont(p)))),
                                       PlayerNameLink(player: p, child: Text(compact(p['name']), style: style.copyWith(fontWeight: FontWeight.bold))),
                                     ]))),
                             if (titleValue(p).isNotEmpty) SizedBox(height: 16, child: text(titleValue(p))),
@@ -758,29 +829,28 @@ class _RecordsBoardState extends State<RecordsBoard> {
             Row(children: [for (final league in selectedLeagues) cell(text(league.name.substring(0, 1), bold: true, color: Colors.white), columnWidth, header: true, background: league.color)]),
           ]),
       ]),
-      years: [
-        for (final year in years)
-          cell(
-              Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                text('$year年', bold: true, color: Colors.white),
-                if (widget.org.kind == OrgKind.npb && year < 1950) text('1リーグ制', color: Colors.white),
-              ]),
-              yearWidth,
-              yearHeader: true,
-              key: ValueKey('title-fixed-year-$year')),
-      ],
-      rows: [
-        for (final entry in years.indexed)
-          Row(key: ValueKey('title-year-${entry.$1}'), children: [
-            for (final category in categories)
-              Row(key: ValueKey('title-cell-${entry.$1}-$category'), children: [
-                if (widget.org.kind == OrgKind.npb && entry.$2 < 1950)
-                  winners(entry.$2, '日本野球連盟', category, columnWidth * selectedLeagues.length)
-                else
-                  for (final league in leagueNames) winners(entry.$2, league, category, columnWidth),
-              ]),
-          ]),
-      ],
+      rowCount: years.length,
+      yearBuilder: (context, index) {
+        final year = years[index];
+        return cell(
+          Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            text('$year年', bold: true, color: Colors.white),
+            if (widget.org.kind == OrgKind.npb && year < 1950) text('1リーグ制', color: Colors.white),
+          ]), yearWidth, yearHeader: true,
+          key: ValueKey('title-fixed-year-$year'));
+      },
+      rowBuilder: (context, index) {
+        final year = years[index];
+        return Row(key: ValueKey('title-year-$index'), children: [
+          for (final category in categories)
+            Row(key: ValueKey('title-cell-$index-$category'), children: [
+              if (widget.org.kind == OrgKind.npb && year < 1950)
+                winners(year, '日本野球連盟', category, columnWidth * selectedLeagues.length)
+              else
+                for (final league in leagueNames) winners(year, league, category, columnWidth),
+            ]),
+        ]);
+      },
     );
   }
 
@@ -1056,10 +1126,11 @@ class _TappedTeamNameState extends State<_TappedTeamName> {
 
 /// Year stays outside the horizontal viewport; both vertical panes move together.
 class _PinnedTitleTable extends StatefulWidget {
-  const _PinnedTitleTable({required this.yearWidth, required this.contentWidth, required this.rowHeight, required this.yearHeader, required this.header, required this.years, required this.rows});
+  const _PinnedTitleTable({required this.yearWidth, required this.contentWidth, required this.rowHeight, required this.yearHeader, required this.header, required this.rowCount, required this.yearBuilder, required this.rowBuilder});
   final double yearWidth, contentWidth, rowHeight;
   final Widget yearHeader, header;
-  final List<Widget> years, rows;
+  final int rowCount;
+  final IndexedWidgetBuilder yearBuilder, rowBuilder;
   @override
   State<_PinnedTitleTable> createState() => _PinnedTitleTableState();
 }
@@ -1097,7 +1168,7 @@ class _PinnedTitleTableState extends State<_PinnedTitleTable> {
             width: widget.yearWidth,
             child: Column(children: [
               widget.yearHeader,
-              Expanded(child: ListView.builder(key: const ValueKey('title-years-scroll'), controller: _years, padding: EdgeInsets.zero, itemExtent: widget.rowHeight, itemCount: widget.years.length, itemBuilder: (_, i) => widget.years[i])),
+              Expanded(child: ListView.builder(key: const ValueKey('title-years-scroll'), controller: _years, padding: EdgeInsets.zero, itemExtent: widget.rowHeight, itemCount: widget.rowCount, itemBuilder: widget.yearBuilder)),
             ])),
         Expanded(
             child: SingleChildScrollView(
@@ -1107,7 +1178,7 @@ class _PinnedTitleTableState extends State<_PinnedTitleTable> {
                     width: widget.contentWidth,
                     child: Column(children: [
                       widget.header,
-                      Expanded(child: ListView.builder(key: const ValueKey('title-body-scroll'), controller: _body, padding: EdgeInsets.zero, itemExtent: widget.rowHeight, itemCount: widget.rows.length, itemBuilder: (_, i) => widget.rows[i])),
+                      Expanded(child: ListView.builder(key: const ValueKey('title-body-scroll'), controller: _body, padding: EdgeInsets.zero, itemExtent: widget.rowHeight, itemCount: widget.rowCount, itemBuilder: widget.rowBuilder)),
                     ])))),
       ]);
 }

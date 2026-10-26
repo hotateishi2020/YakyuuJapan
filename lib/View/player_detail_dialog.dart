@@ -617,7 +617,7 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
                                       '選手の特徴',
                                       '特技・趣味',
                                       if (batting) ...['打球速度', if (position.contains('捕手')) '二塁送球タイム', '一塁到達タイム', '遠投'],
-                                      if (pitching) ...['投球速度', '変化球の球種']
+                                      if (pitching) ...[if (AuthSession.instance.showDetailedGames) '投球速度', '変化球の球種']
                                     ])
                                       key: map(verified[key])['value'],
                                     'Wikipedia': Builder(builder: (context) {

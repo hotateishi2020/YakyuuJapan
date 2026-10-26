@@ -6,9 +6,11 @@ import 'PlayerDetail.dart';
 import 'PlayerArt.dart';
 import 'ScheduledLog.dart';
 import 'SnapshotWork.dart';
+import 'PredictionSnapshot.dart';
+import 'PlayerDisplay.dart';
 
-/// Request path reads one indexed JSON snapshot. All aggregation and upstream
-/// requests belong to refresh(), never to opening a player dialog.
+/// Profile/career data comes from a saved snapshot. Season values and ranks
+/// use the same read path as the individual leaderboard, never cached ranks.
 class PlayerDetailSnapshot {
   static Timer? _timer;
   static Timer? _pendingTimer;
@@ -71,11 +73,13 @@ class PlayerDetailSnapshot {
     final name = normalizedPlayerName(identity['name'] ?? '');
     final team = int.tryParse('${identity['id_team']}');
     final rows = await conn.execute(
-        '''SELECT payload,updated_at::text FROM t_player_detail_snapshot
+        '''SELECT jsonb_set(jsonb_set(payload,'{profile,id}',to_jsonb(id_player)),
+        '{profile,name_full}',to_jsonb(coalesce((SELECT name_full FROM m_player WHERE id=id_player),payload->'profile'->>'name_full',''))) AS payload,updated_at::text FROM t_player_detail_snapshot
       WHERE int_year=\$1 AND id_league=ANY(\$2::int[])
-      AND (CASE WHEN \$3::int>0 THEN id_player=\$3
+      AND (CASE WHEN \$3::int>0 THEN id_player=coalesce((SELECT merged_into_player_id FROM m_player WHERE id=\$3),\$3)
         WHEN \$4::text<>'' THEN source_player_id=\$4
-        ELSE normalized_name=\$5 END)
+        ELSE normalized_name=\$5 OR id_player IN (SELECT id FROM m_player
+          WHERE NOT coalesce(flg_delete,false) AND player_identity_key(\$5)=ANY(name_pattern_keys)) END)
       AND (\$3::int>0 OR \$6::int IS NULL OR id_team=\$6)
       LIMIT 2''',
         parameters: [year, leagues, id, source, name, team]);
@@ -95,8 +99,12 @@ class PlayerDetailSnapshot {
     }
     final payload = detailMap(rows.single[0]);
     final playerId = int.tryParse('${detailMap(payload['profile'])['id']}');
+    final current = playerId == null ? null
+        : await PredictionSnapshot.players(conn, year, leagues);
     return {
       ...payload,
+      'season_stats': current == null ? <Map<String, dynamic>>[]
+          : playerDetailSeasonStats(current.stats, playerId!),
       'updated_at': rows.single[1],
       if (playerId != null)
         'character_image': await PlayerArt.read(conn, playerId,

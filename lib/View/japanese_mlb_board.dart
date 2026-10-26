@@ -24,9 +24,7 @@ double _teamLabelWidth(BuildContext context, List<Map<String, dynamic>> players)
 
 const _pitchingMetrics = ['規定到達率', '登板', '勝利', '敗戦', '防御率', '投球回', '奪三振', 'セーブ', 'ホールド', 'WHIP'];
 const _battingMetrics = ['規定到達率', '打率', '打席', '打数', '安打', '本塁打', '打点', '盗塁', '出塁率', '長打率', 'OPS'];
-String _playerName(Map<String, dynamic> p) => '${p['name_player'] ?? ''}'
-    .replaceAll(RegExp(r'[（(]?\s*[0-9０-９]+(?:[.．][0-9０-９]+)?\s*[%％]\s*[）)]?'), '')
-    .replaceAll(RegExp(r'[\s　]+'), '');
+String _playerName(Map<String, dynamic> p) => '${p['name_player'] ?? ''}'.replaceAll(RegExp(r'[（(]?\s*[0-9０-９]+(?:[.．][0-9０-９]+)?\s*[%％]\s*[）)]?'), '').replaceAll(RegExp(r'[\s　]+'), '');
 String _contractText(Map<String, dynamic> p) => '年俸 ${p['salary_label'] ?? 'ー'}【${p['contract_label'] ?? 'ー'}】';
 String _metricText(Map<String, dynamic> p, String title) {
   final value = (p['stats'] as Map? ?? {})[title];
@@ -37,16 +35,27 @@ String _metricText(Map<String, dynamic> p, String title) {
 class _GridWidths {
   _GridWidths(BuildContext context, List<Map<String, dynamic>> players, double? teamWidth) {
     double measure(String text, double size, FontWeight weight, {bool figures = false}) {
-      final painter = TextPainter(text: TextSpan(text: text, style: TextStyle(
-        fontSize: size, fontWeight: weight, letterSpacing: .25,
-        fontFeatures: figures ? const [FontFeature.tabularFigures()] : null,
-      )), textDirection: Directionality.of(context), textScaler: MediaQuery.textScalerOf(context))..layout();
+      final painter = TextPainter(
+          text: TextSpan(
+              text: text,
+              style: TextStyle(
+                fontSize: size,
+                fontWeight: weight,
+                letterSpacing: .25,
+                fontFeatures: figures ? const [FontFeature.tabularFigures()] : null,
+              )),
+          textDirection: Directionality.of(context),
+          textScaler: MediaQuery.textScalerOf(context))
+        ..layout();
       final width = painter.width.ceilToDouble();
       painter.dispose();
       return width;
     }
-    double widest(Iterable<String> values, double size, FontWeight weight, {bool figures = false}) =>
-        values.fold<double>(0, (w, text) { final n = measure(text, size, weight, figures: figures); return n > w ? n : w; });
+
+    double widest(Iterable<String> values, double size, FontWeight weight, {bool figures = false}) => values.fold<double>(0, (w, text) {
+          final n = measure(text, size, weight, figures: figures);
+          return n > w ? n : w;
+        });
     league = widest(['リーグ', ...players.map((p) => '${p['name_league'] ?? 'ー'}')], 12, FontWeight.w700) + 18;
     area = widest(['地区', ...players.map((p) => '${p['name_area'] ?? 'ー'}')], 12, FontWeight.w700) + 18;
     team = teamWidth ?? _teamLabelWidth(context, players);
@@ -156,12 +165,13 @@ class _JapaneseMlbStatsGridState extends State<JapaneseMlbStatsGrid> {
     }
     final widths = _GridWidths(context, widget.layoutPlayers ?? widget.players, widget.teamLabelWidth);
     Widget leagueCell(Map<String, dynamic> player, String field) => Container(
-      width: double.infinity, height: 28, alignment: Alignment.center,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      color: OrgConfig.mlb.leagueColor(int.tryParse('${player['id_league']}') ?? 0),
-      child: Text('${player[field] ?? 'ー'}', softWrap: false,
-        style: const TextStyle(fontSize: 12, color: Colors.white)),
-    );
+          width: double.infinity,
+          height: 28,
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          color: OrgConfig.mlb.leagueColor(int.tryParse('${player['id_league']}') ?? 0),
+          child: Text('${player[field] ?? 'ー'}', softWrap: false, style: const TextStyle(fontSize: 12, color: Colors.white)),
+        );
     final accent = widget.pitching ? const Color(0xff234b70) : const Color(0xffa84256);
     const line = Color(0xffd5dde5);
     return Padding(
@@ -233,7 +243,7 @@ class _JapaneseMlbStatsGridState extends State<JapaneseMlbStatsGrid> {
                                 DataCell(leagueCell(players[i], 'name_area')),
                                 DataCell(Container(width: double.infinity, height: 28, alignment: Alignment.center, padding: const EdgeInsets.symmetric(horizontal: 9), decoration: BoxDecoration(color: parseColorNameOrNull('${players[i]['color_back']}')), child: Text('${players[i]['name_team']}', softWrap: false, maxLines: 1, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 0, color: parseColorNameOrNull('${players[i]['color_font']}'))))),
                                 DataCell(Padding(padding: const EdgeInsets.symmetric(horizontal: 12), child: PlayerNameLink(player: players[i], child: Text('${players[i]['name_player']}'.replaceAll(RegExp(r'[（(]?\s*[0-9０-９]+(?:[.．][0-9０-９]+)?\s*[%％]\s*[）)]?'), '').replaceAll(RegExp(r'[\s　]+'), ''), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xff243447)))))),
-                                for (final title in columns) DataCell(Padding(padding: const EdgeInsets.symmetric(horizontal: 4), child: Text('${value(players[i], title) == null ? 'ー' : '${value(players[i], title)}${title == '規定到達率' ? '%' : ''}'}', style: TextStyle(color: value(players[i], title) == null ? const Color(0xff94a3b8) : null, fontFeatures: const [FontFeature.tabularFigures()])))),
+                                for (final title in columns) DataCell(Padding(padding: const EdgeInsets.symmetric(horizontal: 4), child: Text(value(players[i], title) == null ? 'ー' : '${value(players[i], title)}${title == '規定到達率' ? '%' : ''}', style: TextStyle(color: value(players[i], title) == null ? const Color(0xff94a3b8) : null, fontFeatures: const [FontFeature.tabularFigures()])))),
                                 DataCell(Padding(padding: const EdgeInsets.symmetric(horizontal: 10), child: Text(_contractText(players[i]), maxLines: 1, softWrap: false, style: TextStyle(fontSize: 12, color: RegExp(r'[（(]2026年まで[）)]').hasMatch('${players[i]['contract_label'] ?? ''}') ? Colors.red : null)))),
                               ])
                       ],

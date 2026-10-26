@@ -1,3 +1,4 @@
+import 'app/GameStatsLoad.dart';
 import 'app/AdminLogQuery.dart';
 import 'app/InjuryList.dart';
 import 'app/HomeDashboard.dart';
@@ -1875,25 +1876,28 @@ void main() async {
         );
         final visitors = visitorSummary(visitorRows.map((row) => row.toColumnMap()), visitorNow);
         final q = (request.url.queryParameters['q'] ?? '').trim();
+        final category = (request.url.queryParameters['category'] ?? '').trim();
+        final categoryRows = await conn.execute(selectAdminLogCategories);
         final access = await conn.execute(
           selectAdminOperationLogs,
-          parameters: [q],
+          parameters: [q, category],
         );
         final errors = await conn.execute(
           '''
             SELECT e.id, e.crtat, e.crtby, COALESCE(u.name_last, '') AS name_user,
-                   e.message_error, e.stacktrace, COALESCE(l.url, '') AS url, e.txt_detail
+                   e.message_error, e.stacktrace, COALESCE(l.url, '') AS url, l.category, e.txt_detail
             FROM t_system_log_error e
             LEFT JOIN t_system_log l ON l.id_log_error = e.id
             LEFT JOIN m_user u ON u.id = e.crtby
-            WHERE \$1::text = ''
+            WHERE (\$1::text = ''
                OR CAST(COALESCE(e.crtby, 0) AS text) = \$1::text
                OR COALESCE(u.name_last, '') ILIKE '%' || \$1::text || '%'
-               OR COALESCE(u.name_first, '') ILIKE '%' || \$1::text || '%'
+               OR COALESCE(u.name_first, '') ILIKE '%' || \$1::text || '%')
+              AND (\$2::text = '' OR BTRIM(l.category) = \$2::text)
             ORDER BY e.crtat DESC
             LIMIT 200
           ''',
-          parameters: [q],
+          parameters: [q, category],
         );
         String stamp(dynamic value) => LogDetail.formatJst(value);
 
@@ -1971,6 +1975,7 @@ void main() async {
         return Response.ok(
           jsonEncode({
             'ok': true,
+            'categories': [for (final row in categoryRows) row[0]],
             'logs': logs,
             'visitors': visitors,
             'visitors_as_of': visitorNow.toIso8601String(),
@@ -2100,6 +2105,15 @@ void main() async {
     });
 
     // 初期表示が描画された後に届く通知。DB・認証処理を挟まず、一度だけ開始する。
+    app.post('/predictions/live-details', (Request request) async {
+      final org = request.url.queryParameters['org'] ?? 'npb';
+      if (!['npb', 'mlb'].contains(org)) return Response(400);
+      final userId = await Postgres.withConnection((conn) => Auth.userIdOf(conn, request), urgent: true);
+      if (!GameStatsLoad.enableLiveViewer(userId)) return Response(403);
+      GameFetchSchedule.resumeTodayWatch(org);
+      return Response(204);
+    });
+
     app.post('/predictions/ready', (Request request) {
       GameFetchSchedule.markInitialDisplayReady();
       return Response(204);

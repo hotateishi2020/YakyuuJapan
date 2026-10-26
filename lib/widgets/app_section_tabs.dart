@@ -16,6 +16,7 @@ class AppSectionTabs extends StatelessWidget {
       this.leadingAssets,
       this.highlightGames = false,
       this.alwaysPicker = false,
+      this.alwaysTabs = false,
       this.height = TAB_BAR_H,
       this.specialLabel});
   final List<(String, int)> tabs;
@@ -25,12 +26,13 @@ class AppSectionTabs extends StatelessWidget {
   final Map<int, String>? leadingAssets;
   final bool highlightGames;
   final bool alwaysPicker;
+  final bool alwaysTabs;
   final double height;
   final Widget Function(TextStyle?)? specialLabel;
   @override
   Widget build(BuildContext context) {
     if (NavigationPickerScope.enabled(context)) {
-      return NavigationPicker(alwaysPicker: alwaysPicker, labels: {for (final tab in tabs) tab.$2: highlightGames && tab.$2 == 0 ? '🔴 ${tab.$1}' : tab.$1}, value: selectedIndex,
+      return NavigationPicker(alwaysTabs: alwaysTabs, alwaysPicker: alwaysPicker, labels: {for (final tab in tabs) tab.$2: highlightGames && tab.$2 == 0 ? '🔴 ${tab.$1}' : tab.$1}, value: selectedIndex,
         onChanged: onSelected, color: selectedColor ?? ALL_COLOR_APP,
         foreground: selectedForeground ?? TAB_COLOR_FONT);
     }
@@ -65,7 +67,7 @@ class AppSectionTabs extends StatelessWidget {
         painter.dispose();
         return needed <= cellWidth;
       });
-      if (alwaysPicker || !fits) {
+      if (!alwaysTabs && (alwaysPicker || !fits)) {
         return Container(
             height: height,
             margin: const EdgeInsets.only(top: ALL_SPACE_BLOCK),

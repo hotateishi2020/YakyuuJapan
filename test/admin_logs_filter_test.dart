@@ -6,6 +6,29 @@ import 'package:http/testing.dart';
 import 'package:Yakyuu_Japan/pages/admin_logs_page.dart';
 
 void main() {
+  testWidgets('現在のログにない過去のカテゴリも選択して取得する', (tester) async {
+    final requests = <Uri>[];
+    await http.runWithClient(() async {
+      await tester.pumpWidget(const MaterialApp(home: AdminLogsPage()));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('log-category')));
+      await tester.pumpAndSettle();
+      expect(find.text('LEGACY'), findsOneWidget);
+      await tester.tap(find.text('LEGACY'));
+      await tester.pumpAndSettle();
+      expect(requests.last.queryParameters['category'], 'LEGACY');
+      expect(find.text('過去の操作'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }, () => MockClient((request) async {
+      if (request.url.path != '/admin/logs') return http.Response('{}', 200);
+      requests.add(request.url);
+      return http.Response(jsonEncode({
+        'categories': ['CLIENT', 'LEGACY'],
+        'logs': [if (request.url.queryParameters['category'] == 'LEGACY')
+          {'log_type': '操作', 'category': 'LEGACY', 'action': '過去の操作'}],
+      }), 200, headers: {'content-type': 'application/json; charset=utf-8'});
+    }));
+  });
   testWidgets('チェック時は操作とエラーのみ、未チェック時はエラーのみ表示する', (tester) async {
     await http.runWithClient(() async {
       await tester.pumpWidget(const MaterialApp(home: AdminLogsPage()));

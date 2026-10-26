@@ -203,7 +203,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         if (!mounted) return;
         setState(() {
           _restoreBoardSession();
-          if (_predictGroupsOpen) _restorePredictSession(allowCookieUser: true);
+          if (_predictGroupsOpen || _homeOpen) _restorePredictSession(allowCookieUser: true);
         });
         unawaited(_bootstrapWithAuth());
       }));
@@ -228,7 +228,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     }
     if (!mounted) return;
     setState(() => _authEntryReady = true);
-    if (_predictGroupsOpen) {
+    if (_predictGroupsOpen || _homeOpen) {
       if (AuthSession.instance.isLoggedIn) {
         final userId = AuthSession.instance.user?.id ?? 0;
         final savedUser = _savedPredictUserId();
@@ -265,10 +265,12 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
 
   void _onAuthChanged() {
     if (!mounted) return;
+    _lastLiveHeartbeat = null;
+    unawaited(_pollDisplayedGames());
     if (AuthSession.instance.isLoggedIn) {
       setState(() => _authEntryReady = true);
       unawaited(_fetchPredictInvites());
-      if (_predictGroupsOpen) unawaited(_fetchPredictGroups());
+      if (_predictGroupsOpen || _homeOpen) unawaited(_loadInitialPredictGroups());
       return;
     }
     _clearPredictSession();
@@ -985,6 +987,44 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     unawaited(_pollDisplayedGames());
   }
 
+  bool get _canRequestHomeDetails => mounted && _homeOpen &&
+      AuthSession.instance.showDetailedGames && _seasonYear == DateTime.now().year &&
+      (WidgetsBinding.instance.lifecycleState == null ||
+       WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed);
+
+  bool get _viewingLiveDetails => _canRequestHomeDetails &&
+      [...games, ...postseasonGames].any((game) {
+        final state = '${game['state'] ?? ''}';
+        return !state.contains('終了') && (state.contains('試合中') || RegExp(r'\d+\s*回').hasMatch(state));
+      });
+
+  DateTime? _lastGamesPoll;
+  DateTime? _lastLiveHeartbeat;
+  String? _liveHeartbeatOrg;
+  bool _liveHeartbeatRunning = false;
+
+  Future<void> _renewHomeLiveDetails() async {
+    if (!_canRequestHomeDetails || _liveHeartbeatRunning) return;
+    final org = _orgKind.name;
+    if (_liveHeartbeatOrg == org && _lastLiveHeartbeat != null &&
+        DateTime.now().difference(_lastLiveHeartbeat!) < const Duration(seconds: 30)) {
+      return;
+    }
+    _liveHeartbeatRunning = true;
+    try {
+      final response = await http.post(Env.api('/predictions/live-details?org=$org'), headers: _readHeaders)
+          .timeout(const Duration(seconds: 10));
+      if (response.statusCode == 204 && _canRequestHomeDetails && _orgKind.name == org) {
+        _lastLiveHeartbeat = DateTime.now();
+        _liveHeartbeatOrg = org;
+      }
+    } catch (_) {
+      // Retry on the next timer tick without blanking the displayed scorecard.
+    } finally {
+      _liveHeartbeatRunning = false;
+    }
+  }
+
   Future<void> _startGamesWatch() async {
     if (!_canWatchGames) return;
     // 一部パート失敗の error があっても、取れたデータがあれば監視は続ける。
@@ -993,8 +1033,14 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     if (error != null && !_boardContentReady) return;
     unawaited(_notifyGamesDisplayReady());
     _gamesPollTimer?.cancel();
-    _gamesPollTimer = Timer.periodic(const Duration(minutes: 1), (_) {
-      unawaited(_pollDisplayedGames());
+    unawaited(_renewHomeLiveDetails());
+    _gamesPollTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+      // Renew independently: a slow games response must not expire live collection.
+      unawaited(_renewHomeLiveDetails());
+      final frequent = _viewingLiveDetails;
+      if (frequent || _lastGamesPoll == null || DateTime.now().difference(_lastGamesPoll!) >= const Duration(minutes: 1)) {
+        unawaited(_pollDisplayedGames());
+      }
     });
   }
 
@@ -1020,9 +1066,13 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
 
   Future<void> _pollDisplayedGames() async {
     if (!_canWatchGames || _gamesPollRunning) return;
+    final lifecycle = WidgetsBinding.instance.lifecycleState;
+    if (lifecycle != null && lifecycle != AppLifecycleState.resumed) return;
     unawaited(_notifyGamesDisplayReady());
+    _lastGamesPoll = DateTime.now();
     _gamesPollRunning = true;
     try {
+      await _renewHomeLiveDetails();
       await _fetchPart(_orgKind, _LoadPart.games, _seasonYear, background: true, force: true);
     } finally {
       _gamesPollRunning = false;
@@ -1583,7 +1633,19 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   /// Info と項目タブのあいだ。選択時は団体色＋ロゴ、非選択は薄いグレー。
+  Widget _homePredictionScores() => !AuthSession.instance.isLoggedIn
+      ? const Text('ログインすると予想対決のスコアを見られます')
+      : PredictGroupBoard(
+          key: const ValueKey('home-prediction-scores'),
+          scoresOnly: true,
+          loading: _predictGroupsLoading,
+          error: _predictGroupsError,
+          groups: _predictGroups,
+          selectedYear: _seasonYear,
+        );
+
   Widget _orgTabBar() => AppSectionTabs(
+    alwaysTabs: _homeOpen,
     tabs: [('🏠HOME', 4), ('🎯予想対決${_predictInvites.isNotEmpty ? ' ●' : ''}', 0), ('🇯🇵NPB', 1), ('🇺🇸MLB', 2), ('⚾️その他', 3)],
     selectedIndex: _homeOpen ? 4 : _otherOpen ? 3 : _predictGroupsOpen ? 0 : _orgKind == OrgKind.npb ? 1 : 2,
     selectedColor: _homeOpen || _otherOpen || _predictGroupsOpen ? Colors.black : _org.tabColor,
@@ -1595,6 +1657,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         unawaited(_ensureSharedInfo());
         unawaited(_loadThenWatchGames());
         unawaited(AuthSession.instance.reportAction('HOMEタブを開いた'));
+        if (AuthSession.instance.isLoggedIn) unawaited(_loadInitialPredictGroups());
         return;
       }
       if (value == 3) {
@@ -2249,7 +2312,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
               MenuBand(level: 1, toggle: true, child: _boardTabBar()),
             ],
           ])),
-        Expanded(child: _homeOpen ? HomeBoard(year: _seasonYear, news: _newsEventsRow(portrait: true, homeNewsOnly: true), gameInformation: _homeGameInformation()) : _otherOpen ? OtherBaseballBoard(year: _seasonYear, user: AuthSession.instance.user) : const Center(child: BaseballLoading())),
+        Expanded(child: _homeOpen ? HomeBoard(year: _seasonYear, news: _newsEventsRow(portrait: true, homeNewsOnly: true), predictionScores: _homePredictionScores(), gameInformation: _homeGameInformation()) : _otherOpen ? OtherBaseballBoard(year: _seasonYear, user: AuthSession.instance.user) : const Center(child: BaseballLoading())),
       ]);
     }
 
@@ -2275,7 +2338,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         );
 
         // 取れたデータがあるときはエラー表示で消さない
-        final Widget orgBody = _homeOpen ? HomeBoard(year: _seasonYear, news: _newsEventsRow(portrait: true, homeNewsOnly: true), gameInformation: _homeGameInformation()) : _otherOpen ? OtherBaseballBoard(year: _seasonYear, user: AuthSession.instance.user) : _predictGroupsOpen
+        final Widget orgBody = _homeOpen ? HomeBoard(year: _seasonYear, news: _newsEventsRow(portrait: true, homeNewsOnly: true), predictionScores: _homePredictionScores(), gameInformation: _homeGameInformation()) : _otherOpen ? OtherBaseballBoard(year: _seasonYear, user: AuthSession.instance.user) : _predictGroupsOpen
             ? (!AuthSession.instance.isLoggedIn
                 ? const Center(child: Text('ログインすると予想を見られます'))
                 : PredictGroupBoard(

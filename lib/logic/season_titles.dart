@@ -113,6 +113,17 @@ Map<String, List<Map<String, dynamic>>> buildSeasonTitles(
           ].contains(label)) { continue; }
       if (officialRows[key]!
           .any((row) => '${row['detail']}'.startsWith('${season['league']} '))) {
+        String normalized(Object? name) => '$name'.replaceAll(RegExp(r'[\s　・･]'), '');
+        for (final official in officialRows[key]!) {
+          if ('${official['detail']}' != '${season['league']} $label') continue;
+          final matching = listMapFromJson(category['players']).where((player) =>
+              (official['id_player'] != null && '${official['id_player']}' == '${player['id_player']}') ||
+              normalized(official['name']) == normalized(player['name'])).firstOrNull;
+          if (matching != null && (official['value'] == null || official['value'] == '受賞')) {
+            official['value'] = matching['value'];
+            official['unit'] = matching['unit'];
+          }
+        }
         continue;
       }
       for (final player in listMapFromJson(category['players'])) {
@@ -158,33 +169,41 @@ Map<String, List<Map<String, dynamic>>> buildSeasonTitles(
     }
   }
   for (final record in listMapFromJson(data['season'])) {
-    for (final player in listMapFromJson(record['leaders'])
-        .where((p) => '${p['year']}' == '$year')) {
-      add('records', {
-        ...player,
-        'detail': record['label'],
-        'unit': record['unit'],
-        'confirmed': true
-      });
+    num? recordValue(Map<String, dynamic> player) {
+      final numeric = num.tryParse('${player['numeric_value']}');
+      if (numeric != null) return numeric;
+      if (record['key'] == 'hr_sb') {
+        final pair = RegExp(r'^(\d+)\s*-\s*(\d+)$').firstMatch('${player['value']}');
+        if (pair == null) return null;
+        final hr = int.parse(pair[1]!), sb = int.parse(pair[2]!);
+        return hr < sb ? hr : sb;
+      }
+      return num.tryParse('${player['value']}');
     }
     final leaders = listMapFromJson(record['leaders']);
-    final historical =
-        leaders.isEmpty ? null : num.tryParse('${leaders.first['value']}');
-    if (historical == null) continue;
+    final values = leaders.map(recordValue).whereType<num>().toList();
+    if (values.isEmpty) continue;
+    final lowerIsBetter = record['key'] == 'era';
+    final historical = values.reduce((a, b) => lowerIsBetter
+        ? (a < b ? a : b) : (a > b ? a : b));
+    Map<String, dynamic> achievement(Map<String, dynamic> player, String detail) => {
+      ...player,
+      'detail': detail,
+      'record_label': record['label'],
+      'unit': record['unit'],
+      'confirmed': true,
+    };
+    // leaders can contain a top-50 list, not just record holders.
+    for (final player in leaders.where((p) => '${p['year']}' == '$year')) {
+      if (recordValue(player) == historical) {
+        add('records', achievement(player, '${record['label']}'));
+      }
+    }
     for (final player in listMapFromJson(record['current'])) {
-      final value = num.tryParse('${player['value']}');
-      if (value != null &&
-          (record['key'] == 'era' ? value < historical : value > historical)) {
-        // Rate records require an officially completed season, not mid-season pace.
-        if (['avg', 'era', 'obp', 'slg'].contains(record['key']) &&
-            year >= DateTime.now().year) {
-          continue;
-        }
-        add('records', {
-          ...player,
-          'detail': '${record['label']}（歴代最高を更新）',
-          'confirmed': true
-        });
+      final value = recordValue(player);
+      if (value != null && (lowerIsBetter ? value < historical : value > historical)) {
+        if (['avg', 'era', 'obp', 'slg'].contains(record['key']) && year >= DateTime.now().year) continue;
+        add('records', achievement(player, '${record['label']}（歴代最高を更新）'));
       }
     }
   }

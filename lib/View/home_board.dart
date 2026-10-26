@@ -11,9 +11,10 @@ import '../widgets/baseball_loading.dart';
 import 'player_detail_dialog.dart';
 
 class HomeBoard extends StatefulWidget {
-  const HomeBoard({super.key, this.year, this.news, this.gameInformation});
+  const HomeBoard({super.key, this.year, this.news, this.predictionScores, this.gameInformation});
   final int? year;
   final Widget? news;
+  final Widget? predictionScores;
   final Widget? gameInformation;
   @override
   State<HomeBoard> createState() => _HomeBoardState();
@@ -82,6 +83,8 @@ class _HomeBoardState extends State<HomeBoard> {
     final todayGames = games.where((g) => g['date_game'] == data['today']).toList();
     return ListView(padding: const EdgeInsets.all(12), children: [
       if (widget.news != null) ...[widget.news!, const SizedBox(height: 12)],
+      if (widget.predictionScores != null)
+        _section('予想対決のスコア', [widget.predictionScores!]),
       Row(children: [Expanded(child: Text('HOME  ${data['today'] ?? ''}（日本時間）', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
         IconButton(tooltip: '再読み込み', onPressed: _loading ? null : _load, icon: const Icon(Icons.refresh))]),
       if (_error != null) Text(_error!, style: const TextStyle(color: Colors.red)),

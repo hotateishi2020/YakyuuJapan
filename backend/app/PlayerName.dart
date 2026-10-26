@@ -1,4 +1,5 @@
 import '../tools/StringTool.dart';
+import 'PlayerIdentityName.dart';
 
 /// Yahoo MLB などで使う選手名の分解・照合。
 /// 例: `J.チョウリオ` → initial=J, surname=チョウリオ
@@ -55,13 +56,14 @@ bool playerNameMatches({
   required String nameFull,
   String nameLast = '',
   String? storedInitial,
+  Iterable<String> patterns = const [],
 }) {
+  if (matchesPlayerPatterns(query, [nameFull, ...patterns])) return true;
   final q = parsePlayerName(query);
   final full = StringTool.noSpace(nameFull);
   final last = StringTool.noSpace(nameLast);
   if (q.compact.isEmpty || full.isEmpty) return false;
   if (full == q.compact || last == q.compact) return true;
-  if (full.startsWith(q.compact) || last.startsWith(q.compact)) return true;
 
   final initial = (storedInitial ?? '').trim().toUpperCase();
   final fullParts = parsePlayerName(full);
@@ -232,10 +234,9 @@ bool _surnameMatches(String fullOrLast, String surname) {
   final b = StringTool.noSpace(surname);
   if (a.isEmpty || b.isEmpty) return false;
   if (a == b) return true;
-  if (a.endsWith(b) || b.endsWith(a)) return true;
   if (a.contains('・')) {
     final tail = a.split('・').last;
-    if (tail == b || tail.endsWith(b) || b.endsWith(tail)) return true;
+    if (tail == b) return true;
   }
   return false;
 }
@@ -266,13 +267,10 @@ int? pickBestPlayerId({
   final q = parsePlayerName(query);
   final exact = candidates.where((c) {
     final full = StringTool.noSpace(c.nameFull);
-    final last = StringTool.noSpace(c.nameLast);
-    return full == q.compact || last == q.compact;
+    return playerIdentityKey(full) == playerIdentityKey(q.compact);
   }).toList();
-  if (exact.isNotEmpty) {
-    exact.sort((a, b) => a.id.compareTo(b.id));
-    return exact.first.id;
-  }
+  if (exact.length == 1) return exact.first.id;
+  if (exact.length > 1) return null;
   if (q.hasInitial) {
     final withInit = candidates.where((c) {
       final stored = c.initial.trim().toUpperCase();
@@ -280,25 +278,8 @@ int? pickBestPlayerId({
       return stored == q.initial || parsed.initial == q.initial;
     }).toList();
     if (withInit.length == 1) return withInit.first.id;
-    if (withInit.length > 1) {
-      // 姓の一致度が高い方
-      withInit.sort((a, b) {
-        final as = _surnameMatches(a.nameFull, q.surname) ? 0 : 1;
-        final bs = _surnameMatches(b.nameFull, q.surname) ? 0 : 1;
-        if (as != bs) return as.compareTo(bs);
-        return a.nameFull.length.compareTo(b.nameFull.length);
-      });
-      return withInit.first.id;
-    }
+    if (withInit.length > 1) return null;
   }
-  // 最短名を優先（従来どおり）
-  candidates = [...candidates]..sort((a, b) {
-      final byLen = a.nameFull.length.compareTo(b.nameFull.length);
-      if (byLen != 0) return byLen;
-      return a.id.compareTo(b.id);
-    });
-  final shortest = candidates.first.nameFull.length;
-  final ties = candidates.where((c) => c.nameFull.length == shortest).toList();
-  if (ties.length == 1) return ties.first.id;
+  // Ambiguous surnames/initials must not choose the shortest name or lowest ID.
   return null;
 }

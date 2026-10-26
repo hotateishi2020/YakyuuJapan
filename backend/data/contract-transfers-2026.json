@@ -1,0 +1,4440 @@
+{
+  "year": 2026,
+  "retrieved_at": "2026-10-24T02:26:19.413757Z",
+  "mlb": {
+    "start": "2026-03-25",
+    "end_exclusive": "2026-09-28",
+    "moves": [
+      {
+        "player_key": "mlb:701618",
+        "name": "Damon Keith",
+        "date": "2026-03-27",
+        "from": "LAD",
+        "to": "MIL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:663542",
+        "name": "Bryan Hudson",
+        "date": "2026-03-27",
+        "from": "NYM",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:678554",
+        "name": "Curtis Mead",
+        "date": "2026-03-28",
+        "from": "CWS",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:695722",
+        "name": "Boston Smith",
+        "date": "2026-03-28",
+        "from": "WSH",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-03-29",
+        "from": "MIA",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:686811",
+        "name": "Carter Rustad",
+        "date": "2026-03-29",
+        "from": "BAL",
+        "to": "CLE",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:682144",
+        "name": "Jayvien Sandridge",
+        "date": "2026-03-29",
+        "from": "LAA",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-03-29",
+        "from": "BAL",
+        "to": "LAA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:671286",
+        "name": "Johnathan Rodríguez",
+        "date": "2026-03-29",
+        "from": "CLE",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:677870",
+        "name": "Leo Jiménez",
+        "date": "2026-03-29",
+        "from": "TOR",
+        "to": "MIA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:801957",
+        "name": "Dub Gleed",
+        "date": "2026-03-29",
+        "from": "MIA",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:682641",
+        "name": "Luis Matos",
+        "date": "2026-03-30",
+        "from": "SF",
+        "to": "MIL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:681916",
+        "name": "Dylan Smith",
+        "date": "2026-03-30",
+        "from": "DET",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-03-30",
+        "from": "SF",
+        "to": "DET",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-03-30",
+        "from": "MIL",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:680880",
+        "name": "Grant Holman",
+        "date": "2026-04-01",
+        "from": "AZ",
+        "to": "LAD",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-04-01",
+        "from": "LAD",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:671109",
+        "name": "Jake Eder",
+        "date": "2026-04-01",
+        "from": "WSH",
+        "to": "LAD",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:670183",
+        "name": "Garrett Acton",
+        "date": "2026-04-02",
+        "from": "MIA",
+        "to": "MIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:681315",
+        "name": "Logan Whitaker",
+        "date": "2026-04-02",
+        "from": "MIN",
+        "to": "MIA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:682989",
+        "name": "Victor Mederos",
+        "date": "2026-04-03",
+        "from": "LAA",
+        "to": "ATL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-04-03",
+        "from": "ATL",
+        "to": "LAA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:671111",
+        "name": "Sammy Peralta",
+        "date": "2026-04-04",
+        "from": "MIL",
+        "to": "COL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:666149",
+        "name": "Tyler Fitzgerald",
+        "date": "2026-04-04",
+        "from": "SF",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-04-04",
+        "from": "TOR",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:702642",
+        "name": "Patrick Galle",
+        "date": "2026-04-05",
+        "from": "BOS",
+        "to": "STL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:680951",
+        "name": "Doug Nikhazy",
+        "date": "2026-04-06",
+        "from": "CLE",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:675919",
+        "name": "Nick Raquet",
+        "date": "2026-04-07",
+        "from": "STL",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:829670",
+        "name": "Brayden Smith",
+        "date": "2026-04-07",
+        "from": "BAL",
+        "to": "STL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-04-08",
+        "from": "PHI",
+        "to": "MIL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:672642",
+        "name": "Steward Berroa",
+        "date": "2026-04-08",
+        "from": "MIL",
+        "to": "PHI",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:680880",
+        "name": "Grant Holman",
+        "date": "2026-04-11",
+        "from": "LAD",
+        "to": "DET",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:813417",
+        "name": "Jordan Rich",
+        "date": "2026-04-13",
+        "from": "TOR",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:692414",
+        "name": "Yoniel Curet",
+        "date": "2026-04-13",
+        "from": "PHI",
+        "to": "DET",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-04-13",
+        "from": "BAL",
+        "to": "CIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:687952",
+        "name": "Christian Encarnacion-Strand",
+        "date": "2026-04-13",
+        "from": "CIN",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:672820",
+        "name": "Lenyn Sosa",
+        "date": "2026-04-13",
+        "from": "CWS",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-04-13",
+        "from": "TOR",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:676046",
+        "name": "Griff McGarry",
+        "date": "2026-04-14",
+        "from": "PHI",
+        "to": "LAD",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-04-14",
+        "from": "LAD",
+        "to": "PHI",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:658551",
+        "name": "Junior Fernández",
+        "date": "2026-04-15",
+        "from": "AZ",
+        "to": "MIL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:821612",
+        "name": "Axel Perez",
+        "date": "2026-04-16",
+        "from": "LAD",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-04-16",
+        "from": "WSH",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:663992",
+        "name": "Richard Lovelady",
+        "date": "2026-04-16",
+        "from": "NYM",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:694646",
+        "name": "Chayce McDermott",
+        "date": "2026-04-16",
+        "from": "BAL",
+        "to": "LAD",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:687957",
+        "name": "Dustin Harris",
+        "date": "2026-04-18",
+        "from": "CWS",
+        "to": "HOU",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:674370",
+        "name": "Osvaldo Bido",
+        "date": "2026-04-18",
+        "from": "ATL",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:804522",
+        "name": "Wilmy Sanchez",
+        "date": "2026-04-19",
+        "from": "HOU",
+        "to": "NYY",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:669699",
+        "name": "Braden Shewmake",
+        "date": "2026-04-19",
+        "from": "NYY",
+        "to": "HOU",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:680604",
+        "name": "Blas Castaño",
+        "date": "2026-04-21",
+        "from": "SEA",
+        "to": "COL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:670032",
+        "name": "Nicky Lopez",
+        "date": "2026-04-23",
+        "from": "COL",
+        "to": "CHC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-04-23",
+        "from": "CHC",
+        "to": "COL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:685005",
+        "name": "Christian Roa",
+        "date": "2026-04-23",
+        "from": "HOU",
+        "to": "MIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:668984",
+        "name": "Casey Legumina",
+        "date": "2026-04-24",
+        "from": "SEA",
+        "to": "TB",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:807744",
+        "name": "Ty Cummings",
+        "date": "2026-04-24",
+        "from": "TB",
+        "to": "SEA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:680862",
+        "name": "Willie MacIver",
+        "date": "2026-04-24",
+        "from": "TEX",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-04-24",
+        "from": "TOR",
+        "to": "TEX",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:678821",
+        "name": "Luis Peralta",
+        "date": "2026-04-27",
+        "from": "COL",
+        "to": "STL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:676572",
+        "name": "Eric Wagaman",
+        "date": "2026-04-27",
+        "from": "MIN",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-04-28",
+        "from": "LAD",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:666149",
+        "name": "Tyler Fitzgerald",
+        "date": "2026-04-28",
+        "from": "TOR",
+        "to": "LAD",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:680951",
+        "name": "Doug Nikhazy",
+        "date": "2026-04-28",
+        "from": "CWS",
+        "to": "CHC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:628451",
+        "name": "Andy Ibáñez",
+        "date": "2026-04-30",
+        "from": "ATH",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:670097",
+        "name": "Zack Short",
+        "date": "2026-05-01",
+        "from": "WSH",
+        "to": "DET",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-05-01",
+        "from": "DET",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:687849",
+        "name": "Zak Kent",
+        "date": "2026-05-03",
+        "from": "MIN",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:660761",
+        "name": "José Suarez",
+        "date": "2026-05-03",
+        "from": "ATL",
+        "to": "SEA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:678821",
+        "name": "Luis Peralta",
+        "date": "2026-05-03",
+        "from": "STL",
+        "to": "CHC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-05-04",
+        "from": "ATH",
+        "to": "ATL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:641680",
+        "name": "Jonah Heim",
+        "date": "2026-05-04",
+        "from": "ATL",
+        "to": "ATH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-05-05",
+        "from": "CWS",
+        "to": "PHI",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:670950",
+        "name": "Trevor Richards",
+        "date": "2026-05-05",
+        "from": "PHI",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-05-06",
+        "from": "MIN",
+        "to": "TB",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:672782",
+        "name": "Yoendrys Gómez",
+        "date": "2026-05-06",
+        "from": "TB",
+        "to": "MIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:621053",
+        "name": "Tyler Ferguson",
+        "date": "2026-05-07",
+        "from": "ATH",
+        "to": "CHC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:680880",
+        "name": "Grant Holman",
+        "date": "2026-05-07",
+        "from": "DET",
+        "to": "PHI",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:835078",
+        "name": "Enyel Garcia",
+        "date": "2026-05-08",
+        "from": "PHI",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:830418",
+        "name": "Maicol Lauriano",
+        "date": "2026-05-08",
+        "from": "PHI",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-05-08",
+        "from": "BAL",
+        "to": "PHI",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:689041",
+        "name": "Rhylan Thomas",
+        "date": "2026-05-09",
+        "from": "SEA",
+        "to": "HOU",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:656212",
+        "name": "Charlie Barnes",
+        "date": "2026-05-09",
+        "from": "CHC",
+        "to": "LAD",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-05-09",
+        "from": "CLE",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:672275",
+        "name": "Patrick Bailey",
+        "date": "2026-05-09",
+        "from": "SF",
+        "to": "CLE",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:683363",
+        "name": "Matt Wilkinson",
+        "date": "2026-05-09",
+        "from": "CLE",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:685005",
+        "name": "Christian Roa",
+        "date": "2026-05-10",
+        "from": "MIN",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:671131",
+        "name": "Jackson Rutledge",
+        "date": "2026-05-10",
+        "from": "WSH",
+        "to": "PHI",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:677950",
+        "name": "Alek Thomas",
+        "date": "2026-05-11",
+        "from": "AZ",
+        "to": "LAD",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:837769",
+        "name": "Jose Requena",
+        "date": "2026-05-11",
+        "from": "LAD",
+        "to": "AZ",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-05-14",
+        "from": "ATH",
+        "to": "SEA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:660761",
+        "name": "José Suarez",
+        "date": "2026-05-14",
+        "from": "SEA",
+        "to": "ATH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:674384",
+        "name": "Eduarniel Núñez",
+        "date": "2026-05-15",
+        "from": "ATH",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-05-15",
+        "from": "BAL",
+        "to": "ATH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:675961",
+        "name": "Alika Williams",
+        "date": "2026-05-16",
+        "from": "PIT",
+        "to": "ATH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:823124",
+        "name": "Jackson Nove",
+        "date": "2026-05-16",
+        "from": "CWS",
+        "to": "ATH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:701836",
+        "name": "Kyle Robinson",
+        "date": "2026-05-16",
+        "from": "ATH",
+        "to": "PIT",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:678577",
+        "name": "Junior Perez",
+        "date": "2026-05-16",
+        "from": "ATH",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:685005",
+        "name": "Christian Roa",
+        "date": "2026-05-17",
+        "from": "BAL",
+        "to": "CHC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:641778",
+        "name": "Eric Lauer",
+        "date": "2026-05-17",
+        "from": "TOR",
+        "to": "LAD",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-05-17",
+        "from": "LAD",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:672279",
+        "name": "Michael Siani",
+        "date": "2026-05-18",
+        "from": "LAD",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:686554",
+        "name": "Oliver Dunn",
+        "date": "2026-05-19",
+        "from": "CWS",
+        "to": "TB",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:697812",
+        "name": "Joe Rock",
+        "date": "2026-05-19",
+        "from": "TB",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:685112",
+        "name": "Zach McCambley",
+        "date": "2026-05-21",
+        "from": "MIA",
+        "to": "CIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:677956",
+        "name": "Rece Hinds",
+        "date": "2026-05-21",
+        "from": "CIN",
+        "to": "MIA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:668974",
+        "name": "Maverick Handley",
+        "date": "2026-05-21",
+        "from": "BAL",
+        "to": "ATL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-05-22",
+        "from": "COL",
+        "to": "PHI",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:687900",
+        "name": "Andrew Baker",
+        "date": "2026-05-22",
+        "from": "PHI",
+        "to": "COL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:688760",
+        "name": "Blaine Crim",
+        "date": "2026-05-23",
+        "from": "COL",
+        "to": "TEX",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-05-25",
+        "from": "WSH",
+        "to": "COL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:687223",
+        "name": "Carson Palmquist",
+        "date": "2026-05-25",
+        "from": "COL",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:806666",
+        "name": "Juanmi Vasquez",
+        "date": "2026-05-27",
+        "from": "TOR",
+        "to": "DET",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:657756",
+        "name": "Connor Seabold",
+        "date": "2026-05-27",
+        "from": "DET",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:664875",
+        "name": "Justin Lawrence",
+        "date": "2026-06-02",
+        "from": "PIT",
+        "to": "MIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-06-02",
+        "from": "MIN",
+        "to": "PIT",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:683090",
+        "name": "Matthew Lugo",
+        "date": "2026-06-02",
+        "from": "LAA",
+        "to": "KC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:642851",
+        "name": "Austin Wynns",
+        "date": "2026-06-03",
+        "from": "LAA",
+        "to": "ATL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:680573",
+        "name": "Simeon Woods Richardson",
+        "date": "2026-06-03",
+        "from": "MIN",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-06-03",
+        "from": "ATL",
+        "to": "LAA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-06-03",
+        "from": "TOR",
+        "to": "MIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-06-04",
+        "from": "BAL",
+        "to": "CIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:693312",
+        "name": "Kyle Nicolas",
+        "date": "2026-06-04",
+        "from": "CIN",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:686747",
+        "name": "Joe La Sorsa",
+        "date": "2026-06-04",
+        "from": "PIT",
+        "to": "BOS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-06-06",
+        "from": "MIL",
+        "to": "ATH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:669270",
+        "name": "Joel Kuhnel",
+        "date": "2026-06-06",
+        "from": "ATH",
+        "to": "MIL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-06-07",
+        "from": "CHC",
+        "to": "LAD",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:681520",
+        "name": "Antoine Kelly",
+        "date": "2026-06-07",
+        "from": "LAD",
+        "to": "CHC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-06-07",
+        "from": "COL",
+        "to": "TEX",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:621006",
+        "name": "Richie Martin Jr.",
+        "date": "2026-06-07",
+        "from": "TEX",
+        "to": "COL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:674384",
+        "name": "Eduarniel Núñez",
+        "date": "2026-06-08",
+        "from": "BAL",
+        "to": "CHC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-06-08",
+        "from": "MIN",
+        "to": "AZ",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:688497",
+        "name": "Taylor Rashi",
+        "date": "2026-06-08",
+        "from": "AZ",
+        "to": "MIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:621097",
+        "name": "Jacob Waguespack",
+        "date": "2026-06-10",
+        "from": "MIL",
+        "to": "DET",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-06-10",
+        "from": "SEA",
+        "to": "PIT",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:608334",
+        "name": "Carson Fulmer",
+        "date": "2026-06-10",
+        "from": "PIT",
+        "to": "SEA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-06-10",
+        "from": "HOU",
+        "to": "TB",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:669384",
+        "name": "Raynel Delgado",
+        "date": "2026-06-10",
+        "from": "TB",
+        "to": "HOU",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-06-11",
+        "from": "CWS",
+        "to": "PHI",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:683569",
+        "name": "Jose Colmenares",
+        "date": "2026-06-11",
+        "from": "PHI",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:681546",
+        "name": "James Outman",
+        "date": "2026-06-11",
+        "from": "MIN",
+        "to": "DET",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:656537",
+        "name": "Derek Hill",
+        "date": "2026-06-11",
+        "from": "CWS",
+        "to": "PHI",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:694749",
+        "name": "Dylan Campbell",
+        "date": "2026-06-11",
+        "from": "PHI",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:666134",
+        "name": "Nolan Jones",
+        "date": "2026-06-11",
+        "from": "CLE",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-06-11",
+        "from": "CLE",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-06-11",
+        "from": "CWS",
+        "to": "CLE",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:702910",
+        "name": "Jhancarlos Lara",
+        "date": "2026-06-12",
+        "from": "ATL",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:691172",
+        "name": "Yosver Zulueta",
+        "date": "2026-06-15",
+        "from": "SEA",
+        "to": "CHC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-06-15",
+        "from": "CHC",
+        "to": "SEA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:657756",
+        "name": "Connor Seabold",
+        "date": "2026-06-15",
+        "from": "TOR",
+        "to": "KC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:830433",
+        "name": "Denis Samudio",
+        "date": "2026-06-15",
+        "from": "KC",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:670097",
+        "name": "Zack Short",
+        "date": "2026-06-15",
+        "from": "DET",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-06-15",
+        "from": "KC",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:623168",
+        "name": "Tyler Heineman",
+        "date": "2026-06-17",
+        "from": "TOR",
+        "to": "LAA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-06-17",
+        "from": "LAA",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-06-17",
+        "from": "KC",
+        "to": "SEA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:677976",
+        "name": "Randy Dobnak",
+        "date": "2026-06-17",
+        "from": "SEA",
+        "to": "KC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:663698",
+        "name": "Joey Bart",
+        "date": "2026-06-18",
+        "from": "PIT",
+        "to": "ATL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:676702",
+        "name": "Hunter Stratton",
+        "date": "2026-06-18",
+        "from": "ATL",
+        "to": "PIT",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:815133",
+        "name": "Cameron Sisneros",
+        "date": "2026-06-20",
+        "from": "CHC",
+        "to": "HOU",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:681151",
+        "name": "Jayden Murray",
+        "date": "2026-06-20",
+        "from": "HOU",
+        "to": "CHC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:649966",
+        "name": "Luis Urías",
+        "date": "2026-06-20",
+        "from": "AZ",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-06-20",
+        "from": "TOR",
+        "to": "AZ",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:694887",
+        "name": "Tyler Schoff",
+        "date": "2026-06-20",
+        "from": "WSH",
+        "to": "ATL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:694939",
+        "name": "Marcus Brown",
+        "date": "2026-06-21",
+        "from": "WSH",
+        "to": "HOU",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-06-21",
+        "from": "HOU",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:666931",
+        "name": "Jared Oliva",
+        "date": "2026-06-23",
+        "from": "SF",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-06-23",
+        "from": "TB",
+        "to": "STL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:688297",
+        "name": "Chris Roycroft",
+        "date": "2026-06-23",
+        "from": "STL",
+        "to": "TB",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:669060",
+        "name": "Bryse Wilson",
+        "date": "2026-06-24",
+        "from": "PHI",
+        "to": "CHC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:664875",
+        "name": "Justin Lawrence",
+        "date": "2026-06-24",
+        "from": "MIN",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:656849",
+        "name": "David Peterson",
+        "date": "2026-06-25",
+        "from": "NYM",
+        "to": "CHC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:695573",
+        "name": "Cole Mathis",
+        "date": "2026-06-25",
+        "from": "CHC",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:700270",
+        "name": "Yilber Díaz",
+        "date": "2026-06-26",
+        "from": "AZ",
+        "to": "DET",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:801928",
+        "name": "Owen Carapellotti",
+        "date": "2026-06-27",
+        "from": "ATH",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:696522",
+        "name": "Hayden Juenger",
+        "date": "2026-06-27",
+        "from": "TOR",
+        "to": "ATH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:681371",
+        "name": "Dom Keegan",
+        "date": "2026-06-27",
+        "from": "TB",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:691172",
+        "name": "Yosver Zulueta",
+        "date": "2026-06-28",
+        "from": "CHC",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-06-29",
+        "from": "SEA",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:671083",
+        "name": "Buddy Kennedy",
+        "date": "2026-06-29",
+        "from": "SF",
+        "to": "SEA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:803015",
+        "name": "Ben Hartl",
+        "date": "2026-07-01",
+        "from": "TEX",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:687239",
+        "name": "Ben Peoples",
+        "date": "2026-07-01",
+        "from": "CWS",
+        "to": "TEX",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:810091",
+        "name": "Ben Hansen",
+        "date": "2026-07-01",
+        "from": "BOS",
+        "to": "ATH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:695391",
+        "name": "Brett Harris",
+        "date": "2026-07-01",
+        "from": "ATH",
+        "to": "BOS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:693312",
+        "name": "Kyle Nicolas",
+        "date": "2026-07-01",
+        "from": "BAL",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:695538",
+        "name": "Randal Diaz",
+        "date": "2026-07-01",
+        "from": "WSH",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:676680",
+        "name": "Tom Cosgrove",
+        "date": "2026-07-03",
+        "from": "HOU",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-07-03",
+        "from": "WSH",
+        "to": "HOU",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:640454",
+        "name": "Matt Krook",
+        "date": "2026-07-04",
+        "from": "ATH",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:813869",
+        "name": "Ryan Degges",
+        "date": "2026-07-04",
+        "from": "PHI",
+        "to": "CLE",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-07-04",
+        "from": "CLE",
+        "to": "PHI",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-07-05",
+        "from": "NYM",
+        "to": "DET",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:676910",
+        "name": "Matt Seelinger",
+        "date": "2026-07-05",
+        "from": "DET",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-07-05",
+        "from": "MIN",
+        "to": "DET",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:808970",
+        "name": "Woo-Suk Go",
+        "date": "2026-07-05",
+        "from": "DET",
+        "to": "MIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:672021",
+        "name": "Eric Cerantola",
+        "date": "2026-07-06",
+        "from": "KC",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:667297",
+        "name": "Tommy Nance",
+        "date": "2026-07-10",
+        "from": "TOR",
+        "to": "MIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-07-10",
+        "from": "MIN",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:823779",
+        "name": "Ryan Sprock",
+        "date": "2026-07-10",
+        "from": "MIN",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:701552",
+        "name": "Andre Granillo",
+        "date": "2026-07-11",
+        "from": "WSH",
+        "to": "DET",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:681252",
+        "name": "Jack Anderson",
+        "date": "2026-07-11",
+        "from": "BOS",
+        "to": "MIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:694930",
+        "name": "Carson Taylor",
+        "date": "2026-07-11",
+        "from": "SEA",
+        "to": "ATL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-07-11",
+        "from": "PIT",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:694378",
+        "name": "Jacob Gonzalez",
+        "date": "2026-07-11",
+        "from": "CWS",
+        "to": "PIT",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:692243",
+        "name": "Jaden Woods",
+        "date": "2026-07-11",
+        "from": "PIT",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:685126",
+        "name": "Brandon Eisert",
+        "date": "2026-07-11",
+        "from": "CWS",
+        "to": "PIT",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:622268",
+        "name": "Donovan Walton",
+        "date": "2026-07-12",
+        "from": "LAA",
+        "to": "ATH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:669699",
+        "name": "Braden Shewmake",
+        "date": "2026-07-12",
+        "from": "HOU",
+        "to": "MIL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:676742",
+        "name": "Cam Sanders",
+        "date": "2026-07-13",
+        "from": "PIT",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-07-13",
+        "from": "BAL",
+        "to": "PIT",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:668834",
+        "name": "Easton McGee",
+        "date": "2026-07-14",
+        "from": "MIL",
+        "to": "KC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-07-14",
+        "from": "KC",
+        "to": "MIL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:663330",
+        "name": "Jahmai Jones",
+        "date": "2026-07-14",
+        "from": "DET",
+        "to": "BOS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-07-14",
+        "from": "BOS",
+        "to": "DET",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-07-15",
+        "from": "HOU",
+        "to": "MIL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:621121",
+        "name": "Lance McCullers Jr.",
+        "date": "2026-07-15",
+        "from": "HOU",
+        "to": "MIL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:676467",
+        "name": "Colton Gordon",
+        "date": "2026-07-15",
+        "from": "HOU",
+        "to": "MIL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:815723",
+        "name": "Jadyn Fielder",
+        "date": "2026-07-15",
+        "from": "MIL",
+        "to": "HOU",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-07-16",
+        "from": "PIT",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:690987",
+        "name": "Robert Hassell III",
+        "date": "2026-07-16",
+        "from": "WSH",
+        "to": "PIT",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:823129",
+        "name": "Trey Pooser",
+        "date": "2026-07-17",
+        "from": "TB",
+        "to": "STL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:657675",
+        "name": "Rudy Martin Jr.",
+        "date": "2026-07-18",
+        "from": "KC",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-07-18",
+        "from": "BAL",
+        "to": "KC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:650644",
+        "name": "Aaron Civale",
+        "date": "2026-07-18",
+        "from": "ATH",
+        "to": "CHC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:702268",
+        "name": "Aiden Moffett",
+        "date": "2026-07-18",
+        "from": "CHC",
+        "to": "ATH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:678020",
+        "name": "Seth Halvorsen",
+        "date": "2026-07-20",
+        "from": "COL",
+        "to": "LAD",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:693308",
+        "name": "Nick Frasso",
+        "date": "2026-07-20",
+        "from": "LAD",
+        "to": "COL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:811716",
+        "name": "Landyn Vidourek",
+        "date": "2026-07-20",
+        "from": "LAD",
+        "to": "COL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:822317",
+        "name": "Max Martin",
+        "date": "2026-07-22",
+        "from": "KC",
+        "to": "HOU",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:663878",
+        "name": "Nate Pearson",
+        "date": "2026-07-22",
+        "from": "HOU",
+        "to": "KC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:676760",
+        "name": "Ron Marinaccio",
+        "date": "2026-07-23",
+        "from": "SD",
+        "to": "PIT",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-07-23",
+        "from": "PIT",
+        "to": "SD",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:650968",
+        "name": "Yohel Pozo",
+        "date": "2026-07-23",
+        "from": "STL",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:657675",
+        "name": "Rudy Martin Jr.",
+        "date": "2026-07-23",
+        "from": "BAL",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-07-25",
+        "from": "PHI",
+        "to": "KC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:670224",
+        "name": "Kameron Misner",
+        "date": "2026-07-25",
+        "from": "KC",
+        "to": "PHI",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:678554",
+        "name": "Curtis Mead",
+        "date": "2026-07-26",
+        "from": "WSH",
+        "to": "BOS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:813349",
+        "name": "Connelly Early",
+        "date": "2026-07-26",
+        "from": "BOS",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:664353",
+        "name": "José Urquidy",
+        "date": "2026-07-26",
+        "from": "PIT",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:829956",
+        "name": "Felix Doroteo",
+        "date": "2026-07-26",
+        "from": "CWS",
+        "to": "PIT",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-07-26",
+        "from": "ATH",
+        "to": "STL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:656240",
+        "name": "Scott Blewett",
+        "date": "2026-07-26",
+        "from": "STL",
+        "to": "ATH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:671286",
+        "name": "Johnathan Rodríguez",
+        "date": "2026-07-27",
+        "from": "BAL",
+        "to": "PIT",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-07-27",
+        "from": "PIT",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:802397",
+        "name": "Angel Arredondo",
+        "date": "2026-07-29",
+        "from": "TEX",
+        "to": "LAA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:681217",
+        "name": "Chase Silseth",
+        "date": "2026-07-29",
+        "from": "LAA",
+        "to": "TEX",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:681351",
+        "name": "Logan O'Hoppe",
+        "date": "2026-07-29",
+        "from": "LAA",
+        "to": "TEX",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:813829",
+        "name": "Zane Barnhart",
+        "date": "2026-07-30",
+        "from": "BAL",
+        "to": "DET",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:668670",
+        "name": "Jake Rogers",
+        "date": "2026-07-30",
+        "from": "DET",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:671162",
+        "name": "Connor Thomas",
+        "date": "2026-07-30",
+        "from": "ATL",
+        "to": "ATH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:621345",
+        "name": "A.J. Minter",
+        "date": "2026-07-31",
+        "from": "NYM",
+        "to": "MIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:828202",
+        "name": "Bruin Agbayani",
+        "date": "2026-07-31",
+        "from": "MIN",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:701771",
+        "name": "Billy Amick",
+        "date": "2026-07-31",
+        "from": "MIN",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:829076",
+        "name": "Jhomnardo Reyes",
+        "date": "2026-08-01",
+        "from": "MIN",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:665152",
+        "name": "Dean Kremer",
+        "date": "2026-08-01",
+        "from": "BAL",
+        "to": "MIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:825411",
+        "name": "Luis Cruz",
+        "date": "2026-08-01",
+        "from": "PIT",
+        "to": "NYY",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:692657",
+        "name": "Omar Alfonzo",
+        "date": "2026-08-01",
+        "from": "PIT",
+        "to": "NYY",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:666808",
+        "name": "Camilo Doval",
+        "date": "2026-08-01",
+        "from": "NYY",
+        "to": "PIT",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:676051",
+        "name": "Codi Heuer",
+        "date": "2026-08-01",
+        "from": "CLE",
+        "to": "MIL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:663368",
+        "name": "Blake Perkins",
+        "date": "2026-08-01",
+        "from": "MIL",
+        "to": "CLE",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:684974",
+        "name": "Craig Yoho",
+        "date": "2026-08-01",
+        "from": "MIL",
+        "to": "CLE",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:666310",
+        "name": "Bo Naylor",
+        "date": "2026-08-01",
+        "from": "CLE",
+        "to": "MIL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-08-01",
+        "from": "NYY",
+        "to": "PIT",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:695293",
+        "name": "Jojo Ingrassia",
+        "date": "2026-08-01",
+        "from": "BOS",
+        "to": "DET",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:814351",
+        "name": "Lucas Braun",
+        "date": "2026-08-02",
+        "from": "ATL",
+        "to": "KC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:689981",
+        "name": "River Ryan",
+        "date": "2026-08-02",
+        "from": "LAD",
+        "to": "DET",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:806224",
+        "name": "Brady Smith",
+        "date": "2026-08-02",
+        "from": "LAD",
+        "to": "DET",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:806223",
+        "name": "Aidan Smith",
+        "date": "2026-08-02",
+        "from": "TB",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:814307",
+        "name": "Zyhir Hope",
+        "date": "2026-08-02",
+        "from": "LAD",
+        "to": "DET",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:669373",
+        "name": "Tarik Skubal",
+        "date": "2026-08-02",
+        "from": "DET",
+        "to": "LAD",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:804541",
+        "name": "Gary Gill Hill",
+        "date": "2026-08-02",
+        "from": "TB",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:692290",
+        "name": "Carter Holton",
+        "date": "2026-08-02",
+        "from": "ATL",
+        "to": "KC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:663559",
+        "name": "Bailey Falter",
+        "date": "2026-08-02",
+        "from": "KC",
+        "to": "ATL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:807257",
+        "name": "Ty Southisene",
+        "date": "2026-08-02",
+        "from": "CHC",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:592332",
+        "name": "Kevin Gausman",
+        "date": "2026-08-02",
+        "from": "TOR",
+        "to": "CHC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:692150",
+        "name": "Émilien Pitre",
+        "date": "2026-08-02",
+        "from": "TB",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:642547",
+        "name": "Freddy Peralta",
+        "date": "2026-08-02",
+        "from": "NYM",
+        "to": "TB",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:592791",
+        "name": "Jameson Taillon",
+        "date": "2026-08-02",
+        "from": "CHC",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-08-02",
+        "from": "TOR",
+        "to": "CHC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-08-02",
+        "from": "CHC",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:657041",
+        "name": "Lane Thomas",
+        "date": "2026-08-02",
+        "from": "KC",
+        "to": "ATL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:671083",
+        "name": "Buddy Kennedy",
+        "date": "2026-08-02",
+        "from": "SEA",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:703520",
+        "name": "Brett Bateman",
+        "date": "2026-08-02",
+        "from": "CHC",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:666134",
+        "name": "Nolan Jones",
+        "date": "2026-08-02",
+        "from": "CWS",
+        "to": "SEA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:695722",
+        "name": "Boston Smith",
+        "date": "2026-08-02",
+        "from": "CWS",
+        "to": "SEA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:641816",
+        "name": "Tyler Mahle",
+        "date": "2026-08-02",
+        "from": "SF",
+        "to": "ATL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:683627",
+        "name": "Anthony Molina",
+        "date": "2026-08-02",
+        "from": "ATL",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:676566",
+        "name": "Shawn Ross",
+        "date": "2026-08-02",
+        "from": "PIT",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:622491",
+        "name": "Luis Castillo",
+        "date": "2026-08-02",
+        "from": "SEA",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-08-02",
+        "from": "CWS",
+        "to": "SEA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:622554",
+        "name": "Seranthony Domínguez",
+        "date": "2026-08-02",
+        "from": "CWS",
+        "to": "SEA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:825484",
+        "name": "Alexander Frias",
+        "date": "2026-08-03",
+        "from": "MIL",
+        "to": "STL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:666171",
+        "name": "Ryan Zeferjahn",
+        "date": "2026-08-03",
+        "from": "LAA",
+        "to": "CHC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:694208",
+        "name": "Moisés Ballesteros",
+        "date": "2026-08-03",
+        "from": "CHC",
+        "to": "LAA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:702576",
+        "name": "Mason McGwire",
+        "date": "2026-08-03",
+        "from": "CHC",
+        "to": "LAA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:827526",
+        "name": "Jacob Kisting",
+        "date": "2026-08-03",
+        "from": "TB",
+        "to": "MIA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:803745",
+        "name": "Adrian Santana",
+        "date": "2026-08-03",
+        "from": "TB",
+        "to": "MIA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:694966",
+        "name": "Brayden Taylor",
+        "date": "2026-08-03",
+        "from": "TB",
+        "to": "MIA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:689414",
+        "name": "Liam Hicks",
+        "date": "2026-08-03",
+        "from": "MIA",
+        "to": "TB",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:824026",
+        "name": "Kash Mayfield",
+        "date": "2026-08-03",
+        "from": "SD",
+        "to": "DET",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:663554",
+        "name": "Casey Mize",
+        "date": "2026-08-03",
+        "from": "DET",
+        "to": "SD",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:680232",
+        "name": "Jackson Wolf",
+        "date": "2026-08-03",
+        "from": "SD",
+        "to": "DET",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:669398",
+        "name": "Gage Workman",
+        "date": "2026-08-03",
+        "from": "DET",
+        "to": "SD",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:671218",
+        "name": "Heliot Ramos",
+        "date": "2026-08-03",
+        "from": "SF",
+        "to": "NYY",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:700649",
+        "name": "Henry Lalane",
+        "date": "2026-08-03",
+        "from": "NYY",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:809763",
+        "name": "Kaeden Kent",
+        "date": "2026-08-03",
+        "from": "NYY",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:489446",
+        "name": "Kirby Yates",
+        "date": "2026-08-03",
+        "from": "LAA",
+        "to": "PIT",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:701836",
+        "name": "Kyle Robinson",
+        "date": "2026-08-03",
+        "from": "PIT",
+        "to": "LAA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:702103",
+        "name": "Zach Franklin",
+        "date": "2026-08-03",
+        "from": "CWS",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:805031",
+        "name": "Gabe Davis",
+        "date": "2026-08-03",
+        "from": "CWS",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:623211",
+        "name": "Huascar Brazobán",
+        "date": "2026-08-03",
+        "from": "NYM",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:837886",
+        "name": "Carlos Vielma",
+        "date": "2026-08-03",
+        "from": "CWS",
+        "to": "COL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:690279",
+        "name": "Mason Adams",
+        "date": "2026-08-03",
+        "from": "CWS",
+        "to": "COL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:686668",
+        "name": "Brenton Doyle",
+        "date": "2026-08-03",
+        "from": "COL",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:700280",
+        "name": "Miguel Mendez",
+        "date": "2026-08-03",
+        "from": "SD",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:592662",
+        "name": "Robbie Ray",
+        "date": "2026-08-03",
+        "from": "SF",
+        "to": "SD",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:836592",
+        "name": "Joniel Hernandez",
+        "date": "2026-08-03",
+        "from": "SD",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:681097",
+        "name": "Andrew Moore",
+        "date": "2026-08-03",
+        "from": "SD",
+        "to": "PIT",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:676702",
+        "name": "Hunter Stratton",
+        "date": "2026-08-03",
+        "from": "PIT",
+        "to": "SD",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:657571",
+        "name": "Caleb Ferguson",
+        "date": "2026-08-03",
+        "from": "CIN",
+        "to": "STL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-08-03",
+        "from": "STL",
+        "to": "CIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:806230",
+        "name": "Sammy Stafura",
+        "date": "2026-08-03",
+        "from": "PIT",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-08-03",
+        "from": "NYM",
+        "to": "PIT",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:596133",
+        "name": "Luke Weaver",
+        "date": "2026-08-03",
+        "from": "NYM",
+        "to": "PIT",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:701474",
+        "name": "Duncan Davitt",
+        "date": "2026-08-03",
+        "from": "CWS",
+        "to": "ATL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:663698",
+        "name": "Joey Bart",
+        "date": "2026-08-03",
+        "from": "ATL",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:801995",
+        "name": "Aiden May",
+        "date": "2026-08-03",
+        "from": "MIA",
+        "to": "COL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:680767",
+        "name": "Victor Vodnik",
+        "date": "2026-08-03",
+        "from": "COL",
+        "to": "MIA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:681393",
+        "name": "Connor Norby",
+        "date": "2026-08-03",
+        "from": "MIA",
+        "to": "COL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:682877",
+        "name": "Juan Brito",
+        "date": "2026-08-03",
+        "from": "CLE",
+        "to": "CIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-08-03",
+        "from": "CIN",
+        "to": "CLE",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:821122",
+        "name": "Alejandro Rivera",
+        "date": "2026-08-03",
+        "from": "CLE",
+        "to": "CIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:663993",
+        "name": "Nathaniel Lowe",
+        "date": "2026-08-03",
+        "from": "CIN",
+        "to": "CLE",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:666129",
+        "name": "Braxton Garrett",
+        "date": "2026-08-03",
+        "from": "MIA",
+        "to": "CHC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:689476",
+        "name": "Jace Beck",
+        "date": "2026-08-03",
+        "from": "CHC",
+        "to": "MIA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:675085",
+        "name": "Jonathon Long",
+        "date": "2026-08-03",
+        "from": "CHC",
+        "to": "MIA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:691785",
+        "name": "Marcelo Mayer",
+        "date": "2026-08-03",
+        "from": "BOS",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:806872",
+        "name": "Carlos Gutierrez",
+        "date": "2026-08-03",
+        "from": "SF",
+        "to": "BOS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:669062",
+        "name": "Erik Miller",
+        "date": "2026-08-03",
+        "from": "SF",
+        "to": "BOS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:805796",
+        "name": "Arjun Nimmala",
+        "date": "2026-08-03",
+        "from": "TOR",
+        "to": "LAA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:667755",
+        "name": "José Soriano",
+        "date": "2026-08-03",
+        "from": "LAA",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:821022",
+        "name": "Angel Rivero",
+        "date": "2026-08-03",
+        "from": "TOR",
+        "to": "LAA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:804446",
+        "name": "Eddie Micheletti Jr.",
+        "date": "2026-08-03",
+        "from": "TOR",
+        "to": "LAA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:702021",
+        "name": "Will Dion",
+        "date": "2026-08-03",
+        "from": "CLE",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:814455",
+        "name": "Nick Mitchell",
+        "date": "2026-08-03",
+        "from": "CLE",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:656492",
+        "name": "Foster Griffin",
+        "date": "2026-08-03",
+        "from": "WSH",
+        "to": "CLE",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:691776",
+        "name": "Josh Hartle",
+        "date": "2026-08-03",
+        "from": "CLE",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:802068",
+        "name": "Kendeglys Virguez",
+        "date": "2026-08-03",
+        "from": "CLE",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-08-03",
+        "from": "BAL",
+        "to": "MIA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:677956",
+        "name": "Rece Hinds",
+        "date": "2026-08-03",
+        "from": "MIA",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:669701",
+        "name": "Josh Smith",
+        "date": "2026-08-03",
+        "from": "TEX",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:671936",
+        "name": "Adam Macko",
+        "date": "2026-08-03",
+        "from": "TOR",
+        "to": "TEX",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:695776",
+        "name": "Josh Stephan",
+        "date": "2026-08-03",
+        "from": "TEX",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-08-03",
+        "from": "TOR",
+        "to": "HOU",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:662139",
+        "name": "Daulton Varsho",
+        "date": "2026-08-03",
+        "from": "TOR",
+        "to": "HOU",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:681293",
+        "name": "Spencer Arrighetti",
+        "date": "2026-08-03",
+        "from": "HOU",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:811139",
+        "name": "Sandro Santana",
+        "date": "2026-08-03",
+        "from": "AZ",
+        "to": "STL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:663457",
+        "name": "Lars Nootbaar",
+        "date": "2026-08-03",
+        "from": "STL",
+        "to": "AZ",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-08-03",
+        "from": "AZ",
+        "to": "STL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:811666",
+        "name": "Daniel Eagen",
+        "date": "2026-08-03",
+        "from": "AZ",
+        "to": "STL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:679922",
+        "name": "Carlos Duran",
+        "date": "2026-08-03",
+        "from": "LAD",
+        "to": "KC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:663460",
+        "name": "Kris Bubic",
+        "date": "2026-08-03",
+        "from": "KC",
+        "to": "LAD",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:608718",
+        "name": "Brent Suter",
+        "date": "2026-08-03",
+        "from": "LAA",
+        "to": "ATL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:805373",
+        "name": "Nacho Alvarez Jr.",
+        "date": "2026-08-03",
+        "from": "ATL",
+        "to": "LAA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:695524",
+        "name": "Jacob Cozart",
+        "date": "2026-08-03",
+        "from": "CLE",
+        "to": "LAA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:666176",
+        "name": "Jo Adell",
+        "date": "2026-08-03",
+        "from": "LAA",
+        "to": "CLE",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:681047",
+        "name": "Christian Franklin",
+        "date": "2026-08-03",
+        "from": "WSH",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:812521",
+        "name": "Joe Glassey",
+        "date": "2026-08-03",
+        "from": "BAL",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:669261",
+        "name": "Jack Suwinski",
+        "date": "2026-08-03",
+        "from": "LAD",
+        "to": "TB",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-08-03",
+        "from": "LAD",
+        "to": "TB",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:695771",
+        "name": "Jacob Kmatz",
+        "date": "2026-08-03",
+        "from": "TB",
+        "to": "LAD",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:676439",
+        "name": "Hunter Feduccia",
+        "date": "2026-08-03",
+        "from": "TB",
+        "to": "LAD",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:684049",
+        "name": "Brandan Bidois",
+        "date": "2026-08-03",
+        "from": "PIT",
+        "to": "MIA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:809331",
+        "name": "Brian Sanchez",
+        "date": "2026-08-03",
+        "from": "PIT",
+        "to": "MIA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:829748",
+        "name": "Hyun Seung Lee",
+        "date": "2026-08-03",
+        "from": "PIT",
+        "to": "MIA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:669199",
+        "name": "Lake Bachar",
+        "date": "2026-08-03",
+        "from": "MIA",
+        "to": "PIT",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:701811",
+        "name": "John Spikerman",
+        "date": "2026-08-03",
+        "from": "PHI",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:548384",
+        "name": "Brooks Raley",
+        "date": "2026-08-03",
+        "from": "NYM",
+        "to": "PHI",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:826939",
+        "name": "Luke Gabrysh",
+        "date": "2026-08-03",
+        "from": "PHI",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:702650",
+        "name": "Michael Forret",
+        "date": "2026-08-03",
+        "from": "TB",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:669330",
+        "name": "Tyler Wells",
+        "date": "2026-08-03",
+        "from": "BAL",
+        "to": "TB",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:827408",
+        "name": "Ramon Marquez",
+        "date": "2026-08-03",
+        "from": "PHI",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:650333",
+        "name": "Luis Arraez",
+        "date": "2026-08-03",
+        "from": "SF",
+        "to": "PHI",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:700248",
+        "name": "Marty Gair",
+        "date": "2026-08-03",
+        "from": "PHI",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:668873",
+        "name": "Caleb Kilian",
+        "date": "2026-08-03",
+        "from": "SF",
+        "to": "PHI",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:695066",
+        "name": "Ben Grable",
+        "date": "2026-08-03",
+        "from": "NYY",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:672442",
+        "name": "Yovanny Cruz",
+        "date": "2026-08-03",
+        "from": "NYY",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:701411",
+        "name": "Jack Cebert",
+        "date": "2026-08-03",
+        "from": "NYY",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:671277",
+        "name": "Luis García Jr.",
+        "date": "2026-08-03",
+        "from": "WSH",
+        "to": "NYY",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:656234",
+        "name": "Jake Bird",
+        "date": "2026-08-03",
+        "from": "NYY",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:800473",
+        "name": "Jefferson Rojas",
+        "date": "2026-08-03",
+        "from": "CHC",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:605280",
+        "name": "Clay Holmes",
+        "date": "2026-08-03",
+        "from": "NYM",
+        "to": "CHC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:621438",
+        "name": "Tyrone Taylor",
+        "date": "2026-08-03",
+        "from": "NYM",
+        "to": "CHC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-08-03",
+        "from": "BAL",
+        "to": "MIL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:676051",
+        "name": "Codi Heuer",
+        "date": "2026-08-03",
+        "from": "MIL",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:694646",
+        "name": "Chayce McDermott",
+        "date": "2026-08-03",
+        "from": "LAD",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:666163",
+        "name": "Ben Rortvedt",
+        "date": "2026-08-03",
+        "from": "NYM",
+        "to": "LAD",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:642201",
+        "name": "Eli White",
+        "date": "2026-08-03",
+        "from": "ATL",
+        "to": "BOS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:700413",
+        "name": "Tyler Uberstine",
+        "date": "2026-08-03",
+        "from": "BOS",
+        "to": "ATL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:828824",
+        "name": "Josiah Ragsdale",
+        "date": "2026-08-03",
+        "from": "MIL",
+        "to": "STL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:669160",
+        "name": "Dustin May",
+        "date": "2026-08-03",
+        "from": "STL",
+        "to": "MIL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:668941",
+        "name": "JoJo Romero",
+        "date": "2026-08-03",
+        "from": "STL",
+        "to": "MIL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:695380",
+        "name": "Alex Hoppe",
+        "date": "2026-08-03",
+        "from": "SEA",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:621493",
+        "name": "Taylor Ward",
+        "date": "2026-08-03",
+        "from": "BAL",
+        "to": "SEA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:822160",
+        "name": "Brock Moore",
+        "date": "2026-08-03",
+        "from": "SEA",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:801653",
+        "name": "Harrison Kreiling",
+        "date": "2026-08-03",
+        "from": "SEA",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:676510",
+        "name": "Nolan Hoffman",
+        "date": "2026-08-03",
+        "from": "PHI",
+        "to": "KC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:823841",
+        "name": "Manuel Colon",
+        "date": "2026-08-03",
+        "from": "KC",
+        "to": "PHI",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:815598",
+        "name": "Dasan Hill",
+        "date": "2026-08-03",
+        "from": "MIN",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-08-03",
+        "from": "TOR",
+        "to": "MIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-08-03",
+        "from": "MIN",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:656546",
+        "name": "Jeff Hoffman",
+        "date": "2026-08-03",
+        "from": "TOR",
+        "to": "MIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:804619",
+        "name": "John Klein",
+        "date": "2026-08-03",
+        "from": "MIN",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:808365",
+        "name": "Dameury Pena",
+        "date": "2026-08-03",
+        "from": "MIN",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:686751",
+        "name": "Seth Johnson",
+        "date": "2026-08-03",
+        "from": "PHI",
+        "to": "ATH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:687515",
+        "name": "Colby Thomas",
+        "date": "2026-08-03",
+        "from": "ATH",
+        "to": "PHI",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-08-03",
+        "from": "BAL",
+        "to": "BOS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:668939",
+        "name": "Adley Rutschman",
+        "date": "2026-08-03",
+        "from": "BAL",
+        "to": "BOS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:668670",
+        "name": "Jake Rogers",
+        "date": "2026-08-03",
+        "from": "BAL",
+        "to": "BOS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:804817",
+        "name": "Kyson Witherspoon",
+        "date": "2026-08-03",
+        "from": "BOS",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:821150",
+        "name": "Enddy Azocar",
+        "date": "2026-08-03",
+        "from": "BOS",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:809254",
+        "name": "Anthony Eyanson",
+        "date": "2026-08-03",
+        "from": "BOS",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-08-03",
+        "from": "BOS",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:665966",
+        "name": "Carlos Narváez",
+        "date": "2026-08-03",
+        "from": "BOS",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:821197",
+        "name": "Juan Martinez",
+        "date": "2026-08-03",
+        "from": "MIL",
+        "to": "COL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:815081",
+        "name": "Mark Manfredi",
+        "date": "2026-08-03",
+        "from": "MIL",
+        "to": "COL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:622608",
+        "name": "Antonio Senzatela",
+        "date": "2026-08-03",
+        "from": "COL",
+        "to": "MIL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:671162",
+        "name": "Connor Thomas",
+        "date": "2026-08-04",
+        "from": "ATH",
+        "to": "KC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:694351",
+        "name": "Jacob Berry",
+        "date": "2026-08-05",
+        "from": "MIA",
+        "to": "KC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:663362",
+        "name": "Matt Waldron",
+        "date": "2026-08-05",
+        "from": "SD",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:676760",
+        "name": "Ron Marinaccio",
+        "date": "2026-08-06",
+        "from": "PIT",
+        "to": "CIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:677592",
+        "name": "Everson Pereira",
+        "date": "2026-08-06",
+        "from": "CWS",
+        "to": "STL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:670090",
+        "name": "Wyatt Mills",
+        "date": "2026-08-06",
+        "from": "LAD",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:686678",
+        "name": "Chase Solesky",
+        "date": "2026-08-06",
+        "from": "TB",
+        "to": "CIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:681432",
+        "name": "Luke Little",
+        "date": "2026-08-06",
+        "from": "CHC",
+        "to": "KC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:670245",
+        "name": "Ryan Watson",
+        "date": "2026-08-07",
+        "from": "BOS",
+        "to": "LAA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:672356",
+        "name": "Gabriel Arias",
+        "date": "2026-08-07",
+        "from": "CLE",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:688497",
+        "name": "Taylor Rashi",
+        "date": "2026-08-09",
+        "from": "MIN",
+        "to": "ATH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:682790",
+        "name": "Wikelman González",
+        "date": "2026-08-10",
+        "from": "CWS",
+        "to": "MIA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:676369",
+        "name": "Nelson Velázquez",
+        "date": "2026-08-10",
+        "from": "STL",
+        "to": "HOU",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:663884",
+        "name": "Nolan Kingham",
+        "date": "2026-08-10",
+        "from": "TEX",
+        "to": "SEA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:680723",
+        "name": "Drew Rom",
+        "date": "2026-08-11",
+        "from": "MIL",
+        "to": "ATH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:829093",
+        "name": "Harold Rivas",
+        "date": "2026-08-12",
+        "from": "BOS",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:623149",
+        "name": "Paul Sewald",
+        "date": "2026-08-12",
+        "from": "AZ",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:680862",
+        "name": "Willie MacIver",
+        "date": "2026-08-12",
+        "from": "TOR",
+        "to": "SEA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:694376",
+        "name": "Shay Whitcomb",
+        "date": "2026-08-13",
+        "from": "HOU",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:668670",
+        "name": "Jake Rogers",
+        "date": "2026-08-14",
+        "from": "BOS",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-08-15",
+        "from": "MIL",
+        "to": "ATH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:681890",
+        "name": "Troy Watson",
+        "date": "2026-08-15",
+        "from": "DET",
+        "to": "SEA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:694680",
+        "name": "Trevor Martin",
+        "date": "2026-08-15",
+        "from": "TB",
+        "to": "LAA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:680716",
+        "name": "Jonathan Ornelas",
+        "date": "2026-08-15",
+        "from": "ATH",
+        "to": "MIL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:697812",
+        "name": "Joe Rock",
+        "date": "2026-08-16",
+        "from": "CWS",
+        "to": "ATH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-08-19",
+        "from": "PIT",
+        "to": "NYY",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:542194",
+        "name": "Christian Bethancourt",
+        "date": "2026-08-19",
+        "from": "NYY",
+        "to": "PIT",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:672356",
+        "name": "Gabriel Arias",
+        "date": "2026-08-19",
+        "from": "NYM",
+        "to": "CHC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:691769",
+        "name": "Philip Abner",
+        "date": "2026-08-19",
+        "from": "AZ",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:694851",
+        "name": "Andrew Hoffmann",
+        "date": "2026-08-20",
+        "from": "AZ",
+        "to": "PHI",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-08-20",
+        "from": "MIA",
+        "to": "TB",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:686482",
+        "name": "Logan Driscoll",
+        "date": "2026-08-20",
+        "from": "TB",
+        "to": "MIA",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:671286",
+        "name": "Johnathan Rodríguez",
+        "date": "2026-08-21",
+        "from": "PIT",
+        "to": "ATH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:663362",
+        "name": "Matt Waldron",
+        "date": "2026-08-22",
+        "from": "TOR",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:688297",
+        "name": "Chris Roycroft",
+        "date": "2026-08-25",
+        "from": "TB",
+        "to": "ATH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:676568",
+        "name": "Ricky Vanasco",
+        "date": "2026-08-26",
+        "from": "DET",
+        "to": "ATL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:670167",
+        "name": "John Schreiber",
+        "date": "2026-08-31",
+        "from": "KC",
+        "to": "NYY",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:673357",
+        "name": "Luis Robert Jr.",
+        "date": "2026-08-31",
+        "from": "NYM",
+        "to": "BAL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:502054",
+        "name": "Tommy Pham",
+        "date": "2026-08-31",
+        "from": "PHI",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-08-31",
+        "from": "CWS",
+        "to": "PHI",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:595909",
+        "name": "Jake Cave",
+        "date": "2026-08-31",
+        "from": "TB",
+        "to": "CWS",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:null",
+        "name": null,
+        "date": "2026-08-31",
+        "from": "CWS",
+        "to": "TB",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:842594",
+        "name": "Sebastian Rodriguez",
+        "date": "2026-09-01",
+        "from": "TOR",
+        "to": "LAD",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:692064",
+        "name": "José Rodríguez",
+        "date": "2026-09-01",
+        "from": "LAD",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "TR"
+      },
+      {
+        "player_key": "mlb:687721",
+        "name": "Cameron Weston",
+        "date": "2026-09-03",
+        "from": "BAL",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:695391",
+        "name": "Brett Harris",
+        "date": "2026-09-03",
+        "from": "BOS",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:669270",
+        "name": "Joel Kuhnel",
+        "date": "2026-09-04",
+        "from": "MIL",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:802686",
+        "name": "Hayden Harris",
+        "date": "2026-09-04",
+        "from": "ATL",
+        "to": "COL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:676566",
+        "name": "Shawn Ross",
+        "date": "2026-09-05",
+        "from": "NYM",
+        "to": "TOR",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:678489",
+        "name": "Jorge Barrosa",
+        "date": "2026-09-06",
+        "from": "AZ",
+        "to": "HOU",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:701474",
+        "name": "Duncan Davitt",
+        "date": "2026-09-09",
+        "from": "ATL",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:685801",
+        "name": "Hunter Bigge",
+        "date": "2026-09-11",
+        "from": "TB",
+        "to": "ATH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:702352",
+        "name": "Spencer Bivens",
+        "date": "2026-09-12",
+        "from": "SF",
+        "to": "KC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:694633",
+        "name": "Chase Hampton",
+        "date": "2026-09-12",
+        "from": "NYY",
+        "to": "WSH",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:660821",
+        "name": "Jesús Sánchez",
+        "date": "2026-09-14",
+        "from": "TOR",
+        "to": "AZ",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:675627",
+        "name": "Michael Grove",
+        "date": "2026-09-15",
+        "from": "TB",
+        "to": "ATL",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:686551",
+        "name": "Christian Cairo",
+        "date": "2026-09-15",
+        "from": "PHI",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:664353",
+        "name": "José Urquidy",
+        "date": "2026-09-17",
+        "from": "CWS",
+        "to": "PHI",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:665828",
+        "name": "Oswaldo Cabrera",
+        "date": "2026-09-18",
+        "from": "NYY",
+        "to": "CIN",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:691769",
+        "name": "Philip Abner",
+        "date": "2026-09-23",
+        "from": "SF",
+        "to": "NYM",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:666808",
+        "name": "Camilo Doval",
+        "date": "2026-09-24",
+        "from": "PIT",
+        "to": "SF",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      },
+      {
+        "player_key": "mlb:687924",
+        "name": "Julian Aguiar",
+        "date": "2026-09-26",
+        "from": "CIN",
+        "to": "CHC",
+        "source_url": "https://statsapi.mlb.com/api/v1/transactions?startDate=2026-03-25&endDate=2026-09-27&sportId=1",
+        "type": "CLW"
+      }
+    ]
+  },
+  "npb": {
+    "start": "2026-02-01",
+    "end_exclusive": "2026-12-01",
+    "moves": [
+      {
+        "player_key": "npb:53555153",
+        "name": "若林 楽人",
+        "date": "2026-07-30",
+        "from": "巨人",
+        "to": "西武",
+        "source_url": "https://npb.jp/announcement/2026/pn_traded.html"
+      },
+      {
+        "player_key": "npb:23125136",
+        "name": "山本 祐大",
+        "date": "2026-05-13",
+        "from": "DeNA",
+        "to": "ソフトバンク",
+        "source_url": "https://npb.jp/announcement/2026/pn_traded.html"
+      },
+      {
+        "player_key": "npb:61365136",
+        "name": "尾形 崇斗",
+        "date": "2026-05-13",
+        "from": "ソフトバンク",
+        "to": "DeNA",
+        "source_url": "https://npb.jp/announcement/2026/pn_traded.html"
+      },
+      {
+        "player_key": "npb:01305153",
+        "name": "井上 朋也",
+        "date": "2026-05-13",
+        "from": "ソフトバンク",
+        "to": "DeNA",
+        "source_url": "https://npb.jp/announcement/2026/pn_traded.html"
+      },
+      {
+        "player_key": "npb:61765139",
+        "name": "杉浦 稔大",
+        "date": "2026-04-14",
+        "from": "日本ハム",
+        "to": "中日",
+        "source_url": "https://npb.jp/announcement/2026/pn_traded.html"
+      }
+    ],
+    "period_source": "https://jpbpa.net/wp-content/uploads/jpbpa-pdf/ag2024.pdf"
+  }
+}

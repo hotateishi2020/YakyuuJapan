@@ -5,6 +5,24 @@ import 'package:Yakyuu_Japan/logic/predict_groups.dart';
 import 'package:Yakyuu_Japan/tools/color_parse.dart';
 
 void main() {
+  testWidgets('HOME用スコアはスクロール内に収まり予想設定を表示しない', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(320, 640));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(const MaterialApp(home: Scaffold(body: SingleChildScrollView(
+      child: PredictGroupBoard(scoresOnly: true, loading: false, selectedYear: 2026,
+        groups: [{'id': 1, 'txt_name': '対決グループ', 'int_year': 2026, 'id_setting': 1, 'users': [
+          {'id': 1, 'name': '参加者A', 'hits': 3},
+          {'id': 2, 'name': '参加者B', 'hits': 5},
+        ]}]),
+    ))));
+    expect(find.text('対決グループ'), findsOneWidget);
+    expect(find.text('3'), findsOneWidget);
+    expect(find.text('5'), findsOneWidget);
+    expect(find.byTooltip('予想設定'), findsNothing);
+    expect(find.byKey(const ValueKey('prediction-situation-block')), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   test('予想グループは新しい年が上で同じ年の重複は1件', () {
     final sections = predictGroupsByYear([
       {'id': 1, 'txt_name': '立石組', 'int_year': 2025},

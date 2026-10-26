@@ -205,6 +205,8 @@ class AuthSession extends ChangeNotifier {
   set user(AuthUser? value) { if (identical(value, _user)) return; _user = value; notifyListeners(); }
   String? get token => _token;
   set token(String? value) { if (value == _token) return; _token = value; notifyListeners(); }
+  bool get showDetailedGames => isLoggedIn && const [1, 2].contains(user?.id);
+
   bool get showSpecialMedia => isLoggedIn && (user?.special ?? false);
 
   bool get isLoggedIn => user != null && (token?.isNotEmpty ?? false);

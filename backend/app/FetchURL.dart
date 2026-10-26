@@ -1,3 +1,5 @@
+import 'PitcherChangeRepair.dart';
+import 'PlayerIdentity.dart';
 import 'FetchMLB.dart';
 import 'GameLiveBrief.dart';
 import 'package:http/http.dart' as http;
@@ -590,7 +592,7 @@ class FetchURL {
       final gameId = existing.first.toColumnMap()['id'] as int;
       final loaded = await GameStatsLoad.isLoaded(conn, gameId);
       final decisionsMissing = await GameStatsLoad.pitcherDecisionsMissing(conn, gameId);
-      final refreshDetails = started && (GameStatsLoad.needsRefresh(finished: state.contains('試合終了'), loaded: loaded) || decisionsMissing);
+      final refreshDetails = started && (GameStatsLoad.needsRefresh(finished: state.contains('試合終了'), loaded: loaded, live: GameStatsLoad.isLive(state)) || decisionsMissing);
       var summarySaved = false;
       try {
         summarySaved = await _syncPostseasonPitchers(
@@ -639,7 +641,9 @@ class FetchURL {
     final haveHome = int.tryParse('${row['id_pitcher_home']}') ?? 0;
     final haveAway = int.tryParse('${row['id_pitcher_away']}') ?? 0;
     final haveLineup = '${row['txt_lineup_announced'] ?? ''}'.trim().length > 2;
-    final needLines = refreshLines && state.contains('試合終了');
+    // The caller has already checked finished/unloaded or an active live viewer.
+    // Do not suppress postseason batting/pitching lines until the game ends.
+    final needLines = refreshLines;
     // 試合前・予告先発・見どころで先発が既にあれば、詳細ページは開かない。
     final awaitingLineup = !started && !haveLineup;
     final needPage = haveHome <= 0 || haveAway <= 0 || needLines || awaitingLineup || (started && !state.contains('試合終了'));
@@ -1350,7 +1354,7 @@ class FetchURL {
               await saveGameTop(conn, gameTop, game.id, idTeamHome, idTeamAway, matchState);
               {
                 final loaded = await GameStatsLoad.isLoaded(conn, game.id);
-                if (!GameStatsLoad.needsRefresh(finished: matchState.contains('試合終了'), loaded: loaded)) {
+                if (!GameStatsLoad.needsRefresh(finished: matchState.contains('試合終了'), loaded: loaded, live: GameStatsLoad.isLive(matchState))) {
                   print('NPB試合スキップ(成績済): $nameTeamAway vs $nameTeamHome');
                   continue;
                 }
@@ -1498,7 +1502,9 @@ class FetchURL {
                   print(stacktrace);
                 }
               }
-              if (matchState.contains('試合終了') && game.id != 0) {
+              if (game.id != 0 && GameStatsLoad.needsRefresh(
+                  finished: matchState.contains('試合終了'), loaded: false,
+                  live: GameStatsLoad.isLive(matchState))) {
                 try {
                   await _saveGameLiveText(
                     conn,
@@ -1961,6 +1967,7 @@ class FetchURL {
         StringTool.noSpace('${map['name_full'] ?? ''}'),
         StringTool.noSpace('${map['name_last'] ?? ''}'),
         '${map['name_first_initial'] ?? ''}'.trim().toUpperCase(),
+        List<String>.from(map['name_patterns'] as List? ?? []),
       ));
     }
 
@@ -1998,6 +2005,7 @@ class FetchURL {
               nameFull: player.name,
               nameLast: player.nameLast,
               storedInitial: player.initial,
+              patterns: player.patterns,
             );
           })
           .map((player) => (
@@ -2277,6 +2285,49 @@ class FetchURL {
     if (deleteFrom != null) {
       await Postgres.execute(conn, AppSql.deleteGameDetailsFromId(), data: [gameId, deleteFrom]);
     }
+    // 過去の取得時に選手IDを解決できなかった継投も、再取得時に補完する。
+    // 新しい打席がない終了試合でも、速報の選手名と一意に一致した行だけ更新する。
+    for (final half in parsed.halves) {
+      final pitchingTeam = half.bottom ? idTeamAway : idTeamHome;
+      final battingTeam = half.bottom ? idTeamHome : idTeamAway;
+      for (final plate in half.plates) {
+        for (final event in plate.events.where((e) => e.pitcherChange && e.enterName.isNotEmpty)) {
+          final entered = playerId(event.enterName, pitchingTeam);
+          if (entered == 0) continue;
+          final batter = playerId(plate.batterName, battingTeam);
+          final missing = stored.where((r) => r.enter == 0 && r.result == Value.CodeGameResult.CHANGE_PITCHER &&
+              r.inning == half.inning && r.bottom == half.bottom && r.batter == batter && r.outs == plate.outs).toList();
+          if (missing.length != 1) continue;
+          await Postgres.execute(conn,
+            'UPDATE t_game_details SET id_player_enter = \$2 WHERE id = \$1 AND COALESCE(id_player_enter, 0) = 0',
+            data: [missing.single.id, entered]);
+        }
+      }
+    }
+
+    // 選手・イニング・打者・アウト数が一意に一致する既存行の空欄だけ補完する。
+    for (final half in parsed.halves) {
+      final team = half.bottom ? idTeamAway : idTeamHome;
+      for (final plate in half.plates) {
+        for (final event in plate.events.where((e) => e.result == 'CHANGE_POSITION' || e.result == 'PINCH_FIELDER')) {
+          if (event.positionFrom.isEmpty || event.positionTo.isEmpty) continue;
+          final entered = playerId(event.enterName, team);
+          final batter = playerId(plate.batterName, half.bottom ? idTeamHome : idTeamAway);
+          if (entered == 0 || batter == 0) continue;
+          final matching = stored.where((r) => r.inning == half.inning && r.bottom == half.bottom &&
+              r.enter == entered && r.batter == batter && r.outs == plate.outs && r.result == event.result).toList();
+          if (matching.length != 1) continue;
+          await Postgres.execute(conn, '''
+            UPDATE t_game_details SET
+              code_position_from = COALESCE(NULLIF(BTRIM(code_position_from), ''), \$2),
+              code_position_to = COALESCE(NULLIF(BTRIM(code_position_to), ''), \$3)
+            WHERE id = \$1 AND id_game = \$4
+              AND (COALESCE(BTRIM(code_position_from), '') = '' OR COALESCE(BTRIM(code_position_to), '') = '')
+          ''', data: [matching.single.id, event.positionFrom, event.positionTo, gameId]);
+        }
+      }
+    }
+
     final seenPos = <int>{};
     for (final half in parsed.halves) {
       final battingTeam = half.bottom ? idTeamHome : idTeamAway;
@@ -2303,6 +2354,7 @@ class FetchURL {
       }
     }
     if (pending.isEmpty) {
+      await repairPitcherChanges(conn, gameId: gameId, homeTeam: idTeamHome, awayTeam: idTeamAway, parsed: parsed, playerId: playerId);
       print('テキスト速報に新しい打席はありません。');
       if (saveMaxVelo) {
         await _saveMaxPitchVelo(
@@ -2318,6 +2370,7 @@ class FetchURL {
       return;
     }
     await Postgres.insertMulti(conn, pending);
+    await repairPitcherChanges(conn, gameId: gameId, homeTeam: idTeamHome, awayTeam: idTeamAway, parsed: parsed, playerId: playerId);
     await conn.execute('UPDATE t_game SET updat = NOW() WHERE id = \$1', parameters: [gameId]);
     print('テキスト速報を${pending.length}件登録しました。');
     if (saveMaxVelo) {
@@ -2521,9 +2574,19 @@ class FetchURL {
       }
     }
 
-    var cntRows = await Postgres.execute(conn, AppSql.selectInsertNewPlayersNPB(players));
-
-    print("登録した新選手の数：${cntRows.affectedRows.toString()}");
+    for (final player in players) {
+      final detail=details.where((d)=>identical(d.player,player)).firstOrNull;
+      final officialId=RegExp(r'/players/(\d+)\.html').firstMatch(detail?.url ?? '')?[1];
+      if(officialId!=null) {
+        final id=await PlayerIdentity.ensure(conn,name:'${player.name_last}${player.name_first}',
+          teamId:player.id_team,source:'npb',externalId:officialId,url:detail!.url,birthDate:player.date_birth);
+        if(id<=0) throw StateError('NPB roster identity requires review: $officialId');
+        // This is the current official roster, unlike historical season imports.
+        await conn.execute('UPDATE m_player SET id_team=\$2 WHERE id=\$1',parameters:[id,player.id_team]);
+      }
+      await Postgres.insert(conn, player);
+    }
+    print('選手名・別名を照合した人数：${players.length}');
     var birthUpdated = 0;
     for (final player in players) {
       if (player.date_birth == null) continue;
@@ -3579,57 +3642,11 @@ class FetchURL {
       return;
     }
     final teamId = teamRows.first.toColumnMap()['id'] as int;
+    final resolved = await PlayerIdentity.ensure(conn, name:playerName.trim(),
+        teamId:teamId, url:playerUrl);
+    if (resolved <= 0) return;
     final existing = await conn.execute(
-      '''
-        SELECT id, name_full, id_country, url, date_birth FROM m_player
-        WHERE id_team = \$1::int
-          AND COALESCE(flg_delete, FALSE) = FALSE
-          AND (
-            (\$3::text <> '' AND substring(url from '/mlb/player/([0-9]+)') = \$3::text)
-            OR name_full = \$2::text
-            OR name_last = \$2::text
-            OR COALESCE(name_last, '') || COALESCE(name_first, '') = \$2::text
-            OR name_full LIKE \$2::text || '%'
-            OR \$2::text LIKE name_full || '%'
-            OR (
-              COALESCE(name_last, '') <> ''
-              AND length(name_last) >= 2
-              AND \$2::text LIKE '%' || name_last
-            )
-            OR (
-              length(regexp_replace(\$2::text, '^.*?[\\.．]', '')) >= 2
-              AND (
-                name_full LIKE '%' || regexp_replace(\$2::text, '^.*?[\\.．]', '')
-                OR regexp_replace(name_full, '^.*・', '')
-                     = regexp_replace(\$2::text, '^.*?[\\.．]', '')
-                OR name_last = regexp_replace(\$2::text, '^.*?[\\.．]', '')
-              )
-            )
-            OR (
-              position('・' in name_full) > 0
-              AND length(regexp_replace(name_full, '^.*・', '')) >= 2
-              AND (
-                \$2::text LIKE '%' || regexp_replace(name_full, '^.*・', '')
-                OR regexp_replace(\$2::text, '^.*?[\\.．]', '')
-                     = regexp_replace(name_full, '^.*・', '')
-              )
-            )
-          )
-        ORDER BY
-          CASE WHEN \$3::text <> '' AND substring(url from '/mlb/player/([0-9]+)') = \$3::text THEN 0 ELSE 1 END,
-          CASE
-            WHEN name_full = \$2::text THEN 0
-            WHEN COALESCE(name_last, '') || COALESCE(name_first, '') = \$2::text THEN 1
-            WHEN name_last = \$2::text THEN 2
-            WHEN name_full LIKE \$2::text || '%' THEN 3
-            WHEN \$2::text LIKE name_full || '%' THEN 4
-            ELSE 5
-          END,
-          length(COALESCE(name_full, '')) DESC
-        LIMIT 1
-      ''',
-      parameters: [teamId, name, RegExp(r'/mlb/player/(\d+)').firstMatch(playerUrl ?? '')?[1] ?? ''],
-    );
+      'SELECT id,name_full,id_country,url,date_birth FROM m_player WHERE id=\$1', parameters:[resolved]);
     var playerId = 0;
     var needsCountry = true;
     var needsBirth = true;
@@ -3654,13 +3671,6 @@ class FetchURL {
           parameters: [name, playerId],
         );
       }
-    } else {
-      final player = m_player()
-        ..name_last = name
-        ..name_first = ''
-        ..name_full = name
-        ..id_team = teamId;
-      playerId = await Postgres.insert(conn, player);
     }
     if (playerId <= 0) return;
 
@@ -4312,7 +4322,8 @@ class _RosterName {
   final String nameLast;
   String initial;
 
-  _RosterName(this.id, this.teamId, this.name, [this.nameLast = '', this.initial = '']);
+  final List<String> patterns;
+  _RosterName(this.id, this.teamId, this.name, [this.nameLast = '', this.initial = '', this.patterns = const []]);
 }
 
 Future<void> _persistPlayerInitial(Connection conn, int playerId, String initial) async {

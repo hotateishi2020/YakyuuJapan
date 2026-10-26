@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/tools/home_data_cache.dart';
 import 'package:Yakyuu_Japan/config/org_config.dart';
 import 'package:Yakyuu_Japan/View/SeasonTable.dart';
 import 'package:Yakyuu_Japan/View/home_games_behind_board.dart';
@@ -11,6 +12,7 @@ import 'package:http/testing.dart';
 import 'package:Yakyuu_Japan/View/home_board.dart';
 
 void main() {
+  setUp(HomeDataCache.clear);
   setUp(HomeCalendarCache.clear);
   tearDown(HomeCalendarCache.clear);
   testWidgets('HOME順位はセ・パ横並び、MLBはア3地区・ナ3地区の2段', (tester) async {

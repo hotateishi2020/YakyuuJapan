@@ -1,0 +1,2295 @@
+{
+  "generated_at": "2026-10-23T22:41:34.438672+00:00",
+  "groups": [
+    {
+      "canonical_id": 6052,
+      "merge_ids": [
+        28786
+      ],
+      "name_ja": "ルイス・ララ",
+      "name_en": "Luis Lara",
+      "team_id": 35,
+      "birth_date": "2004-11-17",
+      "patterns": [
+        "Lara, Luis",
+        "Luis Alexander Lara",
+        "Luis Lara",
+        "ルイス・ララ"
+      ],
+      "identity_sources": {
+        "mlb": "800325",
+        "yahoo_mlb": "202101832"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101832/",
+      "evidence": [
+        {
+          "birth_date": "2004-11-17",
+          "height_cm": 170,
+          "hands": "右投両打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/800325",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101832/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 6308,
+      "merge_ids": [
+        28013
+      ],
+      "name_ja": "サル・フリリック",
+      "name_en": "Sal Frelick",
+      "team_id": 35,
+      "birth_date": "2000-04-19",
+      "patterns": [
+        "Frelick, Sal",
+        "Sal Frelick",
+        "Salvatore Michael Frelick",
+        "サル・フリリック"
+      ],
+      "identity_sources": {
+        "mlb": "686217",
+        "yahoo_mlb": "202100556"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202100556/",
+      "evidence": [
+        {
+          "birth_date": "2000-04-19",
+          "height_cm": 175,
+          "hands": "右投左打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/686217",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202100556/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 1129,
+      "merge_ids": [
+        28934
+      ],
+      "name_ja": "宮内春輝",
+      "name_en": null,
+      "team_id": null,
+      "birth_date": null,
+      "patterns": [
+        "宮内　春輝",
+        "宮内春輝"
+      ],
+      "identity_sources": {
+        "npb": "53155157"
+      },
+      "url": null,
+      "evidence": [
+        {
+          "source": "same full name and birth date",
+          "name_key": "宮内春輝",
+          "birth_date": "1996-05-25"
+        }
+      ]
+    },
+    {
+      "canonical_id": 6349,
+      "merge_ids": [
+        25774
+      ],
+      "name_ja": "ゲーリー・サンチェス",
+      "name_en": "Gary Sánchez",
+      "team_id": 35,
+      "birth_date": "1992-12-02",
+      "patterns": [
+        "Gary Sánchez",
+        "Sánchez, Gary",
+        "ゲーリー・サンチェス"
+      ],
+      "identity_sources": {
+        "mlb": "596142",
+        "yahoo_mlb": "2100328"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2100328/",
+      "evidence": [
+        {
+          "birth_date": "1992-12-02",
+          "height_cm": 188,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/596142",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2100328/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28109,
+      "merge_ids": [],
+      "name_ja": "クイン・プリースター",
+      "name_en": "Quinn Priester",
+      "team_id": 35,
+      "birth_date": "2000-09-16",
+      "patterns": [
+        "Charles Quinn Priester",
+        "Priester, Quinn",
+        "Quinn Priester",
+        "クイン・プリースター"
+      ],
+      "identity_sources": {
+        "mlb": "682990",
+        "yahoo_mlb": "2102409"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2102409/",
+      "evidence": [
+        {
+          "birth_date": "2000-09-16",
+          "height_cm": 191,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/682990",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2102409/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 588,
+      "merge_ids": [
+        27547
+      ],
+      "name_ja": "若林楽人",
+      "name_en": null,
+      "team_id": null,
+      "birth_date": null,
+      "patterns": [
+        "若林　楽人",
+        "若林楽人"
+      ],
+      "identity_sources": {
+        "npb": "53555153"
+      },
+      "url": null,
+      "evidence": [
+        {
+          "source": "same full name and birth date",
+          "name_key": "若林楽人",
+          "birth_date": "1998-04-13"
+        }
+      ]
+    },
+    {
+      "canonical_id": 6049,
+      "merge_ids": [
+        25300
+      ],
+      "name_ja": "クリスチャン・イエリチ",
+      "name_en": "Christian Yelich",
+      "team_id": 35,
+      "birth_date": "1991-12-05",
+      "patterns": [
+        "Christian Stephen Yelich",
+        "Christian Yelich",
+        "Yelich, Christian",
+        "クリスチャン・イエリチ"
+      ],
+      "identity_sources": {
+        "mlb": "592885",
+        "yahoo_mlb": "2100187"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2100187/",
+      "evidence": [
+        {
+          "birth_date": "1991-12-05",
+          "height_cm": 193,
+          "hands": "右投左打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/592885",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2100187/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28628,
+      "merge_ids": [],
+      "name_ja": "トーマス・ハリントン",
+      "name_en": "Thomas Harrington",
+      "team_id": 36,
+      "birth_date": "2001-07-12",
+      "patterns": [
+        "Harrington, Thomas",
+        "Thomas Harrington",
+        "Tom Hinson Harrington",
+        "トーマス・ハリントン"
+      ],
+      "identity_sources": {
+        "mlb": "802419",
+        "yahoo_mlb": "202101313"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101313/",
+      "evidence": [
+        {
+          "birth_date": "2001-07-12",
+          "height_cm": 188,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/802419",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101313/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28263,
+      "merge_ids": [],
+      "name_ja": "カデン・ダナ",
+      "name_en": "Caden Dana",
+      "team_id": 25,
+      "birth_date": "2003-12-17",
+      "patterns": [
+        "Caden Dana",
+        "Caden Lawrence Dana",
+        "Dana, Caden",
+        "カデン・ダナ"
+      ],
+      "identity_sources": {
+        "mlb": "702674",
+        "yahoo_mlb": "202101228"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101228/",
+      "evidence": [
+        {
+          "birth_date": "2003-12-17",
+          "height_cm": 193,
+          "hands": "右投左打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/702674",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101228/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 6050,
+      "merge_ids": [
+        27295
+      ],
+      "name_ja": "アンドルー・ボーン",
+      "name_en": "Andrew Vaughn",
+      "team_id": 35,
+      "birth_date": "1998-04-03",
+      "patterns": [
+        "Andrew Clayton Vaughn",
+        "Andrew Vaughn",
+        "Vaughn, Andrew",
+        "アンドルー・ボーン"
+      ],
+      "identity_sources": {
+        "mlb": "683734",
+        "yahoo_mlb": "2101553"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2101553/",
+      "evidence": [
+        {
+          "birth_date": "1998-04-03",
+          "height_cm": 178,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/683734",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2101553/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 6054,
+      "merge_ids": [
+        27900
+      ],
+      "name_ja": "ジョセフ・オルティス",
+      "name_en": "Joey Ortiz",
+      "team_id": 35,
+      "birth_date": "1998-07-14",
+      "patterns": [
+        "Joey Ortiz",
+        "Joseph Anthony Ortiz",
+        "Ortiz, Joey",
+        "ジョセフ・オルティス"
+      ],
+      "identity_sources": {
+        "mlb": "687401",
+        "yahoo_mlb": "2102918"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2102918/",
+      "evidence": [
+        {
+          "birth_date": "1998-07-14",
+          "height_cm": 178,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/687401",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2102918/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28207,
+      "merge_ids": [],
+      "name_ja": "アンドルー・ウォルターズ",
+      "name_en": "Andrew Walters",
+      "team_id": 19,
+      "birth_date": "2000-12-08",
+      "patterns": [
+        "Andrew Walters",
+        "Andrew Wayne Walters",
+        "Walters, Andrew",
+        "アンドルー・ウォルターズ"
+      ],
+      "identity_sources": {
+        "mlb": "689958",
+        "yahoo_mlb": "202101237"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101237/",
+      "evidence": [
+        {
+          "birth_date": "2000-12-08",
+          "height_cm": 193,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/689958",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101237/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 26681,
+      "merge_ids": [],
+      "name_ja": "パブロ・ロペス",
+      "name_en": "Pablo López",
+      "team_id": 22,
+      "birth_date": "1996-03-07",
+      "patterns": [
+        "López, Pablo",
+        "Pablo Jose López",
+        "Pablo López",
+        "パブロ・ロペス"
+      ],
+      "identity_sources": {
+        "mlb": "641154",
+        "yahoo_mlb": "2100706"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2100706/",
+      "evidence": [
+        {
+          "birth_date": "1996-03-07",
+          "height_cm": 193,
+          "hands": "右投左打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/641154",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2100706/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 25638,
+      "merge_ids": [],
+      "name_ja": "イミ・ガルシア",
+      "name_en": "Yimi García",
+      "team_id": 17,
+      "birth_date": "1990-08-18",
+      "patterns": [
+        "García, Yimi",
+        "Yimi García",
+        "イミ・ガルシア"
+      ],
+      "identity_sources": {
+        "mlb": "554340",
+        "yahoo_mlb": "2100944"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2100944/",
+      "evidence": [
+        {
+          "birth_date": "1990-08-18",
+          "height_cm": 185,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/554340",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2100944/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 25831,
+      "merge_ids": [],
+      "name_ja": "クリス・ブライアント",
+      "name_en": "Kris Bryant",
+      "team_id": 39,
+      "birth_date": "1992-01-04",
+      "patterns": [
+        "Bryant, Kris",
+        "Kris Bryant",
+        "Kristopher Lee Bryant",
+        "クリス・ブライアント"
+      ],
+      "identity_sources": {
+        "mlb": "592178",
+        "yahoo_mlb": "2100547"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2100547/",
+      "evidence": [
+        {
+          "birth_date": "1992-01-04",
+          "height_cm": 196,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/592178",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2100547/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 25307,
+      "merge_ids": [],
+      "name_ja": "アンソニー・レンドン",
+      "name_en": "Anthony Rendon",
+      "team_id": 25,
+      "birth_date": "1990-06-06",
+      "patterns": [
+        "Anthony Michael Rendon",
+        "Anthony Rendon",
+        "Rendon, Anthony",
+        "アンソニー・レンドン"
+      ],
+      "identity_sources": {
+        "mlb": "543685",
+        "yahoo_mlb": "2100068"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2100068/",
+      "evidence": [
+        {
+          "birth_date": "1990-06-06",
+          "height_cm": 185,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/543685",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2100068/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 27448,
+      "merge_ids": [],
+      "name_ja": "エドウィン・ウセタ",
+      "name_en": "Edwin Uceta",
+      "team_id": 16,
+      "birth_date": "1998-01-09",
+      "patterns": [
+        "Edwin Daniel Uceta",
+        "Edwin Uceta",
+        "Uceta, Edwin",
+        "エドウィン・ウセタ"
+      ],
+      "identity_sources": {
+        "mlb": "670955",
+        "yahoo_mlb": "2101168"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2101168/",
+      "evidence": [
+        {
+          "birth_date": "1998-01-09",
+          "height_cm": 183,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/670955",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2101168/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 5783,
+      "merge_ids": [
+        24960
+      ],
+      "name_ja": "ダルビッシュ 有",
+      "name_en": "Yu Darvish",
+      "team_id": 41,
+      "birth_date": "1986-08-16",
+      "patterns": [
+        "Darvish, Yu",
+        "Yu Darvish",
+        "ダルビッシュ 有",
+        "ダルビッシュ　有"
+      ],
+      "identity_sources": {
+        "npb": "name:ダルビッシュ有",
+        "mlb": "506433",
+        "yahoo_mlb": "2100954"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2100954/",
+      "evidence": [
+        {
+          "birth_date": "1986-08-16",
+          "height_cm": 196,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/506433",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2100954/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 27810,
+      "merge_ids": [],
+      "name_ja": "ライアン・ペピオ",
+      "name_en": "Ryan Pepiot",
+      "team_id": 16,
+      "birth_date": "1997-08-21",
+      "patterns": [
+        "Pepiot, Ryan",
+        "Ryan Michael Pepiot",
+        "Ryan Pepiot",
+        "ライアン・ペピオ"
+      ],
+      "identity_sources": {
+        "mlb": "686752",
+        "yahoo_mlb": "2102270"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2102270/",
+      "evidence": [
+        {
+          "birth_date": "1997-08-21",
+          "height_cm": 191,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/686752",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2102270/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 27936,
+      "merge_ids": [],
+      "name_ja": "ソーヤー・ギプソンロング",
+      "name_en": "Sawyer Gipson-Long",
+      "team_id": 20,
+      "birth_date": "1997-12-12",
+      "patterns": [
+        "Alec Sawyer Gipson-Long",
+        "Gipson-Long, Sawyer",
+        "Sawyer Gipson-Long",
+        "ソーヤー・ギプソンロング"
+      ],
+      "identity_sources": {
+        "mlb": "687830",
+        "yahoo_mlb": "202101071"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101071/",
+      "evidence": [
+        {
+          "birth_date": "1997-12-12",
+          "height_cm": 193,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/687830",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101071/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28178,
+      "merge_ids": [],
+      "name_ja": "ローガン・ドリスコル",
+      "name_en": "Logan Driscoll",
+      "team_id": 29,
+      "birth_date": "1997-11-03",
+      "patterns": [
+        "Driscoll, Logan",
+        "Logan Driscoll",
+        "Logan Rylee Driscoll",
+        "ローガン・ドリスコル"
+      ],
+      "identity_sources": {
+        "mlb": "686482",
+        "yahoo_mlb": "202100769"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202100769/",
+      "evidence": [
+        {
+          "birth_date": "1997-11-03",
+          "height_cm": 180,
+          "hands": "右投左打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/686482",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202100769/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 27878,
+      "merge_ids": [],
+      "name_ja": "ジョーダン・ウエストバーグ",
+      "name_en": "Jordan Westburg",
+      "team_id": 13,
+      "birth_date": "1999-02-18",
+      "patterns": [
+        "Jordan Cole Westburg",
+        "Jordan Westburg",
+        "Westburg, Jordan",
+        "ジョーダン・ウエストバーグ"
+      ],
+      "identity_sources": {
+        "mlb": "676059",
+        "yahoo_mlb": "2101845"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2101845/",
+      "evidence": [
+        {
+          "birth_date": "1999-02-18",
+          "height_cm": 185,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/676059",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2101845/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 27286,
+      "merge_ids": [],
+      "name_ja": "アキル・バドゥ",
+      "name_en": "Akil Baddoo",
+      "team_id": 35,
+      "birth_date": "1998-08-16",
+      "patterns": [
+        "Akil Baddoo",
+        "Akil Neomon Baddoo",
+        "Baddoo, Akil",
+        "アキル・バドゥ"
+      ],
+      "identity_sources": {
+        "mlb": "668731",
+        "yahoo_mlb": "2101055"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2101055/",
+      "evidence": [
+        {
+          "birth_date": "1998-08-16",
+          "height_cm": 180,
+          "hands": "左投左打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/668731",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2101055/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 27416,
+      "merge_ids": [],
+      "name_ja": "カッター・クロフォード",
+      "name_en": "Kutter Crawford",
+      "team_id": 14,
+      "birth_date": "1996-04-01",
+      "patterns": [
+        "Crawford, Kutter",
+        "Kutter Crawford",
+        "Kutter Martin Crawford",
+        "カッター・クロフォード"
+      ],
+      "identity_sources": {
+        "mlb": "676710",
+        "yahoo_mlb": "202100084"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202100084/",
+      "evidence": [
+        {
+          "birth_date": "1996-04-01",
+          "height_cm": 185,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/676710",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202100084/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 27922,
+      "merge_ids": [],
+      "name_ja": "メーソン・マッコイ",
+      "name_en": "Mason McCoy",
+      "team_id": 41,
+      "birth_date": "1995-03-31",
+      "patterns": [
+        "Mason McCoy",
+        "Mason Steven McCoy",
+        "McCoy, Mason",
+        "メーソン・マッコイ"
+      ],
+      "identity_sources": {
+        "mlb": "669200",
+        "yahoo_mlb": "2101720"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2101720/",
+      "evidence": [
+        {
+          "birth_date": "1995-03-31",
+          "height_cm": 180,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/669200",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2101720/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 32565,
+      "merge_ids": [
+        26042
+      ],
+      "name_ja": "ジョー・マスグローブ",
+      "name_en": "Joe Musgrove",
+      "team_id": 41,
+      "birth_date": "1992-12-04",
+      "patterns": [
+        "Joe Musgrove",
+        "Joseph Anthony Musgrove",
+        "Musgrove, Joe",
+        "ジョー・マスグローブ"
+      ],
+      "identity_sources": {
+        "mlb": "605397",
+        "yahoo_mlb": "2100433"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2100433/",
+      "evidence": [
+        {
+          "birth_date": "1992-12-04",
+          "height_cm": 196,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/605397",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2100433/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28415,
+      "merge_ids": [],
+      "name_ja": "クリスチャン・キャンベル",
+      "name_en": "Kristian Campbell",
+      "team_id": 14,
+      "birth_date": "2002-06-28",
+      "patterns": [
+        "Campbell, Kristian",
+        "Kristian Campbell",
+        "Kristian Eron Campbell",
+        "クリスチャン・キャンベル"
+      ],
+      "identity_sources": {
+        "mlb": "692225",
+        "yahoo_mlb": "202101310"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101310/",
+      "evidence": [
+        {
+          "birth_date": "2002-06-28",
+          "height_cm": 191,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/692225",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101310/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28492,
+      "merge_ids": [],
+      "name_ja": "ピアソン・オール",
+      "name_en": "Pierson Ohl",
+      "team_id": 39,
+      "birth_date": "1999-09-10",
+      "patterns": [
+        "Ohl, Pierson",
+        "Pierson Blaine Ohl",
+        "Pierson Ohl",
+        "ピアソン・オール"
+      ],
+      "identity_sources": {
+        "mlb": "701487",
+        "yahoo_mlb": "202101392"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101392/",
+      "evidence": [
+        {
+          "birth_date": "1999-09-10",
+          "height_cm": 185,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/701487",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101392/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28463,
+      "merge_ids": [],
+      "name_ja": "マイケル・バシル",
+      "name_en": "Mike Vasil",
+      "team_id": 18,
+      "birth_date": "2000-03-19",
+      "patterns": [
+        "Michael  Vasil",
+        "Mike Vasil",
+        "Vasil, Mike",
+        "マイケル・バシル"
+      ],
+      "identity_sources": {
+        "mlb": "678024",
+        "yahoo_mlb": "202101277"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101277/",
+      "evidence": [
+        {
+          "birth_date": "2000-03-19",
+          "height_cm": 196,
+          "hands": "右投左打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/678024",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101277/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28500,
+      "merge_ids": [],
+      "name_ja": "ガナー・ホグランド",
+      "name_en": "Gunnar Hoglund",
+      "team_id": 23,
+      "birth_date": "1999-12-17",
+      "patterns": [
+        "Gunnar Hoglund",
+        "Gunnar Thomas Hoglund",
+        "Hoglund, Gunnar",
+        "ガナー・ホグランド"
+      ],
+      "identity_sources": {
+        "mlb": "680684",
+        "yahoo_mlb": "202101285"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101285/",
+      "evidence": [
+        {
+          "birth_date": "1999-12-17",
+          "height_cm": 193,
+          "hands": "右投左打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/680684",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101285/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28312,
+      "merge_ids": [],
+      "name_ja": "ポーター・ホッジ",
+      "name_en": "Porter Hodge",
+      "team_id": 33,
+      "birth_date": "2001-02-21",
+      "patterns": [
+        "Hodge, Porter",
+        "Porter Dene Hodge",
+        "Porter Hodge",
+        "ポーター・ホッジ"
+      ],
+      "identity_sources": {
+        "mlb": "687863",
+        "yahoo_mlb": "202101111"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101111/",
+      "evidence": [
+        {
+          "birth_date": "2001-02-21",
+          "height_cm": 193,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/687863",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101111/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28482,
+      "merge_ids": [],
+      "name_ja": "ライアン・バーガート",
+      "name_en": "Ryan Bergert",
+      "team_id": 21,
+      "birth_date": "2000-03-08",
+      "patterns": [
+        "Bergert, Ryan",
+        "Ryan Bergert",
+        "Ryan Michael Bergert",
+        "ライアン・バーガート"
+      ],
+      "identity_sources": {
+        "mlb": "686701",
+        "yahoo_mlb": "202101247"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101247/",
+      "evidence": [
+        {
+          "birth_date": "2000-03-08",
+          "height_cm": 185,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/686701",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101247/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28161,
+      "merge_ids": [],
+      "name_ja": "トレイ・スウィーニー",
+      "name_en": "Trey Sweeney",
+      "team_id": 20,
+      "birth_date": "2000-04-24",
+      "patterns": [
+        "Sweeney, Trey",
+        "Trey Sweeney",
+        "Trey Thomas Sweeney",
+        "トレイ・スウィーニー"
+      ],
+      "identity_sources": {
+        "mlb": "700242",
+        "yahoo_mlb": "202100582"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202100582/",
+      "evidence": [
+        {
+          "birth_date": "2000-04-24",
+          "height_cm": 188,
+          "hands": "右投左打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/700242",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202100582/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28480,
+      "merge_ids": [],
+      "name_ja": "ローガン・エバンス",
+      "name_en": "Logan Evans",
+      "team_id": 26,
+      "birth_date": "2001-06-05",
+      "patterns": [
+        "Evans, Logan",
+        "Logan Evans",
+        "Logan Michael Evans",
+        "ローガン・エバンス"
+      ],
+      "identity_sources": {
+        "mlb": "688138",
+        "yahoo_mlb": "202101331"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101331/",
+      "evidence": [
+        {
+          "birth_date": "2001-06-05",
+          "height_cm": 193,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/688138",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101331/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28251,
+      "merge_ids": [],
+      "name_ja": "ドルー・ソープ",
+      "name_en": "Drew Thorpe",
+      "team_id": 18,
+      "birth_date": "2000-10-01",
+      "patterns": [
+        "Andrew Robert Thorpe",
+        "Drew Thorpe",
+        "Thorpe, Drew",
+        "ドルー・ソープ"
+      ],
+      "identity_sources": {
+        "mlb": "689672",
+        "yahoo_mlb": "202100785"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202100785/",
+      "evidence": [
+        {
+          "birth_date": "2000-10-01",
+          "height_cm": 193,
+          "hands": "右投左打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/689672",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202100785/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 26892,
+      "merge_ids": [],
+      "name_ja": "Ａ．Ｊ．パク",
+      "name_en": "A.J. Puk",
+      "team_id": 38,
+      "birth_date": "1995-04-25",
+      "patterns": [
+        "A.J. Puk",
+        "Andrew Jacob Puk",
+        "Puk, A.J.",
+        "Ａ．Ｊ．パク"
+      ],
+      "identity_sources": {
+        "mlb": "640462",
+        "yahoo_mlb": "2100002"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2100002/",
+      "evidence": [
+        {
+          "birth_date": "1995-04-25",
+          "height_cm": 201,
+          "hands": "左投左打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/640462",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2100002/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28381,
+      "merge_ids": [],
+      "name_ja": "クリスチャン・メナ",
+      "name_en": "Cristian Mena",
+      "team_id": 38,
+      "birth_date": "2002-12-21",
+      "patterns": [
+        "Cristian Jose Mena",
+        "Cristian Mena",
+        "Mena, Cristian",
+        "クリスチャン・メナ"
+      ],
+      "identity_sources": {
+        "mlb": "691441",
+        "yahoo_mlb": "202101097"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101097/",
+      "evidence": [
+        {
+          "birth_date": "2002-12-21",
+          "height_cm": 188,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/691441",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101097/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 27445,
+      "merge_ids": [],
+      "name_ja": "タイラー・メギル",
+      "name_en": "Tylor Megill",
+      "team_id": 30,
+      "birth_date": "1995-07-28",
+      "patterns": [
+        "Megill, Tylor",
+        "Tylor J. Megill",
+        "Tylor Megill",
+        "タイラー・メギル"
+      ],
+      "identity_sources": {
+        "mlb": "656731",
+        "yahoo_mlb": "2102412"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2102412/",
+      "evidence": [
+        {
+          "birth_date": "1995-07-28",
+          "height_cm": 201,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/656731",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2102412/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28117,
+      "merge_ids": [],
+      "name_ja": "ギャビン・ストーン",
+      "name_en": "Gavin Stone",
+      "team_id": 40,
+      "birth_date": "1998-10-15",
+      "patterns": [
+        "Gavin Blaine Stone",
+        "Gavin Stone",
+        "Stone, Gavin",
+        "ギャビン・ストーン"
+      ],
+      "identity_sources": {
+        "mlb": "694813",
+        "yahoo_mlb": "202101029"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101029/",
+      "evidence": [
+        {
+          "birth_date": "1998-10-15",
+          "height_cm": 185,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/694813",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101029/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 25965,
+      "merge_ids": [],
+      "name_ja": "ホセ・ベリオス",
+      "name_en": "José Berríos",
+      "team_id": 17,
+      "birth_date": "1994-05-27",
+      "patterns": [
+        "Berríos, José",
+        "José Berríos",
+        "José Orlando Berríos",
+        "ホセ・ベリオス"
+      ],
+      "identity_sources": {
+        "mlb": "621244",
+        "yahoo_mlb": "2100502"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2100502/",
+      "evidence": [
+        {
+          "birth_date": "1994-05-27",
+          "height_cm": 183,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/621244",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2100502/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28059,
+      "merge_ids": [],
+      "name_ja": "アンドルー・ソールフランク",
+      "name_en": "Andrew Saalfrank",
+      "team_id": 38,
+      "birth_date": "1997-08-18",
+      "patterns": [
+        "Andrew Jacob Saalfrank",
+        "Andrew Saalfrank",
+        "Saalfrank, Andrew",
+        "アンドルー・ソールフランク"
+      ],
+      "identity_sources": {
+        "mlb": "685314",
+        "yahoo_mlb": "202100699"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202100699/",
+      "evidence": [
+        {
+          "birth_date": "1997-08-18",
+          "height_cm": 191,
+          "hands": "左投左打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/685314",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202100699/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 26900,
+      "merge_ids": [],
+      "name_ja": "ブラスダー・グラテロル",
+      "name_en": "Brusdar Graterol",
+      "team_id": 40,
+      "birth_date": "1998-08-26",
+      "patterns": [
+        "Brusdar Graterol",
+        "Brusdar Javier Graterol",
+        "Graterol, Brusdar",
+        "ブラスダー・グラテロル"
+      ],
+      "identity_sources": {
+        "mlb": "660813",
+        "yahoo_mlb": "2100136"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2100136/",
+      "evidence": [
+        {
+          "birth_date": "1998-08-26",
+          "height_cm": 185,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/660813",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2100136/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 27653,
+      "merge_ids": [],
+      "name_ja": "ロニー・エンリケス",
+      "name_en": "Ronny Henriquez",
+      "team_id": 29,
+      "birth_date": "2000-06-20",
+      "patterns": [
+        "Henriquez, Ronny",
+        "Ronny  Henriquez",
+        "Ronny Henriquez",
+        "ロニー・エンリケス"
+      ],
+      "identity_sources": {
+        "mlb": "678692",
+        "yahoo_mlb": "202100131"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202100131/",
+      "evidence": [
+        {
+          "birth_date": "2000-06-20",
+          "height_cm": 178,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/678692",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202100131/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 26212,
+      "merge_ids": [],
+      "name_ja": "ロバート・スティーブンソン",
+      "name_en": "Robert Stephenson",
+      "team_id": 25,
+      "birth_date": "1993-02-24",
+      "patterns": [
+        "Robert Stephenson",
+        "Robert William Stephenson",
+        "Stephenson, Robert",
+        "ロバート・スティーブンソン"
+      ],
+      "identity_sources": {
+        "mlb": "596112",
+        "yahoo_mlb": "2100758"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2100758/",
+      "evidence": [
+        {
+          "birth_date": "1993-02-24",
+          "height_cm": 191,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/596112",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2100758/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 27924,
+      "merge_ids": [],
+      "name_ja": "プリランダー・ベロア",
+      "name_en": "Prelander Berroa",
+      "team_id": 18,
+      "birth_date": "2000-04-18",
+      "patterns": [
+        "Berroa, Prelander",
+        "Prelander Berroa",
+        "プリランダー・ベロア"
+      ],
+      "identity_sources": {
+        "mlb": "672860",
+        "yahoo_mlb": "202100437"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202100437/",
+      "evidence": [
+        {
+          "birth_date": "2000-04-18",
+          "height_cm": 180,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/672860",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202100437/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28166,
+      "merge_ids": [],
+      "name_ja": "ブルックス・ボールドウィン",
+      "name_en": "Brooks Baldwin",
+      "team_id": 18,
+      "birth_date": "2000-08-15",
+      "patterns": [
+        "Baldwin, Brooks",
+        "Brooks Baldwin",
+        "Riley Brooks Baldwin",
+        "ブルックス・ボールドウィン"
+      ],
+      "identity_sources": {
+        "mlb": "681460",
+        "yahoo_mlb": "202101192"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101192/",
+      "evidence": [
+        {
+          "birth_date": "2000-08-15",
+          "height_cm": 185,
+          "hands": "右投両打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/681460",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101192/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 27643,
+      "merge_ids": [],
+      "name_ja": "ボーデン・フランシス",
+      "name_en": "Bowden Francis",
+      "team_id": 17,
+      "birth_date": "1996-04-22",
+      "patterns": [
+        "Bowden Francis",
+        "Francis, Bowden",
+        "Robert Bowden Francis",
+        "ボーデン・フランシス"
+      ],
+      "identity_sources": {
+        "mlb": "670102",
+        "yahoo_mlb": "202100032"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202100032/",
+      "evidence": [
+        {
+          "birth_date": "1996-04-22",
+          "height_cm": 196,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/670102",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202100032/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28373,
+      "merge_ids": [],
+      "name_ja": "アダム・メーザー",
+      "name_en": "Adam Mazur",
+      "team_id": 29,
+      "birth_date": "2001-04-20",
+      "patterns": [
+        "Adam Mazur",
+        "Adam McKinnlee Mazur",
+        "Mazur, Adam",
+        "アダム・メーザー"
+      ],
+      "identity_sources": {
+        "mlb": "800049",
+        "yahoo_mlb": "202101170"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101170/",
+      "evidence": [
+        {
+          "birth_date": "2001-04-20",
+          "height_cm": 188,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/800049",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101170/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 27921,
+      "merge_ids": [],
+      "name_ja": "ジェームズ・マッカーサー",
+      "name_en": "James McArthur",
+      "team_id": 21,
+      "birth_date": "1996-12-11",
+      "patterns": [
+        "James L. McArthur",
+        "James McArthur",
+        "McArthur, James",
+        "ジェームズ・マッカーサー"
+      ],
+      "identity_sources": {
+        "mlb": "663704",
+        "yahoo_mlb": "202100127"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202100127/",
+      "evidence": [
+        {
+          "birth_date": "1996-12-11",
+          "height_cm": 201,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/663704",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202100127/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28211,
+      "merge_ids": [],
+      "name_ja": "リチャード・フィッツ",
+      "name_en": "Richard Fitts",
+      "team_id": 37,
+      "birth_date": "1999-12-17",
+      "patterns": [
+        "Fitts, Richard",
+        "Richard Fitts",
+        "Richard Logan Fitts",
+        "リチャード・フィッツ"
+      ],
+      "identity_sources": {
+        "mlb": "690916",
+        "yahoo_mlb": "202100623"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202100623/",
+      "evidence": [
+        {
+          "birth_date": "1999-12-17",
+          "height_cm": 191,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/690916",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202100623/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 27458,
+      "merge_ids": [],
+      "name_ja": "ジャスティン・スティール",
+      "name_en": "Justin Steele",
+      "team_id": 33,
+      "birth_date": "1995-07-11",
+      "patterns": [
+        "Justin Carl Steele",
+        "Justin Steele",
+        "Steele, Justin",
+        "ジャスティン・スティール"
+      ],
+      "identity_sources": {
+        "mlb": "657006",
+        "yahoo_mlb": "2100521"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2100521/",
+      "evidence": [
+        {
+          "birth_date": "1995-07-11",
+          "height_cm": 188,
+          "hands": "左投左打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/657006",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2100521/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 27948,
+      "merge_ids": [],
+      "name_ja": "リース・オルソン",
+      "name_en": "Reese Olson",
+      "team_id": 20,
+      "birth_date": "1999-07-31",
+      "patterns": [
+        "Olson, Reese",
+        "Reese Olson",
+        "William Reese Olson",
+        "リース・オルソン"
+      ],
+      "identity_sources": {
+        "mlb": "681857",
+        "yahoo_mlb": "202100495"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202100495/",
+      "evidence": [
+        {
+          "birth_date": "1999-07-31",
+          "height_cm": 185,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/681857",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202100495/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28438,
+      "merge_ids": [],
+      "name_ja": "ジェーコブ・メルトン",
+      "name_en": "Jacob Melton",
+      "team_id": 16,
+      "birth_date": "2000-09-07",
+      "patterns": [
+        "Jacob Melton",
+        "Jacob William Melton",
+        "Melton, Jacob",
+        "ジェーコブ・メルトン"
+      ],
+      "identity_sources": {
+        "mlb": "689200",
+        "yahoo_mlb": "202100868"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202100868/",
+      "evidence": [
+        {
+          "birth_date": "2000-09-07",
+          "height_cm": 188,
+          "hands": "左投左打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/689200",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202100868/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28358,
+      "merge_ids": [],
+      "name_ja": "ヘイデン・バードソング",
+      "name_en": "Hayden Birdsong",
+      "team_id": 42,
+      "birth_date": "2001-08-30",
+      "patterns": [
+        "Birdsong, Hayden",
+        "Hayden Birdsong",
+        "ヘイデン・バードソング"
+      ],
+      "identity_sources": {
+        "mlb": "806185",
+        "yahoo_mlb": "202101183"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101183/",
+      "evidence": [
+        {
+          "birth_date": "2001-08-30",
+          "height_cm": 196,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/806185",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101183/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28254,
+      "merge_ids": [],
+      "name_ja": "ベイリー・ホーン",
+      "name_en": "Bailey Horn",
+      "team_id": 20,
+      "birth_date": "1998-01-15",
+      "patterns": [
+        "Bailey Christian Tant Horn",
+        "Bailey Horn",
+        "Horn, Bailey",
+        "ベイリー・ホーン"
+      ],
+      "identity_sources": {
+        "mlb": "690544",
+        "yahoo_mlb": "202100831"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202100831/",
+      "evidence": [
+        {
+          "birth_date": "1998-01-15",
+          "height_cm": 188,
+          "hands": "左投左打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/690544",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202100831/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28252,
+      "merge_ids": [],
+      "name_ja": "カイ・ブッシュ",
+      "name_en": "Ky Bush",
+      "team_id": 18,
+      "birth_date": "1999-11-12",
+      "patterns": [
+        "Bush, Ky",
+        "Ky Bush",
+        "Kyler Spencer Bush",
+        "カイ・ブッシュ"
+      ],
+      "identity_sources": {
+        "mlb": "681066",
+        "yahoo_mlb": "202101206"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101206/",
+      "evidence": [
+        {
+          "birth_date": "1999-11-12",
+          "height_cm": 198,
+          "hands": "左投左打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/681066",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101206/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28546,
+      "merge_ids": [],
+      "name_ja": "マキシモ・アコスタ",
+      "name_en": "Maximo Acosta",
+      "team_id": 29,
+      "birth_date": "2002-10-29",
+      "patterns": [
+        "Acosta, Maximo",
+        "Maximo Acosta",
+        "Maximo Douglas Jose Acosta",
+        "マキシモ・アコスタ"
+      ],
+      "identity_sources": {
+        "mlb": "691185",
+        "yahoo_mlb": "202101254"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101254/",
+      "evidence": [
+        {
+          "birth_date": "2002-10-29",
+          "height_cm": 180,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/691185",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101254/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28617,
+      "merge_ids": [],
+      "name_ja": "マッケード・ブラウン",
+      "name_en": "McCade Brown",
+      "team_id": 39,
+      "birth_date": "2000-08-15",
+      "patterns": [
+        "Brown, McCade",
+        "McCade Brown",
+        "McCade David Brown",
+        "マッケード・ブラウン"
+      ],
+      "identity_sources": {
+        "mlb": "685326",
+        "yahoo_mlb": "202101410"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101410/",
+      "evidence": [
+        {
+          "birth_date": "2000-08-15",
+          "height_cm": 198,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/685326",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101410/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28257,
+      "merge_ids": [],
+      "name_ja": "ジェーク・ブロス",
+      "name_en": "Jake Bloss",
+      "team_id": 17,
+      "birth_date": "2001-06-23",
+      "patterns": [
+        "Bloss, Jake",
+        "Jake Bloss",
+        "John Bloss",
+        "ジェーク・ブロス"
+      ],
+      "identity_sources": {
+        "mlb": "814005",
+        "yahoo_mlb": "202101178"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101178/",
+      "evidence": [
+        {
+          "birth_date": "2001-06-23",
+          "height_cm": 191,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/814005",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101178/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28116,
+      "merge_ids": [],
+      "name_ja": "コリン・セルビー",
+      "name_en": "Colin Selby",
+      "team_id": 13,
+      "birth_date": "1997-10-24",
+      "patterns": [
+        "Colin Selby",
+        "Selby, Colin",
+        "コリン・セルビー"
+      ],
+      "identity_sources": {
+        "mlb": "681882",
+        "yahoo_mlb": "202100458"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202100458/",
+      "evidence": [
+        {
+          "birth_date": "1997-10-24",
+          "height_cm": 188,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/681882",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202100458/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 25047,
+      "merge_ids": [],
+      "name_ja": "シェルビー・ミラー",
+      "name_en": "Shelby Miller",
+      "team_id": 33,
+      "birth_date": "1990-10-10",
+      "patterns": [
+        "Miller, Shelby",
+        "Shelby Charles Miller",
+        "Shelby Miller",
+        "シェルビー・ミラー"
+      ],
+      "identity_sources": {
+        "mlb": "571946",
+        "yahoo_mlb": "2101547"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2101547/",
+      "evidence": [
+        {
+          "birth_date": "1990-10-10",
+          "height_cm": 191,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/571946",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2101547/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 26245,
+      "merge_ids": [],
+      "name_ja": "アンソニー・サンタンダー",
+      "name_en": "Anthony Santander",
+      "team_id": 17,
+      "birth_date": "1994-10-19",
+      "patterns": [
+        "Anthony Roger Santander",
+        "Anthony Santander",
+        "Santander, Anthony",
+        "アンソニー・サンタンダー"
+      ],
+      "identity_sources": {
+        "mlb": "623993",
+        "yahoo_mlb": "2100070"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2100070/",
+      "evidence": [
+        {
+          "birth_date": "1994-10-19",
+          "height_cm": 185,
+          "hands": "右投両打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/623993",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2100070/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 27978,
+      "merge_ids": [],
+      "name_ja": "ブランドン・ウォルター",
+      "name_en": "Brandon Walter",
+      "team_id": 24,
+      "birth_date": "1996-09-08",
+      "patterns": [
+        "Brandon Lee Walter",
+        "Brandon Walter",
+        "Walter, Brandon",
+        "ブランドン・ウォルター"
+      ],
+      "identity_sources": {
+        "mlb": "687888",
+        "yahoo_mlb": "202100488"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202100488/",
+      "evidence": [
+        {
+          "birth_date": "1996-09-08",
+          "height_cm": 188,
+          "hands": "左投左打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/687888",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202100488/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 27847,
+      "merge_ids": [],
+      "name_ja": "ブライアン・ホーイング",
+      "name_en": "Bryan Hoeing",
+      "team_id": 41,
+      "birth_date": "1996-10-19",
+      "patterns": [
+        "Bryan Hoeing",
+        "Bryan Jerome Hoeing",
+        "Hoeing, Bryan",
+        "ブライアン・ホーイング"
+      ],
+      "identity_sources": {
+        "mlb": "663773",
+        "yahoo_mlb": "202100411"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202100411/",
+      "evidence": [
+        {
+          "birth_date": "1996-10-19",
+          "height_cm": 198,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/663773",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202100411/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28464,
+      "merge_ids": [],
+      "name_ja": "ウィクルマン・ゴンサレス",
+      "name_en": "Wikelman González",
+      "team_id": 29,
+      "birth_date": "2002-03-25",
+      "patterns": [
+        "González, Wikelman",
+        "Wikelman David González",
+        "Wikelman González",
+        "ウィクルマン・ゴンサレス"
+      ],
+      "identity_sources": {
+        "mlb": "682790",
+        "yahoo_mlb": "202101088"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101088/",
+      "evidence": [
+        {
+          "birth_date": "2002-03-25",
+          "height_cm": 183,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/682790",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101088/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28337,
+      "merge_ids": [],
+      "name_ja": "スペンサー・シュウェレンバック",
+      "name_en": "Spencer Schwellenbach",
+      "team_id": 28,
+      "birth_date": "2000-05-31",
+      "patterns": [
+        "Schwellenbach, Spencer",
+        "Spencer Drew Schwellenbach",
+        "Spencer Schwellenbach",
+        "スペンサー・シュウェレンバック"
+      ],
+      "identity_sources": {
+        "mlb": "680885",
+        "yahoo_mlb": "202101169"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101169/",
+      "evidence": [
+        {
+          "birth_date": "2000-05-31",
+          "height_cm": 185,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/680885",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101169/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 25988,
+      "merge_ids": [],
+      "name_ja": "タイラー・オースティン",
+      "name_en": "Tyler Austin",
+      "team_id": 33,
+      "birth_date": "1991-09-06",
+      "patterns": [
+        "Austin, Tyler",
+        "Christopher Tyler Austin",
+        "Tyler Austin",
+        "タイラー・オースティン"
+      ],
+      "identity_sources": {
+        "mlb": "592122",
+        "yahoo_mlb": "202101459"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101459/",
+      "evidence": [
+        {
+          "birth_date": "1991-09-06",
+          "height_cm": 188,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/592122",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101459/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 27998,
+      "merge_ids": [],
+      "name_ja": "ヨハン・ロハス",
+      "name_en": "Johan Rojas",
+      "team_id": 31,
+      "birth_date": "2000-08-14",
+      "patterns": [
+        "Johan Rojas",
+        "Johan Stiven Rojas",
+        "Rojas, Johan",
+        "ヨハン・ロハス"
+      ],
+      "identity_sources": {
+        "mlb": "679032",
+        "yahoo_mlb": "2101852"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2101852/",
+      "evidence": [
+        {
+          "birth_date": "2000-08-14",
+          "height_cm": 180,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/679032",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2101852/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28225,
+      "merge_ids": [],
+      "name_ja": "ミケル・オタニェス",
+      "name_en": "Michel Otañez",
+      "team_id": 27,
+      "birth_date": "1997-07-03",
+      "patterns": [
+        "Michel Otañez",
+        "Otañez, Michel",
+        "ミケル・オタニェス"
+      ],
+      "identity_sources": {
+        "mlb": "671305",
+        "yahoo_mlb": "202101033"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101033/",
+      "evidence": [
+        {
+          "birth_date": "1997-07-03",
+          "height_cm": 193,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/671305",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101033/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 26354,
+      "merge_ids": [],
+      "name_ja": "ジョー・ヒメネス",
+      "name_en": "Joe Jiménez",
+      "team_id": 28,
+      "birth_date": "1995-01-17",
+      "patterns": [
+        "Jiménez, Joe",
+        "Joe Alexander Jiménez",
+        "Joe Jiménez",
+        "ジョー・ヒメネス"
+      ],
+      "identity_sources": {
+        "mlb": "641729",
+        "yahoo_mlb": "2100431"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2100431/",
+      "evidence": [
+        {
+          "birth_date": "1995-01-17",
+          "height_cm": 191,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/641729",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2100431/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28248,
+      "merge_ids": [],
+      "name_ja": "デービッド・フェスタ",
+      "name_en": "David Festa",
+      "team_id": 22,
+      "birth_date": "2000-03-08",
+      "patterns": [
+        "David  Festa",
+        "David Festa",
+        "Festa, David",
+        "デービッド・フェスタ"
+      ],
+      "identity_sources": {
+        "mlb": "701581",
+        "yahoo_mlb": "202101184"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101184/",
+      "evidence": [
+        {
+          "birth_date": "2000-03-08",
+          "height_cm": 198,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/701581",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202101184/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 27600,
+      "merge_ids": [],
+      "name_ja": "トリストン・カサス",
+      "name_en": "Triston Casas",
+      "team_id": 14,
+      "birth_date": "2000-01-15",
+      "patterns": [
+        "Casas, Triston",
+        "Triston Casas",
+        "Triston Ray Casas",
+        "トリストン・カサス"
+      ],
+      "identity_sources": {
+        "mlb": "671213",
+        "yahoo_mlb": "2102131"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2102131/",
+      "evidence": [
+        {
+          "birth_date": "2000-01-15",
+          "height_cm": 193,
+          "hands": "右投左打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/671213",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2102131/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 28351,
+      "merge_ids": [],
+      "name_ja": "ランディ・ロドリゲス",
+      "name_en": "Randy Rodríguez",
+      "team_id": 42,
+      "birth_date": "1999-09-05",
+      "patterns": [
+        "Randy Alberto Rodríguez",
+        "Randy Rodríguez",
+        "Rodríguez, Randy",
+        "ランディ・ロドリゲス"
+      ],
+      "identity_sources": {
+        "mlb": "678495",
+        "yahoo_mlb": "202100120"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202100120/",
+      "evidence": [
+        {
+          "birth_date": "1999-09-05",
+          "height_cm": 183,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/678495",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202100120/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 26955,
+      "merge_ids": [],
+      "name_ja": "ギャビン・ラックス",
+      "name_en": "Gavin Lux",
+      "team_id": 16,
+      "birth_date": "1997-11-23",
+      "patterns": [
+        "Gavin Lux",
+        "Gavin Thomas Lux",
+        "Lux, Gavin",
+        "ギャビン・ラックス"
+      ],
+      "identity_sources": {
+        "mlb": "666158",
+        "yahoo_mlb": "2100329"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2100329/",
+      "evidence": [
+        {
+          "birth_date": "1997-11-23",
+          "height_cm": 180,
+          "hands": "右投左打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/666158",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2100329/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 27656,
+      "merge_ids": [],
+      "name_ja": "ジョセフ・ウエンツ",
+      "name_en": "Joey Wentz",
+      "team_id": 28,
+      "birth_date": "1997-10-06",
+      "patterns": [
+        "Joey Wentz",
+        "Joseph Barrett Wentz",
+        "Wentz, Joey",
+        "ジョセフ・ウエンツ"
+      ],
+      "identity_sources": {
+        "mlb": "666214",
+        "yahoo_mlb": "2101061"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/2101061/",
+      "evidence": [
+        {
+          "birth_date": "1997-10-06",
+          "height_cm": 196,
+          "hands": "左投左打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/666214",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/2101061/"
+        }
+      ]
+    },
+    {
+      "canonical_id": 26915,
+      "merge_ids": [],
+      "name_ja": "リード・ギャレット",
+      "name_en": "Reed Garrett",
+      "team_id": 30,
+      "birth_date": "1993-01-02",
+      "patterns": [
+        "Garrett, Reed",
+        "Reed Garrett",
+        "リード・ギャレット"
+      ],
+      "identity_sources": {
+        "mlb": "657585",
+        "yahoo_mlb": "202100372"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202100372/",
+      "evidence": [
+        {
+          "birth_date": "1993-01-02",
+          "height_cm": 188,
+          "hands": "右投右打",
+          "official_source": "https://statsapi.mlb.com/api/v1/people/657585",
+          "japanese_source": "https://baseball.yahoo.co.jp/mlb/player/202100372/"
+        }
+      ]
+    }
+  ],
+  "review": [
+    {
+      "yahoo_id": "202101514",
+      "name": "リード・トリンブル",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "202101503",
+      "name": "ヤデル・アレイナモ",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "202101494",
+      "name": "ヨルマン・ゴメス",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "202101496",
+      "name": "ジェーク・ミラー",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "202101498",
+      "name": "タイロン・リランソ",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "202100827",
+      "name": "ヘンドリー・メンデス",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "202101489",
+      "name": "ベン・クドルナ",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "202101488",
+      "name": "スティーブン・ゾバック",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "202101246",
+      "name": "ヘンリー・バエズ",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "202101481",
+      "name": "ブレーデン・ネット",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "2102360",
+      "name": "ロビンソン・オルティス",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "202101477",
+      "name": "デービッド・ダバリョ",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "202101478",
+      "name": "レアンドロ・ロペス",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "202101261",
+      "name": "モイセス・チャセ",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "202101242",
+      "name": "ライアン・グスト",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": [
+        665947,
+        687473
+      ]
+    },
+    {
+      "yahoo_id": "202103210",
+      "name": "アイバ・アーケット",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "202101265",
+      "name": "テコア・ロビー",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "202100279",
+      "name": "レオ・バルカザール",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "202100294",
+      "name": "カルロス・ホルヘ",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "202103199",
+      "name": "ザック・モーガン",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "202101454",
+      "name": "ディラン・レイ",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "202101443",
+      "name": "ロナン・コップ",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "2100402",
+      "name": "ジェーソン・アダム",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": [
+        592094,
+        593619
+      ]
+    },
+    {
+      "yahoo_id": "202101445",
+      "name": "ギャレット・ホーキンズ",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    },
+    {
+      "yahoo_id": "202101450",
+      "name": "ＲＪ・ペティット",
+      "reason": "bilingual evidence incomplete/ambiguous",
+      "candidates": []
+    }
+  ]
+}

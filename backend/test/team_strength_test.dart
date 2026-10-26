@@ -101,10 +101,13 @@ class _ReadConnection implements Connection {
     }
     final sql = '${invocation.positionalArguments.first}'.trim();
     expect(sql, startsWith('SELECT'));
-    expect(sql, contains('FROM t_team_strength'));
-    expect(invocation.namedArguments[#parameters], [2026, 'npb']);
     calls++;
     final schema = ResultSchema([]);
+    if (sql.contains('FROM t_game') || sql.contains('FROM m_player')) {
+      return Future<Result>.value(Result(rows: [], affectedRows: 0, schema: schema));
+    }
+    expect(sql, contains('FROM t_team_strength'));
+    expect(invocation.namedArguments[#parameters], [2026, 'npb']);
     return Future<Result>.value(Result(rows: [
       ResultRow(values: [
         {'id_team': 7, 'name_team': 'ソフトバンク'}
@@ -142,7 +145,7 @@ void main() {
   test('戦力の初期要求は保存済みテーブルをSELECTするだけ', () async {
     final conn = _ReadConnection();
     final result = await TeamStrength.read(conn, org: 'npb', year: 2026);
-    expect(conn.calls, 1);
+    expect(conn.calls, 3); // 保存済み一覧・開幕日・故障情報の読み取り
     expect(result['org'], 'npb');
     expect((result['teams'] as List).single['name_team'], 'ソフトバンク');
   });

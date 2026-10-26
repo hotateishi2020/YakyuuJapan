@@ -29,31 +29,31 @@ void main() {
 
   testWidgets('代打代走は独立グリッドで切り替え、守備位置に混在しない', (tester) async {
     await tester.pumpWidget(const MaterialApp(
-        home: const Scaffold(
-            body: const StrengthRegularGrid(teams: const [
+        home: Scaffold(
+            body: StrengthRegularGrid(teams: [
       {
         'name_team': '球団A',
-        'positions': const [
+        'positions': [
           {
             'slot': 'C',
             'total': 10,
-            'players': const [
+            'players': [
               {'player_key': 'c', 'name': '捕手選手', 'count': 9}
             ]
           }
         ],
-        'substitutions': const [
+        'substitutions': [
           {
             'slot': 'PH',
             'total': 10,
-            'players': const [
+            'players': [
               {'player_key': 'ph', 'name': '代打選手', 'bats': '左', 'count': 8}
             ]
           },
           {
             'slot': 'PR',
             'total': 10,
-            'players': const [
+            'players': [
               {'player_key': 'pr', 'name': '代走選手', 'count': 6}
             ]
           },

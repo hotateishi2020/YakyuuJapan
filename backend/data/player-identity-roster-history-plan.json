@@ -1,0 +1,1492 @@
+{
+  "generated_at": "2026-10-23T22:58:24.848108+00:00",
+  "groups": [
+    {
+      "canonical_id": 4844,
+      "merge_ids": [
+        28923,
+        1327
+      ],
+      "name_ja": "中村　稔弥",
+      "name_en": null,
+      "team_id": 7,
+      "birth_date": "1996-07-08",
+      "patterns": [
+        "中村　稔弥",
+        "中村稔弥"
+      ],
+      "identity_sources": {
+        "npb": "01205138"
+      },
+      "url": "https://npb.jp/bis/players/01205138.html",
+      "evidence": [
+        {
+          "team_id": 7,
+          "name": "中村　稔弥",
+          "npb_id": "01205138",
+          "url": "https://npb.jp/bis/players/01205138.html",
+          "birth_date": "1996-07-08",
+          "source": "https://npb.jp/bis/teams/rst_h.html"
+        },
+        {
+          "team_id": 12,
+          "name": "中村　稔弥",
+          "npb_id": "01205138",
+          "url": "https://npb.jp/bis/players/01205138.html",
+          "birth_date": "1996-07-08",
+          "source": "https://npb.jp/bis/players/01205138.html",
+          "verified_previous_club": "ロッテ"
+        },
+        {
+          "team_id": 12,
+          "name": "中村　稔弥",
+          "npb_id": "01205138",
+          "url": "https://npb.jp/bis/players/01205138.html",
+          "birth_date": "1996-07-08",
+          "source": "https://npb.jp/bis/players/01205138.html",
+          "verified_previous_club": "ロッテ"
+        }
+      ]
+    },
+    {
+      "canonical_id": 1005,
+      "merge_ids": [
+        573,
+        28901
+      ],
+      "name_ja": "秋広　優人",
+      "name_en": null,
+      "team_id": 7,
+      "birth_date": "2002-09-17",
+      "patterns": [
+        "秋広　優人",
+        "秋広優人"
+      ],
+      "identity_sources": {
+        "npb": "71175153"
+      },
+      "url": "https://npb.jp/bis/players/71175153.html",
+      "evidence": [
+        {
+          "team_id": 7,
+          "name": "秋広　優人",
+          "npb_id": "71175153",
+          "url": "https://npb.jp/bis/players/71175153.html",
+          "birth_date": "2002-09-17",
+          "source": "https://npb.jp/bis/teams/rst_h.html"
+        },
+        {
+          "team_id": 1,
+          "name": "秋広　優人",
+          "npb_id": "71175153",
+          "url": "https://npb.jp/bis/players/71175153.html",
+          "birth_date": "2002-09-17",
+          "source": "https://npb.jp/bis/players/71175153.html",
+          "verified_previous_club": "巨人"
+        }
+      ]
+    },
+    {
+      "canonical_id": 4925,
+      "merge_ids": [
+        28904,
+        548
+      ],
+      "name_ja": "菊地　大稀",
+      "name_en": null,
+      "team_id": 9,
+      "birth_date": "1999-06-02",
+      "patterns": [
+        "菊地　大稀",
+        "菊地大稀"
+      ],
+      "identity_sources": {
+        "npb": "31735155"
+      },
+      "url": "https://npb.jp/bis/players/31735155.html",
+      "evidence": [
+        {
+          "team_id": 9,
+          "name": "菊地　大稀",
+          "npb_id": "31735155",
+          "url": "https://npb.jp/bis/players/31735155.html",
+          "birth_date": "1999-06-02",
+          "source": "https://npb.jp/bis/teams/rst_f.html"
+        },
+        {
+          "team_id": 1,
+          "name": "菊地　大稀",
+          "npb_id": "31735155",
+          "url": "https://npb.jp/bis/players/31735155.html",
+          "birth_date": "1999-06-02",
+          "source": "https://npb.jp/bis/players/31735155.html",
+          "verified_previous_club": "巨人"
+        }
+      ]
+    },
+    {
+      "canonical_id": 3046,
+      "merge_ids": [
+        26230
+      ],
+      "name_ja": "有原　航平",
+      "name_en": null,
+      "team_id": 9,
+      "birth_date": "1992-08-11",
+      "patterns": [
+        "Kohei Arihara",
+        "有原　航平",
+        "有原航平"
+      ],
+      "identity_sources": {
+        "mlb": "685503",
+        "npb": "51155130"
+      },
+      "url": "https://npb.jp/bis/players/51155130.html",
+      "evidence": [
+        {
+          "team_id": 9,
+          "name": "有原　航平",
+          "npb_id": "51155130",
+          "url": "https://npb.jp/bis/players/51155130.html",
+          "birth_date": "1992-08-11",
+          "source": "https://npb.jp/bis/teams/rst_f.html"
+        }
+      ]
+    },
+    {
+      "canonical_id": 4840,
+      "merge_ids": [
+        28908,
+        1143
+      ],
+      "name_ja": "石井　一成",
+      "name_en": null,
+      "team_id": 8,
+      "birth_date": "1994-05-06",
+      "patterns": [
+        "石井　一成",
+        "石井一成"
+      ],
+      "identity_sources": {
+        "npb": "21125134"
+      },
+      "url": "https://npb.jp/bis/players/21125134.html",
+      "evidence": [
+        {
+          "team_id": 8,
+          "name": "石井　一成",
+          "npb_id": "21125134",
+          "url": "https://npb.jp/bis/players/21125134.html",
+          "birth_date": "1994-05-06",
+          "source": "https://npb.jp/bis/teams/rst_l.html"
+        },
+        {
+          "team_id": 9,
+          "name": "石井　一成",
+          "npb_id": "21125134",
+          "url": "https://npb.jp/bis/players/21125134.html",
+          "birth_date": "1994-05-06",
+          "source": "https://npb.jp/bis/players/21125134.html",
+          "verified_previous_club": "日本ハム"
+        },
+        {
+          "team_id": 9,
+          "name": "石井　一成",
+          "npb_id": "21125134",
+          "url": "https://npb.jp/bis/players/21125134.html",
+          "birth_date": "1994-05-06",
+          "source": "https://npb.jp/bis/players/21125134.html",
+          "verified_previous_club": "日本ハム"
+        }
+      ]
+    },
+    {
+      "canonical_id": 4905,
+      "merge_ids": [
+        28915,
+        1228
+      ],
+      "name_ja": "茶野　篤政",
+      "name_en": null,
+      "team_id": 8,
+      "birth_date": "1999-08-04",
+      "patterns": [
+        "茶野　篤政",
+        "茶野篤政"
+      ],
+      "identity_sources": {
+        "npb": "61065157"
+      },
+      "url": "https://npb.jp/bis/players/61065157.html",
+      "evidence": [
+        {
+          "team_id": 8,
+          "name": "茶野　篤政",
+          "npb_id": "61065157",
+          "url": "https://npb.jp/bis/players/61065157.html",
+          "birth_date": "1999-08-04",
+          "source": "https://npb.jp/bis/teams/rst_l.html"
+        },
+        {
+          "team_id": 10,
+          "name": "茶野　篤政",
+          "npb_id": "61065157",
+          "url": "https://npb.jp/bis/players/61065157.html",
+          "birth_date": "1999-08-04",
+          "source": "https://npb.jp/bis/players/61065157.html",
+          "verified_previous_club": "オリックス"
+        },
+        {
+          "team_id": 10,
+          "name": "茶野　篤政",
+          "npb_id": "61065157",
+          "url": "https://npb.jp/bis/players/61065157.html",
+          "birth_date": "1999-08-04",
+          "source": "https://npb.jp/bis/players/61065157.html",
+          "verified_previous_club": "オリックス"
+        }
+      ]
+    },
+    {
+      "canonical_id": 4850,
+      "merge_ids": [
+        1081,
+        28911
+      ],
+      "name_ja": "平沼　翔太",
+      "name_en": null,
+      "team_id": 10,
+      "birth_date": "1997-08-16",
+      "patterns": [
+        "平沼　翔太",
+        "平沼翔太"
+      ],
+      "identity_sources": {
+        "npb": "01605132"
+      },
+      "url": "https://npb.jp/bis/players/01605132.html",
+      "evidence": [
+        {
+          "team_id": 10,
+          "name": "平沼　翔太",
+          "npb_id": "01605132",
+          "url": "https://npb.jp/bis/players/01605132.html",
+          "birth_date": "1997-08-16",
+          "source": "https://npb.jp/bis/teams/rst_b.html"
+        },
+        {
+          "team_id": 8,
+          "name": "平沼　翔太",
+          "npb_id": "01605132",
+          "url": "https://npb.jp/bis/players/01605132.html",
+          "birth_date": "1997-08-16",
+          "source": "https://npb.jp/bis/players/01605132.html",
+          "verified_previous_club": "西武"
+        },
+        {
+          "team_id": 8,
+          "name": "平沼　翔太",
+          "npb_id": "01605132",
+          "url": "https://npb.jp/bis/players/01605132.html",
+          "birth_date": "1997-08-16",
+          "source": "https://npb.jp/bis/players/01605132.html",
+          "verified_previous_club": "西武"
+        }
+      ]
+    },
+    {
+      "canonical_id": 4866,
+      "merge_ids": [
+        1011,
+        28909
+      ],
+      "name_ja": "佐藤　直樹",
+      "name_en": null,
+      "team_id": 11,
+      "birth_date": "1998-09-03",
+      "patterns": [
+        "佐藤　直樹",
+        "佐藤直樹"
+      ],
+      "identity_sources": {
+        "npb": "91095151"
+      },
+      "url": "https://npb.jp/bis/players/91095151.html",
+      "evidence": [
+        {
+          "team_id": 11,
+          "name": "佐藤　直樹",
+          "npb_id": "91095151",
+          "url": "https://npb.jp/bis/players/91095151.html",
+          "birth_date": "1998-09-03",
+          "source": "https://npb.jp/bis/teams/rst_e.html"
+        },
+        {
+          "team_id": 7,
+          "name": "佐藤　直樹",
+          "npb_id": "91095151",
+          "url": "https://npb.jp/bis/players/91095151.html",
+          "birth_date": "1998-09-03",
+          "source": "https://npb.jp/bis/2025/stats/idb1_h.html",
+          "profile_source": "https://npb.jp/bis/players/91095151.html",
+          "season": 2025
+        },
+        {
+          "team_id": 7,
+          "name": "佐藤　直樹",
+          "npb_id": "91095151",
+          "url": "https://npb.jp/bis/players/91095151.html",
+          "birth_date": "1998-09-03",
+          "source": "https://npb.jp/bis/players/91095151.html",
+          "verified_previous_club": "ソフトバンク"
+        },
+        {
+          "team_id": 7,
+          "name": "佐藤　直樹",
+          "npb_id": "91095151",
+          "url": "https://npb.jp/bis/players/91095151.html",
+          "birth_date": "1998-09-03",
+          "source": "https://npb.jp/bis/players/91095151.html",
+          "verified_previous_club": "ソフトバンク"
+        }
+      ]
+    },
+    {
+      "canonical_id": 4895,
+      "merge_ids": [
+        28924,
+        983
+      ],
+      "name_ja": "宮﨑　颯",
+      "name_en": null,
+      "team_id": 12,
+      "birth_date": "2000-06-14",
+      "patterns": [
+        "宮﨑　颯",
+        "宮﨑颯"
+      ],
+      "identity_sources": {
+        "npb": "73175157"
+      },
+      "url": "https://npb.jp/bis/players/73175157.html",
+      "evidence": [
+        {
+          "team_id": 12,
+          "name": "宮﨑　颯",
+          "npb_id": "73175157",
+          "url": "https://npb.jp/bis/players/73175157.html",
+          "birth_date": "2000-06-14",
+          "source": "https://npb.jp/bis/teams/rst_m.html"
+        },
+        {
+          "team_id": 7,
+          "name": "宮﨑　颯",
+          "npb_id": "73175157",
+          "url": "https://npb.jp/bis/players/73175157.html",
+          "birth_date": "2000-06-14",
+          "source": "https://npb.jp/bis/players/73175157.html",
+          "verified_previous_club": "ソフトバンク"
+        },
+        {
+          "team_id": 7,
+          "name": "宮﨑　颯",
+          "npb_id": "73175157",
+          "url": "https://npb.jp/bis/players/73175157.html",
+          "birth_date": "2000-06-14",
+          "source": "https://npb.jp/bis/players/73175157.html",
+          "verified_previous_club": "ソフトバンク"
+        }
+      ]
+    },
+    {
+      "canonical_id": 4816,
+      "merge_ids": [
+        27864,
+        1282
+      ],
+      "name_ja": "山﨑　剛",
+      "name_en": null,
+      "team_id": 12,
+      "birth_date": "1995-12-29",
+      "patterns": [
+        "山﨑　剛",
+        "山﨑剛"
+      ],
+      "identity_sources": {
+        "npb": "73175136"
+      },
+      "url": "https://npb.jp/bis/players/73175136.html",
+      "evidence": [
+        {
+          "team_id": 12,
+          "name": "山﨑　剛",
+          "npb_id": "73175136",
+          "url": "https://npb.jp/bis/players/73175136.html",
+          "birth_date": "1995-12-29",
+          "source": "https://npb.jp/bis/teams/rst_m.html"
+        },
+        {
+          "team_id": 11,
+          "name": "山﨑　剛",
+          "npb_id": "73175136",
+          "url": "https://npb.jp/bis/players/73175136.html",
+          "birth_date": "1995-12-29",
+          "source": "https://npb.jp/bis/players/73175136.html",
+          "verified_previous_club": "楽天"
+        },
+        {
+          "team_id": 11,
+          "name": "山﨑　剛",
+          "npb_id": "73175136",
+          "url": "https://npb.jp/bis/players/73175136.html",
+          "birth_date": "1995-12-29",
+          "source": "https://npb.jp/bis/players/73175136.html",
+          "verified_previous_club": "楽天"
+        }
+      ]
+    },
+    {
+      "canonical_id": 4865,
+      "merge_ids": [
+        28903,
+        655
+      ],
+      "name_ja": "井上　広大",
+      "name_en": null,
+      "team_id": 12,
+      "birth_date": "2001-08-12",
+      "patterns": [
+        "井上　広大",
+        "井上広大"
+      ],
+      "identity_sources": {
+        "npb": "31335151"
+      },
+      "url": "https://npb.jp/bis/players/31335151.html",
+      "evidence": [
+        {
+          "team_id": 12,
+          "name": "井上　広大",
+          "npb_id": "31335151",
+          "url": "https://npb.jp/bis/players/31335151.html",
+          "birth_date": "2001-08-12",
+          "source": "https://npb.jp/bis/teams/rst_m.html"
+        },
+        {
+          "team_id": 2,
+          "name": "井上　広大",
+          "npb_id": "31335151",
+          "url": "https://npb.jp/bis/players/31335151.html",
+          "birth_date": "2001-08-12",
+          "source": "https://npb.jp/bis/players/31335151.html",
+          "verified_previous_club": "阪神"
+        }
+      ]
+    },
+    {
+      "canonical_id": 4829,
+      "merge_ids": [
+        1132,
+        28910
+      ],
+      "name_ja": "伏見　寅威",
+      "name_en": null,
+      "team_id": 2,
+      "birth_date": "1990-05-12",
+      "patterns": [
+        "伏見　寅威",
+        "伏見寅威"
+      ],
+      "identity_sources": {
+        "npb": "61065137"
+      },
+      "url": "https://npb.jp/bis/players/61065137.html",
+      "evidence": [
+        {
+          "team_id": 2,
+          "name": "伏見　寅威",
+          "npb_id": "61065137",
+          "url": "https://npb.jp/bis/players/61065137.html",
+          "birth_date": "1990-05-12",
+          "source": "https://npb.jp/bis/teams/rst_t.html"
+        },
+        {
+          "team_id": 9,
+          "name": "伏見　寅威",
+          "npb_id": "61065137",
+          "url": "https://npb.jp/bis/players/61065137.html",
+          "birth_date": "1990-05-12",
+          "source": "https://npb.jp/bis/2025/stats/idb1_f.html",
+          "profile_source": "https://npb.jp/bis/players/61065137.html",
+          "season": 2025
+        },
+        {
+          "team_id": 9,
+          "name": "伏見　寅威",
+          "npb_id": "61065137",
+          "url": "https://npb.jp/bis/players/61065137.html",
+          "birth_date": "1990-05-12",
+          "source": "https://npb.jp/bis/players/61065137.html",
+          "verified_previous_club": "日本ハム"
+        },
+        {
+          "team_id": 9,
+          "name": "伏見　寅威",
+          "npb_id": "61065137",
+          "url": "https://npb.jp/bis/players/61065137.html",
+          "birth_date": "1990-05-12",
+          "source": "https://npb.jp/bis/players/61065137.html",
+          "verified_previous_club": "日本ハム"
+        }
+      ]
+    },
+    {
+      "canonical_id": 4928,
+      "merge_ids": [
+        28912,
+        1065
+      ],
+      "name_ja": "元山　飛優",
+      "name_en": null,
+      "team_id": 2,
+      "birth_date": "1998-12-04",
+      "patterns": [
+        "元山　飛優",
+        "元山飛優"
+      ],
+      "identity_sources": {
+        "npb": "33335153"
+      },
+      "url": "https://npb.jp/bis/players/33335153.html",
+      "evidence": [
+        {
+          "team_id": 2,
+          "name": "元山　飛優",
+          "npb_id": "33335153",
+          "url": "https://npb.jp/bis/players/33335153.html",
+          "birth_date": "1998-12-04",
+          "source": "https://npb.jp/bis/teams/rst_t.html"
+        },
+        {
+          "team_id": 8,
+          "name": "元山　飛優",
+          "npb_id": "33335153",
+          "url": "https://npb.jp/bis/players/33335153.html",
+          "birth_date": "1998-12-04",
+          "source": "https://npb.jp/bis/players/33335153.html",
+          "verified_previous_club": "西武"
+        },
+        {
+          "team_id": 8,
+          "name": "元山　飛優",
+          "npb_id": "33335153",
+          "url": "https://npb.jp/bis/players/33335153.html",
+          "birth_date": "1998-12-04",
+          "source": "https://npb.jp/bis/players/33335153.html",
+          "verified_previous_club": "西武"
+        }
+      ]
+    },
+    {
+      "canonical_id": 4924,
+      "merge_ids": [
+        28896,
+        801
+      ],
+      "name_ja": "濱田　太貴",
+      "name_en": null,
+      "team_id": 2,
+      "birth_date": "2000-09-04",
+      "patterns": [
+        "濱田　太貴",
+        "濱田太貴"
+      ],
+      "identity_sources": {
+        "npb": "91495138"
+      },
+      "url": "https://npb.jp/bis/players/91495138.html",
+      "evidence": [
+        {
+          "team_id": 2,
+          "name": "濱田　太貴",
+          "npb_id": "91495138",
+          "url": "https://npb.jp/bis/players/91495138.html",
+          "birth_date": "2000-09-04",
+          "source": "https://npb.jp/bis/teams/rst_t.html"
+        },
+        {
+          "team_id": 4,
+          "name": "濱田　太貴",
+          "npb_id": "91495138",
+          "url": "https://npb.jp/bis/players/91495138.html",
+          "birth_date": "2000-09-04",
+          "source": "https://npb.jp/bis/2025/stats/idb1_s.html",
+          "profile_source": "https://npb.jp/bis/players/91495138.html",
+          "season": 2025
+        },
+        {
+          "team_id": 4,
+          "name": "濱田　太貴",
+          "npb_id": "91495138",
+          "url": "https://npb.jp/bis/players/91495138.html",
+          "birth_date": "2000-09-04",
+          "source": "https://npb.jp/bis/players/91495138.html",
+          "verified_previous_club": "ヤクルト"
+        },
+        {
+          "team_id": 4,
+          "name": "濱田　太貴",
+          "npb_id": "91495138",
+          "url": "https://npb.jp/bis/players/91495138.html",
+          "birth_date": "2000-09-04",
+          "source": "https://npb.jp/bis/players/91495138.html",
+          "verified_previous_club": "ヤクルト"
+        }
+      ]
+    },
+    {
+      "canonical_id": 524,
+      "merge_ids": [
+        28128
+      ],
+      "name_ja": "山﨑　伊織",
+      "name_en": null,
+      "team_id": 1,
+      "birth_date": "1998-10-10",
+      "patterns": [
+        "山﨑　伊織",
+        "山﨑伊織"
+      ],
+      "identity_sources": {
+        "npb": "03305153"
+      },
+      "url": "https://npb.jp/bis/players/03305153.html",
+      "evidence": [
+        {
+          "team_id": 1,
+          "name": "山﨑　伊織",
+          "npb_id": "03305153",
+          "url": "https://npb.jp/bis/players/03305153.html",
+          "birth_date": "1998-10-10",
+          "source": "https://npb.jp/bis/teams/rst_g.html"
+        }
+      ]
+    },
+    {
+      "canonical_id": 4817,
+      "merge_ids": [
+        1234,
+        28918
+      ],
+      "name_ja": "ハワード",
+      "name_en": null,
+      "team_id": 1,
+      "birth_date": "1996-07-28",
+      "patterns": [
+        "Spencer Howard",
+        "ハワード"
+      ],
+      "identity_sources": {
+        "mlb": "675921",
+        "npb": "23725150"
+      },
+      "url": "https://npb.jp/bis/players/23725150.html",
+      "evidence": [
+        {
+          "team_id": 1,
+          "name": "ハワード",
+          "npb_id": "23725150",
+          "url": "https://npb.jp/bis/players/23725150.html",
+          "birth_date": "1996-07-28",
+          "source": "https://npb.jp/bis/teams/rst_g.html"
+        },
+        {
+          "team_id": 11,
+          "name": "ハワード",
+          "npb_id": "23725150",
+          "url": "https://npb.jp/bis/players/23725150.html",
+          "birth_date": "1996-07-28",
+          "source": "https://npb.jp/bis/2025/stats/idp1_e.html",
+          "profile_source": "https://npb.jp/bis/players/23725150.html",
+          "season": 2025
+        },
+        {
+          "team_id": 11,
+          "name": "ハワード",
+          "npb_id": "23725150",
+          "url": "https://npb.jp/bis/players/23725150.html",
+          "birth_date": "1996-07-28",
+          "source": "https://npb.jp/bis/players/23725150.html",
+          "verified_previous_club": "楽天"
+        },
+        {
+          "team_id": 11,
+          "name": "ハワード",
+          "npb_id": "23725150",
+          "url": "https://npb.jp/bis/players/23725150.html",
+          "birth_date": "1996-07-28",
+          "source": "https://npb.jp/bis/players/23725150.html",
+          "verified_previous_club": "楽天"
+        }
+      ]
+    },
+    {
+      "canonical_id": 4935,
+      "merge_ids": [
+        1152,
+        26513
+      ],
+      "name_ja": "松本　剛",
+      "name_en": null,
+      "team_id": 1,
+      "birth_date": "1993-08-11",
+      "patterns": [
+        "松本　剛",
+        "松本剛"
+      ],
+      "identity_sources": {
+        "npb": "21625135"
+      },
+      "url": "https://npb.jp/bis/players/21625135.html",
+      "evidence": [
+        {
+          "team_id": 1,
+          "name": "松本　剛",
+          "npb_id": "21625135",
+          "url": "https://npb.jp/bis/players/21625135.html",
+          "birth_date": "1993-08-11",
+          "source": "https://npb.jp/bis/teams/rst_g.html"
+        },
+        {
+          "team_id": 9,
+          "name": "松本　剛",
+          "npb_id": "21625135",
+          "url": "https://npb.jp/bis/players/21625135.html",
+          "birth_date": "1993-08-11",
+          "source": "https://npb.jp/bis/2025/stats/idb1_f.html",
+          "profile_source": "https://npb.jp/bis/players/21625135.html",
+          "season": 2025
+        },
+        {
+          "team_id": 9,
+          "name": "松本　剛",
+          "npb_id": "21625135",
+          "url": "https://npb.jp/bis/players/21625135.html",
+          "birth_date": "1993-08-11",
+          "source": "https://npb.jp/bis/players/21625135.html",
+          "verified_previous_club": "日本ハム"
+        },
+        {
+          "team_id": 9,
+          "name": "松本　剛",
+          "npb_id": "21625135",
+          "url": "https://npb.jp/bis/players/21625135.html",
+          "birth_date": "1993-08-11",
+          "source": "https://npb.jp/bis/players/21625135.html",
+          "verified_previous_club": "日本ハム"
+        }
+      ]
+    },
+    {
+      "canonical_id": 670,
+      "merge_ids": [
+        27858
+      ],
+      "name_ja": "髙橋　宏斗",
+      "name_en": null,
+      "team_id": 3,
+      "birth_date": "2002-08-09",
+      "patterns": [
+        "髙橋　宏斗",
+        "髙橋宏斗"
+      ],
+      "identity_sources": {
+        "npb": "61265153"
+      },
+      "url": "https://npb.jp/bis/players/61265153.html",
+      "evidence": [
+        {
+          "team_id": 3,
+          "name": "髙橋　宏斗",
+          "npb_id": "61265153",
+          "url": "https://npb.jp/bis/players/61265153.html",
+          "birth_date": "2002-08-09",
+          "source": "https://npb.jp/bis/teams/rst_d.html"
+        }
+      ]
+    },
+    {
+      "canonical_id": 4927,
+      "merge_ids": [
+        28899,
+        863
+      ],
+      "name_ja": "知野　直人",
+      "name_en": null,
+      "team_id": 3,
+      "birth_date": "1999-02-16",
+      "patterns": [
+        "知野　直人",
+        "知野直人"
+      ],
+      "identity_sources": {
+        "npb": "91095138"
+      },
+      "url": "https://npb.jp/bis/players/91095138.html",
+      "evidence": [
+        {
+          "team_id": 3,
+          "name": "知野　直人",
+          "npb_id": "91095138",
+          "url": "https://npb.jp/bis/players/91095138.html",
+          "birth_date": "1999-02-16",
+          "source": "https://npb.jp/bis/teams/rst_d.html"
+        },
+        {
+          "team_id": 5,
+          "name": "知野　直人",
+          "npb_id": "91095138",
+          "url": "https://npb.jp/bis/players/91095138.html",
+          "birth_date": "1999-02-16",
+          "source": "https://npb.jp/bis/2025/stats/idb1_db.html",
+          "profile_source": "https://npb.jp/bis/players/91095138.html",
+          "season": 2025
+        },
+        {
+          "team_id": 5,
+          "name": "知野　直人",
+          "npb_id": "91095138",
+          "url": "https://npb.jp/bis/players/91095138.html",
+          "birth_date": "1999-02-16",
+          "source": "https://npb.jp/bis/players/91095138.html",
+          "verified_previous_club": "DeNA"
+        },
+        {
+          "team_id": 5,
+          "name": "知野　直人",
+          "npb_id": "91095138",
+          "url": "https://npb.jp/bis/players/91095138.html",
+          "birth_date": "1999-02-16",
+          "source": "https://npb.jp/bis/players/91095138.html",
+          "verified_previous_club": "DeNA"
+        }
+      ]
+    },
+    {
+      "canonical_id": 4874,
+      "merge_ids": [
+        28907,
+        877
+      ],
+      "name_ja": "大道　温貴",
+      "name_en": null,
+      "team_id": 4,
+      "birth_date": "1999-01-20",
+      "patterns": [
+        "大道　温貴",
+        "大道温貴"
+      ],
+      "identity_sources": {
+        "npb": "41545153"
+      },
+      "url": "https://npb.jp/bis/players/41545153.html",
+      "evidence": [
+        {
+          "team_id": 4,
+          "name": "大道　温貴",
+          "npb_id": "41545153",
+          "url": "https://npb.jp/bis/players/41545153.html",
+          "birth_date": "1999-01-20",
+          "source": "https://npb.jp/bis/teams/rst_s.html"
+        },
+        {
+          "team_id": 6,
+          "name": "大道　温貴",
+          "npb_id": "41545153",
+          "url": "https://npb.jp/bis/players/41545153.html",
+          "birth_date": "1999-01-20",
+          "source": "https://npb.jp/bis/2025/stats/idp1_c.html",
+          "profile_source": "https://npb.jp/bis/players/41545153.html",
+          "season": 2025
+        },
+        {
+          "team_id": 6,
+          "name": "大道　温貴",
+          "npb_id": "41545153",
+          "url": "https://npb.jp/bis/players/41545153.html",
+          "birth_date": "1999-01-20",
+          "source": "https://npb.jp/bis/players/41545153.html",
+          "verified_previous_club": "広島"
+        },
+        {
+          "team_id": 6,
+          "name": "大道　温貴",
+          "npb_id": "41545153",
+          "url": "https://npb.jp/bis/players/41545153.html",
+          "birth_date": "1999-01-20",
+          "source": "https://npb.jp/bis/players/41545153.html",
+          "verified_previous_club": "広島"
+        }
+      ]
+    },
+    {
+      "canonical_id": 3241,
+      "merge_ids": [
+        28905,
+        698
+      ],
+      "name_ja": "ウォルターズ",
+      "name_en": null,
+      "team_id": 4,
+      "birth_date": "1997-05-18",
+      "patterns": [
+        "Nash Walters",
+        "ウォルターズ"
+      ],
+      "identity_sources": {
+        "mlb": "663534",
+        "npb": "63965150"
+      },
+      "url": "https://npb.jp/bis/players/63965150.html",
+      "evidence": [
+        {
+          "team_id": 4,
+          "name": "ウォルターズ",
+          "npb_id": "63965150",
+          "url": "https://npb.jp/bis/players/63965150.html",
+          "birth_date": "1997-05-18",
+          "source": "https://npb.jp/bis/teams/rst_s.html"
+        },
+        {
+          "team_id": 3,
+          "name": "ウォルターズ",
+          "npb_id": "63965150",
+          "url": "https://npb.jp/bis/players/63965150.html",
+          "birth_date": "1997-05-18",
+          "source": "https://npb.jp/bis/players/63965150.html",
+          "verified_previous_club": "中日"
+        }
+      ]
+    },
+    {
+      "canonical_id": 4955,
+      "merge_ids": [
+        1089,
+        28916
+      ],
+      "name_ja": "モンテル",
+      "name_en": null,
+      "team_id": 4,
+      "birth_date": "2000-03-18",
+      "patterns": [
+        "モンテル"
+      ],
+      "identity_sources": {
+        "npb": "23125157"
+      },
+      "url": "https://npb.jp/bis/players/23125157.html",
+      "evidence": [
+        {
+          "team_id": 4,
+          "name": "モンテル",
+          "npb_id": "23125157",
+          "url": "https://npb.jp/bis/players/23125157.html",
+          "birth_date": "2000-03-18",
+          "source": "https://npb.jp/bis/teams/rst_s.html"
+        },
+        {
+          "team_id": 8,
+          "name": "モンテル",
+          "npb_id": "23125157",
+          "url": "https://npb.jp/bis/players/23125157.html",
+          "birth_date": "2000-03-18",
+          "source": "https://npb.jp/bis/2025/stats/idb1_l.html",
+          "profile_source": "https://npb.jp/bis/players/23125157.html",
+          "season": 2025
+        },
+        {
+          "team_id": 8,
+          "name": "モンテル",
+          "npb_id": "23125157",
+          "url": "https://npb.jp/bis/players/23125157.html",
+          "birth_date": "2000-03-18",
+          "source": "https://npb.jp/bis/players/23125157.html",
+          "verified_previous_club": "西武"
+        },
+        {
+          "team_id": 8,
+          "name": "モンテル",
+          "npb_id": "23125157",
+          "url": "https://npb.jp/bis/players/23125157.html",
+          "birth_date": "2000-03-18",
+          "source": "https://npb.jp/bis/players/23125157.html",
+          "verified_previous_club": "西武"
+        }
+      ]
+    },
+    {
+      "canonical_id": 4841,
+      "merge_ids": [
+        28906,
+        532
+      ],
+      "name_ja": "馬場　皐輔",
+      "name_en": null,
+      "team_id": 5,
+      "birth_date": "1995-05-18",
+      "patterns": [
+        "馬場　皐輔",
+        "馬場皐輔"
+      ],
+      "identity_sources": {
+        "npb": "41445136"
+      },
+      "url": "https://npb.jp/bis/players/41445136.html",
+      "evidence": [
+        {
+          "team_id": 5,
+          "name": "馬場　皐輔",
+          "npb_id": "41445136",
+          "url": "https://npb.jp/bis/players/41445136.html",
+          "birth_date": "1995-05-18",
+          "source": "https://npb.jp/bis/teams/rst_db.html"
+        },
+        {
+          "team_id": 1,
+          "name": "馬場　皐輔",
+          "npb_id": "41445136",
+          "url": "https://npb.jp/bis/players/41445136.html",
+          "birth_date": "1995-05-18",
+          "source": "https://npb.jp/bis/players/41445136.html",
+          "verified_previous_club": "巨人"
+        }
+      ]
+    },
+    {
+      "canonical_id": 4908,
+      "merge_ids": [
+        1056,
+        28913
+      ],
+      "name_ja": "古市　尊",
+      "name_en": null,
+      "team_id": 5,
+      "birth_date": "2002-06-15",
+      "patterns": [
+        "古市　尊",
+        "古市尊"
+      ],
+      "identity_sources": {
+        "npb": "91895155"
+      },
+      "url": "https://npb.jp/bis/players/91895155.html",
+      "evidence": [
+        {
+          "team_id": 5,
+          "name": "古市　尊",
+          "npb_id": "91895155",
+          "url": "https://npb.jp/bis/players/91895155.html",
+          "birth_date": "2002-06-15",
+          "source": "https://npb.jp/bis/teams/rst_db.html"
+        },
+        {
+          "team_id": 8,
+          "name": "古市　尊",
+          "npb_id": "91895155",
+          "url": "https://npb.jp/bis/players/91895155.html",
+          "birth_date": "2002-06-15",
+          "source": "https://npb.jp/bis/2025/stats/idb1_l.html",
+          "profile_source": "https://npb.jp/bis/players/91895155.html",
+          "season": 2025
+        },
+        {
+          "team_id": 8,
+          "name": "古市　尊",
+          "npb_id": "91895155",
+          "url": "https://npb.jp/bis/players/91895155.html",
+          "birth_date": "2002-06-15",
+          "source": "https://npb.jp/bis/players/91895155.html",
+          "verified_previous_club": "西武"
+        },
+        {
+          "team_id": 8,
+          "name": "古市　尊",
+          "npb_id": "91895155",
+          "url": "https://npb.jp/bis/players/91895155.html",
+          "birth_date": "2002-06-15",
+          "source": "https://npb.jp/bis/players/91895155.html",
+          "verified_previous_club": "西武"
+        }
+      ]
+    },
+    {
+      "canonical_id": 4933,
+      "merge_ids": [
+        28900,
+        727
+      ],
+      "name_ja": "濱　将乃介",
+      "name_en": null,
+      "team_id": 5,
+      "birth_date": "2000-05-03",
+      "patterns": [
+        "濱　将乃介",
+        "濱将乃介"
+      ],
+      "identity_sources": {
+        "npb": "71675157"
+      },
+      "url": "https://npb.jp/bis/players/71675157.html",
+      "evidence": [
+        {
+          "team_id": 5,
+          "name": "濱　将乃介",
+          "npb_id": "71675157",
+          "url": "https://npb.jp/bis/players/71675157.html",
+          "birth_date": "2000-05-03",
+          "source": "https://npb.jp/bis/teams/rst_db.html"
+        },
+        {
+          "team_id": 3,
+          "name": "濱　将乃介",
+          "npb_id": "71675157",
+          "url": "https://npb.jp/bis/players/71675157.html",
+          "birth_date": "2000-05-03",
+          "source": "https://npb.jp/bis/players/71675157.html",
+          "verified_previous_club": "中日"
+        }
+      ]
+    },
+    {
+      "canonical_id": 734,
+      "merge_ids": [
+        23681,
+        23026
+      ],
+      "name_ja": "高津 臣吾",
+      "name_en": null,
+      "team_id": 4,
+      "birth_date": "1968-11-25",
+      "patterns": [
+        "Shingo Takatsu",
+        "高津 臣吾",
+        "高津　臣吾",
+        "髙津臣吾"
+      ],
+      "identity_sources": {
+        "npb": "51553883",
+        "mlb": "430968"
+      },
+      "url": "https://npb.jp/bis/players/51553883.html",
+      "evidence": [
+        {
+          "team_id": 4,
+          "name": "高津 臣吾",
+          "npb_id": "51553883",
+          "url": "https://npb.jp/bis/players/51553883.html",
+          "birth_date": "1968-11-25",
+          "source": "https://npb.jp/bis/players/51553883.html",
+          "registry_source": "https://github.com/chadwickbureau/register",
+          "mlb_id": 430968
+        },
+        {
+          "team_id": 4,
+          "name": "高津 臣吾",
+          "npb_id": "51553883",
+          "url": "https://npb.jp/bis/players/51553883.html",
+          "birth_date": "1968-11-25",
+          "source": "https://npb.jp/bis/players/51553883.html",
+          "registry_source": "https://github.com/chadwickbureau/register",
+          "mlb_id": 430968
+        },
+        {
+          "team_id": 4,
+          "name": "高津　臣吾",
+          "npb_id": "51553883",
+          "url": "https://npb.jp/bis/players/51553883.html",
+          "birth_date": "1968-11-25",
+          "source": "https://npb.jp/bis/players/51553883.html",
+          "verified_previous_club": "ヤクルト"
+        },
+        {
+          "team_id": 4,
+          "name": "高津　臣吾",
+          "npb_id": "51553883",
+          "url": "https://npb.jp/bis/players/51553883.html",
+          "birth_date": "1968-11-25",
+          "source": "https://npb.jp/bis/players/51553883.html",
+          "verified_previous_club": "ヤクルト"
+        },
+        {
+          "source": "https://github.com/chadwickbureau/register",
+          "npb_id": "51553883",
+          "mlb_id": 430968,
+          "name_en": "Shingo Takatsu",
+          "birth_date": "1968-11-25",
+          "mapping_source": "https://npb.jp/bis/players/search/result"
+        }
+      ]
+    },
+    {
+      "canonical_id": 1002,
+      "merge_ids": [
+        28914
+      ],
+      "name_ja": "井上　朋也",
+      "name_en": null,
+      "team_id": 7,
+      "birth_date": "2003-01-28",
+      "patterns": [
+        "井上　朋也",
+        "井上朋也"
+      ],
+      "identity_sources": {
+        "npb": "01305153"
+      },
+      "url": "https://npb.jp/bis/players/01305153.html",
+      "evidence": [
+        {
+          "team_id": 7,
+          "name": "井上　朋也",
+          "npb_id": "01305153",
+          "url": "https://npb.jp/bis/players/01305153.html",
+          "birth_date": "2003-01-28",
+          "source": "https://npb.jp/bis/2025/stats/idb1_h.html",
+          "profile_source": "https://npb.jp/bis/players/01305153.html",
+          "season": 2025
+        },
+        {
+          "team_id": 7,
+          "name": "井上　朋也",
+          "npb_id": "01305153",
+          "url": "https://npb.jp/bis/players/01305153.html",
+          "birth_date": "2003-01-28",
+          "source": "https://npb.jp/bis/players/01305153.html",
+          "verified_previous_club": "ソフトバンク"
+        },
+        {
+          "team_id": 7,
+          "name": "井上　朋也",
+          "npb_id": "01305153",
+          "url": "https://npb.jp/bis/players/01305153.html",
+          "birth_date": "2003-01-28",
+          "source": "https://npb.jp/bis/players/01305153.html",
+          "verified_previous_club": "ソフトバンク"
+        }
+      ]
+    },
+    {
+      "canonical_id": 963,
+      "merge_ids": [
+        28920
+      ],
+      "name_ja": "尾形　崇斗",
+      "name_en": null,
+      "team_id": 7,
+      "birth_date": "1999-05-15",
+      "patterns": [
+        "尾形　崇斗",
+        "尾形崇斗"
+      ],
+      "identity_sources": {
+        "npb": "61365136"
+      },
+      "url": "https://npb.jp/bis/players/61365136.html",
+      "evidence": [
+        {
+          "team_id": 7,
+          "name": "尾形　崇斗",
+          "npb_id": "61365136",
+          "url": "https://npb.jp/bis/players/61365136.html",
+          "birth_date": "1999-05-15",
+          "source": "https://npb.jp/bis/2025/stats/idp1_h.html",
+          "profile_source": "https://npb.jp/bis/players/61365136.html",
+          "season": 2025
+        },
+        {
+          "team_id": 7,
+          "name": "尾形　崇斗",
+          "npb_id": "61365136",
+          "url": "https://npb.jp/bis/players/61365136.html",
+          "birth_date": "1999-05-15",
+          "source": "https://npb.jp/bis/players/61365136.html",
+          "verified_previous_club": "ソフトバンク"
+        },
+        {
+          "team_id": 7,
+          "name": "尾形　崇斗",
+          "npb_id": "61365136",
+          "url": "https://npb.jp/bis/players/61365136.html",
+          "birth_date": "1999-05-15",
+          "source": "https://npb.jp/bis/players/61365136.html",
+          "verified_previous_club": "ソフトバンク"
+        }
+      ]
+    },
+    {
+      "canonical_id": 1101,
+      "merge_ids": [
+        27550
+      ],
+      "name_ja": "杉浦　稔大",
+      "name_en": null,
+      "team_id": 9,
+      "birth_date": "1992-02-25",
+      "patterns": [
+        "杉浦　稔大",
+        "杉浦稔大"
+      ],
+      "identity_sources": {
+        "npb": "61765139"
+      },
+      "url": "https://npb.jp/bis/players/61765139.html",
+      "evidence": [
+        {
+          "team_id": 9,
+          "name": "杉浦　稔大",
+          "npb_id": "61765139",
+          "url": "https://npb.jp/bis/players/61765139.html",
+          "birth_date": "1992-02-25",
+          "source": "https://npb.jp/bis/2025/stats/idp1_f.html",
+          "profile_source": "https://npb.jp/bis/players/61765139.html",
+          "season": 2025
+        },
+        {
+          "team_id": 9,
+          "name": "杉浦　稔大",
+          "npb_id": "61765139",
+          "url": "https://npb.jp/bis/players/61765139.html",
+          "birth_date": "1992-02-25",
+          "source": "https://npb.jp/bis/players/61765139.html",
+          "verified_previous_club": "日本ハム"
+        },
+        {
+          "team_id": 9,
+          "name": "杉浦　稔大",
+          "npb_id": "61765139",
+          "url": "https://npb.jp/bis/players/61765139.html",
+          "birth_date": "1992-02-25",
+          "source": "https://npb.jp/bis/players/61765139.html",
+          "verified_previous_club": "日本ハム"
+        }
+      ]
+    },
+    {
+      "canonical_id": 848,
+      "merge_ids": [
+        28893
+      ],
+      "name_ja": "山本　祐大",
+      "name_en": null,
+      "team_id": 5,
+      "birth_date": "1998-09-11",
+      "patterns": [
+        "山本　祐大",
+        "山本祐大"
+      ],
+      "identity_sources": {
+        "npb": "23125136"
+      },
+      "url": "https://npb.jp/bis/players/23125136.html",
+      "evidence": [
+        {
+          "team_id": 5,
+          "name": "山本　祐大",
+          "npb_id": "23125136",
+          "url": "https://npb.jp/bis/players/23125136.html",
+          "birth_date": "1998-09-11",
+          "source": "https://npb.jp/bis/2025/stats/idb1_db.html",
+          "profile_source": "https://npb.jp/bis/players/23125136.html",
+          "season": 2025
+        },
+        {
+          "team_id": 5,
+          "name": "山本　祐大",
+          "npb_id": "23125136",
+          "url": "https://npb.jp/bis/players/23125136.html",
+          "birth_date": "1998-09-11",
+          "source": "https://npb.jp/bis/players/23125136.html",
+          "verified_previous_club": "DeNA"
+        },
+        {
+          "team_id": 5,
+          "name": "山本　祐大",
+          "npb_id": "23125136",
+          "url": "https://npb.jp/bis/players/23125136.html",
+          "birth_date": "1998-09-11",
+          "source": "https://npb.jp/bis/players/23125136.html",
+          "verified_previous_club": "DeNA"
+        }
+      ]
+    },
+    {
+      "canonical_id": 600,
+      "merge_ids": [
+        28902,
+        26981
+      ],
+      "name_ja": "デュプランティエ",
+      "name_en": null,
+      "team_id": 2,
+      "birth_date": "1994-07-11",
+      "patterns": [
+        "Jon Duplantier",
+        "デュプランティエ"
+      ],
+      "identity_sources": {
+        "npb": "13715150",
+        "mlb": "641541"
+      },
+      "url": "https://npb.jp/bis/players/13715150.html",
+      "evidence": [
+        {
+          "team_id": 2,
+          "name": "デュプランティエ",
+          "npb_id": "13715150",
+          "url": "https://npb.jp/bis/players/13715150.html",
+          "birth_date": "1994-07-11",
+          "source": "https://npb.jp/bis/players/13715150.html",
+          "verified_previous_club": "阪神"
+        },
+        {
+          "source": "https://github.com/chadwickbureau/register",
+          "npb_id": "13715150",
+          "mlb_id": 641541,
+          "name_en": "Jon Duplantier",
+          "birth_date": "1994-07-11"
+        }
+      ]
+    },
+    {
+      "canonical_id": 720,
+      "merge_ids": [
+        28897
+      ],
+      "name_ja": "佐藤　龍世",
+      "name_en": null,
+      "team_id": 3,
+      "birth_date": "1997-01-15",
+      "patterns": [
+        "佐藤　龍世",
+        "佐藤龍世"
+      ],
+      "identity_sources": {
+        "npb": "81785138"
+      },
+      "url": "https://npb.jp/bis/players/81785138.html",
+      "evidence": [
+        {
+          "team_id": 3,
+          "name": "佐藤　龍世",
+          "npb_id": "81785138",
+          "url": "https://npb.jp/bis/players/81785138.html",
+          "birth_date": "1997-01-15",
+          "source": "https://npb.jp/bis/players/81785138.html",
+          "verified_previous_club": "中日"
+        }
+      ]
+    }
+  ],
+  "review": []
+}

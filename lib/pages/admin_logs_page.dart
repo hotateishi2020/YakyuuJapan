@@ -64,8 +64,10 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
   final _query = TextEditingController();
   int _section = 0;
   bool _showAccess = true;
-  List<Map<String, dynamic>> get _visibleLogs =>
-      _logs.where((r) => r['log_type'] == 'エラー' || (_showAccess && r['log_type'] == '操作')).toList();
+  String _category = '';
+  List<String> _categories = [];
+  int _request = 0;
+  List<Map<String, dynamic>> get _visibleLogs => _logs.where((r) => r['log_type'] == 'エラー' || (_showAccess && r['log_type'] == '操作')).toList();
   Map<String, dynamic> _visitors = {};
   bool _loading = true;
   String? _error;
@@ -85,6 +87,7 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
   }
 
   Future<void> _load() async {
+    final request = ++_request;
     setState(() {
       _loading = true;
       _error = null;
@@ -92,14 +95,12 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
     try {
       final token = AuthSession.instance.token;
       final res = await http.get(
-        Env.api('/admin/logs')
-            .replace(queryParameters: {'q': _query.text.trim()}),
+        Env.api('/admin/logs').replace(queryParameters: {'q': _query.text.trim(), 'category': _category}),
         headers: {
-          if (token != null && token.isNotEmpty)
-            'Authorization': 'Bearer $token',
+          if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
         },
       ).timeout(const Duration(seconds: 20));
-      if (!mounted) return;
+      if (!mounted || request != _request) return;
       if (res.statusCode == 403) {
         setState(() {
           _loading = false;
@@ -117,11 +118,19 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
       final map = jsonDecode(res.body) as Map<String, dynamic>;
       setState(() {
         _logs = _rowsOf(map);
+        _categories = {
+          if (_category.isNotEmpty) _category,
+          for (final value in map['categories'] as List? ?? [])
+            if ('$value'.trim().isNotEmpty) '$value'.trim(),
+          for (final row in _logs)
+            if ('${row['category'] ?? ''}'.trim().isNotEmpty) '${row['category']}'.trim(),
+        }.toList()
+          ..sort();
         _visitors = Map<String, dynamic>.from(map['visitors'] as Map? ?? {});
         _loading = false;
       });
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted || request != _request) return;
       setState(() {
         _loading = false;
         _error = networkErrorMessage(e, fallback: 'ログを読み込めませんでした');
@@ -146,9 +155,7 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
             'log_type': '操作',
             'level': 'INFO',
             'user_id': row['id_user'] ?? '',
-            'action': '${row['memo'] ?? ''}'.trim().isEmpty
-                ? '${row['method'] ?? ''} ${row['url'] ?? ''}'.trim()
-                : row['memo'],
+            'action': '${row['memo'] ?? ''}'.trim().isEmpty ? '${row['method'] ?? ''} ${row['url'] ?? ''}'.trim() : row['memo'],
             'status': '成功',
             'api_path': row['url'] ?? '',
           },
@@ -174,8 +181,7 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
   String _japanTime(String raw) {
     final text = raw.trim();
     if (text.isEmpty) return '';
-    final hasZone =
-        text.endsWith('Z') || RegExp(r'[+-]\d{2}:?\d{2}$').hasMatch(text);
+    final hasZone = text.endsWith('Z') || RegExp(r'[+-]\d{2}:?\d{2}$').hasMatch(text);
     if (!hasZone) {
       final shown = text.replaceFirst('T', ' ');
       final dot = shown.indexOf('.');
@@ -219,8 +225,7 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
 
   Future<Uint8List> _loadSnapshot(String id) async {
     final token = AuthSession.instance.token;
-    final response =
-        await http.get(Env.api('/admin/logs/snapshot/$id'), headers: {
+    final response = await http.get(Env.api('/admin/logs/snapshot/$id'), headers: {
       if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
     }).timeout(const Duration(seconds: 15));
     if (response.statusCode != 200) throw StateError('画面画像を取得できませんでした');
@@ -240,43 +245,33 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
           content: SizedBox(
             width: 640,
             child: SingleChildScrollView(
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (snapshot != null)
-                      FutureBuilder<Uint8List>(
-                          future: snapshot,
-                          builder: (context, result) {
-                            if (result.hasError) {
-                              return const Text('画面画像を取得できませんでした');
-                            }
-                            if (!result.hasData) {
-                              return const SizedBox(
-                                  height: 120, child: BaseballLoading());
-                            }
-                            return Image.memory(result.data!,
-                                fit: BoxFit.contain,
-                                errorBuilder: (_, __, ___) =>
-                                    const Text('画面画像を表示できませんでした'));
-                          }),
-                    if (snapshot == null && row['log_type'] == 'エラー')
-                      const Text('画面画像なし'),
-                    SelectableText(
-                      [
-                        if (stack.isNotEmpty) 'スタックトレース\n$stack',
-                        if (contextText.isNotEmpty) 'エラー詳細\n$contextText',
-                        if (stack.isEmpty && contextText.isEmpty)
-                          _cell(row, 'action'),
-                      ].join('\n\n'),
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ]),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                if (snapshot != null)
+                  FutureBuilder<Uint8List>(
+                      future: snapshot,
+                      builder: (context, result) {
+                        if (result.hasError) {
+                          return const Text('画面画像を取得できませんでした');
+                        }
+                        if (!result.hasData) {
+                          return const SizedBox(height: 120, child: BaseballLoading());
+                        }
+                        return Image.memory(result.data!, fit: BoxFit.contain, errorBuilder: (_, __, ___) => const Text('画面画像を表示できませんでした'));
+                      }),
+                if (snapshot == null && row['log_type'] == 'エラー') const Text('画面画像なし'),
+                SelectableText(
+                  [
+                    if (stack.isNotEmpty) 'スタックトレース\n$stack',
+                    if (contextText.isNotEmpty) 'エラー詳細\n$contextText',
+                    if (stack.isEmpty && contextText.isEmpty) _cell(row, 'action'),
+                  ].join('\n\n'),
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ]),
             ),
           ),
           actions: [
-            TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('閉じる')),
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('閉じる')),
           ],
         );
       },
@@ -285,8 +280,7 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final tableWidth =
-        _columns.fold<double>(0, (sum, column) => sum + column.width);
+    final tableWidth = _columns.fold<double>(0, (sum, column) => sum + column.width);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
@@ -299,29 +293,19 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
             child: SizedBox(
                 width: double.infinity,
                 child: SegmentedButton<int>(
-                  segments: const [
-                    ButtonSegment(
-                        value: 0,
-                        label: Text('ログ管理'),
-                        icon: Icon(Icons.list_alt)),
-                    ButtonSegment(
-                        value: 1,
-                        label: Text('News登録'),
-                        icon: Icon(Icons.newspaper)),
-                    ButtonSegment(value: 2, label: Text('費用'), icon: Icon(Icons.payments_outlined))
-                  ],
+                  segments: const [ButtonSegment(value: 0, label: Text('ログ管理'), icon: Icon(Icons.list_alt)), ButtonSegment(value: 1, label: Text('News登録'), icon: Icon(Icons.newspaper)), ButtonSegment(value: 2, label: Text('費用'), icon: Icon(Icons.payments_outlined))],
                   selected: {_section},
-                  onSelectionChanged: (value) =>
-                      setState(() => _section = value.single),
+                  onSelectionChanged: (value) => setState(() => _section = value.single),
                 ))),
         Expanded(
             child: IndexedStack(index: _section, children: [
           Column(children: [
-            Padding(padding: const EdgeInsets.symmetric(horizontal: 12), child: Wrap(spacing: 12, runSpacing: 6, children: [
-              for (final period in const {'1': '1日（24時間）', '7': '1週間（7日）', '30': '1ヶ月（30日）'}.entries)
-                Chip(label: Text('${period.value}：${_visitors[period.key] ?? '—'}人')),
-              const Text('来訪者数：ID 1・2を除外。ゲストは同じIP・ブラウザ環境で重複除外。', style: TextStyle(fontSize: 11)),
-            ])),
+            Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Wrap(spacing: 12, runSpacing: 6, children: [
+                  for (final period in const {'1': '1日（24時間）', '7': '1週間（7日）', '30': '1ヶ月（30日）'}.entries) Chip(label: Text('${period.value}：${_visitors[period.key] ?? '—'}人')),
+                  const Text('来訪者数：ID 1・2を除外。ゲストは同じIP・ブラウザ環境で重複除外。', style: TextStyle(fontSize: 11)),
+                ])),
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
               child: Row(
@@ -338,10 +322,27 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  FilledButton(
-                      onPressed: _loading ? null : _load,
-                      child: const Text('絞り込み')),
+                  FilledButton(onPressed: _loading ? null : _load, child: const Text('絞り込み')),
                 ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              child: DropdownButtonFormField<String>(
+                key: const ValueKey('log-category'),
+                initialValue: _category,
+                isExpanded: true,
+                decoration: const InputDecoration(labelText: 'カテゴリ', isDense: true, border: OutlineInputBorder()),
+                items: [
+                  const DropdownMenuItem(value: '', child: Text('すべてのカテゴリ')),
+                  for (final category in _categories) DropdownMenuItem(value: category, child: Text(category)),
+                ],
+                onChanged: _loading
+                    ? null
+                    : (value) {
+                        setState(() => _category = value ?? '');
+                        _load();
+                      },
               ),
             ),
             CheckboxListTile(
@@ -378,8 +379,7 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
                                       Expanded(
                                         child: ListView.builder(
                                           itemCount: _visibleLogs.length,
-                                          itemBuilder: (context, index) =>
-                                              _dataRow(_visibleLogs[index]),
+                                          itemBuilder: (context, index) => _dataRow(_visibleLogs[index]),
                                         ),
                                       ),
                                     ],
@@ -411,13 +411,7 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text(column.label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold)),
+                  child: Text(column.label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
                 ),
               ),
             ),
@@ -433,8 +427,7 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
       child: InkWell(
         onTap: () => _openDetail(row),
         child: DecoratedBox(
-          decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: Color(0xFFE0E0E0)))),
+          decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Color(0xFFE0E0E0)))),
           child: Row(
             children: [
               for (final column in _columns)

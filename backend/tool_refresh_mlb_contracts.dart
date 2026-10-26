@@ -1,3 +1,4 @@
+import 'app/ContractTransferShares.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -8,6 +9,7 @@ import 'tools/Postgres.dart';
 
 Future<void> main(List<String> args) async {
   final year = args.isEmpty ? DateTime.now().year : int.parse(args.first);
+  await refreshContractTransfers(year);
   final client = http.Client();
   try {
     final history = usageMap(jsonDecode(await StrengthUsage.get(client, 'https://frontofficemoves.com/data/contracts.json')));

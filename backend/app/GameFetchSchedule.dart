@@ -68,6 +68,15 @@ class GameFetchSchedule {
 
   static bool isTodayBusy(String org) => _todayBusy[org] == true;
 
+  /// A new authorized HOME viewer can resume a loop stopped on an earlier day.
+  /// Reuse the registered job and its busy/queued guards rather than scraping
+  /// inside the HTTP request.
+  static void resumeTodayWatch(String org) {
+    markInitialDisplayReady();
+    final fetch = _todayFetch[org];
+    if (fetch != null) scheduleTodayAgain(org, fetch);
+  }
+
   static bool isTodayQueued(String org) => _todayQueued[org] == true;
 
   static void markTodayBusy(String org, bool busy) => _todayBusy[org] = busy;

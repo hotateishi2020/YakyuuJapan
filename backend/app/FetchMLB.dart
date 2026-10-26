@@ -1,3 +1,4 @@
+import 'PlayerIdentity.dart';
 import 'MlbScheduleReconcile.dart';
 import 'package:html/dom.dart';
 import 'package:intl/intl.dart';
@@ -10,7 +11,6 @@ import '../tools/StringTool.dart';
 import 'AppSql.dart';
 import 'BirthPlaceRegistry.dart';
 import 'ClinchedGames.dart';
-import 'DB/m_player.dart';
 import 'DB/m_player_career.dart';
 import 'DB/m_stadium.dart';
 import 'DB/t_game.dart';
@@ -28,7 +28,6 @@ import 'OrgLeague.dart';
 import 'Value.dart';
 import 'YahooHtml.dart';
 import 'YahooTeamNames.dart';
-import 'PlayerName.dart';
 
 /// MLB 用スクレイプ。Yahoo HTML の読み方は NPB と共通化しつつ、URL・地区構成だけ差し替える。
 class FetchMLB {
@@ -233,54 +232,14 @@ class FetchMLB {
           if (!seenPlayers.add(profileUrl)) continue;
           final name = StringTool.noSpace(parsed.player);
           final team = parsed.team.trim();
-          // ランキング「A.ブレグマン」⇔ DB「アレックス・ブレグマン」を姓で結ぶ。
-          final result = await conn.execute(
-            '''
-              UPDATE m_player p
-              SET url = \$1::text,
-                  updat = NOW()
-              FROM m_team t
-              WHERE p.id_team = t.id
-                AND t.name_shortest = \$2::text
-                AND COALESCE(p.flg_delete, FALSE) = FALSE
-                AND COALESCE(p.url, '') = ''
-                AND (
-                  p.name_full = \$3::text
-                  OR p.name_last = \$3::text
-                  OR COALESCE(p.name_last, '') || COALESCE(p.name_first, '') = \$3::text
-                  OR p.name_full LIKE \$3::text || '%'
-                  OR \$3::text LIKE p.name_full || '%'
-                  OR (
-                    COALESCE(p.name_last, '') <> ''
-                    AND length(p.name_last) >= 2
-                    AND \$3::text LIKE '%' || p.name_last
-                  )
-                  OR (
-                    length(regexp_replace(\$3::text, '^.*?[\\.．]', '')) >= 2
-                    AND (
-                      p.name_full LIKE '%' || regexp_replace(\$3::text, '^.*?[\\.．]', '')
-                      OR regexp_replace(p.name_full, '^.*・', '')
-                           = regexp_replace(\$3::text, '^.*?[\\.．]', '')
-                      OR p.name_last = regexp_replace(\$3::text, '^.*?[\\.．]', '')
-                    )
-                  )
-                  OR (
-                    position('・' in p.name_full) > 0
-                    AND length(regexp_replace(p.name_full, '^.*・', '')) >= 2
-                    AND (
-                      \$3::text LIKE '%' || regexp_replace(p.name_full, '^.*・', '')
-                      OR regexp_replace(\$3::text, '^.*?[\\.．]', '')
-                           = regexp_replace(p.name_full, '^.*・', '')
-                    )
-                  )
-                )
-            ''',
-            parameters: [profileUrl, team, name],
-          );
-          if (result.affectedRows > 0) {
-            updated += result.affectedRows;
-            pageHit += result.affectedRows;
-          }
+          final teams = await conn.execute('SELECT id FROM m_team WHERE name_shortest=\$1 AND NOT coalesce(flg_delete,false)', parameters:[team]);
+          if (teams.length != 1) continue;
+          final id = await PlayerIdentity.find(conn, name:name, teamId:teams.single[0] as int,
+              url:profileUrl, allowUniqueAbbreviation:true);
+          if (id == null) continue;
+          await PlayerIdentity.remember(conn,id,name,url:profileUrl);
+          updated++;
+          pageHit++;
         }
         print('MLBランキングURL: $pageN/${pages.length} +$pageHit ($pageUrl)');
       } catch (e) {
@@ -1022,7 +981,7 @@ class FetchMLB {
             if (gameTop != null) await FetchURL.saveGameTop(conn, gameTop, game.id, idTeamHome, idTeamAway, matchState);
             final loaded = await GameStatsLoad.isLoaded(conn, game.id);
             // 日本時間の朝は UTC では前日なので、日付が「明日」でも開始済みなら出場成績を取る。
-            if (GameStatsLoad.needsRefresh(finished: finished, loaded: loaded) && href.isNotEmpty && game.id > 0) {
+            if (GameStatsLoad.needsRefresh(finished: finished, loaded: loaded, live: live) && href.isNotEmpty && game.id > 0) {
               var summarySaved = false;
               var detailsSaved = false;
               try {
@@ -1293,81 +1252,6 @@ class FetchMLB {
     );
   }
 
-  static Future<int> _ensurePlayer(Connection conn, String rawName, int teamId) async {
-    final name = StringTool.noSpace(rawName);
-    if (name.isEmpty) return 0;
-    final parsed = parsePlayerName(name);
-    try {
-      final rows = await conn.execute(
-        '''
-          SELECT id, name_full, name_last, COALESCE(name_first_initial, '') AS name_first_initial
-          FROM m_player
-          WHERE id_team = \$1::int
-            AND COALESCE(flg_delete, FALSE) = FALSE
-        ''',
-        parameters: [teamId],
-      );
-      final candidates = <({int id, String nameFull, String nameLast, String initial})>[];
-      for (final row in rows) {
-        final map = row.toColumnMap();
-        final full = StringTool.noSpace('${map['name_full'] ?? ''}');
-        final last = StringTool.noSpace('${map['name_last'] ?? ''}');
-        final initial = '${map['name_first_initial'] ?? ''}'.trim().toUpperCase();
-        if (!playerNameMatches(query: name, nameFull: full, nameLast: last, storedInitial: initial)) {
-          continue;
-        }
-        candidates.add((
-          id: map['id'] as int,
-          nameFull: full,
-          nameLast: last,
-          initial: initial,
-        ));
-      }
-      final picked = pickBestPlayerId(query: name, candidates: candidates);
-      if (picked != null) {
-        final chosen = candidates.firstWhere((c) => c.id == picked);
-        final corrected = correctedNameInitial(chosen.nameFull, chosen.initial);
-        if (corrected != null) {
-          await conn.execute(
-            '''
-              UPDATE m_player
-              SET name_first_initial = \$1::text, updat = NOW()
-              WHERE id = \$2::int
-            ''',
-            parameters: [corrected, picked],
-          );
-        } else if (parsed.hasInitial && chosen.initial.trim().isEmpty) {
-          await conn.execute(
-            '''
-              UPDATE m_player
-              SET name_first_initial = \$1::text, updat = NOW()
-              WHERE id = \$2::int
-                AND COALESCE(BTRIM(name_first_initial), '') = ''
-            ''',
-            parameters: [parsed.initial, picked],
-          );
-        }
-        return picked;
-      }
-    } catch (_) {}
-    final player = m_player();
-    final parts = rawName.trim().split(RegExp(r'\s+'));
-    if (parts.length >= 2) {
-      player.name_last = StringTool.noSpace(parts.first);
-      player.name_first = StringTool.noSpace(parts.sublist(1).join());
-      player.name_full = player.name_last + player.name_first;
-    } else {
-      player.name_last = name;
-      player.name_first = '';
-      player.name_full = name;
-    }
-    if (parsed.hasInitial) {
-      player.name_first_initial = parsed.initial!;
-    } else {
-      final fromName = extractNameFirstInitial(player.name_full) ?? extractNameFirstInitial(player.name_last);
-      if (fromName != null) player.name_first_initial = fromName;
-    }
-    player.id_team = teamId;
-    return Postgres.insert(conn, player);
-  }
+  static Future<int> _ensurePlayer(Connection conn, String rawName, int teamId) =>
+      PlayerIdentity.ensure(conn, name: rawName.trim(), teamId: teamId);
 }

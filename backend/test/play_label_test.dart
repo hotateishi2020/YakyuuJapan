@@ -36,6 +36,64 @@ Map<String, dynamic> _row({
 }
 
 void main() {
+  test('表示用打席データに実際のイニングを保持する', () {
+    final labels = playLabelsByPlayer([
+      _row(result: Value.CodeGameResult.HIT_SINGLE, inning: 2, direction: 'LF'),
+      _row(result: Value.CodeGameResult.OUT_GROUND, inning: 5, direction: 'SS'),
+    ]);
+    expect(labels.values.single, '左安|single/inning2/bases6 遊ゴロ|out/inning5/bases6');
+  });
+
+  test('交代と非打撃進塁を打撃の上段用情報として保持する', () {
+    final codes = ['CHANGE_PITCHER', 'PINCH_HITTER', 'PINCH_RUNNER', 'PINCH_FIELDER', 'CHANGE_POSITION', 'STEAL_BASE_SAFE', 'WILD_PITCH', 'PASS_BALL', 'ERROR_RUNNING'];
+    final expected = ['投手', '代打', '代走', '代守', '守備位置転換', '盗塁', '暴投', '捕逸', '送球エラー'];
+    for (var i = 0; i < codes.length; i++) {
+      final event = _row(result: codes[i])..addAll({'id': 1, 'name_enter': '新 選手', 'name_exit': '旧 選手', 'code_position_from': 'LF', 'code_position_to': 'RF'});
+      final result = _row(result: 'OUT_GROUND')..addAll({'id': 2, 'flg_runner_first': true, 'flg_runner_second': true, 'flg_runner_third': true});
+      final labels = playLabelsByPlayer([event, result]).values.join(' ');
+      expect(labels, contains('/event${Uri.encodeComponent(expected[i])}')); 
+      // イベント後の満塁ではなく、打席開始時の二・三塁を表示する。
+      expect(labels, contains('/bases6'));
+    }
+  });
+
+  test('守備位置のDBコードを名字とfrom/toへ変換する', () {
+    for (final data in [('近藤', '健介', 'RIGHT', 'LEFT', '右→左'), ('川村', '友斗', 'LEFT', 'RIGHT', '左→右')]) {
+      final event = _row(result: 'CHANGE_POSITION')..addAll({
+        'id': 1, 'name_enter': '${data.$1}　${data.$2}', 'name_enter_last': data.$1,
+        'code_position_from': data.$3, 'code_position_to': data.$4,
+      });
+      final hit = _row(result: Value.CodeGameResult.HIT_SINGLE)..['id'] = 2;
+      final labels = playLabelsByPlayer([event, hit]).values.join(' ');
+      expect(labels, contains(Uri.encodeComponent('守備位置転換:${data.$1}(${data.$5})')));
+      expect(labels, isNot(contains(Uri.encodeComponent(data.$2))));
+    }
+  });
+
+  test('代守は移動先だけ、守転は移動元と移動先を表示する', () {
+    final events = [
+      _row(result: 'PINCH_FIELDER', inning: 9)..addAll({
+        'id': 1, 'name_enter': '三森　大貴', 'name_enter_last': '三森',
+        'code_position_from': '', 'code_position_to': 'CENTER',
+      }),
+      _row(result: 'CHANGE_POSITION', inning: 9)..addAll({
+        'id': 2, 'name_enter': '蝦名　達夫', 'name_enter_last': '蝦名',
+        'code_position_from': 'CENTER', 'code_position_to': 'RIGHT',
+      }),
+      _row(result: 'STRIKE_OUT', inning: 9)..['id'] = 3,
+    ];
+    final labels = playLabelsByPlayer(events).values.join(' ');
+    expect(labels, contains(Uri.encodeComponent('代守:三森(中)')));
+    expect(labels, contains(Uri.encodeComponent('守備位置転換:蝦名(中→右)')));
+    expect(labels, isNot(contains(Uri.encodeComponent('三森(→中)'))));
+  });
+
+  test('走者の情報がない打席は塁を推測しない', () {
+    final row = _row(result: 'OUT_GROUND')
+      ..remove('flg_runner_first')..remove('flg_runner_second')..remove('flg_runner_third');
+    expect(playLabelsByPlayer([row]).values.single, isNot(contains('/bases')));
+  });
+
   test('代走盗塁は盗塁だけ、同じ打席の安打には盗塁を付ける', () {
     expect(
       formatPlayLabels([_row(result: Value.CodeGameResult.STEAL_BASE_SAFE, runner: '代走')]),

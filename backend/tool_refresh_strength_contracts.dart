@@ -1,3 +1,4 @@
+import 'app/ContractTransferShares.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:html/parser.dart' as html;
@@ -10,6 +11,7 @@ import 'tools/Postgres.dart';
 
 Future<void> main(List<String> args) async {
   final year = args.isEmpty ? DateTime.now().year : int.parse(args.first);
+  await refreshContractTransfers(year);
   final client = http.Client();
   var errors = 0;
   final cache = Directory('/tmp/koko-contract-cache-$year')

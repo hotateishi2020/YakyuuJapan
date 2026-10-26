@@ -2959,17 +2959,17 @@ void main() {
     expect(find.text('二ゴ'), findsNothing);
     expect(find.text('左飛'), findsNothing);
     expect(find.text('代打同点タイムリー'), findsOneWidget);
-    expect(find.text('代打：トミー・ファム'), findsOneWidget);
+    expect(find.text('代打：トミー・ファム'), findsNothing);
     expect(find.text('代守：ブレンドン・ドイル'), findsNothing);
     expect(find.text('ブレンドン・ドイル'), findsNothing);
     expect(find.byKey(const ValueKey('pinch-badge')), findsNothing);
     expect(
-      (tester.widget<Container>(find.byKey(const ValueKey('pinch-caption-0'))).decoration as BoxDecoration).color,
+      (tester.widget<Container>(find.byKey(const ValueKey('notable-pinch-badge-トミー・ファム'))).decoration as BoxDecoration).color,
       const Color(0xFF5C6BC0),
     );
     expect(
-      tester.getTopLeft(find.text('代打：トミー・ファム')).dx,
-      greaterThan(tester.getTopRight(find.text('代打同点タイムリー')).dx - 1),
+      tester.getTopLeft(find.byKey(const ValueKey('notable-pinch-badge-トミー・ファム'))).dy,
+      lessThan(tester.getTopLeft(find.text('代打同点タイムリー')).dy),
     );
   });
 

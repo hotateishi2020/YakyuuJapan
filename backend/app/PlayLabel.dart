@@ -24,6 +24,7 @@ String playPlayerKey(dynamic idGame, dynamic idTeam, dynamic name) {
 /// 各結果は「表示|種別」。その選手の最初の打席から記録順。
 Map<String, String> playLabelsByPlayer(List<Map<String, dynamic>> rows) {
   _assignTimeline(rows);
+  _attachPlateDisplayMetadata(rows);
   _attachNonBattingRunFlags(rows);
   final grouped = <String, List<Map<String, dynamic>>>{};
   for (final row in rows) {
@@ -37,14 +38,14 @@ Map<String, String> playLabelsByPlayer(List<Map<String, dynamic>> rows) {
   }
   final labels = <String, String>{};
   for (final entry in grouped.entries) {
-    final text = formatPlayLabels(entry.value);
+    final text = formatPlayLabels(entry.value, includeInning: true);
     if (text.isNotEmpty) labels[entry.key] = text;
   }
   return labels;
 }
 
 /// 1人分の打席を、最初の打席から記録順に連結する。
-String formatPlayLabels(Iterable<Map<String, dynamic>> rows) {
+String formatPlayLabels(Iterable<Map<String, dynamic>> rows, {bool includeInning = false}) {
   final ordered = rows.toList()
     ..sort((a, b) {
       final bySeq = _asInt(a['_seq']).compareTo(_asInt(b['_seq']));
@@ -66,7 +67,19 @@ String formatPlayLabels(Iterable<Map<String, dynamic>> rows) {
 
   void flush() {
     for (final chip in _chipsForPlate(plate)) {
-      labels.add((text: chip.text, kind: chip.kind));
+      final inning = plate.isEmpty ? 0 : _asInt(plate.first['int_inning']);
+      var kind = includeInning && inning > 0 ? '${chip.kind}/inning$inning' : chip.kind;
+      if (includeInning) {
+        final batting = plate.where((r) => _isBattingResult('${r['code_result'] ?? ''}')).firstOrNull;
+        if (batting != null) {
+          final bases = batting['_entryBases'] ?? _baseMask(batting);
+          if (bases != null) kind += '/bases$bases';
+          for (final event in (batting['_displayEvents'] as List<String>? ?? const <String>[])) {
+            kind += '/event${Uri.encodeComponent(event)}';
+          }
+        }
+      }
+      labels.add((text: chip.text, kind: kind));
     }
     plate.clear();
   }
@@ -82,6 +95,87 @@ String formatPlayLabels(Iterable<Map<String, dynamic>> rows) {
   }
   if (plate.isNotEmpty) flush();
   return labels.map((chip) => '${chip.text}|${chip.kind}').join(' ');
+}
+
+int? _baseMask(Map<String, dynamic> row) {
+  if (!['flg_runner_first', 'flg_runner_second', 'flg_runner_third'].every(row.containsKey)) return null;
+  return (_asBool(row['flg_runner_first']) ? 1 : 0) |
+      (_asBool(row['flg_runner_second']) ? 2 : 0) |
+      (_asBool(row['flg_runner_third']) ? 4 : 0);
+}
+
+String _plateEventLabel(Map<String, dynamic> row) {
+  final type = switch ('${row['code_result'] ?? ''}') {
+    'CHANGE_PITCHER' => '投手', 'PINCH_HITTER' => '代打',
+    'PINCH_RUNNER' => '代走', 'PINCH_FIELDER' => '代守',
+    'CHANGE_POSITION' => '守備位置転換', 'STEAL_BASE_SAFE' => '盗塁',
+    'STEAL_BASE_OUT' => '盗塁失敗', 'WILD_PITCH' => '暴投',
+    'PASS_BALL' => '捕逸', 'ERROR_RUNNING' => '送球エラー',
+    _ => '',
+  };
+  if (type.isEmpty) return '';
+  String name(dynamic value) => value == null ? '' : StringTool.noSpace('$value');
+  final entered = name(row['name_enter'] ?? row['name_runner']);
+  final exited = name(row['name_exit']);
+  const positions = {'LEFT':'左','RIGHT':'右','CENTER':'中','FIRST':'一','SECOND':'二','THIRD':'三','P':'投', 'C':'捕', '1B':'一', '2B':'二', '3B':'三', 'SS':'遊', 'LF':'左', 'CF':'中', 'RF':'右', 'DH':'指'};
+  String position(dynamic value) => positions['$value'] ?? name(value);
+  String surname(String side) {
+    final stored = name(row['name_${side}_last']);
+    if (stored.isNotEmpty) return stored;
+    final full = '${row['name_$side'] ?? ''}'.trim();
+    return full.split(RegExp(r'[\s　]+')).first;
+  }
+  if (type == '代走') return '$type:${surname('enter')}';
+  if (type == '守備位置転換' || type == '代守') {
+    final from = position(row['code_position_from']);
+    final to = position(row['code_position_to']);
+    final player = surname('enter').isEmpty ? surname('exit') : surname('enter');
+    if (type == '代守') return '$type:$player${to.isEmpty ? '' : '($to)'}';
+    return '$type:$player${from.isEmpty && to.isEmpty ? '' : '($from→$to)'}';
+  }
+  if (['投手', '代打', '代走', '代守'].contains(type)) {
+    return '$type:${exited.isEmpty ? '' : '$exited→'}$entered';
+  }
+  return entered.isEmpty ? type : '$type:$entered';
+}
+
+// 打撃結果と別に記録される交代・進塁を、その時点の打者の打席へ付ける。
+void _attachPlateDisplayMetadata(List<Map<String, dynamic>> rows) {
+  final halves = <String, List<Map<String, dynamic>>>{};
+  for (final row in rows) {
+    row.remove('_displayEvents');
+    row.remove('_entryBases');
+    final key = '${row['id_game']}|${row['int_inning']}|${row['flg_bottom']}';
+    halves.putIfAbsent(key, () => []).add(row);
+  }
+  for (final half in halves.values) {
+    half.sort((a, b) => _asInt(a['_seq']).compareTo(_asInt(b['_seq'])));
+    for (var i = 0; i < half.length; i++) {
+      final event = half[i];
+      final label = _plateEventLabel(event);
+      if (label.isEmpty) continue;
+      bool matches(Map<String, dynamic> row) => _isBattingResult('${row['code_result'] ?? ''}') &&
+          (_asInt(event['int_batting_order']) == 0 || _asInt(row['int_batting_order']) == _asInt(event['int_batting_order']));
+      final candidates = <int>[for (var j = 0; j < half.length; j++) if (matches(half[j])) j];
+      // 同じ回の2打席を区別し、アウト数と記録上の距離が近い打席に付ける。
+      candidates.sort((a, b) {
+        final outA = (_asInt(half[a]['cnt_out']) - _asInt(event['cnt_out'])).abs();
+        final outB = (_asInt(half[b]['cnt_out']) - _asInt(event['cnt_out'])).abs();
+        if (outA != outB) return outA.compareTo(outB);
+        final distance = (a - i).abs().compareTo((b - i).abs());
+        return distance != 0 ? distance : b.compareTo(a);
+      });
+      // 盗塁死で攻撃終了し次の打席結果がない場合は、直前の打席の上段に残す。
+      final previous = half.take(i).where((r) => _isBattingResult('${r['code_result'] ?? ''}')).lastOrNull;
+      final target = candidates.isEmpty ? previous : half[candidates.first];
+      if (target == null) continue;
+      (target.putIfAbsent('_displayEvents', () => <String>[]) as List<String>).add(label);
+      // 後から起きたイベントで打席開始時の走者を上書きしない。
+      if (candidates.isNotEmpty && candidates.first > i && _baseMask(event) != null) {
+        target.putIfAbsent('_entryBases', () => _baseMask(event));
+      }
+    }
+  }
 }
 
 bool _isNonBattingRunResult(String result) {

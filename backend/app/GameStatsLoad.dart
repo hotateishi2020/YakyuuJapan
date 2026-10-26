@@ -5,14 +5,25 @@ import 'GameFetchSchedule.dart';
 
 /// t_game.flg_stats_loaded — 終了試合の選手成績（出場成績＋打席）を取り終えたか。
 class GameStatsLoad {
-  /// 全成績は試合終了後、保存が完了するまでだけ取得する。
-  static bool needsRefresh({required bool finished, required bool loaded}) {
-    return finished && !loaded;
+  static DateTime? _liveViewerUntil;
+  static bool enableLiveViewer(int? userId, {DateTime? now}) {
+    if (userId != 1 && userId != 2) return false;
+    _liveViewerUntil = (now ?? DateTime.now()).add(const Duration(seconds: 90));
+    return true;
+  }
+  static bool liveViewerActive({DateTime? now}) =>
+      _liveViewerUntil?.isAfter(now ?? DateTime.now()) ?? false;
+  static bool isLive(String state) => !state.contains('終了') &&
+      (state.contains('試合中') || RegExp(r'\d+\s*回').hasMatch(state));
+
+  /// Detailed live collection is enabled only while an authorized viewer is active.
+  static bool needsRefresh({required bool finished, required bool loaded, bool live = false}) {
+    return (finished && !loaded) || (live && liveViewerActive());
   }
 
   static Future<bool> canFetchDetails(Connection conn, int gameId) async {
     final rows = await conn.execute("SELECT state, COALESCE(flg_stats_loaded, FALSE) FROM t_game WHERE id = \$1", parameters: [gameId]);
-    return rows.isNotEmpty && needsRefresh(finished: '${rows.first[0]}'.contains('試合終了'), loaded: rows.first[1] == true);
+    return rows.isNotEmpty && needsRefresh(finished: '${rows.first[0]}'.contains('試合終了'), loaded: rows.first[1] == true, live: isLive('${rows.first[0]}'));
   }
 
   /// 試合終了で勝利投手がいるのに、出場成績の勝・負・H・Sが一人も無い。

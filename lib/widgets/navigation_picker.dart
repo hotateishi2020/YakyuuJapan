@@ -170,6 +170,12 @@ class NavigationPickerBar extends StatelessWidget {
           return LayoutBuilder(builder: (context, constraints) {
             final pickerWidths = [for (final entry in entries) _pickerWidth(context, entry)];
             final last = entries.last;
+            if (entries.length == 1 && last.level == 0 && last.alwaysTabs && constraints.maxWidth.isFinite) {
+              return SizedBox(height: 40, width: constraints.maxWidth,
+                child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft,
+                  child: _options(last, [for (final value in last.labels.keys) _optionWidth(context, last, value)])));
+            }
+
             final optionWidths = [for (final value in last.labels.keys) _optionWidth(context, last, value)];
             final separatorWidth = _textWidth(context, '>') + 12;
             final requiredWidth = pickerWidths.take(entries.length - 1).fold<double>(0, (a, b) => a + b) +

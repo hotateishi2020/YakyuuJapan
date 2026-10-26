@@ -33,10 +33,11 @@ class AppSql {
       SELECT
         m_player.id
       FROM m_player
-      WHERE regexp_replace(m_player.name_full, '[[:space:]]', '', 'g')
-          = regexp_replace(\$1, '[[:space:]]', '', 'g')
+      WHERE player_identity_key(\$1) = ANY(m_player.name_pattern_keys)
         AND m_player.id_team = \$2
         AND COALESCE(m_player.flg_delete, FALSE) = FALSE
+        AND 1=(SELECT count(*) FROM m_player p WHERE p.id_team=\$2
+          AND NOT coalesce(p.flg_delete,false) AND player_identity_key(\$1)=ANY(p.name_pattern_keys))
       ORDER BY (
         SELECT COALESCE(MAX(c.double_inning), -1)
         FROM m_player_career c
@@ -1058,12 +1059,15 @@ class AppSql {
         d.flg_goodbye,
         d.code_direction_batting,
         d.code_position_from,
+        d.code_position_to,
         COALESCE(d.flg_fine_play, FALSE) AS flg_fine_play,
         runner.name_full AS name_runner,
         runner.id_team AS id_team_runner,
         g.id_team_home,
         g.id_team_away,
         entered.name_full AS name_enter,
+        entered.name_last AS name_enter_last,
+        exited.name_last AS name_exit_last,
         exited.name_full AS name_exit
       FROM t_game_details d
         INNER JOIN m_player p ON p.id = d.id_batter
@@ -1125,7 +1129,7 @@ class AppSql {
 
   static String selectPlayersByTeams() {
     return '''
-      SELECT id, id_team, name_full, name_last, name_first,
+      SELECT id, id_team, name_full, name_last, name_first, name_patterns,
              COALESCE(name_first_initial, '') AS name_first_initial
       FROM m_player
       WHERE id_team IN (\$1, \$2)
@@ -1562,7 +1566,7 @@ ORDER BY mt.id_league, tpt.int_rank
         tsp.id_team,
         m_stats.flg_pitcher,
         m_league.name_short AS league_name,
-        COALESCE(m_player.name_last, '') || COALESCE(m_player.name_first, '') AS prediction_name,
+        COALESCE(m_player.name_full, '') AS prediction_name,
         m_team.name_shortest AS name_team,
         m_team.color_font,
         m_team.color_back,

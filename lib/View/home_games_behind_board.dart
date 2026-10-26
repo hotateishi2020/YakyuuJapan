@@ -1,3 +1,4 @@
+import '../tools/home_data_cache.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -21,14 +22,18 @@ class HomeGamesBehindBoard extends StatefulWidget {
 class _HomeGamesBehindBoardState extends State<HomeGamesBehindBoard> {
   late Future<List<Map<String, dynamic>>> _rows;
 
-  Future<List<Map<String, dynamic>>> _load() async {
+  Future<List<Map<String, dynamic>>> _load({bool refresh = false}) async {
+    final org = widget.org;
+    final data = await HomeDataCache.read('standings:${org.kind.name}:${widget.year}', () async {
     final response = await http.get(Env.api(
         '/predictions/part?org=${widget.org.kind.name}&part=standings&year=${widget.year}'))
         .timeout(const Duration(seconds: 60));
     if (response.statusCode != 200) throw const FormatException();
     final data = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
     if (data['pending'] == true) throw const FormatException();
-    return listMapFromJson(data['stats_team']).where(widget.org.rowBelongs).toList();
+    return Map<String, dynamic>.from(data);
+    }, refresh: refresh);
+    return listMapFromJson(data['stats_team']).where(org.rowBelongs).toList();
   }
 
   @override
@@ -52,7 +57,7 @@ class _HomeGamesBehindBoardState extends State<HomeGamesBehindBoard> {
       if (snapshot.hasError) {
         return Column(children: [
           const Text('ゲーム差を取得できませんでした。'),
-          TextButton(onPressed: () => setState(() => _rows = _load()),
+          TextButton(onPressed: () => setState(() => _rows = _load(refresh: true)),
             child: const Text('再読み込み')),
         ]);
       }

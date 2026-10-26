@@ -27,6 +27,7 @@ class PageSnapshot {
       {required String kind, required OrgKind org, required int year, String? section}) async {
     const sections = {
       'timeline': ['org', 'year', 'standings', 'timeline', 'championship_summary'],
+      'record_titles': ['org', 'year', 'titles'],
       'titles': ['org', 'year', 'season_awards', 'season_award_supplement', 'titles', 'minor_title_leaders', 'standings', 'season'],
     };
     final fields = sections[section];

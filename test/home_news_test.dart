@@ -20,6 +20,18 @@ void main() {
       final news = find.byKey(const ValueKey('home-news'));
       final scroll = find.byKey(const ValueKey('home-news-scroll'));
       expect(news, findsOneWidget);
+      final score = find.text('予想対決のスコア');
+      expect(score, findsOneWidget);
+      expect(tester.getRect(news).bottom, lessThan(tester.getRect(score).top));
+      final navigation = find.byKey(const ValueKey('navigation-picker-0'));
+      expect(find.descendant(of: navigation, matching: find.byType(DropdownButton<int>)), findsNothing);
+      final tabs = ['🏠HOME', '🎯予想対決', '🇯🇵NPB', '🇺🇸MLB', '⚾️その他'];
+      final top = tester.getRect(find.text(tabs.first)).top;
+      for (final label in tabs) {
+        expect(find.text(label), findsOneWidget);
+        expect(tester.getRect(find.text(label)).top, closeTo(top, .1));
+      }
+
       expect(tester.getSize(scroll).height, closeTo(110, .1));
       expect(tester.getRect(news).bottom,
           lessThan(tester.getRect(find.textContaining('HOME  ')).top));

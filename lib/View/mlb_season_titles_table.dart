@@ -80,7 +80,7 @@ class MlbSeasonTitlesTable extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text('$year年 タイトル', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: SeasonTitlesTable.ink)),
-                    const Padding(padding: EdgeInsets.symmetric(vertical: 14), child: Text('「現在首位」は受賞確定ではありません。未定の項目は受賞者を表示していません。', style: TextStyle(fontSize: 12, color: SeasonTitlesTable.muted))),
+                    const Padding(padding: EdgeInsets.symmetric(vertical: 14), child: Text('未定の項目は受賞者を表示していません。', style: TextStyle(fontSize: 12, color: SeasonTitlesTable.muted))),
                     shared.surface(Column(key: const ValueKey('mlb-titles-grid-series'), children: [
                       shared.label('ワールドシリーズ', SeasonTitlesTable.red),
                       shared.line([shared.label('優勝チーム', SeasonTitlesTable.gold), shared.label('MVP', SeasonTitlesTable.gold)]),

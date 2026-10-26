@@ -1,3 +1,4 @@
+import 'GamesBoard.dart' show mlbTeamAbbrev;
 import 'player_detail_dialog.dart';
 import 'compact_layout.dart';
 import '../logic/baseball_labor.dart';
@@ -35,6 +36,17 @@ String contractSalaryLabel(Map<String, dynamic> salary) {
   return rate != null && rate.isFinite && rate > 0 ? '$label（約${salaryAmount((amount * rate).floor(), 'JPY')}）' : '$label（円換算未確認）';
 }
 
+/// Only complete, positive allocations can set gauge proportions.
+List<Map<String, dynamic>> contractSalaryShares(Map<String, dynamic> salary) {
+  final shares = listMapFromJson(salary['team_shares']);
+  if (shares.length < 2 || shares.any((s) => '${s['team'] ?? ''}'.isEmpty || usageInt(s['amount']) <= 0)) return [];
+  if (shares.fold<int>(0, (sum, s) => sum + usageInt(s['amount'])) != usageInt(salary['amount'])) return [];
+  return shares;
+}
+
+String contractShareLabel(Map<String, dynamic> salary, Map<String, dynamic> share) =>
+    '${share['team']}${share['method'] == 'tenure_estimate' ? '負担目安' : '負担'}：${share['estimated'] == true ? '約' : ''}${salaryAmount(usageInt(share['amount']), '${salary['currency'] ?? 'JPY'}')}';
+
 String contractExchangeTooltip(Map<String, dynamic> salary) {
   if (salary['projected'] == true) {
     return '${contractSalaryLabel(salary)}\n${salary['projection_note']}';
@@ -71,6 +83,7 @@ List<Map<String, dynamic>> contractDisplaySalaries(List<Map<String, dynamic>> sa
       ...current,
       'year': next,
       'projected': true,
+      'team_shares': null,
       'projection_note': '$year年の年俸が同額で継続すると仮定した表示（契約期限：$end年）',
       'contract_source_url': contract['source_url'],
     });
@@ -141,7 +154,10 @@ Color contractTeamColor(Map<String, dynamic> period, List<Map<String, dynamic>> 
   final name = '${period['team'] ?? ''}'.trim();
   if (name.isNotEmpty) {
     for (final team in teams) {
-      if (['name_team', 'name_shortest', 'name_full', 'abbreviation'].any((field) => '${team[field] ?? ''}'.trim() == name)) {
+      if (['name_team', 'name_shortest', 'name_full', 'abbreviation'].any((field) {
+        final candidate = '${team[field] ?? ''}'.trim();
+        return candidate == name || (mlbTeamAbbrev(name) != null && mlbTeamAbbrev(candidate) == mlbTeamAbbrev(name));
+      })) {
         return parseColorNameOrNull('${team['color_back']}') ?? Colors.blueGrey;
       }
     }
@@ -171,6 +187,29 @@ List<Map<String, dynamic>> contractTimelineBands(List<Map<String, dynamic>> peri
       'period': '$year年 所属履歴',
       'detail': '${salary['detail'] ?? ''}',
     });
+  }
+  // Replace only the affected year, retaining the rest of multi-year terms.
+  for (final salary in salaries) {
+    final shares = contractSalaryShares(salary);
+    final year = usageInt(salary['year']);
+    if (shares.isEmpty || year <= 0) continue;
+    final covering = bands.where((b) => usageInt(b['start_year']) <= year && usageInt(b['end_year']) >= year).toList();
+    bands.removeWhere((b) => covering.contains(b));
+    for (final band in covering) {
+      if (usageInt(band['start_year']) < year) bands.add({...band, 'end_year': year - 1});
+      if (usageInt(band['end_year']) > year) bands.add({...band, 'start_year': year + 1});
+    }
+    var offset = 0.0;
+    for (final share in shares) {
+      final fraction = usageInt(share['amount']) / usageInt(salary['amount']);
+      bands.add({
+        'start_year': year, 'end_year': year, 'team': share['team'],
+        'start_fraction': offset, 'width_fraction': fraction,
+        'period': '$year年 ${contractShareLabel(salary, share)}',
+        'detail': '${share['detail'] ?? ''}\n${share['source_url'] ?? salary['source_url'] ?? ''}',
+      });
+      offset += fraction;
+    }
   }
   return bands;
 }
@@ -641,7 +680,7 @@ class _StrengthContractsState extends State<StrengthContracts> {
         builder: (context, child) => Transform.translate(offset: Offset(_horizontal.hasClients ? _horizontal.offset : 0, 0), child: child),
       );
 
-  Widget get _notes => const Padding(padding: EdgeInsets.all(8), child: Text('札束は1段につきNPBは5億円、MLBは2000万ドルで折り返します。年ごとの推定年俸を契約帯の下に表示します。契約期間未確認の年も、年俸・所属が確認できれば球団色で表示します。確認状況は帯の詳細で確認できます。生涯年俸は選択年度までに取得できた年俸の合計（推定額を含む）です。未取得年と将来年は含みません。生涯年俸の札束はNPBでは20億円、MLBでは2000万ドルごとに折り返します。NPBのドル建て年俸は契約時レートで円換算できた分のみ描画します。円と米ドルは別の尺度です。円換算は契約日当日（休業日は直前公表日）のECBレートによる概算です。契約日・レート未確認の場合は換算しません。FAラベルは確認できた取得年（再取得を含む）のみ表示します。将来の最短試算は「見込み」と表示し、一軍登録日数等により変わります。ラベルから根拠を確認できます。', style: TextStyle(fontSize: 11)));
+  Widget get _notes => const Padding(padding: EdgeInsets.all(8), child: Text('札束は1段につきNPBは5億円、MLBは2000万ドルで折り返します。年ごとの推定年俸を契約帯の下に表示します。途中移籍年は確認できた球団別の年俸負担割合で帯を分割し、総額の下に負担額を表示します。負担額の公表がない途中移籍は在籍日数按分の「負担目安」を表示します。球団間の負担金・個別精算は未反映です。契約期間未確認の年も、年俸・所属が確認できれば球団色で表示します。確認状況は帯の詳細で確認できます。生涯年俸は選択年度までに取得できた年俸の合計（推定額を含む）です。未取得年と将来年は含みません。生涯年俸の札束はNPBでは20億円、MLBでは2000万ドルごとに折り返します。NPBのドル建て年俸は契約時レートで円換算できた分のみ描画します。円と米ドルは別の尺度です。円換算は契約日当日（休業日は直前公表日）のECBレートによる概算です。契約日・レート未確認の場合は換算しません。FAラベルは確認できた取得年（再取得を含む）のみ表示します。将来の最短試算は「見込み」と表示し、一軍登録日数等により変わります。ラベルから根拠を確認できます。', style: TextStyle(fontSize: 11)));
 
   bool get _pinCareer => !compactBaseballLayout(context);
   Widget _careerCell(Widget child) => _pinCareer ? _pinnedName(child) : child;
@@ -818,8 +857,9 @@ class _StrengthContractsState extends State<StrengthContracts> {
                                       final bands = contractTimelineBands(periods, salaries, listMapFromJson(e['affiliations'])).where((b) => !compact || usageInt(b['start_year']) <= year && usageInt(b['end_year']) >= year).toList();
                                       final lineHeight = _textHeight(context, '年俸', const TextStyle(fontSize: 11), yearWidth - 8);
                                       final periodHeight = (lineHeight + 4).clamp(22.0, double.infinity);
-                                      final topHeight = 4.0 + (first == last || bands.isEmpty ? 0 : periodHeight + 2);
-                                      final moneyHeight = salaries.any((s) => usageInt(s['year']) > 0) ? salaries.map((s) => salaryBarRows(usageInt(s['amount']), salaryWrapAmount('${s['currency'] ?? 'JPY'}'))).fold<int>(1, (a, b) => a > b ? a : b) * 32.0 + lineHeight + 2 : 0.0;
+                                      final topHeight = 4.0 + (bands.isEmpty ? 0 : periodHeight + 2);
+                                      final shareHeight = salaries.fold<double>(0, (height, salary) => math.max(height, contractSalaryShares(salary).length * (lineHeight + 2)));
+                                      final moneyHeight = salaries.any((s) => usageInt(s['year']) > 0) ? salaries.map((s) => salaryBarRows(usageInt(s['amount']), salaryWrapAmount('${s['currency'] ?? 'JPY'}'))).fold<int>(1, (a, b) => a > b ? a : b) * 32.0 + lineHeight + 2 + shareHeight : 0.0;
                                       final nameHeight = _textHeight(context, '${e['team']['name_team']}', const TextStyle(fontSize: 11), nameWidth - 16) + _textHeight(context, '${e['player']['name']}', const TextStyle(fontWeight: FontWeight.bold), nameWidth - 16) + 8;
                                       final futureNotes = {
                                         for (final entry in (e['future_notes'] as Map<int, String>).entries)
@@ -846,8 +886,8 @@ class _StrengthContractsState extends State<StrengthContracts> {
                                                     width: chartWidth,
                                                     child: Stack(children: [
                                                       for (var y = first; y <= last; y++) Positioned(left: (y - first) * yearWidth, top: 0, bottom: 0, child: Container(width: yearWidth, decoration: BoxDecoration(color: y == year ? Colors.amber.withValues(alpha: .18) : null, border: Border(left: BorderSide(color: Colors.grey.shade300))))),
-                                                      if (first != last)
-                                                        for (var i = 0; i < bands.length; i++) Positioned(left: (compact ? 0 : usageInt(bands[i]['start_year']) - first) * yearWidth + 2, top: 4, width: (compact ? 1 : usageInt(bands[i]['end_year']) - usageInt(bands[i]['start_year']) + 1) * yearWidth - 4, height: periodHeight, child: Tooltip(message: '${bands[i]['period'] ?? ''} ${bands[i]['detail'] ?? ''}', child: Container(alignment: Alignment.centerLeft, padding: const EdgeInsets.symmetric(horizontal: 6), decoration: BoxDecoration(color: contractTeamColor(bands[i], colorTeams), borderRadius: BorderRadius.circular(4)), child: Text(bands[i]['start_year'] == bands[i]['end_year'] ? '${bands[i]['start_year']} ${bands[i]['team'] ?? ''}' : '${bands[i]['start_year']}–${bands[i]['end_year']} ${bands[i]['team'] ?? ''}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: contractTeamColor(bands[i], colorTeams).computeLuminance() > .179 ? Colors.black : Colors.white))))),
+                                                      if (bands.isNotEmpty)
+                                                        for (var i = 0; i < bands.length; i++) Positioned(left: (compact ? 0 : usageInt(bands[i]['start_year']) - first) * yearWidth + ((bands[i]['start_fraction'] as num?)?.toDouble() ?? 0) * (yearWidth - 4) + 2, top: 4, width: ((bands[i]['width_fraction'] as num?)?.toDouble() ?? (compact ? 1 : usageInt(bands[i]['end_year']) - usageInt(bands[i]['start_year']) + 1)) * (yearWidth - (bands[i]['width_fraction'] != null ? 4 : 0)) - (bands[i]['width_fraction'] != null ? 0 : 4), height: periodHeight, child: Tooltip(message: '${bands[i]['period'] ?? ''} ${bands[i]['detail'] ?? ''}', child: Container(key: ValueKey('contract-band-${usagePlayerKey(e['player'])}-${bands[i]['start_year']}-${bands[i]['team']}'), alignment: Alignment.centerLeft, padding: const EdgeInsets.symmetric(horizontal: 6), decoration: BoxDecoration(color: contractTeamColor(bands[i], colorTeams), borderRadius: BorderRadius.circular(4)), child: Text(bands[i]['start_year'] == bands[i]['end_year'] ? '${bands[i]['start_year']} ${bands[i]['team'] ?? ''}' : '${bands[i]['start_year']}–${bands[i]['end_year']} ${bands[i]['team'] ?? ''}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: contractTeamColor(bands[i], colorTeams).computeLuminance() > .179 ? Colors.black : Colors.white))))),
                                                       for (final note in futureNotes.entries)
                                                         Positioned(
                                                           left: (note.key - first) * yearWidth + 4,
@@ -902,6 +942,12 @@ class _StrengthContractsState extends State<StrengthContracts> {
                                                                     ),
                                                                   ),
                                                                 ),
+                                                                for (final share in contractSalaryShares(salary))
+                                                                  Tooltip(message: '${share['detail'] ?? ''}\n${share['source_url'] ?? salary['source_url'] ?? ''}',
+                                                                    child: SizedBox(height: lineHeight + 2,
+                                                                      child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft,
+                                                                        child: Text(contractShareLabel(salary, share), style: const TextStyle(fontSize: 11)))),
+                                                                  ),
                                                                 SalaryMoneyBar(banknoteCurrency: salaryBanknoteCurrency(salary), amount: usageInt(salary['amount']), maximum: salaryWrapAmount('${salary['currency'] ?? 'JPY'}'), wrapAt: salaryWrapAmount('${salary['currency'] ?? 'JPY'}'), currency: '${salary['currency'] ?? 'JPY'}'),
                                                               ])),
                                                     ]))),

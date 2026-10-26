@@ -1,0 +1,4915 @@
+{
+  "checked_at": "2026-10-24",
+  "names": [
+    {
+      "name_en": "A.J. Burnett",
+      "name_ja": "A.J.バーネット",
+      "source": "http://www.wikidata.org/entity/Q278745"
+    },
+    {
+      "name_en": "Aaron Harang",
+      "name_ja": "アーロン・ハラング",
+      "source": "http://www.wikidata.org/entity/Q2820054"
+    },
+    {
+      "name_en": "Aaron Judge",
+      "name_ja": "アーロン・ジャッジ",
+      "source": "http://www.wikidata.org/entity/Q16234676"
+    },
+    {
+      "name_en": "Aaron Sanchez",
+      "name_ja": "アーロン・サンチェス",
+      "source": "http://www.wikidata.org/entity/Q16234981"
+    },
+    {
+      "name_en": "Abner Dalrymple",
+      "name_ja": "アブナー・ダルリンプル",
+      "source": "http://www.wikidata.org/entity/Q1252010"
+    },
+    {
+      "name_en": "Ace Adams",
+      "name_ja": "エース・アダムズ",
+      "source": "http://www.wikidata.org/entity/Q4672953"
+    },
+    {
+      "name_en": "Adalberto Mondesi",
+      "name_ja": "アダルベルト・モンデシー",
+      "source": "http://www.wikidata.org/entity/Q16236920"
+    },
+    {
+      "name_en": "Adam Duvall",
+      "name_ja": "アダム・デュバル",
+      "source": "http://www.wikidata.org/entity/Q17182656"
+    },
+    {
+      "name_en": "Adam Wainwright",
+      "name_ja": "アダム・ウェインライト",
+      "source": "http://www.wikidata.org/entity/Q1185516"
+    },
+    {
+      "name_en": "Addie Joss",
+      "name_ja": "アディ・ジョス",
+      "source": "http://www.wikidata.org/entity/Q2255564"
+    },
+    {
+      "name_en": "Adrián González",
+      "name_ja": "エイドリアン・ゴンザレス",
+      "source": "http://www.wikidata.org/entity/Q1151872"
+    },
+    {
+      "name_en": "Al Bumbry",
+      "name_ja": "アル・バンブリー",
+      "source": "http://www.wikidata.org/entity/Q4703628"
+    },
+    {
+      "name_en": "Al Downing",
+      "name_ja": "アル・ダウニング",
+      "source": "http://www.wikidata.org/entity/Q4703754"
+    },
+    {
+      "name_en": "Al Hrabosky",
+      "name_ja": "アル・ラボスキー",
+      "source": "http://www.wikidata.org/entity/Q4704059"
+    },
+    {
+      "name_en": "Al Kaline",
+      "name_ja": "アル・ケーライン",
+      "source": "http://www.wikidata.org/entity/Q202323"
+    },
+    {
+      "name_en": "Al Oliver",
+      "name_ja": "アル・オリバー",
+      "source": "http://www.wikidata.org/entity/Q2829385"
+    },
+    {
+      "name_en": "Al Orth",
+      "name_ja": "アル・オース",
+      "source": "http://www.wikidata.org/entity/Q4704574"
+    },
+    {
+      "name_en": "Al Rosen",
+      "name_ja": "アル・ローゼン",
+      "source": "http://www.wikidata.org/entity/Q2747018"
+    },
+    {
+      "name_en": "Al Simmons",
+      "name_ja": "アル・シモンズ",
+      "source": "http://www.wikidata.org/entity/Q711946"
+    },
+    {
+      "name_en": "Albert Belle",
+      "name_ja": "アルバート・ベル",
+      "source": "http://www.wikidata.org/entity/Q2422798"
+    },
+    {
+      "name_en": "Albert Pujols",
+      "name_ja": "アルバート・プホルス",
+      "source": "http://www.wikidata.org/entity/Q148726"
+    },
+    {
+      "name_en": "Albie Pearson",
+      "name_ja": "アルビー・ピアーソン",
+      "source": "http://www.wikidata.org/entity/Q4712353"
+    },
+    {
+      "name_en": "Alec Burleson",
+      "name_ja": "アレク・バールソン",
+      "source": "http://www.wikidata.org/entity/Q112208131"
+    },
+    {
+      "name_en": "Alejandro Pena",
+      "name_ja": "アレハンドロ・ペーニャ",
+      "source": "http://www.wikidata.org/entity/Q2832468"
+    },
+    {
+      "name_en": "Alex Colomé",
+      "name_ja": "アレックス・コロメ",
+      "source": "http://www.wikidata.org/entity/Q8076640"
+    },
+    {
+      "name_en": "Alex Johnson",
+      "name_ja": "アレックス・ジョンソン",
+      "source": "http://www.wikidata.org/entity/Q4717245"
+    },
+    {
+      "name_en": "Alex Rodriguez",
+      "name_ja": "アレックス・ロドリゲス",
+      "source": "http://www.wikidata.org/entity/Q558664"
+    },
+    {
+      "name_en": "Alfonso Soriano",
+      "name_ja": "アルフォンソ・ソリアーノ",
+      "source": "http://www.wikidata.org/entity/Q1363352"
+    },
+    {
+      "name_en": "Alfredo Griffin",
+      "name_ja": "アルフレド・グリフィン",
+      "source": "http://www.wikidata.org/entity/Q519251"
+    },
+    {
+      "name_en": "Allan Anderson",
+      "name_ja": "アラン・アンダーソン",
+      "source": "http://www.wikidata.org/entity/Q4730455"
+    },
+    {
+      "name_en": "Allen Russell",
+      "name_ja": "アレン・ラッセル",
+      "source": "http://www.wikidata.org/entity/Q4731856"
+    },
+    {
+      "name_en": "Allie Reynolds",
+      "name_ja": "アリー・レイノルズ",
+      "source": "http://www.wikidata.org/entity/Q4732530"
+    },
+    {
+      "name_en": "Alvin Davis",
+      "name_ja": "アルビン・デービス",
+      "source": "http://www.wikidata.org/entity/Q4738082"
+    },
+    {
+      "name_en": "Amos Otis",
+      "name_ja": "エイモス・オーティス",
+      "source": "http://www.wikidata.org/entity/Q4747930"
+    },
+    {
+      "name_en": "Amos Rusie",
+      "name_ja": "エイモス・ルーシー",
+      "source": "http://www.wikidata.org/entity/Q4747947"
+    },
+    {
+      "name_en": "Andre Dawson",
+      "name_ja": "アンドレ・ドーソン",
+      "source": "http://www.wikidata.org/entity/Q127582"
+    },
+    {
+      "name_en": "Andres Galarraga",
+      "name_ja": "アンドレス・ガララーガ",
+      "source": "http://www.wikidata.org/entity/Q1038979"
+    },
+    {
+      "name_en": "Andrew Bailey",
+      "name_ja": "アンドリュー・ベイリー",
+      "source": "http://www.wikidata.org/entity/Q1059981"
+    },
+    {
+      "name_en": "Andrew McCutchen",
+      "name_ja": "アンドリュー・マカッチェン",
+      "source": "http://www.wikidata.org/entity/Q574689"
+    },
+    {
+      "name_en": "Andruw Jones",
+      "name_ja": "アンドリュー・ジョーンズ",
+      "source": "http://www.wikidata.org/entity/Q1376903"
+    },
+    {
+      "name_en": "Andy Benes",
+      "name_ja": "アンディ・ベネス",
+      "source": "http://www.wikidata.org/entity/Q4760427"
+    },
+    {
+      "name_en": "Andy Messersmith",
+      "name_ja": "アンディ・メサースミス",
+      "source": "http://www.wikidata.org/entity/Q4761039"
+    },
+    {
+      "name_en": "Andy Pettitte",
+      "name_ja": "アンディ・ペティット",
+      "source": "http://www.wikidata.org/entity/Q372506"
+    },
+    {
+      "name_en": "Andy Van Slyke",
+      "name_ja": "アンディ・バンスライク",
+      "source": "http://www.wikidata.org/entity/Q2849181"
+    },
+    {
+      "name_en": "Angel Berroa",
+      "name_ja": "アンヘル・ベローア",
+      "source": "http://www.wikidata.org/entity/Q3034836"
+    },
+    {
+      "name_en": "Anthony Rendon",
+      "name_ja": "アンソニー・レンドン",
+      "source": "http://www.wikidata.org/entity/Q4773350"
+    },
+    {
+      "name_en": "Antonio Alfonseca",
+      "name_ja": "アントニオ・アルフォンセカ",
+      "source": "http://www.wikidata.org/entity/Q599576"
+    },
+    {
+      "name_en": "Aníbal Sánchez",
+      "name_ja": "アニバル・サンチェス",
+      "source": "http://www.wikidata.org/entity/Q936661"
+    },
+    {
+      "name_en": "Arky Vaughan",
+      "name_ja": "アーキー・ヴォーン",
+      "source": "http://www.wikidata.org/entity/Q2861599"
+    },
+    {
+      "name_en": "Armando Benítez",
+      "name_ja": "アーマンド・ベニテス",
+      "source": "http://www.wikidata.org/entity/Q4792737"
+    },
+    {
+      "name_en": "Atlee Hammaker",
+      "name_ja": "アトリー・ハマカー",
+      "source": "http://www.wikidata.org/entity/Q4816911"
+    },
+    {
+      "name_en": "Augie Galan",
+      "name_ja": "オージー・ギャラン",
+      "source": "http://www.wikidata.org/entity/Q4820394"
+    },
+    {
+      "name_en": "Babe Ruth",
+      "name_ja": "ベーブ・ルース",
+      "source": "http://www.wikidata.org/entity/Q213812"
+    },
+    {
+      "name_en": "Bake McBride",
+      "name_ja": "ベイク・マクブライド",
+      "source": "http://www.wikidata.org/entity/Q4849047"
+    },
+    {
+      "name_en": "Barry Bonds",
+      "name_ja": "バリー・ボンズ",
+      "source": "http://www.wikidata.org/entity/Q314712"
+    },
+    {
+      "name_en": "Barry Larkin",
+      "name_ja": "バリー・ラーキン",
+      "source": "http://www.wikidata.org/entity/Q1053189"
+    },
+    {
+      "name_en": "Barry Zito",
+      "name_ja": "バリー・ジト",
+      "source": "http://www.wikidata.org/entity/Q809118"
+    },
+    {
+      "name_en": "Bartolo Colon",
+      "name_ja": "バートロ・コローン",
+      "source": "http://www.wikidata.org/entity/Q2886078"
+    },
+    {
+      "name_en": "Ben Chapman",
+      "name_ja": "ベン・チャップマン",
+      "source": "http://www.wikidata.org/entity/Q2895367"
+    },
+    {
+      "name_en": "Ben Grieve",
+      "name_ja": "ベン・グリーブ",
+      "source": "http://www.wikidata.org/entity/Q2895451"
+    },
+    {
+      "name_en": "Ben Oglivie",
+      "name_ja": "ベン・オグリビー",
+      "source": "http://www.wikidata.org/entity/Q4886249"
+    },
+    {
+      "name_en": "Ben Revere",
+      "name_ja": "ベン・リビア",
+      "source": "http://www.wikidata.org/entity/Q2895541"
+    },
+    {
+      "name_en": "Benito Santiago",
+      "name_ja": "ベニート・サンティアゴ",
+      "source": "http://www.wikidata.org/entity/Q2895955"
+    },
+    {
+      "name_en": "Bert Blyleven",
+      "name_ja": "バート・ブライレブン",
+      "source": "http://www.wikidata.org/entity/Q1186030"
+    },
+    {
+      "name_en": "Bert Campaneris",
+      "name_ja": "バート・キャンパネリス",
+      "source": "http://www.wikidata.org/entity/Q4895000"
+    },
+    {
+      "name_en": "Bill Bruton",
+      "name_ja": "ブルートン",
+      "source": "http://www.wikidata.org/entity/Q4908300"
+    },
+    {
+      "name_en": "Bill Buckner",
+      "name_ja": "ビル・バックナー",
+      "source": "http://www.wikidata.org/entity/Q2903144"
+    },
+    {
+      "name_en": "Bill Campbell",
+      "name_ja": "ビル・キャンベル",
+      "source": "http://www.wikidata.org/entity/Q4908399"
+    },
+    {
+      "name_en": "Bill Dahlen",
+      "name_ja": "ビル・ダーレン",
+      "source": "http://www.wikidata.org/entity/Q4908652"
+    },
+    {
+      "name_en": "Bill Dinneen",
+      "name_ja": "ビル・ディニーン",
+      "source": "http://www.wikidata.org/entity/Q4908773"
+    },
+    {
+      "name_en": "Bill Doak",
+      "name_ja": "ビル・ドーク",
+      "source": "http://www.wikidata.org/entity/Q4908785"
+    },
+    {
+      "name_en": "Bill Gullickson",
+      "name_ja": "ビル・ガリクソン",
+      "source": "http://www.wikidata.org/entity/Q2903228"
+    },
+    {
+      "name_en": "Bill Hallahan",
+      "name_ja": "ウィリアム・H・ハラハン",
+      "source": "http://www.wikidata.org/entity/Q4909272"
+    },
+    {
+      "name_en": "Bill Joyce",
+      "name_ja": "ビル・ジョイス",
+      "source": "http://www.wikidata.org/entity/Q4909650"
+    },
+    {
+      "name_en": "Bill Madlock",
+      "name_ja": "ビル・マドロック",
+      "source": "http://www.wikidata.org/entity/Q2903287"
+    },
+    {
+      "name_en": "Bill Mueller",
+      "name_ja": "ビル・ミラー",
+      "source": "http://www.wikidata.org/entity/Q4910284"
+    },
+    {
+      "name_en": "Bill Sowders",
+      "name_ja": "ビル・ソーダーズ",
+      "source": "http://www.wikidata.org/entity/Q15998158"
+    },
+    {
+      "name_en": "Bill Swift",
+      "name_ja": "ビル・スウィフト",
+      "source": "http://www.wikidata.org/entity/Q4911090"
+    },
+    {
+      "name_en": "Bill Terry",
+      "name_ja": "ビル・テリー",
+      "source": "http://www.wikidata.org/entity/Q2812721"
+    },
+    {
+      "name_en": "Bill Virdon",
+      "name_ja": "ビル・バードン",
+      "source": "http://www.wikidata.org/entity/Q2903378"
+    },
+    {
+      "name_en": "Bill Walker",
+      "name_ja": "ビル・ウォーカー",
+      "source": "http://www.wikidata.org/entity/Q4911265"
+    },
+    {
+      "name_en": "Billy Goodman",
+      "name_ja": "ビリー・グッドマン",
+      "source": "http://www.wikidata.org/entity/Q4912620"
+    },
+    {
+      "name_en": "Billy Herman",
+      "name_ja": "ビリー・ハーマン",
+      "source": "http://www.wikidata.org/entity/Q863124"
+    },
+    {
+      "name_en": "Billy Pierce",
+      "name_ja": "ビリー・ピアース",
+      "source": "http://www.wikidata.org/entity/Q4913170"
+    },
+    {
+      "name_en": "Billy Rhines",
+      "name_ja": "ビリー・ラインズ",
+      "source": "http://www.wikidata.org/entity/Q4913234"
+    },
+    {
+      "name_en": "Billy Werber",
+      "name_ja": "ビリー・ワーバー",
+      "source": "http://www.wikidata.org/entity/Q4913454"
+    },
+    {
+      "name_en": "Billy Williams",
+      "name_ja": "ビリー・ウィリアムズ",
+      "source": "http://www.wikidata.org/entity/Q4913471"
+    },
+    {
+      "name_en": "Blake Snell",
+      "name_ja": "ブレイク・スネル",
+      "source": "http://www.wikidata.org/entity/Q21062597"
+    },
+    {
+      "name_en": "Bo Bichette",
+      "name_ja": "ボー・ビシェット",
+      "source": "http://www.wikidata.org/entity/Q24572140"
+    },
+    {
+      "name_en": "Bob Allison",
+      "name_ja": "ボブ・アリソン",
+      "source": "http://www.wikidata.org/entity/Q2907564"
+    },
+    {
+      "name_en": "Bob Bescher",
+      "name_ja": "ボブ・ベスチャー",
+      "source": "http://www.wikidata.org/entity/Q4931821"
+    },
+    {
+      "name_en": "Bob Elliott",
+      "name_ja": "ボブ・エリオット",
+      "source": "http://www.wikidata.org/entity/Q4932365"
+    },
+    {
+      "name_en": "Bob Feller",
+      "name_ja": "ボブ・フェラー",
+      "source": "http://www.wikidata.org/entity/Q1206676"
+    },
+    {
+      "name_en": "Bob Friend",
+      "name_ja": "ボブ・フレンド",
+      "source": "http://www.wikidata.org/entity/Q4932472"
+    },
+    {
+      "name_en": "Bob Grim",
+      "name_ja": "ボブ・グリム",
+      "source": "http://www.wikidata.org/entity/Q4932628"
+    },
+    {
+      "name_en": "Bob Hamelin",
+      "name_ja": "ボブ・ハムリン",
+      "source": "http://www.wikidata.org/entity/Q2907692"
+    },
+    {
+      "name_en": "Bob Horner",
+      "name_ja": "ボブ・ホーナー",
+      "source": "http://www.wikidata.org/entity/Q4932854"
+    },
+    {
+      "name_en": "Bob Lemon",
+      "name_ja": "ボブ・レモン",
+      "source": "http://www.wikidata.org/entity/Q290596"
+    },
+    {
+      "name_en": "Bob Meusel",
+      "name_ja": "ボブ・ミューゼル",
+      "source": "http://www.wikidata.org/entity/Q941868"
+    },
+    {
+      "name_en": "Bob Shawkey",
+      "name_ja": "ボブ・ショーキー",
+      "source": "http://www.wikidata.org/entity/Q4933950"
+    },
+    {
+      "name_en": "Bob Turley",
+      "name_ja": "ボブ・ターリー",
+      "source": "http://www.wikidata.org/entity/Q4356076"
+    },
+    {
+      "name_en": "Bob Veale",
+      "name_ja": "ボブ・ヴィール",
+      "source": "http://www.wikidata.org/entity/Q4934271"
+    },
+    {
+      "name_en": "Bob Welch",
+      "name_ja": "ボブ・ウェルチ",
+      "source": "http://www.wikidata.org/entity/Q2907864"
+    },
+    {
+      "name_en": "Bob Wickman",
+      "name_ja": "ボブ・ウィックマン",
+      "source": "http://www.wikidata.org/entity/Q2907863"
+    },
+    {
+      "name_en": "Bobby Crosby",
+      "name_ja": "ボビー・クロスビー",
+      "source": "http://www.wikidata.org/entity/Q2907944"
+    },
+    {
+      "name_en": "Bobby Grich",
+      "name_ja": "ボビー・グリッチ",
+      "source": "http://www.wikidata.org/entity/Q4935075"
+    },
+    {
+      "name_en": "Bobby Mathews",
+      "name_ja": "ボビー・マシューズ",
+      "source": "http://www.wikidata.org/entity/Q1566731"
+    },
+    {
+      "name_en": "Bobby Richardson",
+      "name_ja": "ボビー・リチャードソン",
+      "source": "http://www.wikidata.org/entity/Q869771"
+    },
+    {
+      "name_en": "Bobby Shantz",
+      "name_ja": "ボビー・シャンツ",
+      "source": "http://www.wikidata.org/entity/Q4355956"
+    },
+    {
+      "name_en": "Bobby Thigpen",
+      "name_ja": "ボビー・シグペン",
+      "source": "http://www.wikidata.org/entity/Q2908017"
+    },
+    {
+      "name_en": "Bobby Tolan",
+      "name_ja": "ボビー・トーラン",
+      "source": "http://www.wikidata.org/entity/Q4935644"
+    },
+    {
+      "name_en": "Bobby Veach",
+      "name_ja": "ボビー・ビーチ",
+      "source": "http://www.wikidata.org/entity/Q4935661"
+    },
+    {
+      "name_en": "Bobby Witt Jr.",
+      "name_ja": "ボビー・ウィット・ジュニア",
+      "source": "http://www.wikidata.org/entity/Q64009042"
+    },
+    {
+      "name_en": "Bobo Newsom",
+      "name_ja": "ボボ・ニューサム",
+      "source": "http://www.wikidata.org/entity/Q4935860"
+    },
+    {
+      "name_en": "Boog Powell",
+      "name_ja": "ブーグ・パウエル",
+      "source": "http://www.wikidata.org/entity/Q4942810"
+    },
+    {
+      "name_en": "Brad Boxberger",
+      "name_ja": "ブラッド・ボックスバーガー",
+      "source": "http://www.wikidata.org/entity/Q2923381"
+    },
+    {
+      "name_en": "Brad Hand",
+      "name_ja": "ブラッド・ハンド",
+      "source": "http://www.wikidata.org/entity/Q2923396"
+    },
+    {
+      "name_en": "Brad Penny",
+      "name_ja": "ブラッド・ペニー",
+      "source": "http://www.wikidata.org/entity/Q2923427"
+    },
+    {
+      "name_en": "Braggo Roth",
+      "name_ja": "ブラジオ・ロス",
+      "source": "http://www.wikidata.org/entity/Q4955423"
+    },
+    {
+      "name_en": "Brandon Webb",
+      "name_ja": "ブランドン・ウェブ",
+      "source": "http://www.wikidata.org/entity/Q1004234"
+    },
+    {
+      "name_en": "Bret Boone",
+      "name_ja": "ブレット・ブーン",
+      "source": "http://www.wikidata.org/entity/Q4961922"
+    },
+    {
+      "name_en": "Bret Saberhagen",
+      "name_ja": "ブレット・セイバーヘイゲン",
+      "source": "http://www.wikidata.org/entity/Q2924542"
+    },
+    {
+      "name_en": "Brett Butler",
+      "name_ja": "ブレット・バトラー",
+      "source": "http://www.wikidata.org/entity/Q4962106"
+    },
+    {
+      "name_en": "Brett Gardner",
+      "name_ja": "ブレット・ガードナー",
+      "source": "http://www.wikidata.org/entity/Q910782"
+    },
+    {
+      "name_en": "Brian Fuentes",
+      "name_ja": "ブライアン・フエンテス",
+      "source": "http://www.wikidata.org/entity/Q1046195"
+    },
+    {
+      "name_en": "Brian Roberts",
+      "name_ja": "ブライアン・ロバーツ",
+      "source": "http://www.wikidata.org/entity/Q1057730"
+    },
+    {
+      "name_en": "Brian Wilson",
+      "name_ja": "ブライアン・ウィルソン",
+      "source": "http://www.wikidata.org/entity/Q913269"
+    },
+    {
+      "name_en": "Brooks Robinson",
+      "name_ja": "ブルックス・ロビンソン",
+      "source": "http://www.wikidata.org/entity/Q521270"
+    },
+    {
+      "name_en": "Bruce Sutter",
+      "name_ja": "ブルース・スーター",
+      "source": "http://www.wikidata.org/entity/Q2926482"
+    },
+    {
+      "name_en": "Bryan Baker",
+      "name_ja": "ブライアン・ベイカー",
+      "source": "http://www.wikidata.org/entity/Q108444617"
+    },
+    {
+      "name_en": "Bryan Harvey",
+      "name_ja": "ブライアン・ハービー",
+      "source": "http://www.wikidata.org/entity/Q4980144"
+    },
+    {
+      "name_en": "Bryce Harper",
+      "name_ja": "ブライス・ハーパー",
+      "source": "http://www.wikidata.org/entity/Q2524302"
+    },
+    {
+      "name_en": "Buck Ewing",
+      "name_ja": "バック・ユーイング",
+      "source": "http://www.wikidata.org/entity/Q1562569"
+    },
+    {
+      "name_en": "Bucky Walters",
+      "name_ja": "バッキー・ウォルターズ",
+      "source": "http://www.wikidata.org/entity/Q640842"
+    },
+    {
+      "name_en": "Buddy Myer",
+      "name_ja": "バディ・マイヤー",
+      "source": "http://www.wikidata.org/entity/Q4984915"
+    },
+    {
+      "name_en": "Burleigh Grimes",
+      "name_ja": "バーリー・グライムス",
+      "source": "http://www.wikidata.org/entity/Q1016606"
+    },
+    {
+      "name_en": "Buster Posey",
+      "name_ja": "バスター・ポージー",
+      "source": "http://www.wikidata.org/entity/Q971912"
+    },
+    {
+      "name_en": "Butch Metzger",
+      "name_ja": "ブッチ・メッツガー",
+      "source": "http://www.wikidata.org/entity/Q5002407"
+    },
+    {
+      "name_en": "CC Sabathia",
+      "name_ja": "CC・サバシア",
+      "source": "http://www.wikidata.org/entity/Q926404"
+    },
+    {
+      "name_en": "Cade Smith",
+      "name_ja": "ケイド・スミス",
+      "source": "http://www.wikidata.org/entity/Q116978385"
+    },
+    {
+      "name_en": "Cal McVey",
+      "name_ja": "カル・マクヴィー",
+      "source": "http://www.wikidata.org/entity/Q10947564"
+    },
+    {
+      "name_en": "Cal Raleigh",
+      "name_ja": "カル・ローリー",
+      "source": "http://www.wikidata.org/entity/Q107493798"
+    },
+    {
+      "name_en": "Cal Ripken Jr.",
+      "name_ja": "カル・リプケン・ジュニア",
+      "source": "http://www.wikidata.org/entity/Q731168"
+    },
+    {
+      "name_en": "Cam Schlittler",
+      "name_ja": "キャム・シュリトラー",
+      "source": "http://www.wikidata.org/entity/Q135116160"
+    },
+    {
+      "name_en": "Camilo Doval",
+      "name_ja": "カミロ・ドバル",
+      "source": "http://www.wikidata.org/entity/Q106560431"
+    },
+    {
+      "name_en": "Camilo Pascual",
+      "name_ja": "カミロ・パスカル",
+      "source": "http://www.wikidata.org/entity/Q5026744"
+    },
+    {
+      "name_en": "Cap Anson",
+      "name_ja": "キャップ・アンソン",
+      "source": "http://www.wikidata.org/entity/Q1028466"
+    },
+    {
+      "name_en": "Carl Hubbell",
+      "name_ja": "カール・ハッベル",
+      "source": "http://www.wikidata.org/entity/Q2938945"
+    },
+    {
+      "name_en": "Carl Lundgren",
+      "name_ja": "カール・ラングレン",
+      "source": "http://www.wikidata.org/entity/Q5040502"
+    },
+    {
+      "name_en": "Carl Mays",
+      "name_ja": "カール・メイズ",
+      "source": "http://www.wikidata.org/entity/Q5040536"
+    },
+    {
+      "name_en": "Carl Morton",
+      "name_ja": "カール・モートン",
+      "source": "http://www.wikidata.org/entity/Q2938967"
+    },
+    {
+      "name_en": "Carl Yastrzemski",
+      "name_ja": "カール・ヤストレムスキー",
+      "source": "http://www.wikidata.org/entity/Q956100"
+    },
+    {
+      "name_en": "Carlos Beltrán",
+      "name_ja": "カルロス・ベルトラン",
+      "source": "http://www.wikidata.org/entity/Q1042743"
+    },
+    {
+      "name_en": "Carlos Carrasco",
+      "name_ja": "カルロス・カラスコ",
+      "source": "http://www.wikidata.org/entity/Q2939315"
+    },
+    {
+      "name_en": "Carlos Correa",
+      "name_ja": "カルロス・コレア",
+      "source": "http://www.wikidata.org/entity/Q82518"
+    },
+    {
+      "name_en": "Carlos Delgado",
+      "name_ja": "カルロス・デルガド",
+      "source": "http://www.wikidata.org/entity/Q1072788"
+    },
+    {
+      "name_en": "Carlos Estévez",
+      "name_ja": "カルロス・エステベス",
+      "source": "http://www.wikidata.org/entity/Q24005070"
+    },
+    {
+      "name_en": "Carlos González",
+      "name_ja": "カルロス・ゴンザレス",
+      "source": "http://www.wikidata.org/entity/Q2699280"
+    },
+    {
+      "name_en": "Carlos Pena",
+      "name_ja": "カルロス・ペーニャ",
+      "source": "http://www.wikidata.org/entity/Q1043157"
+    },
+    {
+      "name_en": "Carlos Zambrano",
+      "name_ja": "カルロス・ザンブラーノ",
+      "source": "http://www.wikidata.org/entity/Q2939511"
+    },
+    {
+      "name_en": "Carlton Fisk",
+      "name_ja": "カールトン・フィスク",
+      "source": "http://www.wikidata.org/entity/Q1043433"
+    },
+    {
+      "name_en": "Carney Lansford",
+      "name_ja": "カーネイ・ランスフォード",
+      "source": "http://www.wikidata.org/entity/Q2939790"
+    },
+    {
+      "name_en": "Catfish Hunter",
+      "name_ja": "キャットフィッシュ・ハンター",
+      "source": "http://www.wikidata.org/entity/Q325250"
+    },
+    {
+      "name_en": "Cecil Cooper",
+      "name_ja": "セシル・クーパー",
+      "source": "http://www.wikidata.org/entity/Q2943685"
+    },
+    {
+      "name_en": "Cecil Fielder",
+      "name_ja": "セシル・フィルダー",
+      "source": "http://www.wikidata.org/entity/Q2943695"
+    },
+    {
+      "name_en": "Cecil Travis",
+      "name_ja": "セシル・トラビス",
+      "source": "http://www.wikidata.org/entity/Q5056335"
+    },
+    {
+      "name_en": "Cesar Tovar",
+      "name_ja": "シーザー・トーバー",
+      "source": "http://www.wikidata.org/entity/Q5202642"
+    },
+    {
+      "name_en": "Chad Cordero",
+      "name_ja": "チャド・コルデロ",
+      "source": "http://www.wikidata.org/entity/Q2947427"
+    },
+    {
+      "name_en": "Charley Jones",
+      "name_ja": "チャーレイ・ジョーンズ",
+      "source": "http://www.wikidata.org/entity/Q1566756"
+    },
+    {
+      "name_en": "Charlie Blackmon",
+      "name_ja": "チャーリー・ブラックモン",
+      "source": "http://www.wikidata.org/entity/Q2960824"
+    },
+    {
+      "name_en": "Charlie Ferguson",
+      "name_ja": "チャーリー・ファーガソン",
+      "source": "http://www.wikidata.org/entity/Q5084837"
+    },
+    {
+      "name_en": "Charlie Gehringer",
+      "name_ja": "チャーリー・ゲーリンジャー",
+      "source": "http://www.wikidata.org/entity/Q711944"
+    },
+    {
+      "name_en": "Charlie Jamieson",
+      "name_ja": "チャーリー・ジェイミーソン",
+      "source": "http://www.wikidata.org/entity/Q2960861"
+    },
+    {
+      "name_en": "Charlie Root",
+      "name_ja": "チャーリー・ルート",
+      "source": "http://www.wikidata.org/entity/Q5085471"
+    },
+    {
+      "name_en": "Chase Headley",
+      "name_ja": "チェイス・ヘッドリー",
+      "source": "http://www.wikidata.org/entity/Q2961326"
+    },
+    {
+      "name_en": "Chet Nichols Jr.",
+      "name_ja": "チェット・ニコルズ・ジュニア",
+      "source": "http://www.wikidata.org/entity/Q5094121"
+    },
+    {
+      "name_en": "Chick Hafey",
+      "name_ja": "チック・ヘイフィー",
+      "source": "http://www.wikidata.org/entity/Q8836279"
+    },
+    {
+      "name_en": "Chief Bender",
+      "name_ja": "チーフ・ベンダー",
+      "source": "http://www.wikidata.org/entity/Q328836"
+    },
+    {
+      "name_en": "Chief Wilson",
+      "name_ja": "チーフ・ウィルソン",
+      "source": "http://www.wikidata.org/entity/Q5096961"
+    },
+    {
+      "name_en": "Chipper Jones",
+      "name_ja": "チッパー・ジョーンズ",
+      "source": "http://www.wikidata.org/entity/Q948508"
+    },
+    {
+      "name_en": "Chone Figgins",
+      "name_ja": "ショーン・フィギンズ",
+      "source": "http://www.wikidata.org/entity/Q2964451"
+    },
+    {
+      "name_en": "Chris Bassitt",
+      "name_ja": "クリス・バシット",
+      "source": "http://www.wikidata.org/entity/Q16198285"
+    },
+    {
+      "name_en": "Chris Chambliss",
+      "name_ja": "クリス・チャンブリス",
+      "source": "http://www.wikidata.org/entity/Q421496"
+    },
+    {
+      "name_en": "Chris Coghlan",
+      "name_ja": "クリス・コグラン",
+      "source": "http://www.wikidata.org/entity/Q1061272"
+    },
+    {
+      "name_en": "Chris Sabo",
+      "name_ja": "クリス・セイボー",
+      "source": "http://www.wikidata.org/entity/Q2964855"
+    },
+    {
+      "name_en": "Christian Yelich",
+      "name_ja": "クリスチャン・イエリッチ",
+      "source": "http://www.wikidata.org/entity/Q14375933"
+    },
+    {
+      "name_en": "Christy Mathewson",
+      "name_ja": "クリスティ・マシューソン",
+      "source": "http://www.wikidata.org/entity/Q73086"
+    },
+    {
+      "name_en": "Chuck Carr",
+      "name_ja": "チャック・カー",
+      "source": "http://www.wikidata.org/entity/Q5115392"
+    },
+    {
+      "name_en": "Chuck Klein",
+      "name_ja": "チャック・クライン",
+      "source": "http://www.wikidata.org/entity/Q5115567"
+    },
+    {
+      "name_en": "Chuck Knoblauch",
+      "name_ja": "チャック・ノブロック",
+      "source": "http://www.wikidata.org/entity/Q939053"
+    },
+    {
+      "name_en": "Claude Jonnard",
+      "name_ja": "クロード・ジョナード",
+      "source": "http://www.wikidata.org/entity/Q5128909"
+    },
+    {
+      "name_en": "Clayton Kershaw",
+      "name_ja": "クレイトン・カーショウ",
+      "source": "http://www.wikidata.org/entity/Q520665"
+    },
+    {
+      "name_en": "Clem Labine",
+      "name_ja": "C.ラバイン",
+      "source": "http://www.wikidata.org/entity/Q2978794"
+    },
+    {
+      "name_en": "Cliff Melton",
+      "name_ja": "クリフ・メルトン",
+      "source": "http://www.wikidata.org/entity/Q5132702"
+    },
+    {
+      "name_en": "Clyde Milan",
+      "name_ja": "クライド・ミラン",
+      "source": "http://www.wikidata.org/entity/Q5136985"
+    },
+    {
+      "name_en": "Clyde Shoun",
+      "name_ja": "クライド・ショーン",
+      "source": "http://www.wikidata.org/entity/Q5137014"
+    },
+    {
+      "name_en": "Coco Crisp",
+      "name_ja": "ココ・クリスプ",
+      "source": "http://www.wikidata.org/entity/Q2702487"
+    },
+    {
+      "name_en": "Cody Bellinger",
+      "name_ja": "コディ・ベリンジャー",
+      "source": "http://www.wikidata.org/entity/Q29514757"
+    },
+    {
+      "name_en": "Corbin Burnes",
+      "name_ja": "コービン・バーンズ",
+      "source": "http://www.wikidata.org/entity/Q50345079"
+    },
+    {
+      "name_en": "Corbin Carroll",
+      "name_ja": "コービン・キャロル",
+      "source": "http://www.wikidata.org/entity/Q64759119"
+    },
+    {
+      "name_en": "Corey Seager",
+      "name_ja": "コーリー・シーガー",
+      "source": "http://www.wikidata.org/entity/Q17403431"
+    },
+    {
+      "name_en": "Craig Biggio",
+      "name_ja": "クレイグ・ビジオ",
+      "source": "http://www.wikidata.org/entity/Q988487"
+    },
+    {
+      "name_en": "Craig Kimbrel",
+      "name_ja": "クレイグ・キンブレル",
+      "source": "http://www.wikidata.org/entity/Q2760861"
+    },
+    {
+      "name_en": "Cristopher Sánchez",
+      "name_ja": "クリストファー・サンチェス",
+      "source": "http://www.wikidata.org/entity/Q75876814"
+    },
+    {
+      "name_en": "Curt Blefary",
+      "name_ja": "カート・ブレファリー",
+      "source": "http://www.wikidata.org/entity/Q5195349"
+    },
+    {
+      "name_en": "Curt Flood",
+      "name_ja": "カート・フラッド",
+      "source": "http://www.wikidata.org/entity/Q5195372"
+    },
+    {
+      "name_en": "Curt Schilling",
+      "name_ja": "カート・シリング",
+      "source": "http://www.wikidata.org/entity/Q954975"
+    },
+    {
+      "name_en": "Curtis Granderson",
+      "name_ja": "カーティス・グランダーソン",
+      "source": "http://www.wikidata.org/entity/Q212244"
+    },
+    {
+      "name_en": "Cy Seymour",
+      "name_ja": "サイ・セイモアー",
+      "source": "http://www.wikidata.org/entity/Q5197334"
+    },
+    {
+      "name_en": "Cy Williams",
+      "name_ja": "サイ・ウィリアムズ",
+      "source": "http://www.wikidata.org/entity/Q5197346"
+    },
+    {
+      "name_en": "Cy Young",
+      "name_ja": "サイ・ヤング",
+      "source": "http://www.wikidata.org/entity/Q362264"
+    },
+    {
+      "name_en": "DJ LeMahieu",
+      "name_ja": "DJ・ルメイユ",
+      "source": "http://www.wikidata.org/entity/Q3011059"
+    },
+    {
+      "name_en": "Dale Mitchell",
+      "name_ja": "デール・ミッチェル",
+      "source": "http://www.wikidata.org/entity/Q5210559"
+    },
+    {
+      "name_en": "Dale Murphy",
+      "name_ja": "デール・マーフィー",
+      "source": "http://www.wikidata.org/entity/Q3012322"
+    },
+    {
+      "name_en": "Dallas Keuchel",
+      "name_ja": "ダラス・カイケル",
+      "source": "http://www.wikidata.org/entity/Q401892"
+    },
+    {
+      "name_en": "Dan Brouthers",
+      "name_ja": "ダン・ブローザース",
+      "source": "http://www.wikidata.org/entity/Q284797"
+    },
+    {
+      "name_en": "Dan Casey",
+      "name_ja": "ダン・ケイシー",
+      "source": "http://www.wikidata.org/entity/Q1562585"
+    },
+    {
+      "name_en": "Dan Quisenberry",
+      "name_ja": "ダン・クイゼンベリー",
+      "source": "http://www.wikidata.org/entity/Q5214238"
+    },
+    {
+      "name_en": "Danny Darwin",
+      "name_ja": "ダニー・ダーウィン",
+      "source": "http://www.wikidata.org/entity/Q5220271"
+    },
+    {
+      "name_en": "Danny Jackson",
+      "name_ja": "ダニー・ジャクソン",
+      "source": "http://www.wikidata.org/entity/Q5220484"
+    },
+    {
+      "name_en": "Danny Murtaugh",
+      "name_ja": "ダニー・マートー",
+      "source": "http://www.wikidata.org/entity/Q5220662"
+    },
+    {
+      "name_en": "Dante Bichette",
+      "name_ja": "ダンテ・ビシェット",
+      "source": "http://www.wikidata.org/entity/Q8836231"
+    },
+    {
+      "name_en": "Darin Erstad",
+      "name_ja": "ダリン・アースタッド",
+      "source": "http://www.wikidata.org/entity/Q861442"
+    },
+    {
+      "name_en": "Darrell Evans",
+      "name_ja": "ダレル・エバンス",
+      "source": "http://www.wikidata.org/entity/Q5224622"
+    },
+    {
+      "name_en": "Darren Daulton",
+      "name_ja": "ダレン・ドールトン",
+      "source": "http://www.wikidata.org/entity/Q3016497"
+    },
+    {
+      "name_en": "Darryl Strawberry",
+      "name_ja": "ダリル・ストロベリー",
+      "source": "http://www.wikidata.org/entity/Q1166727"
+    },
+    {
+      "name_en": "Dave Cash",
+      "name_ja": "デーブ・キャッシュ",
+      "source": "http://www.wikidata.org/entity/Q5228505"
+    },
+    {
+      "name_en": "Dave Foutz",
+      "name_ja": "デーブ・ファウツ",
+      "source": "http://www.wikidata.org/entity/Q5228784"
+    },
+    {
+      "name_en": "Dave Kingman",
+      "name_ja": "デーブ・キングマン",
+      "source": "http://www.wikidata.org/entity/Q5229109"
+    },
+    {
+      "name_en": "Dave McNally",
+      "name_ja": "デーブ・マクナリー",
+      "source": "http://www.wikidata.org/entity/Q5229363"
+    },
+    {
+      "name_en": "Dave Parker",
+      "name_ja": "デーブ・パーカー",
+      "source": "http://www.wikidata.org/entity/Q26038"
+    },
+    {
+      "name_en": "Dave Righetti",
+      "name_ja": "デイブ・リゲッティ",
+      "source": "http://www.wikidata.org/entity/Q3017229"
+    },
+    {
+      "name_en": "Dave Robertson",
+      "name_ja": "デーブ・ロバートソン",
+      "source": "http://www.wikidata.org/entity/Q5229704"
+    },
+    {
+      "name_en": "Dave Stewart",
+      "name_ja": "デーブ・スチュワート",
+      "source": "http://www.wikidata.org/entity/Q3017268"
+    },
+    {
+      "name_en": "Dave Stieb",
+      "name_ja": "デーブ・スティーブ",
+      "source": "http://www.wikidata.org/entity/Q3017273"
+    },
+    {
+      "name_en": "Dave Winfield",
+      "name_ja": "デーブ・ウィンフィールド",
+      "source": "http://www.wikidata.org/entity/Q1173396"
+    },
+    {
+      "name_en": "Davey Lopes",
+      "name_ja": "デイビー・ロープス",
+      "source": "http://www.wikidata.org/entity/Q5230338"
+    },
+    {
+      "name_en": "David Bednar",
+      "name_ja": "デビッド・ベッドナー",
+      "source": "http://www.wikidata.org/entity/Q67225024"
+    },
+    {
+      "name_en": "David Cone",
+      "name_ja": "デビッド・コーン",
+      "source": "http://www.wikidata.org/entity/Q1136890"
+    },
+    {
+      "name_en": "David Justice",
+      "name_ja": "デビッド・ジャスティス",
+      "source": "http://www.wikidata.org/entity/Q3018182"
+    },
+    {
+      "name_en": "David Ortiz",
+      "name_ja": "デビッド・オルティーズ",
+      "source": "http://www.wikidata.org/entity/Q448005"
+    },
+    {
+      "name_en": "David Price",
+      "name_ja": "デビッド・プライス",
+      "source": "http://www.wikidata.org/entity/Q332804"
+    },
+    {
+      "name_en": "David Wells",
+      "name_ja": "デビッド・ウェルズ",
+      "source": "http://www.wikidata.org/entity/Q2741630"
+    },
+    {
+      "name_en": "Dazzy Vance",
+      "name_ja": "ダジー・ヴァンス",
+      "source": "http://www.wikidata.org/entity/Q1179317"
+    },
+    {
+      "name_en": "Deacon White",
+      "name_ja": "ディーコン・ホワイト",
+      "source": "http://www.wikidata.org/entity/Q1566790"
+    },
+    {
+      "name_en": "Dean Chance",
+      "name_ja": "ディーン・チャンス",
+      "source": "http://www.wikidata.org/entity/Q3704255"
+    },
+    {
+      "name_en": "Dee Strange-Gordon",
+      "name_ja": "ディー・ゴードン",
+      "source": "http://www.wikidata.org/entity/Q2026390"
+    },
+    {
+      "name_en": "Denard Span",
+      "name_ja": "デナード・スパン",
+      "source": "http://www.wikidata.org/entity/Q1046176"
+    },
+    {
+      "name_en": "Dennis Eckersley",
+      "name_ja": "デニス・エカーズリー",
+      "source": "http://www.wikidata.org/entity/Q1145696"
+    },
+    {
+      "name_en": "Dennis Leonard",
+      "name_ja": "デニス・レナード",
+      "source": "http://www.wikidata.org/entity/Q5258645"
+    },
+    {
+      "name_en": "Denny McLain",
+      "name_ja": "デニー・マクレイン",
+      "source": "http://www.wikidata.org/entity/Q1703370"
+    },
+    {
+      "name_en": "Denny Neagle",
+      "name_ja": "デニー・ネーグル",
+      "source": "http://www.wikidata.org/entity/Q5259220"
+    },
+    {
+      "name_en": "Derek Lowe",
+      "name_ja": "デレク・ロウ",
+      "source": "http://www.wikidata.org/entity/Q1146798"
+    },
+    {
+      "name_en": "Derrek Lee",
+      "name_ja": "デレク・リー",
+      "source": "http://www.wikidata.org/entity/Q1046168"
+    },
+    {
+      "name_en": "Devin Williams",
+      "name_ja": "デビン・ウィリアムズ",
+      "source": "http://www.wikidata.org/entity/Q66336465"
+    },
+    {
+      "name_en": "Dick Allen",
+      "name_ja": "ディック・アレン",
+      "source": "http://www.wikidata.org/entity/Q5272620"
+    },
+    {
+      "name_en": "Dick Bosman",
+      "name_ja": "ディック・ボスマン",
+      "source": "http://www.wikidata.org/entity/Q5272695"
+    },
+    {
+      "name_en": "Dick Coffman",
+      "name_ja": "ディック・コフマン",
+      "source": "http://www.wikidata.org/entity/Q5272772"
+    },
+    {
+      "name_en": "Dick Donovan",
+      "name_ja": "ディック・ドノバン",
+      "source": "http://www.wikidata.org/entity/Q5272838"
+    },
+    {
+      "name_en": "Dick Groat",
+      "name_ja": "ディック・グロート",
+      "source": "http://www.wikidata.org/entity/Q1608378"
+    },
+    {
+      "name_en": "Dick Radatz",
+      "name_ja": "ディック・ラディッツ",
+      "source": "http://www.wikidata.org/entity/Q5273297"
+    },
+    {
+      "name_en": "Dick Stuart",
+      "name_ja": "ディック・スチュアート",
+      "source": "http://www.wikidata.org/entity/Q5273429"
+    },
+    {
+      "name_en": "Dick Wakefield",
+      "name_ja": "ディック・ウェイクフィールド",
+      "source": "http://www.wikidata.org/entity/Q5273512"
+    },
+    {
+      "name_en": "Dickey Kerr",
+      "name_ja": "ディッキー・カー",
+      "source": "http://www.wikidata.org/entity/Q5273661"
+    },
+    {
+      "name_en": "Diego Segui",
+      "name_ja": "ディエゴ・セギー",
+      "source": "http://www.wikidata.org/entity/Q5274815"
+    },
+    {
+      "name_en": "Dizzy Dean",
+      "name_ja": "ディジー・ディーン",
+      "source": "http://www.wikidata.org/entity/Q3032684"
+    },
+    {
+      "name_en": "Dizzy Trout",
+      "name_ja": "ディジー・トラウト",
+      "source": "http://www.wikidata.org/entity/Q5285135"
+    },
+    {
+      "name_en": "Doc Cramer",
+      "name_ja": "ドク・クレーマー",
+      "source": "http://www.wikidata.org/entity/Q5287034"
+    },
+    {
+      "name_en": "Doc Miller",
+      "name_ja": "ドク・ミラー",
+      "source": "http://www.wikidata.org/entity/Q5287096"
+    },
+    {
+      "name_en": "Doc White",
+      "name_ja": "ドク・ホワイト",
+      "source": "http://www.wikidata.org/entity/Q5287144"
+    },
+    {
+      "name_en": "Dolf Luque",
+      "name_ja": "ドルフ・ルケ",
+      "source": "http://www.wikidata.org/entity/Q5288965"
+    },
+    {
+      "name_en": "Dolph Camilli",
+      "name_ja": "ドルフ・カミリ",
+      "source": "http://www.wikidata.org/entity/Q5289592"
+    },
+    {
+      "name_en": "Dom DiMaggio",
+      "name_ja": "ドム・ディマジオ",
+      "source": "http://www.wikidata.org/entity/Q3288297"
+    },
+    {
+      "name_en": "Don Baylor",
+      "name_ja": "ドン・ベイラー",
+      "source": "http://www.wikidata.org/entity/Q4797537"
+    },
+    {
+      "name_en": "Don Drysdale",
+      "name_ja": "ドン・ドライスデール",
+      "source": "http://www.wikidata.org/entity/Q972358"
+    },
+    {
+      "name_en": "Don Hurst",
+      "name_ja": "ドン・ハースト",
+      "source": "http://www.wikidata.org/entity/Q5292810"
+    },
+    {
+      "name_en": "Don Mattingly",
+      "name_ja": "ドン・マッティングリー",
+      "source": "http://www.wikidata.org/entity/Q679120"
+    },
+    {
+      "name_en": "Don McMahon",
+      "name_ja": "ドン・マクマホン",
+      "source": "http://www.wikidata.org/entity/Q5293121"
+    },
+    {
+      "name_en": "Don Mueller",
+      "name_ja": "ドン・ミューラー",
+      "source": "http://www.wikidata.org/entity/Q5293186"
+    },
+    {
+      "name_en": "Don Newcombe",
+      "name_ja": "ドン・ニューカム",
+      "source": "http://www.wikidata.org/entity/Q285629"
+    },
+    {
+      "name_en": "Don Schwall",
+      "name_ja": "ドン・シュウォール",
+      "source": "http://www.wikidata.org/entity/Q5293486"
+    },
+    {
+      "name_en": "Don Sutton",
+      "name_ja": "ドン・サットン",
+      "source": "http://www.wikidata.org/entity/Q3035912"
+    },
+    {
+      "name_en": "Dontrelle Willis",
+      "name_ja": "ドントレル・ウィリス",
+      "source": "http://www.wikidata.org/entity/Q1062219"
+    },
+    {
+      "name_en": "Doug Drabek",
+      "name_ja": "ダグ・ドレイベック",
+      "source": "http://www.wikidata.org/entity/Q3037932"
+    },
+    {
+      "name_en": "Drake Baldwin",
+      "name_ja": "ドレイク・ボールドウィン",
+      "source": "http://www.wikidata.org/entity/Q131543192"
+    },
+    {
+      "name_en": "Duane Ward",
+      "name_ja": "デュアン・ウォード",
+      "source": "http://www.wikidata.org/entity/Q5310399"
+    },
+    {
+      "name_en": "Duke Snider",
+      "name_ja": "デューク・スナイダー",
+      "source": "http://www.wikidata.org/entity/Q1204653"
+    },
+    {
+      "name_en": "Dummy Hoy",
+      "name_ja": "ダミー・ホイ",
+      "source": "http://www.wikidata.org/entity/Q1562685"
+    },
+    {
+      "name_en": "Dustin Pedroia",
+      "name_ja": "ダスティン・ペドロイア",
+      "source": "http://www.wikidata.org/entity/Q558490"
+    },
+    {
+      "name_en": "Dwight Evans",
+      "name_ja": "ドワイト・エバンス",
+      "source": "http://www.wikidata.org/entity/Q5318152"
+    },
+    {
+      "name_en": "Dwight Gooden",
+      "name_ja": "ドワイト・グッデン",
+      "source": "http://www.wikidata.org/entity/Q1076161"
+    },
+    {
+      "name_en": "Earl Williams",
+      "name_ja": "アール・ウィリアムズ",
+      "source": "http://www.wikidata.org/entity/Q5326165"
+    },
+    {
+      "name_en": "Earl Wilson",
+      "name_ja": "アール・ウィルソン",
+      "source": "http://www.wikidata.org/entity/Q5326169"
+    },
+    {
+      "name_en": "Earle Combs",
+      "name_ja": "アール・コームス",
+      "source": "http://www.wikidata.org/entity/Q1277453"
+    },
+    {
+      "name_en": "Early Wynn",
+      "name_ja": "アーリー・ウィン",
+      "source": "http://www.wikidata.org/entity/Q713760"
+    },
+    {
+      "name_en": "Ed Andrews",
+      "name_ja": "エド・アンドリュース",
+      "source": "http://www.wikidata.org/entity/Q5334497"
+    },
+    {
+      "name_en": "Ed Delahanty",
+      "name_ja": "エド・デラハンティ",
+      "source": "http://www.wikidata.org/entity/Q3047165"
+    },
+    {
+      "name_en": "Ed Walsh",
+      "name_ja": "エド・ウォルシュ",
+      "source": "http://www.wikidata.org/entity/Q1282549"
+    },
+    {
+      "name_en": "Edd Roush",
+      "name_ja": "エド・ローシュ",
+      "source": "http://www.wikidata.org/entity/Q1282610"
+    },
+    {
+      "name_en": "Eddie Cicotte",
+      "name_ja": "エディ・シーコット",
+      "source": "http://www.wikidata.org/entity/Q5335930"
+    },
+    {
+      "name_en": "Eddie Guardado",
+      "name_ja": "エディ・グアダード",
+      "source": "http://www.wikidata.org/entity/Q3047272"
+    },
+    {
+      "name_en": "Eddie Mathews",
+      "name_ja": "エディ・マシューズ",
+      "source": "http://www.wikidata.org/entity/Q590424"
+    },
+    {
+      "name_en": "Eddie Murray",
+      "name_ja": "エディ・マレー",
+      "source": "http://www.wikidata.org/entity/Q326992"
+    },
+    {
+      "name_en": "Eddie Plank",
+      "name_ja": "エディ・プランク",
+      "source": "http://www.wikidata.org/entity/Q2734900"
+    },
+    {
+      "name_en": "Eddie Rommel",
+      "name_ja": "エディ・ロンメル",
+      "source": "http://www.wikidata.org/entity/Q5336458"
+    },
+    {
+      "name_en": "Edgar Martinez",
+      "name_ja": "エドガー・マルティネス",
+      "source": "http://www.wikidata.org/entity/Q1148022"
+    },
+    {
+      "name_en": "Edwin Díaz",
+      "name_ja": "エドウィン・ディアス",
+      "source": "http://www.wikidata.org/entity/Q5346370"
+    },
+    {
+      "name_en": "Edwin Encarnación",
+      "name_ja": "エドウィン・エンカーナシオン",
+      "source": "http://www.wikidata.org/entity/Q633736"
+    },
+    {
+      "name_en": "Ellis Burks",
+      "name_ja": "エリス・バークス",
+      "source": "http://www.wikidata.org/entity/Q3051520"
+    },
+    {
+      "name_en": "Ellis Kinder",
+      "name_ja": "エリス・カインダー",
+      "source": "http://www.wikidata.org/entity/Q5365929"
+    },
+    {
+      "name_en": "Elly De La Cruz",
+      "name_ja": "エリー・デラクルーズ",
+      "source": "http://www.wikidata.org/entity/Q111112050"
+    },
+    {
+      "name_en": "Elmer Flick",
+      "name_ja": "エルマー・フリック",
+      "source": "http://www.wikidata.org/entity/Q3051561"
+    },
+    {
+      "name_en": "Elmer Riddle",
+      "name_ja": "エルマー・リドル",
+      "source": "http://www.wikidata.org/entity/Q5366654"
+    },
+    {
+      "name_en": "Elston Howard",
+      "name_ja": "エルストン・ハワード",
+      "source": "http://www.wikidata.org/entity/Q332991"
+    },
+    {
+      "name_en": "Emmanuel Clase",
+      "name_ja": "エマヌエル・クラセ",
+      "source": "http://www.wikidata.org/entity/Q66119491"
+    },
+    {
+      "name_en": "Enos Slaughter",
+      "name_ja": "イーノス・スローター",
+      "source": "http://www.wikidata.org/entity/Q326235"
+    },
+    {
+      "name_en": "Eppa Rixey",
+      "name_ja": "エッパ・リクシー",
+      "source": "http://www.wikidata.org/entity/Q3055847"
+    },
+    {
+      "name_en": "Eric Gagne",
+      "name_ja": "エリック・ガニエ",
+      "source": "http://www.wikidata.org/entity/Q3082828"
+    },
+    {
+      "name_en": "Eric Hinske",
+      "name_ja": "エリック・ヒンスキー",
+      "source": "http://www.wikidata.org/entity/Q1136215"
+    },
+    {
+      "name_en": "Eric Karros",
+      "name_ja": "エリック・キャロス",
+      "source": "http://www.wikidata.org/entity/Q3056314"
+    },
+    {
+      "name_en": "Eric Young Jr.",
+      "name_ja": "エリック・ヤング・ジュニア",
+      "source": "http://www.wikidata.org/entity/Q3056444"
+    },
+    {
+      "name_en": "Ernie Banks",
+      "name_ja": "アーニー・バンクス",
+      "source": "http://www.wikidata.org/entity/Q3051017"
+    },
+    {
+      "name_en": "Ernie Broglio",
+      "name_ja": "アーニー・ブログリオ",
+      "source": "http://www.wikidata.org/entity/Q5394378"
+    },
+    {
+      "name_en": "Ernie Lombardi",
+      "name_ja": "アーニー・ロンバルディ",
+      "source": "http://www.wikidata.org/entity/Q5394605"
+    },
+    {
+      "name_en": "Esteban Loaiza",
+      "name_ja": "エステバン・ロアイザ",
+      "source": "http://www.wikidata.org/entity/Q844831"
+    },
+    {
+      "name_en": "Esteury Ruiz",
+      "name_ja": "エステウリー・ルイーズ",
+      "source": "http://www.wikidata.org/entity/Q113044424"
+    },
+    {
+      "name_en": "Evan Longoria",
+      "name_ja": "エバン・ロンゴリア",
+      "source": "http://www.wikidata.org/entity/Q162360"
+    },
+    {
+      "name_en": "Everth Cabrera",
+      "name_ja": "エバース・カブレラ",
+      "source": "http://www.wikidata.org/entity/Q3061496"
+    },
+    {
+      "name_en": "Ewell Blackwell",
+      "name_ja": "イーウェル・ブラックウェル",
+      "source": "http://www.wikidata.org/entity/Q5418960"
+    },
+    {
+      "name_en": "Ezra Sutton",
+      "name_ja": "エズラ・サットン",
+      "source": "http://www.wikidata.org/entity/Q5423418"
+    },
+    {
+      "name_en": "Felipe Alou",
+      "name_ja": "フェリペ・アルー",
+      "source": "http://www.wikidata.org/entity/Q3068115"
+    },
+    {
+      "name_en": "Fernando Rodney",
+      "name_ja": "フェルナンド・ロドニー",
+      "source": "http://www.wikidata.org/entity/Q331916"
+    },
+    {
+      "name_en": "Fernando Tatis Jr.",
+      "name_ja": "フェルナンド・タティス・ジュニア",
+      "source": "http://www.wikidata.org/entity/Q50345083"
+    },
+    {
+      "name_en": "Fernando Valenzuela",
+      "name_ja": "フェルナンド・バレンズエラ",
+      "source": "http://www.wikidata.org/entity/Q1131057"
+    },
+    {
+      "name_en": "Ferris Fain",
+      "name_ja": "フェリス・フェイン",
+      "source": "http://www.wikidata.org/entity/Q5445369"
+    },
+    {
+      "name_en": "Floyd Bannister",
+      "name_ja": "フロイド・バニスター",
+      "source": "http://www.wikidata.org/entity/Q5462384"
+    },
+    {
+      "name_en": "Francisco Rodríguez",
+      "name_ja": "フランシスコ・ロドリゲス",
+      "source": "http://www.wikidata.org/entity/Q1151895"
+    },
+    {
+      "name_en": "Frank Chance",
+      "name_ja": "フランク・チャンス",
+      "source": "http://www.wikidata.org/entity/Q784534"
+    },
+    {
+      "name_en": "Frank Howard",
+      "name_ja": "フランク・ハワード",
+      "source": "http://www.wikidata.org/entity/Q5487342"
+    },
+    {
+      "name_en": "Frank Isbell",
+      "name_ja": "フランク・イズベル",
+      "source": "http://www.wikidata.org/entity/Q5487408"
+    },
+    {
+      "name_en": "Frank Killen",
+      "name_ja": "フランク・キレン",
+      "source": "http://www.wikidata.org/entity/Q5487687"
+    },
+    {
+      "name_en": "Frank Lary",
+      "name_ja": "フランク・ラリー",
+      "source": "http://www.wikidata.org/entity/Q5487858"
+    },
+    {
+      "name_en": "Frank McCormick",
+      "name_ja": "フランク・マコーミック",
+      "source": "http://www.wikidata.org/entity/Q5488273"
+    },
+    {
+      "name_en": "Frank Mountain",
+      "name_ja": "フランク・マウンテン",
+      "source": "http://www.wikidata.org/entity/Q5488570"
+    },
+    {
+      "name_en": "Frank Robinson",
+      "name_ja": "フランク・ロビンソン",
+      "source": "http://www.wikidata.org/entity/Q1317158"
+    },
+    {
+      "name_en": "Frank Schulte",
+      "name_ja": "フランク・シュルト",
+      "source": "http://www.wikidata.org/entity/Q5489457"
+    },
+    {
+      "name_en": "Frank Smith",
+      "name_ja": "フランク・スミス",
+      "source": "http://www.wikidata.org/entity/Q5489667"
+    },
+    {
+      "name_en": "Frank Sullivan",
+      "name_ja": "フランク・サリバン",
+      "source": "http://www.wikidata.org/entity/Q16091647"
+    },
+    {
+      "name_en": "Frank Tanana",
+      "name_ja": "フランク・タナナ",
+      "source": "http://www.wikidata.org/entity/Q5489892"
+    },
+    {
+      "name_en": "Frank Taveras",
+      "name_ja": "フランク・タベラス",
+      "source": "http://www.wikidata.org/entity/Q5489906"
+    },
+    {
+      "name_en": "Frank Viola",
+      "name_ja": "フランク・バイオーラ",
+      "source": "http://www.wikidata.org/entity/Q659741"
+    },
+    {
+      "name_en": "Frankie Crosetti",
+      "name_ja": "フランキー・クロセッティ",
+      "source": "http://www.wikidata.org/entity/Q5490943"
+    },
+    {
+      "name_en": "Frankie Frisch",
+      "name_ja": "フランキー・フリッシュ",
+      "source": "http://www.wikidata.org/entity/Q2739073"
+    },
+    {
+      "name_en": "Fred Lynn",
+      "name_ja": "フレッド・リン",
+      "source": "http://www.wikidata.org/entity/Q26036"
+    },
+    {
+      "name_en": "Fred McGriff",
+      "name_ja": "フレッド・マグリフ",
+      "source": "http://www.wikidata.org/entity/Q2726999"
+    },
+    {
+      "name_en": "Fred Pfeffer",
+      "name_ja": "フレッド・フェファー",
+      "source": "http://www.wikidata.org/entity/Q5496070"
+    },
+    {
+      "name_en": "Fred Toney",
+      "name_ja": "フレッド・トニー",
+      "source": "http://www.wikidata.org/entity/Q5496415"
+    },
+    {
+      "name_en": "Freddie Freeman",
+      "name_ja": "フレディ・フリーマン",
+      "source": "http://www.wikidata.org/entity/Q3087003"
+    },
+    {
+      "name_en": "Freddie Lindstrom",
+      "name_ja": "フレディ・リンドストロム",
+      "source": "http://www.wikidata.org/entity/Q3087008"
+    },
+    {
+      "name_en": "Freddie Patek",
+      "name_ja": "フレディ・パテック",
+      "source": "http://www.wikidata.org/entity/Q5496779"
+    },
+    {
+      "name_en": "Freddy Peralta",
+      "name_ja": "フレディ・ペラルタ",
+      "source": "http://www.wikidata.org/entity/Q50843151"
+    },
+    {
+      "name_en": "Freddy Sanchez",
+      "name_ja": "フレディ・サンチェス",
+      "source": "http://www.wikidata.org/entity/Q3087064"
+    },
+    {
+      "name_en": "Fritz Maisel",
+      "name_ja": "フリッツ・メイゼル",
+      "source": "http://www.wikidata.org/entity/Q5504971"
+    },
+    {
+      "name_en": "Félix Hernández",
+      "name_ja": "フェリックス・ヘルナンデス",
+      "source": "http://www.wikidata.org/entity/Q1196594"
+    },
+    {
+      "name_en": "Gabby Hartnett",
+      "name_ja": "ギャビー・ハートネット",
+      "source": "http://www.wikidata.org/entity/Q3093501"
+    },
+    {
+      "name_en": "Gabriel Moreno",
+      "name_ja": "ガブリエル・モレノ",
+      "source": "http://www.wikidata.org/entity/Q108109387"
+    },
+    {
+      "name_en": "Garrett Crochet",
+      "name_ja": "ギャレット・クロシェ",
+      "source": "http://www.wikidata.org/entity/Q85261723"
+    },
+    {
+      "name_en": "Gary Carter",
+      "name_ja": "ゲイリー・カーター",
+      "source": "http://www.wikidata.org/entity/Q1056011"
+    },
+    {
+      "name_en": "Gary Peters",
+      "name_ja": "ゲイリー・ピーターズ",
+      "source": "http://www.wikidata.org/entity/Q5525742"
+    },
+    {
+      "name_en": "Gary Sheffield",
+      "name_ja": "ゲイリー・シェフィールド",
+      "source": "http://www.wikidata.org/entity/Q3098626"
+    },
+    {
+      "name_en": "Gavin Williams",
+      "name_ja": "ギャビン・ウィリアムズ",
+      "source": "http://www.wikidata.org/entity/Q107381722"
+    },
+    {
+      "name_en": "Gavvy Cravath",
+      "name_ja": "ギャビー・クラバス",
+      "source": "http://www.wikidata.org/entity/Q5528403"
+    },
+    {
+      "name_en": "Gaylord Perry",
+      "name_ja": "ゲイロード・ペリー",
+      "source": "http://www.wikidata.org/entity/Q1496596"
+    },
+    {
+      "name_en": "Gene Bearden",
+      "name_ja": "ジーン・ビアーデン",
+      "source": "http://www.wikidata.org/entity/Q5531087"
+    },
+    {
+      "name_en": "George Brett",
+      "name_ja": "ジョージ・ブレット",
+      "source": "http://www.wikidata.org/entity/Q1152442"
+    },
+    {
+      "name_en": "George Case",
+      "name_ja": "ジョージ・ケース",
+      "source": "http://www.wikidata.org/entity/Q5537739"
+    },
+    {
+      "name_en": "George Davis",
+      "name_ja": "ジョージ・デイヴィス",
+      "source": "http://www.wikidata.org/entity/Q2856958"
+    },
+    {
+      "name_en": "George Derby",
+      "name_ja": "ジョージ・ダービー",
+      "source": "http://www.wikidata.org/entity/Q5538497"
+    },
+    {
+      "name_en": "George Foster",
+      "name_ja": "ジョージ・フォスター",
+      "source": "http://www.wikidata.org/entity/Q5539381"
+    },
+    {
+      "name_en": "George Gore",
+      "name_ja": "ジョージ・ゴア",
+      "source": "http://www.wikidata.org/entity/Q1562555"
+    },
+    {
+      "name_en": "George Hall",
+      "name_ja": "ジョージ・ホール",
+      "source": "http://www.wikidata.org/entity/Q1566700"
+    },
+    {
+      "name_en": "George Kell",
+      "name_ja": "ジョージ・ケル",
+      "source": "http://www.wikidata.org/entity/Q267760"
+    },
+    {
+      "name_en": "George Kelly",
+      "name_ja": "ジョージ・ケリー",
+      "source": "http://www.wikidata.org/entity/Q5541282"
+    },
+    {
+      "name_en": "George Mogridge",
+      "name_ja": "ジョージ・モグリッジ",
+      "source": "http://www.wikidata.org/entity/Q5542541"
+    },
+    {
+      "name_en": "George Mullin",
+      "name_ja": "ジョージ・マリン",
+      "source": "http://www.wikidata.org/entity/Q5542684"
+    },
+    {
+      "name_en": "George Pipgras",
+      "name_ja": "ジョージ・ピプグラス",
+      "source": "http://www.wikidata.org/entity/Q5543432"
+    },
+    {
+      "name_en": "George Scott",
+      "name_ja": "ジョージ・スコット",
+      "source": "http://www.wikidata.org/entity/Q5544366"
+    },
+    {
+      "name_en": "George Sisler",
+      "name_ja": "ジョージ・シスラー",
+      "source": "http://www.wikidata.org/entity/Q711950"
+    },
+    {
+      "name_en": "George Stone",
+      "name_ja": "ジョージ・ストーン",
+      "source": "http://www.wikidata.org/entity/Q5544876"
+    },
+    {
+      "name_en": "George Uhle",
+      "name_ja": "ジョージ・ウール",
+      "source": "http://www.wikidata.org/entity/Q5545396"
+    },
+    {
+      "name_en": "George Wood",
+      "name_ja": "ジョージ・ウッド",
+      "source": "http://www.wikidata.org/entity/Q1567273"
+    },
+    {
+      "name_en": "Geovany Soto",
+      "name_ja": "ジオバニー・ソト",
+      "source": "http://www.wikidata.org/entity/Q3103815"
+    },
+    {
+      "name_en": "Gerrit Cole",
+      "name_ja": "ゲリット・コール",
+      "source": "http://www.wikidata.org/entity/Q5552563"
+    },
+    {
+      "name_en": "Giancarlo Stanton",
+      "name_ja": "ジャンカルロ・スタントン",
+      "source": "http://www.wikidata.org/entity/Q3105192"
+    },
+    {
+      "name_en": "Gil McDougald",
+      "name_ja": "ギル・マクドゥガルド",
+      "source": "http://www.wikidata.org/entity/Q4356119"
+    },
+    {
+      "name_en": "Ginger Beaumont",
+      "name_ja": "ジンジャー・ビューモン",
+      "source": "http://www.wikidata.org/entity/Q3106758"
+    },
+    {
+      "name_en": "Goose Goslin",
+      "name_ja": "グース・ゴスリン",
+      "source": "http://www.wikidata.org/entity/Q1537731"
+    },
+    {
+      "name_en": "Gorman Thomas",
+      "name_ja": "ゴーマン・トーマス",
+      "source": "http://www.wikidata.org/entity/Q5586639"
+    },
+    {
+      "name_en": "Graig Nettles",
+      "name_ja": "グレイグ・ネトルズ",
+      "source": "http://www.wikidata.org/entity/Q3113290"
+    },
+    {
+      "name_en": "Greg Holland",
+      "name_ja": "グレッグ・ホランド",
+      "source": "http://www.wikidata.org/entity/Q3116245"
+    },
+    {
+      "name_en": "Greg Luzinski",
+      "name_ja": "グレッグ・ルジンスキー",
+      "source": "http://www.wikidata.org/entity/Q5605941"
+    },
+    {
+      "name_en": "Greg Maddux",
+      "name_ja": "グレッグ・マダックス",
+      "source": "http://www.wikidata.org/entity/Q709138"
+    },
+    {
+      "name_en": "Gunnar Henderson",
+      "name_ja": "ガナー・ヘンダーソン",
+      "source": "http://www.wikidata.org/entity/Q111441021"
+    },
+    {
+      "name_en": "Gus Weyhing",
+      "name_ja": "ガス・ウェイイング",
+      "source": "http://www.wikidata.org/entity/Q954521"
+    },
+    {
+      "name_en": "Gus Zernial",
+      "name_ja": "ガス・ザーニアル",
+      "source": "http://www.wikidata.org/entity/Q1136434"
+    },
+    {
+      "name_en": "Guy Bush",
+      "name_ja": "ガイ・ブッシュ",
+      "source": "http://www.wikidata.org/entity/Q5622127"
+    },
+    {
+      "name_en": "Hack Wilson",
+      "name_ja": "ハック・ウィルソン",
+      "source": "http://www.wikidata.org/entity/Q5371347"
+    },
+    {
+      "name_en": "Hal Chase",
+      "name_ja": "ハル・チェイス",
+      "source": "http://www.wikidata.org/entity/Q5640726"
+    },
+    {
+      "name_en": "Hal McRae",
+      "name_ja": "ハル・マクレー",
+      "source": "http://www.wikidata.org/entity/Q5640861"
+    },
+    {
+      "name_en": "Hal Newhouser",
+      "name_ja": "ハル・ニューハウザー",
+      "source": "http://www.wikidata.org/entity/Q711730"
+    },
+    {
+      "name_en": "Hank Aaron",
+      "name_ja": "ハンク・アーロン",
+      "source": "http://www.wikidata.org/entity/Q215777"
+    },
+    {
+      "name_en": "Hank Aguirre",
+      "name_ja": "H.アグワイリー",
+      "source": "http://www.wikidata.org/entity/Q5648269"
+    },
+    {
+      "name_en": "Hank Greenberg",
+      "name_ja": "ハンク・グリーンバーグ",
+      "source": "http://www.wikidata.org/entity/Q687282"
+    },
+    {
+      "name_en": "Hank Sauer",
+      "name_ja": "ハンク・サウアー",
+      "source": "http://www.wikidata.org/entity/Q284662"
+    },
+    {
+      "name_en": "Hanley Ramirez",
+      "name_ja": "ハンリー・ラミレス",
+      "source": "http://www.wikidata.org/entity/Q1111592"
+    },
+    {
+      "name_en": "Hardy Richardson",
+      "name_ja": "ハーディ・リチャードソン",
+      "source": "http://www.wikidata.org/entity/Q1392623"
+    },
+    {
+      "name_en": "Harmon Killebrew",
+      "name_ja": "ハーモン・キルブルー",
+      "source": "http://www.wikidata.org/entity/Q1585630"
+    },
+    {
+      "name_en": "Harold Reynolds",
+      "name_ja": "ハロルド・レイノルズ",
+      "source": "http://www.wikidata.org/entity/Q5662152"
+    },
+    {
+      "name_en": "Harry Byrd",
+      "name_ja": "ハリー・バード",
+      "source": "http://www.wikidata.org/entity/Q5667666"
+    },
+    {
+      "name_en": "Harry Davis",
+      "name_ja": "ハリー・デービス",
+      "source": "http://www.wikidata.org/entity/Q3127810"
+    },
+    {
+      "name_en": "Harry Heilmann",
+      "name_ja": "ハリー・ハイルマン",
+      "source": "http://www.wikidata.org/entity/Q711738"
+    },
+    {
+      "name_en": "Harry Stovey",
+      "name_ja": "ハリー・ストービー",
+      "source": "http://www.wikidata.org/entity/Q1563080"
+    },
+    {
+      "name_en": "Harry Walker",
+      "name_ja": "ハリー・ウォーカー",
+      "source": "http://www.wikidata.org/entity/Q5673157"
+    },
+    {
+      "name_en": "Harvey Kuenn",
+      "name_ja": "ハービー・キーン",
+      "source": "http://www.wikidata.org/entity/Q3128037"
+    },
+    {
+      "name_en": "Heath Bell",
+      "name_ja": "ヒース・ベル",
+      "source": "http://www.wikidata.org/entity/Q1133768"
+    },
+    {
+      "name_en": "Heinie Groh",
+      "name_ja": "ヘイニー・グロー",
+      "source": "http://www.wikidata.org/entity/Q5699746"
+    },
+    {
+      "name_en": "Heinie Manush",
+      "name_ja": "ヘイニー・マナシュ",
+      "source": "http://www.wikidata.org/entity/Q1346198"
+    },
+    {
+      "name_en": "Heinie Zimmerman",
+      "name_ja": "ヘイニー・ジマーマン",
+      "source": "http://www.wikidata.org/entity/Q12073527"
+    },
+    {
+      "name_en": "Henry Boyle",
+      "name_ja": "ヘンリー・ボイル",
+      "source": "http://www.wikidata.org/entity/Q1564585"
+    },
+    {
+      "name_en": "Herb Score",
+      "name_ja": "ハーブ・スコア",
+      "source": "http://www.wikidata.org/entity/Q3133397"
+    },
+    {
+      "name_en": "Herman Long",
+      "name_ja": "ハーマン・ロング",
+      "source": "http://www.wikidata.org/entity/Q5739990"
+    },
+    {
+      "name_en": "Hippo Vaughn",
+      "name_ja": "ヒッポ・ボーン",
+      "source": "http://www.wikidata.org/entity/Q11330089"
+    },
+    {
+      "name_en": "Home Run Baker",
+      "name_ja": "フランク・ベーカー",
+      "source": "http://www.wikidata.org/entity/Q333035"
+    },
+    {
+      "name_en": "Honus Wagner",
+      "name_ja": "ホーナス・ワグナー",
+      "source": "http://www.wikidata.org/entity/Q1316903"
+    },
+    {
+      "name_en": "Howard Johnson",
+      "name_ja": "ハワード・ジョンソン",
+      "source": "http://www.wikidata.org/entity/Q5920011"
+    },
+    {
+      "name_en": "Hoyt Wilhelm",
+      "name_ja": "ホイト・ウィルヘルム",
+      "source": "http://www.wikidata.org/entity/Q326963"
+    },
+    {
+      "name_en": "Hugh Casey",
+      "name_ja": "ヒュー・ケイシー",
+      "source": "http://www.wikidata.org/entity/Q5930279"
+    },
+    {
+      "name_en": "Hugh Duffy",
+      "name_ja": "ヒュー・ダフィー",
+      "source": "http://www.wikidata.org/entity/Q1634294"
+    },
+    {
+      "name_en": "Huston Street",
+      "name_ja": "ヒューストン・ストリート",
+      "source": "http://www.wikidata.org/entity/Q2760886"
+    },
+    {
+      "name_en": "Hyun Jin Ryu",
+      "name_ja": "柳賢振",
+      "source": "http://www.wikidata.org/entity/Q50604"
+    },
+    {
+      "name_en": "Ian Kennedy",
+      "name_ja": "イアン・ケネディ",
+      "source": "http://www.wikidata.org/entity/Q1057322"
+    },
+    {
+      "name_en": "Ichiro Suzuki",
+      "name_ja": "イチロー",
+      "source": "http://www.wikidata.org/entity/Q600"
+    },
+    {
+      "name_en": "Irish Meusel",
+      "name_ja": "アイリッシュ・ミューゼル",
+      "source": "http://www.wikidata.org/entity/Q6070979"
+    },
+    {
+      "name_en": "Ivan Rodriguez",
+      "name_ja": "イバン・ロドリゲス",
+      "source": "http://www.wikidata.org/entity/Q706908"
+    },
+    {
+      "name_en": "Ivy Olson",
+      "name_ja": "アイビー・オルソン",
+      "source": "http://www.wikidata.org/entity/Q6099905"
+    },
+    {
+      "name_en": "J.D. Martinez",
+      "name_ja": "J.D.マルティネス",
+      "source": "http://www.wikidata.org/entity/Q3156794"
+    },
+    {
+      "name_en": "J.R. Richard",
+      "name_ja": "J.R.リチャード",
+      "source": "http://www.wikidata.org/entity/Q665951"
+    },
+    {
+      "name_en": "Jack Bentley",
+      "name_ja": "ジャック・ベントレー",
+      "source": "http://www.wikidata.org/entity/Q6111248"
+    },
+    {
+      "name_en": "Jack Chesbro",
+      "name_ja": "ジャック・チェスブロ",
+      "source": "http://www.wikidata.org/entity/Q254553"
+    },
+    {
+      "name_en": "Jack Glasscock",
+      "name_ja": "ジャック・グラスコック",
+      "source": "http://www.wikidata.org/entity/Q6112727"
+    },
+    {
+      "name_en": "Jack McDowell",
+      "name_ja": "ジャック・マクダウエル",
+      "source": "http://www.wikidata.org/entity/Q3157271"
+    },
+    {
+      "name_en": "Jack Morris",
+      "name_ja": "ジャック・モリス",
+      "source": "http://www.wikidata.org/entity/Q2386218"
+    },
+    {
+      "name_en": "Jack Pfiester",
+      "name_ja": "ジャック・フィースター",
+      "source": "http://www.wikidata.org/entity/Q6114602"
+    },
+    {
+      "name_en": "Jack Powell",
+      "name_ja": "ジャック・パウエル",
+      "source": "http://www.wikidata.org/entity/Q6114656"
+    },
+    {
+      "name_en": "Jack Quinn",
+      "name_ja": "ジャック・クイン",
+      "source": "http://www.wikidata.org/entity/Q6114701"
+    },
+    {
+      "name_en": "Jack Russell",
+      "name_ja": "ジャック・ラッセル",
+      "source": "http://www.wikidata.org/entity/Q6114942"
+    },
+    {
+      "name_en": "Jack Sanford",
+      "name_ja": "ジャック・サンフォード",
+      "source": "http://www.wikidata.org/entity/Q6114998"
+    },
+    {
+      "name_en": "Jack Taylor",
+      "name_ja": "ジャック・テイラー",
+      "source": "http://www.wikidata.org/entity/Q6115441"
+    },
+    {
+      "name_en": "Jackie Jensen",
+      "name_ja": "ジャッキー・ジェンセン",
+      "source": "http://www.wikidata.org/entity/Q3048466"
+    },
+    {
+      "name_en": "Jackie Robinson",
+      "name_ja": "ジャッキー・ロビンソン",
+      "source": "http://www.wikidata.org/entity/Q221048"
+    },
+    {
+      "name_en": "Jacob Misiorowski",
+      "name_ja": "ジェイコブ・ミジオロウスキー",
+      "source": "http://www.wikidata.org/entity/Q112686301"
+    },
+    {
+      "name_en": "Jacoby Ellsbury",
+      "name_ja": "ジャコビー・エルズベリー",
+      "source": "http://www.wikidata.org/entity/Q1207375"
+    },
+    {
+      "name_en": "Jake Arrieta",
+      "name_ja": "ジェイク・アリエータ",
+      "source": "http://www.wikidata.org/entity/Q3047116"
+    },
+    {
+      "name_en": "Jake Daubert",
+      "name_ja": "ジェイク・ドーバート",
+      "source": "http://www.wikidata.org/entity/Q11309086"
+    },
+    {
+      "name_en": "Jake Peavy",
+      "name_ja": "ジェイク・ピービー",
+      "source": "http://www.wikidata.org/entity/Q567887"
+    },
+    {
+      "name_en": "Jakie May",
+      "name_ja": "ジャッキー・メイ",
+      "source": "http://www.wikidata.org/entity/Q16006795"
+    },
+    {
+      "name_en": "Jason Bay",
+      "name_ja": "ジェイソン・ベイ",
+      "source": "http://www.wikidata.org/entity/Q974125"
+    },
+    {
+      "name_en": "Jason Giambi",
+      "name_ja": "ジェイソン・ジアンビ",
+      "source": "http://www.wikidata.org/entity/Q1683912"
+    },
+    {
+      "name_en": "Jason Isringhausen",
+      "name_ja": "ジェイソン・イズリングハウゼン",
+      "source": "http://www.wikidata.org/entity/Q2315641"
+    },
+    {
+      "name_en": "Jason Jennings",
+      "name_ja": "ジェイソン・ジェニングス",
+      "source": "http://www.wikidata.org/entity/Q3162952"
+    },
+    {
+      "name_en": "Jason Motte",
+      "name_ja": "ジェイソン・モット",
+      "source": "http://www.wikidata.org/entity/Q2351140"
+    },
+    {
+      "name_en": "Jason Schmidt",
+      "name_ja": "ジェイソン・シュミット",
+      "source": "http://www.wikidata.org/entity/Q2747583"
+    },
+    {
+      "name_en": "Jason Vargas",
+      "name_ja": "ジェイソン・バルガス",
+      "source": "http://www.wikidata.org/entity/Q3163010"
+    },
+    {
+      "name_en": "Javier Báez",
+      "name_ja": "ハビアー・バエズ",
+      "source": "http://www.wikidata.org/entity/Q16163541"
+    },
+    {
+      "name_en": "Jean Segura",
+      "name_ja": "ジーン・セグラ",
+      "source": "http://www.wikidata.org/entity/Q3174607"
+    },
+    {
+      "name_en": "Jeff Burroughs",
+      "name_ja": "ジェフ・バロウズ",
+      "source": "http://www.wikidata.org/entity/Q6173473"
+    },
+    {
+      "name_en": "Jeff Kent",
+      "name_ja": "ジェフ・ケント",
+      "source": "http://www.wikidata.org/entity/Q3106533"
+    },
+    {
+      "name_en": "Jeff McNeil",
+      "name_ja": "ジェフ・マクニール",
+      "source": "http://www.wikidata.org/entity/Q16567206"
+    },
+    {
+      "name_en": "Jeff Montgomery",
+      "name_ja": "ジェフ・モンゴメリー",
+      "source": "http://www.wikidata.org/entity/Q16194708"
+    },
+    {
+      "name_en": "Jeff Reardon",
+      "name_ja": "ジェフ・リアドン",
+      "source": "http://www.wikidata.org/entity/Q373657"
+    },
+    {
+      "name_en": "Jeff Russell",
+      "name_ja": "ジェフ・ラッセル",
+      "source": "http://www.wikidata.org/entity/Q276901"
+    },
+    {
+      "name_en": "Jeff Shaw",
+      "name_ja": "ジェフ・ショウ",
+      "source": "http://www.wikidata.org/entity/Q651178"
+    },
+    {
+      "name_en": "Jeff Tesreau",
+      "name_ja": "ジェフ・テスラウ",
+      "source": "http://www.wikidata.org/entity/Q12858626"
+    },
+    {
+      "name_en": "Jered Weaver",
+      "name_ja": "ジェレッド・ウィーバー",
+      "source": "http://www.wikidata.org/entity/Q1045949"
+    },
+    {
+      "name_en": "Jeremy Hellickson",
+      "name_ja": "ジェレミー・ヘリクソン",
+      "source": "http://www.wikidata.org/entity/Q1754648"
+    },
+    {
+      "name_en": "Jerome Walton",
+      "name_ja": "ジェローム・ウォルトン",
+      "source": "http://www.wikidata.org/entity/Q3177431"
+    },
+    {
+      "name_en": "Jesse Barfield",
+      "name_ja": "ジェシー・バーフィールド",
+      "source": "http://www.wikidata.org/entity/Q6186138"
+    },
+    {
+      "name_en": "Jesse Barnes",
+      "name_ja": "ジェシー・バーンズ",
+      "source": "http://www.wikidata.org/entity/Q6186136"
+    },
+    {
+      "name_en": "Jesse Burkett",
+      "name_ja": "ジェシー・バーケット",
+      "source": "http://www.wikidata.org/entity/Q1688144"
+    },
+    {
+      "name_en": "Jesse Tannehill",
+      "name_ja": "ジェシー・タンヒル",
+      "source": "http://www.wikidata.org/entity/Q6186901"
+    },
+    {
+      "name_en": "Jeurys Familia",
+      "name_ja": "ジェウリス・ファミリア",
+      "source": "http://www.wikidata.org/entity/Q3178206"
+    },
+    {
+      "name_en": "Jim Bagby Sr.",
+      "name_ja": "ジム・バグビー・シニア",
+      "source": "http://www.wikidata.org/entity/Q3178729"
+    },
+    {
+      "name_en": "Jim Bottomley",
+      "name_ja": "ジム・ボトムリー",
+      "source": "http://www.wikidata.org/entity/Q6193756"
+    },
+    {
+      "name_en": "Jim Bunning",
+      "name_ja": "ジム・バニング",
+      "source": "http://www.wikidata.org/entity/Q918265"
+    },
+    {
+      "name_en": "Jim Devlin",
+      "name_ja": "ジム・デブリン",
+      "source": "http://www.wikidata.org/entity/Q1566667"
+    },
+    {
+      "name_en": "Jim Fogarty",
+      "name_ja": "ジム・フォガティ",
+      "source": "http://www.wikidata.org/entity/Q6195017"
+    },
+    {
+      "name_en": "Jim Gentile",
+      "name_ja": "ジム・ジェンタイル",
+      "source": "http://www.wikidata.org/entity/Q6195185"
+    },
+    {
+      "name_en": "Jim Gilliam",
+      "name_ja": "ジム・ギリアム",
+      "source": "http://www.wikidata.org/entity/Q3178807"
+    },
+    {
+      "name_en": "Jim Kaat",
+      "name_ja": "ジム・カート",
+      "source": "http://www.wikidata.org/entity/Q6195984"
+    },
+    {
+      "name_en": "Jim Konstanty",
+      "name_ja": "ジム・コンスタンティー",
+      "source": "http://www.wikidata.org/entity/Q6122757"
+    },
+    {
+      "name_en": "Jim Lefebvre",
+      "name_ja": "ジム・ラフィーバー",
+      "source": "http://www.wikidata.org/entity/Q4263128"
+    },
+    {
+      "name_en": "Jim Lonborg",
+      "name_ja": "ジム・ロンボーグ",
+      "source": "http://www.wikidata.org/entity/Q16105989"
+    },
+    {
+      "name_en": "Jim McCormick",
+      "name_ja": "ジム・マコーミック",
+      "source": "http://www.wikidata.org/entity/Q1562660"
+    },
+    {
+      "name_en": "Jim O'Rourke",
+      "name_ja": "ジム・オルーク",
+      "source": "http://www.wikidata.org/entity/Q1562589"
+    },
+    {
+      "name_en": "Jim Palmer",
+      "name_ja": "ジム・パーマー",
+      "source": "http://www.wikidata.org/entity/Q1356627"
+    },
+    {
+      "name_en": "Jim Perry",
+      "name_ja": "ジム・ペリー",
+      "source": "http://www.wikidata.org/entity/Q6197472"
+    },
+    {
+      "name_en": "Jim Rice",
+      "name_ja": "ジム・ライス",
+      "source": "http://www.wikidata.org/entity/Q1056244"
+    },
+    {
+      "name_en": "Jim Rivera",
+      "name_ja": "ジム・リベラ",
+      "source": "http://www.wikidata.org/entity/Q6197776"
+    },
+    {
+      "name_en": "Jim Thome",
+      "name_ja": "ジム・トーミ",
+      "source": "http://www.wikidata.org/entity/Q1187225"
+    },
+    {
+      "name_en": "Jim Turner",
+      "name_ja": "ジム・ターナー",
+      "source": "http://www.wikidata.org/entity/Q6198614"
+    },
+    {
+      "name_en": "Jim Whitney",
+      "name_ja": "ジム・ホイットニー",
+      "source": "http://www.wikidata.org/entity/Q1564525"
+    },
+    {
+      "name_en": "Jimmie Foxx",
+      "name_ja": "ジミー・フォックス",
+      "source": "http://www.wikidata.org/entity/Q1329352"
+    },
+    {
+      "name_en": "Jimmy Collins",
+      "name_ja": "ジミー・コリンズ",
+      "source": "http://www.wikidata.org/entity/Q1186024"
+    },
+    {
+      "name_en": "Jimmy Key",
+      "name_ja": "ジミー・キー",
+      "source": "http://www.wikidata.org/entity/Q6143472"
+    },
+    {
+      "name_en": "Jimmy Ryan",
+      "name_ja": "ジミー・ライアン",
+      "source": "http://www.wikidata.org/entity/Q6201201"
+    },
+    {
+      "name_en": "Jimmy Sheckard",
+      "name_ja": "ジミー・シェッカード",
+      "source": "http://www.wikidata.org/entity/Q6201263"
+    },
+    {
+      "name_en": "Joaquin Andujar",
+      "name_ja": "ウォーキーン・アンドゥハー",
+      "source": "http://www.wikidata.org/entity/Q6141924"
+    },
+    {
+      "name_en": "Joe Black",
+      "name_ja": "ジョー・ブラック",
+      "source": "http://www.wikidata.org/entity/Q3468061"
+    },
+    {
+      "name_en": "Joe Borowski",
+      "name_ja": "ジョー・ボロウスキー",
+      "source": "http://www.wikidata.org/entity/Q994092"
+    },
+    {
+      "name_en": "Joe Carter",
+      "name_ja": "ジョー・カーター",
+      "source": "http://www.wikidata.org/entity/Q3178736"
+    },
+    {
+      "name_en": "Joe Charboneau",
+      "name_ja": "ジョー・シャボニュー",
+      "source": "http://www.wikidata.org/entity/Q3180016"
+    },
+    {
+      "name_en": "Joe DiMaggio",
+      "name_ja": "ジョー・ディマジオ",
+      "source": "http://www.wikidata.org/entity/Q297142"
+    },
+    {
+      "name_en": "Joe Gordon",
+      "name_ja": "ジョー・ゴードン",
+      "source": "http://www.wikidata.org/entity/Q3180075"
+    },
+    {
+      "name_en": "Joe Horlen",
+      "name_ja": "ジョー・ホーレン",
+      "source": "http://www.wikidata.org/entity/Q16104685"
+    },
+    {
+      "name_en": "Joe Kelley",
+      "name_ja": "ジョー・ケリー",
+      "source": "http://www.wikidata.org/entity/Q1527259"
+    },
+    {
+      "name_en": "Joe McGinnity",
+      "name_ja": "ジョー・マクギニティ",
+      "source": "http://www.wikidata.org/entity/Q6211238"
+    },
+    {
+      "name_en": "Joe Medwick",
+      "name_ja": "ジョー・メドウィック",
+      "source": "http://www.wikidata.org/entity/Q6211313"
+    },
+    {
+      "name_en": "Joe Niekro",
+      "name_ja": "ジョー・ニークロ",
+      "source": "http://www.wikidata.org/entity/Q329944"
+    },
+    {
+      "name_en": "Joe Oeschger",
+      "name_ja": "ジョー・オシュガー",
+      "source": "http://www.wikidata.org/entity/Q16011630"
+    },
+    {
+      "name_en": "Joe Page",
+      "name_ja": "ジョー・ペイジ",
+      "source": "http://www.wikidata.org/entity/Q6211664"
+    },
+    {
+      "name_en": "Joe Rudi",
+      "name_ja": "ジョー・ルディ",
+      "source": "http://www.wikidata.org/entity/Q6212118"
+    },
+    {
+      "name_en": "Joe Start",
+      "name_ja": "ジョー・スタート",
+      "source": "http://www.wikidata.org/entity/Q6212493"
+    },
+    {
+      "name_en": "Joe Torre",
+      "name_ja": "ジョー・トーリ",
+      "source": "http://www.wikidata.org/entity/Q707804"
+    },
+    {
+      "name_en": "Joe Wood",
+      "name_ja": "ジョー・ウッド",
+      "source": "http://www.wikidata.org/entity/Q6213059"
+    },
+    {
+      "name_en": "Joey Votto",
+      "name_ja": "ジョーイ・ボット",
+      "source": "http://www.wikidata.org/entity/Q762227"
+    },
+    {
+      "name_en": "Johan Santana",
+      "name_ja": "ヨハン・サンタナ",
+      "source": "http://www.wikidata.org/entity/Q919620"
+    },
+    {
+      "name_en": "John Anderson",
+      "name_ja": "ジョン・アンダーソン",
+      "source": "http://www.wikidata.org/entity/Q3439974"
+    },
+    {
+      "name_en": "John Axford",
+      "name_ja": "ジョン・アックスフォード",
+      "source": "http://www.wikidata.org/entity/Q3180954"
+    },
+    {
+      "name_en": "John Burkett",
+      "name_ja": "ジョン・バーケット",
+      "source": "http://www.wikidata.org/entity/Q11310774"
+    },
+    {
+      "name_en": "John Candelaria",
+      "name_ja": "ジョン・キャンデラリア",
+      "source": "http://www.wikidata.org/entity/Q6225033"
+    },
+    {
+      "name_en": "John Castino",
+      "name_ja": "ジョン・カスティーノ",
+      "source": "http://www.wikidata.org/entity/Q6225509"
+    },
+    {
+      "name_en": "John Clarkson",
+      "name_ja": "ジョン・クラークソン",
+      "source": "http://www.wikidata.org/entity/Q1251902"
+    },
+    {
+      "name_en": "John Denny",
+      "name_ja": "ジョン・デニー",
+      "source": "http://www.wikidata.org/entity/Q11310764"
+    },
+    {
+      "name_en": "John Ewing",
+      "name_ja": "ジョン・ユーイング",
+      "source": "http://www.wikidata.org/entity/Q6232102"
+    },
+    {
+      "name_en": "John Franco",
+      "name_ja": "ジョン・フランコ",
+      "source": "http://www.wikidata.org/entity/Q8836325"
+    },
+    {
+      "name_en": "John Hiller",
+      "name_ja": "ジョン・ヒラー",
+      "source": "http://www.wikidata.org/entity/Q3181754"
+    },
+    {
+      "name_en": "John Lackey",
+      "name_ja": "ジョン・ラッキー",
+      "source": "http://www.wikidata.org/entity/Q3178824"
+    },
+    {
+      "name_en": "John Montefusco",
+      "name_ja": "ジョン・モンテフュスコ",
+      "source": "http://www.wikidata.org/entity/Q6249192"
+    },
+    {
+      "name_en": "John O'Rourke",
+      "name_ja": "ジョン・オルーク",
+      "source": "http://www.wikidata.org/entity/Q6251020"
+    },
+    {
+      "name_en": "John Olerud",
+      "name_ja": "ジョン・オルルド",
+      "source": "http://www.wikidata.org/entity/Q6251217"
+    },
+    {
+      "name_en": "John Smiley",
+      "name_ja": "ジョン・スマイリー",
+      "source": "http://www.wikidata.org/entity/Q6258233"
+    },
+    {
+      "name_en": "John Smoltz",
+      "name_ja": "ジョン・スモルツ",
+      "source": "http://www.wikidata.org/entity/Q1145308"
+    },
+    {
+      "name_en": "John Wetteland",
+      "name_ja": "ジョン・ウェッテランド",
+      "source": "http://www.wikidata.org/entity/Q3182721"
+    },
+    {
+      "name_en": "Johnny Antonelli",
+      "name_ja": "ジョニー・アントネッリ",
+      "source": "http://www.wikidata.org/entity/Q6266238"
+    },
+    {
+      "name_en": "Johnny Barrett",
+      "name_ja": "ジョニー・バレット",
+      "source": "http://www.wikidata.org/entity/Q6266294"
+    },
+    {
+      "name_en": "Johnny Bench",
+      "name_ja": "ジョニー・ベンチ",
+      "source": "http://www.wikidata.org/entity/Q1155003"
+    },
+    {
+      "name_en": "Johnny Cueto",
+      "name_ja": "ジョニー・クエト",
+      "source": "http://www.wikidata.org/entity/Q3112333"
+    },
+    {
+      "name_en": "Johnny Damon",
+      "name_ja": "ジョニー・デイモン",
+      "source": "http://www.wikidata.org/entity/Q25720"
+    },
+    {
+      "name_en": "Johnny Mize",
+      "name_ja": "ジョニー・マイズ",
+      "source": "http://www.wikidata.org/entity/Q918889"
+    },
+    {
+      "name_en": "Johnny Mostil",
+      "name_ja": "ジョニー・モスチル",
+      "source": "http://www.wikidata.org/entity/Q6267347"
+    },
+    {
+      "name_en": "Johnny Pesky",
+      "name_ja": "ジョニー・ペスキー",
+      "source": "http://www.wikidata.org/entity/Q1320754"
+    },
+    {
+      "name_en": "Johnny Podres",
+      "name_ja": "ジョニー・ポドレス",
+      "source": "http://www.wikidata.org/entity/Q3182958"
+    },
+    {
+      "name_en": "Johnny Sain",
+      "name_ja": "ジョニー・セイン",
+      "source": "http://www.wikidata.org/entity/Q6267649"
+    },
+    {
+      "name_en": "Johnny Vander Meer",
+      "name_ja": "ジョニー・ヴァンダー・ミーア",
+      "source": "http://www.wikidata.org/entity/Q6267823"
+    },
+    {
+      "name_en": "Jon Berti",
+      "name_ja": "ジョン・バーティ",
+      "source": "http://www.wikidata.org/entity/Q18385669"
+    },
+    {
+      "name_en": "Jon Lester",
+      "name_ja": "ジョン・レスター",
+      "source": "http://www.wikidata.org/entity/Q928223"
+    },
+    {
+      "name_en": "Jon Matlack",
+      "name_ja": "ジョン・マトラック",
+      "source": "http://www.wikidata.org/entity/Q6271207"
+    },
+    {
+      "name_en": "Jonathan India",
+      "name_ja": "ジョナサン・インディア",
+      "source": "http://www.wikidata.org/entity/Q52210990"
+    },
+    {
+      "name_en": "Jonathan Villar",
+      "name_ja": "ジョナサン・ビヤー",
+      "source": "http://www.wikidata.org/entity/Q14375934"
+    },
+    {
+      "name_en": "Jordan Zimmermann",
+      "name_ja": "ジョーダン・ジマーマン",
+      "source": "http://www.wikidata.org/entity/Q3131844"
+    },
+    {
+      "name_en": "Jorge Soler",
+      "name_ja": "ホルヘ・ソレア",
+      "source": "http://www.wikidata.org/entity/Q15115212"
+    },
+    {
+      "name_en": "Jose Altuve",
+      "name_ja": "ホセ・アルトゥーベ",
+      "source": "http://www.wikidata.org/entity/Q3186148"
+    },
+    {
+      "name_en": "Jose Mesa",
+      "name_ja": "ホセ・メサ",
+      "source": "http://www.wikidata.org/entity/Q3186475"
+    },
+    {
+      "name_en": "Jose Rijo",
+      "name_ja": "ホセ・リーホ",
+      "source": "http://www.wikidata.org/entity/Q3111680"
+    },
+    {
+      "name_en": "Jose Valverde",
+      "name_ja": "ホセ・バルベルデ",
+      "source": "http://www.wikidata.org/entity/Q3112768"
+    },
+    {
+      "name_en": "Josh Beckett",
+      "name_ja": "ジョシュ・ベケット",
+      "source": "http://www.wikidata.org/entity/Q1365880"
+    },
+    {
+      "name_en": "Josh Donaldson",
+      "name_ja": "ジョシュ・ドナルドソン",
+      "source": "http://www.wikidata.org/entity/Q3045726"
+    },
+    {
+      "name_en": "Josh Hamilton",
+      "name_ja": "ジョシュ・ハミルトン",
+      "source": "http://www.wikidata.org/entity/Q716346"
+    },
+    {
+      "name_en": "Josh Johnson",
+      "name_ja": "ジョシュ・ジョンソン",
+      "source": "http://www.wikidata.org/entity/Q1057295"
+    },
+    {
+      "name_en": "José Abreu",
+      "name_ja": "ホセ・アブレイユ",
+      "source": "http://www.wikidata.org/entity/Q9013791"
+    },
+    {
+      "name_en": "José Bautista",
+      "name_ja": "ホセ・バティスタ",
+      "source": "http://www.wikidata.org/entity/Q1346122"
+    },
+    {
+      "name_en": "José Caballero",
+      "name_ja": "ホセ・カバレーロ",
+      "source": "http://www.wikidata.org/entity/Q118220115"
+    },
+    {
+      "name_en": "José Canseco",
+      "name_ja": "ホセ・カンセコ",
+      "source": "http://www.wikidata.org/entity/Q982714"
+    },
+    {
+      "name_en": "José Reyes",
+      "name_ja": "ホセ・レイエス",
+      "source": "http://www.wikidata.org/entity/Q220096"
+    },
+    {
+      "name_en": "Juan Gonzalez",
+      "name_ja": "フアン・ゴンザレス",
+      "source": "http://www.wikidata.org/entity/Q3107002"
+    },
+    {
+      "name_en": "Juan Guzmán",
+      "name_ja": "フアン・グーズマン",
+      "source": "http://www.wikidata.org/entity/Q387212"
+    },
+    {
+      "name_en": "Juan Marichal",
+      "name_ja": "フアン・マリシャル",
+      "source": "http://www.wikidata.org/entity/Q327386"
+    },
+    {
+      "name_en": "Juan Pierre",
+      "name_ja": "フアン・ピエール",
+      "source": "http://www.wikidata.org/entity/Q1152587"
+    },
+    {
+      "name_en": "Juan Soto",
+      "name_ja": "フアン・ソト",
+      "source": "http://www.wikidata.org/entity/Q52717515"
+    },
+    {
+      "name_en": "Julio Franco",
+      "name_ja": "フリオ・フランコ",
+      "source": "http://www.wikidata.org/entity/Q487717"
+    },
+    {
+      "name_en": "Julio Rodríguez",
+      "name_ja": "フリオ・ロドリゲス",
+      "source": "http://www.wikidata.org/entity/Q64785849"
+    },
+    {
+      "name_en": "Julio Urías",
+      "name_ja": "フリオ・ウリアス",
+      "source": "http://www.wikidata.org/entity/Q16929779"
+    },
+    {
+      "name_en": "Jumbo Elliott",
+      "name_ja": "ジャンボ・エリオット",
+      "source": "http://www.wikidata.org/entity/Q16006750"
+    },
+    {
+      "name_en": "Justin Morneau",
+      "name_ja": "ジャスティン・モルノー",
+      "source": "http://www.wikidata.org/entity/Q127585"
+    },
+    {
+      "name_en": "Justin Verlander",
+      "name_ja": "ジャスティン・バーランダー",
+      "source": "http://www.wikidata.org/entity/Q981788"
+    },
+    {
+      "name_en": "Kazuhiro Sasaki",
+      "name_ja": "佐々木主浩",
+      "source": "http://www.wikidata.org/entity/Q1045357"
+    },
+    {
+      "name_en": "Keith Foulke",
+      "name_ja": "キース・フォーク",
+      "source": "http://www.wikidata.org/entity/Q2748186"
+    },
+    {
+      "name_en": "Keith Hernandez",
+      "name_ja": "キース・ヘルナンデス",
+      "source": "http://www.wikidata.org/entity/Q3194742"
+    },
+    {
+      "name_en": "Ken Boyer",
+      "name_ja": "ケン・ボイヤー",
+      "source": "http://www.wikidata.org/entity/Q6136026"
+    },
+    {
+      "name_en": "Ken Caminiti",
+      "name_ja": "ケン・カミニティ",
+      "source": "http://www.wikidata.org/entity/Q1147649"
+    },
+    {
+      "name_en": "Ken Griffey Jr.",
+      "name_ja": "ケン・グリフィー・ジュニア",
+      "source": "http://www.wikidata.org/entity/Q536900"
+    },
+    {
+      "name_en": "Ken Harrelson",
+      "name_ja": "ケン・ハレルソン",
+      "source": "http://www.wikidata.org/entity/Q3814472"
+    },
+    {
+      "name_en": "Ken Hill",
+      "name_ja": "ケン・ヒル",
+      "source": "http://www.wikidata.org/entity/Q3195039"
+    },
+    {
+      "name_en": "Ken Hubbs",
+      "name_ja": "ケン・ハブス",
+      "source": "http://www.wikidata.org/entity/Q3195045"
+    },
+    {
+      "name_en": "Ken Sanders",
+      "name_ja": "ケン・サンダース",
+      "source": "http://www.wikidata.org/entity/Q6388437"
+    },
+    {
+      "name_en": "Ken Williams",
+      "name_ja": "ケン・ウィリアムズ",
+      "source": "http://www.wikidata.org/entity/Q6388699"
+    },
+    {
+      "name_en": "Kenley Jansen",
+      "name_ja": "ケンリー・ジャンセン",
+      "source": "http://www.wikidata.org/entity/Q1902109"
+    },
+    {
+      "name_en": "Kenny Lofton",
+      "name_ja": "ケニー・ロフトン",
+      "source": "http://www.wikidata.org/entity/Q970848"
+    },
+    {
+      "name_en": "Kerry Wood",
+      "name_ja": "ケリー・ウッド",
+      "source": "http://www.wikidata.org/entity/Q968334"
+    },
+    {
+      "name_en": "Kevin Appier",
+      "name_ja": "ケビン・エイピアー",
+      "source": "http://www.wikidata.org/entity/Q6395740"
+    },
+    {
+      "name_en": "Kevin Brown",
+      "name_ja": "ケビン・ブラウン",
+      "source": "http://www.wikidata.org/entity/Q867833"
+    },
+    {
+      "name_en": "Kevin Gausman",
+      "name_ja": "ケビン・ゴーズマン",
+      "source": "http://www.wikidata.org/entity/Q6396355"
+    },
+    {
+      "name_en": "Kevin Millwood",
+      "name_ja": "ケビン・ミルウッド",
+      "source": "http://www.wikidata.org/entity/Q1042333"
+    },
+    {
+      "name_en": "Kevin Mitchell",
+      "name_ja": "ケビン・ミッチェル",
+      "source": "http://www.wikidata.org/entity/Q11301188"
+    },
+    {
+      "name_en": "Kevin Seitzer",
+      "name_ja": "ケビン・サイツァー",
+      "source": "http://www.wikidata.org/entity/Q16194797"
+    },
+    {
+      "name_en": "Khris Davis",
+      "name_ja": "クリス・デービス",
+      "source": "http://www.wikidata.org/entity/Q6402724"
+    },
+    {
+      "name_en": "Kid Gleason",
+      "name_ja": "キッド・グリーソン",
+      "source": "http://www.wikidata.org/entity/Q6404490"
+    },
+    {
+      "name_en": "Kid Nichols",
+      "name_ja": "キッド・ニコルズ",
+      "source": "http://www.wikidata.org/entity/Q3196371"
+    },
+    {
+      "name_en": "Kiki Cuyler",
+      "name_ja": "カイカイ・カイラー",
+      "source": "http://www.wikidata.org/entity/Q6406252"
+    },
+    {
+      "name_en": "King Cole",
+      "name_ja": "キング・コール",
+      "source": "http://www.wikidata.org/entity/Q6411340"
+    },
+    {
+      "name_en": "King Kelly",
+      "name_ja": "キング・ケリー",
+      "source": "http://www.wikidata.org/entity/Q1527827"
+    },
+    {
+      "name_en": "Kirby Higbe",
+      "name_ja": "カービー・ヒグビー",
+      "source": "http://www.wikidata.org/entity/Q15459633"
+    },
+    {
+      "name_en": "Kirby Puckett",
+      "name_ja": "カービー・パケット",
+      "source": "http://www.wikidata.org/entity/Q955278"
+    },
+    {
+      "name_en": "Kirby Yates",
+      "name_ja": "カービー・イエーツ",
+      "source": "http://www.wikidata.org/entity/Q16232037"
+    },
+    {
+      "name_en": "Kirk Gibson",
+      "name_ja": "カーク・ギブソン",
+      "source": "http://www.wikidata.org/entity/Q1185498"
+    },
+    {
+      "name_en": "Kris Bryant",
+      "name_ja": "クリス・ブライアント",
+      "source": "http://www.wikidata.org/entity/Q16234450"
+    },
+    {
+      "name_en": "Kyle Hendricks",
+      "name_ja": "カイル・ヘンドリックス",
+      "source": "http://www.wikidata.org/entity/Q17182882"
+    },
+    {
+      "name_en": "Kyle Lewis",
+      "name_ja": "カイル・ルイス",
+      "source": "http://www.wikidata.org/entity/Q6451269"
+    },
+    {
+      "name_en": "Kyle Schwarber",
+      "name_ja": "カイル・シュワーバー",
+      "source": "http://www.wikidata.org/entity/Q16980697"
+    },
+    {
+      "name_en": "Kyle Tucker",
+      "name_ja": "カイル・タッカー",
+      "source": "http://www.wikidata.org/entity/Q21062696"
+    },
+    {
+      "name_en": "Kyle Wright",
+      "name_ja": "カイル・ライト",
+      "source": "http://www.wikidata.org/entity/Q28017372"
+    },
+    {
+      "name_en": "LaMarr Hoyt",
+      "name_ja": "ラマー・ホイト",
+      "source": "http://www.wikidata.org/entity/Q3206252"
+    },
+    {
+      "name_en": "Lady Baldwin",
+      "name_ja": "レディ・ボールドウィン",
+      "source": "http://www.wikidata.org/entity/Q1566675"
+    },
+    {
+      "name_en": "Lance Berkman",
+      "name_ja": "ランス・バークマン",
+      "source": "http://www.wikidata.org/entity/Q967779"
+    },
+    {
+      "name_en": "Lance Johnson",
+      "name_ja": "ランス・ジョンソン",
+      "source": "http://www.wikidata.org/entity/Q6483432"
+    },
+    {
+      "name_en": "Larry Corcoran",
+      "name_ja": "ラリー・コーコラン",
+      "source": "http://www.wikidata.org/entity/Q267079"
+    },
+    {
+      "name_en": "Larry Doby",
+      "name_ja": "ラリー・ドビー",
+      "source": "http://www.wikidata.org/entity/Q711825"
+    },
+    {
+      "name_en": "Larry Doyle",
+      "name_ja": "ラリー・ドイル",
+      "source": "http://www.wikidata.org/entity/Q6490221"
+    },
+    {
+      "name_en": "Larry Hisle",
+      "name_ja": "ラリー・ハイズル",
+      "source": "http://www.wikidata.org/entity/Q6490507"
+    },
+    {
+      "name_en": "Larry Jackson",
+      "name_ja": "ラリー・ジャクソン",
+      "source": "http://www.wikidata.org/entity/Q6490558"
+    },
+    {
+      "name_en": "Larry Jansen",
+      "name_ja": "ラリー・ジャンセン",
+      "source": "http://www.wikidata.org/entity/Q6490565"
+    },
+    {
+      "name_en": "Larry Twitchell",
+      "name_ja": "ラリー・トウィッチェル",
+      "source": "http://www.wikidata.org/entity/Q6491236"
+    },
+    {
+      "name_en": "Larry Walker",
+      "name_ja": "ラリー・ウォーカー",
+      "source": "http://www.wikidata.org/entity/Q3218116"
+    },
+    {
+      "name_en": "Lee Handley",
+      "name_ja": "リー・ハンドリー",
+      "source": "http://www.wikidata.org/entity/Q6513794"
+    },
+    {
+      "name_en": "Lee May",
+      "name_ja": "リー・メイ",
+      "source": "http://www.wikidata.org/entity/Q6514493"
+    },
+    {
+      "name_en": "Lee Richmond",
+      "name_ja": "リー・リッチモンド",
+      "source": "http://www.wikidata.org/entity/Q1251856"
+    },
+    {
+      "name_en": "Lee Smith",
+      "name_ja": "リー・スミス",
+      "source": "http://www.wikidata.org/entity/Q1078252"
+    },
+    {
+      "name_en": "Lefty Gomez",
+      "name_ja": "レフティ・ゴメス",
+      "source": "http://www.wikidata.org/entity/Q1355631"
+    },
+    {
+      "name_en": "Lefty Grove",
+      "name_ja": "レフティ・グローブ",
+      "source": "http://www.wikidata.org/entity/Q751263"
+    },
+    {
+      "name_en": "Lefty O'Doul",
+      "name_ja": "レフティ・オドール",
+      "source": "http://www.wikidata.org/entity/Q3229026"
+    },
+    {
+      "name_en": "Len Barker",
+      "name_ja": "レン・バーカー",
+      "source": "http://www.wikidata.org/entity/Q3229408"
+    },
+    {
+      "name_en": "Lenny Dykstra",
+      "name_ja": "レニー・ダイクストラ",
+      "source": "http://www.wikidata.org/entity/Q506988"
+    },
+    {
+      "name_en": "Les Webber",
+      "name_ja": "レス・ウェバー",
+      "source": "http://www.wikidata.org/entity/Q6530092"
+    },
+    {
+      "name_en": "Lew Burdette",
+      "name_ja": "ルー・バーデット",
+      "source": "http://www.wikidata.org/entity/Q3237263"
+    },
+    {
+      "name_en": "Lew Fonseca",
+      "name_ja": "ルー・フォンセカ",
+      "source": "http://www.wikidata.org/entity/Q6535978"
+    },
+    {
+      "name_en": "Liam Hendriks",
+      "name_ja": "リアム・ヘンドリックス",
+      "source": "http://www.wikidata.org/entity/Q3237646"
+    },
+    {
+      "name_en": "Lindy McDaniel",
+      "name_ja": "リンディ・マクダニエル",
+      "source": "http://www.wikidata.org/entity/Q6552990"
+    },
+    {
+      "name_en": "Lip Pike",
+      "name_ja": "リップ・パイク",
+      "source": "http://www.wikidata.org/entity/Q6556136"
+    },
+    {
+      "name_en": "Lloyd Waner",
+      "name_ja": "ロイド・ウェイナー",
+      "source": "http://www.wikidata.org/entity/Q8836264"
+    },
+    {
+      "name_en": "Logan Webb",
+      "name_ja": "ローガン・ウェブ",
+      "source": "http://www.wikidata.org/entity/Q66558112"
+    },
+    {
+      "name_en": "Lon Warneke",
+      "name_ja": "ロン・ワーネギー",
+      "source": "http://www.wikidata.org/entity/Q6669624"
+    },
+    {
+      "name_en": "Lou Boudreau",
+      "name_ja": "ルー・ブードロー",
+      "source": "http://www.wikidata.org/entity/Q326781"
+    },
+    {
+      "name_en": "Lou Brock",
+      "name_ja": "ルー・ブロック",
+      "source": "http://www.wikidata.org/entity/Q3260115"
+    },
+    {
+      "name_en": "Lou Gehrig",
+      "name_ja": "ルー・ゲーリッグ",
+      "source": "http://www.wikidata.org/entity/Q357444"
+    },
+    {
+      "name_en": "Lou Piniella",
+      "name_ja": "ルー・ピネラ",
+      "source": "http://www.wikidata.org/entity/Q676861"
+    },
+    {
+      "name_en": "Lou Whitaker",
+      "name_ja": "ルー・ウィテカー",
+      "source": "http://www.wikidata.org/entity/Q3260156"
+    },
+    {
+      "name_en": "Luis Aparicio",
+      "name_ja": "ルイス・アパリシオ",
+      "source": "http://www.wikidata.org/entity/Q540248"
+    },
+    {
+      "name_en": "Luis Arraez",
+      "name_ja": "ルイス・アラエス",
+      "source": "http://www.wikidata.org/entity/Q63982823"
+    },
+    {
+      "name_en": "Luis Arroyo",
+      "name_ja": "ルイス・アローヨ",
+      "source": "http://www.wikidata.org/entity/Q6700337"
+    },
+    {
+      "name_en": "Luis Gil",
+      "name_ja": "ルイス・ヒール",
+      "source": "http://www.wikidata.org/entity/Q107920179"
+    },
+    {
+      "name_en": "Luis Tiant",
+      "name_ja": "ルイス・ティアント",
+      "source": "http://www.wikidata.org/entity/Q3266840"
+    },
+    {
+      "name_en": "Luke Appling",
+      "name_ja": "ルーク・アップリング",
+      "source": "http://www.wikidata.org/entity/Q327030"
+    },
+    {
+      "name_en": "Luke Voit",
+      "name_ja": "ルーク・ボイト",
+      "source": "http://www.wikidata.org/entity/Q30658688"
+    },
+    {
+      "name_en": "Magglio Ordonez",
+      "name_ja": "マグリオ・オルドニェス",
+      "source": "http://www.wikidata.org/entity/Q928155"
+    },
+    {
+      "name_en": "Mallex Smith",
+      "name_ja": "マレックス・スミス",
+      "source": "http://www.wikidata.org/entity/Q18351932"
+    },
+    {
+      "name_en": "Manny Ramirez",
+      "name_ja": "マニー・ラミレス",
+      "source": "http://www.wikidata.org/entity/Q375648"
+    },
+    {
+      "name_en": "Marcell Ozuna",
+      "name_ja": "マーセル・オズナ",
+      "source": "http://www.wikidata.org/entity/Q6756344"
+    },
+    {
+      "name_en": "Marcus Semien",
+      "name_ja": "マーカス・セミエン",
+      "source": "http://www.wikidata.org/entity/Q15946610"
+    },
+    {
+      "name_en": "Mariano Rivera",
+      "name_ja": "マリアノ・リベラ",
+      "source": "http://www.wikidata.org/entity/Q382303"
+    },
+    {
+      "name_en": "Mark Baldwin",
+      "name_ja": "マーク・ボールドウィン",
+      "source": "http://www.wikidata.org/entity/Q6766647"
+    },
+    {
+      "name_en": "Mark Davis",
+      "name_ja": "マーク・デービス",
+      "source": "http://www.wikidata.org/entity/Q3294048"
+    },
+    {
+      "name_en": "Mark Fidrych",
+      "name_ja": "マーク・フィドリッチ",
+      "source": "http://www.wikidata.org/entity/Q6767600"
+    },
+    {
+      "name_en": "Mark Langston",
+      "name_ja": "マーク・ラングストン",
+      "source": "http://www.wikidata.org/entity/Q3294145"
+    },
+    {
+      "name_en": "Mark McGwire",
+      "name_ja": "マーク・マグワイア",
+      "source": "http://www.wikidata.org/entity/Q462481"
+    },
+    {
+      "name_en": "Mark Melancon",
+      "name_ja": "マーク・マランソン",
+      "source": "http://www.wikidata.org/entity/Q3294181"
+    },
+    {
+      "name_en": "Mark Mulder",
+      "name_ja": "マーク・マルダー",
+      "source": "http://www.wikidata.org/entity/Q5366242"
+    },
+    {
+      "name_en": "Mark Teixeira",
+      "name_ja": "マーク・テシェイラ",
+      "source": "http://www.wikidata.org/entity/Q928196"
+    },
+    {
+      "name_en": "Mark Trumbo",
+      "name_ja": "マーク・トランボ",
+      "source": "http://www.wikidata.org/entity/Q2254970"
+    },
+    {
+      "name_en": "Marquis Grissom",
+      "name_ja": "マーキス・グリッソム",
+      "source": "http://www.wikidata.org/entity/Q3294778"
+    },
+    {
+      "name_en": "Marty Cordova",
+      "name_ja": "マーティ・コードバ",
+      "source": "http://www.wikidata.org/entity/Q3295921"
+    },
+    {
+      "name_en": "Marty Marion",
+      "name_ja": "マーティー・マリオン",
+      "source": "http://www.wikidata.org/entity/Q129221"
+    },
+    {
+      "name_en": "Mason Miller",
+      "name_ja": "メイソン・ミラー",
+      "source": "http://www.wikidata.org/entity/Q117810779"
+    },
+    {
+      "name_en": "Matt Carpenter",
+      "name_ja": "マット・カーペンター",
+      "source": "http://www.wikidata.org/entity/Q2351564"
+    },
+    {
+      "name_en": "Matt Kemp",
+      "name_ja": "マット・ケンプ",
+      "source": "http://www.wikidata.org/entity/Q746914"
+    },
+    {
+      "name_en": "Matt Morris",
+      "name_ja": "マット・モリス",
+      "source": "http://www.wikidata.org/entity/Q6789097"
+    },
+    {
+      "name_en": "Matt Olson",
+      "name_ja": "マット・オルソン",
+      "source": "http://www.wikidata.org/entity/Q17489773"
+    },
+    {
+      "name_en": "Matt Williams",
+      "name_ja": "マット・ウィリアムズ",
+      "source": "http://www.wikidata.org/entity/Q3299589"
+    },
+    {
+      "name_en": "Matty Alou",
+      "name_ja": "マティ・アルー",
+      "source": "http://www.wikidata.org/entity/Q3133102"
+    },
+    {
+      "name_en": "Maury Wills",
+      "name_ja": "モーリー・ウィルス",
+      "source": "http://www.wikidata.org/entity/Q3301795"
+    },
+    {
+      "name_en": "Max Carey",
+      "name_ja": "マックス・キャリー",
+      "source": "http://www.wikidata.org/entity/Q1912364"
+    },
+    {
+      "name_en": "Max Fried",
+      "name_ja": "マックス・フリード",
+      "source": "http://www.wikidata.org/entity/Q29833482"
+    },
+    {
+      "name_en": "Mel Harder",
+      "name_ja": "メル・ハーダー",
+      "source": "http://www.wikidata.org/entity/Q952957"
+    },
+    {
+      "name_en": "Mel Ott",
+      "name_ja": "メル・オット",
+      "source": "http://www.wikidata.org/entity/Q726655"
+    },
+    {
+      "name_en": "Mel Parnell",
+      "name_ja": "メル・パーネル",
+      "source": "http://www.wikidata.org/entity/Q6810805"
+    },
+    {
+      "name_en": "Michael Bourn",
+      "name_ja": "マイケル・ボーン",
+      "source": "http://www.wikidata.org/entity/Q3308049"
+    },
+    {
+      "name_en": "Michael Cuddyer",
+      "name_ja": "マイケル・カダイアー",
+      "source": "http://www.wikidata.org/entity/Q861747"
+    },
+    {
+      "name_en": "Michael Fulmer",
+      "name_ja": "マイケル・フルマー",
+      "source": "http://www.wikidata.org/entity/Q16578206"
+    },
+    {
+      "name_en": "Michael Harris II",
+      "name_ja": "マイケル・ハリス2世",
+      "source": "http://www.wikidata.org/entity/Q111361307"
+    },
+    {
+      "name_en": "Michael Young",
+      "name_ja": "マイケル・ヤング",
+      "source": "http://www.wikidata.org/entity/Q1046185"
+    },
+    {
+      "name_en": "Mickey Cochrane",
+      "name_ja": "ミッキー・カクレーン",
+      "source": "http://www.wikidata.org/entity/Q326416"
+    },
+    {
+      "name_en": "Mickey Lolich",
+      "name_ja": "ミッキー・ロリッチ",
+      "source": "http://www.wikidata.org/entity/Q6838697"
+    },
+    {
+      "name_en": "Mickey Mantle",
+      "name_ja": "ミッキー・マントル",
+      "source": "http://www.wikidata.org/entity/Q345004"
+    },
+    {
+      "name_en": "Mickey Rivers",
+      "name_ja": "ミッキー・リバース",
+      "source": "http://www.wikidata.org/entity/Q6838772"
+    },
+    {
+      "name_en": "Mickey Vernon",
+      "name_ja": "ミッキー・バーノン",
+      "source": "http://www.wikidata.org/entity/Q4356090"
+    },
+    {
+      "name_en": "Miguel Cabrera",
+      "name_ja": "ミゲル・カブレラ",
+      "source": "http://www.wikidata.org/entity/Q735354"
+    },
+    {
+      "name_en": "Miguel Tejada",
+      "name_ja": "ミゲル・テハダ",
+      "source": "http://www.wikidata.org/entity/Q1185158"
+    },
+    {
+      "name_en": "Mike Boddicker",
+      "name_ja": "マイク・ボディッカー",
+      "source": "http://www.wikidata.org/entity/Q6846067"
+    },
+    {
+      "name_en": "Mike Cuellar",
+      "name_ja": "マイク・クェイヤー",
+      "source": "http://www.wikidata.org/entity/Q6846454"
+    },
+    {
+      "name_en": "Mike Flanagan",
+      "name_ja": "マイク・フラナガン",
+      "source": "http://www.wikidata.org/entity/Q869473"
+    },
+    {
+      "name_en": "Mike Fornieles",
+      "name_ja": "マイク・フォーニエス",
+      "source": "http://www.wikidata.org/entity/Q6846884"
+    },
+    {
+      "name_en": "Mike Garcia",
+      "name_ja": "マイク・ガルシア",
+      "source": "http://www.wikidata.org/entity/Q3313316"
+    },
+    {
+      "name_en": "Mike Hampton",
+      "name_ja": "マイク・ハンプトン",
+      "source": "http://www.wikidata.org/entity/Q3106860"
+    },
+    {
+      "name_en": "Mike Hargrove",
+      "name_ja": "マイク・ハーグローヴ",
+      "source": "http://www.wikidata.org/entity/Q3313358"
+    },
+    {
+      "name_en": "Mike Mussina",
+      "name_ja": "マイク・ムッシーナ",
+      "source": "http://www.wikidata.org/entity/Q1069430"
+    },
+    {
+      "name_en": "Mike Piazza",
+      "name_ja": "マイク・ピアッツァ",
+      "source": "http://www.wikidata.org/entity/Q613319"
+    },
+    {
+      "name_en": "Mike Schmidt",
+      "name_ja": "マイク・シュミット",
+      "source": "http://www.wikidata.org/entity/Q1147513"
+    },
+    {
+      "name_en": "Mike Scott",
+      "name_ja": "マイク・スコット",
+      "source": "http://www.wikidata.org/entity/Q3313545"
+    },
+    {
+      "name_en": "Mike Tiernan",
+      "name_ja": "マイク・ティアナン",
+      "source": "http://www.wikidata.org/entity/Q1094988"
+    },
+    {
+      "name_en": "Mike Trout",
+      "name_ja": "マイク・トラウト",
+      "source": "http://www.wikidata.org/entity/Q3090378"
+    },
+    {
+      "name_en": "Miles Mikolas",
+      "name_ja": "マイルズ・マイコラス",
+      "source": "http://www.wikidata.org/entity/Q3314079"
+    },
+    {
+      "name_en": "Minnie Minoso",
+      "name_ja": "ミニー・ミノーソ",
+      "source": "http://www.wikidata.org/entity/Q3315554"
+    },
+    {
+      "name_en": "Mo Vaughn",
+      "name_ja": "モー・ボーン",
+      "source": "http://www.wikidata.org/entity/Q3030993"
+    },
+    {
+      "name_en": "Monte Irvin",
+      "name_ja": "モンテ・アーヴィン",
+      "source": "http://www.wikidata.org/entity/Q4356515"
+    },
+    {
+      "name_en": "Mookie Betts",
+      "name_ja": "ムーキー・ベッツ",
+      "source": "http://www.wikidata.org/entity/Q16226579"
+    },
+    {
+      "name_en": "Mort Cooper",
+      "name_ja": "モート・クーパー",
+      "source": "http://www.wikidata.org/entity/Q11344863"
+    },
+    {
+      "name_en": "Mudcat Grant",
+      "name_ja": "マッドキャット・グラント",
+      "source": "http://www.wikidata.org/entity/Q3327401"
+    },
+    {
+      "name_en": "Nap Lajoie",
+      "name_ja": "ナップ・ラジョイ",
+      "source": "http://www.wikidata.org/entity/Q3335869"
+    },
+    {
+      "name_en": "Nasim Nuñez",
+      "name_ja": "ナシム・ヌニェス",
+      "source": "http://www.wikidata.org/entity/Q115529794"
+    },
+    {
+      "name_en": "Ned Williamson",
+      "name_ja": "ネッド・ウィリアムソン",
+      "source": "http://www.wikidata.org/entity/Q255824"
+    },
+    {
+      "name_en": "Neftalí Feliz",
+      "name_ja": "ネフタリ・フェリス",
+      "source": "http://www.wikidata.org/entity/Q1185663"
+    },
+    {
+      "name_en": "Nellie Fox",
+      "name_ja": "ネリー・フォックス",
+      "source": "http://www.wikidata.org/entity/Q328594"
+    },
+    {
+      "name_en": "Nick Kurtz",
+      "name_ja": "ニック・カーツ",
+      "source": "http://www.wikidata.org/entity/Q123375539"
+    },
+    {
+      "name_en": "Nolan Arenado",
+      "name_ja": "ノーラン・アレナド",
+      "source": "http://www.wikidata.org/entity/Q7048171"
+    },
+    {
+      "name_en": "Nomar Garciaparra",
+      "name_ja": "ノマー・ガルシアパーラ",
+      "source": "http://www.wikidata.org/entity/Q1187214"
+    },
+    {
+      "name_en": "Noodles Hahn",
+      "name_ja": "ヌードルズ・ハーン",
+      "source": "http://www.wikidata.org/entity/Q7049681"
+    },
+    {
+      "name_en": "Norm Cash",
+      "name_ja": "ノーム・キャッシュ",
+      "source": "http://www.wikidata.org/entity/Q7051448"
+    },
+    {
+      "name_en": "Omar Moreno",
+      "name_ja": "オマー・モレノ",
+      "source": "http://www.wikidata.org/entity/Q7089768"
+    },
+    {
+      "name_en": "Oneil Cruz",
+      "name_ja": "オニール・クルーズ",
+      "source": "http://www.wikidata.org/entity/Q64785864"
+    },
+    {
+      "name_en": "Orel Hershiser",
+      "name_ja": "オーレル・ハーシュハイザー",
+      "source": "http://www.wikidata.org/entity/Q2410775"
+    },
+    {
+      "name_en": "Orlando Cepeda",
+      "name_ja": "オーランド・セペダ",
+      "source": "http://www.wikidata.org/entity/Q1356662"
+    },
+    {
+      "name_en": "Orval Overall",
+      "name_ja": "オーバル・オーバーオール",
+      "source": "http://www.wikidata.org/entity/Q7105198"
+    },
+    {
+      "name_en": "Otto Hess",
+      "name_ja": "オットー・ヘス",
+      "source": "http://www.wikidata.org/entity/Q7109625"
+    },
+    {
+      "name_en": "Otto Lopez",
+      "name_ja": "オット・ロペス",
+      "source": "http://www.wikidata.org/entity/Q104872239"
+    },
+    {
+      "name_en": "Oyster Burns",
+      "name_ja": "オイスター・バーンズ",
+      "source": "http://www.wikidata.org/entity/Q7116325"
+    },
+    {
+      "name_en": "Ozzie Guillen",
+      "name_ja": "オジー・ギーエン",
+      "source": "http://www.wikidata.org/entity/Q2609164"
+    },
+    {
+      "name_en": "Pat Hentgen",
+      "name_ja": "パット・ヘントゲン",
+      "source": "http://www.wikidata.org/entity/Q3041984"
+    },
+    {
+      "name_en": "Pat Listach",
+      "name_ja": "パット・リスタッチ",
+      "source": "http://www.wikidata.org/entity/Q3368553"
+    },
+    {
+      "name_en": "Pat Malone",
+      "name_ja": "パット・マローン",
+      "source": "http://www.wikidata.org/entity/Q7143698"
+    },
+    {
+      "name_en": "Pat Zachry",
+      "name_ja": "パット・ザクリー",
+      "source": "http://www.wikidata.org/entity/Q7144125"
+    },
+    {
+      "name_en": "Patsy Dougherty",
+      "name_ja": "パッツィ・ドハティ",
+      "source": "http://www.wikidata.org/entity/Q7148246"
+    },
+    {
+      "name_en": "Paul Goldschmidt",
+      "name_ja": "ポール・ゴールドシュミット",
+      "source": "http://www.wikidata.org/entity/Q3067488"
+    },
+    {
+      "name_en": "Paul Hines",
+      "name_ja": "ポール・ハインズ",
+      "source": "http://www.wikidata.org/entity/Q1564506"
+    },
+    {
+      "name_en": "Paul Molitor",
+      "name_ja": "ポール・モリター",
+      "source": "http://www.wikidata.org/entity/Q1972377"
+    },
+    {
+      "name_en": "Paul O'Neill",
+      "name_ja": "ポール・オニール",
+      "source": "http://www.wikidata.org/entity/Q865424"
+    },
+    {
+      "name_en": "Paul Skenes",
+      "name_ja": "ポール・スキーンズ",
+      "source": "http://www.wikidata.org/entity/Q112581490"
+    },
+    {
+      "name_en": "Paul Waner",
+      "name_ja": "ポール・ウェイナー",
+      "source": "http://www.wikidata.org/entity/Q710916"
+    },
+    {
+      "name_en": "Pedro Álvarez",
+      "name_ja": "ペドロ・アルバレス",
+      "source": "http://www.wikidata.org/entity/Q767616"
+    },
+    {
+      "name_en": "Pee Wee Reese",
+      "name_ja": "ピー・ウィー・リース",
+      "source": "http://www.wikidata.org/entity/Q182485"
+    },
+    {
+      "name_en": "Pepper Martin",
+      "name_ja": "ペッパー・マーティン",
+      "source": "http://www.wikidata.org/entity/Q949092"
+    },
+    {
+      "name_en": "Pete Alonso",
+      "name_ja": "ピート・アロンソ",
+      "source": "http://www.wikidata.org/entity/Q27926052"
+    },
+    {
+      "name_en": "Pete Crow-Armstrong",
+      "name_ja": "ピート・クロウ＝アームストロング",
+      "source": "http://www.wikidata.org/entity/Q95971503"
+    },
+    {
+      "name_en": "Pete Reiser",
+      "name_ja": "ピート・ライザー",
+      "source": "http://www.wikidata.org/entity/Q7172213"
+    },
+    {
+      "name_en": "Pete Rose",
+      "name_ja": "ピート・ローズ",
+      "source": "http://www.wikidata.org/entity/Q739866"
+    },
+    {
+      "name_en": "Pete Runnels",
+      "name_ja": "ピート・ラネルズ",
+      "source": "http://www.wikidata.org/entity/Q7172232"
+    },
+    {
+      "name_en": "Pete Vuckovich",
+      "name_ja": "ピート・ブコビッチ",
+      "source": "http://www.wikidata.org/entity/Q7172321"
+    },
+    {
+      "name_en": "Phil Cavarretta",
+      "name_ja": "フィル・キャバレッタ",
+      "source": "http://www.wikidata.org/entity/Q581425"
+    },
+    {
+      "name_en": "Phil Niekro",
+      "name_ja": "フィル・ニークロ",
+      "source": "http://www.wikidata.org/entity/Q114468"
+    },
+    {
+      "name_en": "Phil Regan",
+      "name_ja": "フィル・リーガン",
+      "source": "http://www.wikidata.org/entity/Q7182332"
+    },
+    {
+      "name_en": "Phil Rizzuto",
+      "name_ja": "フィル・リズート",
+      "source": "http://www.wikidata.org/entity/Q1030203"
+    },
+    {
+      "name_en": "Preacher Roe",
+      "name_ja": "プリーチャー・ロー",
+      "source": "http://www.wikidata.org/entity/Q7239299"
+    },
+    {
+      "name_en": "Preston Wilson",
+      "name_ja": "プレストン・ウィルソン",
+      "source": "http://www.wikidata.org/entity/Q7242019"
+    },
+    {
+      "name_en": "Prince Fielder",
+      "name_ja": "プリンス・フィルダー",
+      "source": "http://www.wikidata.org/entity/Q2501704"
+    },
+    {
+      "name_en": "Quilvio Veras",
+      "name_ja": "キルビーオ・ベラス",
+      "source": "http://www.wikidata.org/entity/Q577832"
+    },
+    {
+      "name_en": "R.A. Dickey",
+      "name_ja": "R.A.ディッキー",
+      "source": "http://www.wikidata.org/entity/Q1320688"
+    },
+    {
+      "name_en": "Rafael Furcal",
+      "name_ja": "ラファエル・ファーカル",
+      "source": "http://www.wikidata.org/entity/Q2339046"
+    },
+    {
+      "name_en": "Rafael Palmeiro",
+      "name_ja": "ラファエル・パルメイロ",
+      "source": "http://www.wikidata.org/entity/Q1081144"
+    },
+    {
+      "name_en": "Rafael Soriano",
+      "name_ja": "ラファエル・ソリアーノ",
+      "source": "http://www.wikidata.org/entity/Q366928"
+    },
+    {
+      "name_en": "Rajai Davis",
+      "name_ja": "ラージャイ・デービス",
+      "source": "http://www.wikidata.org/entity/Q3417960"
+    },
+    {
+      "name_en": "Ralph Garr",
+      "name_ja": "ラルフ・ガー",
+      "source": "http://www.wikidata.org/entity/Q7287527"
+    },
+    {
+      "name_en": "Ralph Kiner",
+      "name_ja": "ラルフ・カイナー",
+      "source": "http://www.wikidata.org/entity/Q3108486"
+    },
+    {
+      "name_en": "Ralph Terry",
+      "name_ja": "ラルフ・テリー",
+      "source": "http://www.wikidata.org/entity/Q4357583"
+    },
+    {
+      "name_en": "Randy Arozarena",
+      "name_ja": "ランディ・アロサレーナ",
+      "source": "http://www.wikidata.org/entity/Q65972748"
+    },
+    {
+      "name_en": "Randy Jones",
+      "name_ja": "ランディ・ジョーンズ",
+      "source": "http://www.wikidata.org/entity/Q7292269"
+    },
+    {
+      "name_en": "Randy Myers",
+      "name_ja": "ランディ・マイヤーズ",
+      "source": "http://www.wikidata.org/entity/Q3026404"
+    },
+    {
+      "name_en": "Ray Boone",
+      "name_ja": "レイ・ブーン",
+      "source": "http://www.wikidata.org/entity/Q7297213"
+    },
+    {
+      "name_en": "Raúl Mondesi",
+      "name_ja": "ラウル・モンデシー",
+      "source": "http://www.wikidata.org/entity/Q1152434"
+    },
+    {
+      "name_en": "Red Faber",
+      "name_ja": "レッド・フェイバー",
+      "source": "http://www.wikidata.org/entity/Q2135954"
+    },
+    {
+      "name_en": "Red Rolfe",
+      "name_ja": "レッド・ロルフ",
+      "source": "http://www.wikidata.org/entity/Q3931452"
+    },
+    {
+      "name_en": "Red Ruffing",
+      "name_ja": "レッド・ラフィング",
+      "source": "http://www.wikidata.org/entity/Q2136063"
+    },
+    {
+      "name_en": "Red Schoendienst",
+      "name_ja": "レッド・ショーエンディーンスト",
+      "source": "http://www.wikidata.org/entity/Q4356083"
+    },
+    {
+      "name_en": "Rich Aurilia",
+      "name_ja": "リッチ・オーリリア",
+      "source": "http://www.wikidata.org/entity/Q633064"
+    },
+    {
+      "name_en": "Richie Ashburn",
+      "name_ja": "リッチー・アシュバーン",
+      "source": "http://www.wikidata.org/entity/Q1489089"
+    },
+    {
+      "name_en": "Rick Helling",
+      "name_ja": "リック・ヘリング",
+      "source": "http://www.wikidata.org/entity/Q5971858"
+    },
+    {
+      "name_en": "Rick Honeycutt",
+      "name_ja": "リック・ハニカット",
+      "source": "http://www.wikidata.org/entity/Q4355617"
+    },
+    {
+      "name_en": "Rick Porcello",
+      "name_ja": "リック・ポーセロ",
+      "source": "http://www.wikidata.org/entity/Q3431596"
+    },
+    {
+      "name_en": "Rick Sutcliffe",
+      "name_ja": "リック・サトクリフ",
+      "source": "http://www.wikidata.org/entity/Q3431604"
+    },
+    {
+      "name_en": "Rickey Henderson",
+      "name_ja": "リッキー・ヘンダーソン",
+      "source": "http://www.wikidata.org/entity/Q601521"
+    },
+    {
+      "name_en": "Rico Carty",
+      "name_ja": "リコ・カーティ",
+      "source": "http://www.wikidata.org/entity/Q7332253"
+    },
+    {
+      "name_en": "Riley O'Brien",
+      "name_ja": "ライリー・オブライエン",
+      "source": "http://www.wikidata.org/entity/Q108743621"
+    },
+    {
+      "name_en": "Rip Sewell",
+      "name_ja": "リップ・シーウェル",
+      "source": "http://www.wikidata.org/entity/Q7335537"
+    },
+    {
+      "name_en": "Ripper Collins",
+      "name_ja": "リッパー・コリンズ",
+      "source": "http://www.wikidata.org/entity/Q7335697"
+    },
+    {
+      "name_en": "Robb Nen",
+      "name_ja": "ロブ・ネン",
+      "source": "http://www.wikidata.org/entity/Q6139806"
+    },
+    {
+      "name_en": "Robbie Ray",
+      "name_ja": "ロビー・レイ",
+      "source": "http://www.wikidata.org/entity/Q16735037"
+    },
+    {
+      "name_en": "Robert Suarez",
+      "name_ja": "ロベルト・スアレス",
+      "source": "http://www.wikidata.org/entity/Q28113211"
+    },
+    {
+      "name_en": "Roberto Clemente",
+      "name_ja": "ロベルト・クレメンテ",
+      "source": "http://www.wikidata.org/entity/Q684020"
+    },
+    {
+      "name_en": "Roberto Osuna",
+      "name_ja": "ロベルト・オスナ",
+      "source": "http://www.wikidata.org/entity/Q19793652"
+    },
+    {
+      "name_en": "Robin Roberts",
+      "name_ja": "ロビン・ロバーツ",
+      "source": "http://www.wikidata.org/entity/Q1185477"
+    },
+    {
+      "name_en": "Robin Yount",
+      "name_ja": "ロビン・ヨーント",
+      "source": "http://www.wikidata.org/entity/Q3437143"
+    },
+    {
+      "name_en": "Rocky Colavito",
+      "name_ja": "ロッキー・コラビト",
+      "source": "http://www.wikidata.org/entity/Q3108759"
+    },
+    {
+      "name_en": "Rod Carew",
+      "name_ja": "ロッド・カルー",
+      "source": "http://www.wikidata.org/entity/Q1316950"
+    },
+    {
+      "name_en": "Roger Clemens",
+      "name_ja": "ロジャー・クレメンス",
+      "source": "http://www.wikidata.org/entity/Q473208"
+    },
+    {
+      "name_en": "Roger Connor",
+      "name_ja": "ロジャー・コナー",
+      "source": "http://www.wikidata.org/entity/Q846872"
+    },
+    {
+      "name_en": "Roger Maris",
+      "name_ja": "ロジャー・マリス",
+      "source": "http://www.wikidata.org/entity/Q741023"
+    },
+    {
+      "name_en": "Rogers Hornsby",
+      "name_ja": "ロジャース・ホーンスビー",
+      "source": "http://www.wikidata.org/entity/Q262945"
+    },
+    {
+      "name_en": "Rollie Fingers",
+      "name_ja": "ローリー・フィンガーズ",
+      "source": "http://www.wikidata.org/entity/Q542827"
+    },
+    {
+      "name_en": "Ron Bryant",
+      "name_ja": "R.ブライアント",
+      "source": "http://www.wikidata.org/entity/Q7363580"
+    },
+    {
+      "name_en": "Ron Guidry",
+      "name_ja": "ロン・ギドリー",
+      "source": "http://www.wikidata.org/entity/Q711832"
+    },
+    {
+      "name_en": "Ron Hansen",
+      "name_ja": "ロン・ハンセン",
+      "source": "http://www.wikidata.org/entity/Q7363876"
+    },
+    {
+      "name_en": "Ron Kittle",
+      "name_ja": "ロン・キトル",
+      "source": "http://www.wikidata.org/entity/Q7364032"
+    },
+    {
+      "name_en": "Ron Kline",
+      "name_ja": "R.クライン",
+      "source": "http://www.wikidata.org/entity/Q7364034"
+    },
+    {
+      "name_en": "Ron LeFlore",
+      "name_ja": "ロン・ルフロア",
+      "source": "http://www.wikidata.org/entity/Q3441428"
+    },
+    {
+      "name_en": "Ron Perranoski",
+      "name_ja": "ロン・ペラノスキー",
+      "source": "http://www.wikidata.org/entity/Q7364257"
+    },
+    {
+      "name_en": "Ronald Acuña Jr.",
+      "name_ja": "ロナルド・アクーニャ・ジュニア",
+      "source": "http://www.wikidata.org/entity/Q33043957"
+    },
+    {
+      "name_en": "Ross Barnes",
+      "name_ja": "ロス・バーンズ",
+      "source": "http://www.wikidata.org/entity/Q1562614"
+    },
+    {
+      "name_en": "Roy Campanella",
+      "name_ja": "ロイ・キャンパネラ",
+      "source": "http://www.wikidata.org/entity/Q735795"
+    },
+    {
+      "name_en": "Roy Face",
+      "name_ja": "ロイ・フェイス",
+      "source": "http://www.wikidata.org/entity/Q7372792"
+    },
+    {
+      "name_en": "Roy Halladay",
+      "name_ja": "ロイ・ハラデイ",
+      "source": "http://www.wikidata.org/entity/Q715571"
+    },
+    {
+      "name_en": "Roy Oswalt",
+      "name_ja": "ロイ・オズワルト",
+      "source": "http://www.wikidata.org/entity/Q1330721"
+    },
+    {
+      "name_en": "Roy Sievers",
+      "name_ja": "ロイ・シーバス",
+      "source": "http://www.wikidata.org/entity/Q2170911"
+    },
+    {
+      "name_en": "Rube Marquard",
+      "name_ja": "ルーブ・マーカード",
+      "source": "http://www.wikidata.org/entity/Q7375896"
+    },
+    {
+      "name_en": "Rube Waddell",
+      "name_ja": "ルーブ・ワッデル",
+      "source": "http://www.wikidata.org/entity/Q326234"
+    },
+    {
+      "name_en": "Ruben Sierra",
+      "name_ja": "ルーベン・シエラ",
+      "source": "http://www.wikidata.org/entity/Q3297806"
+    },
+    {
+      "name_en": "Rudy May",
+      "name_ja": "ルディ・メイ",
+      "source": "http://www.wikidata.org/entity/Q7377660"
+    },
+    {
+      "name_en": "Rudy York",
+      "name_ja": "ルディ・ヨーク",
+      "source": "http://www.wikidata.org/entity/Q1486997"
+    },
+    {
+      "name_en": "Russ Christopher",
+      "name_ja": "ラス・クリストファー",
+      "source": "http://www.wikidata.org/entity/Q7381114"
+    },
+    {
+      "name_en": "Russ Ortiz",
+      "name_ja": "ラス・オルティス",
+      "source": "http://www.wikidata.org/entity/Q7381202"
+    },
+    {
+      "name_en": "Ryan Helsley",
+      "name_ja": "ライアン・ヘルズリー",
+      "source": "http://www.wikidata.org/entity/Q42434072"
+    },
+    {
+      "name_en": "Ryan Howard",
+      "name_ja": "ライアン・ハワード",
+      "source": "http://www.wikidata.org/entity/Q705213"
+    },
+    {
+      "name_en": "Ryne Duren",
+      "name_ja": "ライン・デュレン",
+      "source": "http://www.wikidata.org/entity/Q3063021"
+    },
+    {
+      "name_en": "Ryne Sandberg",
+      "name_ja": "ライン・サンドバーグ",
+      "source": "http://www.wikidata.org/entity/Q3453949"
+    },
+    {
+      "name_en": "Sad Sam Jones",
+      "name_ja": "サド・サム・ジョーンズ",
+      "source": "http://www.wikidata.org/entity/Q7397441"
+    },
+    {
+      "name_en": "Sal Maglie",
+      "name_ja": "サル・マグリー",
+      "source": "http://www.wikidata.org/entity/Q7403290"
+    },
+    {
+      "name_en": "Salvador Perez",
+      "name_ja": "サルバドール・ペレス",
+      "source": "http://www.wikidata.org/entity/Q3470332"
+    },
+    {
+      "name_en": "Sam Jethroe",
+      "name_ja": "サム・ジェスロー",
+      "source": "http://www.wikidata.org/entity/Q7407699"
+    },
+    {
+      "name_en": "Sam Jones",
+      "name_ja": "トゥースピック・サム・ジョーンズ",
+      "source": "http://www.wikidata.org/entity/Q7407713"
+    },
+    {
+      "name_en": "Sam McDowell",
+      "name_ja": "サム・マクダウェル",
+      "source": "http://www.wikidata.org/entity/Q3470514"
+    },
+    {
+      "name_en": "Sam Mertes",
+      "name_ja": "サム・メルテス",
+      "source": "http://www.wikidata.org/entity/Q7407906"
+    },
+    {
+      "name_en": "Sam Rice",
+      "name_ja": "サム・ライス",
+      "source": "http://www.wikidata.org/entity/Q3470538"
+    },
+    {
+      "name_en": "Sam Thompson",
+      "name_ja": "サム・トンプソン",
+      "source": "http://www.wikidata.org/entity/Q339668"
+    },
+    {
+      "name_en": "Sammy Stewart",
+      "name_ja": "サミー・スチュワート",
+      "source": "http://www.wikidata.org/entity/Q7409832"
+    },
+    {
+      "name_en": "Sandy Alcantara",
+      "name_ja": "サンディ・アルカンタラ",
+      "source": "http://www.wikidata.org/entity/Q38458271"
+    },
+    {
+      "name_en": "Sandy Alomar Jr.",
+      "name_ja": "サンディー・アロマー・ジュニア",
+      "source": "http://www.wikidata.org/entity/Q3472093"
+    },
+    {
+      "name_en": "Sandy Koufax",
+      "name_ja": "サンディー・コーファックス",
+      "source": "http://www.wikidata.org/entity/Q440256"
+    },
+    {
+      "name_en": "Scott Erickson",
+      "name_ja": "スコット・エリクソン",
+      "source": "http://www.wikidata.org/entity/Q6143550"
+    },
+    {
+      "name_en": "Scott Kazmir",
+      "name_ja": "スコット・カズミアー",
+      "source": "http://www.wikidata.org/entity/Q1356611"
+    },
+    {
+      "name_en": "Scott Podsednik",
+      "name_ja": "スコット・ポドセドニック",
+      "source": "http://www.wikidata.org/entity/Q1046172"
+    },
+    {
+      "name_en": "Scott Rolen",
+      "name_ja": "スコット・ローレン",
+      "source": "http://www.wikidata.org/entity/Q3030289"
+    },
+    {
+      "name_en": "Scott Williamson",
+      "name_ja": "スコット・ウィリアムソン",
+      "source": "http://www.wikidata.org/entity/Q276883"
+    },
+    {
+      "name_en": "Shane Bieber",
+      "name_ja": "シェーン・ビーバー",
+      "source": "http://www.wikidata.org/entity/Q54611398"
+    },
+    {
+      "name_en": "Sherry Magee",
+      "name_ja": "シェリー・マギー",
+      "source": "http://www.wikidata.org/entity/Q7495421"
+    },
+    {
+      "name_en": "Shohei Ohtani",
+      "name_ja": "大谷翔平",
+      "source": "http://www.wikidata.org/entity/Q4391858"
+    },
+    {
+      "name_en": "Slim Sallee",
+      "name_ja": "スリム・サリー",
+      "source": "http://www.wikidata.org/entity/Q7540604"
+    },
+    {
+      "name_en": "Sonny Gray",
+      "name_ja": "ソニー・グレイ",
+      "source": "http://www.wikidata.org/entity/Q14184394"
+    },
+    {
+      "name_en": "Sparky Lyle",
+      "name_ja": "スパーキー・ライル",
+      "source": "http://www.wikidata.org/entity/Q7573735"
+    },
+    {
+      "name_en": "Spencer Strider",
+      "name_ja": "スペンサー・ストライダー",
+      "source": "http://www.wikidata.org/entity/Q108109413"
+    },
+    {
+      "name_en": "Spud Chandler",
+      "name_ja": "スパッド・チャンドラー",
+      "source": "http://www.wikidata.org/entity/Q7581475"
+    },
+    {
+      "name_en": "Stan Bahnsen",
+      "name_ja": "スタン・バーンセン",
+      "source": "http://www.wikidata.org/entity/Q7597537"
+    },
+    {
+      "name_en": "Stan Coveleski",
+      "name_ja": "スタン・コベレスキ",
+      "source": "http://www.wikidata.org/entity/Q11603"
+    },
+    {
+      "name_en": "Stan Musial",
+      "name_ja": "スタン・ミュージアル",
+      "source": "http://www.wikidata.org/entity/Q1328142"
+    },
+    {
+      "name_en": "Starlin Castro",
+      "name_ja": "スターリン・カストロ",
+      "source": "http://www.wikidata.org/entity/Q1486575"
+    },
+    {
+      "name_en": "Stephen Strasburg",
+      "name_ja": "スティーブン・ストラスバーグ",
+      "source": "http://www.wikidata.org/entity/Q1192310"
+    },
+    {
+      "name_en": "Steve Carlton",
+      "name_ja": "スティーブ・カールトン",
+      "source": "http://www.wikidata.org/entity/Q1287709"
+    },
+    {
+      "name_en": "Steve Garvey",
+      "name_ja": "スティーブ・ガービー",
+      "source": "http://www.wikidata.org/entity/Q615887"
+    },
+    {
+      "name_en": "Steve Howe",
+      "name_ja": "スティーヴ・ハウ",
+      "source": "http://www.wikidata.org/entity/Q7612889"
+    },
+    {
+      "name_en": "Steve Rogers",
+      "name_ja": "スティーブ・ロジャース",
+      "source": "http://www.wikidata.org/entity/Q3499089"
+    },
+    {
+      "name_en": "Steve Sax",
+      "name_ja": "スティーブ・サックス",
+      "source": "http://www.wikidata.org/entity/Q3297148"
+    },
+    {
+      "name_en": "Steve Stone",
+      "name_ja": "スティーブ・ストーン",
+      "source": "http://www.wikidata.org/entity/Q3499130"
+    },
+    {
+      "name_en": "Stu Miller",
+      "name_ja": "スチュー・ミラー",
+      "source": "http://www.wikidata.org/entity/Q7626193"
+    },
+    {
+      "name_en": "Tarik Skubal",
+      "name_ja": "タリック・スクーバル",
+      "source": "http://www.wikidata.org/entity/Q86307967"
+    },
+    {
+      "name_en": "Ted Abernathy",
+      "name_ja": "テッド・アバーナシー",
+      "source": "http://www.wikidata.org/entity/Q7692939"
+    },
+    {
+      "name_en": "Ted Breitenstein",
+      "name_ja": "テッド・ブリーテンスタイン",
+      "source": "http://www.wikidata.org/entity/Q7693030"
+    },
+    {
+      "name_en": "Ted Kluszewski",
+      "name_ja": "テッド・クルズースキー",
+      "source": "http://www.wikidata.org/entity/Q7693393"
+    },
+    {
+      "name_en": "Ted Lyons",
+      "name_ja": "テッド・ライオンズ",
+      "source": "http://www.wikidata.org/entity/Q328603"
+    },
+    {
+      "name_en": "Ted Sizemore",
+      "name_ja": "テッド・サイズモア",
+      "source": "http://www.wikidata.org/entity/Q7693728"
+    },
+    {
+      "name_en": "Ted Williams",
+      "name_ja": "テッド・ウィリアムズ",
+      "source": "http://www.wikidata.org/entity/Q172478"
+    },
+    {
+      "name_en": "Teddy Higuera",
+      "name_ja": "テディ・ヒゲーラ",
+      "source": "http://www.wikidata.org/entity/Q7694026"
+    },
+    {
+      "name_en": "Terry Forster",
+      "name_ja": "テリー・フォースター",
+      "source": "http://www.wikidata.org/entity/Q7704390"
+    },
+    {
+      "name_en": "Terry Pendleton",
+      "name_ja": "テリー・ペンドルトン",
+      "source": "http://www.wikidata.org/entity/Q3518920"
+    },
+    {
+      "name_en": "Tex Hughson",
+      "name_ja": "テックス・ヒューソン",
+      "source": "http://www.wikidata.org/entity/Q7707260"
+    },
+    {
+      "name_en": "Thornton Lee",
+      "name_ja": "ソーントン・リー",
+      "source": "http://www.wikidata.org/entity/Q7796543"
+    },
+    {
+      "name_en": "Thurman Munson",
+      "name_ja": "サーマン・マンソン",
+      "source": "http://www.wikidata.org/entity/Q921807"
+    },
+    {
+      "name_en": "Tim Anderson",
+      "name_ja": "ティム・アンダーソン",
+      "source": "http://www.wikidata.org/entity/Q16150286"
+    },
+    {
+      "name_en": "Tim Hudson",
+      "name_ja": "ティム・ハドソン",
+      "source": "http://www.wikidata.org/entity/Q3528647"
+    },
+    {
+      "name_en": "Tim Keefe",
+      "name_ja": "ティム・キーフ",
+      "source": "http://www.wikidata.org/entity/Q1264106"
+    },
+    {
+      "name_en": "Tim Lincecum",
+      "name_ja": "ティム・リンスカム",
+      "source": "http://www.wikidata.org/entity/Q1604"
+    },
+    {
+      "name_en": "Tim Salmon",
+      "name_ja": "ティム・サーモン",
+      "source": "http://www.wikidata.org/entity/Q3111424"
+    },
+    {
+      "name_en": "Todd Hollandsworth",
+      "name_ja": "トッド・ホランズワース",
+      "source": "http://www.wikidata.org/entity/Q3041860"
+    },
+    {
+      "name_en": "Todd Jones",
+      "name_ja": "トッド・ジョーンズ",
+      "source": "http://www.wikidata.org/entity/Q3530260"
+    },
+    {
+      "name_en": "Todd Worrell",
+      "name_ja": "トッド・ウォーレル",
+      "source": "http://www.wikidata.org/entity/Q3530292"
+    },
+    {
+      "name_en": "Tom Glavine",
+      "name_ja": "トム・グラビン",
+      "source": "http://www.wikidata.org/entity/Q943668"
+    },
+    {
+      "name_en": "Tom Gordon",
+      "name_ja": "トム・ゴードン",
+      "source": "http://www.wikidata.org/entity/Q3110725"
+    },
+    {
+      "name_en": "Tom Henke",
+      "name_ja": "トム・ヘンキー",
+      "source": "http://www.wikidata.org/entity/Q7816170"
+    },
+    {
+      "name_en": "Tom Parrott",
+      "name_ja": "トム・パロット",
+      "source": "http://www.wikidata.org/entity/Q7817165"
+    },
+    {
+      "name_en": "Tom Seaver",
+      "name_ja": "トム・シーバー",
+      "source": "http://www.wikidata.org/entity/Q1287084"
+    },
+    {
+      "name_en": "Tom Tresh",
+      "name_ja": "トム・トレッシュ",
+      "source": "http://www.wikidata.org/entity/Q11279093"
+    },
+    {
+      "name_en": "Tommie Agee",
+      "name_ja": "トミー・エイジー",
+      "source": "http://www.wikidata.org/entity/Q7819117"
+    },
+    {
+      "name_en": "Tommy Bond",
+      "name_ja": "トミー・ボンド",
+      "source": "http://www.wikidata.org/entity/Q1188946"
+    },
+    {
+      "name_en": "Tommy Bridges",
+      "name_ja": "トミー・ブリッジス",
+      "source": "http://www.wikidata.org/entity/Q7819250"
+    },
+    {
+      "name_en": "Tommy Davis",
+      "name_ja": "トミー・デービス",
+      "source": "http://www.wikidata.org/entity/Q7819340"
+    },
+    {
+      "name_en": "Tommy Harper",
+      "name_ja": "トミー・ハーパー",
+      "source": "http://www.wikidata.org/entity/Q732445"
+    },
+    {
+      "name_en": "Tommy Helms",
+      "name_ja": "トミー・ヘルムズ",
+      "source": "http://www.wikidata.org/entity/Q7819512"
+    },
+    {
+      "name_en": "Tommy Holmes",
+      "name_ja": "トミー・ホームズ",
+      "source": "http://www.wikidata.org/entity/Q7819527"
+    },
+    {
+      "name_en": "Tony Armas",
+      "name_ja": "トニー・アーマス・シニア",
+      "source": "http://www.wikidata.org/entity/Q7821778"
+    },
+    {
+      "name_en": "Tony Conigliaro",
+      "name_ja": "トニー・コニグリアロ",
+      "source": "http://www.wikidata.org/entity/Q3531727"
+    },
+    {
+      "name_en": "Tony Gwynn",
+      "name_ja": "トニー・グウィン",
+      "source": "http://www.wikidata.org/entity/Q1145222"
+    },
+    {
+      "name_en": "Tony Kubek",
+      "name_ja": "トニー・クーベック",
+      "source": "http://www.wikidata.org/entity/Q7822737"
+    },
+    {
+      "name_en": "Tony Mullane",
+      "name_ja": "トニー・マレーン",
+      "source": "http://www.wikidata.org/entity/Q1564515"
+    },
+    {
+      "name_en": "Tony Oliva",
+      "name_ja": "トニー・オリバ",
+      "source": "http://www.wikidata.org/entity/Q1653317"
+    },
+    {
+      "name_en": "Tony Womack",
+      "name_ja": "トニー・ウォマック",
+      "source": "http://www.wikidata.org/entity/Q7823692"
+    },
+    {
+      "name_en": "Trea Turner",
+      "name_ja": "トレイ・ターナー",
+      "source": "http://www.wikidata.org/entity/Q16235922"
+    },
+    {
+      "name_en": "Trevor Bauer",
+      "name_ja": "トレバー・バウアー",
+      "source": "http://www.wikidata.org/entity/Q3538556"
+    },
+    {
+      "name_en": "Trevor Hoffman",
+      "name_ja": "トレバー・ホフマン",
+      "source": "http://www.wikidata.org/entity/Q1071829"
+    },
+    {
+      "name_en": "Trevor Story",
+      "name_ja": "トレバー・ストーリー",
+      "source": "http://www.wikidata.org/entity/Q23724211"
+    },
+    {
+      "name_en": "Troy Glaus",
+      "name_ja": "トロイ・グロース",
+      "source": "http://www.wikidata.org/entity/Q1364355"
+    },
+    {
+      "name_en": "Ty Cobb",
+      "name_ja": "タイ・カッブ",
+      "source": "http://www.wikidata.org/entity/Q552828"
+    },
+    {
+      "name_en": "Ugueth Urbina",
+      "name_ja": "ウーゲット・ウービナ",
+      "source": "http://www.wikidata.org/entity/Q3090074"
+    },
+    {
+      "name_en": "Urban Shocker",
+      "name_ja": "アーバン・ショッカー",
+      "source": "http://www.wikidata.org/entity/Q7900044"
+    },
+    {
+      "name_en": "Vada Pinson",
+      "name_ja": "ベイダ・ピンソン",
+      "source": "http://www.wikidata.org/entity/Q16013505"
+    },
+    {
+      "name_en": "Vern Stephens",
+      "name_ja": "バーン・スティーブンス",
+      "source": "http://www.wikidata.org/entity/Q7921892"
+    },
+    {
+      "name_en": "Vernon Wells",
+      "name_ja": "バーノン・ウェルズ",
+      "source": "http://www.wikidata.org/entity/Q2067952"
+    },
+    {
+      "name_en": "Vic Willis",
+      "name_ja": "ビック・ウィリス",
+      "source": "http://www.wikidata.org/entity/Q7924946"
+    },
+    {
+      "name_en": "Vida Blue",
+      "name_ja": "ヴァイダ・ブルー",
+      "source": "http://www.wikidata.org/entity/Q434503"
+    },
+    {
+      "name_en": "Vince Coleman",
+      "name_ja": "ビンス・コールマン",
+      "source": "http://www.wikidata.org/entity/Q3559410"
+    },
+    {
+      "name_en": "Vinny Castilla",
+      "name_ja": "ビニー・カスティーヤ",
+      "source": "http://www.wikidata.org/entity/Q7932680"
+    },
+    {
+      "name_en": "Virgil Trucks",
+      "name_ja": "バージャル・トラクス",
+      "source": "http://www.wikidata.org/entity/Q7933838"
+    },
+    {
+      "name_en": "Vladimir Guerrero",
+      "name_ja": "ブラディミール・ゲレーロ",
+      "source": "http://www.wikidata.org/entity/Q1185254"
+    },
+    {
+      "name_en": "Vladimir Guerrero Jr.",
+      "name_ja": "ブラディミール・ゲレーロ・ジュニア",
+      "source": "http://www.wikidata.org/entity/Q28967469"
+    },
+    {
+      "name_en": "Wade Boggs",
+      "name_ja": "ウェイド・ボッグス",
+      "source": "http://www.wikidata.org/entity/Q246539"
+    },
+    {
+      "name_en": "Wade Davis",
+      "name_ja": "ウェイド・デービス",
+      "source": "http://www.wikidata.org/entity/Q3564978"
+    },
+    {
+      "name_en": "Waite Hoyt",
+      "name_ja": "ウェイト・ホイト",
+      "source": "http://www.wikidata.org/entity/Q1410004"
+    },
+    {
+      "name_en": "Wally Berger",
+      "name_ja": "ウォーリー・バーガー",
+      "source": "http://www.wikidata.org/entity/Q7963298"
+    },
+    {
+      "name_en": "Wally Moon",
+      "name_ja": "ウォーリー・ムーン",
+      "source": "http://www.wikidata.org/entity/Q7963442"
+    },
+    {
+      "name_en": "Wally Pipp",
+      "name_ja": "ウォーリー・ピップ",
+      "source": "http://www.wikidata.org/entity/Q7963465"
+    },
+    {
+      "name_en": "Walt Dropo",
+      "name_ja": "ウォルト・ドローポ",
+      "source": "http://www.wikidata.org/entity/Q4017859"
+    },
+    {
+      "name_en": "Walt Weiss",
+      "name_ja": "ウォルト・ワイス",
+      "source": "http://www.wikidata.org/entity/Q3041278"
+    },
+    {
+      "name_en": "Walter Johnson",
+      "name_ja": "ウォルター・ジョンソン",
+      "source": "http://www.wikidata.org/entity/Q722059"
+    },
+    {
+      "name_en": "Warren Spahn",
+      "name_ja": "ウォーレン・スパーン",
+      "source": "http://www.wikidata.org/entity/Q1131345"
+    },
+    {
+      "name_en": "Wayne Granger",
+      "name_ja": "ウェイン・グレンジャー",
+      "source": "http://www.wikidata.org/entity/Q7976275"
+    },
+    {
+      "name_en": "Wes Ferrell",
+      "name_ja": "ウェス・フェレル",
+      "source": "http://www.wikidata.org/entity/Q3567364"
+    },
+    {
+      "name_en": "Whit Merrifield",
+      "name_ja": "ウィット・メリフィールド",
+      "source": "http://www.wikidata.org/entity/Q17916942"
+    },
+    {
+      "name_en": "Whitey Ford",
+      "name_ja": "ホワイティー・フォード",
+      "source": "http://www.wikidata.org/entity/Q1345775"
+    },
+    {
+      "name_en": "Wil Myers",
+      "name_ja": "ウィル・マイヤーズ",
+      "source": "http://www.wikidata.org/entity/Q649459"
+    },
+    {
+      "name_en": "Wilbur Wood",
+      "name_ja": "ウィルバー・ウッド",
+      "source": "http://www.wikidata.org/entity/Q8000251"
+    },
+    {
+      "name_en": "Will Clark",
+      "name_ja": "ウィル・クラーク",
+      "source": "http://www.wikidata.org/entity/Q3568281"
+    },
+    {
+      "name_en": "Willie Hernandez",
+      "name_ja": "ウィリー・ヘルナンデス",
+      "source": "http://www.wikidata.org/entity/Q3569083"
+    },
+    {
+      "name_en": "Willie Keeler",
+      "name_ja": "ウィリー・キーラー",
+      "source": "http://www.wikidata.org/entity/Q710260"
+    },
+    {
+      "name_en": "Willie Mays",
+      "name_ja": "ウィリー・メイズ",
+      "source": "http://www.wikidata.org/entity/Q561852"
+    },
+    {
+      "name_en": "Willie McCovey",
+      "name_ja": "ウィリー・マッコビー",
+      "source": "http://www.wikidata.org/entity/Q3569094"
+    },
+    {
+      "name_en": "Willie McGee",
+      "name_ja": "ウィリー・マギー",
+      "source": "http://www.wikidata.org/entity/Q3569093"
+    },
+    {
+      "name_en": "Willie Stargell",
+      "name_ja": "ウィリー・スタージェル",
+      "source": "http://www.wikidata.org/entity/Q1054942"
+    },
+    {
+      "name_en": "Willie Wilson",
+      "name_ja": "ウィリー・ウィルソン",
+      "source": "http://www.wikidata.org/entity/Q3569114"
+    },
+    {
+      "name_en": "Willy Taveras",
+      "name_ja": "ウィリー・タベラス",
+      "source": "http://www.wikidata.org/entity/Q3041900"
+    },
+    {
+      "name_en": "Yandy Díaz",
+      "name_ja": "ヤンディ・ディアス",
+      "source": "http://www.wikidata.org/entity/Q27644382"
+    },
+    {
+      "name_en": "Yogi Berra",
+      "name_ja": "ヨギ・ベラ",
+      "source": "http://www.wikidata.org/entity/Q367566"
+    },
+    {
+      "name_en": "Yordan Alvarez",
+      "name_ja": "ヨルダン・アルバレス",
+      "source": "http://www.wikidata.org/entity/Q55638110"
+    },
+    {
+      "name_en": "Yuli Gurriel",
+      "name_ja": "ユリ・グリエル",
+      "source": "http://www.wikidata.org/entity/Q3272042"
+    },
+    {
+      "name_en": "Zach Eflin",
+      "name_ja": "ザック・エフリン",
+      "source": "http://www.wikidata.org/entity/Q18390636"
+    },
+    {
+      "name_en": "Zack Britton",
+      "name_ja": "ザック・ブリットン",
+      "source": "http://www.wikidata.org/entity/Q3574496"
+    },
+    {
+      "name_en": "Zack Greinke",
+      "name_ja": "ザック・グレインキー",
+      "source": "http://www.wikidata.org/entity/Q1208454"
+    },
+    {
+      "name_en": "Zack Wheat",
+      "name_ja": "ザック・ウィート",
+      "source": "http://www.wikidata.org/entity/Q3574544"
+    },
+    {
+      "name_en": "Zack Wheeler",
+      "name_ja": "ザック・ウィーラー",
+      "source": "http://www.wikidata.org/entity/Q650445"
+    },
+    {
+      "name_en": "Zoilo Versalles",
+      "name_ja": "ソイロ・ベルサイエス",
+      "source": "http://www.wikidata.org/entity/Q8073510"
+    }
+  ]
+}

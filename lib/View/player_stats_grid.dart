@@ -19,19 +19,17 @@ const metricNotes = {
   '平均投球回': '全登板（先発・救援）における投球回÷登板数。小数表記。',
   '投球回数': '投球回。.1/.2は小数ではなく1/3回・2/3回。',
 };
-String statPlayerKey(Map<String, dynamic> r) => r['id_player'] != null
-    ? 'id:${r['id_player']}'
-    : '${r['id_team']}:${r['name_player'] ?? r['player_name']}';
+String statPlayerKey(Map<String, dynamic> r) => r['id_player'] != null ? 'id:${r['id_player']}' : '${r['id_team']}:${r['name_player'] ?? r['player_name']}';
 
 /// Legacy MLB snapshots incorrectly marked Japanese batters as pitchers.
 /// Resolve those established identities before consulting cached position fields.
 String? knownMlbStatRole(Map<String, dynamic> row) {
-  if (![3,4].contains(int.tryParse('${row['id_league']}'))) return null;
-  final name = '${row['name_player'] ?? row['name_full'] ?? ''}'
-      .replaceAll(RegExp(r'\([^)]*\)|（[^）]*）|[\s　・.]'), '');
+  if (![3, 4].contains(int.tryParse('${row['id_league']}'))) return null;
+  final name = '${row['name_player'] ?? row['name_full'] ?? ''}'.replaceAll(RegExp(r'\([^)]*\)|（[^）]*）|[\s　・.]'), '');
   if (const ['大谷', '大谷翔平', 'ShoheiOhtani'].contains(name)) return 'both';
-  if (const ['吉田正尚', '西田陸浮', '岡本和真', '村上宗隆', '鈴木誠也',
-    'ラーズヌートバー', 'ヌートバー'].contains(name)) return 'batter';
+  if (const ['吉田正尚', '西田陸浮', '岡本和真', '村上宗隆', '鈴木誠也', 'ラーズヌートバー', 'ヌートバー'].contains(name)) {
+    return 'batter';
+  }
   return null;
 }
 
@@ -41,10 +39,10 @@ bool isPitcherOnlyStatPlayer(Map<String, dynamic> row) {
   if (['true', 't', '1'].contains('${row['flg_two_way']}'.toLowerCase())) return false;
   final position = '${row['txt_position'] ?? ''}';
   final groups = '${row['season_position_groups'] ?? ''}';
-  if (RegExp('二刀流|指名打者|内野手|外野手|捕手|DH|TWP', caseSensitive: false)
-      .hasMatch('$position $groups')) return false;
-  return position.contains('投手') || RegExp(r'\b(SP|RP|P)\b').hasMatch(position) ||
-      (groups.contains('投手') && !groups.contains('野手'));
+  if (RegExp('二刀流|指名打者|内野手|外野手|捕手|DH|TWP', caseSensitive: false).hasMatch('$position $groups')) {
+    return false;
+  }
+  return position.contains('投手') || RegExp(r'\b(SP|RP|P)\b').hasMatch(position) || (groups.contains('投手') && !groups.contains('野手'));
 }
 
 bool personalStatPlayerMatchesRole(Map<String, dynamic> row, {required bool batting}) {
@@ -75,21 +73,16 @@ List<Map<String, dynamic>> withHrStealStats(List<Map<String, dynamic>> rows) {
 }
 
 /// Combine steals with the same player's success percentage for display only.
-String personalStatDisplay(Map<String, dynamic> row,
-    Iterable<Map<String, dynamic>> rows) {
+String personalStatDisplay(Map<String, dynamic> row, Iterable<Map<String, dynamic>> rows) {
   final raw = '${row['stats'] ?? ''}'.trim();
   final value = raw.isEmpty ? '—' : raw;
   if (row['title'] == '代打起用数') {
-    final rate = rows.where((r) => r['title'] == '代打打率' &&
-      statPlayerKey(r) == statPlayerKey(row) && r['id_league'] == row['id_league']).firstOrNull;
+    final rate = rows.where((r) => r['title'] == '代打打率' && statPlayerKey(r) == statPlayerKey(row) && r['id_league'] == row['id_league']).firstOrNull;
     return '$value（${rate == null ? '—' : rate['stats'] ?? '—'}）';
   }
   if (row['title'] != '盗塁') return value;
   final key = statPlayerKey(row);
-  final rateRow = rows.where((r) =>
-      r['title'] == '盗塁成功率' &&
-      statPlayerKey(r) == key &&
-      r['id_league'] == row['id_league']).firstOrNull;
+  final rateRow = rows.where((r) => r['title'] == '盗塁成功率' && statPlayerKey(r) == key && r['id_league'] == row['id_league']).firstOrNull;
   final numeric = rateRow == null ? null : statNumeric(rateRow);
   final percent = numeric == null ? '—' : '${numeric.toStringAsFixed(1)}%';
   return '$value（$percent）';
@@ -141,8 +134,7 @@ class _PlayerStatsGridState extends State<PlayerStatsGrid> {
     final keys = people.keys.toList();
     if (sort != null) {
       keys.sort((a, b) {
-        final av = statNumeric(values[a]?[sort] ?? {}),
-            bv = statNumeric(values[b]?[sort] ?? {});
+        final av = statNumeric(values[a]?[sort] ?? {}), bv = statNumeric(values[b]?[sort] ?? {});
         if (av == null) return bv == null ? a.compareTo(b) : 1;
         if (bv == null) return -1;
         final cmp = av.compareTo(bv);
@@ -153,109 +145,53 @@ class _PlayerStatsGridState extends State<PlayerStatsGrid> {
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Expanded(
           child: SingleChildScrollView(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: DecoratedBox(
-                    decoration: widget.batting ? statsBattingHeaderDecoration : statsPitchingHeaderDecoration,
-                    child: DataTable(
-                      border: TableBorder.all(color: Colors.black26, width: .5),
-                      headingRowColor: const WidgetStatePropertyAll(Colors.transparent),
-                      headingTextStyle: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                      dataTextStyle: const TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold),
-                      horizontalMargin: 6,
-                      columnSpacing: 12,
-                      headingRowHeight: 40,
-                      dataRowMinHeight: 32,
-                      dataRowMaxHeight: 32,
-                      sortColumnIndex: sort == null || !columns.contains(sort)
-                          ? null
-                          : columns.indexOf(sort!) + 2,
-                      sortAscending: ascending,
-                      columns: [
-                        const DataColumn(label: Text('選手')),
-                        const DataColumn(label: Text('球団')),
-                        for (final title in columns)
-                          DataColumn(
-                              label: Tooltip(
-                                  message: metricNotes[title] ?? title,
-                                  child: Text(title)),
-                              numeric: true,
-                              onSort: (_, asc) => setState(() {
-                                    ascending = sort == title
-                                        ? asc
-                                        : [
-                                            'BB/9',
-                                            '四球/9',
-                                            '四死球/9',
-                                            '防御率',
-                                            'WHIP',
-                                            '被打率',
-                                            '与四球率'
-                                          ].contains(title);
-                                    sort = title;
-                                  }))
-                      ],
-                      rows: [
-                        for (final key in keys.take(30))
-                          DataRow(color: WidgetStatePropertyAll(personalStatPositionColor('${people[key]!['txt_position'] ?? ''}') ?? Colors.white), cells: [
-                            DataCell(PlayerNameLink(
-                                player: people[key]!,
-                                child: Text(
-                                    '${people[key]!['name_player'] ?? people[key]!['player_name'] ?? ''}'
-                                        .replaceAll(RegExp(r'\(.*\)$'), ''), style: const TextStyle(fontSize: 14)))),
-                            DataCell(Container(alignment: Alignment.center, padding: const EdgeInsets.symmetric(horizontal: 4),
-                                color: parseColorNameOrNull('${people[key]!['color_back'] ?? ''}'),
-                                child: Text('${people[key]!['name_team'] ?? ''}', style: TextStyle(color: parseColorNameOrNull('${people[key]!['color_font'] ?? ''}'))))),
-                            for (final title in columns)
-                              DataCell(Tooltip(
-                                  message:
-                                      '${values[key]?[title]?['note'] ?? metricNotes[title] ?? title}',
-                                  child: Text(
-                                      personalStatDisplay(values[key]?[title] ?? {}, values[key]!.values))))
-                          ])
-                      ]))),
-                const Padding(
-          padding: EdgeInsets.all(4),
-          child: Text('指標をクリックして並び替え。— は未取得・計算不能（0とは区別）。',
-              style: TextStyle(fontSize: 11)))
-              ])))
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: DecoratedBox(
+                decoration: widget.batting ? statsBattingHeaderDecoration : statsPitchingHeaderDecoration,
+                child: DataTable(border: TableBorder.all(color: Colors.black26, width: .5), headingRowColor: const WidgetStatePropertyAll(Colors.transparent), headingTextStyle: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold), dataTextStyle: const TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold), horizontalMargin: 6, columnSpacing: 12, headingRowHeight: 40, dataRowMinHeight: 32, dataRowMaxHeight: 32, sortColumnIndex: sort == null || !columns.contains(sort) ? null : columns.indexOf(sort!) + 2, sortAscending: ascending, columns: [
+                  const DataColumn(label: Text('選手')),
+                  const DataColumn(label: Text('球団')),
+                  for (final title in columns)
+                    DataColumn(
+                        label: Tooltip(message: metricNotes[title] ?? title, child: Text(title)),
+                        numeric: true,
+                        onSort: (_, asc) => setState(() {
+                              ascending = sort == title ? asc : ['BB/9', '四球/9', '四死球/9', '防御率', 'WHIP', '被打率', '与四球率'].contains(title);
+                              sort = title;
+                            }))
+                ], rows: [
+                  for (final key in keys.take(30)) DataRow(color: WidgetStatePropertyAll(personalStatPositionColor('${people[key]!['txt_position'] ?? ''}') ?? Colors.white), cells: [DataCell(PlayerNameLink(player: people[key]!, child: Text('${people[key]!['name_player'] ?? people[key]!['player_name'] ?? ''}'.replaceAll(RegExp(r'\(.*\)$'), ''), style: const TextStyle(fontSize: 14)))), DataCell(Container(alignment: Alignment.center, padding: const EdgeInsets.symmetric(horizontal: 4), color: parseColorNameOrNull('${people[key]!['color_back'] ?? ''}'), child: Text('${people[key]!['name_team'] ?? ''}', style: TextStyle(color: parseColorNameOrNull('${people[key]!['color_font'] ?? ''}'))))), for (final title in columns) DataCell(Tooltip(message: '${values[key]?[title]?['note'] ?? metricNotes[title] ?? title}', child: Text(personalStatDisplay(values[key]?[title] ?? {}, values[key]!.values))))])
+                ]))),
+        const Padding(padding: EdgeInsets.all(4), child: Text('指標をクリックして並び替え。— は未取得・計算不能（0とは区別）。', style: TextStyle(fontSize: 11)))
+      ])))
     ]);
   }
 }
 
-bool isPredictionStat(Map<String, dynamic> row) =>
-    !extraBattingTitles.contains(row['title']) &&
-    !extraPitchingTitles.contains(row['title']) &&
-    !['代打打率', '盗塁成功率'].contains(row['title']);
+bool isPredictionStat(Map<String, dynamic> row) => !extraBattingTitles.contains(row['title']) && !extraPitchingTitles.contains(row['title']) && !['代打打率', '盗塁成功率'].contains(row['title']);
 
-bool isPredictedStatPlayer(Map<String, dynamic> row) =>
-    isPredictionStat(row) && (
-    '${row['id_users'] ?? ''}'.split('/').any((id) => (int.tryParse(id) ?? 0) > 0) ||
-    '${row['colors_user'] ?? ''}'.split('/').any((color) => color.trim().isNotEmpty));
+bool isPredictedStatPlayer(Map<String, dynamic> row) => isPredictionStat(row) && ('${row['id_users'] ?? ''}'.split('/').any((id) => (int.tryParse(id) ?? 0) > 0) || '${row['colors_user'] ?? ''}'.split('/').any((color) => color.trim().isNotEmpty));
 
-bool isJapaneseMlbStatPlayer(Map<String, dynamic> row) =>
-    [3, 4].contains(int.tryParse('${row['id_league']}')) &&
-    ['true', 't', '1'].contains('${row['flg_japan']}'.toLowerCase());
+bool isJapaneseMlbStatPlayer(Map<String, dynamic> row) => [3, 4].contains(int.tryParse('${row['id_league']}')) && ['true', 't', '1'].contains('${row['flg_japan']}'.toLowerCase());
 
 bool hasPersonalStatValue(Map<String, dynamic> row) {
   final value = '${row['stats'] ?? ''}'.trim();
-  return value.isNotEmpty && !RegExp(
-      r'^(?:[-ー―—–−－]+(?:\s*[（(].*[）)])?|null|N/A|NaN)$',
-      caseSensitive: false).hasMatch(value);
+  return value.isNotEmpty && !RegExp(r'^(?:[-ー―—–−－]+(?:\s*[（(].*[）)])?|null|N/A|NaN)$', caseSensitive: false).hasMatch(value);
 }
 
 /// Keep the preview at ten rows, replacing the lowest non-predicted players.
-List<Map<String, dynamic>> personalStatPreview(List<Map<String, dynamic>> ranked,
-    {bool showPredictions = true, bool includeJapanese = false, bool Function(Map<String, dynamic>)? isHighlighted}) {
+List<Map<String, dynamic>> personalStatPreview(List<Map<String, dynamic>> ranked, {bool showPredictions = true, bool includeJapanese = false, bool Function(Map<String, dynamic>)? isHighlighted}) {
   ranked = ranked.where(hasPersonalStatValue).toList();
   final result = ranked.take(10).toList();
-  bool retained(Map<String, dynamic> row) =>
-      showPredictions && isPredictedStatPlayer(row) ||
-      includeJapanese && isJapaneseMlbStatPlayer(row);
+  bool retained(Map<String, dynamic> row) => showPredictions && isPredictedStatPlayer(row) || includeJapanese && isJapaneseMlbStatPlayer(row);
   final outside = ranked.skip(10).where(retained).toList();
   var slot = result.length - 1;
   for (final player in outside) {
-    while (slot >= 0 && retained(result[slot])) { slot--; }
+    while (slot >= 0 && retained(result[slot])) {
+      slot--;
+    }
     if (slot < 0) break;
     result[slot--] = player;
   }
@@ -274,14 +210,15 @@ List<Map<String, dynamic>> personalStatPreview(List<Map<String, dynamic>> ranked
   final outsideStart = result.indexWhere((row) => (positions[row] ?? 0) >= 10);
   if (outsideStart > 0) {
     var separator = outsideStart - 1;
-    while (separator >= 0 && (retained(result[separator]) ||
-        isHighlighted?.call(result[separator]) == true)) {
+    while (separator >= 0 && (retained(result[separator]) || isHighlighted?.call(result[separator]) == true)) {
       separator--;
     }
-    if (separator >= 0) result[separator] = {
-      ...result[separator],
-      'preview_separator': true,
-    };
+    if (separator >= 0) {
+      result[separator] = {
+        ...result[separator],
+        'preview_separator': true,
+      };
+    }
   }
   return result;
 }
@@ -298,8 +235,7 @@ void sortPersonalStatRows(List<Map<String, dynamic>> rows, {bool limitToThirty =
       final compared = lowerIsBetter ? av.compareTo(bv) : bv.compareTo(av);
       if (compared != 0) return compared;
     }
-    return (int.tryParse('${a['int_rank']}') ?? 1000)
-        .compareTo(int.tryParse('${b['int_rank']}') ?? 1000);
+    return (int.tryParse('${a['int_rank']}') ?? 1000).compareTo(int.tryParse('${b['int_rank']}') ?? 1000);
   });
   if (limitToThirty && rows.length > 30) {
     final predicted = rows.skip(30).where((row) => isPredictedStatPlayer(row) || isJapaneseMlbStatPlayer(row)).toList();
@@ -312,8 +248,6 @@ void sortPersonalStatRows(List<Map<String, dynamic>> rows, {bool limitToThirty =
 List<Map<String, dynamic>> personalStatRankingDetail(List<Map<String, dynamic>> ranked, {bool includeJapanese = false}) {
   ranked = ranked.where(hasPersonalStatValue).toList();
   bool japanese(Map<String, dynamic> row) => ['true', 't', '1'].contains('${row['flg_japan']}'.toLowerCase());
-  final top = (includeJapanese
-      ? ranked.where((row) => int.tryParse('${row['int_rank']}') != 1000)
-      : ranked).take(50).toSet();
+  final top = (includeJapanese ? ranked.where((row) => int.tryParse('${row['int_rank']}') != 1000) : ranked).take(50).toSet();
   return ranked.where((row) => top.contains(row) || includeJapanese && japanese(row)).toList();
 }

@@ -1,3 +1,5 @@
+import 'ContractTransferShares.dart';
+import 'ContractSalaryShares.dart';
 import 'StrengthUsage.dart';
 import 'OverseasContracts.dart';
 
@@ -156,6 +158,6 @@ Map<String, dynamic> supplementContracts(
       periods.add(updated);
     }
   }
-  return mergeOverseasContracts({...record, 'periods': periods},
-      verifiedTaiwanContracts('${record['player_key']}'));
+  return supplementTransferShares(org, supplementSalaryShares(org, mergeOverseasContracts({...record, 'periods': periods},
+      verifiedTaiwanContracts('${record['player_key']}'))));
 }

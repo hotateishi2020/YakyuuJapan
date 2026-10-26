@@ -92,7 +92,7 @@ void main() {
     expect(find.text('E'), findsNothing);
     expect(t.takeException(), isNull);
   });
-  testWidgets('打順ごとの最多起用選手は同じ選手でも各打順に表示', (t) async {
+  testWidgets('打順全体で同じ選手は一度だけ表示', (t) async {
     await t.pumpWidget(MaterialApp(
         home: Scaffold(
             body: StrengthRegularGrid(teams: [
@@ -112,8 +112,8 @@ void main() {
     ]))));
     await t.tap(find.text('打順別'));
     await t.pumpAndSettle();
-    expect(find.text('選手'), findsNWidgets(9));
-    expect(find.text('80.0%'), findsNWidgets(9));
+    expect(find.text('選手'), findsOneWidget);
+    expect(find.text('80.0%'), findsOneWidget);
     expect(t.takeException(), isNull);
   });
 }

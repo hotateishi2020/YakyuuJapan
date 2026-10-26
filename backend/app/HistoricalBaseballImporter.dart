@@ -1,3 +1,4 @@
+import 'PlayerIdentity.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
@@ -1474,7 +1475,7 @@ class HistoricalBaseballImporter {
           name_full = data.full_name,
           name_last = data.last_name,
           name_first = data.first_name,
-          id_team = data.team_id,
+          id_team = COALESCE(NULLIF(player.id_team, 0), data.team_id),
           date_birth = COALESCE(
             NULLIF(data.birth_date, '')::timestamp, player.date_birth),
           flg_delete = false,
@@ -1485,29 +1486,15 @@ class HistoricalBaseballImporter {
       ''',
       parameters: [jsonEncode(playerRows)],
     );
-    await conn.execute(
-      '''
-        WITH data AS (
-          SELECT * FROM jsonb_to_recordset(\$1::jsonb) AS x(
-            external_id text, full_name text, last_name text, first_name text,
-            team_id integer, birth_date text
-          )
-        )
-        INSERT INTO m_player
-          (name_last, name_first, name_middle, name_full, id_team, date_birth,
-           source_key, external_id, flg_delete, crtat, updat)
-        SELECT data.last_name, data.first_name, '', data.full_name, data.team_id,
-               NULLIF(data.birth_date, '')::timestamp,
-               'mlb', data.external_id, false, now(), now()
-        FROM data
-        WHERE NOT EXISTS (
-          SELECT 1 FROM m_player existing
-          WHERE existing.source_key = 'mlb'
-            AND existing.external_id = data.external_id
-        )
-      ''',
-      parameters: [jsonEncode(playerRows)],
-    );
+    final known = await conn.execute("SELECT external_id FROM m_player WHERE source_key='mlb' AND NOT coalesce(flg_delete,false) AND external_id=ANY(\$1::text[])", parameters:[playersByExternal.keys.toList()]);
+    final knownIds = known.map((r)=>'${r[0]}').toSet();
+    for (final row in playerRows) {
+      if (knownIds.contains(row['external_id'])) continue;
+      final id=await PlayerIdentity.ensure(conn,name:'${row['full_name']}',
+        teamId:row['team_id'] as int,source:'mlb',externalId:'${row['external_id']}',
+        birthDate:DateTime.tryParse('${row['birth_date']}'));
+      if(id<=0) throw StateError('Player identity requires review: ${row['external_id']} ${row['full_name']}');
+    }
     final playerIds = await conn.execute(
       '''
         SELECT DISTINCT ON (external_id) external_id, id FROM m_player
@@ -2227,90 +2214,12 @@ class HistoricalBaseballImporter {
     DateTime? birthDate,
   }) async {
     final cacheKey = '$sourceKey|$externalId';
-    var existingId = _playerIdCache[cacheKey];
-    if (existingId == null) {
-      final found = await conn.execute(
-        '''
-          SELECT id FROM m_player
-          WHERE source_key = \$1::text AND external_id = \$2::text
-          ORDER BY id LIMIT 1
-        ''',
-        parameters: [sourceKey, externalId],
-      );
-      if (found.isNotEmpty) existingId = found.first[0] as int;
-    }
-    final parts = splitPlayerName(fullName);
-    if (existingId == null && sourceKey == 'npb') {
-      final byName = await conn.execute(
-        '''
-          SELECT id FROM m_player
-          WHERE COALESCE(flg_delete, false) = false
-            AND (
-              regexp_replace(COALESCE(name_full, ''), '[\\s　・･]', '', 'g')
-                = \$1::text
-              OR (
-                regexp_replace(COALESCE(name_last, ''), '[\\s　・･]', '', 'g')
-                  = \$2::text
-                AND regexp_replace(COALESCE(name_first, ''), '[\\s　・･]', '', 'g')
-                  = \$3::text
-                AND \$2::text <> ''
-                AND \$3::text <> ''
-              )
-            )
-          ORDER BY id LIMIT 2
-        ''',
-        parameters: [
-          normalizeJapaneseName(fullName),
-          normalizeJapaneseName(parts.$1),
-          normalizeJapaneseName(parts.$2),
-        ],
-      );
-      if (byName.length == 1) existingId = byName.first[0] as int;
-    }
-    if (existingId != null) {
-      await conn.execute(
-        '''
-          UPDATE m_player SET name_full = \$1::text, name_last = \$2::text,
-            name_first = \$3::text,
-            date_birth = COALESCE(\$4::timestamp, date_birth),
-            source_key = COALESCE(source_key, \$6::text),
-            external_id = COALESCE(external_id, \$7::text),
-            flg_delete = false, updat = now()
-          WHERE id = \$5::int
-        ''',
-        parameters: [
-          fullName,
-          parts.$1,
-          parts.$2,
-          birthDate,
-          existingId,
-          sourceKey,
-          externalId,
-        ],
-      );
-      _playerIdCache[cacheKey] = existingId;
-      return existingId;
-    }
-    final inserted = await conn.execute(
-      '''
-        INSERT INTO m_player
-          (name_last, name_first, name_middle, name_full, id_team, date_birth,
-           source_key, external_id, flg_delete, crtat, updat)
-        VALUES (\$1,\$2,'',\$3,\$4,\$5,\$6,\$7,false,now(),now())
-        RETURNING id
-      ''',
-      parameters: [
-        parts.$1,
-        parts.$2,
-        fullName,
-        teamId,
-        birthDate,
-        sourceKey,
-        externalId,
-      ],
-    );
-    final id = inserted.first[0] as int;
-    _playerIdCache[cacheKey] = id;
+    final cached = _playerIdCache[cacheKey];
+    if (cached != null) return cached;
+    final id = await PlayerIdentity.ensure(conn,name:fullName,teamId:teamId,
+      source:sourceKey,externalId:externalId,birthDate:birthDate);
+    if (id <= 0) throw StateError('Player identity requires review: $sourceKey:$externalId $fullName');
+    _playerIdCache[cacheKey]=id;
     return id;
   }
 

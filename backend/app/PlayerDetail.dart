@@ -1,3 +1,4 @@
+import 'PlayerIdentityName.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'QualifiedPitchingMetrics.dart';
@@ -9,8 +10,14 @@ import 'RecentPlayerGames.dart';
 import 'MlbPlayerGames.dart';
 
 Map<String, dynamic> detailMap(dynamic v) => v is String ? usageMap(jsonDecode(v)) : usageMap(v);
-String normalizedPlayerName(dynamic v) => usageName('$v').replaceAll(RegExp(r'\(.*\)$'), '');
-String? officialPlayerId(Map<String, dynamic> p) => p['official_source_player_id']?.toString() ?? RegExp(r'/players/(\d+)\.html').firstMatch('${p['url']}')?[1];
+String normalizedPlayerName(dynamic v) => playerIdentityKey(usageName('$v').replaceAll(RegExp(r'\(.*\)$'), ''));
+String? officialPlayerId(Map<String, dynamic> p) {
+  if(p['official_source_player_id']!=null) return '${p['official_source_player_id']}';
+  final sources=p['identity_sources'] as Map? ?? {};
+  final preferred=[1,2].contains(p['id_league']) ? sources['npb'] : sources['mlb'];
+  if(preferred!=null && RegExp(r'^\d+$').hasMatch('$preferred')) return '$preferred';
+  return RegExp(r'/players/(\d+)\.html').firstMatch('${p['url']}')?[1];
+}
 
 String? playerWikipediaUrl(Map<String, dynamic> person) {
   final id = officialPlayerId(person);
@@ -36,7 +43,7 @@ Map<String, dynamic>? matchPlayer(Map<String, dynamic> wanted, List<Map<String, 
   final id = usageInt(wanted['id_player']);
   if (id > 0) return players.where((p) => usageInt(p['id']) == id).firstOrNull;
   final source = '${wanted['source_player_id'] ?? ''}';
-  var hits = players.where((p) => source.isNotEmpty ? officialPlayerId(p) == source : normalizedPlayerName(p['name_full']) == normalizedPlayerName(wanted['name'])).where((p) => wanted['id_team'] == null || '${wanted['id_team']}' == '${p['id_team']}').toList();
+  var hits = players.where((p) => source.isNotEmpty ? officialPlayerId(p) == source : matchesPlayerPatterns('${wanted['name']}', ['${p['name_full']}', ...List<String>.from(p['name_patterns'] as List? ?? [])])).where((p) => wanted['id_team'] == null || '${wanted['id_team']}' == '${p['id_team']}').toList();
   if (source.isEmpty && hits.length > 1) {
     final uri = Uri.tryParse('${wanted['source'] ?? ''}');
     final code = uri?.host == 'npb.jp'
@@ -64,7 +71,7 @@ Future<void> attachOfficialIdentity(Connection conn, int year, List<Map<String, 
       ...?byName['${p['id_team']}:${normalizedPlayerName(p['name'])}'],
       if (p['date_birth'] != null) ...?byBirth['${p['id_team']}:${p['date_birth']}'],
     };
-    if (matches.length == 1) {
+    if (matches.length == 1 && officialPlayerId(matches.single) == null) {
       matches.single['official_source_player_id'] = p['source_player_id'];
     }
   }
@@ -72,14 +79,17 @@ Future<void> attachOfficialIdentity(Connection conn, int year, List<Map<String, 
 
 Future<List<Map<String, dynamic>>> extraStatRows(Connection conn, int year, List<int> leagues) async {
   final data = readClubFile('player-metrics-$year.json');
-  final people = (await conn.execute('SELECT p.id,p.name_full,p.url,p.date_birth::date::text,p.id_team,p.txt_position,t.id_league,t.name_shortest AS name_team,t.name_short,t.url_npb_players,t.color_back,t.color_font FROM m_player p JOIN m_team t ON t.id=p.id_team WHERE t.id_league=ANY(\$1::int[]) AND NOT COALESCE(p.flg_delete,false)', parameters: [leagues])).map((r) => r.toColumnMap()).toList();
+  final people = (await conn.execute('SELECT p.id,p.name_full,p.name_patterns,p.identity_sources,p.url,p.date_birth::date::text,p.id_team,p.txt_position,t.id_league,t.name_shortest AS name_team,t.name_short,t.url_npb_players,t.color_back,t.color_font FROM m_player p JOIN m_team t ON t.id=p.id_team WHERE t.id_league=ANY(\$1::int[]) AND NOT COALESCE(p.flg_delete,false)', parameters: [leagues])).map((r) => r.toColumnMap()).toList();
   await attachOfficialIdentity(conn, year, people);
   final bySource = <String, List<Map<String, dynamic>>>{};
   final byName = <String, List<Map<String, dynamic>>>{};
   for (final p in people) {
     final source = officialPlayerId(p);
     if (source != null) bySource.putIfAbsent(source, () => []).add(p);
-    byName.putIfAbsent(normalizedPlayerName(p['name_full']), () => []).add(p);
+    for (final name in <String>{'${p['name_full']}', ...List<String>.from(p['name_patterns'] as List? ?? [])}) {
+      final matches=byName.putIfAbsent(normalizedPlayerName(name),()=>[]);
+      if(!matches.contains(p)) matches.add(p);
+    }
   }
   final rows = <Map<String, dynamic>>[];
   for (final p in usageMaps(data['players'])) {
@@ -126,7 +136,7 @@ Future<List<Map<String, dynamic>>> extraStatRows(Connection conn, int year, List
 }
 
 Future<Map<String, dynamic>> readPlayerDetail(Connection conn, {required int year, required List<int> leagues, required Map<String, dynamic> identity, PlayerDetailBatch? batch}) async {
-  final people = batch?.people ?? (await conn.execute('''SELECT p.id,p.name_full,p.url,p.id_team,p.txt_position,p.date_birth::text,p.height,p.weight,p.pitching,p.batting,p.uniform_number,c.name AS birth_country,b.name AS birth_place,t.name_short AS name_team,t.color_back,t.color_font,t.id_league FROM m_player p JOIN m_team t ON t.id=p.id_team LEFT JOIN m_country c ON c.id=p.id_country LEFT JOIN m_place_birth b ON b.id=p.id_place_birth WHERE t.id_league=ANY(\$1::int[]) AND NOT COALESCE(p.flg_delete,false)''', parameters: [leagues])).map((r) => r.toColumnMap()).toList();
+  final people = batch?.people ?? (await conn.execute('''SELECT p.id,p.name_full,p.name_patterns,p.identity_sources,p.url,p.id_team,p.txt_position,p.date_birth::text,p.height,p.weight,p.pitching,p.batting,p.uniform_number,c.name AS birth_country,b.name AS birth_place,t.name_short AS name_team,t.color_back,t.color_font,t.id_league FROM m_player p JOIN m_team t ON t.id=p.id_team LEFT JOIN m_country c ON c.id=p.id_country LEFT JOIN m_place_birth b ON b.id=p.id_place_birth WHERE t.id_league=ANY(\$1::int[]) AND NOT COALESCE(p.flg_delete,false)''', parameters: [leagues])).map((r) => r.toColumnMap()).toList();
   if (batch == null) await attachOfficialIdentity(conn, year, people);
   final person = matchPlayer(identity, people);
   if (person == null) {
@@ -265,7 +275,7 @@ class PlayerDetailBatch {
   }
 
   static Future<PlayerDetailBatch> load(Connection conn, int year, {required List<int> playerIds}) async {
-    final people = (await conn.execute("SELECT p.id,p.name_full,p.url,p.id_team,p.txt_position,p.date_birth::text,p.height,p.weight,p.pitching,p.batting,p.uniform_number,c.name AS birth_country,b.name AS birth_place,t.name_short AS name_team,t.color_back,t.color_font,t.id_league FROM m_player p JOIN m_team t ON t.id=p.id_team LEFT JOIN m_country c ON c.id=p.id_country LEFT JOIN m_place_birth b ON b.id=p.id_place_birth WHERE t.id_league IN (1,2,3,4) AND NOT COALESCE(p.flg_delete,false) AND p.id=ANY(\$1::int[])", parameters: [playerIds])).map((r) => r.toColumnMap()).toList();
+    final people = (await conn.execute("SELECT p.id,p.name_full,p.name_patterns,p.identity_sources,p.url,p.id_team,p.txt_position,p.date_birth::text,p.height,p.weight,p.pitching,p.batting,p.uniform_number,c.name AS birth_country,b.name AS birth_place,t.name_short AS name_team,t.color_back,t.color_font,t.id_league FROM m_player p JOIN m_team t ON t.id=p.id_team LEFT JOIN m_country c ON c.id=p.id_country LEFT JOIN m_place_birth b ON b.id=p.id_place_birth WHERE t.id_league IN (1,2,3,4) AND NOT COALESCE(p.flg_delete,false) AND p.id=ANY(\$1::int[])", parameters: [playerIds])).map((r) => r.toColumnMap()).toList();
     await attachOfficialIdentity(conn, year, people);
     final careers = <Map<String, dynamic>>[];
     final stats = (await conn.execute('SELECT payload FROM v_stats_player WHERE int_year=\$1 AND (payload->>\'id_player\')::int=ANY(\$2::int[]) ORDER BY row_no', parameters: [year, playerIds])).map((r) => detailMap(r[0])).toList();

@@ -84,85 +84,88 @@ class SeasonTitlesTable extends StatelessWidget {
   }
 
   Widget winners(List<Map<String, dynamic>> values, {bool mlb = false, String empty = '未定', bool showLogo = false, bool showStatus = true, bool showVideo = false, String? side, Color? background}) {
-    return cell(values.isEmpty
-        ? Text(empty, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, color: muted))
-        : Column(mainAxisSize: MainAxisSize.min, children: [
-            for (final row in values)
-              Tooltip(
-                  triggerMode: TooltipTriggerMode.tap,
-                  message: '${detail(row)}\n${row['team'] ?? ''}\n${row['source'] ?? ''}'.trim(),
-                  child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 2),
-                      child: Column(mainAxisSize: MainAxisSize.min, children: [
-                        if (showLogo) ...[
-                          (() {
-                            final visual = teamLogoVisual('${row['name'] ?? row['team'] ?? ''}');
-                            return SizedBox(
-                                height: 36,
-                                child: visual.asset != null
-                                    ? SpecialMedia(child: Image.asset(visual.asset!, fit: BoxFit.contain))
-                                    : visual.networkUrl != null
-                                        ? SpecialMedia(child: Image.network(visual.networkUrl!, fit: BoxFit.contain))
-                                        : const SizedBox.shrink());
-                          })(),
-                          const SizedBox(height: 4),
-                        ],
-                        Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, children: [
-                          if (!showLogo && '${row['team'] ?? ''}'.isNotEmpty && row['team'] != row['name'])
-                            Padding(
-                                padding: const EdgeInsets.only(right: 4),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                                  decoration: BoxDecoration(color: parseColorName(row['color_back']?.toString(), const Color(0xffedf1f6)), borderRadius: BorderRadius.circular(4)),
-                                  child: Text(teamLabel(row, mlb: mlb), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: parseColorName(row['color_font']?.toString(), parseColorName(row['color_back']?.toString(), const Color(0xffedf1f6)).computeLuminance() > .179 ? Colors.black : Colors.white))),
-                                )),
-                          Flexible(child: FittedBox(fit: BoxFit.scaleDown, child: PlayerNameLink(player: row, enabled: !showLogo && !['fresh_champion', 'allstar_champion', 'series_champion', 'interleague_champion', 'league_champion', 'cs_champion', 'series_entrants'].any((key) => (groups[key] ?? []).contains(row)), child: Text('${row['name'] ?? '—'}', maxLines: 1, softWrap: false, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ink))))),
-                          if (showVideo) const SizedBox(width: 8),
-                          if (showVideo)
-                            Builder(builder: (context) {
-                              final id = '${row['highlight_video_id'] ?? ''}';
-                              final available = RegExp(r'^[A-Za-z0-9_-]{11}$').hasMatch(id);
-                              return IconButton(
-                                key: ValueKey('sayonara-video-${row['name']}-${detail(row)}'),
-                                tooltip: available ? 'サヨナラシーンをYouTubeで見る' : '該当シーンの動画は確認中です',
-                                icon: Container(
-                                  width: 24,
-                                  height: 24,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: available ? const Color(0xffd71920) : Colors.grey,
-                                  ),
-                                  child: const Icon(Icons.play_arrow_rounded, size: 20, color: Colors.white),
-                                ),
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints.tightFor(width: 28, height: 28),
-                                onPressed: available
-                                    ? () async {
-                                        if (!await openYoutube(id) && context.mounted) {
-                                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('動画を開けませんでした。')));
-                                        }
-                                      }
-                                    : null,
-                              );
-                            }),
-                        ]),
-                        if (showStatus && row['confirmed'] != true) Text(row['statistical'] == true ? '指標首位（表彰対象外を含む）' : '現在首位（暫定）', style: const TextStyle(fontSize: 10, color: Color(0xffa64b00))),
-                      ]))),
-          ]), color: background ?? (side == 'セ'
-              ? Color.lerp(central, Colors.white, 0.55)!
-              : side == 'パ'
-                  ? Color.lerp(pacific, Colors.white, 0.55)!
-                  : Colors.white));
+    return cell(
+        values.isEmpty
+            ? Text(empty, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, color: muted))
+            : Column(mainAxisSize: MainAxisSize.min, children: [
+                for (final row in values)
+                  Tooltip(
+                      triggerMode: TooltipTriggerMode.tap,
+                      message: '${detail(row)}\n${row['team'] ?? ''}\n${row['source'] ?? ''}'.trim(),
+                      child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Column(mainAxisSize: MainAxisSize.min, children: [
+                            if (showLogo) ...[
+                              (() {
+                                final visual = teamLogoVisual('${row['name'] ?? row['team'] ?? ''}');
+                                return SizedBox(
+                                    height: 36,
+                                    child: visual.asset != null
+                                        ? SpecialMedia(child: Image.asset(visual.asset!, fit: BoxFit.contain))
+                                        : visual.networkUrl != null
+                                            ? SpecialMedia(child: Image.network(visual.networkUrl!, fit: BoxFit.contain))
+                                            : const SizedBox.shrink());
+                              })(),
+                              const SizedBox(height: 4),
+                            ],
+                            Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, children: [
+                              if (!showLogo && '${row['team'] ?? ''}'.isNotEmpty && row['team'] != row['name'])
+                                Padding(
+                                    padding: const EdgeInsets.only(right: 4),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                      decoration: BoxDecoration(color: parseColorName(row['color_back']?.toString(), const Color(0xffedf1f6)), borderRadius: BorderRadius.circular(4)),
+                                      child: Text(teamLabel(row, mlb: mlb), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: parseColorName(row['color_font']?.toString(), parseColorName(row['color_back']?.toString(), const Color(0xffedf1f6)).computeLuminance() > .179 ? Colors.black : Colors.white))),
+                                    )),
+                              Flexible(child: FittedBox(fit: BoxFit.scaleDown, child: PlayerNameLink(player: row, enabled: !showLogo && !['fresh_champion', 'allstar_champion', 'series_champion', 'interleague_champion', 'league_champion', 'cs_champion', 'series_entrants'].any((key) => (groups[key] ?? []).contains(row)), child: Text('${row['name'] ?? '—'}', maxLines: 1, softWrap: false, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ink))))),
+                              if (showVideo) const SizedBox(width: 8),
+                              if (showVideo)
+                                Builder(builder: (context) {
+                                  final id = '${row['highlight_video_id'] ?? ''}';
+                                  final available = RegExp(r'^[A-Za-z0-9_-]{11}$').hasMatch(id);
+                                  return IconButton(
+                                    key: ValueKey('sayonara-video-${row['name']}-${detail(row)}'),
+                                    tooltip: available ? 'サヨナラシーンをYouTubeで見る' : '該当シーンの動画は確認中です',
+                                    icon: Container(
+                                      width: 24,
+                                      height: 24,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: available ? const Color(0xffd71920) : Colors.grey,
+                                      ),
+                                      child: const Icon(Icons.play_arrow_rounded, size: 20, color: Colors.white),
+                                    ),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints.tightFor(width: 28, height: 28),
+                                    onPressed: available
+                                        ? () async {
+                                            if (!await openYoutube(id) && context.mounted) {
+                                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('動画を開けませんでした。')));
+                                            }
+                                          }
+                                        : null,
+                                  );
+                                }),
+                            ]),
+                            if (row['value'] != null && !['', '受賞', 'null', '—', 'ー'].contains('${row['value']}'.trim())) Padding(padding: const EdgeInsets.only(top: 4), child: Text('${row['record_label'] == null ? '' : '${row['record_label']}：'}${row['value']}${row['unit'] ?? ''}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: ink))),
+                            if (showStatus && row['confirmed'] != true && row['statistical'] == true) const Text('指標首位（表彰対象外を含む）', style: TextStyle(fontSize: 10, color: Color(0xffa64b00))),
+                          ]))),
+              ]),
+        color: background ??
+            (side == 'セ'
+                ? Color.lerp(central, Colors.white, 0.55)!
+                : side == 'パ'
+                    ? Color.lerp(pacific, Colors.white, 0.55)!
+                    : Colors.white));
   }
 
   Widget line(List<Widget> cells, {List<int>? weights}) => IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [for (var i = 0; i < cells.length; i++) Expanded(flex: weights?[i] ?? 1, child: cells[i])]));
   static const double leagueColumnWidth = 112;
 
   Widget leagueLine(List<Widget> cells, {List<int>? weights}) => IntrinsicHeight(
-      child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         SizedBox(width: leagueColumnWidth, child: cells.first),
-        for (var i = 1; i < cells.length; i++)
-          Expanded(flex: weights?[i] ?? 1, child: cells[i]),
+        for (var i = 1; i < cells.length; i++) Expanded(flex: weights?[i] ?? 1, child: cells[i]),
       ]));
 
   Widget pair(List<Map<String, dynamic>> values) => Column(children: [
@@ -266,13 +269,15 @@ class SeasonTitlesTable extends StatelessWidget {
                   p,
                   [
                     for (final side in ['セ', 'パ'])
-                      winners(rows(key,
-                          side: side,
-                          where: (r) => p == '外野手'
-                              ? RegExp('外野|左翼|中堅|右翼').hasMatch(detail(r))
-                              : p == 'DH'
-                                  ? RegExp('DH|指名打者').hasMatch(detail(r))
-                                  : detail(r).contains(p)), side: side)
+                      winners(
+                          rows(key,
+                              side: side,
+                              where: (r) => p == '外野手'
+                                  ? RegExp('外野|左翼|中堅|右翼').hasMatch(detail(r))
+                                  : p == 'DH'
+                                      ? RegExp('DH|指名打者').hasMatch(detail(r))
+                                      : detail(r).contains(p)),
+                          side: side)
                   ],
                   color),
           ]));
@@ -370,7 +375,8 @@ class SeasonTitlesTable extends StatelessWidget {
           return recordAwardLabel(name.replaceFirst(RegExp(r'賞$'), '')) == normalized;
         }),
         empty: farm && normalized == '最優秀中継ぎ' ? 'ー' : '未定',
-        showStatus: !farm, side: side);
+        showStatus: !farm,
+        side: side);
     if (portrait) {
       return SizedBox(
           key: ValueKey(farm ? 'titles-grid-farm' : 'titles-grid-statistical'),
@@ -397,7 +403,8 @@ class SeasonTitlesTable extends StatelessWidget {
                       return recordAwardLabel(name.replaceFirst(RegExp(r'賞$'), '')) == normalized;
                     }),
                     empty: farm && normalized == '最優秀中継ぎ' ? 'ー' : '未定',
-                    showStatus: !farm, side: side),
+                    showStatus: !farm,
+                    side: side),
             ]),
         ]));
   }
@@ -652,7 +659,7 @@ class SeasonTitlesTable extends StatelessWidget {
                         const SizedBox(width: 12),
                         Flexible(child: Text('$year年 タイトル', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: ink))),
                       ]),
-                      Padding(padding: const EdgeInsets.symmetric(vertical: 14), child: Text('「現在首位」は受賞確定ではありません。未定の項目は受賞者を表示していません。\n${portrait ? '' : '表は左右にスクロールできます。'}外野手は発表区分に合わせてまとめて表示します。', style: const TextStyle(fontSize: 12, color: muted, height: 1.6))),
+                      Padding(padding: const EdgeInsets.symmetric(vertical: 14), child: Text('未定の項目は受賞者を表示していません。\n${portrait ? '' : '表は左右にスクロールできます。'}外野手は発表区分に合わせてまとめて表示します。', style: const TextStyle(fontSize: 12, color: muted, height: 1.6))),
                       if (portrait)
                         portraitBoard()
                       else

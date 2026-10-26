@@ -69,8 +69,14 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
         ];
   int get _positionSlotCount => pitcherAceSlots.length + usagePositions.length - 1 +
       (widget.teamHeader == '年度' && widget.teams.any((t) => listMapFromJson(t['pitching_workload']).isEmpty && listMapFromJson(t['positions']).any((p) => p['slot'] == 'P')) ? 1 : 0);
-  double _commonColumnWidth(double width, bool hideTeam) =>
-      (width / (_positionSlotCount + (hideTeam ? 0 : 1))).clamp(128.0, double.infinity);
+  double _commonColumnWidth(double width, bool hideTeam) {
+    final fitted = width / (_positionSlotCount + (hideTeam ? 0 : 1));
+    // Landscape position, batting-order and bench grids share this width.
+    // A minimum width here would push the DH column outside the viewport.
+    return hideTeam && !compactBaseballLayout(context)
+        ? fitted
+        : fitted.clamp(128.0, double.infinity);
+  }
   Color _positionColor(String slot) => switch (slot) {
         'PH_L' ||
         'PH_R' ||
@@ -238,7 +244,7 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
                         padding: const EdgeInsets.all(8),
                         child: Text(
                             _battingOrder
-                                ? '打順別のスタメン数・起用率。各打順の最多スタメン数の70%以上の選手も表示します。同じ選手が複数の打順で最多の場合も表示し、追加の選手は薄い背景で表示します。'
+                                ? '打順別のスタメン数・起用率。各打順の最多スタメン数の70%以上の選手も表示します。重複選手は起用率の高い打順を優先し、追加の選手は薄い背景で表示します。'
                                 : '先発エースは左右別の先発投球回最多、リリーフエースは守護神を除く左右別のホールド最多（同数は救援投球回）、守護神はセーブ最多。WHIPはシーズン通算。守備位置別のスタメン数・起用率。各位置の最多スタメン数の70%以上の選手も表示します。重複選手は起用率の高い位置を優先し、追加の選手は薄い背景で表示します。途中出場は既存レギュラーを除外し、各項目の最多起用者とその70%以上を表示。両打ちは左右の候補とし重複表示しません。代守は出場時の守備位置で分類します。',
                             style: const TextStyle(fontSize: 12))),
                   ],
@@ -267,10 +273,7 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
 
   TableRow _row(Map<String, dynamic> team) {
     final selected = _battingOrder
-        ? {
-            for (final group in listMapFromJson(team['batting_order']))
-              ...selectRegularGroups([group]),
-          }
+        ? selectRegularGroups(listMapFromJson(team['batting_order']))
         : {
             ...selectRegularGroups(listMapFromJson(team['positions'])),
             ...selectPitcherAces(team)

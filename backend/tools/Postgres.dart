@@ -1,3 +1,4 @@
+import '../app/PlayerIdentity.dart';
 import 'dart:async';
 import 'dart:collection';
 import 'dart:io';
@@ -293,6 +294,21 @@ class Postgres {
 // トランザクション/既存接続で使うINSERT（安全な名前付きパラメータ）
   static Future<int> insert(Connection conn, DBModel model) async {
     final data = model.toMap();
+    if (model.tableName == 'm_player') {
+      final id = await PlayerIdentity.ensure(conn,
+        name: '${data['name_full'] ?? ''}', teamId: data['id_team'] as int,
+        birthDate: data['date_birth'] as DateTime?);
+      if (id <= 0) throw StateError('Player identity needs review: ${data['name_full']}');
+      final extras = Map<String,dynamic>.from(data)..removeWhere((key,value) =>
+        ['id','name_full','name_last','name_first','name_middle','crtat','date_birth','id_team','flg_delete'].contains(key)
+          || value == null || value == '' || value == 0 || value == false);
+      if (extras.isNotEmpty) {
+        final fields=extras.keys.toList();
+        final assignments=[for(var i=0;i<fields.length;i++) '${fields[i]}=\$${i+2}'].join(',');
+        await conn.execute('UPDATE m_player SET $assignments WHERE id=\$1',parameters:[id,...extras.values]);
+      }
+      return id;
+    }
     data.remove("id"); //insertではidを指定しない（DBの方で自動生成されるため）
     data.remove("crtat");
     final columns = data.keys.toList();

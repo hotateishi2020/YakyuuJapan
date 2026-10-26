@@ -6,6 +6,15 @@ class PlayerDisplay {
   const PlayerDisplay({required this.stats, required this.predictions});
 }
 
+/// Detail dialogs use the leaderboard's values and ranks without reranking a
+/// subset of players or retaining ranks from an older profile snapshot.
+List<Map<String, dynamic>> playerDetailSeasonStats(
+    List<Map<String, dynamic>> rows, int playerId) => [
+  for (final row in rows)
+    if (int.tryParse('${row['id_player']}') == playerId)
+      Map<String, dynamic>.from(row),
+];
+
 /// 成績の順位は再集計せず、登録済みの1位と最新の予想を照合する。
 /// 入力のリスト・行は変更しない。
 PlayerDisplay buildPlayerDisplay(

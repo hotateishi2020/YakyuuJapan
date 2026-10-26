@@ -14,15 +14,17 @@ sh tool/build_web.sh
 
 git add . 
 
-git commit -m "サーバーが落ちる不具合を修正しました。" 
+git commit -m "HOME画面を追加しました。" 
 
 git push 
 
 cd /Users/standapp/StudioProjects/Koko/backend
 
-dart run tool_sql.dart
+
 
 【別途実行】
+
+dart run tool_sql.dart
 
 dart run tool_sql2.dart
 

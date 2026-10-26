@@ -1,3 +1,4 @@
+import '../logic/auth_session.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -37,6 +38,7 @@ String predictDisplayTitle(String title) => title == '優勝' ? '日本一' : ti
 /// グループごとの年度別予想一覧を上部に置き、その下に選んだ年の予想状況を表示する。
 class PredictGroupBoard extends StatefulWidget {
   final bool loading;
+  final bool scoresOnly;
   final String? error;
   final int selectedYear;
   final List<Map<String, dynamic>> groups;
@@ -56,6 +58,7 @@ class PredictGroupBoard extends StatefulWidget {
   const PredictGroupBoard({
     super.key,
     required this.loading,
+    this.scoresOnly = false,
     required this.groups,
     required this.selectedYear,
     this.titleCatalog = const [],
@@ -105,6 +108,16 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
       return Center(child: Text(widget.error!));
     }
     final clusters = predictGroupClusters(widget.groups);
+    if (widget.scoresOnly) {
+      if (clusters.isEmpty) return const Text('予想グループはまだありません');
+      return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        for (final cluster in clusters)
+          _frame(header: cluster.name, child: Column(children: [
+            for (final row in _visibleYears(cluster.years))
+              _yearRow(cluster.id, row, _userSlots(cluster.years)),
+          ])),
+      ]);
+    }
     if (clusters.isEmpty) {
       return ListView(
         padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
@@ -234,7 +247,7 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
               ),
             ),
           if (spacer) const Spacer(),
-          SizedBox(
+          if (!widget.scoresOnly) SizedBox(
             width: editW,
             height: 32,
             child: IconButton(
@@ -972,7 +985,13 @@ Widget predictPlayerLabels(List<Map<String, dynamic>> players, TextStyle style, 
     Padding(padding: const EdgeInsets.symmetric(vertical: 1), child: Column(mainAxisSize: MainAxisSize.min, children: [FittedBox(
       fit: BoxFit.scaleDown,
       child: Row(mainAxisSize: MainAxisSize.min, children: [
-        _predictionLogo('${player['team_name'] ?? ''}', abbrev: '${player['team_shortest'] ?? ''}'),
+        ListenableBuilder(listenable: AuthSession.instance, builder: (context, _) {
+          final logo = teamLogoVisual('${player['team_name'] ?? ''}', abbrev: '${player['team_shortest'] ?? ''}');
+          if (AuthSession.instance.showDetailedGames && (logo.asset != null || logo.networkUrl != null)) {
+            return Padding(padding: const EdgeInsets.only(right: 4), child: SizedBox(width: 24, height: 24,
+              child: logo.asset != null ? Image.asset(logo.asset!, fit: BoxFit.contain) : Image.network(logo.networkUrl!, fit: BoxFit.contain, errorBuilder: (_, __, ___) => const SizedBox.shrink())));
+          }
+          return Row(mainAxisSize: MainAxisSize.min, children: [
         if ('${player['team_shortest'] ?? ''}'.isNotEmpty) ...[
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
@@ -981,6 +1000,8 @@ Widget predictPlayerLabels(List<Map<String, dynamic>> players, TextStyle style, 
           ),
           const SizedBox(width: 4),
         ],
+          ]);
+        }),
         Text('${player['player_name'] ?? player['name'] ?? ''}', style: style),
       ]),
     ),

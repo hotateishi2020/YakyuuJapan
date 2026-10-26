@@ -275,7 +275,37 @@ class LiveText {
       ));
     }
 
-    return ParsedLiveText(halves: _withoutExtraPlates(_inPlayOrder(halves)), finished: finished, positions: positions);
+    final parsed = ParsedLiveText(halves: _withoutExtraPlates(_inPlayOrder(halves)), finished: finished, positions: positions);
+    completeFieldingMoves(parsed);
+    return parsed;
+  }
+
+  /// 代走・代打が引き継いだ守備位置を保存前に補完する。
+  static void completeFieldingMoves(ParsedLiveText parsed) {
+    String key(String name) => name.replaceAll(RegExp(r'[\s　]+'), '');
+    const codes = {'投':'P','捕':'C','一':'FIRST','二':'SECOND','三':'THIRD','遊':'SS','左':'LEFT','中':'CENTER','右':'RIGHT','指':'DH'};
+    final positions = <bool, Map<String, String>>{
+      for (final team in [false, true]) team: {
+        for (final entry in (parsed.positions[team] ?? {}).entries) key(entry.key): codes[entry.value] ?? entry.value,
+      },
+    };
+    for (final half in parsed.halves) {
+      for (final plate in half.plates) {
+        for (final event in plate.events) {
+          final batting = event.result == 'PINCH_RUNNER' || event.result == 'PINCH_HITTER';
+          final state = positions[batting ? half.bottom : !half.bottom]!;
+          final entered = key(event.enterName), exited = key(event.exitName);
+          if (batting) {
+            if (entered.isNotEmpty && state.containsKey(exited)) state[entered] = state[exited]!;
+            if (exited != entered) state.remove(exited);
+          } else if (event.result == 'CHANGE_POSITION' || event.result == 'PINCH_FIELDER') {
+            if (event.positionFrom.isEmpty) event.positionFrom = state[entered] ?? state[exited] ?? '';
+            if (entered.isNotEmpty && event.positionTo.isNotEmpty) state[entered] = event.positionTo;
+            if (event.result == 'PINCH_FIELDER' && exited != entered) state.remove(exited);
+          }
+        }
+      }
+    }
   }
 
   /// Yahoo MLB のテキスト速報は新しいイニング・打席が先に来る。打席数の整合は古い順で見る。
@@ -382,7 +412,17 @@ class LiveText {
             break;
           }
         }
-        if (!ahead) continue;
+        if (!ahead) {
+          // 打撃結果の重複を除いても、その打席前の交代情報は失わない。
+          final changes = plate.events.where((e) => e.pitcherChange).toList();
+          if (changes.isNotEmpty) kept.add(ParsedPlate(
+            battingOrder: plate.battingOrder, batterName: plate.batterName,
+            outs: plate.outs, runnerFirst: plate.runnerFirst,
+            runnerSecond: plate.runnerSecond, runnerThird: plate.runnerThird,
+            events: changes,
+          ));
+          continue;
+        }
         count[order] = next;
         nextSlot[half.bottom] = order == 9 ? 1 : order + 1;
         kept.add(plate);
@@ -395,7 +435,7 @@ class LiveText {
   static List<ParsedLiveEvent> _eventsOf(Element summary) {
     final text = summary.text.replaceAll(RegExp(r'\s+'), ' ').trim();
     final changing = summary.classes.contains('bb-liveText__summary--change') ||
-        RegExp(r'投手交代|守備交代|守備固め|守備変更|代打|代走|退場').hasMatch(text);
+        RegExp(r'投手交代|ピッチャー.+に代わって.+マウンド|守備交代|守備固め|守備変更|代打|代走|退場').hasMatch(text);
     if (changing) {
       return _changeEvents(summary);
     }
@@ -432,6 +472,7 @@ class LiveText {
 
       final event = ParsedLiveEvent();
       switch (token.text) {
+        case 'ピッチャー':
         case '投手交代':
           event.category = Value.CodeGameResultCategory.CHANGE_PLAYER;
           event.result = Value.CodeGameResult.CHANGE_PITCHER;
@@ -859,7 +900,7 @@ class LiveText {
   static List<_Tok> _splitKeywords(String raw) {
     final text = raw.replaceAll(RegExp(r'\s+'), ' ');
     if (text.trim().isEmpty) return const [];
-    final pattern = RegExp(r'投手交代|守備交代|守備固め|守備変更|代打|代走|退場');
+    final pattern = RegExp(r'投手交代|ピッチャー|守備交代|守備固め|守備変更|代打|代走|退場');
     final tokens = <_Tok>[];
     var cursor = 0;
     for (final match in pattern.allMatches(text)) {

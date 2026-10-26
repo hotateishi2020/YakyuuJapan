@@ -1,3 +1,4 @@
+import 'PlayerIdentity.dart';
 import 'RosterInjuries.dart';
 import 'SnapshotWork.dart';
 import 'NpbResearchEvents.dart';
@@ -74,10 +75,11 @@ class TeamStrength {
       SELECT id AS id_player, id_team, name_full AS name_player, COALESCE(flg_injury, false) AS flg_injury
       FROM m_player WHERE id_team=ANY(\$1::int[]) AND NOT COALESCE(flg_delete, false)
     ''', parameters: [ids])).map((r) => r.toColumnMap()).toList();
+    final localized = org=='mlb' ? List<Map<String,dynamic>>.from(await PlayerIdentity.localize(conn, teams) as List) : teams;
     return {
       'org': org,
       'year': year,
-      'teams': withRosterInjuries(teams, players),
+      'teams': withRosterInjuries(localized, players),
     };
   }
 

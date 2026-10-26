@@ -110,18 +110,20 @@ Map<String, dynamic> handednessBand(Map<String, dynamic> team, {required bool pi
   };
 }
 
-const baseParts = [('home_runs', 4, '本塁打'), ('triples', 3, '三塁打'), ('doubles', 2, '二塁打'), ('singles', 1, '単打'), ('walks', 1, '四球')];
+const baseParts = [('home_runs', 4, '本塁打'), ('triples', 3, '三塁打'), ('doubles', 2, '二塁打'), ('singles', 1, '単打'), ('walks', 1, '四球'), ('stolen_bases', 1, '盗塁')];
 List<Map<String, dynamic>> contributionBands(Map<String, dynamic> team) => [
       for (final metric in [('home_runs', '本塁打'), ('total_bases_walks', '塁打数'), ('rbi', '打点')])
         (() {
+          int contribution(Map<String, dynamic> p) => usageInt(p[metric.$1]) +
+              (metric.$1 == 'total_bases_walks' ? usageInt(p['stolen_bases']) : 0);
           final players = [
             for (final p in listMapFromJson(team['batting_stats']))
-              if (usageInt(p[metric.$1]) > 0)
+              if (contribution(p) > 0)
                 {
                   ...p,
-                  'count': usageInt(p[metric.$1]),
+                  'count': contribution(p),
                   'contribution_metric': metric.$1,
-                  'value_label': '${usageInt(p[metric.$1])}${metric.$1 == 'home_runs' ? '本' : metric.$1 == 'rbi' ? '打点' : '塁打'}',
+                  'value_label': '${contribution(p)}${metric.$1 == 'home_runs' ? '本' : metric.$1 == 'rbi' ? '打点' : '塁打'}',
                   if (metric.$1 == 'total_bases_walks')
                     'parts': [
                       for (final part in baseParts) {'label': part.$3, 'events': usageInt(p[part.$1]), 'count': usageInt(p[part.$1]) * part.$2}

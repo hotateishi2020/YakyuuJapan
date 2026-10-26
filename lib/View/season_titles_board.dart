@@ -1,3 +1,4 @@
+import '../tools/home_data_cache.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -35,16 +36,22 @@ class _SeasonTitlesBoardState extends State<SeasonTitlesBoard> {
     }
   }
 
-  Future<void> load() async {
+  Future<void> load({bool refresh = false}) async {
     final token = ++request;
     setState(() {
       data = null;
       failed = false;
     });
     try {
+      Future<Map<String, dynamic>> fetch() async {
       final response = await http.get(Env.api('/records?org=${widget.org.kind.name}&year=${widget.year}&section=titles')).timeout(const Duration(seconds: 60));
       if (response.statusCode != 200) throw const FormatException();
       final parsed = Map<String, dynamic>.from(jsonDecode(utf8.decode(response.bodyBytes)));
+      return parsed;
+      }
+      final parsed = widget.individualOnly
+          ? await HomeDataCache.read('titles:${widget.org.kind.name}:${widget.year}', fetch, refresh: refresh)
+          : await fetch();
       if (mounted && token == request) setState(() => data = parsed);
     } catch (_) {
       if (mounted && token == request) setState(() => failed = true);
@@ -54,14 +61,14 @@ class _SeasonTitlesBoardState extends State<SeasonTitlesBoard> {
   @override
   Widget build(BuildContext context) {
     if (failed) {
-      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [const Text('タイトル情報を取得できませんでした'), TextButton(onPressed: load, child: const Text('再読み込み'))]));
+      return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [const Text('タイトル情報を取得できませんでした'), TextButton(onPressed: () => load(refresh: true), child: const Text('再読み込み'))]));
     }
     if (data == null) return const Center(child: BaseballLoading());
     if (data!['pending'] == true) {
       return Center(
           child: Column(mainAxisSize: MainAxisSize.min, children: [
         Text('${data!['message']}'),
-        TextButton(onPressed: load, child: const Text('再読み込み')),
+        TextButton(onPressed: () => load(refresh: true), child: const Text('再読み込み')),
       ]));
     }
     return SeasonTitlesGrid(data: data!, year: widget.year, org: widget.org, individualOnly: widget.individualOnly);

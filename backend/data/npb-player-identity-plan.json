@@ -1,0 +1,2808 @@
+{
+  "generated_at": "2026-10-23T23:19:07.585417+00:00",
+  "groups": [
+    {
+      "canonical_id": 5601,
+      "merge_ids": [
+        790,
+        27040
+      ],
+      "name_ja": "村上 宗隆",
+      "name_en": null,
+      "team_id": 18,
+      "birth_date": "2000-02-02",
+      "patterns": [
+        "Munetaka Murakami",
+        "Murakami, Munetaka",
+        "村上",
+        "村上 宗隆",
+        "村上　宗隆",
+        "村上宗隆"
+      ],
+      "identity_sources": {
+        "mlb": "808959",
+        "yahoo_mlb": "202101502",
+        "npb": "41845136"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101502/",
+      "evidence": [
+        {
+          "npb_id": "41845136",
+          "name": "村上　宗隆",
+          "birth_date": "2000-02-02",
+          "career": [
+            {
+              "year": 2018,
+              "club": "東京ヤクルト"
+            },
+            {
+              "year": 2019,
+              "club": "東京ヤクルト"
+            },
+            {
+              "year": 2020,
+              "club": "東京ヤクルト"
+            },
+            {
+              "year": 2021,
+              "club": "東京ヤクルト"
+            },
+            {
+              "year": 2022,
+              "club": "東京ヤクルト"
+            },
+            {
+              "year": 2023,
+              "club": "東京ヤクルト"
+            },
+            {
+              "year": 2024,
+              "club": "東京ヤクルト"
+            },
+            {
+              "year": 2025,
+              "club": "東京ヤクルト"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/41845136.html"
+        },
+        {
+          "old_id": 790,
+          "name": "村上宗隆",
+          "team_id": 4,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        },
+        {
+          "old_id": 27040,
+          "name": "村上　宗隆",
+          "team_id": 4,
+          "last_year": 2024,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 4914,
+      "merge_ids": [
+        794,
+        25425
+      ],
+      "name_ja": "西川　遥輝",
+      "name_en": null,
+      "team_id": 9,
+      "birth_date": "1992-04-16",
+      "patterns": [
+        "西川　遥輝",
+        "西川遥輝"
+      ],
+      "identity_sources": {
+        "npb": "21225133"
+      },
+      "url": "https://npb.jp/bis/players/21225133.html",
+      "evidence": [
+        {
+          "npb_id": "21225133",
+          "name": "西川　遥輝",
+          "birth_date": "1992-04-16",
+          "career": [
+            {
+              "year": 2012,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2013,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2014,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2015,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2016,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2017,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2018,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2019,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2020,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2021,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2022,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2023,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2024,
+              "club": "東京ヤクルト"
+            },
+            {
+              "year": 2025,
+              "club": "東京ヤクルト"
+            },
+            {
+              "year": 2026,
+              "club": "北海道日本ハム"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/21225133.html"
+        },
+        {
+          "old_id": 794,
+          "name": "西川遥輝",
+          "team_id": 4,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        },
+        {
+          "old_id": 25425,
+          "name": "西川　遥輝",
+          "team_id": 9,
+          "last_year": 2020,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 3046,
+      "merge_ids": [
+        954
+      ],
+      "name_ja": "有原　航平",
+      "name_en": null,
+      "team_id": 9,
+      "birth_date": "1992-08-11",
+      "patterns": [
+        "Kohei Arihara",
+        "有原　航平",
+        "有原航平"
+      ],
+      "identity_sources": {
+        "mlb": "685503",
+        "npb": "51155130"
+      },
+      "url": "https://npb.jp/bis/players/51155130.html",
+      "evidence": [
+        {
+          "npb_id": "51155130",
+          "name": "有原　航平",
+          "birth_date": "1992-08-11",
+          "career": [
+            {
+              "year": 2015,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2016,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2017,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2018,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2019,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2020,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2023,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2024,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2025,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2026,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2015,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2016,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2017,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2018,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2019,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2020,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2023,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2024,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2025,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2026,
+              "club": "北海道日本ハム"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/51155130.html"
+        },
+        {
+          "old_id": 954,
+          "name": "有原航平",
+          "team_id": 7,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 572,
+      "merge_ids": [
+        1004
+      ],
+      "name_ja": "リチャード",
+      "name_en": null,
+      "team_id": 1,
+      "birth_date": "1999-06-18",
+      "patterns": [
+        "リチャード"
+      ],
+      "identity_sources": {
+        "npb": "11015136"
+      },
+      "url": "https://npb.jp/bis/players/11015136.html",
+      "evidence": [
+        {
+          "npb_id": "11015136",
+          "name": "リチャード",
+          "birth_date": "1999-06-18",
+          "career": [
+            {
+              "year": 2021,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2022,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2023,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2024,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2025,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2025,
+              "club": "読　売"
+            },
+            {
+              "year": 2026,
+              "club": "読　売"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/11015136.html"
+        },
+        {
+          "old_id": 1004,
+          "name": "リチャード",
+          "team_id": 7,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 786,
+      "merge_ids": [
+        1060
+      ],
+      "name_ja": "山野辺　翔",
+      "name_en": null,
+      "team_id": 4,
+      "birth_date": "1994-05-24",
+      "patterns": [
+        "山野辺　翔",
+        "山野辺翔"
+      ],
+      "identity_sources": {
+        "npb": "21825138"
+      },
+      "url": "https://npb.jp/bis/players/21825138.html",
+      "evidence": [
+        {
+          "npb_id": "21825138",
+          "name": "山野辺　翔",
+          "birth_date": "1994-05-24",
+          "career": [
+            {
+              "year": 2019,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2020,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2021,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2022,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2023,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2024,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2025,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2025,
+              "club": "東京ヤクルト"
+            },
+            {
+              "year": 2026,
+              "club": "東京ヤクルト"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/21825138.html"
+        },
+        {
+          "old_id": 1060,
+          "name": "山野辺翔",
+          "team_id": 8,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 720,
+      "merge_ids": [
+        1063
+      ],
+      "name_ja": "佐藤　龍世",
+      "name_en": null,
+      "team_id": 3,
+      "birth_date": "1997-01-15",
+      "patterns": [
+        "佐藤　龍世",
+        "佐藤龍世"
+      ],
+      "identity_sources": {
+        "npb": "81785138"
+      },
+      "url": "https://npb.jp/bis/players/81785138.html",
+      "evidence": [
+        {
+          "npb_id": "81785138",
+          "name": "佐藤　龍世",
+          "birth_date": "1997-01-15",
+          "career": [
+            {
+              "year": 2019,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2021,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2021,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2022,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2023,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2024,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2025,
+              "club": "中　日"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/81785138.html"
+        },
+        {
+          "old_id": 1063,
+          "name": "佐藤龍世",
+          "team_id": 8,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 2967,
+      "merge_ids": [
+        1233,
+        25422
+      ],
+      "name_ja": "則本　昂大",
+      "name_en": null,
+      "team_id": 1,
+      "birth_date": "1990-12-17",
+      "patterns": [
+        "則本　昂大",
+        "則本昂大"
+      ],
+      "identity_sources": {
+        "npb": "51055137"
+      },
+      "url": "https://npb.jp/bis/players/51055137.html",
+      "evidence": [
+        {
+          "npb_id": "51055137",
+          "name": "則本　昂大",
+          "birth_date": "1990-12-17",
+          "career": [
+            {
+              "year": 2013,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2014,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2015,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2016,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2017,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2018,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2019,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2020,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2021,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2022,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2023,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2024,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2025,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2026,
+              "club": "読　売"
+            },
+            {
+              "year": 2013,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2014,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2015,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2016,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2017,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2018,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2019,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2020,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2021,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2022,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2023,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2024,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2025,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2026,
+              "club": "読　売"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/51055137.html"
+        },
+        {
+          "old_id": 1233,
+          "name": "則本昂大",
+          "team_id": 11,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        },
+        {
+          "old_id": 25422,
+          "name": "則本　昂大",
+          "team_id": 11,
+          "last_year": 2023,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 5607,
+      "merge_ids": [
+        568,
+        26766
+      ],
+      "name_ja": "岡本 和真",
+      "name_en": null,
+      "team_id": 17,
+      "birth_date": "1996-06-30",
+      "patterns": [
+        "Kazuma Okamoto",
+        "Okamoto, Kazuma",
+        "岡本",
+        "岡本 和真",
+        "岡本　和真",
+        "岡本和真"
+      ],
+      "identity_sources": {
+        "mlb": "672960",
+        "yahoo_mlb": "202101516",
+        "npb": "11515130"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101516/",
+      "evidence": [
+        {
+          "npb_id": "11515130",
+          "name": "岡本　和真",
+          "birth_date": "1996-06-30",
+          "career": [
+            {
+              "year": 2015,
+              "club": "読　売"
+            },
+            {
+              "year": 2016,
+              "club": "読　売"
+            },
+            {
+              "year": 2017,
+              "club": "読　売"
+            },
+            {
+              "year": 2018,
+              "club": "読　売"
+            },
+            {
+              "year": 2019,
+              "club": "読　売"
+            },
+            {
+              "year": 2020,
+              "club": "読　売"
+            },
+            {
+              "year": 2021,
+              "club": "読　売"
+            },
+            {
+              "year": 2022,
+              "club": "読　売"
+            },
+            {
+              "year": 2023,
+              "club": "読　売"
+            },
+            {
+              "year": 2024,
+              "club": "読　売"
+            },
+            {
+              "year": 2025,
+              "club": "読　売"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/11515130.html"
+        },
+        {
+          "old_id": 568,
+          "name": "岡本和真",
+          "team_id": 1,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        },
+        {
+          "old_id": 26766,
+          "name": "岡本　和真",
+          "team_id": 1,
+          "last_year": 2024,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 5290,
+      "merge_ids": [
+        1039,
+        27054
+      ],
+      "name_ja": "今井 達也",
+      "name_en": null,
+      "team_id": 24,
+      "birth_date": "1998-05-09",
+      "patterns": [
+        "Imai, Tatsuya",
+        "Tatsuya Imai",
+        "今井",
+        "今井 達也",
+        "今井　達也",
+        "今井達也"
+      ],
+      "identity_sources": {
+        "mlb": "837227",
+        "yahoo_mlb": "202101474",
+        "npb": "31335134"
+      },
+      "url": "https://baseball.yahoo.co.jp/mlb/player/202101474/",
+      "evidence": [
+        {
+          "npb_id": "31335134",
+          "name": "今井　達也",
+          "birth_date": "1998-05-09",
+          "career": [
+            {
+              "year": 2018,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2019,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2020,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2021,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2022,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2023,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2024,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2025,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2018,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2019,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2020,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2021,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2022,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2023,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2024,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2025,
+              "club": "埼玉西武"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/31335134.html"
+        },
+        {
+          "old_id": 1039,
+          "name": "今井達也",
+          "team_id": 8,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        },
+        {
+          "old_id": 27054,
+          "name": "今井　達也",
+          "team_id": 8,
+          "last_year": 2025,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 1021,
+      "merge_ids": [
+        27051
+      ],
+      "name_ja": "髙橋　光成",
+      "name_en": null,
+      "team_id": 8,
+      "birth_date": "1997-02-03",
+      "patterns": [
+        "髙橋　光成",
+        "髙橋光成"
+      ],
+      "identity_sources": {
+        "npb": "71075130"
+      },
+      "url": "https://npb.jp/bis/players/71075130.html",
+      "evidence": [
+        {
+          "npb_id": "71075130",
+          "name": "髙橋　光成",
+          "birth_date": "1997-02-03",
+          "career": [
+            {
+              "year": 2015,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2016,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2017,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2018,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2019,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2020,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2021,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2022,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2023,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2024,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2025,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2026,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2015,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2016,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2017,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2018,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2019,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2020,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2021,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2022,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2023,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2024,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2025,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2026,
+              "club": "埼玉西武"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/71075130.html"
+        },
+        {
+          "old_id": 27051,
+          "name": "髙橋　光成",
+          "team_id": 8,
+          "last_year": 2023,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 4932,
+      "merge_ids": [
+        688
+      ],
+      "name_ja": "マルテ",
+      "name_en": null,
+      "team_id": 11,
+      "birth_date": "1995-02-02",
+      "patterns": [
+        "Yunior Marte",
+        "マルテ",
+        "Ｙ．マルテ"
+      ],
+      "identity_sources": {
+        "mlb": "628708",
+        "npb": "13015150"
+      },
+      "url": "https://npb.jp/bis/players/13015150.html",
+      "evidence": [
+        {
+          "npb_id": "13015150",
+          "name": "Ｙ．マルテ",
+          "birth_date": "1995-02-02",
+          "career": [
+            {
+              "year": 2025,
+              "club": "中　日"
+            },
+            {
+              "year": 2026,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2025,
+              "club": "中　日"
+            },
+            {
+              "year": 2026,
+              "club": "東北楽天"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/13015150.html"
+        },
+        {
+          "old_id": 688,
+          "name": "マルテ",
+          "team_id": 3,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 4833,
+      "merge_ids": [
+        537
+      ],
+      "name_ja": "田中　千晴",
+      "name_en": null,
+      "team_id": 11,
+      "birth_date": "2000-09-21",
+      "patterns": [
+        "田中　千晴",
+        "田中千晴"
+      ],
+      "identity_sources": {
+        "npb": "91095157"
+      },
+      "url": "https://npb.jp/bis/players/91095157.html",
+      "evidence": [
+        {
+          "npb_id": "91095157",
+          "name": "田中　千晴",
+          "birth_date": "2000-09-21",
+          "career": [
+            {
+              "year": 2023,
+              "club": "読　売"
+            },
+            {
+              "year": 2024,
+              "club": "読　売"
+            },
+            {
+              "year": 2026,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2023,
+              "club": "読　売"
+            },
+            {
+              "year": 2024,
+              "club": "読　売"
+            },
+            {
+              "year": 2026,
+              "club": "東北楽天"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/91095157.html"
+        },
+        {
+          "old_id": 537,
+          "name": "田中千晴",
+          "team_id": 1,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 960,
+      "merge_ids": [
+        544
+      ],
+      "name_ja": "大江　竜聖",
+      "name_en": null,
+      "team_id": 7,
+      "birth_date": "1999-01-15",
+      "patterns": [
+        "大江　竜聖",
+        "大江竜聖"
+      ],
+      "identity_sources": {
+        "npb": "71375134"
+      },
+      "url": "https://npb.jp/bis/players/71375134.html",
+      "evidence": [
+        {
+          "npb_id": "71375134",
+          "name": "大江　竜聖",
+          "birth_date": "1999-01-15",
+          "career": [
+            {
+              "year": 2019,
+              "club": "読　売"
+            },
+            {
+              "year": 2020,
+              "club": "読　売"
+            },
+            {
+              "year": 2021,
+              "club": "読　売"
+            },
+            {
+              "year": 2022,
+              "club": "読　売"
+            },
+            {
+              "year": 2023,
+              "club": "読　売"
+            },
+            {
+              "year": 2024,
+              "club": "読　売"
+            },
+            {
+              "year": 2025,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2026,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2019,
+              "club": "読　売"
+            },
+            {
+              "year": 2020,
+              "club": "読　売"
+            },
+            {
+              "year": 2021,
+              "club": "読　売"
+            },
+            {
+              "year": 2022,
+              "club": "読　売"
+            },
+            {
+              "year": 2023,
+              "club": "読　売"
+            },
+            {
+              "year": 2024,
+              "club": "読　売"
+            },
+            {
+              "year": 2025,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2026,
+              "club": "福岡ソフトバンク"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/71375134.html"
+        },
+        {
+          "old_id": 544,
+          "name": "大江竜聖",
+          "team_id": 1,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 600,
+      "merge_ids": [
+        3201
+      ],
+      "name_ja": "デュプランティエ",
+      "name_en": null,
+      "team_id": 5,
+      "birth_date": "1994-07-11",
+      "patterns": [
+        "Jon Duplantier",
+        "デュプランティエ",
+        "Ｊ．デュプランティエ"
+      ],
+      "identity_sources": {
+        "mlb": "641541",
+        "npb": "13715150"
+      },
+      "url": "https://npb.jp/bis/players/13715150.html",
+      "evidence": [
+        {
+          "npb_id": "13715150",
+          "name": "Ｊ．デュプランティエ",
+          "birth_date": "1994-07-11",
+          "career": [
+            {
+              "year": 2025,
+              "club": "阪　神"
+            },
+            {
+              "year": 2026,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2025,
+              "club": "阪　神"
+            },
+            {
+              "year": 2026,
+              "club": "横浜DeNA"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/13715150.html"
+        },
+        {
+          "old_id": 3201,
+          "name": "デュプランティエ",
+          "team_id": 5,
+          "last_year": 2026,
+          "same_birth": true,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 4824,
+      "merge_ids": [
+        614
+      ],
+      "name_ja": "島本　浩也",
+      "name_en": null,
+      "team_id": 9,
+      "birth_date": "1993-02-14",
+      "patterns": [
+        "島本　浩也",
+        "島本浩也"
+      ],
+      "identity_sources": {
+        "npb": "51055133"
+      },
+      "url": "https://npb.jp/bis/players/51055133.html",
+      "evidence": [
+        {
+          "npb_id": "51055133",
+          "name": "島本　浩也",
+          "birth_date": "1993-02-14",
+          "career": [
+            {
+              "year": 2015,
+              "club": "阪　神"
+            },
+            {
+              "year": 2016,
+              "club": "阪　神"
+            },
+            {
+              "year": 2018,
+              "club": "阪　神"
+            },
+            {
+              "year": 2019,
+              "club": "阪　神"
+            },
+            {
+              "year": 2022,
+              "club": "阪　神"
+            },
+            {
+              "year": 2023,
+              "club": "阪　神"
+            },
+            {
+              "year": 2024,
+              "club": "阪　神"
+            },
+            {
+              "year": 2025,
+              "club": "阪　神"
+            },
+            {
+              "year": 2026,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2015,
+              "club": "阪　神"
+            },
+            {
+              "year": 2016,
+              "club": "阪　神"
+            },
+            {
+              "year": 2018,
+              "club": "阪　神"
+            },
+            {
+              "year": 2019,
+              "club": "阪　神"
+            },
+            {
+              "year": 2022,
+              "club": "阪　神"
+            },
+            {
+              "year": 2023,
+              "club": "阪　神"
+            },
+            {
+              "year": 2024,
+              "club": "阪　神"
+            },
+            {
+              "year": 2025,
+              "club": "阪　神"
+            },
+            {
+              "year": 2026,
+              "club": "北海道日本ハム"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/51055133.html"
+        },
+        {
+          "old_id": 614,
+          "name": "島本浩也",
+          "team_id": 2,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 1180,
+      "merge_ids": [
+        667,
+        26514
+      ],
+      "name_ja": "岩嵜　翔",
+      "name_en": null,
+      "team_id": 10,
+      "birth_date": "1989-10-21",
+      "patterns": [
+        "岩嵜　翔",
+        "岩嵜翔"
+      ],
+      "identity_sources": {
+        "npb": "31335116"
+      },
+      "url": "https://npb.jp/bis/players/31335116.html",
+      "evidence": [
+        {
+          "npb_id": "31335116",
+          "name": "岩嵜　翔",
+          "birth_date": "1989-10-21",
+          "career": [
+            {
+              "year": 2008,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2009,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2010,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2011,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2012,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2013,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2014,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2015,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2016,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2017,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2018,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2019,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2020,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2021,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2022,
+              "club": "中　日"
+            },
+            {
+              "year": 2024,
+              "club": "中　日"
+            },
+            {
+              "year": 2025,
+              "club": "中　日"
+            },
+            {
+              "year": 2025,
+              "club": "オリックス"
+            },
+            {
+              "year": 2026,
+              "club": "オリックス"
+            },
+            {
+              "year": 2008,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2009,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2010,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2011,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2012,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2013,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2014,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2015,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2016,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2017,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2018,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2019,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2020,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2021,
+              "club": "福岡ソフトバンク"
+            },
+            {
+              "year": 2022,
+              "club": "中　日"
+            },
+            {
+              "year": 2024,
+              "club": "中　日"
+            },
+            {
+              "year": 2025,
+              "club": "中　日"
+            },
+            {
+              "year": 2025,
+              "club": "オリックス"
+            },
+            {
+              "year": 2026,
+              "club": "オリックス"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/31335116.html"
+        },
+        {
+          "old_id": 667,
+          "name": "岩嵜翔",
+          "team_id": 3,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        },
+        {
+          "old_id": 26514,
+          "name": "岩嵜　翔",
+          "team_id": 7,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 2965,
+      "merge_ids": [
+        826
+      ],
+      "name_ja": "ジャクソン",
+      "name_en": null,
+      "team_id": 12,
+      "birth_date": "1996-05-01",
+      "patterns": [
+        "Andre Jackson",
+        "ジャクソン",
+        "Ａ．ジャクソン"
+      ],
+      "identity_sources": {
+        "mlb": "656578",
+        "npb": "43745159"
+      },
+      "url": "https://npb.jp/bis/players/43745159.html",
+      "evidence": [
+        {
+          "npb_id": "43745159",
+          "name": "Ａ．ジャクソン",
+          "birth_date": "1996-05-01",
+          "career": [
+            {
+              "year": 2024,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2025,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2026,
+              "club": "千葉ロッテ"
+            },
+            {
+              "year": 2024,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2025,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2026,
+              "club": "千葉ロッテ"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/43745159.html"
+        },
+        {
+          "old_id": 826,
+          "name": "ジャクソン",
+          "team_id": 5,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 4810,
+      "merge_ids": [
+        846
+      ],
+      "name_ja": "伊藤　光",
+      "name_en": null,
+      "team_id": 11,
+      "birth_date": "1989-04-23",
+      "patterns": [
+        "伊藤　光",
+        "伊藤光"
+      ],
+      "identity_sources": {
+        "npb": "81185116"
+      },
+      "url": "https://npb.jp/bis/players/81185116.html",
+      "evidence": [
+        {
+          "npb_id": "81185116",
+          "name": "伊藤　光",
+          "birth_date": "1989-04-23",
+          "career": [
+            {
+              "year": 2008,
+              "club": "オリックス"
+            },
+            {
+              "year": 2010,
+              "club": "オリックス"
+            },
+            {
+              "year": 2011,
+              "club": "オリックス"
+            },
+            {
+              "year": 2012,
+              "club": "オリックス"
+            },
+            {
+              "year": 2013,
+              "club": "オリックス"
+            },
+            {
+              "year": 2014,
+              "club": "オリックス"
+            },
+            {
+              "year": 2015,
+              "club": "オリックス"
+            },
+            {
+              "year": 2016,
+              "club": "オリックス"
+            },
+            {
+              "year": 2017,
+              "club": "オリックス"
+            },
+            {
+              "year": 2018,
+              "club": "オリックス"
+            },
+            {
+              "year": 2018,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2019,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2020,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2021,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2022,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2023,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2024,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2025,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2026,
+              "club": "東北楽天"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/81185116.html"
+        },
+        {
+          "old_id": 846,
+          "name": "伊藤光",
+          "team_id": 5,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 4863,
+      "merge_ids": [
+        866,
+        26225
+      ],
+      "name_ja": "桑原　将志",
+      "name_en": null,
+      "team_id": 8,
+      "birth_date": "1993-07-21",
+      "patterns": [
+        "桑原　将志",
+        "桑原将志"
+      ],
+      "identity_sources": {
+        "npb": "51755135"
+      },
+      "url": "https://npb.jp/bis/players/51755135.html",
+      "evidence": [
+        {
+          "npb_id": "51755135",
+          "name": "桑原　将志",
+          "birth_date": "1993-07-21",
+          "career": [
+            {
+              "year": 2012,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2013,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2014,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2015,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2016,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2017,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2018,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2019,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2020,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2021,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2022,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2023,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2024,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2025,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2026,
+              "club": "埼玉西武"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/51755135.html"
+        },
+        {
+          "old_id": 866,
+          "name": "桑原将志",
+          "team_id": 5,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        },
+        {
+          "old_id": 26225,
+          "name": "桑原　将志",
+          "team_id": 5,
+          "last_year": 2025,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 4947,
+      "merge_ids": [
+        1069,
+        28390
+      ],
+      "name_ja": "セデーニョ",
+      "name_en": null,
+      "team_id": 4,
+      "birth_date": "1998-08-22",
+      "patterns": [
+        "セデーニョ",
+        "Ｌ．セデーニョ"
+      ],
+      "identity_sources": {
+        "npb": "13915157"
+      },
+      "url": "https://npb.jp/bis/players/13915157.html",
+      "evidence": [
+        {
+          "npb_id": "13915157",
+          "name": "Ｌ．セデーニョ",
+          "birth_date": "1998-08-22",
+          "career": [
+            {
+              "year": 2023,
+              "club": "オリックス"
+            },
+            {
+              "year": 2024,
+              "club": "オリックス"
+            },
+            {
+              "year": 2025,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2026,
+              "club": "東京ヤクルト"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/13915157.html"
+        },
+        {
+          "old_id": 1069,
+          "name": "セデーニョ",
+          "team_id": 8,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        },
+        {
+          "old_id": 28390,
+          "name": "セデーニョ",
+          "team_id": 10,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 4880,
+      "merge_ids": [
+        1120
+      ],
+      "name_ja": "松浦　慶斗",
+      "name_en": null,
+      "team_id": 1,
+      "birth_date": "2003-07-01",
+      "patterns": [
+        "松浦　慶斗",
+        "松浦慶斗"
+      ],
+      "identity_sources": {
+        "npb": "33135155"
+      },
+      "url": "https://npb.jp/bis/players/33135155.html",
+      "evidence": [
+        {
+          "npb_id": "33135155",
+          "name": "松浦　慶斗",
+          "birth_date": "2003-07-01",
+          "career": [
+            {
+              "year": 2022,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2024,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2022,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2024,
+              "club": "北海道日本ハム"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/33135155.html"
+        },
+        {
+          "old_id": 1120,
+          "name": "松浦慶斗",
+          "team_id": 9,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 1368,
+      "merge_ids": [
+        27862
+      ],
+      "name_ja": "髙部　瑛斗",
+      "name_en": null,
+      "team_id": 12,
+      "birth_date": "1997-12-11",
+      "patterns": [
+        "髙部　瑛斗",
+        "髙部瑛斗"
+      ],
+      "identity_sources": {
+        "npb": "11215151"
+      },
+      "url": "https://npb.jp/bis/players/11215151.html",
+      "evidence": [
+        {
+          "npb_id": "11215151",
+          "name": "髙部　瑛斗",
+          "birth_date": "1997-12-11",
+          "career": [
+            {
+              "year": 2020,
+              "club": "千葉ロッテ"
+            },
+            {
+              "year": 2021,
+              "club": "千葉ロッテ"
+            },
+            {
+              "year": 2022,
+              "club": "千葉ロッテ"
+            },
+            {
+              "year": 2024,
+              "club": "千葉ロッテ"
+            },
+            {
+              "year": 2025,
+              "club": "千葉ロッテ"
+            },
+            {
+              "year": 2026,
+              "club": "千葉ロッテ"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/11215151.html"
+        },
+        {
+          "old_id": 27862,
+          "name": "髙部　瑛斗",
+          "team_id": 12,
+          "last_year": 2022,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 4948,
+      "merge_ids": [
+        1276,
+        27039
+      ],
+      "name_ja": "阿部　寿樹",
+      "name_en": null,
+      "team_id": 3,
+      "birth_date": "1989-12-03",
+      "patterns": [
+        "阿部　寿樹",
+        "阿部寿樹"
+      ],
+      "identity_sources": {
+        "npb": "61165132"
+      },
+      "url": "https://npb.jp/bis/players/61165132.html",
+      "evidence": [
+        {
+          "npb_id": "61165132",
+          "name": "阿部　寿樹",
+          "birth_date": "1989-12-03",
+          "career": [
+            {
+              "year": 2016,
+              "club": "中　日"
+            },
+            {
+              "year": 2017,
+              "club": "中　日"
+            },
+            {
+              "year": 2018,
+              "club": "中　日"
+            },
+            {
+              "year": 2019,
+              "club": "中　日"
+            },
+            {
+              "year": 2020,
+              "club": "中　日"
+            },
+            {
+              "year": 2021,
+              "club": "中　日"
+            },
+            {
+              "year": 2022,
+              "club": "中　日"
+            },
+            {
+              "year": 2023,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2024,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2025,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2026,
+              "club": "中　日"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/61165132.html"
+        },
+        {
+          "old_id": 1276,
+          "name": "阿部寿樹",
+          "team_id": 11,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        },
+        {
+          "old_id": 27039,
+          "name": "阿部　寿樹",
+          "team_id": 3,
+          "last_year": 2019,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 4815,
+      "merge_ids": [
+        1291
+      ],
+      "name_ja": "辰見　鴻之介",
+      "name_en": null,
+      "team_id": 6,
+      "birth_date": "2000-11-24",
+      "patterns": [
+        "辰見　鴻之介",
+        "辰見鴻之介"
+      ],
+      "identity_sources": {
+        "npb": "71075157"
+      },
+      "url": "https://npb.jp/bis/players/71075157.html",
+      "evidence": [
+        {
+          "npb_id": "71075157",
+          "name": "辰見　鴻之介",
+          "birth_date": "2000-11-24",
+          "career": [
+            {
+              "year": 2024,
+              "club": "東北楽天"
+            },
+            {
+              "year": 2026,
+              "club": "広島東洋"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/71075157.html"
+        },
+        {
+          "old_id": 1291,
+          "name": "辰見鴻之介",
+          "team_id": 11,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 4812,
+      "merge_ids": [
+        1303,
+        21193,
+        21757
+      ],
+      "name_ja": "吉井理人",
+      "name_en": "Masato Yoshii",
+      "team_id": 11,
+      "birth_date": "1965-04-20",
+      "patterns": [
+        "Masato Yoshii",
+        "吉井 理人",
+        "吉井　理人",
+        "吉井理人"
+      ],
+      "identity_sources": {
+        "npb": "51653860",
+        "mlb": "134180"
+      },
+      "url": "https://npb.jp/bis/players/51653860.html",
+      "evidence": [
+        {
+          "npb_id": "51653860",
+          "name": "吉井　理人",
+          "birth_date": "1965-04-20",
+          "career": [
+            {
+              "year": 1985,
+              "club": "近　鉄"
+            },
+            {
+              "year": 1986,
+              "club": "近　鉄"
+            },
+            {
+              "year": 1987,
+              "club": "近　鉄"
+            },
+            {
+              "year": 1988,
+              "club": "近　鉄"
+            },
+            {
+              "year": 1989,
+              "club": "近　鉄"
+            },
+            {
+              "year": 1990,
+              "club": "近　鉄"
+            },
+            {
+              "year": 1991,
+              "club": "近　鉄"
+            },
+            {
+              "year": 1992,
+              "club": "近　鉄"
+            },
+            {
+              "year": 1993,
+              "club": "近　鉄"
+            },
+            {
+              "year": 1994,
+              "club": "近　鉄"
+            },
+            {
+              "year": 1995,
+              "club": "ヤクルト"
+            },
+            {
+              "year": 1996,
+              "club": "ヤクルト"
+            },
+            {
+              "year": 1997,
+              "club": "ヤクルト"
+            },
+            {
+              "year": 2003,
+              "club": "オリックス"
+            },
+            {
+              "year": 2004,
+              "club": "オリックス"
+            },
+            {
+              "year": 2005,
+              "club": "オリックス"
+            },
+            {
+              "year": 2006,
+              "club": "オリックス"
+            },
+            {
+              "year": 2007,
+              "club": "オリックス"
+            },
+            {
+              "year": 2007,
+              "club": "千葉ロッテ"
+            },
+            {
+              "year": 1985,
+              "club": "近　鉄"
+            },
+            {
+              "year": 1986,
+              "club": "近　鉄"
+            },
+            {
+              "year": 1987,
+              "club": "近　鉄"
+            },
+            {
+              "year": 1988,
+              "club": "近　鉄"
+            },
+            {
+              "year": 1989,
+              "club": "近　鉄"
+            },
+            {
+              "year": 1990,
+              "club": "近　鉄"
+            },
+            {
+              "year": 1991,
+              "club": "近　鉄"
+            },
+            {
+              "year": 1992,
+              "club": "近　鉄"
+            },
+            {
+              "year": 1993,
+              "club": "近　鉄"
+            },
+            {
+              "year": 1994,
+              "club": "近　鉄"
+            },
+            {
+              "year": 1995,
+              "club": "ヤクルト"
+            },
+            {
+              "year": 1996,
+              "club": "ヤクルト"
+            },
+            {
+              "year": 1997,
+              "club": "ヤクルト"
+            },
+            {
+              "year": 2003,
+              "club": "オリックス"
+            },
+            {
+              "year": 2004,
+              "club": "オリックス"
+            },
+            {
+              "year": 2005,
+              "club": "オリックス"
+            },
+            {
+              "year": 2006,
+              "club": "オリックス"
+            },
+            {
+              "year": 2007,
+              "club": "オリックス"
+            },
+            {
+              "year": 2007,
+              "club": "千葉ロッテ"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/51653860.html"
+        },
+        {
+          "old_id": 1303,
+          "name": "吉井理人",
+          "team_id": 12,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        },
+        {
+          "old_id": 21193,
+          "name": "吉井 理人",
+          "team_id": 4,
+          "last_year": 1997,
+          "same_birth": false,
+          "official_previous_club": true
+        },
+        {
+          "source": "https://statsapi.mlb.com/api/v1/people/134180",
+          "name": "Masato Yoshii",
+          "birth_date": "1965-04-20",
+          "japanese_biography": "https://www.marines.co.jp/team/player/detail/2025_00001092.html",
+          "current_role_source": "https://www.rakuteneagles.jp/news/detail/202601127900.html"
+        }
+      ]
+    },
+    {
+      "canonical_id": 4883,
+      "merge_ids": [
+        1345
+      ],
+      "name_ja": "柿沼　友哉",
+      "name_en": null,
+      "team_id": 4,
+      "birth_date": "1993-05-12",
+      "patterns": [
+        "柿沼　友哉",
+        "柿沼友哉"
+      ],
+      "identity_sources": {
+        "npb": "21525132"
+      },
+      "url": "https://npb.jp/bis/players/21525132.html",
+      "evidence": [
+        {
+          "npb_id": "21525132",
+          "name": "柿沼　友哉",
+          "birth_date": "1993-05-12",
+          "career": [
+            {
+              "year": 2017,
+              "club": "千葉ロッテ"
+            },
+            {
+              "year": 2018,
+              "club": "千葉ロッテ"
+            },
+            {
+              "year": 2019,
+              "club": "千葉ロッテ"
+            },
+            {
+              "year": 2020,
+              "club": "千葉ロッテ"
+            },
+            {
+              "year": 2021,
+              "club": "千葉ロッテ"
+            },
+            {
+              "year": 2022,
+              "club": "千葉ロッテ"
+            },
+            {
+              "year": 2023,
+              "club": "千葉ロッテ"
+            },
+            {
+              "year": 2024,
+              "club": "千葉ロッテ"
+            },
+            {
+              "year": 2026,
+              "club": "東京ヤクルト"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/21525132.html"
+        },
+        {
+          "old_id": 1345,
+          "name": "柿沼友哉",
+          "team_id": 12,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 1098,
+      "merge_ids": [
+        28133
+      ],
+      "name_ja": "山﨑　福也",
+      "name_en": null,
+      "team_id": 9,
+      "birth_date": "1992-09-09",
+      "patterns": [
+        "山﨑　福也",
+        "山﨑福也"
+      ],
+      "identity_sources": {
+        "npb": "21825130"
+      },
+      "url": "https://npb.jp/bis/players/21825130.html",
+      "evidence": [
+        {
+          "npb_id": "21825130",
+          "name": "山﨑　福也",
+          "birth_date": "1992-09-09",
+          "career": [
+            {
+              "year": 2015,
+              "club": "オリックス"
+            },
+            {
+              "year": 2016,
+              "club": "オリックス"
+            },
+            {
+              "year": 2017,
+              "club": "オリックス"
+            },
+            {
+              "year": 2018,
+              "club": "オリックス"
+            },
+            {
+              "year": 2019,
+              "club": "オリックス"
+            },
+            {
+              "year": 2020,
+              "club": "オリックス"
+            },
+            {
+              "year": 2021,
+              "club": "オリックス"
+            },
+            {
+              "year": 2022,
+              "club": "オリックス"
+            },
+            {
+              "year": 2023,
+              "club": "オリックス"
+            },
+            {
+              "year": 2024,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2025,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2026,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2015,
+              "club": "オリックス"
+            },
+            {
+              "year": 2016,
+              "club": "オリックス"
+            },
+            {
+              "year": 2017,
+              "club": "オリックス"
+            },
+            {
+              "year": 2018,
+              "club": "オリックス"
+            },
+            {
+              "year": 2019,
+              "club": "オリックス"
+            },
+            {
+              "year": 2020,
+              "club": "オリックス"
+            },
+            {
+              "year": 2021,
+              "club": "オリックス"
+            },
+            {
+              "year": 2022,
+              "club": "オリックス"
+            },
+            {
+              "year": 2023,
+              "club": "オリックス"
+            },
+            {
+              "year": 2024,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2025,
+              "club": "北海道日本ハム"
+            },
+            {
+              "year": 2026,
+              "club": "北海道日本ハム"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/21825130.html"
+        },
+        {
+          "old_id": 28133,
+          "name": "山﨑　福也",
+          "team_id": 10,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 1070,
+      "merge_ids": [
+        27543
+      ],
+      "name_ja": "髙松　渡",
+      "name_en": null,
+      "team_id": 8,
+      "birth_date": "1999-07-02",
+      "patterns": [
+        "髙松　渡",
+        "髙松渡"
+      ],
+      "identity_sources": {
+        "npb": "21025136"
+      },
+      "url": "https://npb.jp/bis/players/21025136.html",
+      "evidence": [
+        {
+          "npb_id": "21025136",
+          "name": "髙松　渡",
+          "birth_date": "1999-07-02",
+          "career": [
+            {
+              "year": 2019,
+              "club": "中　日"
+            },
+            {
+              "year": 2021,
+              "club": "中　日"
+            },
+            {
+              "year": 2022,
+              "club": "中　日"
+            },
+            {
+              "year": 2023,
+              "club": "中　日"
+            },
+            {
+              "year": 2023,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2024,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2025,
+              "club": "埼玉西武"
+            },
+            {
+              "year": 2026,
+              "club": "埼玉西武"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/21025136.html"
+        },
+        {
+          "old_id": 27543,
+          "name": "髙松　渡",
+          "team_id": 3,
+          "last_year": null,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    },
+    {
+      "canonical_id": 860,
+      "merge_ids": [
+        26498
+      ],
+      "name_ja": "宮﨑　敏郎",
+      "name_en": null,
+      "team_id": 5,
+      "birth_date": "1988-12-12",
+      "patterns": [
+        "宮﨑　敏郎",
+        "宮﨑敏郎"
+      ],
+      "identity_sources": {
+        "npb": "51455137"
+      },
+      "url": "https://npb.jp/bis/players/51455137.html",
+      "evidence": [
+        {
+          "npb_id": "51455137",
+          "name": "宮﨑　敏郎",
+          "birth_date": "1988-12-12",
+          "career": [
+            {
+              "year": 2013,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2014,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2015,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2016,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2017,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2018,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2019,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2020,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2021,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2022,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2023,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2024,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2025,
+              "club": "横浜DeNA"
+            },
+            {
+              "year": 2026,
+              "club": "横浜DeNA"
+            }
+          ],
+          "source": "https://npb.jp/bis/players/51455137.html"
+        },
+        {
+          "old_id": 26498,
+          "name": "宮﨑　敏郎",
+          "team_id": 5,
+          "last_year": 2024,
+          "same_birth": false,
+          "official_previous_club": true
+        }
+      ]
+    }
+  ],
+  "review": [
+    {
+      "name": "ディアス",
+      "ids": [
+        1216,
+        841,
+        22531
+      ],
+      "reason": "different official IDs / no single verified profile"
+    },
+    {
+      "name": "マルティネス",
+      "ids": [
+        1130,
+        551,
+        21596
+      ],
+      "reason": "different official IDs / no single verified profile"
+    },
+    {
+      "name": "マルテ",
+      "ids": [
+        27542,
+        4932
+      ],
+      "reason": "birth/source conflict or unverified former club"
+    },
+    {
+      "name": "ヘルナンデス",
+      "ids": [
+        582,
+        978
+      ],
+      "reason": "birth/source conflict or unverified former club"
+    },
+    {
+      "name": "ヘルナンデス",
+      "ids": [
+        652,
+        978
+      ],
+      "reason": "birth/source conflict or unverified former club"
+    },
+    {
+      "name": "ジャクソン",
+      "ids": [
+        16620,
+        2965
+      ],
+      "reason": "birth/source conflict or unverified former club"
+    },
+    {
+      "name": "ロドリゲス",
+      "ids": [
+        721,
+        4807
+      ],
+      "reason": "different official IDs / no single verified profile"
+    },
+    {
+      "name": "オスナ",
+      "ids": [
+        784,
+        973
+      ],
+      "reason": "different official IDs / no single verified profile"
+    }
+  ],
+  "errors": []
+}

@@ -268,7 +268,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
                                   if (pitchingRates.isNotEmpty && !TeamSectionLayout.embedded(context)) _pitchingDetails(team),
                                   _heading('打撃貢献度', headerBackground, foreground),
                                   _rates(performance, headerBackground, foreground, playerColors, totalUnit: '個'),
-                                  const Text('塁打の内訳：本塁打×4・三塁打×3・二塁打×2・単打・四球。死球は含みません。'),
+                                  const Text('塁打の内訳：本塁打×4・三塁打×3・二塁打×2・単打・四球・盗塁。盗塁1個は単打1本分として加算します。死球は含みません。'),
                                 ] else ...[
                                   _heading('投手のスタメン比率', headerBackground, foreground),
                                   _rates(positions.where((r) => r['slot'] == 'P').toList(), headerBackground, foreground, playerColors),
@@ -731,7 +731,7 @@ class _TeamStrengthBoardState extends State<TeamStrengthBoard> {
         ]),
       );
 
-  static const _baseColors = [Color(0xFFE86680), Color(0xFFF8B6CC), Color(0xFFFFBC59), Color(0xFFFFF280), Color(0xFF8BCB8D)];
+  static const _baseColors = [Color(0xFFE86680), Color(0xFFF8B6CC), Color(0xFFFFBC59), Color(0xFFFFF280), Color(0xFF8BCB8D), Color(0xFF64B5F6)];
   bool get _fitBandsToViewport {
     final size = MediaQuery.sizeOf(context);
     // 縦画面は細い区分も含めて帯全体と詳細アイコンを画面内に収める。

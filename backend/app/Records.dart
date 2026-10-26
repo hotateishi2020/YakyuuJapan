@@ -1,3 +1,5 @@
+import 'RecordPlayerNames.dart';
+import 'PlayerIdentity.dart';
 import 'ChampionshipSummary.dart';
 import 'TimelineCs.dart';
 import 'ClubData.dart' show readClubFile, clubKey;
@@ -56,7 +58,7 @@ class Records {
     ''', parameters: [year]);
     final titleRows = await conn.execute('''
       SELECT s.int_year AS year,s.id_league,s.id_stats,s.id_player,s.stats AS value,
-        s.id_team, ms.title AS stat_title, p.name_full AS name,COALESCE(h.name_short,NULLIF(st.name_team,''),t.name_short) AS team,
+        s.id_team, ms.title AS stat_title, COALESCE(NULLIF(p.name_ja,''),p.name_full) AS name,COALESCE(h.name_short,NULLIF(st.name_team,''),t.name_short) AS team,
         t.color_back AS color_back,
         t.color_font AS color_font,
         CASE WHEN p.year_retire > 0 THEN 'retired' ELSE 'unknown' END AS status
@@ -180,7 +182,10 @@ class Records {
         ? buildClubRecords(clubTeams.values.toList(), await readClubRecordRows(conn, year), year,
             streakRows: await readClubStreakRows(conn, baseline, clubTeams.values.toList(), year)) : null;
     final additional = await readAdditionalRecords(conn, org, year);
-    final completeTitles = colorRecordTitles(mergeRecordAwards(buildRecordTitles(titles, org), usageMaps(baseline['awards']), year), standingRows.map((r) => r.toColumnMap()).toList(), titles);
+    final awards = org == OrgKind.mlb
+        ? localizeRecordTitleNames(await PlayerIdentity.localize(conn, baseline['awards']))
+        : baseline['awards'];
+    final completeTitles = colorRecordTitles(mergeRecordAwards(buildRecordTitles(titles, org), usageMaps(awards), year), standingRows.map((r) => r.toColumnMap()).toList(), titles);
     season.add(usageMap(additional['hr_sb']));
     final data = <String, dynamic>{
       'org': org.code,
@@ -226,8 +231,10 @@ class Records {
       ],
     };
     _cache.clear(); // Background historical builds must not retain every full season in memory.
-    if (!force) _cache[key] = (at: DateTime.now(), data: data);
-    return data;
+    final localized = org == OrgKind.mlb ? usageMap(await PlayerIdentity.localize(conn, data)) : data;
+    if (org == OrgKind.mlb) localized['titles'] = localizeRecordTitleNames(localized['titles']);
+    if (!force) _cache[key] = (at: DateTime.now(), data: localized);
+    return localized;
   }
 }
 

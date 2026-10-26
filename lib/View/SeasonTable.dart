@@ -1647,7 +1647,7 @@ class PlayerStatCell extends StatelessWidget {
         ? AutoSizeText.rich(
             nameSpan,
             style: nameStyle,
-            minFontSize: 10,
+            minFontSize: 12,
             maxFontSize: 14,
             stepGranularity: .5,
             maxLines: 1,
@@ -1681,7 +1681,10 @@ class PlayerStatCell extends StatelessWidget {
         ),
       );
     } else {
-      nameWidget = cellBg(child: Align(alignment: Alignment.center, child: nameLine));
+      nameWidget = cellBg(child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: showJapanFlag ? 6 : 0),
+        child: Align(alignment: Alignment.center, child: nameLine),
+      ));
     }
 
     Widget body = SizedBox(

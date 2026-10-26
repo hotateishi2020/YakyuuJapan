@@ -59,6 +59,26 @@ void main() {
     });
   }
 
+  testWidgets('MLBタイトルは英語球団名を略称にし暫定表示を省く', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: Scaffold(body: SingleChildScrollView(
+      child: MlbSeasonTitlesTable(year: 2026, groups: {
+        'major': [
+          {'name': '選手A', 'team': 'Houston Astros', 'id_league': 3, 'detail': '首位打者', 'name_shortest': 'Astros'},
+          {'name': '選手B', 'team': 'New York Yankees', 'id_league': 3, 'detail': '本塁打王', 'name_shortest': 'Yankees'},
+          {'name': '選手C', 'team': 'Los Angeles Dodgers', 'id_league': 4, 'detail': '本塁打王', 'name_shortest': 'Dodgers'},
+          {'name': '選手D', 'team': 'D-backs', 'id_league': 4, 'detail': '首位打者', 'name_shortest': 'D-backs'},
+        ],
+      }),
+    ))));
+    await tester.pumpAndSettle();
+    for (final code in ['HOU', 'NYY', 'LAD', 'AZ']) {
+      expect(find.text(code), findsOneWidget);
+    }
+    expect(find.textContaining('現在首位'), findsNothing);
+    expect(find.text('選手A'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   for (final size in [const Size(390, 844), const Size(1440, 900)]) {
     testWidgets('MLB titles use league grids at $size', (tester) async {
       tester.view.physicalSize = size;

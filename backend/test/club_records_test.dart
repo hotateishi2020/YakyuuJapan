@@ -1,6 +1,30 @@
 import 'package:test/test.dart';
 import '../app/ClubRecords.dart';
 void main() {
+  test('球団別の監査値を使い全国首位の流用と未確認値を抑止する', () {
+    final result=buildClubRecords([
+      {'id_team':1,'short_name':'巨人'}, {'id_team':2,'short_name':'阪神'}], [],2026,
+      streakRows:[{'id_team':1,'key':'wins','year':2026,'current':true,'name':'古い流用値','value':99}],
+      currentStreakSnapshot:{'checked_at':'2026-10-26','clubs':{
+        'G':{'records':{'wins':[{'name':'甲','value':5},{'name':'乙','value':5}]},
+          'categories':{'wins':{'status':'verified','sources':['https://npb.jp/']}}},
+        'T':{'records':{'wins':[{'name':'未検証','value':999}]},
+          'categories':{'wins':{'status':'unavailable','note':'全試合未確認'}}},
+      }});
+    final metric=(result['metrics'] as List).firstWhere((m)=>m['key']=='streak_wins');
+    expect(metric['cells'][0]['current'].length,2);
+    expect(metric['cells'][0]['current'][0]['value'],5);
+    expect(metric['cells'][0]['current_sources'],['https://npb.jp/']);
+    expect(metric['cells'][1]['current'],isEmpty);
+    expect(metric['cells'][1]['current_message'],contains('全試合未確認'));
+  });
+  test('監査ファイルがない年度の全国首位を球団首位として表示しない', () {
+    final data=buildClubRecords([{'id_team':1,'short_name':'巨人'}],[],2025,
+      streakRows:[{'id_team':1,'key':'wins','year':2025,'current':true,'name':'全国首位','value':10}]);
+    final cell=(data['metrics'] as List).firstWhere((m)=>m['key']=='streak_wins')['cells'][0];
+    expect(cell['current'],isEmpty);
+    expect(cell['current_status'],'unavailable');
+  });
   test('球団別に前年までと今季を分離し同率の選手を残す', () {
     final result = buildClubRecords([{'id_team': 1}, {'id_team': 2}], [
       {'id_team': 1, 'key': 'hr', 'year': 2000, 'name': '旧記録', 'value': 50},

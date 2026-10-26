@@ -21,7 +21,7 @@ CODES = {'巨人':'g', '阪神':'t', '中日':'d', 'DeNA':'yb', '広島':'c',
 
 def normalized(name):
     return re.sub(r'[\s・･.]+', '', unicodedata.normalize('NFKC', name)).translate(
-        str.maketrans({'髙':'高', '﨑':'崎', '瀨':'瀬', '海':'海'}))
+        str.maketrans({'髙':'高', '﨑':'崎', '瀨':'瀬', '海':'海', '濵':'濱', '踐':'践', '樂':'楽'}))
 
 
 def fetch(year, code, kind):
@@ -91,10 +91,11 @@ def normalize_groups(row):
     pitchers = row.get('pitching_stats', [])
     # Official full names distinguish two players with the same surname.
     def resolve(name, pool):
-        query = normalized(name)
+        query = normalized(name).replace('Jr', 'ジュニア')
         exact = [p for p in pool if normalized(p['name']) == query]
         candidates = exact or [p for p in pool
-                              if normalized(p['name']).startswith(query)]
+                              if normalized(p['name']).startswith(query)
+                              or re.sub(r'^[A-Z]+', '', normalized(p['name'])).startswith(query)]
         return candidates[0] if len(candidates) == 1 else None
     unresolved = set()
     for field in ('positions', 'batting_order'):
@@ -123,7 +124,7 @@ def normalize_groups(row):
               if g['slot'] == 'P' for p in g['players']}
     workload = []
     for pitcher in pitchers:
-        count = starts.get(pitcher['player_key'])
+        count = pitcher.get('starts', starts.get(pitcher['player_key']))
         # An unresolved starting name could be this pitcher: do not assume relief.
         unresolved_starts = any(p.get('player_key', '').startswith('npb:archive:')
                                 for g in row['positions'] if g['slot'] == 'P'
@@ -131,6 +132,7 @@ def normalize_groups(row):
         p = {**pitcher}
         if count is not None or not unresolved_starts:
             p['starts'] = count or 0
+            p['relief_appearances'] = p['appearances'] - p['starts']
             if p['starts'] == p['appearances']:
                 p.update(starter_outs=p['total_outs'], relief_outs=0)
             elif p['starts'] == 0:
@@ -148,7 +150,9 @@ def main():
     errors = []
     def run(row):
         year = row['year']
-        if '--modern-only' in sys.argv and year < 2005:
+        # Earlier years have no official team-stat pages at this URL.
+        # tool_enrich_regular_archive.py supplies their sourced statistics.
+        if year < 2005:
             return row
         code = CODES[row['club_name']]
         if row['club_name'] == 'DeNA' and year >= 2012:

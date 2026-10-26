@@ -1148,7 +1148,9 @@ class AppSql {
   //t_nortification
   static String selectNotification() {
     return '''
-      SELECT  
+      SELECT
+        t_nortification.id,
+        t_nortification.crtat::timestamptz::text AS created_at,
         tag_main.name1 AS tag_main_title,
         tag_sub.name1 AS tag_sub_title,
         title,
@@ -1163,6 +1165,7 @@ class AppSql {
       FROM t_nortification
         LEFT OUTER JOIN m_system_code AS tag_main ON tag_main.key = t_nortification.code_tag_main AND tag_main.code = 'NORTIFICATION'
         LEFT OUTER JOIN m_system_code AS tag_sub ON tag_sub.key = t_nortification.code_tag_sub AND tag_sub.code = 'NORTIFICATION_SUB'
+      WHERE NOT COALESCE(t_nortification.flg_delete,FALSE) AND t_nortification.id_user IS NULL
       ORDER BY t_nortification.id DESC
     ''';
   }
@@ -1173,9 +1176,27 @@ class AppSql {
     final ids = leagueIds.where((id) => id > 0).toSet().toList()..sort();
     final leagues = ids.isEmpty ? 'NULL' : ids.join(', ');
     return '''
-      SELECT kind, row_no, payload FROM v_predict_stats
-      WHERE int_year = \$1 AND id_league IN ($leagues)
-      ORDER BY kind, row_no
+      SELECT s.kind, s.row_no,
+        (CASE WHEN p.merged_into_player_id IS NOT NULL THEN
+          s.payload || jsonb_build_object('id_player', p.merged_into_player_id)
+        ELSE s.payload END) || COALESCE(marks.flags, '{}'::jsonb) AS payload
+      FROM v_predict_stats s
+      LEFT JOIN m_player p ON p.id = (s.payload->>'id_player')::int
+      LEFT JOIN LATERAL (
+        SELECT jsonb_strip_nulls(jsonb_build_object(
+          'flg_rookie', actual.payload->'flg_rookie',
+          'flg_career_this_year', actual.payload->'flg_career_this_year'
+        )) AS flags
+        FROM v_stats_player actual
+        WHERE s.kind = 'stats' AND actual.int_year = s.int_year
+          AND (actual.payload->>'id_player')::int = COALESCE(p.merged_into_player_id, p.id)
+          AND actual.payload->>'id_league' = s.payload->>'id_league'
+          AND actual.payload->>'title' = s.payload->>'title'
+        ORDER BY actual.row_no
+        LIMIT 1
+      ) marks ON TRUE
+      WHERE s.int_year = \$1 AND s.id_league IN ($leagues)
+      ORDER BY s.kind, s.row_no
     ''';
   }
 

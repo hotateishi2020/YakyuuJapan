@@ -1,3 +1,4 @@
+import 'app/GameVisibility.dart';
 import 'app/GameStatsLoad.dart';
 import 'app/AdminLogQuery.dart';
 import 'app/InjuryList.dart';
@@ -42,10 +43,12 @@ import 'app/TeamStrength.dart';
 import 'app/RosterMoves.dart';
 import 'app/AdditionalRecords.dart';
 import 'app/VideoFeed.dart';
+import 'app/HomeBirthdays.dart';
 import 'app/VideoChannels.dart';
 import 'app/ClubData.dart';
 import 'app/PlayerDetailSnapshot.dart';
 import 'app/PostseasonForm.dart';
+import '../lib/logic/postseason_homers.dart';
 import 'app/PlayerMetricSchedule.dart';
 import 'app/GamesReadGate.dart';
 import 'app/FetchURL.dart';
@@ -75,22 +78,35 @@ Future<Map<String, dynamic>> readHomeDashboard() async {
     _buildPredictionsPartGames(OrgKind.npb, now.year, from: today, to: until),
     _buildPredictionsPartGames(OrgKind.mlb, now.year, from: today, to: until),
     Postgres.withConnection((conn) async => <String, dynamic>{'stats_player': await DisplaySnapshot.players(conn, now.year)}),
+    Postgres.withConnection((conn) async => <String, dynamic>{'birthdays': await homeBirthdays(conn, today)}),
   ]);
   final games = <Map<String, dynamic>>[
     for (final index in [1, 2])
       for (final game in results[index]['games'] as List)
         {...Map<String, dynamic>.from(game as Map), 'org': index == 1 ? 'NPB' : 'MLB'},
   ];
-  final lines = await Postgres.withConnection((conn) => homeHeroLines(conn, today));
+  final heroes = await Postgres.withConnection((conn) async {
+    final lines = await homeHeroLines(conn, today);
+    final result = <Map<String, dynamic>>[];
+    for (final game in games.where((g) => g['date_game'] == today)) {
+      final hero = homeHero(game, lines);
+      if (hero == null) continue;
+      final id = int.tryParse('${hero['id_player']}');
+      final art = id == null ? null : await PlayerArt.read(conn, id);
+      result.add({...hero, 'id_game': game['id_game'], 'org': game['org'],
+        if (art != null) 'character_image': art});
+    }
+    return result;
+  });
   return {
     'today': today,
+    'birthdays': results[4]['birthdays'],
     'notification': results[0]['notification'],
     'events': results[0]['events'],
     'games': [for (final game in games) {
       for (final key in ['id_game', 'org', 'date_game', 'time_game', 'state', 'name_team_home', 'name_team_away', 'score_home', 'score_away']) key: game[key],
     }],
-    'heroes': [for (final game in games.where((g) => g['date_game'] == today))
-      if (homeHero(game, lines) case final hero?) {...hero, 'id_game': game['id_game'], 'org': game['org']}],
+    'heroes': heroes,
     'leaders': homeLeaders([for (final row in results[3]['stats_player'] as List) Map<String, dynamic>.from(row as Map)]),
   };
 }
@@ -284,9 +300,11 @@ Future<void> _attachSavedForms(DisplayGames snap, List<Map<String, dynamic>> gam
   final missing = <Map<String, dynamic>>[];
   for (final game in games) {
     final row = saved[_asInt(game['id_game'])];
-    if (row == null) { missing.add(game); continue; }
+    if (row == null || !row.containsKey('season_player_stats') || (npbPostseasonCodes.contains('${game['code_game']}'.toUpperCase()) && !row.containsKey('postseason_homers_before'))) { missing.add(game); continue; }
     game['postseason_form'] = row['postseason_form'];
     game['player_hands'] = row['player_hands'];
+    game['season_player_stats'] = row['season_player_stats'];
+    if (row.containsKey('postseason_homers_before')) game['postseason_homers_before'] = row['postseason_homers_before'];
   }
   // Compatibility with snapshots produced before form precomputation.
   if (missing.isNotEmpty) await Postgres.withConnection((conn) => attachPostseasonForm(conn, missing, year));
@@ -2359,6 +2377,9 @@ void main() async {
         return app.call(req);
       });
     }
+
+    handler = gameVisibility((request) async => !Auth.hasSessionToken(request) ? null : await Postgres.withConnection(
+      (conn) => Auth.readOnlyUserIdOf(conn, request), urgent: true))(handler);
 
     final port = int.tryParse(Platform.environment['PORT'] ?? '') ?? 8080;
     await Postgres.withConnection(PageSnapshot.ensure);

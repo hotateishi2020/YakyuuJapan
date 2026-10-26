@@ -99,7 +99,7 @@ void main() {
       const NavigationPickerBar(),
       NavigationPicker(level: 0, labels: const {0:'NPB',1:'MLB'}, value:0, onChanged: (_) {}, color: Colors.red, foreground: Colors.white),
       NavigationPicker(level: 1, labels: const {0:'戦力',1:'記録'}, value:0, onChanged: (_) {}, color: Colors.red, foreground: Colors.white),
-      NavigationPicker(level: 2, labels: const {0:'ドラフト',1:'チーム'}, value:selected, onChanged: (v) => update(() => selected = v), color: Colors.red, foreground: Colors.white),
+      NavigationPicker(level: 2, alwaysTabs: true, labels: const {0:'ドラフト',1:'チーム'}, value:selected, onChanged: (v) => update(() => selected = v), color: Colors.red, foreground: Colors.white),
     ]))))));
     await t.pumpAndSettle();
     final option = find.byKey(const ValueKey('navigation-option-2-1'));

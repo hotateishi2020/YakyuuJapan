@@ -1,0 +1,4122 @@
+{
+  "year": 2026,
+  "checked_at": "2026-10-26T13:57:00.965725+00:00",
+  "player_team_roles": 1128,
+  "verified_cells": 144,
+  "unavailable_cells": 36,
+  "scope": "12球団×15項目。球団別の年度内最長。歴代最高の全面調査は対象外。",
+  "changes": [
+    {
+      "club": "阪神",
+      "key": "hit_games",
+      "before": [],
+      "after": [
+        {
+          "name": "近本光司",
+          "team": "阪神",
+          "team_code": "T",
+          "value": 20,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=5&leg=0&mon=0&tm=T&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=5&leg=0&mon=0&tm=T&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "阪神",
+      "key": "hit_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "大山悠輔",
+          "team": "阪神",
+          "team_code": "T",
+          "value": 5,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=3&leg=0&mon=0&tm=T&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=3&leg=0&mon=0&tm=T&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "阪神",
+      "key": "holds",
+      "before": [],
+      "after": [
+        {
+          "name": "木下里都",
+          "team": "阪神",
+          "team_code": "T",
+          "value": 5,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=54&tm=T&mon=0&vst=all",
+          "status": "active"
+        },
+        {
+          "name": "桐敷拓馬",
+          "team": "阪神",
+          "team_code": "T",
+          "value": 5,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=47&tm=T&mon=0&vst=all",
+          "status": "active"
+        },
+        {
+          "name": "ドリス",
+          "team": "阪神",
+          "team_code": "T",
+          "value": 5,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=98&tm=T&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=47&tm=T&mon=0&vst=all",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=54&tm=T&mon=0&vst=all",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=98&tm=T&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "阪神",
+      "key": "hr_games",
+      "before": [],
+      "after": [
+        {
+          "name": "大山悠輔",
+          "team": "阪神",
+          "team_code": "T",
+          "value": 3,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=3&leg=0&mon=0&tm=T&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "佐藤輝明",
+          "team": "阪神",
+          "team_code": "T",
+          "value": 3,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=8&leg=0&mon=0&tm=T&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "前川右京",
+          "team": "阪神",
+          "team_code": "T",
+          "value": 3,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=58&leg=0&mon=0&tm=T&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "森下翔太",
+          "team": "阪神",
+          "team_code": "T",
+          "value": 3,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=1&leg=0&mon=0&tm=T&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=1&leg=0&mon=0&tm=T&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=3&leg=0&mon=0&tm=T&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=58&leg=0&mon=0&tm=T&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=8&leg=0&mon=0&tm=T&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "阪神",
+      "key": "hr_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "大山悠輔",
+          "team": "阪神",
+          "team_code": "T",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=3&leg=0&mon=0&tm=T&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "ガルシア",
+          "team": "阪神",
+          "team_code": "T",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=94&leg=0&mon=0&tm=T&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "佐藤輝明",
+          "team": "阪神",
+          "team_code": "T",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=8&leg=0&mon=0&tm=T&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "森下翔太",
+          "team": "阪神",
+          "team_code": "T",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=1&leg=0&mon=0&tm=T&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=1&leg=0&mon=0&tm=T&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=3&leg=0&mon=0&tm=T&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=8&leg=0&mon=0&tm=T&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=94&leg=0&mon=0&tm=T&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "阪神",
+      "key": "onbase_games",
+      "before": [],
+      "after": [
+        {
+          "name": "近本光司",
+          "team": "阪神",
+          "team_code": "T",
+          "value": 32,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=5&leg=0&mon=0&tm=T&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=5&leg=0&mon=0&tm=T&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "阪神",
+      "key": "onbase_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "大山悠輔",
+          "team": "阪神",
+          "team_code": "T",
+          "value": 8,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=3&leg=0&mon=0&tm=T&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "佐藤輝明",
+          "team": "阪神",
+          "team_code": "T",
+          "value": 8,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=8&leg=0&mon=0&tm=T&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=3&leg=0&mon=0&tm=T&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=8&leg=0&mon=0&tm=T&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "阪神",
+      "key": "saves",
+      "before": [],
+      "after": [
+        {
+          "name": "工藤泰成",
+          "team": "阪神",
+          "team_code": "T",
+          "value": 7,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=49&tm=T&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=49&tm=T&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "阪神",
+      "key": "scoreless_games",
+      "before": [],
+      "after": [
+        {
+          "name": "木下里都",
+          "team": "阪神",
+          "team_code": "T",
+          "value": 14,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=54&tm=T&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=54&tm=T&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "阪神",
+      "key": "wins",
+      "before": [],
+      "after": [
+        {
+          "name": "髙橋遥人",
+          "team": "阪神",
+          "team_code": "T",
+          "value": 10,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=29&tm=T&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=29&tm=T&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "阪神",
+      "key": "appearances",
+      "before": [],
+      "after": [
+        {
+          "name": "佐藤輝明",
+          "team": "阪神",
+          "team_code": "T",
+          "year": 2026,
+          "value": 143,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=8&leg=0&mon=0&tm=T&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "中野拓夢",
+          "team": "阪神",
+          "team_code": "T",
+          "year": 2026,
+          "value": 143,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=0&mon=0&tm=T&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "森下翔太",
+          "team": "阪神",
+          "team_code": "T",
+          "year": 2026,
+          "value": 143,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=1&leg=0&mon=0&tm=T&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式年間出場数と試合別出場を照合。143試合の日程で欠場を区切り年度内最長を計算。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=8&leg=0&mon=0&tm=T&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=0&mon=0&tm=T&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=1&leg=0&mon=0&tm=T&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "阪神",
+      "key": "steals",
+      "before": [],
+      "after": [
+        {
+          "name": "髙寺望夢",
+          "team": "阪神",
+          "year": 2026,
+          "value": 8,
+          "status": "active",
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=67&leg=0&mon=0&tm=T&vst=all&y=0",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=67&leg=0&mon=0&tm=T&vst=all&y=0",
+            "https://npb.jp/bis/2026/stats/idb1_t.html"
+          ]
+        }
+      ],
+      "status": "verified",
+      "note": "公式年間盗塁・盗塁死と試合別合計を照合。同日内で順序により首位が変わるケースは試合経過で実際の順序を確認。",
+      "sources": [
+        "https://npb.jp/bis/2026/stats/idb1_t.html",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=8&leg=0&mon=0&tm=T&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=0&mon=0&tm=T&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=5&leg=0&mon=0&tm=T&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=67&leg=0&mon=0&tm=T&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "阪神",
+      "key": "outs",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "走者の出塁・打者のアウトを全公式戦の打席順で確認できる資料が未取得。",
+      "sources": []
+    },
+    {
+      "club": "阪神",
+      "key": "scoreless_innings",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "失点時点・端数回・前任投手の残した走者を含む公式の年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "阪神",
+      "key": "strikeouts",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "試合をまたぐ対戦打者順を含めた年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "DeNA",
+      "key": "hit_games",
+      "before": [],
+      "after": [
+        {
+          "name": "勝又温史",
+          "team": "DeNA",
+          "team_code": "DB",
+          "value": 23,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=28&leg=0&mon=0&tm=DB&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=28&leg=0&mon=0&tm=DB&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "DeNA",
+      "key": "hit_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "度会隆輝",
+          "team": "DeNA",
+          "team_code": "DB",
+          "value": 6,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=4&leg=0&mon=0&tm=DB&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=4&leg=0&mon=0&tm=DB&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "DeNA",
+      "key": "holds",
+      "before": [],
+      "after": [
+        {
+          "name": "レイノルズ",
+          "team": "DeNA",
+          "team_code": "DB",
+          "value": 7,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=62&tm=DB&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=62&tm=DB&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "DeNA",
+      "key": "hr_games",
+      "before": [],
+      "after": [
+        {
+          "name": "筒香嘉智",
+          "team": "DeNA",
+          "team_code": "DB",
+          "value": 4,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=25&leg=0&mon=0&tm=DB&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=25&leg=0&mon=0&tm=DB&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "DeNA",
+      "key": "hr_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "エンカーナシオン",
+          "team": "DeNA",
+          "team_code": "DB",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=69&leg=0&mon=0&tm=DB&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "牧秀悟",
+          "team": "DeNA",
+          "team_code": "DB",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=2&leg=0&mon=0&tm=DB&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=2&leg=0&mon=0&tm=DB&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=69&leg=0&mon=0&tm=DB&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "DeNA",
+      "key": "onbase_games",
+      "before": [],
+      "after": [
+        {
+          "name": "勝又温史",
+          "team": "DeNA",
+          "team_code": "DB",
+          "value": 33,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=28&leg=0&mon=0&tm=DB&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=28&leg=0&mon=0&tm=DB&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "DeNA",
+      "key": "onbase_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "蝦名達夫",
+          "team": "DeNA",
+          "team_code": "DB",
+          "value": 7,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=61&leg=0&mon=0&tm=DB&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "佐野恵太",
+          "team": "DeNA",
+          "team_code": "DB",
+          "value": 7,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=0&mon=0&tm=DB&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=61&leg=0&mon=0&tm=DB&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=0&mon=0&tm=DB&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "DeNA",
+      "key": "saves",
+      "before": [],
+      "after": [
+        {
+          "name": "山﨑康晃",
+          "team": "DeNA",
+          "team_code": "DB",
+          "value": 4,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=19&tm=DB&mon=0&vst=all",
+          "status": "active"
+        },
+        {
+          "name": "レイノルズ",
+          "team": "DeNA",
+          "team_code": "DB",
+          "value": 4,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=62&tm=DB&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=19&tm=DB&mon=0&vst=all",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=62&tm=DB&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "DeNA",
+      "key": "scoreless_games",
+      "before": [],
+      "after": [
+        {
+          "name": "レイノルズ",
+          "team": "DeNA",
+          "team_code": "DB",
+          "value": 17,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=62&tm=DB&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=62&tm=DB&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "DeNA",
+      "key": "wins",
+      "before": [],
+      "after": [
+        {
+          "name": "東克樹",
+          "team": "DeNA",
+          "team_code": "DB",
+          "value": 5,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=11&tm=DB&mon=0&vst=all",
+          "status": "active"
+        },
+        {
+          "name": "深沢鳳介",
+          "team": "DeNA",
+          "team_code": "DB",
+          "value": 5,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=43&tm=DB&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=11&tm=DB&mon=0&vst=all",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=43&tm=DB&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "DeNA",
+      "key": "appearances",
+      "before": [],
+      "after": [
+        {
+          "name": "度会隆輝",
+          "team": "DeNA",
+          "team_code": "DB",
+          "year": 2026,
+          "value": 54,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=4&leg=0&mon=0&tm=DB&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式年間出場数と試合別出場を照合。143試合の日程で欠場を区切り年度内最長を計算。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=4&leg=0&mon=0&tm=DB&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "DeNA",
+      "key": "steals",
+      "before": [],
+      "after": [
+        {
+          "name": "三森大貴",
+          "team": "DeNA",
+          "year": 2026,
+          "value": 11,
+          "status": "active",
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=26&leg=0&mon=0&tm=DB&vst=all&y=0",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=26&leg=0&mon=0&tm=DB&vst=all&y=0",
+            "https://npb.jp/bis/2026/stats/idb1_db.html"
+          ]
+        }
+      ],
+      "status": "verified",
+      "note": "公式年間盗塁・盗塁死と試合別合計を照合。同日内で順序により首位が変わるケースは試合経過で実際の順序を確認。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=26&leg=0&mon=0&tm=DB&vst=all&y=0",
+        "https://npb.jp/bis/2026/stats/idb1_db.html"
+      ]
+    },
+    {
+      "club": "DeNA",
+      "key": "outs",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "走者の出塁・打者のアウトを全公式戦の打席順で確認できる資料が未取得。",
+      "sources": []
+    },
+    {
+      "club": "DeNA",
+      "key": "scoreless_innings",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "失点時点・端数回・前任投手の残した走者を含む公式の年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "DeNA",
+      "key": "strikeouts",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "試合をまたぐ対戦打者順を含めた年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "巨人",
+      "key": "hit_games",
+      "before": [],
+      "after": [
+        {
+          "name": "泉口友汰",
+          "team": "巨人",
+          "team_code": "G",
+          "value": 10,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=35&leg=0&mon=0&tm=G&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=35&leg=0&mon=0&tm=G&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "巨人",
+      "key": "hit_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "佐々木俊輔",
+          "team": "巨人",
+          "team_code": "G",
+          "value": 5,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=44&leg=0&mon=0&tm=G&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "丸佳浩",
+          "team": "巨人",
+          "team_code": "G",
+          "value": 5,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=8&leg=0&mon=0&tm=G&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=44&leg=0&mon=0&tm=G&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=8&leg=0&mon=0&tm=G&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "巨人",
+      "key": "holds",
+      "before": [],
+      "after": [
+        {
+          "name": "田中瑛斗",
+          "team": "巨人",
+          "team_code": "G",
+          "value": 9,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=45&tm=G&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=45&tm=G&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "巨人",
+      "key": "hr_games",
+      "before": [],
+      "after": [
+        {
+          "name": "ダルベック",
+          "team": "巨人",
+          "team_code": "G",
+          "value": 3,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=29&leg=0&mon=0&tm=G&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=29&leg=0&mon=0&tm=G&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "巨人",
+      "key": "hr_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "ダルベック",
+          "team": "巨人",
+          "team_code": "G",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=29&leg=0&mon=0&tm=G&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=29&leg=0&mon=0&tm=G&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "巨人",
+      "key": "onbase_games",
+      "before": [],
+      "after": [
+        {
+          "name": "キャベッジ",
+          "team": "巨人",
+          "team_code": "G",
+          "value": 19,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=13&leg=0&mon=0&tm=G&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=13&leg=0&mon=0&tm=G&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "巨人",
+      "key": "onbase_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "泉口友汰",
+          "team": "巨人",
+          "team_code": "G",
+          "value": 6,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=35&leg=0&mon=0&tm=G&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "大城卓三",
+          "team": "巨人",
+          "team_code": "G",
+          "value": 6,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=24&leg=0&mon=0&tm=G&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "佐々木俊輔",
+          "team": "巨人",
+          "team_code": "G",
+          "value": 6,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=44&leg=0&mon=0&tm=G&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=24&leg=0&mon=0&tm=G&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=35&leg=0&mon=0&tm=G&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=44&leg=0&mon=0&tm=G&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "巨人",
+      "key": "saves",
+      "before": [],
+      "after": [
+        {
+          "name": "マルティネス",
+          "team": "巨人",
+          "team_code": "G",
+          "value": 8,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=92&tm=G&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=92&tm=G&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "巨人",
+      "key": "scoreless_games",
+      "before": [],
+      "after": [
+        {
+          "name": "田中瑛斗",
+          "team": "巨人",
+          "team_code": "G",
+          "value": 23,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=45&tm=G&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=45&tm=G&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "巨人",
+      "key": "wins",
+      "before": [],
+      "after": [
+        {
+          "name": "井上温大",
+          "team": "巨人",
+          "team_code": "G",
+          "value": 5,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=97&tm=G&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=97&tm=G&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "巨人",
+      "key": "appearances",
+      "before": [],
+      "after": [
+        {
+          "name": "泉口友汰",
+          "team": "巨人",
+          "team_code": "G",
+          "year": 2026,
+          "value": 80,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=35&leg=0&mon=0&tm=G&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式年間出場数と試合別出場を照合。143試合の日程で欠場を区切り年度内最長を計算。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=35&leg=0&mon=0&tm=G&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "巨人",
+      "key": "steals",
+      "before": [],
+      "after": [
+        {
+          "name": "浦田俊輔",
+          "team": "巨人",
+          "year": 2026,
+          "value": 9,
+          "status": "active",
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=32&leg=0&mon=0&tm=G&vst=all&y=0",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=32&leg=0&mon=0&tm=G&vst=all&y=0",
+            "https://npb.jp/bis/2026/stats/idb1_g.html"
+          ]
+        }
+      ],
+      "status": "verified",
+      "note": "公式年間盗塁・盗塁死と試合別合計を照合。同日内で順序により首位が変わるケースは試合経過で実際の順序を確認。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=32&leg=0&mon=0&tm=G&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=35&leg=0&mon=0&tm=G&vst=all&y=0",
+        "https://npb.jp/bis/2026/stats/idb1_g.html",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=44&leg=0&mon=0&tm=G&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=9&leg=0&mon=0&tm=G&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "巨人",
+      "key": "outs",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "走者の出塁・打者のアウトを全公式戦の打席順で確認できる資料が未取得。",
+      "sources": []
+    },
+    {
+      "club": "巨人",
+      "key": "scoreless_innings",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "失点時点・端数回・前任投手の残した走者を含む公式の年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "巨人",
+      "key": "strikeouts",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "試合をまたぐ対戦打者順を含めた年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "中日",
+      "key": "hit_games",
+      "before": [],
+      "after": [
+        {
+          "name": "村松開人",
+          "team": "中日",
+          "team_code": "D",
+          "value": 11,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=5&leg=0&mon=0&tm=D&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=5&leg=0&mon=0&tm=D&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "中日",
+      "key": "hit_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "阿部寿樹",
+          "team": "中日",
+          "team_code": "D",
+          "value": 5,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=48&leg=0&mon=0&tm=D&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=48&leg=0&mon=0&tm=D&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "中日",
+      "key": "holds",
+      "before": [],
+      "after": [
+        {
+          "name": "吉田聖弥",
+          "team": "中日",
+          "team_code": "D",
+          "value": 5,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=47&tm=D&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=47&tm=D&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "中日",
+      "key": "hr_games",
+      "before": [],
+      "after": [
+        {
+          "name": "サノー",
+          "team": "中日",
+          "team_code": "D",
+          "value": 3,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=23&leg=0&mon=0&tm=D&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=23&leg=0&mon=0&tm=D&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "中日",
+      "key": "hr_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "阿部寿樹",
+          "team": "中日",
+          "team_code": "D",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=48&leg=0&mon=0&tm=D&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "板山祐太郎",
+          "team": "中日",
+          "team_code": "D",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=63&leg=0&mon=0&tm=D&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "サノー",
+          "team": "中日",
+          "team_code": "D",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=23&leg=0&mon=0&tm=D&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "細川成也",
+          "team": "中日",
+          "team_code": "D",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=55&leg=0&mon=0&tm=D&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=23&leg=0&mon=0&tm=D&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=48&leg=0&mon=0&tm=D&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=55&leg=0&mon=0&tm=D&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=63&leg=0&mon=0&tm=D&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "中日",
+      "key": "onbase_games",
+      "before": [],
+      "after": [
+        {
+          "name": "村松開人",
+          "team": "中日",
+          "team_code": "D",
+          "value": 19,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=5&leg=0&mon=0&tm=D&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=5&leg=0&mon=0&tm=D&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "中日",
+      "key": "onbase_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "サノー",
+          "team": "中日",
+          "team_code": "D",
+          "value": 6,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=23&leg=0&mon=0&tm=D&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=23&leg=0&mon=0&tm=D&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "中日",
+      "key": "saves",
+      "before": [],
+      "after": [
+        {
+          "name": "松山晋也",
+          "team": "中日",
+          "team_code": "D",
+          "value": 5,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=90&tm=D&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=90&tm=D&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "中日",
+      "key": "scoreless_games",
+      "before": [],
+      "after": [
+        {
+          "name": "藤嶋健人",
+          "team": "中日",
+          "team_code": "D",
+          "value": 17,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=54&tm=D&mon=0&vst=all",
+          "status": "active"
+        },
+        {
+          "name": "松山晋也",
+          "team": "中日",
+          "team_code": "D",
+          "value": 17,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=90&tm=D&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=54&tm=D&mon=0&vst=all",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=90&tm=D&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "中日",
+      "key": "wins",
+      "before": [],
+      "after": [
+        {
+          "name": "大野雄大",
+          "team": "中日",
+          "team_code": "D",
+          "value": 4,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=22&tm=D&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=22&tm=D&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "中日",
+      "key": "appearances",
+      "before": [],
+      "after": [
+        {
+          "name": "細川成也",
+          "team": "中日",
+          "team_code": "D",
+          "year": 2026,
+          "value": 143,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=55&leg=0&mon=0&tm=D&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式年間出場数と試合別出場を照合。143試合の日程で欠場を区切り年度内最長を計算。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=55&leg=0&mon=0&tm=D&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "中日",
+      "key": "steals",
+      "before": [],
+      "after": [
+        {
+          "name": "福永裕基",
+          "team": "中日",
+          "year": 2026,
+          "value": 6,
+          "status": "active",
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=0&mon=0&tm=D&vst=all&y=0",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=0&mon=0&tm=D&vst=all&y=0",
+            "https://npb.jp/bis/2026/stats/idb1_d.html"
+          ]
+        },
+        {
+          "name": "樋口正修",
+          "team": "中日",
+          "year": 2026,
+          "value": 6,
+          "status": "active",
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=97&leg=0&mon=0&tm=D&vst=all&y=0",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=97&leg=0&mon=0&tm=D&vst=all&y=0",
+            "https://npb.jp/bis/2026/stats/idb1_d.html"
+          ]
+        }
+      ],
+      "status": "verified",
+      "note": "公式年間盗塁・盗塁死と試合別合計を照合。同日内で順序により首位が変わるケースは試合経過で実際の順序を確認。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=2&leg=0&mon=0&tm=D&vst=all&y=0",
+        "https://npb.jp/bis/2026/stats/idb1_d.html",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=97&leg=0&mon=0&tm=D&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=0&mon=0&tm=D&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "中日",
+      "key": "outs",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "走者の出塁・打者のアウトを全公式戦の打席順で確認できる資料が未取得。",
+      "sources": []
+    },
+    {
+      "club": "中日",
+      "key": "scoreless_innings",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "失点時点・端数回・前任投手の残した走者を含む公式の年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "中日",
+      "key": "strikeouts",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "試合をまたぐ対戦打者順を含めた年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "広島",
+      "key": "hit_games",
+      "before": [],
+      "after": [
+        {
+          "name": "坂倉将吾",
+          "team": "広島",
+          "team_code": "C",
+          "value": 11,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=31&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=31&leg=0&mon=0&tm=C&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "広島",
+      "key": "hit_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "勝田成",
+          "team": "広島",
+          "team_code": "C",
+          "value": 5,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=0&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=0&leg=0&mon=0&tm=C&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "広島",
+      "key": "holds",
+      "before": [],
+      "after": [
+        {
+          "name": "ハーン",
+          "team": "広島",
+          "team_code": "C",
+          "value": 9,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=68&tm=C&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=68&tm=C&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "広島",
+      "key": "hr_games",
+      "before": [],
+      "after": [
+        {
+          "name": "中村奨成",
+          "team": "広島",
+          "team_code": "C",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=96&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "ファビアン",
+          "team": "広島",
+          "team_code": "C",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=61&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "持丸泰輝",
+          "team": "広島",
+          "team_code": "C",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=57&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=57&leg=0&mon=0&tm=C&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=61&leg=0&mon=0&tm=C&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=96&leg=0&mon=0&tm=C&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "広島",
+      "key": "hr_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "秋山翔吾",
+          "team": "広島",
+          "team_code": "C",
+          "value": 1,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=9&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "石原貴規",
+          "team": "広島",
+          "team_code": "C",
+          "value": 1,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=32&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "大盛穂",
+          "team": "広島",
+          "team_code": "C",
+          "value": 1,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=59&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "菊池涼介",
+          "team": "広島",
+          "team_code": "C",
+          "value": 1,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=33&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "小園海斗",
+          "team": "広島",
+          "team_code": "C",
+          "value": 1,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=5&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "坂倉将吾",
+          "team": "広島",
+          "team_code": "C",
+          "value": 1,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=31&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "佐々木泰",
+          "team": "広島",
+          "team_code": "C",
+          "value": 1,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=10&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "佐藤啓介",
+          "team": "広島",
+          "team_code": "C",
+          "value": 1,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=94&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "末包昇大",
+          "team": "広島",
+          "team_code": "C",
+          "value": 1,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=52&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "中村奨成",
+          "team": "広島",
+          "team_code": "C",
+          "value": 1,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=96&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "名原典彦",
+          "team": "広島",
+          "team_code": "C",
+          "value": 1,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=92&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "平川蓮",
+          "team": "広島",
+          "team_code": "C",
+          "value": 1,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=51&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "ファビアン",
+          "team": "広島",
+          "team_code": "C",
+          "value": 1,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=61&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "二俣翔一",
+          "team": "広島",
+          "team_code": "C",
+          "value": 1,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=99&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "モンテロ",
+          "team": "広島",
+          "team_code": "C",
+          "value": 1,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=95&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "持丸泰輝",
+          "team": "広島",
+          "team_code": "C",
+          "value": 1,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=57&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "矢野雅哉",
+          "team": "広島",
+          "team_code": "C",
+          "value": 1,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=4&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=10&leg=0&mon=0&tm=C&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=31&leg=0&mon=0&tm=C&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=32&leg=0&mon=0&tm=C&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=33&leg=0&mon=0&tm=C&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=4&leg=0&mon=0&tm=C&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=5&leg=0&mon=0&tm=C&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=51&leg=0&mon=0&tm=C&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=52&leg=0&mon=0&tm=C&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=57&leg=0&mon=0&tm=C&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=59&leg=0&mon=0&tm=C&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=61&leg=0&mon=0&tm=C&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=9&leg=0&mon=0&tm=C&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=92&leg=0&mon=0&tm=C&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=94&leg=0&mon=0&tm=C&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=95&leg=0&mon=0&tm=C&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=96&leg=0&mon=0&tm=C&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=99&leg=0&mon=0&tm=C&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "広島",
+      "key": "onbase_games",
+      "before": [],
+      "after": [
+        {
+          "name": "坂倉将吾",
+          "team": "広島",
+          "team_code": "C",
+          "value": 16,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=31&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=31&leg=0&mon=0&tm=C&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "広島",
+      "key": "onbase_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "小園海斗",
+          "team": "広島",
+          "team_code": "C",
+          "value": 7,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=5&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=5&leg=0&mon=0&tm=C&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "広島",
+      "key": "saves",
+      "before": [],
+      "after": [
+        {
+          "name": "森浦大輔",
+          "team": "広島",
+          "team_code": "C",
+          "value": 6,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=13&tm=C&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=13&tm=C&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "広島",
+      "key": "scoreless_games",
+      "before": [],
+      "after": [
+        {
+          "name": "髙太一",
+          "team": "広島",
+          "team_code": "C",
+          "value": 15,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=22&tm=C&mon=0&vst=all",
+          "status": "active"
+        },
+        {
+          "name": "ハーン",
+          "team": "広島",
+          "team_code": "C",
+          "value": 15,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=68&tm=C&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=22&tm=C&mon=0&vst=all",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=68&tm=C&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "広島",
+      "key": "wins",
+      "before": [],
+      "after": [
+        {
+          "name": "遠藤淳志",
+          "team": "広島",
+          "team_code": "C",
+          "value": 4,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=66&tm=C&mon=0&vst=all",
+          "status": "active"
+        },
+        {
+          "name": "森浦大輔",
+          "team": "広島",
+          "team_code": "C",
+          "value": 4,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=13&tm=C&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=13&tm=C&mon=0&vst=all",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=66&tm=C&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "広島",
+      "key": "appearances",
+      "before": [],
+      "after": [
+        {
+          "name": "坂倉将吾",
+          "team": "広島",
+          "team_code": "C",
+          "year": 2026,
+          "value": 121,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=31&leg=0&mon=0&tm=C&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式年間出場数と試合別出場を照合。143試合の日程で欠場を区切り年度内最長を計算。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=31&leg=0&mon=0&tm=C&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "広島",
+      "key": "steals",
+      "before": [],
+      "after": [
+        {
+          "name": "辰見鴻之介",
+          "team": "広島",
+          "year": 2026,
+          "value": 7,
+          "status": "active",
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=69&leg=0&mon=0&tm=C&vst=all&y=0",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=69&leg=0&mon=0&tm=C&vst=all&y=0",
+            "https://npb.jp/bis/2026/stats/idb1_c.html"
+          ]
+        }
+      ],
+      "status": "verified",
+      "note": "公式年間盗塁・盗塁死と試合別合計を照合。同日内で順序により首位が変わるケースは試合経過で実際の順序を確認。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=59&leg=0&mon=0&tm=C&vst=all&y=0",
+        "https://npb.jp/bis/2026/stats/idb1_c.html",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=69&leg=0&mon=0&tm=C&vst=all&y=0",
+        "https://baseball.yahoo.co.jp/npb/game/2021038920/text",
+        "https://www.nikkansports.com/baseball/professional/score/2026/il2026052706.html"
+      ]
+    },
+    {
+      "club": "広島",
+      "key": "outs",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "走者の出塁・打者のアウトを全公式戦の打席順で確認できる資料が未取得。",
+      "sources": []
+    },
+    {
+      "club": "広島",
+      "key": "scoreless_innings",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "失点時点・端数回・前任投手の残した走者を含む公式の年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "広島",
+      "key": "strikeouts",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "試合をまたぐ対戦打者順を含めた年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "ヤクルト",
+      "key": "hit_games",
+      "before": [],
+      "after": [
+        {
+          "name": "長岡秀樹",
+          "team": "ヤクルト",
+          "team_code": "S",
+          "value": 11,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=0&mon=0&tm=S&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=0&mon=0&tm=S&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ヤクルト",
+      "key": "hit_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "丸山和郁",
+          "team": "ヤクルト",
+          "team_code": "S",
+          "value": 6,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=4&leg=0&mon=0&tm=S&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=4&leg=0&mon=0&tm=S&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ヤクルト",
+      "key": "holds",
+      "before": [],
+      "after": [
+        {
+          "name": "星知弥",
+          "team": "ヤクルト",
+          "team_code": "S",
+          "value": 7,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=24&tm=S&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=24&tm=S&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "ヤクルト",
+      "key": "hr_games",
+      "before": [],
+      "after": [
+        {
+          "name": "内山壮真",
+          "team": "ヤクルト",
+          "team_code": "S",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=3&leg=0&mon=0&tm=S&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "サンタナ",
+          "team": "ヤクルト",
+          "team_code": "S",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=25&leg=0&mon=0&tm=S&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "長岡秀樹",
+          "team": "ヤクルト",
+          "team_code": "S",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=0&mon=0&tm=S&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=25&leg=0&mon=0&tm=S&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=3&leg=0&mon=0&tm=S&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=0&mon=0&tm=S&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ヤクルト",
+      "key": "hr_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "オスナ",
+          "team": "ヤクルト",
+          "team_code": "S",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=13ff&leg=0&mon=0&tm=S&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "モンテル",
+          "team": "ヤクルト",
+          "team_code": "S",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=90&leg=0&mon=0&tm=S&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=13ff&leg=0&mon=0&tm=S&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=90&leg=0&mon=0&tm=S&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ヤクルト",
+      "key": "onbase_games",
+      "before": [],
+      "after": [
+        {
+          "name": "長岡秀樹",
+          "team": "ヤクルト",
+          "team_code": "S",
+          "value": 18,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=0&mon=0&tm=S&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=0&mon=0&tm=S&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ヤクルト",
+      "key": "onbase_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "サンタナ",
+          "team": "ヤクルト",
+          "team_code": "S",
+          "value": 7,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=25&leg=0&mon=0&tm=S&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=25&leg=0&mon=0&tm=S&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ヤクルト",
+      "key": "saves",
+      "before": [],
+      "after": [
+        {
+          "name": "キハダ",
+          "team": "ヤクルト",
+          "team_code": "S",
+          "value": 10,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=11&tm=S&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=11&tm=S&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "ヤクルト",
+      "key": "scoreless_games",
+      "before": [],
+      "after": [
+        {
+          "name": "キハダ",
+          "team": "ヤクルト",
+          "team_code": "S",
+          "value": 17,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=11&tm=S&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=11&tm=S&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "ヤクルト",
+      "key": "wins",
+      "before": [],
+      "after": [
+        {
+          "name": "松本健吾",
+          "team": "ヤクルト",
+          "team_code": "S",
+          "value": 5,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=28&tm=S&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&pcnum=28&tm=S&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "ヤクルト",
+      "key": "appearances",
+      "before": [],
+      "after": [
+        {
+          "name": "長岡秀樹",
+          "team": "ヤクルト",
+          "team_code": "S",
+          "year": 2026,
+          "value": 58,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=0&mon=0&tm=S&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式年間出場数と試合別出場を照合。143試合の日程で欠場を区切り年度内最長を計算。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=0&mon=0&tm=S&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ヤクルト",
+      "key": "steals",
+      "before": [],
+      "after": [
+        {
+          "name": "岩田幸宏",
+          "team": "ヤクルト",
+          "year": 2026,
+          "value": 12,
+          "status": "active",
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=64&leg=0&mon=0&tm=S&vst=all&y=0",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=64&leg=0&mon=0&tm=S&vst=all&y=0",
+            "https://npb.jp/bis/2026/stats/idb1_s.html"
+          ]
+        }
+      ],
+      "status": "verified",
+      "note": "公式年間盗塁・盗塁死と試合別合計を照合。同日内で順序により首位が変わるケースは試合経過で実際の順序を確認。",
+      "sources": [
+        "https://npb.jp/bis/2026/stats/idb1_s.html",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=0&leg=0&mon=0&tm=S&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=64&leg=0&mon=0&tm=S&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ヤクルト",
+      "key": "outs",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "走者の出塁・打者のアウトを全公式戦の打席順で確認できる資料が未取得。",
+      "sources": []
+    },
+    {
+      "club": "ヤクルト",
+      "key": "scoreless_innings",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "失点時点・端数回・前任投手の残した走者を含む公式の年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "ヤクルト",
+      "key": "strikeouts",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "試合をまたぐ対戦打者順を含めた年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "ソフトバンク",
+      "key": "hit_games",
+      "before": [],
+      "after": [
+        {
+          "name": "正木智也",
+          "team": "ソフトバンク",
+          "team_code": "H",
+          "value": 13,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=31&leg=1&mon=0&tm=H&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "柳町達",
+          "team": "ソフトバンク",
+          "team_code": "H",
+          "value": 13,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=32&leg=1&mon=0&tm=H&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=31&leg=1&mon=0&tm=H&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=32&leg=1&mon=0&tm=H&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ソフトバンク",
+      "key": "hit_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "柳田悠岐",
+          "team": "ソフトバンク",
+          "team_code": "H",
+          "value": 6,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=9&leg=1&mon=0&tm=H&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=9&leg=1&mon=0&tm=H&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ソフトバンク",
+      "key": "holds",
+      "before": [],
+      "after": [
+        {
+          "name": "松本裕樹",
+          "team": "ソフトバンク",
+          "team_code": "H",
+          "value": 14,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=66&tm=H&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=66&tm=H&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "ソフトバンク",
+      "key": "hr_games",
+      "before": [],
+      "after": [
+        {
+          "name": "近藤健介",
+          "team": "ソフトバンク",
+          "team_code": "H",
+          "value": 4,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=3&leg=1&mon=0&tm=H&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=3&leg=1&mon=0&tm=H&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ソフトバンク",
+      "key": "hr_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "栗原陵矢",
+          "team": "ソフトバンク",
+          "team_code": "H",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=24&leg=1&mon=0&tm=H&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "近藤健介",
+          "team": "ソフトバンク",
+          "team_code": "H",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=3&leg=1&mon=0&tm=H&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "野村勇",
+          "team": "ソフトバンク",
+          "team_code": "H",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=99&leg=1&mon=0&tm=H&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "正木智也",
+          "team": "ソフトバンク",
+          "team_code": "H",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=31&leg=1&mon=0&tm=H&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "柳田悠岐",
+          "team": "ソフトバンク",
+          "team_code": "H",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=9&leg=1&mon=0&tm=H&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "山川穂高",
+          "team": "ソフトバンク",
+          "team_code": "H",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=5&leg=1&mon=0&tm=H&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=24&leg=1&mon=0&tm=H&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=3&leg=1&mon=0&tm=H&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=31&leg=1&mon=0&tm=H&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=5&leg=1&mon=0&tm=H&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=9&leg=1&mon=0&tm=H&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=99&leg=1&mon=0&tm=H&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ソフトバンク",
+      "key": "onbase_games",
+      "before": [],
+      "after": [
+        {
+          "name": "正木智也",
+          "team": "ソフトバンク",
+          "team_code": "H",
+          "value": 33,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=31&leg=1&mon=0&tm=H&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=31&leg=1&mon=0&tm=H&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ソフトバンク",
+      "key": "onbase_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "栗原陵矢",
+          "team": "ソフトバンク",
+          "team_code": "H",
+          "value": 7,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=24&leg=1&mon=0&tm=H&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "近藤健介",
+          "team": "ソフトバンク",
+          "team_code": "H",
+          "value": 7,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=3&leg=1&mon=0&tm=H&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=24&leg=1&mon=0&tm=H&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=3&leg=1&mon=0&tm=H&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ソフトバンク",
+      "key": "saves",
+      "before": [],
+      "after": [
+        {
+          "name": "杉山一樹",
+          "team": "ソフトバンク",
+          "team_code": "H",
+          "value": 6,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=40&tm=H&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=40&tm=H&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "ソフトバンク",
+      "key": "scoreless_games",
+      "before": [],
+      "after": [
+        {
+          "name": "オスナ",
+          "team": "ソフトバンク",
+          "team_code": "H",
+          "value": 23,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=54&tm=H&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=54&tm=H&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "ソフトバンク",
+      "key": "wins",
+      "before": [],
+      "after": [
+        {
+          "name": "前田悠伍",
+          "team": "ソフトバンク",
+          "team_code": "H",
+          "value": 12,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=41&tm=H&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=41&tm=H&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "ソフトバンク",
+      "key": "appearances",
+      "before": [],
+      "after": [
+        {
+          "name": "栗原陵矢",
+          "team": "ソフトバンク",
+          "team_code": "H",
+          "year": 2026,
+          "value": 100,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=24&leg=1&mon=0&tm=H&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式年間出場数と試合別出場を照合。143試合の日程で欠場を区切り年度内最長を計算。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=24&leg=1&mon=0&tm=H&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ソフトバンク",
+      "key": "steals",
+      "before": [],
+      "after": [
+        {
+          "name": "庄子雄大",
+          "team": "ソフトバンク",
+          "year": 2026,
+          "value": 12,
+          "status": "active",
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=25&leg=1&mon=0&tm=H&vst=all&y=0",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=25&leg=1&mon=0&tm=H&vst=all&y=0",
+            "https://npb.jp/bis/2026/stats/idb1_h.html"
+          ]
+        }
+      ],
+      "status": "verified",
+      "note": "公式年間盗塁・盗塁死と試合別合計を照合。同日内で順序により首位が変わるケースは試合経過で実際の順序を確認。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=23&leg=1&mon=0&tm=H&vst=all&y=0",
+        "https://npb.jp/bis/2026/stats/idb1_h.html",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=25&leg=1&mon=0&tm=H&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ソフトバンク",
+      "key": "outs",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "走者の出塁・打者のアウトを全公式戦の打席順で確認できる資料が未取得。",
+      "sources": []
+    },
+    {
+      "club": "ソフトバンク",
+      "key": "scoreless_innings",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "失点時点・端数回・前任投手の残した走者を含む公式の年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "ソフトバンク",
+      "key": "strikeouts",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "試合をまたぐ対戦打者順を含めた年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "日本ハム",
+      "key": "hit_games",
+      "before": [],
+      "after": [
+        {
+          "name": "レイエス",
+          "team": "日本ハム",
+          "team_code": "F",
+          "value": 17,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=99&leg=1&mon=0&tm=F&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=99&leg=1&mon=0&tm=F&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "日本ハム",
+      "key": "hit_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "郡司裕也",
+          "team": "日本ハム",
+          "team_code": "F",
+          "value": 6,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=3&leg=1&mon=0&tm=F&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=3&leg=1&mon=0&tm=F&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "日本ハム",
+      "key": "holds",
+      "before": [],
+      "after": [
+        {
+          "name": "田中正義",
+          "team": "日本ハム",
+          "team_code": "F",
+          "value": 8,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=26&tm=F&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=26&tm=F&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "日本ハム",
+      "key": "hr_games",
+      "before": [],
+      "after": [
+        {
+          "name": "レイエス",
+          "team": "日本ハム",
+          "team_code": "F",
+          "value": 3,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=99&leg=1&mon=0&tm=F&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=99&leg=1&mon=0&tm=F&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "日本ハム",
+      "key": "hr_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "野村佑希",
+          "team": "日本ハム",
+          "team_code": "F",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=5&leg=1&mon=0&tm=F&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "吉田賢吾",
+          "team": "日本ハム",
+          "team_code": "F",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=60&leg=1&mon=0&tm=F&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "レイエス",
+          "team": "日本ハム",
+          "team_code": "F",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=99&leg=1&mon=0&tm=F&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=5&leg=1&mon=0&tm=F&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=60&leg=1&mon=0&tm=F&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=99&leg=1&mon=0&tm=F&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "日本ハム",
+      "key": "onbase_games",
+      "before": [],
+      "after": [
+        {
+          "name": "レイエス",
+          "team": "日本ハム",
+          "team_code": "F",
+          "value": 26,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=99&leg=1&mon=0&tm=F&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=99&leg=1&mon=0&tm=F&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "日本ハム",
+      "key": "onbase_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "郡司裕也",
+          "team": "日本ハム",
+          "team_code": "F",
+          "value": 8,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=3&leg=1&mon=0&tm=F&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "レイエス",
+          "team": "日本ハム",
+          "team_code": "F",
+          "value": 8,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=99&leg=1&mon=0&tm=F&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=3&leg=1&mon=0&tm=F&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=99&leg=1&mon=0&tm=F&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "日本ハム",
+      "key": "saves",
+      "before": [],
+      "after": [
+        {
+          "name": "柳川大晟",
+          "team": "日本ハム",
+          "team_code": "F",
+          "value": 6,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=47&tm=F&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=47&tm=F&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "日本ハム",
+      "key": "scoreless_games",
+      "before": [],
+      "after": [
+        {
+          "name": "柳川大晟",
+          "team": "日本ハム",
+          "team_code": "F",
+          "value": 19,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=47&tm=F&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=47&tm=F&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "日本ハム",
+      "key": "wins",
+      "before": [],
+      "after": [
+        {
+          "name": "加藤貴之",
+          "team": "日本ハム",
+          "team_code": "F",
+          "value": 8,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=14&tm=F&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=14&tm=F&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "日本ハム",
+      "key": "appearances",
+      "before": [],
+      "after": [
+        {
+          "name": "レイエス",
+          "team": "日本ハム",
+          "team_code": "F",
+          "year": 2026,
+          "value": 65,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=99&leg=1&mon=0&tm=F&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式年間出場数と試合別出場を照合。143試合の日程で欠場を区切り年度内最長を計算。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=99&leg=1&mon=0&tm=F&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "日本ハム",
+      "key": "steals",
+      "before": [],
+      "after": [
+        {
+          "name": "奈良間大己",
+          "team": "日本ハム",
+          "year": 2026,
+          "value": 7,
+          "status": "active",
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=58&leg=1&mon=0&tm=F&vst=all&y=0",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=58&leg=1&mon=0&tm=F&vst=all&y=0",
+            "https://npb.jp/bis/2026/stats/idb1_f.html"
+          ]
+        }
+      ],
+      "status": "verified",
+      "note": "公式年間盗塁・盗塁死と試合別合計を照合。同日内で順序により首位が変わるケースは試合経過で実際の順序を確認。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=58&leg=1&mon=0&tm=F&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=43&leg=1&mon=0&tm=F&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=50&leg=1&mon=0&tm=F&vst=all&y=0",
+        "https://npb.jp/bis/2026/stats/idb1_f.html",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=56&leg=1&mon=0&tm=F&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "日本ハム",
+      "key": "outs",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "走者の出塁・打者のアウトを全公式戦の打席順で確認できる資料が未取得。",
+      "sources": []
+    },
+    {
+      "club": "日本ハム",
+      "key": "scoreless_innings",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "失点時点・端数回・前任投手の残した走者を含む公式の年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "日本ハム",
+      "key": "strikeouts",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "試合をまたぐ対戦打者順を含めた年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "オリックス",
+      "key": "hit_games",
+      "before": [],
+      "after": [
+        {
+          "name": "西川龍馬",
+          "team": "オリックス",
+          "team_code": "B",
+          "value": 15,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=1&mon=0&tm=B&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=1&mon=0&tm=B&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "オリックス",
+      "key": "hit_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "山中稜真",
+          "team": "オリックス",
+          "team_code": "B",
+          "value": 6,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=50&leg=1&mon=0&tm=B&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=50&leg=1&mon=0&tm=B&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "オリックス",
+      "key": "holds",
+      "before": [],
+      "after": [
+        {
+          "name": "椋木蓮",
+          "team": "オリックス",
+          "team_code": "B",
+          "value": 9,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=15&tm=B&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=15&tm=B&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "オリックス",
+      "key": "hr_games",
+      "before": [],
+      "after": [
+        {
+          "name": "太田椋",
+          "team": "オリックス",
+          "team_code": "B",
+          "value": 3,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=1&leg=1&mon=0&tm=B&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=1&leg=1&mon=0&tm=B&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "オリックス",
+      "key": "hr_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "来田涼斗",
+          "team": "オリックス",
+          "team_code": "B",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=38&leg=1&mon=0&tm=B&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "宗佑磨",
+          "team": "オリックス",
+          "team_code": "B",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=6&leg=1&mon=0&tm=B&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=38&leg=1&mon=0&tm=B&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=6&leg=1&mon=0&tm=B&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "オリックス",
+      "key": "onbase_games",
+      "before": [],
+      "after": [
+        {
+          "name": "紅林弘太郎",
+          "team": "オリックス",
+          "team_code": "B",
+          "value": 17,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=24&leg=1&mon=0&tm=B&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=24&leg=1&mon=0&tm=B&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "オリックス",
+      "key": "onbase_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "渡部遼人",
+          "team": "オリックス",
+          "team_code": "B",
+          "value": 8,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=0&leg=1&mon=0&tm=B&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=0&leg=1&mon=0&tm=B&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "オリックス",
+      "key": "saves",
+      "before": [],
+      "after": [
+        {
+          "name": "マチャド",
+          "team": "オリックス",
+          "team_code": "B",
+          "value": 14,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=42&tm=B&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=42&tm=B&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "オリックス",
+      "key": "scoreless_games",
+      "before": [],
+      "after": [
+        {
+          "name": "マチャド",
+          "team": "オリックス",
+          "team_code": "B",
+          "value": 16,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=42&tm=B&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=42&tm=B&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "オリックス",
+      "key": "wins",
+      "before": [],
+      "after": [
+        {
+          "name": "エスピノーザ",
+          "team": "オリックス",
+          "team_code": "B",
+          "value": 4,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=00&tm=B&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=00&tm=B&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "オリックス",
+      "key": "appearances",
+      "before": [],
+      "after": [
+        {
+          "name": "西川龍馬",
+          "team": "オリックス",
+          "team_code": "B",
+          "year": 2026,
+          "value": 143,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=1&mon=0&tm=B&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式年間出場数と試合別出場を照合。143試合の日程で欠場を区切り年度内最長を計算。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=1&mon=0&tm=B&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "オリックス",
+      "key": "steals",
+      "before": [],
+      "after": [
+        {
+          "name": "渡部遼人",
+          "team": "オリックス",
+          "year": 2026,
+          "value": 9,
+          "status": "active",
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=0&leg=1&mon=0&tm=B&vst=all&y=0",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=0&leg=1&mon=0&tm=B&vst=all&y=0",
+            "https://npb.jp/bis/2026/stats/idb1_b.html"
+          ]
+        }
+      ],
+      "status": "verified",
+      "note": "公式年間盗塁・盗塁死と試合別合計を照合。同日内で順序により首位が変わるケースは試合経過で実際の順序を確認。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=0&leg=1&mon=0&tm=B&vst=all&y=0",
+        "https://npb.jp/bis/2026/stats/idb1_b.html"
+      ]
+    },
+    {
+      "club": "オリックス",
+      "key": "outs",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "走者の出塁・打者のアウトを全公式戦の打席順で確認できる資料が未取得。",
+      "sources": []
+    },
+    {
+      "club": "オリックス",
+      "key": "scoreless_innings",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "失点時点・端数回・前任投手の残した走者を含む公式の年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "オリックス",
+      "key": "strikeouts",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "試合をまたぐ対戦打者順を含めた年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "楽天",
+      "key": "hit_games",
+      "before": [],
+      "after": [
+        {
+          "name": "村林一輝",
+          "team": "楽天",
+          "team_code": "E",
+          "value": 13,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=6&leg=1&mon=0&tm=E&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=6&leg=1&mon=0&tm=E&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "楽天",
+      "key": "hit_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "マッカスカー",
+          "team": "楽天",
+          "team_code": "E",
+          "value": 6,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=34&leg=1&mon=0&tm=E&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=34&leg=1&mon=0&tm=E&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "楽天",
+      "key": "holds",
+      "before": [],
+      "after": [
+        {
+          "name": "西垣雅矢",
+          "team": "楽天",
+          "team_code": "E",
+          "value": 7,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=49&tm=E&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=49&tm=E&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "楽天",
+      "key": "hr_games",
+      "before": [],
+      "after": [
+        {
+          "name": "平良竜哉",
+          "team": "楽天",
+          "team_code": "E",
+          "value": 3,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=48&leg=1&mon=0&tm=E&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "辰己涼介",
+          "team": "楽天",
+          "team_code": "E",
+          "value": 3,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=8&leg=1&mon=0&tm=E&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=48&leg=1&mon=0&tm=E&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=8&leg=1&mon=0&tm=E&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "楽天",
+      "key": "hr_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "マッカスカー",
+          "team": "楽天",
+          "team_code": "E",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=34&leg=1&mon=0&tm=E&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "宗山塁",
+          "team": "楽天",
+          "team_code": "E",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=1&leg=1&mon=0&tm=E&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=1&leg=1&mon=0&tm=E&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=34&leg=1&mon=0&tm=E&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "楽天",
+      "key": "onbase_games",
+      "before": [],
+      "after": [
+        {
+          "name": "中島大輔",
+          "team": "楽天",
+          "team_code": "E",
+          "value": 19,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=32&leg=1&mon=0&tm=E&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=32&leg=1&mon=0&tm=E&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "楽天",
+      "key": "onbase_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "マッカスカー",
+          "team": "楽天",
+          "team_code": "E",
+          "value": 6,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=34&leg=1&mon=0&tm=E&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "宗山塁",
+          "team": "楽天",
+          "team_code": "E",
+          "value": 6,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=1&leg=1&mon=0&tm=E&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=1&leg=1&mon=0&tm=E&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=34&leg=1&mon=0&tm=E&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "楽天",
+      "key": "saves",
+      "before": [],
+      "after": [
+        {
+          "name": "藤平尚真",
+          "team": "楽天",
+          "team_code": "E",
+          "value": 8,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=46&tm=E&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=46&tm=E&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "楽天",
+      "key": "scoreless_games",
+      "before": [],
+      "after": [
+        {
+          "name": "藤平尚真",
+          "team": "楽天",
+          "team_code": "E",
+          "value": 15,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=46&tm=E&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=46&tm=E&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "楽天",
+      "key": "wins",
+      "before": [],
+      "after": [
+        {
+          "name": "荘司康誠",
+          "team": "楽天",
+          "team_code": "E",
+          "value": 4,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=19&tm=E&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=19&tm=E&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "楽天",
+      "key": "appearances",
+      "before": [],
+      "after": [
+        {
+          "name": "辰己涼介",
+          "team": "楽天",
+          "team_code": "E",
+          "year": 2026,
+          "value": 98,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=8&leg=1&mon=0&tm=E&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式年間出場数と試合別出場を照合。143試合の日程で欠場を区切り年度内最長を計算。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=8&leg=1&mon=0&tm=E&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "楽天",
+      "key": "steals",
+      "before": [],
+      "after": [
+        {
+          "name": "小深田大翔",
+          "team": "楽天",
+          "year": 2026,
+          "value": 6,
+          "status": "active",
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=0&leg=1&mon=0&tm=E&vst=all&y=0",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=0&leg=1&mon=0&tm=E&vst=all&y=0",
+            "https://npb.jp/bis/2026/stats/idb1_e.html"
+          ]
+        },
+        {
+          "name": "村林一輝",
+          "team": "楽天",
+          "year": 2026,
+          "value": 6,
+          "status": "active",
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=6&leg=1&mon=0&tm=E&vst=all&y=0",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=6&leg=1&mon=0&tm=E&vst=all&y=0",
+            "https://npb.jp/bis/2026/stats/idb1_e.html"
+          ]
+        }
+      ],
+      "status": "verified",
+      "note": "公式年間盗塁・盗塁死と試合別合計を照合。同日内で順序により首位が変わるケースは試合経過で実際の順序を確認。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=32&leg=1&mon=0&tm=E&vst=all&y=0",
+        "https://www.nikkansports.com/baseball/news/202606190002129.html?mode=all",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=6&leg=1&mon=0&tm=E&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=48&leg=1&mon=0&tm=E&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=8&leg=1&mon=0&tm=E&vst=all&y=0",
+        "https://baseball.yahoo.co.jp/npb/game/2021039021/text",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=0&leg=1&mon=0&tm=E&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=51&leg=1&mon=0&tm=E&vst=all&y=0",
+        "https://npb.jp/bis/2026/stats/idb1_e.html"
+      ]
+    },
+    {
+      "club": "楽天",
+      "key": "outs",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "走者の出塁・打者のアウトを全公式戦の打席順で確認できる資料が未取得。",
+      "sources": []
+    },
+    {
+      "club": "楽天",
+      "key": "scoreless_innings",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "失点時点・端数回・前任投手の残した走者を含む公式の年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "楽天",
+      "key": "strikeouts",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "試合をまたぐ対戦打者順を含めた年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "西武",
+      "key": "hit_games",
+      "before": [],
+      "after": [
+        {
+          "name": "長谷川信哉",
+          "team": "西武",
+          "team_code": "L",
+          "value": 16,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=63&leg=1&mon=0&tm=L&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=63&leg=1&mon=0&tm=L&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "西武",
+      "key": "hit_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "ネビン",
+          "team": "西武",
+          "team_code": "L",
+          "value": 5,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=26&leg=1&mon=0&tm=L&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=26&leg=1&mon=0&tm=L&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "西武",
+      "key": "holds",
+      "before": [
+        {
+          "key": "holds",
+          "name": "ウィンゲンター",
+          "team": "西武",
+          "year": 2026,
+          "value": 20,
+          "period": "2026-06-11〜2026-08-12",
+          "status": "active",
+          "current": true,
+          "id_team": 8,
+          "source_url": "https://npb.jp/history/2026/review_rec_p.html",
+          "numeric_value": 20
+        }
+      ],
+      "after": [
+        {
+          "name": "ウィンゲンター",
+          "team": "西武",
+          "team_code": "L",
+          "value": 20,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=45&tm=L&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=45&tm=L&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "西武",
+      "key": "hr_games",
+      "before": [],
+      "after": [
+        {
+          "name": "ネビン",
+          "team": "西武",
+          "team_code": "L",
+          "value": 3,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=26&leg=1&mon=0&tm=L&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=26&leg=1&mon=0&tm=L&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "西武",
+      "key": "hr_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "カナリオ",
+          "team": "西武",
+          "team_code": "L",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=25&leg=1&mon=0&tm=L&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "ネビン",
+          "team": "西武",
+          "team_code": "L",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=26&leg=1&mon=0&tm=L&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "林安可",
+          "team": "西武",
+          "team_code": "L",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=73&leg=1&mon=0&tm=L&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=25&leg=1&mon=0&tm=L&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=26&leg=1&mon=0&tm=L&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=73&leg=1&mon=0&tm=L&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "西武",
+      "key": "onbase_games",
+      "before": [],
+      "after": [
+        {
+          "name": "滝澤夏央",
+          "team": "西武",
+          "team_code": "L",
+          "value": 32,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=62&leg=1&mon=0&tm=L&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=62&leg=1&mon=0&tm=L&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "西武",
+      "key": "onbase_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "桑原将志",
+          "team": "西武",
+          "team_code": "L",
+          "value": 6,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=1&mon=0&tm=L&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "古賀悠斗",
+          "team": "西武",
+          "team_code": "L",
+          "value": 6,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=22&leg=1&mon=0&tm=L&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "ネビン",
+          "team": "西武",
+          "team_code": "L",
+          "value": 6,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=26&leg=1&mon=0&tm=L&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=22&leg=1&mon=0&tm=L&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=26&leg=1&mon=0&tm=L&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=7&leg=1&mon=0&tm=L&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "西武",
+      "key": "saves",
+      "before": [],
+      "after": [
+        {
+          "name": "岩城颯空",
+          "team": "西武",
+          "team_code": "L",
+          "value": 8,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=20&tm=L&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=20&tm=L&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "西武",
+      "key": "scoreless_games",
+      "before": [],
+      "after": [
+        {
+          "name": "ウィンゲンター",
+          "team": "西武",
+          "team_code": "L",
+          "value": 20,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=45&tm=L&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=45&tm=L&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "西武",
+      "key": "wins",
+      "before": [],
+      "after": [
+        {
+          "name": "髙橋光成",
+          "team": "西武",
+          "team_code": "L",
+          "value": 5,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=13&tm=L&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=13&tm=L&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "西武",
+      "key": "appearances",
+      "before": [],
+      "after": [
+        {
+          "name": "渡部聖弥",
+          "team": "西武",
+          "team_code": "L",
+          "year": 2026,
+          "value": 72,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=8&leg=1&mon=0&tm=L&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式年間出場数と試合別出場を照合。143試合の日程で欠場を区切り年度内最長を計算。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=8&leg=1&mon=0&tm=L&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "西武",
+      "key": "steals",
+      "before": [],
+      "after": [
+        {
+          "name": "滝澤夏央",
+          "team": "西武",
+          "year": 2026,
+          "value": 6,
+          "status": "active",
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=62&leg=1&mon=0&tm=L&vst=all&y=0",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=62&leg=1&mon=0&tm=L&vst=all&y=0",
+            "https://npb.jp/bis/2026/stats/idb1_l.html"
+          ]
+        }
+      ],
+      "status": "verified",
+      "note": "公式年間盗塁・盗塁死と試合別合計を照合。同日内で順序により首位が変わるケースは試合経過で実際の順序を確認。",
+      "sources": [
+        "https://npb.jp/bis/2026/stats/idb1_l.html",
+        "https://baseball.yahoo.co.jp/npb/game/2021038748/top",
+        "https://baseball.yahoo.co.jp/npb/game/2021038748/text",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=25&leg=1&mon=0&tm=L&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=63&leg=1&mon=0&tm=L&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=62&leg=1&mon=0&tm=L&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "西武",
+      "key": "outs",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "走者の出塁・打者のアウトを全公式戦の打席順で確認できる資料が未取得。",
+      "sources": []
+    },
+    {
+      "club": "西武",
+      "key": "scoreless_innings",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "失点時点・端数回・前任投手の残した走者を含む公式の年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "西武",
+      "key": "strikeouts",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "試合をまたぐ対戦打者順を含めた年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "ロッテ",
+      "key": "hit_games",
+      "before": [],
+      "after": [
+        {
+          "name": "西川史礁",
+          "team": "ロッテ",
+          "team_code": "M",
+          "value": 12,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=6&leg=1&mon=0&tm=M&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=6&leg=1&mon=0&tm=M&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ロッテ",
+      "key": "hit_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "藤原恭大",
+          "team": "ロッテ",
+          "team_code": "M",
+          "value": 5,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=1&leg=1&mon=0&tm=M&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=1&leg=1&mon=0&tm=M&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ロッテ",
+      "key": "holds",
+      "before": [],
+      "after": [
+        {
+          "name": "鈴木昭汰",
+          "team": "ロッテ",
+          "team_code": "M",
+          "value": 5,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=47&tm=M&mon=0&vst=all",
+          "status": "active"
+        },
+        {
+          "name": "中森俊介",
+          "team": "ロッテ",
+          "team_code": "M",
+          "value": 5,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=56&tm=M&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=47&tm=M&mon=0&vst=all",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=56&tm=M&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "ロッテ",
+      "key": "hr_games",
+      "before": [],
+      "after": [
+        {
+          "name": "山口航輝",
+          "team": "ロッテ",
+          "team_code": "M",
+          "value": 4,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=51&leg=1&mon=0&tm=M&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=51&leg=1&mon=0&tm=M&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ロッテ",
+      "key": "hr_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "佐藤都志也",
+          "team": "ロッテ",
+          "team_code": "M",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=32&leg=1&mon=0&tm=M&vst=all&y=0",
+          "status": "active"
+        },
+        {
+          "name": "山口航輝",
+          "team": "ロッテ",
+          "team_code": "M",
+          "value": 2,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=51&leg=1&mon=0&tm=M&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=32&leg=1&mon=0&tm=M&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=51&leg=1&mon=0&tm=M&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ロッテ",
+      "key": "onbase_games",
+      "before": [],
+      "after": [
+        {
+          "name": "山口航輝",
+          "team": "ロッテ",
+          "team_code": "M",
+          "value": 27,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=51&leg=1&mon=0&tm=M&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=51&leg=1&mon=0&tm=M&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ロッテ",
+      "key": "onbase_pa",
+      "before": [],
+      "after": [
+        {
+          "name": "藤原恭大",
+          "team": "ロッテ",
+          "team_code": "M",
+          "value": 7,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=1&leg=1&mon=0&tm=M&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=1&leg=1&mon=0&tm=M&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ロッテ",
+      "key": "saves",
+      "before": [],
+      "after": [
+        {
+          "name": "横山陸人",
+          "team": "ロッテ",
+          "team_code": "M",
+          "value": 12,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=15&tm=M&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=15&tm=M&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "ロッテ",
+      "key": "scoreless_games",
+      "before": [],
+      "after": [
+        {
+          "name": "横山陸人",
+          "team": "ロッテ",
+          "team_code": "M",
+          "value": 18,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=15&tm=M&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=15&tm=M&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "ロッテ",
+      "key": "wins",
+      "before": [],
+      "after": [
+        {
+          "name": "八木彬",
+          "team": "ロッテ",
+          "team_code": "M",
+          "value": 9,
+          "year": 2026,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=33&tm=M&mon=0&vst=all",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式の全出場選手を母集団に、試合別成績を年度内で再集計。公式年間合計と照合し同率を全員保持。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&pcnum=33&tm=M&mon=0&vst=all"
+      ]
+    },
+    {
+      "club": "ロッテ",
+      "key": "appearances",
+      "before": [],
+      "after": [
+        {
+          "name": "小川龍成",
+          "team": "ロッテ",
+          "team_code": "M",
+          "year": 2026,
+          "value": 108,
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=57&leg=1&mon=0&tm=M&vst=all&y=0",
+          "status": "active"
+        }
+      ],
+      "status": "verified",
+      "note": "NPB公式年間出場数と試合別出場を照合。143試合の日程で欠場を区切り年度内最長を計算。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=57&leg=1&mon=0&tm=M&vst=all&y=0"
+      ]
+    },
+    {
+      "club": "ロッテ",
+      "key": "steals",
+      "before": [],
+      "after": [
+        {
+          "name": "藤原恭大",
+          "team": "ロッテ",
+          "year": 2026,
+          "value": 7,
+          "status": "active",
+          "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=1&leg=1&mon=0&tm=M&vst=all&y=0",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=1&leg=1&mon=0&tm=M&vst=all&y=0",
+            "https://npb.jp/bis/2026/stats/idb1_m.html"
+          ]
+        }
+      ],
+      "status": "verified",
+      "note": "公式年間盗塁・盗塁死と試合別合計を照合。同日内で順序により首位が変わるケースは試合経過で実際の順序を確認。",
+      "sources": [
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=57&leg=1&mon=0&tm=M&vst=all&y=0",
+        "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=1&leg=1&mon=0&tm=M&vst=all&y=0",
+        "https://npb.jp/bis/2026/stats/idb1_m.html"
+      ]
+    },
+    {
+      "club": "ロッテ",
+      "key": "outs",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "走者の出塁・打者のアウトを全公式戦の打席順で確認できる資料が未取得。",
+      "sources": []
+    },
+    {
+      "club": "ロッテ",
+      "key": "scoreless_innings",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "失点時点・端数回・前任投手の残した走者を含む公式の年度内最長値が未確認。",
+      "sources": []
+    },
+    {
+      "club": "ロッテ",
+      "key": "strikeouts",
+      "before": [],
+      "after": [],
+      "status": "unavailable",
+      "note": "試合をまたぐ対戦打者順を含めた年度内最長値が未確認。",
+      "sources": []
+    }
+  ]
+}

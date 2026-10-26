@@ -47,7 +47,14 @@ void main() {
     expect(sql, contains('FROM v_predict_stats'));
     expect(sql, contains('id_league IN (3, 4)'));
     expect(sql, isNot(contains('t_predict_player')));
-    expect(sql, isNot(contains('JOIN')));
+    expect(sql, contains('LEFT JOIN m_player p'));
+    expect(sql, contains("jsonb_build_object('id_player', p.merged_into_player_id)"));
+    expect(sql, contains('ELSE s.payload END'));
+    expect(sql, contains('FROM v_stats_player actual'));
+    expect(sql, contains("'flg_rookie', actual.payload->'flg_rookie'"));
+    expect(sql, contains("'flg_career_this_year', actual.payload->'flg_career_this_year'"));
+    expect(sql, contains("actual.payload->>'title' = s.payload->>'title'"));
+    expect(sql, contains("actual.payload->>'id_league' = s.payload->>'id_league'"));
     expect(AppSql.selectPlayerDisplay([]), contains('IN (NULL)'));
   });
 }

@@ -1,3 +1,5 @@
+import '../logic/game_visibility.dart';
+import '../logic/auth_session.dart';
 import '../widgets/special_media.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'package:flutter/material.dart';
@@ -97,8 +99,12 @@ class MlbPostseasonBracket extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final board = buildMlbPostseasonBoard(standings: standings, games: games);
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: AuthSession.instance, builder: (context, _) => _buildContent(context),
+  );
+
+  Widget _buildContent(BuildContext context) {
+    final board = buildMlbPostseasonBoard(standings: standings, games: AuthSession.instance.showDetailedGames ? games : publicGameRows(games));
     return FittedBox(
       fit: BoxFit.contain,
       child: SizedBox(

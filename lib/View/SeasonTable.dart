@@ -947,7 +947,8 @@ class SeasonTableBlock extends StatelessWidget {
             ]);
           }
 
-          Widget pinnedBodyRow(Map<String, dynamic> row, int divisionRank) {
+          Widget pinnedBodyRow(Map<String, dynamic> row, int divisionRank, {double? height}) {
+            final rowHeight = height ?? gridBodyH;
             final int rk = org.kind == OrgKind.mlb ? divisionRank : (int.tryParse('${row['int_rank']}') ?? divisionRank);
             final sourceLeague = int.tryParse('${row['source_league_id']}');
             final leagueLabel = switch (sourceLeague) { 1 => 'セ', 2 => 'パ', _ => '—' };
@@ -955,13 +956,13 @@ class SeasonTableBlock extends StatelessWidget {
             final Color? teamBg = _parseColorName(row['color_back']);
             final Color? teamFg = _parseColorName(row['color_font']);
             return Row(children: [
-              SizedBox(width: wChar2, child: gridCell('$rk', h: gridBodyH, bg: leagueColor, fg: leagueForeground, weight: FontWeight.bold)),
-              if (showNpbLeagueColumn) SizedBox(width: wChar2, child: gridCell(leagueLabel, h: gridBodyH, bg: affiliationColor, fg: Colors.white, weight: FontWeight.bold)),
+              SizedBox(width: wChar2, child: gridCell('$rk', h: rowHeight, bg: leagueColor, fg: leagueForeground, weight: FontWeight.bold)),
+              if (showNpbLeagueColumn) SizedBox(width: wChar2, child: gridCell(leagueLabel, h: rowHeight, bg: affiliationColor, fg: Colors.white, weight: FontWeight.bold)),
               SizedBox(
                 width: wName,
                 child: teamNameCell(
                   _num(!useFullStandingsTeamNames && compactBaseballLayout(context) ? row['name_shortest'] ?? row['name_team'] : row['name_team']),
-                  h: gridBodyH,
+                  h: rowHeight,
                   bg: teamBg,
                   fg: teamFg,
                   showJapan: org.kind == OrgKind.mlb && isTrue(row['flg_japan']),
@@ -1124,13 +1125,17 @@ class SeasonTableBlock extends StatelessWidget {
           Widget sectionTable(
             ({String label, List<Map<String, dynamic>> rows}) section,
             ({double game, double result, double behind, double pct, double avg, double hr, double rbi, double sb, double field, double era, bool scrollStats, bool scrollAll}) cols,
+            {double? fillHeight}
           ) {
+            final rowHeight = fillHeight != null && section.rows.isNotEmpty
+                ? math.max(gridBodyH, (fillHeight - ALL_HEADER_H) / section.rows.length)
+                : gridBodyH;
             final Widget pinned = Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 pinnedHeader(),
-                for (var i = 0; i < section.rows.length; i++) pinnedBodyRow(section.rows[i], i + 1),
+                for (var i = 0; i < section.rows.length; i++) pinnedBodyRow(section.rows[i], i + 1, height: rowHeight),
               ],
             );
             if (standingsNamesOnly) return pinned;
@@ -1194,6 +1199,9 @@ class SeasonTableBlock extends StatelessWidget {
             final areaW = beside ? parentW - chartW - chartGap : parentW;
             final cols = statCols(areaW);
             if (beside) {
+              final chartH = standingsNamesOnly
+                  ? math.max(standingsChartHeight ?? tableH, tableH)
+                  : standingsChartHeight ?? tableH;
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1203,12 +1211,12 @@ class SeasonTableBlock extends StatelessWidget {
                     key: const Key('standings-gb-beside'),
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(child: sectionTable(section, cols)),
+                      Expanded(child: sectionTable(section, cols, fillHeight: standingsNamesOnly ? chartH : null)),
                       const SizedBox(width: chartGap),
                       SizedBox(
                         width: chartW,
-                        height: standingsChartHeight ?? tableH,
-                        child: GamesBehindChart(rows: section.rows, fitHeight: standingsChartHeight ?? tableH),
+                        height: chartH,
+                        child: GamesBehindChart(rows: section.rows, fitHeight: chartH),
                       ),
                     ],
                   ),
@@ -1987,7 +1995,8 @@ class _DualStatsSegmentBars extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (NavigationPickerScope.enabled(context)) {
+    if (NavigationPickerScope.enabled(context) &&
+        MediaQuery.orientationOf(context) != Orientation.portrait) {
       final titles = battingSelected ? battingTitles : pitchingTitles;
       return Column(children: [
         if (showRoleTabs) NavigationPicker(level: 3,
@@ -2755,16 +2764,7 @@ class _SegmentedLeaguePersonalStatsState extends State<SegmentedLeaguePersonalSt
   static const _pitchingCols = ['防御率', '最多勝', '勝率', '奪三振', 'ホールド', 'HP', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'K/BB', 'QS率'];
 
   bool _battingSelected = true;
-  int _titleIndex = 0;
-
-  @override
-  void didUpdateWidget(covariant SegmentedLeaguePersonalStats oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.batting != widget.batting || oldWidget.pitching != widget.pitching) {
-      _battingSelected = widget.batting.isNotEmpty;
-      _titleIndex = 0;
-    }
-  }
+  String? _selectedTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -2779,7 +2779,7 @@ class _SegmentedLeaguePersonalStatsState extends State<SegmentedLeaguePersonalSt
     }
     final battingSelected = batTitles.isEmpty ? false : (pitTitles.isEmpty ? true : _battingSelected);
     final titles = battingSelected ? batTitles : pitTitles;
-    final index = titles.isEmpty ? 0 : _titleIndex.clamp(0, titles.length - 1);
+    final index = math.max(0, titles.indexOf(_selectedTitle ?? ''));
     final title = titles.isEmpty ? '' : titles[index];
     final src = battingSelected ? widget.batting : widget.pitching;
     final rows = src.where((m) {
@@ -2802,7 +2802,7 @@ class _SegmentedLeaguePersonalStatsState extends State<SegmentedLeaguePersonalSt
               titleIndex: index,
               onSelected: (sel) => setState(() {
                 _battingSelected = sel.batting;
-                _titleIndex = sel.index;
+                _selectedTitle = (sel.batting ? batTitles : pitTitles)[sel.index];
               }),
             )),
         const SizedBox(height: 4),
@@ -2848,16 +2848,8 @@ class _BothLeaguePersonalStatsState extends State<BothLeaguePersonalStats> {
   static const _pitchingCols = ['防御率', '最多勝', '勝率', '奪三振', 'ホールド', 'HP', 'セーブ', 'WHIP', '被打率', '奪三振率', '与四球率', 'K/BB', 'QS率'];
 
   bool _battingSelected = true;
-  int _titleIndex = 0;
+  String? _selectedTitle;
   int _batterPitcherTab = 0;
-
-  @override
-  void didUpdateWidget(covariant BothLeaguePersonalStats oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.stats != widget.stats) {
-      _titleIndex = 0;
-    }
-  }
 
   void _setLayout(PersonalStatsLayout value) {
     if (value == widget.layout) return;
@@ -2880,7 +2872,7 @@ class _BothLeaguePersonalStatsState extends State<BothLeaguePersonalStats> {
 
     final battingSelected = batTitles.isEmpty ? false : (pitTitles.isEmpty ? true : _battingSelected);
     final titles = battingSelected ? batTitles : pitTitles;
-    final index = titles.isEmpty ? 0 : _titleIndex.clamp(0, titles.length - 1);
+    final index = math.max(0, titles.indexOf(_selectedTitle ?? ''));
     final title = titles.isEmpty ? '' : titles[index];
     final rows = battingSelected ? battingRows : pitchingRows;
     final org = widget.org;
@@ -2912,7 +2904,7 @@ class _BothLeaguePersonalStatsState extends State<BothLeaguePersonalStats> {
           titleIndex: index,
           onSelected: (sel) => setState(() {
             _battingSelected = sel.batting;
-            _titleIndex = sel.index;
+            _selectedTitle = (sel.batting ? batTitles : pitTitles)[sel.index];
           }),
         ),
         const SizedBox(height: 6),

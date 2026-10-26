@@ -690,8 +690,12 @@ class HallOfFameBoard extends StatelessWidget {
     final target = num.tryParse('${row['target']}') ?? 0;
     final overTarget = candidate && target > 0 && value > target;
     final nearTarget = candidate && target > 0 && value / target >= 0.9;
+    final estimate = (row['estimate'] as num?)?.toStringAsFixed(1);
+    final estimateLabel = estimate == null || estimate == '0.0'
+        ? ''
+        : '　約${estimate}シーズン';
     final detail = candidate
-        ? '${row['label']} ${row['value']} / ${row['target']}\n達成${((num.tryParse('${row['value']}') ?? 0) / (num.tryParse('${row['target']}') ?? 1) * 100).toStringAsFixed(1)}%　残り${row['remaining']}　${row['estimate'] == null ? '予測不可（当年実績なし）' : '約${(row['estimate'] as num).toStringAsFixed(1)}シーズン'}'
+        ? '${row['label']} ${row['value']} / ${row['target']}\n達成${((num.tryParse('${row['value']}') ?? 0) / (num.tryParse('${row['target']}') ?? 1) * 100).toStringAsFixed(1)}%　残り${row['remaining']}${estimateLabel}'
         : [
             if (row['year'] != null) '${row['year']}年',
             if (row['category'] != null) '${row['category']}'

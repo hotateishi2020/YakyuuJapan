@@ -9,6 +9,28 @@ spec.loader.exec_module(module)
 
 
 class RegularEnrichmentTest(unittest.TestCase):
+    def test_junior_alias_does_not_block_all_relief_pitchers(self):
+        row = {'club_name': 'ソフトバンク', 'batting_order': [],
+               'positions': [{'slot': 'P', 'total': 20, 'players': [
+                   {'name': 'スチュワートJr.', 'count': 20}]}],
+               'pitching_stats': [
+                   {'name': 'スチュワートジュニア', 'player_key': 'starter',
+                    'appearances': 20, 'total_outs': 360},
+                   {'name': 'ヘルナンデス', 'player_key': 'relief',
+                    'appearances': 40, 'total_outs': 120}]}
+        module.normalize_groups(row)
+        self.assertEqual(row['unresolved_names'], [])
+        self.assertEqual(row['pitching_workload'][1]['relief_outs'], 120)
+
+    def test_sourced_starts_survive_lineup_name_ambiguity(self):
+        row = {'club_name': '球団', 'batting_order': [],
+               'positions': [{'slot': 'P', 'total': 100, 'players': [
+                   {'name': '不明略称', 'count': 20}]}],
+               'pitching_stats': [{'name': '救援', 'player_key': 'r',
+                   'starts': 0, 'appearances': 40, 'total_outs': 120}]}
+        module.normalize_groups(row)
+        self.assertEqual(row['pitching_workload'][0]['relief_outs'], 120)
+
     def test_aliases_merge_counts_without_merging_same_surname_players(self):
         def group(slot, entries):
             return {'slot': slot, 'total': 100, 'players': [

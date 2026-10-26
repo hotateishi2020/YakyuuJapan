@@ -64,7 +64,6 @@ class AdminNews {
         (title,text_main,url,code_tag_main,code_tag_sub,id_user,flg_read,flg_delete,crtby,updby,crtpgm,updpgm)
         VALUES ($1,$2,$3,$4,$5,NULL,FALSE,FALSE,$6,$6,'ADMIN_NEWS','ADMIN_NEWS')
         RETURNING id,title,text_main,url,code_tag_main,code_tag_sub,crtat::text AS created_at''', parameters: [input['title'], input['text_main'], input['url'], input['code_tag_main']!.isEmpty ? null : input['code_tag_main'], input['code_tag_sub']!.isEmpty ? null : input['code_tag_sub'], admin]);
-      await tx.execute('UPDATE m_user SET flg_read_news=FALSE WHERE NOT COALESCE(flg_delete,FALSE)');
       return inserted.single.toColumnMap();
     });
     return json(201, {'ok': true, 'news': item});

@@ -79,7 +79,7 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
     try {
       final p = widget.player;
       final q = <String, String>{'org': widget.org, 'year': '${widget.year}', 'name': '${p['name'] ?? p['name_full'] ?? p['name_player'] ?? p['player_name'] ?? ''}'.replaceAll(RegExp(r'\(.*\)$'), ''), if (p['id_player'] != null) 'id_player': '${p['id_player']}', if (p['source_player_id'] != null) 'source_player_id': '${p['source_player_id']}', if (p['id_team'] != null) 'id_team': '${p['id_team']}'};
-      final r = await http.get(Env.api('/player-detail').replace(queryParameters: q)).timeout(const Duration(seconds: 15));
+      final r = await http.get(Env.api('/player-detail').replace(queryParameters: q), headers: {if (AuthSession.instance.token != null) 'Authorization': 'Bearer ${AuthSession.instance.token}'}).timeout(const Duration(seconds: 15));
       if (r.statusCode != 200) throw Exception('HTTP ${r.statusCode}');
       final d = jsonDecode(utf8.decode(r.bodyBytes));
       if (mounted) {

@@ -37,6 +37,18 @@ void main() {
         contains('active_draft'));
     expect(researchJst(DateTime.utc(2026, 12, 31, 16)).year, 2027);
   });
+  test('11月から3月は土日を含め毎日、未解決案件なしでも調査する', () {
+    for (var day = DateTime.utc(2026, 11, 1, 12);
+        day.isBefore(DateTime.utc(2027, 4, 1, 12));
+        day = day.add(const Duration(days: 1))) {
+      final topics = researchDue(day, {});
+      expect(topics, contains('posting_approved'), reason: '$day');
+      expect(topics, contains('posting_completed'), reason: '$day');
+      expect(topics, contains('fa_declared'), reason: '$day');
+      expect(researchDue(day.subtract(const Duration(hours: 1)), {}), isEmpty);
+    }
+    expect(researchDue(DateTime.utc(2027, 4, 1, 12), {}), isEmpty);
+  });
   test('unresolved negotiations override quiet days and close on completion',
       () {
     final open = {...event('posting_approved'), 'date': '2026-02-20'};
@@ -155,6 +167,14 @@ void main() {
       expect(body['store'], false);
       expect(body['tool_choice'], 'required');
       expect(body['text']['format']['strict'], true);
+      final codes = body['text']['format']['schema']['properties']['calendar_events']['items']['properties']['code']['enum'];
+      for (final code in ['npb_autumn_camp', 'npb_joint_tryout', 'npb_contract_renewal',
+          'npb_active_draft', 'npb_joining_conference', 'npb_independent_training',
+          'npb_rookie_training', 'npb_spring_camp', 'npb_preseason', 'npb_opening', 'npb_fan_festival', 'npb_intrasquad_game']) {
+        expect(codes, contains(code));
+        expect(body['instructions'], contains(code));
+      }
+      expect(body['tools'][0]['filters']['allowed_domains'], contains('jpbpa.net'));
       return http.Response(
           jsonEncode({'status': 'incomplete', 'output': []}), 200);
     });

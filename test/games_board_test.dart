@@ -2,6 +2,7 @@ import 'package:Yakyuu_Japan/View/player_condition.dart';
 import 'package:Yakyuu_Japan/View/player_country_flag.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'package:flutter/material.dart';
+import 'package:Yakyuu_Japan/logic/auth_session.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/View/BlinkBg.dart';
 import 'package:Yakyuu_Japan/View/GamesBoard.dart';
@@ -3480,6 +3481,9 @@ void main() {
   });
 
   testWidgets('postseason game cards put a crown on season stat leaders', (tester) async {
+    AuthSession.instance.user = AuthUser.fromJson({'id': 1});
+    AuthSession.instance.token = 'test';
+    addTearDown(() { AuthSession.instance.user = null; AuthSession.instance.token = null; });
     await tester.pumpWidget(
       const MaterialApp(
         home: Center(
@@ -3528,12 +3532,19 @@ void main() {
     );
     await tester.pump();
     expect(find.textContaining('👑'), findsOneWidget);
+    final badge = find.byKey(const ValueKey('season-crown-initial-奪三振'));
+    expect(find.descendant(of: find.byKey(const ValueKey('season-crown-奪三振')), matching: find.text('奪')), findsOneWidget);
+    expect(tester.getTopLeft(badge).dy, lessThan(tester.getTopLeft(find.text('👑')).dy));
+    expect(tester.getTopLeft(badge).dx, greaterThan(tester.getTopLeft(find.text('👑')).dx));
     expect(find.textContaining('🇯🇵'), findsOneWidget);
     expect(tester.getTopLeft(find.textContaining('🇯🇵')).dx, greaterThan(tester.getTopLeft(find.byType(PlayerConditionFace).first).dx));
     expect(tester.getTopLeft(find.textContaining('👑')).dx, greaterThan(tester.getTopLeft(find.textContaining('🇯🇵')).dx));
   });
 
   testWidgets('a shared family name does not crown another announced starter', (tester) async {
+    AuthSession.instance.user = AuthUser.fromJson({'id': 1});
+    AuthSession.instance.token = 'test';
+    addTearDown(() { AuthSession.instance.user = null; AuthSession.instance.token = null; });
     await tester.pumpWidget(
       const MaterialApp(
         home: Center(
@@ -3595,6 +3606,9 @@ void main() {
   });
 
   testWidgets('stolen base percentage leaders do not get a crown', (tester) async {
+    AuthSession.instance.user = AuthUser.fromJson({'id': 1});
+    AuthSession.instance.token = 'test';
+    addTearDown(() { AuthSession.instance.user = null; AuthSession.instance.token = null; });
     await tester.pumpWidget(
       const MaterialApp(
         home: Center(
@@ -3811,6 +3825,9 @@ void main() {
   });
 
   testWidgets('NPB regular season cards do not show Japan flag or crown', (tester) async {
+    AuthSession.instance.user = AuthUser.fromJson({'id': 1});
+    AuthSession.instance.token = 'test';
+    addTearDown(() { AuthSession.instance.user = null; AuthSession.instance.token = null; });
     await tester.pumpWidget(
       const MaterialApp(
         home: Center(

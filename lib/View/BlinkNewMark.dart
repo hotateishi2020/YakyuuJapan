@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 /// ヘッダー用の点滅 New バッジ。
 class BlinkNewMark extends StatefulWidget {
   final double fontSize;
+  final String label;
   final EdgeInsetsGeometry padding;
 
   const BlinkNewMark({
     super.key,
     this.fontSize = 10,
+    this.label = 'New',
     this.padding = const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
   });
 
@@ -43,7 +45,7 @@ class _BlinkNewMarkState extends State<BlinkNewMark> with SingleTickerProviderSt
           borderRadius: BorderRadius.circular(4),
         ),
         child: Text(
-          'New',
+          widget.label,
           style: TextStyle(
             color: Colors.white,
             fontSize: widget.fontSize,

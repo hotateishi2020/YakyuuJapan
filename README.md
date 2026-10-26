@@ -14,13 +14,11 @@ sh tool/build_web.sh
 
 git add . 
 
-git commit -m "HOME画面を追加しました。" 
+git commit -m "修正を調整しました。" 
 
 git push 
 
 cd /Users/standapp/StudioProjects/Koko/backend
-
-
 
 【別途実行】
 

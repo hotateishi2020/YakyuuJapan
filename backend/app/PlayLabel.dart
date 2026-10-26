@@ -167,11 +167,13 @@ void _attachPlateDisplayMetadata(List<Map<String, dynamic>> rows) {
       });
       // 盗塁死で攻撃終了し次の打席結果がない場合は、直前の打席の上段に残す。
       final previous = half.take(i).where((r) => _isBattingResult('${r['code_result'] ?? ''}')).lastOrNull;
-      final target = candidates.isEmpty ? previous : half[candidates.first];
+      // 代走は直前に出塁した打席の下へ表示する。
+      final target = label.startsWith('代走:') && previous != null
+          ? previous : candidates.isEmpty ? previous : half[candidates.first];
       if (target == null) continue;
       (target.putIfAbsent('_displayEvents', () => <String>[]) as List<String>).add(label);
       // 後から起きたイベントで打席開始時の走者を上書きしない。
-      if (candidates.isNotEmpty && candidates.first > i && _baseMask(event) != null) {
+      if (!(label.startsWith('代走:') && previous != null) && candidates.isNotEmpty && candidates.first > i && _baseMask(event) != null) {
         target.putIfAbsent('_entryBases', () => _baseMask(event));
       }
     }

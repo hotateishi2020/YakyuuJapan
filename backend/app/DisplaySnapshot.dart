@@ -176,6 +176,8 @@ class DisplaySnapshot {
       'id_game': game['id_game'], 'date_game': game['date_game'],
       'postseason_form': game['postseason_form'] ?? [],
       'player_hands': game['player_hands'] ?? [],
+      'season_player_stats': game['season_player_stats'] ?? [],
+      if (game.containsKey('postseason_homers_before')) 'postseason_homers_before': game['postseason_homers_before'],
     }];
     final dates = <int, String>{
       for (final game in games) _asInt(game['id_game']): _ymd('${game['date_game'] ?? ''}'),

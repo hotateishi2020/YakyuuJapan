@@ -7,6 +7,16 @@ import 'StrengthUsage.dart';
 
 const calendarCodes = [
   'npb_opening',
+  'npb_autumn_camp',
+  'npb_fan_festival',
+  'npb_intrasquad_game',
+  'npb_joint_tryout',
+  'npb_contract_renewal',
+  'npb_joining_conference',
+  'npb_independent_training',
+  'npb_rookie_training',
+  'npb_spring_camp',
+  'npb_preseason',
   'npb_interleague',
   'npb_allstar',
   'npb_fresh_allstar',
@@ -15,6 +25,13 @@ const calendarCodes = [
   'npb_draft',
   'npb_active_draft',
   'npb_awards',
+  'npb_best_nine',
+  'npb_golden_glove',
+  'npb_sawamura',
+  'npb_fa_application',
+  'npb_fa_negotiation_start',
+  'npb_posting_application',
+  'npb_posting_negotiation',
   'mlb_spring',
   'mlb_opening',
   'mlb_allstar',
@@ -154,6 +171,17 @@ String? validateCalendarEvent(
       !calendarDateSupported('${e['announced_on']}', text)) {
     return 'announcement_not_supported';
   }
+  if (e['code'] == 'npb_posting_negotiation') {
+    // stage is the official full name, venue is the originating NPB team.
+    // Keep the same identity when the deadline is corrected or crosses years.
+    final player = compactResearchText('${e['stage'] ?? ''}');
+    if (player.length < 2 || !quote.contains(player) ||
+        !researchTeams.contains(e['venue']) || e['kind'] != 'tournament' ||
+        '${e['sale_phase'] ?? ''}'.isNotEmpty) return 'posting_player_not_supported';
+    if (!RegExp(r'公示|交渉期間|交渉期限|posted|posting|negotiat', caseSensitive: false).hasMatch(quote)) {
+      return 'posting_not_supported';
+    }
+  }
   if (e['status'] != 'scheduled') {
     if (!RegExp(
             e['status'] == 'cancelled'
@@ -176,6 +204,10 @@ String? validateCalendarEvent(
   if (!calendarDateSupported(e['start'], quote) ||
       !calendarDateSupported(e['end'], quote)) {
     return 'period_not_supported';
+  }
+  if (e['code'] == 'npb_posting_negotiation' &&
+      end.difference(start) > const Duration(days: 45)) {
+    return 'posting_period_too_long';
   }
   if (e['kind'] == 'ticket' &&
       !RegExp(r'チケット|入場券|ticket', caseSensitive: false).hasMatch(quote)) {
@@ -271,6 +303,8 @@ class CalendarResearch {
       }
       result.add({
         'research_key': calendarEventKey(e),
+        'calendar_code': e['code'],
+        'calendar_kind': e['kind'],
         'title_event': e['title'],
         'date_from_temp': from,
         'date_to': to,

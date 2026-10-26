@@ -162,9 +162,16 @@ Map<String, dynamic> seasonStreakPresentation({
   required bool official,
   required int completedGames,
   required int loadedGames,
+  Map<String, dynamic> audit = const {},
 }) => {
-  'current': observed,
-  if (!official) ...{
+  'current': audit['status'] == 'unavailable' ? [] : observed,
+  if (audit.isNotEmpty) ...{
+    'current_status': audit['status'],
+    'current_label': '今シーズン記録',
+    if (audit['status'] == 'unavailable')
+      'current_message': '年度内の最長記録は未確認です。${audit['note'] ?? ''}',
+    'current_sources': audit['sources'] ?? [],
+  } else if (!official) ...{
     'current_status': observed.isEmpty ? 'unavailable' : 'partial',
     'current_label': '今シーズン・取得済み区間の最長',
     'current_message': observed.isEmpty

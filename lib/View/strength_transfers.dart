@@ -16,6 +16,7 @@ class StrengthTransfers extends StatefulWidget {
 
 class _StrengthTransfersState extends State<StrengthTransfers> {
   final _horizontal = ScrollController();
+  TransferSort _sort = TransferSort.attention;
   @override
   void dispose() {
     _horizontal.dispose();
@@ -24,10 +25,11 @@ class _StrengthTransfersState extends State<StrengthTransfers> {
 
   @override
   Widget build(BuildContext context) {
-    final rows = transferCandidates(widget.teams, widget.year);
+    final rows = transferCandidates(widget.teams, widget.year, sort: _sort);
     final compact = compactBaseballLayout(context);
     final teamWidth = compact ? 48.0 : 120.0;
     const playerWidth = 120.0;
+    const attentionWidth = 80.0;
     final pinnedWidth = teamWidth + playerWidth;
     Widget cell(Widget child, double width, {Color color = Colors.white}) =>
         Container(
@@ -46,6 +48,15 @@ class _StrengthTransfersState extends State<StrengthTransfers> {
           padding: const EdgeInsets.all(8),
           child: Text('${widget.year}年オフの移籍候補',
               style: const TextStyle(fontWeight: FontWeight.bold))),
+      Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: Wrap(spacing: 8, runSpacing: 4, children: [
+        for (final sort in TransferSort.values)
+          ChoiceChip(label: Text(sort == TransferSort.attention ? '注目度順' : 'チーム別'),
+            selected: _sort == sort,
+            onSelected: (_) => setState(() => _sort = sort)),
+      ])),
+      const Padding(padding: EdgeInsets.all(8), child: Text(
+        '注目度（登録情報に基づく目安）：★★★ FA宣言・ポスティング容認／★★ 移籍報道あり／★ 権利保有・行使未確認',
+        style: TextStyle(fontSize: 11, color: Colors.black54))),
       Expanded(
           child: rows.isEmpty
               ? const Center(child: Text('この年度の移籍候補情報はありません。'))
@@ -76,6 +87,7 @@ class _StrengthTransfersState extends State<StrengthTransfers> {
                                                   color: Colors.white)),
                                           playerWidth,
                                           color: Colors.black)),
+                                  cell(const Text('注目度', style: TextStyle(color: Colors.white)), attentionWidth, color: Colors.black),
                                   cell(
                                       const Text('移籍方式',
                                           style:
@@ -86,7 +98,7 @@ class _StrengthTransfersState extends State<StrengthTransfers> {
                                       const Text('備考',
                                           style:
                                               TextStyle(color: Colors.white)),
-                                      width - pinnedWidth - 150,
+                                      width - pinnedWidth - attentionWidth - 150,
                                       color: Colors.black),
                                 ]),
                             Expanded(
@@ -127,6 +139,7 @@ class _StrengthTransfersState extends State<StrengthTransfers> {
                                                                   FontWeight
                                                                       .bold))),
                                                   playerWidth)),
+                                          cell(Tooltip(message: '${row['attention_reason']}', child: Text(List.filled(row['attention'] as int, '★').join(), style: const TextStyle(color: Color(0xFFB77900), fontWeight: FontWeight.bold))), attentionWidth),
                                           cell(
                                               Text((row['labels'] as List)
                                                   .join('・')),
@@ -143,7 +156,7 @@ class _StrengthTransfersState extends State<StrengthTransfers> {
                                                     const SizedBox(height: 4),
                                                     Text('${row['detail']}'),
                                                   ]),
-                                              width - pinnedWidth - 150),
+                                              width - pinnedWidth - attentionWidth - 150),
                                         ]),
                                 ])),
                           ])));

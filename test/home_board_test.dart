@@ -6,6 +6,7 @@ import 'package:Yakyuu_Japan/View/season_schedule_board.dart';
 import 'package:Yakyuu_Japan/View/EventCalendar.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:Yakyuu_Japan/logic/auth_session.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -15,6 +16,87 @@ void main() {
   setUp(HomeDataCache.clear);
   setUp(HomeCalendarCache.clear);
   tearDown(HomeCalendarCache.clear);
+  testWidgets('HOME表示で前回既読日時を保持し、認証ユーザーの日時を一度だけ更新する', (tester) async {
+    final session = AuthSession.instance;
+    session.user = AuthUser.fromJson({'id': 1, 'date_read_news': '2026-10-25T00:00:00Z'});
+    session.token = 'test-session';
+    addTearDown(() { session.user = null; session.token = null; });
+    var writes = 0;
+    DateTime? baseline;
+    await http.runWithClient(() async {
+      await tester.pumpWidget(MaterialApp(home: Scaffold(body: HomeBoard(onNewsViewed: (id, previous) {
+        expect(id, 1); baseline = previous;
+      }))));
+      await tester.pumpAndSettle();
+      expect(writes, 1);
+      expect(baseline, DateTime.utc(2026,10,25));
+      expect(session.user!.dateReadNews, DateTime.utc(2026,10,27));
+      await tester.pump();
+      expect(writes, 1);
+    }, () => MockClient((request) async {
+      if (request.url.path == '/auth/mark-read') {
+        writes++;
+        expect(request.method, 'POST');
+        expect(request.headers['Authorization'], 'Bearer test-session');
+        expect(jsonDecode(request.body), {'target': 'news'});
+        return http.Response(jsonEncode({'ok': true, 'user': {'id': 1, 'date_read_news': '2026-10-27T00:00:00Z'}}), 200);
+      }
+      return http.Response(jsonEncode({'today': '2026-10-27', 'games': [], 'heroes': [], 'events': [], 'stats_team': []}), 200);
+    }));
+  });
+
+  testWidgets('終了試合の生成画像と成績を表示し未終了の試合を含めない', (tester) async {
+    final session = AuthSession.instance;
+    session.user = AuthUser.fromJson({'id': 1});
+    session.token = 'test-session';
+    addTearDown(() { session.user = null; session.token = null; });
+    await tester.binding.setSurfaceSize(const Size(320, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await http.runWithClient(() async {
+      await tester.pumpWidget(const MaterialApp(home: Scaffold(body: HomeBoard())));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('home-hero-game-NPB-1')), findsOneWidget);
+      expect(find.byKey(const ValueKey('home-hero-game-NPB-2')), findsNothing);
+      expect(find.text('7回 0失点（自責点0） 10奪三振'), findsOneWidget);
+      expect(find.text('勝利投手'), findsOneWidget);
+      final images = tester.widgetList<Image>(find.byType(Image));
+      expect(images.any((image) => image.semanticLabel == '投手の生成画像' &&
+        image.image is NetworkImage && (image.image as NetworkImage).url.endsWith('/player-art/test.png')), isTrue);
+      expect(tester.takeException(), isNull);
+    }, () => MockClient((request) async {
+      if (request.url.path == '/auth/mark-read') return http.Response('{}', 401);
+      return http.Response(jsonEncode({
+        'today': '2026-10-27', 'events': [], 'stats_team': [],
+        'games': [
+          {'id_game': 1, 'org': 'NPB', 'date_game': '2026-10-27', 'state': '試合終了'},
+          {'id_game': 2, 'org': 'NPB', 'date_game': '2026-10-27', 'state': '5回表'},
+        ],
+        'heroes': [{'id_game': 1, 'org': 'NPB', 'id_player': 1, 'name_player': '投手',
+          'name_team': '球団', 'character_image': {'url': '/player-art/test.png'},
+          'appearance_stats': ['7回 0失点（自責点0） 10奪三振'], 'highlights': ['勝利投手']}],
+      }), 200, headers: {'content-type': 'application/json; charset=utf-8'});
+    }));
+  });
+
+  testWidgets('誕生日の選手はゲストにも表示し、狭い画面でも折り返す', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(320, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await http.runWithClient(() async {
+      await tester.pumpWidget(const MaterialApp(home: Scaffold(body: HomeBoard())));
+      await tester.pumpAndSettle();
+      expect(find.text('今日誕生日の選手'), findsOneWidget);
+      expect(find.text('対象選手（阪神）  25歳'), findsOneWidget);
+      expect(find.text('MLB選手（LAD）  30歳'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }, () => MockClient((request) async => http.Response(jsonEncode({
+      'today': '2026-10-27', 'games': [], 'heroes': [], 'events': [], 'stats_team': [],
+      'birthdays': [
+        {'id_player': 10, 'name_player': '対象選手', 'name_team': '阪神', 'org': 'npb', 'age': 25},
+        {'id_player': 20, 'name_player': 'MLB選手', 'name_team': 'LAD', 'org': 'mlb', 'age': 30},
+      ],
+    }), 200, headers: {'content-type': 'application/json; charset=utf-8'})));
+  });
+
   testWidgets('HOME順位はセ・パ横並び、MLBはア3地区・ナ3地区の2段', (tester) async {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -34,6 +116,11 @@ void main() {
             portrait ? findsNothing : findsNWidgets(8));
         for (final panel in panels.evaluate()) {
           final scope = find.byWidget(panel.widget);
+          expect((panel.widget as SeasonTableBlock).useFullStandingsTeamNames, isTrue);
+          if ((panel.widget as SeasonTableBlock).org.kind == OrgKind.npb &&
+              (panel.widget as SeasonTableBlock).onlyLeagueId == 1) {
+            expect(find.descendant(of: scope, matching: find.text('巨人')), findsNWidgets(6));
+          }
           if ((panel.widget as SeasonTableBlock).org.kind == OrgKind.mlb) {
             expect(find.descendant(of: scope,
                 matching: find.text('ロサンゼルス・ドジャース')), findsNWidgets(5));
@@ -49,6 +136,11 @@ void main() {
             expect(chart.right, closeTo(header.right, .01));
           } else {
             expect(chart.left, greaterThanOrEqualTo(header.right));
+            final row = tester.widget<Row>(find.descendant(of: scope,
+              matching: find.byKey(const Key('standings-gb-beside'))));
+            final table = tester.getRect(find.byWidget(row.children.first));
+            expect(table.top, closeTo(chart.top, .01));
+            expect(table.bottom, closeTo(chart.bottom, .01));
           }
         }
         final nameHeaders = find.byKey(const ValueKey('standings-team-name-header'));
@@ -93,9 +185,11 @@ void main() {
     final requests = <String>[];
     await http.runWithClient(() async {
       await tester.pumpWidget(MaterialApp(home: Scaffold(body:
-        HomeSeasonCalendar(year: 2026, weekStart: DateTime(2026, 12, 20)))));
+        HomeSeasonCalendar(year: 2026, weekStart: DateTime(2026, 12, 20), weekCount: 2))));
       await tester.pumpAndSettle();
       DateTime? week() => tester.widget<EventCalendar>(find.byType(EventCalendar)).weekStart;
+      expect(tester.widget<EventCalendar>(find.byType(EventCalendar)).weekCount, 2);
+      expect(requests, containsAll(['npb:2027', 'mlb:2027']));
       await tester.tap(find.byTooltip('次の週'));
       await tester.pumpAndSettle();
       expect(week(), DateTime(2026, 12, 27));
@@ -121,19 +215,27 @@ void main() {
     }));
   });
 
-  testWidgets("今日の試合がない日はTODAY'S HEROを表示しない", (tester) async {
+  testWidgets("終了した今日の試合がなければTODAY'S HEROを表示しない", (tester) async {
     await http.runWithClient(() async {
       await tester.pumpWidget(const MaterialApp(home: Scaffold(body: HomeBoard())));
+      await tester.pump();
+      expect(find.textContaining('（日本時間）'), findsNothing);
       await tester.pumpAndSettle();
       expect(find.text("TODAY'S HERO — 今日の試合"), findsNothing);
+      expect(find.text('今日誕生日の選手はいません。'), findsOneWidget);
       expect(find.text('勝利チームの活躍選手'), findsNothing);
       expect(find.text('今日の試合は登録されていません。'), findsNothing);
       expect(tester.takeException(), isNull);
     }, () => MockClient((request) async => http.Response(jsonEncode({
       'today': '2026-10-23',
-      'games': [{'date_game': '2026-10-24', 'id_game': 2, 'org': 'NPB'}],
+      'games': [
+        {'date_game': '2026-10-24', 'id_game': 2, 'org': 'NPB', 'state': '試合終了'},
+        {'date_game': '2026-10-23', 'id_game': 3, 'org': 'NPB', 'state': '5回表'},
+        {'date_game': '2026-10-23', 'id_game': 4, 'org': 'NPB', 'state': '試合前'},
+        {'date_game': '2026-10-23', 'id_game': 5, 'org': 'NPB', 'state': '中止'},
+      ],
       'heroes': [], 'events': [], 'stats_team': [],
-    }), 200)));
+    }), 200, headers: {'content-type': 'application/json; charset=utf-8'})));
   });
 
   testWidgets('HOMEカレンダーは両団体の日程をまとめ年送りで両方更新する', (tester) async {
@@ -167,6 +269,8 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
     await http.runWithClient(() async {
       await tester.pumpWidget(const MaterialApp(home: Scaffold(body: HomeBoard())));
+      await tester.pump();
+      expect(find.textContaining('（日本時間）'), findsNothing);
       await tester.pumpAndSettle();
       expect(find.text('NPB 公式サイト'), findsNothing);
       expect(find.text('MLB 公式サイト'), findsNothing);
@@ -178,9 +282,14 @@ void main() {
       expect(find.descendant(of: find.byKey(const ValueKey('home-hero-game-NPB-1')),
           matching: find.text('NPB  阪神  活躍選手')), findsOneWidget);
       expect(find.text('NPB  阪神  活躍選手'), findsOneWidget);
-      await tester.scrollUntilVisible(find.text('今週のカレンダー（NPB・MLB）'), 200, scrollable: find.byType(Scrollable).first);
-      expect(find.text('今週のカレンダー（NPB・MLB）'), findsOneWidget);
+      expect(find.text('4打数3安打 2打点'), findsOneWidget);
+      expect(find.text('猛打賞'), findsOneWidget);
+      expect(find.text('1本塁打'), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('今週・翌週のカレンダー（NPB・MLB）'), 200, scrollable: find.byType(Scrollable).first);
+      expect(find.text('今週・翌週のカレンダー（NPB・MLB）'), findsOneWidget);
       expect(tester.widget<EventCalendar>(find.byType(EventCalendar)).weekStart, DateTime(2026,10,18));
+      expect(tester.widget<EventCalendar>(find.byType(EventCalendar)).weekCount, 2);
+      expect(find.text('31'), findsOneWidget);
       await tester.scrollUntilVisible(find.text('1ヶ月分の日程を見る'), 150, scrollable: find.byType(Scrollable).first);
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.text('1ヶ月分の日程を見る'));
@@ -268,7 +377,7 @@ void main() {
         'today':'2026-10-23', 'notification':[], 'events':[],
         'articles':[{'title':'テストの野球記事タイトル', 'url':'https://news.yahoo.co.jp/articles/test', 'category':'NPB', 'source':'Yahoo!ニュース'}],
         'games':[{'id_game':1,'date_game':'2026-10-23','org':'NPB','name_team_home':'阪神','name_team_away':'巨人','score_home':3,'score_away':1,'state':'試合終了'}],
-        'heroes':[{'id_game':1,'id_player':1,'name_player':'活躍選手','name_team':'阪神','org':'NPB'}],
+        'heroes':[{'id_game':1,'id_player':1,'name_player':'活躍選手','name_team':'阪神','org':'NPB','appearance_stats':['4打数3安打 2打点'],'highlights':['1本塁打','猛打賞'],'character_image':{'url':'/player-art/test.png'}}],
         'leaders':[{'id_league':1,'title':'打率','name_player':'首位打者','name_team':'阪神','stats':'.330'}],
       }),200,headers:{'content-type':'application/json; charset=utf-8'});
     }));

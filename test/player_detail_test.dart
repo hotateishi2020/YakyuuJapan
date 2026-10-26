@@ -12,6 +12,11 @@ import 'package:Yakyuu_Japan/View/GamesBoard.dart' show GameBattingResult, GameP
 import 'package:Yakyuu_Japan/View/BlinkBg.dart';
 
 void main() {
+  setUp(() {
+    AuthSession.instance.user = AuthUser.fromJson({'id': 1});
+    AuthSession.instance.token = 'test';
+  });
+  tearDown(() { AuthSession.instance.user = null; AuthSession.instance.token = null; });
   for (final special in [false, true]) {
     testWidgets('選手生成画像は許可ユーザーだけ表示しログアウトで消える $special', (t) async {
       AuthSession.instance.user = AuthUser.fromJson({'id': special ? 1 : 3, 'flg_special': special});

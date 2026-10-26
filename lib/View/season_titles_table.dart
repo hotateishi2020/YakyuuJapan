@@ -84,6 +84,23 @@ class SeasonTitlesTable extends StatelessWidget {
   }
 
   Widget winners(List<Map<String, dynamic>> values, {bool mlb = false, String empty = '未定', bool showLogo = false, bool showStatus = true, bool showVideo = false, String? side, Color? background}) {
+    final statsAtBottom = values.any((row) => ['major', 'farm_major'].contains(row['key']));
+    bool hasValue(Map<String, dynamic> row) => row['value'] != null &&
+        !['', '受賞', 'null', '—', 'ー'].contains('${row['value']}'.trim());
+    String statText(Map<String, dynamic> row) {
+      final value = '${row['value']}'.trim();
+      if (statsAtBottom) {
+        final number = value.replaceFirst(
+          RegExp(r'^(?:ホールドポイント|奪三振|防御率|出塁率|本塁打|セーブ|勝利|勝率|安打|打点|打率|盗塁)\s*[:：]?\s*'), '');
+        return '$number${row['unit'] ?? ''}';
+      }
+      return '${row['record_label'] == null ? '' : '${row['record_label']}：'}$value${row['unit'] ?? ''}';
+    }
+    Widget statLabel(String text) => Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Text(text, textAlign: TextAlign.center,
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: ink)),
+    );
     return cell(
         values.isEmpty
             ? Text(empty, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, color: muted))
@@ -147,9 +164,11 @@ class SeasonTitlesTable extends StatelessWidget {
                                   );
                                 }),
                             ]),
-                            if (row['value'] != null && !['', '受賞', 'null', '—', 'ー'].contains('${row['value']}'.trim())) Padding(padding: const EdgeInsets.only(top: 4), child: Text('${row['record_label'] == null ? '' : '${row['record_label']}：'}${row['value']}${row['unit'] ?? ''}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: ink))),
+                            if (!statsAtBottom && hasValue(row)) statLabel(statText(row)),
                             if (showStatus && row['confirmed'] != true && row['statistical'] == true) const Text('指標首位（表彰対象外を含む）', style: TextStyle(fontSize: 10, color: Color(0xffa64b00))),
                           ]))),
+                if (statsAtBottom)
+                  for (final text in values.where(hasValue).map(statText).toSet()) statLabel(text),
               ]),
         color: background ??
             (side == 'セ'

@@ -9,6 +9,32 @@ void main() {
   final rows = listMapFromJson(
       jsonDecode(File('backend/data/regular-history.json').readAsStringSync())['rows']);
 
+  test('全540球団年度の投手を補完し実際に左先発がいない3年度だけ除外する', () {
+    expect(rows.length, 540);
+    const noLeftStarter = {'1996:日本ハム', '1981:ソフトバンク', '1981:広島'};
+    for (final row in rows) {
+      final key = '${row['year']}:${row['club_name']}';
+      expect(row['archive_stat_sources'], isNotEmpty, reason: key);
+      final selected = selectPitcherAces(row);
+      for (final slot in pitcherAceSlots.keys) {
+        if (slot == 'SP_L' && noLeftStarter.contains(key)) {
+          expect(selected[slot], isNull, reason: key);
+          continue;
+        }
+        expect(selected[slot], isNotEmpty, reason: '$key $slot');
+      }
+    }
+  });
+
+  test('兼任投手の内訳未確認でも確認済み先発登板数でエースを表示する', () {
+    final row = rows.singleWhere((r) => r['year'] == 2021 && r['club_name'] == 'ソフトバンク');
+    final pitcher = selectPitcherAces(row)['SP_R']!.single;
+    expect(pitcher['name'], '石川柊太');
+    expect(pitcher['ace_basis'], 'starts');
+    expect(pitcher['starts'], 25);
+    expect(pitcher['starter_outs'], isNull);
+  });
+
   test('全年度の守備レギュラーは現年度と同じ選出処理で選手を重複させない', () {
     for (final row in rows) {
       final selected = selectRegularGroups(listMapFromJson(row['positions']));

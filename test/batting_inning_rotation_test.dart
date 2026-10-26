@@ -82,6 +82,8 @@ void main() {
 
     final chip = find.descendant(of: opening, matching: find.text('左安'));
     final header = find.descendant(of: opening, matching: keyed('plate-event-header'));
+    final runnerFooter = find.descendant(of: opening, matching: keyed('plate-event-footer'));
+    expect(tester.getTopLeft(runnerFooter).dy, greaterThanOrEqualTo(tester.getBottomLeft(chip).dy));
     for (final expected in [
       ('投手', '新投手', const Color(0xFFFF4B7D)),
       ('盗塁', '盗塁：走者', const Color(0xFFC6FF00)),

@@ -45,6 +45,8 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('1981年'), findsOneWidget);
       expect(find.text('昔の投手'), findsOneWidget);
+      expect(find.text('投手'), findsNothing);
+      expect(find.text('30先発'), findsOneWidget);
       expect(find.text('昔の捕手'), findsOneWidget);
       await tester.tap(find.text('打順'));
       await tester.pumpAndSettle();
@@ -61,6 +63,13 @@ void main() {
                         'name_team': '巨人',
                         'year': 1981,
                         'source_label': 'スタメンデータベース',
+                        'historical_enrichment_version': 2,
+                        'pitching_workload': [
+                          {'name': '昔の投手', 'throws': '右', 'starts': 30,
+                            'appearances': 35, 'total_outs': 600},
+                          {'name': '昔の救援投手', 'throws': '右', 'starts': 0,
+                            'appearances': 50, 'relief_outs': 180, 'total_outs': 180},
+                        ],
                         'positions': [
                           {
                             'slot': 'P',

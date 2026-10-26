@@ -1,0 +1,1591 @@
+{
+  "year": 2026,
+  "scope": "一軍レギュラーシーズンの年度内最長。歴代記録は対象外。",
+  "organizations": {
+    "npb": {
+      "checked_at": "2026-10-26T13:24:49.004035+00:00",
+      "categories": [
+        {
+          "key": "hit_games",
+          "before": [
+            {
+              "name": "山口　航輝",
+              "year": 2026,
+              "value": 6,
+              "status": "unknown",
+              "id_player": 1370
+            }
+          ],
+          "after": [
+            {
+              "name": "勝又温史",
+              "team": "DeNA",
+              "value": 23,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=11"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=11"
+          ],
+          "note": "セ・パ両リーグのシーズン最高記録を照合。同率を全員保持。出典：ヌルデータ置き場f3。"
+        },
+        {
+          "key": "hr_games",
+          "before": [
+            {
+              "name": "山口　航輝",
+              "year": 2026,
+              "value": 3,
+              "status": "unknown",
+              "id_player": 1370
+            }
+          ],
+          "after": [
+            {
+              "name": "筒香嘉智",
+              "team": "DeNA",
+              "value": 4,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=14"
+            },
+            {
+              "name": "近藤健介",
+              "team": "ソフトバンク",
+              "value": 4,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=14"
+            },
+            {
+              "name": "山口航輝",
+              "team": "ロッテ",
+              "value": 4,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=14"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=14",
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=14"
+          ],
+          "note": "セ・パ両リーグのシーズン最高記録を照合。同率を全員保持。出典：ヌルデータ置き場f3。"
+        },
+        {
+          "key": "onbase_games",
+          "before": [
+            {
+              "name": "近本　光司",
+              "year": 2026,
+              "value": 6,
+              "status": "unknown",
+              "id_player": 654
+            },
+            {
+              "name": "山口　航輝",
+              "year": 2026,
+              "value": 6,
+              "status": "unknown",
+              "id_player": 1370
+            }
+          ],
+          "after": [
+            {
+              "name": "勝又温史",
+              "team": "DeNA",
+              "value": 33,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=15"
+            },
+            {
+              "name": "正木智也",
+              "team": "ソフトバンク",
+              "value": 33,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=15"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=15",
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=15"
+          ],
+          "note": "セ・パ両リーグのシーズン最高記録を照合。同率を全員保持。出典：ヌルデータ置き場f3。"
+        },
+        {
+          "key": "hit_pa",
+          "before": [
+            {
+              "name": "森下　翔太",
+              "year": 2026,
+              "value": 3,
+              "status": "unknown",
+              "id_player": 653
+            },
+            {
+              "name": "寺地　隆成",
+              "year": 2026,
+              "value": 3,
+              "status": "unknown",
+              "id_player": 1346
+            }
+          ],
+          "after": [
+            {
+              "name": "度会隆輝",
+              "team": "DeNA",
+              "value": 6,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=16"
+            },
+            {
+              "name": "丸山和郁",
+              "team": "ヤクルト",
+              "value": 6,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=16"
+            },
+            {
+              "name": "郡司裕也",
+              "team": "日本ハム",
+              "value": 6,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=16"
+            },
+            {
+              "name": "柳田悠岐",
+              "team": "ソフトバンク",
+              "value": 6,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=16"
+            },
+            {
+              "name": "マッカスカー",
+              "team": "楽天",
+              "value": 6,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=16"
+            },
+            {
+              "name": "山中稜真",
+              "team": "オリックス",
+              "value": 6,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=16"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=16",
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=16"
+          ],
+          "note": "セ・パ両リーグのシーズン最高記録を照合。同率を全員保持。出典：ヌルデータ置き場f3。"
+        },
+        {
+          "key": "hr_pa",
+          "before": [
+            {
+              "name": "大山　悠輔",
+              "year": 2026,
+              "value": 1,
+              "status": "unknown",
+              "id_player": 638
+            },
+            {
+              "name": "佐藤　輝明",
+              "year": 2026,
+              "value": 1,
+              "status": "unknown",
+              "id_player": 640
+            },
+            {
+              "name": "リチャード",
+              "year": 2026,
+              "value": 1,
+              "status": "unknown",
+              "id_player": 572
+            },
+            {
+              "name": "近藤　健介",
+              "year": 2026,
+              "value": 1,
+              "status": "unknown",
+              "id_player": 1008
+            },
+            {
+              "name": "井上　広大",
+              "year": 2026,
+              "value": 1,
+              "status": "unknown",
+              "id_player": 4865
+            },
+            {
+              "name": "佐藤　都志也",
+              "year": 2026,
+              "value": 1,
+              "status": "unknown",
+              "id_player": 1343
+            },
+            {
+              "name": "山本　祐大",
+              "year": 2026,
+              "value": 1,
+              "status": "unknown",
+              "id_player": 848
+            },
+            {
+              "name": "坂本　誠志郎",
+              "year": 2026,
+              "value": 1,
+              "status": "unknown",
+              "id_player": 631
+            },
+            {
+              "name": "末包　昇大",
+              "year": 2026,
+              "value": 1,
+              "status": "unknown",
+              "id_player": 939
+            },
+            {
+              "name": "丸　佳浩",
+              "year": 2026,
+              "value": 1,
+              "status": "unknown",
+              "id_player": 577
+            },
+            {
+              "name": "上田　希由翔",
+              "year": 2026,
+              "value": 1,
+              "status": "unknown",
+              "id_player": 1352
+            },
+            {
+              "name": "山口　航輝",
+              "year": 2026,
+              "value": 1,
+              "status": "unknown",
+              "id_player": 1370
+            },
+            {
+              "name": "長谷川　信哉",
+              "year": 2026,
+              "value": 1,
+              "status": "unknown",
+              "id_player": 1087
+            }
+          ],
+          "after": [
+            {
+              "name": "森下翔太",
+              "team": "阪神",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "オスナ",
+              "team": "ヤクルト",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "牧秀悟",
+              "team": "DeNA",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "大山悠輔",
+              "team": "阪神",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "佐藤輝明",
+              "team": "阪神",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "サノー",
+              "team": "中日",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "ダルベック",
+              "team": "巨人",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "阿部寿樹",
+              "team": "中日",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "細川成也",
+              "team": "中日",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "板山祐太郎",
+              "team": "中日",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "エンカーナシオン",
+              "team": "DeNA",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "モンテル",
+              "team": "ヤクルト",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "ガルシア",
+              "team": "阪神",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "宗山塁",
+              "team": "楽天",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "近藤健介",
+              "team": "ソフトバンク",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "野村佑希",
+              "team": "日本ハム",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "山川穂高",
+              "team": "ソフトバンク",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "宗佑磨",
+              "team": "オリックス",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "柳田悠岐",
+              "team": "ソフトバンク",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "栗原陵矢",
+              "team": "ソフトバンク",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "カナリオ",
+              "team": "西武",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "ネビン",
+              "team": "西武",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "正木智也",
+              "team": "ソフトバンク",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "佐藤都志也",
+              "team": "ロッテ",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "マッカスカー",
+              "team": "楽天",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "来田涼斗",
+              "team": "オリックス",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "山口航輝",
+              "team": "ロッテ",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "吉田賢吾",
+              "team": "日本ハム",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "林安可",
+              "team": "西武",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "レイエス",
+              "team": "日本ハム",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=17"
+            },
+            {
+              "name": "野村勇",
+              "team": "ソフトバンク",
+              "value": 2,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=17"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=17",
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=17"
+          ],
+          "note": "セ・パ両リーグのシーズン最高記録を照合。同率を全員保持。出典：ヌルデータ置き場f3。"
+        },
+        {
+          "key": "onbase_pa",
+          "before": [
+            {
+              "name": "近本　光司",
+              "year": 2026,
+              "value": 3,
+              "status": "unknown",
+              "id_player": 654
+            },
+            {
+              "name": "森下　翔太",
+              "year": 2026,
+              "value": 3,
+              "status": "unknown",
+              "id_player": 653
+            },
+            {
+              "name": "佐藤　輝明",
+              "year": 2026,
+              "value": 3,
+              "status": "unknown",
+              "id_player": 640
+            },
+            {
+              "name": "近藤　健介",
+              "year": 2026,
+              "value": 3,
+              "status": "unknown",
+              "id_player": 1008
+            },
+            {
+              "name": "寺地　隆成",
+              "year": 2026,
+              "value": 3,
+              "status": "unknown",
+              "id_player": 1346
+            },
+            {
+              "name": "西川　史礁",
+              "year": 2026,
+              "value": 3,
+              "status": "unknown",
+              "id_player": 1364
+            },
+            {
+              "name": "坂倉　将吾",
+              "year": 2026,
+              "value": 3,
+              "status": "unknown",
+              "id_player": 911
+            },
+            {
+              "name": "伏見　寅威",
+              "year": 2026,
+              "value": 3,
+              "status": "unknown",
+              "id_player": 4829
+            }
+          ],
+          "after": [
+            {
+              "name": "大山悠輔",
+              "team": "阪神",
+              "value": 8,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=21"
+            },
+            {
+              "name": "佐藤輝明",
+              "team": "阪神",
+              "value": 8,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=21"
+            },
+            {
+              "name": "渡部遼人",
+              "team": "オリックス",
+              "value": 8,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=21"
+            },
+            {
+              "name": "郡司裕也",
+              "team": "日本ハム",
+              "value": 8,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=21"
+            },
+            {
+              "name": "レイエス",
+              "team": "日本ハム",
+              "value": 8,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=21"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=0&dn=21",
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=0&dn=21"
+          ],
+          "note": "セ・パ両リーグのシーズン最高記録を照合。同率を全員保持。出典：ヌルデータ置き場f3。"
+        },
+        {
+          "key": "wins",
+          "before": [
+            {
+              "name": "大瀬良　大地",
+              "year": 2026,
+              "value": 2,
+              "status": "unknown",
+              "id_player": 879
+            },
+            {
+              "name": "尾形　崇斗",
+              "year": 2026,
+              "value": 2,
+              "status": "unknown",
+              "id_player": 963
+            }
+          ],
+          "after": [
+            {
+              "name": "前田悠伍",
+              "team": "ソフトバンク",
+              "value": 12,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=1&dn=11"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=1&dn=11"
+          ],
+          "note": "セ・パ両リーグのシーズン最高記録を照合。同率を全員保持。出典：ヌルデータ置き場f3。"
+        },
+        {
+          "key": "holds",
+          "before": [
+            {
+              "name": "ウィンゲンター",
+              "team": "西武",
+              "year": 2026,
+              "value": 20,
+              "period": "2026-06-11〜2026-08-12",
+              "status": "active",
+              "source_url": "https://npb.jp/history/2026/review_rec_p.html"
+            }
+          ],
+          "after": [
+            {
+              "name": "ウィンゲンター",
+              "team": "西武",
+              "value": 20,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=1&dn=13",
+              "sources": [
+                "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=1&dn=13",
+                "https://npb.jp/history/2026/review_rec_p.html"
+              ]
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=1&dn=13",
+            "https://npb.jp/history/2026/review_rec_p.html"
+          ],
+          "note": "セ・パ両リーグのシーズン最高記録を照合。同率を全員保持。出典：ヌルデータ置き場f3。"
+        },
+        {
+          "key": "saves",
+          "before": [
+            {
+              "name": "藤平　尚真",
+              "year": 2026,
+              "value": 2,
+              "status": "unknown",
+              "id_player": 1249
+            },
+            {
+              "name": "森浦　大輔",
+              "year": 2026,
+              "value": 2,
+              "status": "unknown",
+              "id_player": 878
+            }
+          ],
+          "after": [
+            {
+              "name": "マチャド",
+              "team": "オリックス",
+              "value": 14,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=1&dn=14"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=1&dn=14"
+          ],
+          "note": "セ・パ両リーグのシーズン最高記録を照合。同率を全員保持。出典：ヌルデータ置き場f3。"
+        },
+        {
+          "key": "scoreless_games",
+          "before": [
+            {
+              "name": "岩崎　優",
+              "year": 2026,
+              "value": 4,
+              "status": "unknown",
+              "id_player": 594
+            }
+          ],
+          "after": [
+            {
+              "name": "田中瑛斗",
+              "team": "巨人",
+              "value": 23,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=1&dn=17"
+            },
+            {
+              "name": "オスナ",
+              "team": "ソフトバンク",
+              "value": 23,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=1&dn=17"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=0&tm=srk&fp=1&dn=17",
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?y=0&leg=1&tm=srk&fp=1&dn=17"
+          ],
+          "note": "セ・パ両リーグのシーズン最高記録を照合。同率を全員保持。出典：ヌルデータ置き場f3。"
+        },
+        {
+          "key": "appearances",
+          "before": [
+            {
+              "name": "近本　光司",
+              "year": 2026,
+              "value": 4,
+              "status": "unknown",
+              "id_player": 654
+            },
+            {
+              "name": "中野　拓夢",
+              "year": 2026,
+              "value": 4,
+              "status": "unknown",
+              "id_player": 646
+            },
+            {
+              "name": "森下　翔太",
+              "year": 2026,
+              "value": 4,
+              "status": "unknown",
+              "id_player": 653
+            },
+            {
+              "name": "佐藤　輝明",
+              "year": 2026,
+              "value": 4,
+              "status": "unknown",
+              "id_player": 640
+            },
+            {
+              "name": "大山　悠輔",
+              "year": 2026,
+              "value": 4,
+              "status": "unknown",
+              "id_player": 638
+            },
+            {
+              "name": "髙寺　望夢",
+              "year": 2026,
+              "value": 4,
+              "status": "unknown",
+              "id_player": 650
+            },
+            {
+              "name": "糸原　健斗",
+              "year": 2026,
+              "value": 4,
+              "status": "unknown",
+              "id_player": 642
+            },
+            {
+              "name": "熊谷　敬宥",
+              "year": 2026,
+              "value": 4,
+              "status": "unknown",
+              "id_player": 639
+            }
+          ],
+          "after": [
+            {
+              "name": "佐藤輝明",
+              "team": "阪神",
+              "value": 143,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://npb.jp/bis/2026/stats/idb1_t.html"
+            },
+            {
+              "name": "中野拓夢",
+              "team": "阪神",
+              "value": 143,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://npb.jp/bis/2026/stats/idb1_t.html"
+            },
+            {
+              "name": "森下翔太",
+              "team": "阪神",
+              "value": 143,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://npb.jp/bis/2026/stats/idb1_t.html"
+            },
+            {
+              "name": "細川成也",
+              "team": "中日",
+              "value": 143,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://npb.jp/bis/2026/stats/idb1_d.html"
+            },
+            {
+              "name": "西川龍馬",
+              "team": "オリックス",
+              "value": 143,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://npb.jp/bis/2026/stats/idb1_b.html"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://npb.jp/bis/2026/stats/idb1_b.html",
+            "https://npb.jp/bis/2026/stats/idb1_d.html",
+            "https://npb.jp/bis/2026/stats/idb1_t.html"
+          ],
+          "note": "NPB公式の12球団全選手成績を照合。各球団143試合、143試合出場者は全試合連続出場。"
+        },
+        {
+          "key": "steals",
+          "before": [
+            {
+              "name": "庄子　雄大",
+              "year": 2026,
+              "value": 2,
+              "status": "unknown",
+              "id_player": 999
+            }
+          ],
+          "after": [
+            {
+              "name": "岩田幸宏",
+              "team": "ヤクルト",
+              "year": 2026,
+              "value": 12,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=64&leg=0&mon=0&tm=S&vst=all&y=0",
+              "sources": [
+                "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=64&leg=0&mon=0&tm=S&vst=all&y=0",
+                "https://npb.jp/bis/2026/stats/idb1_s.html"
+              ]
+            },
+            {
+              "name": "庄子雄大",
+              "team": "ソフトバンク",
+              "year": 2026,
+              "value": 12,
+              "status": "active",
+              "source_url": "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=25&leg=1&mon=0&tm=H&vst=all&y=0",
+              "sources": [
+                "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=25&leg=1&mon=0&tm=H&vst=all&y=0",
+                "https://npb.jp/bis/2026/stats/idb1_h.html"
+              ]
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=25&leg=1&mon=0&tm=H&vst=all&y=0",
+            "https://nf3.sakura.ne.jp/php/stat_disp/stat_disp.php?fpnum=64&leg=0&mon=0&tm=S&vst=all&y=0",
+            "https://npb.jp/bis/2026/stats/idb1_h.html",
+            "https://npb.jp/bis/2026/stats/idb1_s.html"
+          ],
+          "note": "NPB公式年間盗塁・盗塁刺と全候補者の試合別合計を照合。同日の成功・失敗の全順序で最長値と同率首位が変わらないことを確認。年間盗塁数が確定最長値未満の選手は上限で除外。"
+        },
+        {
+          "key": "outs",
+          "before": [
+            {
+              "name": "山野　太一",
+              "year": 2026,
+              "value": 15,
+              "status": "unknown",
+              "id_player": 744
+            }
+          ],
+          "after": [],
+          "status": "unavailable",
+          "note": "走者の出塁・打者のアウトを全公式戦の打席順で確認できる資料が未取得。",
+          "sources": []
+        },
+        {
+          "key": "scoreless_innings",
+          "before": [],
+          "after": [],
+          "status": "unavailable",
+          "note": "失点時点・端数回・前任投手の残した走者を含む公式の年度内最長値が未確認。",
+          "sources": []
+        },
+        {
+          "key": "strikeouts",
+          "before": [
+            {
+              "name": "大竹　耕太郎",
+              "year": 2026,
+              "value": 6,
+              "status": "unknown",
+              "id_player": 617
+            }
+          ],
+          "after": [],
+          "status": "unavailable",
+          "note": "試合をまたぐ対戦打者順を含めた年度内最長値が未確認。",
+          "sources": []
+        }
+      ]
+    },
+    "mlb": {
+      "checked_at": "2026-10-26T13:30:19.209294+00:00",
+      "categories": [
+        {
+          "key": "wins",
+          "before": [
+            {
+              "name": "チェース・バーンズ",
+              "year": 2026,
+              "value": 12,
+              "source": "https://statsapi.mlb.com/api/v1/people/695505/stats?stats=gameLog&group=hitting,pitching&season=2026",
+              "status": "active",
+              "player_id": 695505
+            }
+          ],
+          "after": [
+            {
+              "player_id": 695505,
+              "name": "Chase Burns",
+              "value": 12,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/695505/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://statsapi.mlb.com/api/v1/schedule?sportId=1&gameType=R&season=2026",
+            "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting,pitching&season=2026&sportIds=1&playerPool=ALL&limit=10000",
+            "https://statsapi.mlb.com/api/v1/people/695505/stats?stats=gameLog&group=hitting,pitching&season=2026"
+          ],
+          "note": "MLB公式の全2429試合・全1472選手を集計。試合別・打席別の年間合計を公式シーズン成績と照合。"
+        },
+        {
+          "key": "saves",
+          "before": [
+            {
+              "name": "ケード・スミス",
+              "year": 2026,
+              "value": 16,
+              "source": "https://statsapi.mlb.com/api/v1/people/671922/stats?stats=gameLog&group=hitting,pitching&season=2026",
+              "status": "active",
+              "player_id": 671922
+            }
+          ],
+          "after": [
+            {
+              "player_id": 671922,
+              "name": "Cade Smith",
+              "value": 16,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/671922/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://statsapi.mlb.com/api/v1/schedule?sportId=1&gameType=R&season=2026",
+            "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting,pitching&season=2026&sportIds=1&playerPool=ALL&limit=10000",
+            "https://statsapi.mlb.com/api/v1/people/671922/stats?stats=gameLog&group=hitting,pitching&season=2026"
+          ],
+          "note": "MLB公式の全2429試合・全1472選手を集計。試合別・打席別の年間合計を公式シーズン成績と照合。"
+        },
+        {
+          "key": "holds",
+          "before": [
+            {
+              "name": "ブラッド・ケラー",
+              "year": 2026,
+              "value": 9,
+              "source": "https://statsapi.mlb.com/api/v1/people/641745/stats?stats=gameLog&group=hitting,pitching&season=2026",
+              "status": "active",
+              "player_id": 641745
+            }
+          ],
+          "after": [
+            {
+              "player_id": 641745,
+              "name": "Brad Keller",
+              "value": 9,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/641745/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://statsapi.mlb.com/api/v1/schedule?sportId=1&gameType=R&season=2026",
+            "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting,pitching&season=2026&sportIds=1&playerPool=ALL&limit=10000",
+            "https://statsapi.mlb.com/api/v1/people/641745/stats?stats=gameLog&group=hitting,pitching&season=2026"
+          ],
+          "note": "MLB公式の全2429試合・全1472選手を集計。試合別・打席別の年間合計を公式シーズン成績と照合。"
+        },
+        {
+          "key": "scoreless_games",
+          "before": [
+            {
+              "name": "アブネル・ウリベ",
+              "year": 2026,
+              "value": 25,
+              "source": "https://statsapi.mlb.com/api/v1/people/682842/stats?stats=gameLog&group=hitting,pitching&season=2026",
+              "status": "active",
+              "player_id": 682842
+            },
+            {
+              "name": "メイソン・モンゴメリー",
+              "year": 2026,
+              "value": 25,
+              "source": "https://statsapi.mlb.com/api/v1/people/682254/stats?stats=gameLog&group=hitting,pitching&season=2026",
+              "status": "active",
+              "player_id": 682254
+            }
+          ],
+          "after": [
+            {
+              "player_id": 682254,
+              "name": "Mason Montgomery",
+              "value": 25,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/682254/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            },
+            {
+              "player_id": 682842,
+              "name": "Abner Uribe",
+              "value": 25,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/682842/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://statsapi.mlb.com/api/v1/schedule?sportId=1&gameType=R&season=2026",
+            "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting,pitching&season=2026&sportIds=1&playerPool=ALL&limit=10000",
+            "https://statsapi.mlb.com/api/v1/people/682254/stats?stats=gameLog&group=hitting,pitching&season=2026",
+            "https://statsapi.mlb.com/api/v1/people/682842/stats?stats=gameLog&group=hitting,pitching&season=2026"
+          ],
+          "note": "MLB公式の全2429試合・全1472選手を集計。試合別・打席別の年間合計を公式シーズン成績と照合。"
+        },
+        {
+          "key": "hit_games",
+          "before": [
+            {
+              "name": "ザカリー・ゲロフ",
+              "year": 2026,
+              "value": 24,
+              "source": "https://statsapi.mlb.com/api/v1/people/680869/stats?stats=gameLog&group=hitting,pitching&season=2026",
+              "status": "active",
+              "player_id": 680869
+            },
+            {
+              "name": "イルデマロ・バルガス",
+              "year": 2026,
+              "value": 24,
+              "source": "https://statsapi.mlb.com/api/v1/people/545121/stats?stats=gameLog&group=hitting,pitching&season=2026",
+              "status": "active",
+              "player_id": 545121
+            }
+          ],
+          "after": [
+            {
+              "player_id": 545121,
+              "name": "Ildemaro Vargas",
+              "value": 24,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/545121/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            },
+            {
+              "player_id": 680869,
+              "name": "Zack Gelof",
+              "value": 24,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/680869/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://statsapi.mlb.com/api/v1/schedule?sportId=1&gameType=R&season=2026",
+            "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting,pitching&season=2026&sportIds=1&playerPool=ALL&limit=10000",
+            "https://statsapi.mlb.com/api/v1/people/545121/stats?stats=gameLog&group=hitting,pitching&season=2026",
+            "https://statsapi.mlb.com/api/v1/people/680869/stats?stats=gameLog&group=hitting,pitching&season=2026"
+          ],
+          "note": "MLB公式の全2429試合・全1472選手を集計。試合別・打席別の年間合計を公式シーズン成績と照合。"
+        },
+        {
+          "key": "onbase_games",
+          "before": [
+            {
+              "name": "ニック・カーツ",
+              "year": 2026,
+              "value": 48,
+              "source": "https://statsapi.mlb.com/api/v1/people/701762/stats?stats=gameLog&group=hitting,pitching&season=2026",
+              "status": "active",
+              "player_id": 701762
+            }
+          ],
+          "after": [
+            {
+              "player_id": 701762,
+              "name": "Nick Kurtz",
+              "value": 48,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/701762/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://statsapi.mlb.com/api/v1/schedule?sportId=1&gameType=R&season=2026",
+            "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting,pitching&season=2026&sportIds=1&playerPool=ALL&limit=10000",
+            "https://statsapi.mlb.com/api/v1/people/701762/stats?stats=gameLog&group=hitting,pitching&season=2026"
+          ],
+          "note": "MLB公式の全2429試合・全1472選手を集計。試合別・打席別の年間合計を公式シーズン成績と照合。"
+        },
+        {
+          "key": "hr_games",
+          "before": [
+            {
+              "name": "フニオール・カミネロ",
+              "year": 2026,
+              "value": 6,
+              "source": "https://statsapi.mlb.com/api/v1/people/691406/stats?stats=gameLog&group=hitting,pitching&season=2026",
+              "status": "active",
+              "player_id": 691406
+            }
+          ],
+          "after": [
+            {
+              "player_id": 691406,
+              "name": "Junior Caminero",
+              "value": 6,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/691406/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://statsapi.mlb.com/api/v1/schedule?sportId=1&gameType=R&season=2026",
+            "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting,pitching&season=2026&sportIds=1&playerPool=ALL&limit=10000",
+            "https://statsapi.mlb.com/api/v1/people/691406/stats?stats=gameLog&group=hitting,pitching&season=2026"
+          ],
+          "note": "MLB公式の全2429試合・全1472選手を集計。試合別・打席別の年間合計を公式シーズン成績と照合。"
+        },
+        {
+          "key": "appearances",
+          "before": [
+            {
+              "name": "ピート・クローアームストロング",
+              "year": 2026,
+              "value": 162,
+              "source": "https://statsapi.mlb.com/api/v1/people/691718/stats?stats=gameLog&group=hitting,pitching&season=2026",
+              "status": "active",
+              "player_id": 691718
+            },
+            {
+              "name": "フニオール・カミネロ",
+              "year": 2026,
+              "value": 162,
+              "source": "https://statsapi.mlb.com/api/v1/people/691406/stats?stats=gameLog&group=hitting,pitching&season=2026",
+              "status": "active",
+              "player_id": 691406
+            },
+            {
+              "name": "ブライス・ハーパー",
+              "year": 2026,
+              "value": 162,
+              "source": "https://statsapi.mlb.com/api/v1/people/547180/stats?stats=gameLog&group=hitting,pitching&season=2026",
+              "status": "active",
+              "player_id": 547180
+            },
+            {
+              "name": "サル・スチュワート",
+              "year": 2026,
+              "value": 162,
+              "source": "https://statsapi.mlb.com/api/v1/people/701398/stats?stats=gameLog&group=hitting,pitching&season=2026",
+              "status": "active",
+              "player_id": 701398
+            },
+            {
+              "name": "ブライアン・レイノルズ",
+              "year": 2026,
+              "value": 162,
+              "source": "https://statsapi.mlb.com/api/v1/people/668804/stats?stats=gameLog&group=hitting,pitching&season=2026",
+              "status": "active",
+              "player_id": 668804
+            },
+            {
+              "name": "マット・オルソン",
+              "year": 2026,
+              "value": 162,
+              "source": "https://statsapi.mlb.com/api/v1/people/621566/stats?stats=gameLog&group=hitting,pitching&season=2026",
+              "status": "active",
+              "player_id": 621566
+            },
+            {
+              "name": "オジー・アルビーズ",
+              "year": 2026,
+              "value": 162,
+              "source": "https://statsapi.mlb.com/api/v1/people/645277/stats?stats=gameLog&group=hitting,pitching&season=2026",
+              "status": "active",
+              "player_id": 645277
+            }
+          ],
+          "after": [
+            {
+              "player_id": 547180,
+              "name": "Bryce Harper",
+              "value": 162,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/547180/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            },
+            {
+              "player_id": 621566,
+              "name": "Matt Olson",
+              "value": 162,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/621566/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            },
+            {
+              "player_id": 645277,
+              "name": "Ozzie Albies",
+              "value": 162,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/645277/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            },
+            {
+              "player_id": 668804,
+              "name": "Bryan Reynolds",
+              "value": 162,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/668804/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            },
+            {
+              "player_id": 691406,
+              "name": "Junior Caminero",
+              "value": 162,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/691406/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            },
+            {
+              "player_id": 691718,
+              "name": "Pete Crow-Armstrong",
+              "value": 162,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/691718/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            },
+            {
+              "player_id": 701398,
+              "name": "Sal Stewart",
+              "value": 162,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/701398/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://statsapi.mlb.com/api/v1/schedule?sportId=1&gameType=R&season=2026",
+            "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting,pitching&season=2026&sportIds=1&playerPool=ALL&limit=10000",
+            "https://statsapi.mlb.com/api/v1/people/547180/stats?stats=gameLog&group=hitting,pitching&season=2026",
+            "https://statsapi.mlb.com/api/v1/people/621566/stats?stats=gameLog&group=hitting,pitching&season=2026",
+            "https://statsapi.mlb.com/api/v1/people/645277/stats?stats=gameLog&group=hitting,pitching&season=2026",
+            "https://statsapi.mlb.com/api/v1/people/668804/stats?stats=gameLog&group=hitting,pitching&season=2026",
+            "https://statsapi.mlb.com/api/v1/people/691406/stats?stats=gameLog&group=hitting,pitching&season=2026",
+            "https://statsapi.mlb.com/api/v1/people/691718/stats?stats=gameLog&group=hitting,pitching&season=2026",
+            "https://statsapi.mlb.com/api/v1/people/701398/stats?stats=gameLog&group=hitting,pitching&season=2026"
+          ],
+          "note": "MLB公式の全2429試合・全1472選手を集計。試合別・打席別の年間合計を公式シーズン成績と照合。"
+        },
+        {
+          "key": "hit_pa",
+          "before": [],
+          "after": [
+            {
+              "player_id": 686475,
+              "name": "Tyler Tolbert",
+              "value": 12,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/686475/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://statsapi.mlb.com/api/v1/schedule?sportId=1&gameType=R&season=2026",
+            "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting,pitching&season=2026&sportIds=1&playerPool=ALL&limit=10000",
+            "https://statsapi.mlb.com/api/v1/people/686475/stats?stats=gameLog&group=hitting,pitching&season=2026"
+          ],
+          "note": "MLB公式の全2429試合・全1472選手を集計。試合別・打席別の年間合計を公式シーズン成績と照合。"
+        },
+        {
+          "key": "hr_pa",
+          "before": [],
+          "after": [
+            {
+              "player_id": 545121,
+              "name": "Ildemaro Vargas",
+              "value": 3,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/545121/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            },
+            {
+              "player_id": 545361,
+              "name": "Mike Trout",
+              "value": 3,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/545361/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            },
+            {
+              "player_id": 608324,
+              "name": "Alex Bregman",
+              "value": 3,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/608324/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            },
+            {
+              "player_id": 641933,
+              "name": "Tyler O'Neill",
+              "value": 3,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/641933/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            },
+            {
+              "player_id": 663728,
+              "name": "Cal Raleigh",
+              "value": 3,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/663728/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            },
+            {
+              "player_id": 665862,
+              "name": "Jazz Chisholm Jr.",
+              "value": 3,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/665862/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            },
+            {
+              "player_id": 677595,
+              "name": "Ronny Mauricio",
+              "value": 3,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/677595/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            },
+            {
+              "player_id": 695491,
+              "name": "Joshua Báez",
+              "value": 3,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/695491/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            },
+            {
+              "player_id": 696100,
+              "name": "Hunter Goodman",
+              "value": 3,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/696100/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            },
+            {
+              "player_id": 804668,
+              "name": "Rafael Flores Jr.",
+              "value": 3,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/804668/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://statsapi.mlb.com/api/v1/schedule?sportId=1&gameType=R&season=2026",
+            "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting,pitching&season=2026&sportIds=1&playerPool=ALL&limit=10000",
+            "https://statsapi.mlb.com/api/v1/people/545121/stats?stats=gameLog&group=hitting,pitching&season=2026",
+            "https://statsapi.mlb.com/api/v1/people/545361/stats?stats=gameLog&group=hitting,pitching&season=2026",
+            "https://statsapi.mlb.com/api/v1/people/608324/stats?stats=gameLog&group=hitting,pitching&season=2026",
+            "https://statsapi.mlb.com/api/v1/people/641933/stats?stats=gameLog&group=hitting,pitching&season=2026",
+            "https://statsapi.mlb.com/api/v1/people/663728/stats?stats=gameLog&group=hitting,pitching&season=2026",
+            "https://statsapi.mlb.com/api/v1/people/665862/stats?stats=gameLog&group=hitting,pitching&season=2026",
+            "https://statsapi.mlb.com/api/v1/people/677595/stats?stats=gameLog&group=hitting,pitching&season=2026",
+            "https://statsapi.mlb.com/api/v1/people/695491/stats?stats=gameLog&group=hitting,pitching&season=2026",
+            "https://statsapi.mlb.com/api/v1/people/696100/stats?stats=gameLog&group=hitting,pitching&season=2026",
+            "https://statsapi.mlb.com/api/v1/people/804668/stats?stats=gameLog&group=hitting,pitching&season=2026"
+          ],
+          "note": "MLB公式の全2429試合・全1472選手を集計。試合別・打席別の年間合計を公式シーズン成績と照合。"
+        },
+        {
+          "key": "onbase_pa",
+          "before": [],
+          "after": [
+            {
+              "player_id": 686475,
+              "name": "Tyler Tolbert",
+              "value": 12,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/686475/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://statsapi.mlb.com/api/v1/schedule?sportId=1&gameType=R&season=2026",
+            "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting,pitching&season=2026&sportIds=1&playerPool=ALL&limit=10000",
+            "https://statsapi.mlb.com/api/v1/people/686475/stats?stats=gameLog&group=hitting,pitching&season=2026"
+          ],
+          "note": "MLB公式の全2429試合・全1472選手を集計。試合別・打席別の年間合計を公式シーズン成績と照合。"
+        },
+        {
+          "key": "outs",
+          "before": [],
+          "after": [
+            {
+              "player_id": 808967,
+              "name": "Yoshinobu Yamamoto",
+              "value": 45,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/808967/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://statsapi.mlb.com/api/v1/schedule?sportId=1&gameType=R&season=2026",
+            "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting,pitching&season=2026&sportIds=1&playerPool=ALL&limit=10000",
+            "https://statsapi.mlb.com/api/v1/people/808967/stats?stats=gameLog&group=hitting,pitching&season=2026"
+          ],
+          "note": "MLB公式の全2429試合・全1472選手を集計。試合別・打席別の年間合計を公式シーズン成績と照合。"
+        },
+        {
+          "key": "strikeouts",
+          "before": [],
+          "after": [
+            {
+              "player_id": 695243,
+              "name": "Mason Miller",
+              "value": 11,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/695243/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://statsapi.mlb.com/api/v1/schedule?sportId=1&gameType=R&season=2026",
+            "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting,pitching&season=2026&sportIds=1&playerPool=ALL&limit=10000",
+            "https://statsapi.mlb.com/api/v1/people/695243/stats?stats=gameLog&group=hitting,pitching&season=2026"
+          ],
+          "note": "MLB公式の全2429試合・全1472選手を集計。試合別・打席別の年間合計を公式シーズン成績と照合。"
+        },
+        {
+          "key": "steals",
+          "before": [],
+          "after": [
+            {
+              "player_id": 681082,
+              "name": "Bryson Stott",
+              "value": 27,
+              "year": 2026,
+              "status": "active",
+              "source_url": "https://statsapi.mlb.com/api/v1/people/681082/stats?stats=gameLog&group=hitting,pitching&season=2026"
+            }
+          ],
+          "status": "verified",
+          "sources": [
+            "https://statsapi.mlb.com/api/v1/schedule?sportId=1&gameType=R&season=2026",
+            "https://statsapi.mlb.com/api/v1/stats?stats=season&group=hitting,pitching&season=2026&sportIds=1&playerPool=ALL&limit=10000",
+            "https://statsapi.mlb.com/api/v1/people/681082/stats?stats=gameLog&group=hitting,pitching&season=2026"
+          ],
+          "note": "MLB公式の全2429試合・全1472選手を集計。試合別・打席別の年間合計を公式シーズン成績と照合。"
+        },
+        {
+          "key": "scoreless_innings",
+          "before": [],
+          "after": [],
+          "status": "unavailable",
+          "sources": [],
+          "note": "失点時点と継承走者を含む公式の年度内最長無失点投球回は未確認。"
+        }
+      ]
+    }
+  }
+}

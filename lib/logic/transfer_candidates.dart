@@ -28,8 +28,10 @@ bool _retiring(
                   '${announcement['name']}'.replaceAll(RegExp(r'[\s　]'), ''))));
 }
 
+enum TransferSort { attention, team }
+
 List<Map<String, dynamic>> transferCandidates(
-    List<Map<String, dynamic>> teams, int year) {
+    List<Map<String, dynamic>> teams, int year, {TransferSort sort = TransferSort.attention}) {
   final result = <Map<String, dynamic>>[];
   for (final team in teams.where(npbContractTeam)) {
     final seen = <String>{};
@@ -106,6 +108,10 @@ List<Map<String, dynamic>> transferCandidates(
         'team': team,
         'labels': eligibility.toList(),
         'reported': reports.isNotEmpty,
+        'attention': status == 'ポスティング容認' || status == 'FA宣言（移籍先未定）'
+            ? 3 : reports.isNotEmpty ? 2 : 1,
+        'attention_reason': status == 'ポスティング容認' || status == 'FA宣言（移籍先未定）'
+            ? 'FA宣言・ポスティング容認' : reports.isNotEmpty ? '移籍関連の報道あり' : '権利保有・行使未確認',
         'contract': end == null
             ? '契約期限未確認'
             : end == year
@@ -127,14 +133,13 @@ List<Map<String, dynamic>> transferCandidates(
     }
   }
   result.sort((a, b) {
-    final priority = (b['reported'] == true ? 1 : 0)
-        .compareTo(a['reported'] == true ? 1 : 0);
-    if (priority != 0) return priority;
-    final team = usageInt(a['team']['id_team'])
-        .compareTo(usageInt(b['team']['id_team']));
-    return team != 0
-        ? team
-        : '${a['player']['name']}'.compareTo('${b['player']['name']}');
+    final attention = usageInt(b['attention']).compareTo(usageInt(a['attention']));
+    final team = usageInt(a['team']['id_team']).compareTo(usageInt(b['team']['id_team']));
+    final primary = sort == TransferSort.attention ? attention : team;
+    if (primary != 0) return primary;
+    final secondary = sort == TransferSort.attention ? team : attention;
+    if (secondary != 0) return secondary;
+    return '${a['player']['name']}'.compareTo('${b['player']['name']}');
   });
   return result;
 }

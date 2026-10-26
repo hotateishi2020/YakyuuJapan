@@ -95,7 +95,7 @@ List<Map<String, dynamic>> normalizeRecordAwards(
 String recordShortestTeam(Map<String, dynamic> row, {bool preferCanonical = false}) {
   final explicit =
       '${row['name_shortest'] ?? row['team_shortest'] ?? ''}'.trim();
-  if (explicit.isNotEmpty && !preferCanonical) return explicit;
+  if (explicit.isNotEmpty && !preferCanonical) return explicit == 'オイ' ? 'オ' : explicit;
   final team = '${row['team'] ?? ''}';
   const names = {
     '巨人': '巨',
@@ -112,7 +112,7 @@ String recordShortestTeam(Map<String, dynamic> row, {bool preferCanonical = fals
     '楽天': '楽',
     'オリックス': 'オ',
     'ロッテ': 'ロ',
-    'オイシックス': 'オイ',
+    'オイシックス': 'オ',
     'ハヤテ': 'ハ',
     'くふう': 'ハ',
   };

@@ -342,8 +342,8 @@ void main() {
       {'key': 'monthly', 'name': '同月パ投手', 'detail': 'パシフィック・リーグ 投手 3、4月度'},
       {'key': 'monthly', 'name': '月間投手', 'detail': 'セントラル・リーグ 投手 3、4月度'},
       {'key': 'monthly', 'name': '月間打者', 'detail': 'パシフィック・リーグ 打者 9、10月度'},
-      {'key': 'major', 'name': '勝利投手', 'detail': 'セ・リーグ 最多勝利投手賞'},
-      {'key': 'major', 'name': '同率勝利投手', 'detail': 'セ・リーグ 最多勝利投手賞'},
+      {'key': 'major', 'name': '勝利投手', 'detail': 'セ・リーグ 最多勝利投手賞', 'value': '勝利 13'},
+      {'key': 'major', 'name': '同率勝利投手', 'detail': 'セ・リーグ 最多勝利投手賞', 'value': '勝利 13'},
     ];
     await tester.pumpWidget(MaterialApp(
         home: Scaffold(
@@ -355,6 +355,10 @@ void main() {
     for (final row in awards) {
       expect(find.text(row['name']!), findsOneWidget);
     }
+    expect(find.text('勝利 13'), findsNothing);
+    expect(find.text('13'), findsOneWidget);
+    expect(tester.getTopLeft(find.text('13')).dy,
+      greaterThan(tester.getBottomLeft(find.text('同率勝利投手')).dy));
     expect(find.text('ベストナイン'), findsOneWidget);
     expect(find.text('ゴールデングラブ賞'), findsOneWidget);
     expect(find.text('3・4月月間MVP'), findsOneWidget);

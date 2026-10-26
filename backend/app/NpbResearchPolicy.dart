@@ -13,6 +13,9 @@ const researchKinds = [
 ];
 const researchDomains = [
   'npb.jp',
+  'mgg.mitsuipr.com',
+  'pacificleague.com',
+  'jpbpa.net',
   'npb.or.jp',
   'wbsc.org',
   'japan-baseball.jp',
@@ -91,7 +94,7 @@ List<String> researchDue(DateTime now, Map<String, String> calendar,
   final jst = researchJst(now);
   if (jst.hour < 21) return [];
   final today = researchDate(jst);
-  final busy = jst.month >= 10 || jst.month <= 2 || jst.month == 7;
+  final busy = jst.month >= 10 || jst.month <= 3 || jst.month == 7;
   final eventDay = calendar.values.any((date) {
     final difference =
         DateTime.parse(today).difference(DateTime.parse(date)).inDays;
@@ -109,7 +112,7 @@ List<String> researchDue(DateTime now, Map<String, String> calendar,
               today.compareTo(calendar[kind]!) < 0) &&
           !(kind == 'contract_renewal' && jst.month > 2 && jst.month < 10) &&
           !(kind == 'fa_declared' &&
-              jst.month > 2 &&
+              jst.month > 3 &&
               (jst.month < 10 || (jst.month == 10 && jst.day < 25))) &&
           !(kind == 'draft_selection' &&
               !calendar.containsKey(kind) &&

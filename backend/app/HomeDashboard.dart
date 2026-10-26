@@ -39,7 +39,7 @@ Map<String, dynamic>? homeHero(Map<String, dynamic> game, Iterable<Map<String, d
     final score = batting > pitching ? batting : pitching;
     if (score > bestScore) {
       bestScore = score;
-      best = {'id_player': line['id_player'], 'name_player': line['name_player'], 'name_team': game[home > away ? 'name_team_home' : 'name_team_away']};
+      best = {'id_player': line['id_player'], 'name_player': line['name_player'], 'name_team': game[home > away ? 'name_team_home' : 'name_team_away'], ...homeHeroPerformance(line)};
     }
   }
   return best;
@@ -54,4 +54,35 @@ Future<List<Map<String, dynamic>>> homeHeroLines(Connection conn, String today) 
       AND g.state LIKE '%試合終了%' AND COALESCE(g.flg_stats_loaded, false)
   ''', parameters: [today]);
   return result.map((r) => r.toColumnMap()).toList();
+}
+
+/// Only completed game summary values, never season totals or live plate results.
+Map<String, dynamic> homeHeroPerformance(Map<String, dynamic> line) {
+  num n(String key) => num.tryParse('${line[key]}') ?? 0;
+  final stats = <String>[];
+  final highlights = <String>[];
+  final innings = n('double_inning_pitch');
+  final fraction = ((innings - innings.floor()) * 10).round();
+  if (innings > 0 || n('int_pitch') > 0) {
+    final ip = '${innings.floor()}${fraction == 0 ? '' : ' $fraction/3'}回';
+    stats.add('$ip ${n('int_runs')}失点（自責点${n('int_runs_earned')}） ${n('int_strike_out')}奪三振');
+    const results = {'WIN': '勝利投手', 'W': '勝利投手', 'SAVE': 'セーブ', 'S': 'セーブ', 'HOLD': 'ホールド', 'H': 'ホールド'};
+    final result = results['${line['code_result_pitcher']}'];
+    if (result != null) highlights.add(result);
+    if (n('int_runs') == 0) highlights.add('$ip無失点');
+    if (n('int_strike_out') >= 10) highlights.add('2桁奪三振');
+  }
+  if (n('int_batting') > 0 || n('int_fourball') > 0 || n('int_dead_batting') > 0) {
+    stats.add('${n('int_batting')}打数${n('int_hit1')}安打 ${n('int_rbi')}打点'
+        '${n('int_fourball') > 0 ? ' ${n('int_fourball')}四球' : ''}');
+    if (n('int_homerun') > 0) highlights.add('${n('int_homerun')}本塁打');
+    if (n('int_rbi') > 0) highlights.add('${n('int_rbi')}打点');
+    if (n('int_hit1') >= 3) {
+      highlights.add('猛打賞');
+    } else if (n('int_hit1') >= 2) {
+      highlights.add('マルチ安打');
+    }
+  }
+  if (n('int_steal_base') > 0) highlights.add('${n('int_steal_base')}盗塁');
+  return {'appearance_stats': stats, 'highlights': highlights};
 }

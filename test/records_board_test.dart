@@ -150,11 +150,13 @@ void main() {
         headers: {'content-type': 'application/json; charset=utf-8'})));
   });
   testWidgets('連続記録の取得済み結果と未確認範囲を同時に表示する', (tester) async {
-    await tester.binding.setSurfaceSize(const Size(2400, 850));
+    await tester.binding.setSurfaceSize(const Size(390, 850));
     addTearDown(() => tester.binding.setSurfaceSize(null));
     await http.runWithClient(() async {
       await tester.pumpWidget(const MaterialApp(
           home: Scaffold(body: RecordsBoard(org: OrgConfig.npb, year: 2026))));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('records-picker-npb')));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('records-tab-4')));
       await tester.pumpAndSettle();
@@ -165,6 +167,34 @@ void main() {
       expect(tester.takeException(), isNull);
     }, () => MockClient((_) async => http.Response(jsonEncode(fixture), 200,
         headers: {'content-type': 'application/json; charset=utf-8'})));
+  });
+  testWidgets('連続記録の監査結果と今季の出典を表示する', (tester) async {
+    final payload = {'streaks': [
+      {'key': 'wins', 'label': '連続勝利', 'unit': '勝',
+        'current': [{'name':'確認済み選手','value':12}],
+        'current_label':'今シーズン記録', 'current_status':'verified',
+        'current_note':'両リーグの年間最高値を照合',
+        'current_sources':['https://npb.jp/history/2026/review_rec_p.html']},
+      {'key':'outs','label':'連続アウト','unit':'人','current':[],
+        'current_status':'unavailable','current_label':'今シーズン記録',
+        'current_message':'年度内の最長記録は未確認です。全打席順が未取得。'},
+    ]};
+    await http.runWithClient(() async {
+      await tester.pumpWidget(const MaterialApp(
+        home: Scaffold(body: RecordsBoard(org: OrgConfig.npb, year: 2026))));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('records-picker-npb')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('records-tab-4')));
+      await tester.pumpAndSettle();
+      expect(find.text('12勝'), findsOneWidget);
+      expect(find.text('年度内の最長記録は未確認です。全打席順が未取得。'), findsOneWidget);
+      await tester.tap(find.text('連続勝利'));
+      await tester.pumpAndSettle();
+      expect(find.text('https://npb.jp/history/2026/review_rec_p.html'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }, () => MockClient((_) async => http.Response(jsonEncode(payload), 200,
+      headers: {'content-type':'application/json; charset=utf-8'})));
   });
   testWidgets('携帯でも球団ロゴをタップして文字に置き換えない', (tester) async {
     tester.view.physicalSize = const Size(390, 844);
@@ -556,6 +586,8 @@ void main() {
       ]};
       await http.runWithClient(() async {
         await tester.pumpWidget(MaterialApp(home: Scaffold(body: RecordsBoard(org:org,year:2026))));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(ValueKey('records-picker-${org.kind.name}')));
         await tester.pumpAndSettle();
         await tester.tap(find.byKey(const ValueKey('records-tab-3')));
         await tester.pumpAndSettle();

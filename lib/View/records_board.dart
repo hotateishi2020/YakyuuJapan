@@ -871,7 +871,16 @@ class _RecordsBoardState extends State<RecordsBoard> {
     final rowCount = columns.expand((c) => c.entries).fold<int>(50, (n, e) => math.max(n, e.key + e.value.length - 1));
     void source(Map<String, dynamic> record) => showStrengthSource(context, '${record['label']}', '${record['note'] ?? ''}\n確認日：${record['checked_at'] ?? '—'}', [for (final url in (record['sources'] as List? ?? [])) '$url']);
     Widget text(String value, {bool bold = false, Color color = Colors.black}) => FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: Text(value, maxLines: 1, style: TextStyle(fontSize: 12, color: color, fontWeight: bold ? FontWeight.bold : FontWeight.normal)));
-    Widget cell(Widget child, double width, {bool header = false, int span = 1, Key? key}) => Container(key: key, width: width, height: header ? 32 : rowHeight * span, decoration: BoxDecoration(color: header ? Colors.black : Colors.white, border: Border.all(color: Colors.grey.shade400, width: .5)), child: child);
+    Widget cell(Widget child, double width, {bool header = false, int span = 1, Key? key}) => Container(
+      key: key,
+      width: width,
+      height: header ? 32 : rowHeight * span,
+      padding: const EdgeInsets.all(.5),
+      color: header ? Colors.black : Colors.white,
+      // 選手ごとの背景色より後に描画し、セル端の罫線が隠れないようにする。
+      foregroundDecoration: BoxDecoration(border: Border.all(color: Colors.grey.shade400, width: .5)),
+      child: child,
+    );
     Widget entry(Map<String, dynamic> p, Map<String, dynamic> record) {
       final status = p['status'];
       final detail = [if (p['combined'] == true) '日米通算', if ('${p['team'] ?? ''}'.isNotEmpty) '${p['team']}', if ('${p['period'] ?? ''}'.isNotEmpty) '${p['period']}', if (p['year'] != null) '${p['year']}年'].join(' ');
@@ -964,7 +973,7 @@ class _RecordsBoardState extends State<RecordsBoard> {
               ]);
           return Card(
               child: InkWell(
-                  onTap: () => showStrengthSource(context, '${record['label']}', '${record['note'] ?? ''}\n${record['current_note'] ?? ''}', [for (final url in (record['sources'] as List? ?? [])) '$url']),
+                  onTap: () => showStrengthSource(context, '${record['label']}', '${record['note'] ?? ''}\n${record['current_note'] ?? ''}', {for (final url in [...(record['sources'] as List? ?? []), ...(record['current_sources'] as List? ?? [])]) '$url'}.toList(), showSources: true),
                   child: Padding(
                       padding: const EdgeInsets.all(10),
                       child: Column(key: ValueKey('$section-record-$key'), crossAxisAlignment: CrossAxisAlignment.start, children: [

@@ -29,6 +29,8 @@ import '../tools/json_utils.dart';
 import '../tools/date_format.dart';
 import '../logic/auth_session.dart';
 import '../logic/show_user_predictions.dart';
+import '../logic/news_read.dart';
+import '../logic/prediction_visibility.dart';
 import '../View/EventCalendar.dart';
 import '../View/season_schedule_board.dart';
 import '../View/Headers.dart';
@@ -159,6 +161,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   List<Map<String, dynamic>> _predictInvites = const [];
   List<Map<String, dynamic>> _predictTitleCatalog = const [];
   bool _gamesPollRunning = false;
+  final Map<OrgKind, bool> _gamesCacheAccess = {};
   final Map<OrgKind, int> _gameDayOffset = {};
   final Map<OrgKind, String?> _loadingGameDateByOrg = {};
   final Set<String> _pastDateInflight = {};
@@ -178,6 +181,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   @override
   void initState() {
     super.initState();
+    AuthSession.instance.addListener(_onPredictionAuthChanged);
     WidgetsBinding.instance.addObserver(this);
     bindPageVisibility(_onPageBecameVisible);
     // cookie のタブをそのまま初回表示（predict / npb / mlb）
@@ -203,7 +207,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         if (!mounted) return;
         setState(() {
           _restoreBoardSession();
-          if (_predictGroupsOpen || _homeOpen) _restorePredictSession(allowCookieUser: true);
+          if (_predictGroupsOpen || _homeOpen) _restorePredictSession();
         });
         unawaited(_bootstrapWithAuth());
       }));
@@ -228,6 +232,10 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     }
     if (!mounted) return;
     setState(() => _authEntryReady = true);
+    if (!AuthSession.instance.isLoggedIn) {
+      _clearPredictSession();
+      _persistBoardSession();
+    }
     if (_predictGroupsOpen || _homeOpen) {
       if (AuthSession.instance.isLoggedIn) {
         final userId = AuthSession.instance.user?.id ?? 0;
@@ -263,17 +271,37 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     }
   }
 
+  bool _predictionWasLoggedIn = AuthSession.instance.isLoggedIn;
+  void _onPredictionAuthChanged() {
+    final loggedIn = AuthSession.instance.isLoggedIn;
+    if (_predictionWasLoggedIn == loggedIn) return;
+    _predictionWasLoggedIn = loggedIn;
+    // Auth restoration and expiry can happen outside the account menu.
+    scheduleMicrotask(() { if (mounted) _onAuthChanged(); });
+  }
+
   void _onAuthChanged() {
     if (!mounted) return;
     _lastLiveHeartbeat = null;
+    _gamesPollTimer?.cancel();
+    for (final bundle in _orgCache.values) { bundle.extraGameDates.clear(); }
+    unawaited(_startGamesWatch());
     unawaited(_pollDisplayedGames());
     if (AuthSession.instance.isLoggedIn) {
       setState(() => _authEntryReady = true);
+      for (final part in [_LoadPart.standings, _LoadPart.players]) {
+        unawaited(_fetchPart(_orgKind, part, _seasonYear, background: true, force: true));
+      }
       unawaited(_fetchPredictInvites());
       if (_predictGroupsOpen || _homeOpen) unawaited(_loadInitialPredictGroups());
       return;
     }
     _clearPredictSession();
+    for (final bundle in _orgCache.values) { _removeUserPredictions(bundle); }
+    final current = _snapshotCurrent();
+    _removeUserPredictions(current);
+    _applyBundle(current);
+    _persistBoardSession();
     setState(() {
       _predictInvites = const [];
       _predictGroups = const [];
@@ -298,6 +326,20 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     setState(() => _authEntryReady = true);
   }
 
+  int? _homeNewsUser;
+  DateTime? _homeNewsPreviousRead;
+  void _captureHomeNewsRead(int userId, DateTime? previous) {
+    if (!mounted) return;
+    setState(() { _homeNewsUser = userId; _homeNewsPreviousRead = previous; });
+  }
+  bool _newsIsNew(Map<String, dynamic> news) {
+    final session = AuthSession.instance;
+    if (!session.isLoggedIn) return false;
+    final read = _homeOpen && _homeNewsUser == session.user!.id
+        ? _homeNewsPreviousRead : session.user!.dateReadNews;
+    return newsAddedAfter(news['created_at'], read);
+  }
+
   Future<void> _markRead(String target) async {
     if (!AuthSession.instance.isLoggedIn) return;
     final err = await AuthSession.instance.markRead(target);
@@ -308,7 +350,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   void _toggleNewsSection() {
     final opening = !_newsExpanded;
     setState(() => _newsExpanded = opening);
-    if (opening) unawaited(_markRead('news'));
   }
 
   void _toggleEventsSection() {
@@ -323,7 +364,19 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     setState(() => _personalStatsLayout = layout);
   }
 
+  void _removeUserPredictions(_OrgBundle bundle) {
+    List<Map<String, dynamic>> publicRows(List<Map<String, dynamic>> rows) =>
+        listMapFromJson(publicPredictionData(rows));
+    bundle.predictions = [];
+    bundle.playerStats = [];
+    bundle.standings = publicRows(bundle.standings);
+    bundle.playerStatsActual = publicRows(bundle.playerStatsActual);
+    bundle.games = publicRows(bundle.games);
+    bundle.postseasonGames = publicRows(bundle.postseasonGames);
+  }
+
   void _applyBundle(_OrgBundle bundle, {OrgKind? kind}) {
+    if (!AuthSession.instance.isLoggedIn) _removeUserPredictions(bundle);
     // キャッシュと表示用リストを分離し、他団体表示中のクリアで消えないようにする
     predictions = List<Map<String, dynamic>>.from(bundle.predictions);
     standings = List<Map<String, dynamic>>.from(bundle.standings);
@@ -399,6 +452,9 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   _OrgBundle _bundleFromSession(Map<dynamic, dynamic> raw) {
+    if (!AuthSession.instance.isLoggedIn) {
+      raw = publicPredictionData(raw) as Map;
+    }
     final predictions = listMapFromJson(raw['predictions']);
     final standings = listMapFromJson(raw['standings']);
     final playerStats = listMapFromJson(raw['playerStats']);
@@ -486,7 +542,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     if (orgs.isEmpty && events.isEmpty && notifications.isEmpty) return;
     final map = _sessionMap();
     map['year'] = _seasonYear;
-    map['orgs'] = orgs;
+    map['orgs'] = publicPredictionData(orgs);
     map['events'] = events;
     map['notifications'] = notifications;
     _writeBoardSession();
@@ -498,35 +554,12 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     return _jsonInt(predict['userId']);
   }
 
-  int? _cookieUserId() {
-    if (readBrowserCookie(authManualLogoutCookie) == '1') return null;
-    final token = readBrowserCookie(authTokenCookie);
-    if (token == null || token.isEmpty) return null;
-    final raw = readBrowserCookie(authUserCookie);
-    if (raw == null || raw.isEmpty) return null;
-    try {
-      final decoded = jsonDecode(raw);
-      if (decoded is! Map) return null;
-      final id = _jsonInt(decoded['id']);
-      return id > 0 ? id : null;
-    } catch (_) {
-      return null;
-    }
-  }
-
-  bool _restorePredictSession({bool allowCookieUser = false}) {
+  bool _restorePredictSession() {
+    if (!AuthSession.instance.isLoggedIn) return false;
     final predict = _sessionMap()['predict'];
     if (predict is! Map) return false;
     final savedUser = _jsonInt(predict['userId']);
-    if (savedUser <= 0) return false;
-    final sessionUser = AuthSession.instance.user?.id ?? 0;
-    if (sessionUser > 0) {
-      if (sessionUser != savedUser) return false;
-    } else if (allowCookieUser) {
-      if (_cookieUserId() != savedUser) return false;
-    } else {
-      return false;
-    }
+    if (savedUser <= 0 || savedUser != AuthSession.instance.user?.id) return false;
     final groups = listMapFromJson(predict['groups']);
     if (groups.isEmpty) return false;
     _predictGroups = groups;
@@ -538,7 +571,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
 
   void _persistPredictSession() {
     final userId = AuthSession.instance.user?.id ?? 0;
-    if (userId <= 0 || _predictGroups.isEmpty) return;
+    if (!AuthSession.instance.isLoggedIn || userId <= 0 || _predictGroups.isEmpty) return;
     final map = _sessionMap();
     map['year'] = map['year'] ?? _seasonYear;
     map['predict'] = {
@@ -739,7 +772,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         Env.api('/predict-invites'),
         headers: {'Authorization': 'Bearer $token'},
       ).timeout(const Duration(seconds: 15));
-      if (!mounted || res.statusCode != 200) return;
+      if (!mounted || res.statusCode != 200 || !AuthSession.instance.isLoggedIn || AuthSession.instance.token != token) return;
       final decoded = jsonDecode(res.body);
       final raw = decoded is Map ? decoded['invites'] : null;
       setState(() {
@@ -938,7 +971,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
 
   void _openInfoPopup() {
     unawaited(AuthSession.instance.reportAction('news・イベント日程ポップアップを開いた'));
-    if (AuthSession.instance.showNewsNew) unawaited(_markRead('news'));
     if (AuthSession.instance.showEventNew) unawaited(_markRead('event'));
     if (!_sharedInfoReady) unawaited(_ensureSharedInfo());
     showDialog<void>(
@@ -972,6 +1004,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
 
   @override
   void dispose() {
+    AuthSession.instance.removeListener(_onPredictionAuthChanged);
     WidgetsBinding.instance.removeObserver(this);
     _gamesPollTimer?.cancel();
     super.dispose();
@@ -1044,7 +1077,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     });
   }
 
-  bool get _canWatchGames => mounted && _initialGamesDisplayComplete && _partLoadedForYear(_orgKind, _LoadPart.games) && !_orgLoadFutures.containsKey(_orgKind) && _seasonYear == DateTime.now().year;
+  bool get _canWatchGames => AuthSession.instance.showDetailedGames && mounted && _initialGamesDisplayComplete && _partLoadedForYear(_orgKind, _LoadPart.games) && !_orgLoadFutures.containsKey(_orgKind) && _seasonYear == DateTime.now().year;
 
   Map<String, String> get _readHeaders {
     final token = AuthSession.instance.token;
@@ -1317,6 +1350,8 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
 
   Future<void> _fetchPartOnce(OrgKind target, _LoadPart part, int year, {required bool background, bool fresh = false}) async {
     final org = OrgConfig.of(target);
+    final detailedAccess = AuthSession.instance.showDetailedGames;
+    final requestToken = AuthSession.instance.token;
     try {
       String? from;
       String? to;
@@ -1326,16 +1361,19 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         to = ymdOf(window.to);
       }
       final cachedGames = _orgCache[target]?.games.isNotEmpty ?? false;
-      final haveGames = part == _LoadPart.games && (_partLoadedForYear(target, part) || cachedGames);
+      final haveGames = part == _LoadPart.games && _gamesCacheAccess[target] == detailedAccess && (_partLoadedForYear(target, part) || cachedGames);
       final uri = Env.api(_partPath(target, part.name, year, fresh: fresh, haveGames: haveGames, from: from, to: to));
-      final startup = fresh ? null : await takeStartupResponse(uri);
+      final startup = fresh || (part == _LoadPart.games && detailedAccess) ? null : await takeStartupResponse(uri);
       final res = startup ?? await http.get(uri, headers: _readHeaders).timeout(const Duration(seconds: 150));
       if (res.statusCode != 200) {
         logger.w('part ${part.name} HTTP ${res.statusCode}');
         _maybeSetPartError(target, background, 'HTTPエラー: ${res.statusCode}');
         return;
       }
-      final map = jsonDecode(res.body) as Map<String, dynamic>;
+      if (part == _LoadPart.games && detailedAccess != AuthSession.instance.showDetailedGames) return;
+      if (requestToken != AuthSession.instance.token) return;
+      final decoded = jsonDecode(res.body);
+      final map = (AuthSession.instance.isLoggedIn ? decoded : publicPredictionData(decoded)) as Map<String, dynamic>;
       if (part == _LoadPart.games && map['unchanged'] == true && (_partLoadedForYear(target, part) || (_orgCache[target]?.games.isNotEmpty ?? false))) {
         _loadedPartYears['${target.name}|${part.name}'] = year;
         _ensureCache(target).readyParts.add(part);
@@ -1359,6 +1397,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           bundle.playerStatsActual = listMapFromJson(map['stats_player']).where(org.rowBelongs).toList();
           break;
         case _LoadPart.games:
+          _gamesCacheAccess[target] = detailedAccess;
           _applyGamesPayload(bundle, map, org, year);
           break;
       }
@@ -1464,6 +1503,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       serverFlag: map['show_postseason_board'] == true,
       today: DateTime.now(),
     );
+    if (!AuthSession.instance.isLoggedIn) _removeUserPredictions(bundle);
   }
 
   bool _shouldLoadGameDate(DateTime date) {
@@ -1641,7 +1681,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           loading: _predictGroupsLoading,
           error: _predictGroupsError,
           groups: _predictGroups,
-          selectedYear: _seasonYear,
+          selectedYear: DateTime.now().toUtc().add(const Duration(hours: 9)).year,
         );
 
   Widget _orgTabBar() => AppSectionTabs(
@@ -2063,7 +2103,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                 color: Colors.black,
                 borderRadius: BorderRadius.circular(3),
                 child: InkWell(
-                  onTap: AuthSession.instance.showNewsNew ? () => unawaited(_markRead('news')) : null,
+                  onTap: null,
                   borderRadius: BorderRadius.circular(3),
                   child: Container(
                     height: homeNewsOnly ? 28 : null,
@@ -2130,6 +2170,10 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                                                     softWrap: false,
                                                     style: const TextStyle(fontSize: 12, height: 1.1, color: Colors.black87),
                                                   ),
+                                                  if (_newsIsNew(n)) ...[
+                                                    const SizedBox(width: 4),
+                                                    BlinkNewMark(key: ValueKey('news-new-${n['id']}'), fontSize: 9, label: 'new'),
+                                                  ],
                                                 ],
                                               ),
                                             ),
@@ -2312,7 +2356,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
               MenuBand(level: 1, toggle: true, child: _boardTabBar()),
             ],
           ])),
-        Expanded(child: _homeOpen ? HomeBoard(year: _seasonYear, news: _newsEventsRow(portrait: true, homeNewsOnly: true), predictionScores: _homePredictionScores(), gameInformation: _homeGameInformation()) : _otherOpen ? OtherBaseballBoard(year: _seasonYear, user: AuthSession.instance.user) : const Center(child: BaseballLoading())),
+        Expanded(child: _homeOpen ? HomeBoard(year: _seasonYear, onNewsViewed: _captureHomeNewsRead, news: _newsEventsRow(portrait: true, homeNewsOnly: true), predictionScores: _homePredictionScores(), gameInformation: _homeGameInformation()) : _otherOpen ? OtherBaseballBoard(year: _seasonYear, user: AuthSession.instance.user) : const Center(child: BaseballLoading())),
       ]);
     }
 
@@ -2338,7 +2382,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         );
 
         // 取れたデータがあるときはエラー表示で消さない
-        final Widget orgBody = _homeOpen ? HomeBoard(year: _seasonYear, news: _newsEventsRow(portrait: true, homeNewsOnly: true), predictionScores: _homePredictionScores(), gameInformation: _homeGameInformation()) : _otherOpen ? OtherBaseballBoard(year: _seasonYear, user: AuthSession.instance.user) : _predictGroupsOpen
+        final Widget orgBody = _homeOpen ? HomeBoard(year: _seasonYear, onNewsViewed: _captureHomeNewsRead, news: _newsEventsRow(portrait: true, homeNewsOnly: true), predictionScores: _homePredictionScores(), gameInformation: _homeGameInformation()) : _otherOpen ? OtherBaseballBoard(year: _seasonYear, user: AuthSession.instance.user) : _predictGroupsOpen
             ? (!AuthSession.instance.isLoggedIn
                 ? const Center(child: Text('ログインすると予想を見られます'))
                 : PredictGroupBoard(

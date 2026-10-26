@@ -1,4 +1,5 @@
 import 'error_snapshot.dart';
+import 'game_visibility.dart';
 import '../tools/network_error.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -104,8 +105,8 @@ class AuthUser {
   final bool notifyNews;
   final bool notifyEvent;
 
-  /// false のとき News に New を出す
-  final bool readNews;
+  final DateTime? dateReadNews;
+  final DateTime? dateLatestNews;
 
   /// false のときイベント日程に New を出す
   final bool readEvent;
@@ -127,7 +128,8 @@ class AuthUser {
     this.namePlayerFav = '',
     this.notifyNews = true,
     this.notifyEvent = true,
-    this.readNews = true,
+    this.dateReadNews,
+    this.dateLatestNews,
     this.readEvent = true,
     this.admin = false,
     this.special = false,
@@ -167,7 +169,8 @@ class AuthUser {
         namePlayerFav: '${json['name_player_fav'] ?? ''}',
         notifyNews: _asBool(json['flg_notify_news']),
         notifyEvent: _asBool(json['flg_notify_event']),
-        readNews: _asBool(json['flg_read_news']),
+        dateReadNews: DateTime.tryParse('${json['date_read_news'] ?? ''}'),
+        dateLatestNews: DateTime.tryParse('${json['date_latest_news'] ?? ''}'),
         readEvent: _asBool(json['flg_read_event']),
         admin: _asBool(json['flg_admin'], fallback: false),
         special: _asBool(json['flg_special'], fallback: false),
@@ -188,7 +191,8 @@ class AuthUser {
         'name_player_fav': namePlayerFav,
         'flg_notify_news': notifyNews,
         'flg_notify_event': notifyEvent,
-        'flg_read_news': readNews,
+        'date_read_news': dateReadNews?.toIso8601String(),
+        'date_latest_news': dateLatestNews?.toIso8601String(),
         'flg_read_event': readEvent,
         'flg_admin': admin,
         'flg_special': special,
@@ -205,9 +209,9 @@ class AuthSession extends ChangeNotifier {
   set user(AuthUser? value) { if (identical(value, _user)) return; _user = value; notifyListeners(); }
   String? get token => _token;
   set token(String? value) { if (value == _token) return; _token = value; notifyListeners(); }
-  bool get showDetailedGames => isLoggedIn && const [1, 2].contains(user?.id);
+  bool get showDetailedGames => isLoggedIn && canViewRestrictedGames(user?.id);
 
-  bool get showSpecialMedia => isLoggedIn && (user?.special ?? false);
+  bool get showSpecialMedia => showDetailedGames;
 
   bool get isLoggedIn => user != null && (token?.isNotEmpty ?? false);
 
@@ -282,7 +286,8 @@ class AuthSession extends ChangeNotifier {
     }
   }
 
-  bool get showNewsNew => isLoggedIn && !(user?.readNews ?? true);
+  bool get showNewsNew => isLoggedIn && user?.dateLatestNews != null &&
+      (user?.dateReadNews == null || user!.dateLatestNews!.isAfter(user!.dateReadNews!));
   bool get showEventNew => isLoggedIn && !(user?.readEvent ?? true);
   bool get showInfoNew => showNewsNew || showEventNew;
 
@@ -474,6 +479,9 @@ class AuthSession extends ChangeNotifier {
   }
 
   Future<String?> markRead(String target) async {
+    final requestToken = token;
+    final requestUser = user?.id;
+    if (!isLoggedIn) return '未ログイン';
     try {
       final res = await http
           .post(
@@ -483,6 +491,7 @@ class AuthSession extends ChangeNotifier {
           )
           .timeout(const Duration(seconds: 15));
       final map = jsonDecode(res.body) as Map<String, dynamic>;
+      if (token != requestToken || user?.id != requestUser) return null;
       if (res.statusCode != 200 || map['ok'] != true) {
         return '${map['error'] ?? '既読更新に失敗しました'}';
       }

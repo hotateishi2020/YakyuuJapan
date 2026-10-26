@@ -72,6 +72,25 @@ void main() {
     expect(result['current'], leaders);
     expect(result.containsKey('current_status'), isFalse);
   });
+  test('audited unavailable categories never expose partial DB maxima', () {
+    final result = seasonStreakPresentation(
+      observed: [{'name': '不完全な集計', 'value': 15}], official: true,
+      completedGames: 471, loadedGames: 21,
+      audit: {'status': 'unavailable', 'note': '全打席の順序が未確認', 'sources': []});
+    expect(result['current'], isEmpty);
+    expect(result['current_status'], 'unavailable');
+    expect(result['current_message'], contains('全打席の順序が未確認'));
+    expect(result['current_label'], '今シーズン記録');
+  });
+  test('audited category retains ties and current-season sources', () {
+    final leaders = [{'name': '甲', 'value': 12}, {'name': '乙', 'value': 12}];
+    final result = seasonStreakPresentation(observed: leaders, official: true,
+      completedGames: 471, loadedGames: 21,
+      audit: {'status': 'verified', 'sources': ['https://npb.jp/']});
+    expect(result['current'], leaders);
+    expect(result['current_status'], 'verified');
+    expect(result['current_sources'], ['https://npb.jp/']);
+  });
 
   test('公式の春秋順位は合算せず優勝・順位・球団IDを季別に保持する', () {
     final phases = (jsonDecode(File('data/npb_split_standings.json').readAsStringSync()) as List).cast<Map<String, dynamic>>();

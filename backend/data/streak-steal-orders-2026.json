@@ -1,0 +1,22 @@
+{
+  "year": 2026,
+  "checked_at": "2026-10-26",
+  "note": "同日内の盗塁企図順。1=盗塁成功、0=盗塁死。試合経過と照合した事実のみ。",
+  "orders": {
+    "C|大盛穂|5/27": {
+      "sequence": [0, 1],
+      "note": "1回裏に盗塁死、6回裏に三盗成功。",
+      "sources": ["https://baseball.yahoo.co.jp/npb/game/2021038920/text", "https://www.nikkansports.com/baseball/professional/score/2026/il2026052706.html"]
+    },
+    "E|平良竜哉|6/19": {
+      "sequence": [1, 0],
+      "note": "4回表、佐藤直樹の打席で二盗成功後に三盗失敗。",
+      "sources": ["https://baseball.yahoo.co.jp/npb/game/2021039021/text", "https://www.nikkansports.com/baseball/news/202606190002129.html?mode=all"]
+    },
+    "L|長谷川信哉|4/21": {
+      "sequence": [1, 0],
+      "note": "1回裏に二盗成功、6回裏に二盗失敗（リプレーで判定変更）。",
+      "sources": ["https://baseball.yahoo.co.jp/npb/game/2021038748/text", "https://baseball.yahoo.co.jp/npb/game/2021038748/top"]
+    }
+  }
+}

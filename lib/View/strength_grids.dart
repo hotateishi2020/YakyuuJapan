@@ -63,12 +63,10 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
       : _battingOrder
       ? [for (var i = 1; i <= 9; i++) '$i']
       : [
-          if (widget.teamHeader == '年度' && widget.teams.any((t) => listMapFromJson(t['pitching_workload']).isEmpty && listMapFromJson(t['positions']).any((p) => p['slot'] == 'P'))) 'P',
           ...pitcherAceSlots.keys,
           ...usagePositions.keys.where((slot) => slot != 'P'),
         ];
-  int get _positionSlotCount => pitcherAceSlots.length + usagePositions.length - 1 +
-      (widget.teamHeader == '年度' && widget.teams.any((t) => listMapFromJson(t['pitching_workload']).isEmpty && listMapFromJson(t['positions']).any((p) => p['slot'] == 'P')) ? 1 : 0);
+  int get _positionSlotCount => pitcherAceSlots.length + usagePositions.length - 1;
   double _commonColumnWidth(double width, bool hideTeam) {
     final fitted = width / (_positionSlotCount + (hideTeam ? 0 : 1));
     // Landscape position, batting-order and bench grids share this width.
@@ -278,19 +276,13 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
             ...selectRegularGroups(listMapFromJson(team['positions'])),
             ...selectPitcherAces(team)
           };
-    if (!_battingOrder && _slots.contains('P')) {
-      final group = listMapFromJson(team['positions']).where((p) => p['slot'] == 'P').firstOrNull;
-      final players = listMapFromJson(group?['players']);
-      final total = usageInt(group?['total']);
-      final most = players.fold<int>(0, (n, p) => usageInt(p['count']) > n ? usageInt(p['count']) : n);
-      if (total > 0 && most > 0) {
-        selected['P'] = [
-        for (final player in players.where((p) => usageInt(p['count']) == most))
-          {...player, 'usage_rate': most / total}
-        ];
-      }
-    }
     if (!_battingOrder) selected.addAll(selectBenchRegulars(team, selected));
+    final workload = listMapFromJson(team['pitching_workload']);
+    bool noStartingPitcher(String slot) => slot.startsWith('SP_') &&
+        team['historical_enrichment_version'] == 2 && workload.isNotEmpty &&
+        workload.every((p) => p['starts'] != null && p['throws'] != null) &&
+        !workload.any((p) => usageInt(p['starts']) > 0 &&
+            [slot == 'SP_L' ? '左' : '右', slot == 'SP_L' ? 'L' : 'R', '両'].contains(p['throws']));
     final roster = listMapFromJson(team['roster']);
     final teamColor =
         parseColorNameOrNull('${team['color_back']}') ?? Colors.blueGrey;
@@ -303,7 +295,7 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
                   color: benchRegularSlots.containsKey(slot)
                       ? Color.lerp(Colors.white, _positionColor(slot), 0.24)!
                       : Colors.transparent,
-                  child: const Center(child: Text('—')))
+                  child: Center(child: Text(noStartingPitcher(slot) ? '該当なし' : '—')))
               : Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                   for (var i = 0; i < selected[slot]!.length; i++)
                     Expanded(
@@ -330,8 +322,12 @@ class _StrengthRegularGridState extends State<StrengthRegularGrid> {
                           _regularLine(slot == 'CL'
                               ? '${usageInt(selected[slot]![i]['saves'])}セーブ'
                               : slot.startsWith('RP')
-                                  ? '${usageInt(selected[slot]![i]['holds'])}ホールド'
-                                  : inningsLabel(usageInt(
+                                  ? selected[slot]![i]['holds'] == null
+                                      ? '${usageInt(selected[slot]![i]['relief_appearances'])}救援'
+                                      : '${usageInt(selected[slot]![i]['holds'])}ホールド'
+                                  : selected[slot]![i]['ace_basis'] == 'starts'
+                                      ? '${usageInt(selected[slot]![i]['starts'])}先発'
+                                      : inningsLabel(usageInt(
                                       selected[slot]![i]['starter_outs']))),
                         ] else ...[
                           _regularLine(

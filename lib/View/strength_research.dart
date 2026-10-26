@@ -17,13 +17,15 @@ import 'achievement_layout.dart';
 import '../logic/achievement_priority.dart';
 import '../logic/player_honors.dart';
 
-void showStrengthSource(BuildContext context, String title, String detail, List<String> urls) => showDialog<void>(
+void showStrengthSource(BuildContext context, String title, String detail, List<String> urls, {bool showSources = false}) => showDialog<void>(
     context: context,
     builder: (context) => AlertDialog(
         title: Text(title),
         content: SingleChildScrollView(
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(detail),
+          if (showSources)
+            for (final url in urls.toSet()) Padding(padding: const EdgeInsets.only(top: 8), child: SelectableText(url)),
         ])),
         actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('閉じる'))]));
 

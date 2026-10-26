@@ -1,6 +1,38 @@
 import 'package:postgres/postgres.dart';
 import 'RecordCatalog.dart';
 import 'StrengthUsage.dart';
+import 'RecordStreaks.dart';
+
+const clubStreakNames = {'T':'阪神','DB':'DeNA','G':'巨人','D':'中日','C':'広島','S':'ヤクルト',
+  'H':'ソフトバンク','F':'日本ハム','B':'オリックス','E':'楽天','L':'西武','M':'ロッテ'};
+
+/// A national leader list is not a complete list of leaders for each club.
+Map<String, dynamic> applyAuditedClubStreaks(Map<String, dynamic> data,
+    Map<String, dynamic> snapshot) {
+  final teams = usageMaps(data['teams']);
+  return {...data, 'metrics': [for (final metric in usageMaps(data['metrics']))
+    if (metric['group'] != 'streak') metric else {...metric,
+      'cells': [for (final cell in usageMaps(metric['cells'])) (() {
+        final team = teams.where((t) => t['id_team'] == cell['id_team']).firstOrNull;
+        final code = clubStreakNames.entries.where((e) =>
+          team != null && [team['name'],team['short_name']].contains(e.value)).firstOrNull?.key;
+        final club = usageMap(usageMap(snapshot['clubs'])[code]);
+        final key = '${metric['key']}'.replaceFirst('streak_', '');
+        final audit = usageMap(usageMap(club['categories'])[key]);
+        final verified = audit['status'] == 'verified';
+        return {...cell,
+          ...seasonStreakPresentation(
+            observed: verified ? usageMaps(usageMap(club['records'])[key]) : [],
+            official: true, completedGames: 0, loadedGames: 0,
+            audit: audit.isNotEmpty ? audit : {'status':'unavailable','note':'球団別の年度内最長を未確認。'}),
+          'current_note': '${audit['note'] ?? ''}',
+          'current_checked_at': snapshot['checked_at'],
+          'historical_status': usageMaps(cell['record']).isEmpty ? 'unavailable' : 'partial',
+        };
+      })()],
+    }
+  ]};
+}
 
 const clubRecordMetrics = [
   ('hits', '安打', '安打', 'int_hit1', 2),
@@ -69,7 +101,8 @@ Future<List<Map<String, dynamic>>> readClubRecordRows(
 
 Map<String, dynamic> buildClubRecords(
     List<Map<String, dynamic>> teams, List<Map<String, dynamic>> rows, int year,
-    {List<Map<String, dynamic>> streakRows = const []}) {
+    {List<Map<String, dynamic>> streakRows = const [],
+     Map<String, dynamic> currentStreakSnapshot = const {}}) {
   List<Map<String, dynamic>> leaders(dynamic team, String key, bool current) {
     final matching = rows
         .where((r) =>
@@ -84,7 +117,7 @@ Map<String, dynamic> buildClubRecords(
     return matching.where((r) => num.parse('${r['value']}') == best).toList();
   }
 
-  return {
+  return applyAuditedClubStreaks({
     'year': year,
     'note':
         '登録済みの球団別成績。通算は当該球団での成績のみを合算し、今季出場者の通算値と比較。連続記録は出典を確認できた記録のみ（年度をまたぐ記録を含む）。未収録の記録は未取得と表示します。',
@@ -126,7 +159,7 @@ Map<String, dynamic> buildClubRecords(
           ],
         }
     ],
-  };
+  }, currentStreakSnapshot);
 }
 
 num? clubRecordValue(dynamic raw) {
@@ -175,11 +208,6 @@ Future<List<Map<String, dynamic>>> readClubStreakRows(
             'sources': metric['sources'],
             'current': false
           },
-    for (final entry in usageMap(
-            usageMap(usageMap(baseline['current_streaks'])['$year'])['records'])
-        .entries)
-      for (final row in usageMaps(entry.value))
-        {...row, 'key': entry.key, 'current': true},
   ];
   if (candidates.isEmpty) return [];
   final affiliations = (await conn.execute(r'''

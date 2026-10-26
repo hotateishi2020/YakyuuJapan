@@ -90,7 +90,7 @@ class _HomeGamesBehindBoardState extends State<HomeGamesBehindBoard> {
               standingsChartBeside: !portrait, standingsChartBelow: portrait,
               standingsChartHeight: 200,
               standingsNamesOnly: true,
-              useFullStandingsTeamNames: widget.org.kind == OrgKind.mlb,
+              useFullStandingsTeamNames: true,
               standingsTeamNameWidth: teamNameWidth, showPredictionColumns: false,
               includeMlbWildcard: false,
             )),

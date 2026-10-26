@@ -176,12 +176,24 @@ class NavigationPickerBar extends StatelessWidget {
                   child: _options(last, [for (final value in last.labels.keys) _optionWidth(context, last, value)])));
             }
 
-            final optionWidths = [for (final value in last.labels.keys) _optionWidth(context, last, value)];
             final separatorWidth = _textWidth(context, '>') + 12;
-            final requiredWidth = pickerWidths.take(entries.length - 1).fold<double>(0, (a, b) => a + b) +
-                separatorWidth * (entries.length - 1) +
-                optionWidths.fold<double>(0, (a, b) => a + b) + (optionWidths.length - 1) * 4;
-            final expanded = !last.alwaysPicker && constraints.maxWidth.isFinite && requiredWidth <= constraints.maxWidth;
+            var usedWidth = pickerWidths.fold<double>(0, (a, b) => a + b) +
+                separatorWidth * (entries.length - 1);
+            final expandedIndices = <int>{};
+            // Prefer the rightmost group, but even tab-preferred groups must fit
+            // alongside all of the other controls in this row.
+            for (var i = entries.length - 1; i >= 0; i--) {
+              final entry = entries[i];
+              if (entry.alwaysPicker || (!entry.alwaysTabs && i != entries.length - 1)) continue;
+              final tabsWidth = entry.labels.keys.fold<double>(0,
+                  (sum, value) => sum + _optionWidth(context, entry, value)) +
+                  (entry.labels.length - 1) * 4;
+              final nextWidth = usedWidth - pickerWidths[i] + tabsWidth;
+              if (constraints.maxWidth.isFinite && nextWidth <= constraints.maxWidth) {
+                expandedIndices.add(i);
+                usedWidth = nextWidth;
+              }
+            }
             return SizedBox(
               height: 40,
               child: SingleChildScrollView(
@@ -191,7 +203,7 @@ class NavigationPickerBar extends StatelessWidget {
                   for (final indexed in entries.indexed) ...[
                     if (indexed.$1 > 0)
                       SizedBox(width: separatorWidth, child: const Center(child: Text('>', style: _textStyle))),
-                    if (indexed.$2.alwaysTabs || (expanded && indexed.$1 == entries.length - 1))
+                    if (expandedIndices.contains(indexed.$1))
                       _options(indexed.$2, [for (final value in indexed.$2.labels.keys) _optionWidth(context, indexed.$2, value)])
                     else
                       SizedBox(width: pickerWidths[indexed.$1], child: _picker(indexed.$2)),

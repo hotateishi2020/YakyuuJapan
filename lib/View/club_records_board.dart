@@ -47,13 +47,25 @@ class _ClubRecordsBoardState extends State<ClubRecordsBoard> {
       return number != null && number.isFinite && number >= 0 ? number : null;
     }
 
+    bool samePlayer(Map<String, dynamic> a, Map<String, dynamic> b) {
+      final aId = int.tryParse('${a['id_player']}');
+      final bId = int.tryParse('${b['id_player']}');
+      if (aId != null && aId > 0 && bId != null && bId > 0) {
+        return aId == bId;
+      }
+      String name(Map<String, dynamic> row) =>
+          '${row['name'] ?? ''}'.replaceAll(RegExp(r'[\s\u3000]+'), '');
+      return name(a).isNotEmpty && name(a) == name(b);
+    }
+
     Widget entries(List<Map<String, dynamic>> rows, String unit,
             {required double maximum,
             required Color color,
             required String key,
+            String emptyLabel = '未取得',
             bool past = false}) =>
         Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          if (rows.isEmpty) const Text('未取得', style: TextStyle(fontSize: 11)),
+          if (rows.isEmpty) Text(emptyLabel, style: const TextStyle(fontSize: 11)),
           for (var i = 0; i < rows.length; i++)
             Padding(
                 padding: const EdgeInsets.only(top: 3, bottom: 6),
@@ -209,15 +221,19 @@ class _ClubRecordsBoardState extends State<ClubRecordsBoard> {
                                           ? null
                                           : value(current.first);
                                       final gap =
-                                          previous == null || now == null
+                                          (_group == 'streak' && item['historical_status'] != 'verified') || previous == null || now == null
                                               ? null
                                               : previous - now;
+                                      final unchangedRecord = gap == 0 &&
+                                          current.every((player) => record.any(
+                                              (past) => samePlayer(player, past) &&
+                                                  value(player) == value(past)));
                                       return Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.stretch,
                                           children: [
-                                            const Text('歴代最高',
-                                                style: TextStyle(
+                                            Text(_group == 'streak' ? '確認済みの歴代記録' : '歴代最高',
+                                                style: const TextStyle(
                                                     fontSize: 11,
                                                     fontWeight:
                                                         FontWeight.bold)),
@@ -237,12 +253,13 @@ class _ClubRecordsBoardState extends State<ClubRecordsBoard> {
                                                         FontWeight.bold)),
                                             entries(
                                                 current, '${metric['unit']}',
+                                                emptyLabel: '${item['current_message'] ?? '未取得'}',
                                                 maximum: maximum,
                                                 color: parseColorNameOrNull(
                                                         '${team['color_back']}') ??
                                                     Colors.blue,
                                                 key: '$barKey-current'),
-                                            if (gap != null)
+                                            if (gap != null && !unchangedRecord)
                                               Padding(
                                                   padding:
                                                       const EdgeInsets.only(

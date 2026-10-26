@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:Yakyuu_Japan/logic/auth_session.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/View/PredictGroupBoard.dart';
 import 'package:Yakyuu_Japan/logic/predict_groups.dart';
 import 'package:Yakyuu_Japan/tools/color_parse.dart';
 
 void main() {
+  setUp(() {
+    AuthSession.instance.user = AuthUser.fromJson({'id': 1});
+    AuthSession.instance.token = 'test-session';
+  });
+  tearDown(() {
+    AuthSession.instance.user = null;
+    AuthSession.instance.token = null;
+  });
   testWidgets('HOME用スコアはスクロール内に収まり予想設定を表示しない', (tester) async {
     await tester.binding.setSurfaceSize(const Size(320, 640));
     addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -13,15 +22,48 @@ void main() {
         groups: [{'id': 1, 'txt_name': '対決グループ', 'int_year': 2026, 'id_setting': 1, 'users': [
           {'id': 1, 'name': '参加者A', 'hits': 3},
           {'id': 2, 'name': '参加者B', 'hits': 5},
-        ]}]),
+        ]}, {'id': 1, 'txt_name': '対決グループ', 'int_year': 2025, 'id_setting': 2,
+          'users': [{'id': 3, 'name': '昨年の参加者', 'hits': 99}]},
+          {'id': 2, 'txt_name': '昨年だけのグループ', 'int_year': 2025, 'id_setting': 3},
+          {'id': 3, 'txt_name': '翌年のグループ', 'int_year': 2027, 'id_setting': 4}]),
     ))));
     expect(find.text('対決グループ'), findsOneWidget);
+    expect(find.text('昨年の参加者'), findsNothing);
+    expect(find.text('昨年だけのグループ'), findsNothing);
+    expect(find.text('翌年のグループ'), findsNothing);
+    expect(find.text('99'), findsNothing);
+    final firstCard = tester.getRect(find.byKey(const ValueKey('home-score-1-1')));
+    final secondCard = tester.getRect(find.byKey(const ValueKey('home-score-1-2')));
+    expect(firstCard.width, firstCard.height);
+    expect(secondCard.width, secondCard.height);
+    expect(firstCard.left, tester.getTopLeft(find.text('対決グループ')).dx);
+    expect(secondCard.left - firstCard.right, 8);
+    expect(firstCard.top, secondCard.top);
+    expect(find.text('2026'), findsNothing);
     expect(find.text('3'), findsOneWidget);
     expect(find.text('5'), findsOneWidget);
     expect(find.byTooltip('予想設定'), findsNothing);
     expect(find.byKey(const ValueKey('prediction-situation-block')), findsNothing);
     expect(tester.takeException(), isNull);
   });
+
+  for (final width in [1200.0, 375.0]) {
+    testWidgets('年度一覧と予想状況の幅と左右位置を揃える width=$width', (tester) async {
+      await tester.binding.setSurfaceSize(Size(width, 1600));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester.pumpWidget(const MaterialApp(home: Scaffold(body: PredictGroupBoard(
+        loading: false, selectedYear: 2026,
+        groups: [{'id': 1, 'txt_name': '対決', 'int_year': 2026, 'id_setting': 1,
+          'users': [{'id': 1, 'name': '参加者A', 'hits': 3}, {'id': 2, 'name': '参加者B', 'hits': 5}]}],
+      ))));
+      final years = tester.getRect(find.byKey(const ValueKey('prediction-years-block-1')));
+      final situation = tester.getRect(find.byKey(const ValueKey('prediction-situation-block')));
+      expect(years.width, closeTo(situation.width, 0.01));
+      expect(years.left, closeTo(situation.left, 0.01));
+      expect(years.right, closeTo(situation.right, 0.01));
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   test('予想グループは新しい年が上で同じ年の重複は1件', () {
     final sections = predictGroupsByYear([
@@ -358,6 +400,12 @@ void main() {
     for (var i = 1; i < 13; i++) {
       expect(tester.getTopRight(icons.at(i)).dx, iconRight);
     }
+    AuthSession.instance.token = null;
+    await tester.pump();
+    expect(find.text('2026年の予想設定'), findsNothing);
+    expect(find.text('立石'), findsNothing);
+    expect(find.text('江島'), findsNothing);
+    expect(find.text('ログインすると予想を見られます'), findsWidgets);
   });
 
   testWidgets('狭い幅でも年度から編集アイコンまで収まる', (tester) async {

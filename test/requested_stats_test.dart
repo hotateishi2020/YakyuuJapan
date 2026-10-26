@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/View/player_detail_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:Yakyuu_Japan/View/SeasonTable.dart';
@@ -197,6 +198,30 @@ void main() {
     await tester.longPress(find.byType(PlayerStatCell).at(1));
     await tester.pump();
     expect(colors(), original);
+  });
+
+  testWidgets('投手の勝率を長押しすると他の投手成績も同時に強調される', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: Scaffold(body: Column(children: [
+      PlayerStatCell(row: {'id_player': 605, 'name_player': '髙橋遥人', 'title': '最多勝', 'stats': '14', 'color_back': 'yellow', 'txt_position': '投手'}),
+      PlayerStatCell(row: {'id_player': 605, 'name_player': '髙橋遥人', 'title': '勝率', 'stats': '.875', 'color_back': 'yellow', 'txt_position': '投手'}),
+      PlayerStatCell(row: {'id_player': 744, 'name_player': '山野太一', 'title': '勝率', 'stats': '.800', 'color_back': 'midnightblue', 'txt_position': '投手'}),
+    ]))));
+    List<Color> colors() => tester.widgetList<ColoredBox>(find.byKey(const ValueKey('player-stat-bg'))).map((w) => w.color).toList();
+    final original = colors();
+    for (final target in [
+      find.text('.875'),
+      find.descendant(of: find.byType(PlayerStatCell).at(1), matching: find.byType(PlayerNameLink)),
+      find.byType(PlayerStatCell).first,
+    ]) {
+      await tester.longPress(target);
+      await tester.pump();
+      expect(colors()[0], isNot(original[0]));
+      expect(colors()[1], colors()[0]);
+      expect(colors()[2], original[2]);
+      await tester.longPress(target);
+      await tester.pump();
+      expect(colors(), original);
+    }
   });
 
   test('規定未達も数値順に並べ順位の表示値は保持する', () {

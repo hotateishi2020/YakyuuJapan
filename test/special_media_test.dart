@@ -22,16 +22,16 @@ void main() {
       await tester.pumpWidget(MaterialApp(home: Scaffold(body: item.value)));
       expect(find.byType(Image), findsNothing);
       session.token = 'test';
-      session.user = AuthUser.fromJson({'id': 3, 'flg_special': false});
+      session.user = AuthUser.fromJson({'id': 3, 'flg_special': true});
       await tester.pump();
       expect(find.byType(Image), findsNothing);
-      session.user = AuthUser.fromJson({'id': 1, 'flg_special': true});
+      session.user = AuthUser.fromJson({'id': 1, 'flg_special': false});
       await tester.pump();
       expect(find.byType(Image), findsWidgets);
-      session.user = AuthUser.fromJson({'id': 3, 'flg_special': false});
+      session.user = AuthUser.fromJson({'id': 3, 'flg_special': true});
       await tester.pump();
       expect(find.byType(Image), findsNothing);
-      session.user = AuthUser.fromJson({'id': 2, 'flg_special': true});
+      session.user = AuthUser.fromJson({'id': 2, 'flg_special': false});
       await tester.pump();
       expect(find.byType(Image), findsWidgets);
       session.token = null;
@@ -50,16 +50,16 @@ void main() {
   testWidgets('media is mounted only with special user and active session', (tester) async {
     await tester.pumpWidget(const MaterialApp(home: SpecialMedia(fallback: Text('name'), child: Text('restricted'))));
     expect(find.text('restricted'), findsNothing);
-    session.user = AuthUser.fromJson({'id': 1, 'flg_special': true});
+    session.user = AuthUser.fromJson({'id': 1, 'flg_special': false});
     await tester.pump();
     expect(find.text('restricted'), findsNothing);
     session.token = 'test';
     await tester.pump();
     expect(find.text('restricted'), findsOneWidget);
-    session.user = AuthUser.fromJson({'id': 3, 'flg_special': false});
+    session.user = AuthUser.fromJson({'id': 3, 'flg_special': true});
     await tester.pump();
     expect(find.text('restricted'), findsNothing);
-    session.user = AuthUser.fromJson({'id': 2, 'flg_special': true});
+    session.user = AuthUser.fromJson({'id': 2, 'flg_special': false});
     await tester.pump();
     expect(find.text('restricted'), findsOneWidget);
     session.token = null;
@@ -67,7 +67,7 @@ void main() {
     expect(find.text('restricted'), findsNothing);
   });
   testWidgets('prediction keeps team name and hides logo on logout', (tester) async {
-    session.user = AuthUser.fromJson({'id': 1, 'flg_special': true});
+    session.user = AuthUser.fromJson({'id': 1, 'flg_special': false});
     session.token = 'test';
     await tester.pumpWidget(MaterialApp(home: predictTeamLabels('巨人', const TextStyle())));
     expect(find.byType(Image), findsOneWidget);

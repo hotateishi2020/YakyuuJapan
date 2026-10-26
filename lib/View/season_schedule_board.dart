@@ -196,9 +196,10 @@ class _SeasonCalendarBoardState extends State<SeasonCalendarBoard> {
 
 /// HOMEでは両団体の試合とイベントを同じ月間カレンダーに表示する。
 class HomeSeasonCalendar extends StatefulWidget {
-  const HomeSeasonCalendar({super.key, required this.year, this.weekStart});
+  const HomeSeasonCalendar({super.key, required this.year, this.weekStart, this.weekCount = 1}) : assert(weekCount > 0);
   final int year;
   final DateTime? weekStart;
+  final int weekCount;
   @override
   State<HomeSeasonCalendar> createState() => _HomeSeasonCalendarState();
 }
@@ -219,7 +220,7 @@ class _HomeSeasonCalendarState extends State<HomeSeasonCalendar> {
   Widget build(BuildContext context) {
     final years = _weekStart == null ? {_year} : {
       _weekStart!.year,
-      _weekStart!.add(const Duration(days: 6)).year,
+      _weekStart!.add(Duration(days: 7 * widget.weekCount - 1)).year,
     };
     final sources = [for (final year in years)
       for (final org in [OrgConfig.npb, OrgConfig.mlb]) (year: year, org: org)];
@@ -236,6 +237,7 @@ class _HomeSeasonCalendarState extends State<HomeSeasonCalendar> {
       return EventCalendar(
         games: games,
         weekStart: _weekStart,
+        weekCount: widget.weekCount,
         onWeekChanged: (week) => setState(() => _weekStart = week),
         events: {
           for (final event in events)

@@ -60,7 +60,7 @@ void main() {
       session.token = null;
       await tester.pump();
       expect(find.textContaining('4打数'), findsNothing);
-      expect(find.textContaining('19号'), lineup ? findsNothing : findsWidgets);
+      expect(find.textContaining('19号'), findsNothing);
       expect(find.textContaining('猛打賞'), lineup ? findsNothing : findsWidgets);
       expect(tester.takeException(), isNull);
     });

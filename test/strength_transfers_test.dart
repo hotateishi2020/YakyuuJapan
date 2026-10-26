@@ -42,6 +42,38 @@ void main() {
       },
     ]
   };
+  final sortedTeams = [
+    {...team, 'id_team': 1, 'name_team': '球団A', 'roster': [
+      {'player_key': 'attention-low', 'name': '権利保有選手', 'fa_rights_type': 'domestic', 'fa_rights_year': 2026},
+    ]},
+    {...team, 'id_team': 2, 'name_team': '球団B', 'roster': [
+      {'player_key': 'attention-high', 'name': '宣言選手', 'fa_rights_type': 'domestic', 'fa_rights_year': 2026,
+        'move_status': 'FA宣言（移籍先未定）', 'move_status_year': 2026},
+      {'player_key': 'attention-medium', 'name': '報道選手', 'fa_rights_type': 'domestic', 'fa_rights_year': 2026,
+        'transfer_reports': [{'year': 2026, 'status': 'rumored', 'source_url': 'https://example.com/report'}]},
+    ]},
+  ];
+  test('初期表示は注目度順で、チーム別では球団内を注目度順にする', () {
+    final rows = transferCandidates(sortedTeams, 2026);
+    expect(rows.map((r) => r['attention']), [3, 2, 1]);
+    expect(rows.map((r) => r['player']['name']), ['宣言選手', '報道選手', '権利保有選手']);
+    expect(transferCandidates(sortedTeams, 2026, sort: TransferSort.team).map((r) => r['player']['name']),
+      ['権利保有選手', '宣言選手', '報道選手']);
+  });
+  testWidgets('注目度列と並び順切替を表示する', (t) async {
+    await t.pumpWidget(MaterialApp(home: Scaffold(body: StrengthTransfers(teams: sortedTeams, year: 2026))));
+    expect(find.text('注目度'), findsOneWidget);
+    expect(find.text('★★★'), findsOneWidget);
+    expect(t.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '注目度順')).selected, isTrue);
+    expect(t.getTopLeft(find.text('宣言選手')).dy, lessThan(t.getTopLeft(find.text('権利保有選手')).dy));
+    await t.tap(find.text('チーム別'));
+    await t.pumpAndSettle();
+    expect(t.getTopLeft(find.text('権利保有選手')).dy, lessThan(t.getTopLeft(find.text('宣言選手')).dy));
+    await t.tap(find.text('注目度順'));
+    await t.pumpAndSettle();
+    expect(t.getTopLeft(find.text('宣言選手')).dy, lessThan(t.getTopLeft(find.text('権利保有選手')).dy));
+    expect(t.takeException(), isNull);
+  });
   test('高橋の海外FA取得と今オフ報道を掲載し確定・前年の候補を混ぜない', () {
     final rows = transferCandidates([team], 2026);
     expect(rows.map((r) => r['player']['name']),

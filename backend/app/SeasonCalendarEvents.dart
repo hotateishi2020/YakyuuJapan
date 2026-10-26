@@ -1,3 +1,5 @@
+import 'AnnualAwardEvents.dart';
+
 /// Combine researched events and existing event periods without duplicate bands.
 List<Map<String, dynamic>> seasonCalendarEvents({
   required String org,
@@ -33,5 +35,38 @@ List<Map<String, dynamic>> seasonCalendarEvents({
       'detail': '日本時間。第7戦までの予定期間（第5〜7戦は必要な場合のみ）。\n$source',
     });
   }
-  return result;
+  if (org == 'npb' && year == 2026 && !result.any((e) =>
+      RegExp(r'パテレ(?:アワード|AWARD)', caseSensitive: false)
+          .hasMatch('${e['title_event']}'.replaceAll(RegExp(r'\s'), '')) ||
+      '${e['source_url']}'.contains('/ptv_awards2026'))) {
+    const source = 'https://pacificleague.com/contents/ptv_awards2026';
+    result.add({
+      'title_event': 'パテレAWARD',
+      'date_from_temp': '2026-12-11',
+      'date_to': '2026-12-11',
+      'event_category': 'NPB',
+      'event_category_color_back': 'navy',
+      'event_category_color_font': 'white',
+      'source_url': source,
+      'detail': 'パテレアワード2026。12月11日（金）午後予定。\n$source',
+    });
+  }
+  // Samurai Japan events are shared by the NPB/MLB and combined HOME calendars.
+  if (year == 2026 && !result.any((e) =>
+      '${e['title_event']}'.contains('アジアプロ野球チャンピオンシップ') ||
+      '${e['title_event']}'.contains('アジアチャンピオンシップ') ||
+      '${e['source_url']}'.contains('/apbc2026/'))) {
+    const source = 'https://www.japan-baseball.jp/jp/games/apbc2026/';
+    result.add({
+      'title_event': 'アジアプロ野球チャンピオンシップ',
+      'date_from_temp': '2026-11-12',
+      'date_to': '2026-11-15',
+      'event_category': '侍JAPAN',
+      'event_category_color_back': 'navy',
+      'event_category_color_font': 'white',
+      'source_url': source,
+      'detail': '東京ドーム。2026年11月12日〜15日（日本時間）。\n$source',
+    });
+  }
+  return org == 'npb' ? annualAwardEvents(result, year) : result;
 }

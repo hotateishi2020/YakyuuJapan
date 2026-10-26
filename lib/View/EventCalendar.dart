@@ -9,6 +9,7 @@ class EventCalendar extends StatefulWidget {
   final List<Map<String, dynamic>> games;
   final DateTime? initialMonth;
   final DateTime? weekStart;
+  final int weekCount;
   final ValueChanged<DateTime>? onMonthChanged;
   final ValueChanged<DateTime>? onWeekChanged;
 
@@ -18,8 +19,9 @@ class EventCalendar extends StatefulWidget {
       this.games = const [],
       this.initialMonth,
       this.weekStart,
+      this.weekCount = 1,
       this.onWeekChanged,
-      this.onMonthChanged});
+      this.onMonthChanged}) : assert(weekCount > 0);
 
   @override
   State<EventCalendar> createState() => _EventCalendarState();
@@ -97,7 +99,7 @@ class _EventCalendarState extends State<EventCalendar> {
     final lead = first.weekday % 7;
     final days = DateTime(_month.year, _month.month + 1, 0).day;
     final cells = lead + days;
-    final rows = widget.weekStart == null ? (cells / 7).ceil() : 1;
+    final rows = widget.weekStart == null ? (cells / 7).ceil() : widget.weekCount;
     const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
 
     return Column(
@@ -109,7 +111,7 @@ class _EventCalendarState extends State<EventCalendar> {
               onPressed: widget.onWeekChanged == null ? null : () => widget.onWeekChanged!(widget.weekStart!.subtract(const Duration(days: 7))),
               icon: const Icon(Icons.chevron_left, size: 18)),
             Expanded(child: Text(
-              '${scheduleDate(widget.weekStart!)} ～ ${scheduleDate(widget.weekStart!.add(const Duration(days: 6)))}',
+              '${scheduleDate(widget.weekStart!)} ～ ${scheduleDate(widget.weekStart!.add(Duration(days: 7 * widget.weekCount - 1)))}',
               textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
             IconButton(tooltip: '次の週',
               onPressed: widget.onWeekChanged == null ? null : () => widget.onWeekChanged!(widget.weekStart!.add(const Duration(days: 7))),

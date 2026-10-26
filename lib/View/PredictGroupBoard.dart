@@ -9,6 +9,16 @@ import '../tools/color_parse.dart';
 import '../widgets/special_media.dart';
 import 'GamesBoard.dart' show teamLogoVisual, teamLogoImage;
 
+Widget _authenticatedPredictionDialog(Widget child) => ListenableBuilder(
+  listenable: AuthSession.instance,
+  builder: (context, _) => AuthSession.instance.isLoggedIn
+      ? child
+      : AlertDialog(
+          content: const Text('ログインすると予想を見られます'),
+          actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('閉じる'))],
+        ),
+);
+
 const predictSelectLabels = {
   'FREE': '自由選択',
   'DRAW': '被ったらくじ引き',
@@ -100,22 +110,29 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: AuthSession.instance,
+    builder: (context, _) => AuthSession.instance.isLoggedIn
+        ? _buildAuthenticated(context)
+        : const Center(child: Text('ログインすると予想を見られます')),
+  );
+
+  Widget _buildAuthenticated(BuildContext context) {
     if (widget.loading && widget.groups.isEmpty) {
       return const Center(child: BaseballLoading());
     }
     if (widget.error != null && widget.groups.isEmpty) {
       return Center(child: Text(widget.error!));
     }
-    final clusters = predictGroupClusters(widget.groups);
+    final clusters = predictGroupClusters(widget.scoresOnly
+        ? widget.groups.where((row) => _asInt(row['int_year']) == widget.selectedYear).toList()
+        : widget.groups);
     if (widget.scoresOnly) {
       if (clusters.isEmpty) return const Text('予想グループはまだありません');
       return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         for (final cluster in clusters)
-          _frame(header: cluster.name, child: Column(children: [
-            for (final row in _visibleYears(cluster.years))
-              _yearRow(cluster.id, row, _userSlots(cluster.years)),
-          ])),
+          for (final row in _visibleYears(cluster.years))
+            _homeScoreCards(row),
       ]);
     }
     if (clusters.isEmpty) {
@@ -130,33 +147,48 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
       );
     }
     final featured = _featured(clusters);
+    final blockWidth = (400.0 + 160.0 * (featured == null ? 0 : _maps(featured.row['users']).length)) *
+        MediaQuery.textScalerOf(context).scale(13) / 13;
     return ListView(
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
       children: [
         _inviteList(),
         for (final cluster in clusters)
-          _frame(
-            header: cluster.name,
-            onRename: () => _openRename(cluster.id, cluster.name),
-            member: _isMember(cluster.years),
-            onAddYear: () => _openYear(cluster.id, cluster.years),
-            onDelete: () => _openDelete(cluster.id, cluster.name, _deleteApprovals(cluster.years)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (_deleteApprovals(cluster.years).isNotEmpty) _deleteBanner(cluster.id, cluster.years),
-                for (var i = 0; i < _visibleYears(cluster.years).length; i++) ...[
-                  if (i > 0) const Divider(height: 1, color: Color(0xFFE0E0E0)),
-                  _yearRow(cluster.id, _visibleYears(cluster.years)[i], _userSlots(cluster.years)),
-                ],
-              ],
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              key: ValueKey('prediction-years-block-${cluster.id}'),
+              constraints: BoxConstraints(maxWidth: blockWidth),
+              child: _frame(
+                header: cluster.name,
+                onRename: () => _openRename(cluster.id, cluster.name),
+                member: _isMember(cluster.years),
+                onAddYear: () => _openYear(cluster.id, cluster.years),
+                onDelete: () => _openDelete(cluster.id, cluster.name, _deleteApprovals(cluster.years)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (_deleteApprovals(cluster.years).isNotEmpty) _deleteBanner(cluster.id, cluster.years),
+                    for (var i = 0; i < _visibleYears(cluster.years).length; i++) ...[
+                      if (i > 0) const Divider(height: 1, color: Color(0xFFE0E0E0)),
+                      _yearRow(cluster.id, _visibleYears(cluster.years)[i], _userSlots(cluster.years)),
+                    ],
+                  ],
+                ),
+              ),
             ),
           ),
         if (featured == null)
-          _frame(
-            header: '${_focusYear ?? widget.selectedYear}年の予想状況',
-            large: true,
-            child: const Text('この年の予想グループはありません', style: TextStyle(fontSize: 16)),
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: blockWidth),
+              child: _frame(
+                header: '${_focusYear ?? widget.selectedYear}年の予想状況',
+                large: true,
+                child: const Text('この年の予想グループはありません', style: TextStyle(fontSize: 16)),
+              ),
+            ),
           )
         else
           Align(
@@ -164,8 +196,7 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
             child: ConstrainedBox(
               key: const ValueKey('prediction-situation-block'),
               constraints: BoxConstraints(
-                maxWidth: (400.0 + 160.0 * _maps(featured.row['users']).length) *
-                    MediaQuery.textScalerOf(context).scale(13) / 13,
+                maxWidth: blockWidth,
               ),
               child: _frame(
                 header: '${featured.year == null ? '年度なし' : '${featured.year}年'}　${predictSeasonHeader(featured.year)}',
@@ -313,7 +344,9 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
   }
 
   bool _featuredGroup(int groupId) {
-    final clusters = predictGroupClusters(widget.groups);
+    final clusters = predictGroupClusters(widget.scoresOnly
+        ? widget.groups.where((row) => _asInt(row['int_year']) == widget.selectedYear).toList()
+        : widget.groups);
     for (final cluster in clusters) {
       if (cluster.years.any((row) => row['int_year'] == _focusYear)) return cluster.id == groupId;
     }
@@ -323,7 +356,7 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
   Future<void> _openEditor(int? year, Map<String, dynamic> yearRow) async {
     await showDialog<void>(
       context: context,
-      builder: (context) => _PredictSettingDialog(
+      builder: (context) => _authenticatedPredictionDialog(_PredictSettingDialog(
         year: year,
         setting: yearRow,
         titleCatalog: widget.titleCatalog,
@@ -331,18 +364,18 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
         onSave: widget.onSaveSetting,
         onApprove: widget.onApproveRule,
         onSearch: widget.onSearchNames,
-      ),
+      )),
     );
   }
 
   Future<void> _openRename(int id, String name) async {
     await showDialog<void>(
       context: context,
-      builder: (context) => _PredictNameDialog(
+      builder: (context) => _authenticatedPredictionDialog(_PredictNameDialog(
         groupId: id,
         name: name,
         onSave: widget.onRenameGroup,
-      ),
+      )),
     );
   }
 
@@ -413,6 +446,43 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
             child,
         ],
       ),
+    );
+  }
+
+  Widget _homeScoreCards(Map<String, dynamic> group) {
+    final users = _maps(group['users']);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(_name(group), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 10),
+        if (users.isEmpty) const Text('参加ユーザーはまだいません')
+        else LayoutBuilder(builder: (context, constraints) {
+          final preferredSide = 112.0 * MediaQuery.textScalerOf(context).scale(16) / 16;
+          final side = constraints.maxWidth < preferredSide ? constraints.maxWidth : preferredSide;
+          return Wrap(spacing: 8, runSpacing: 8, children: [
+            for (final user in users)
+              Container(
+                key: ValueKey('home-score-${group['id']}-${user['id']}'),
+                width: side, height: side,
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: _userColor(user).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: _userColor(user).withValues(alpha: 0.45)),
+                ),
+                child: Center(child: FittedBox(fit: BoxFit.scaleDown, child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(_userName(user), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: _userColor(user))),
+                    const SizedBox(height: 2),
+                    Text('${_asInt(user['hits'])}', style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w800, height: 1.05)),
+                  ],
+                ))),
+              ),
+          ]);
+        }),
+      ]),
     );
   }
 
@@ -731,10 +801,10 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
   Future<void> _openCreateGroup() async {
     await showDialog<void>(
       context: context,
-      builder: (context) => _PredictGroupCreateDialog(
+      builder: (context) => _authenticatedPredictionDialog(_PredictGroupCreateDialog(
         onSearch: widget.onSearchUsers,
         onCreate: widget.onCreateGroup,
-      ),
+      )),
     );
   }
 
@@ -745,11 +815,11 @@ class _PredictGroupBoardState extends State<PredictGroupBoard> {
     };
     await showDialog<void>(
       context: context,
-      builder: (context) => _PredictYearDialog(
+      builder: (context) => _authenticatedPredictionDialog(_PredictYearDialog(
         groupId: groupId,
         taken: taken,
         onCreate: widget.onCreateYear,
-      ),
+      )),
     );
   }
 

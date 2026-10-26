@@ -1,3 +1,4 @@
+import 'NewsReadDate.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
@@ -43,7 +44,7 @@ class Auth {
           AND (SELECT COUNT(*) FROM information_schema.columns
             WHERE table_schema = 'public' AND table_name = 'm_user'
               AND column_name IN ('nickname', 'name_handle', 'id_team_fav', 'id_player_fav',
-                'flg_notify_news', 'flg_notify_event', 'flg_admin', 'favorite_high_school', 'flg_special')) = 9
+                'flg_notify_news', 'flg_notify_event', 'flg_admin', 'favorite_high_school', 'flg_special', 'date_read_news')) = 10
       ''');
       if (existing.isNotEmpty && existing.first[0] == true) {
         _schemaReady = true;
@@ -64,6 +65,7 @@ class Auth {
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS favorite_high_school TEXT');
       await conn.execute("UPDATE m_user SET favorite_high_school='佐賀北' WHERE id=1 AND favorite_high_school IS NULL");
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS id_player_fav INTEGER');
+      await ensureNewsReadDate(conn);
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS flg_notify_news BOOLEAN DEFAULT TRUE');
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS flg_notify_event BOOLEAN DEFAULT TRUE');
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS flg_admin BOOLEAN NOT NULL DEFAULT FALSE');
@@ -171,7 +173,8 @@ class Auth {
         'name_player_fav': row['name_player_fav'] ?? '',
         'flg_notify_news': row['flg_notify_news'] ?? true,
         'flg_notify_event': row['flg_notify_event'] ?? true,
-        'flg_read_news': row['flg_read_news'] ?? true,
+        'date_read_news': row['date_read_news'],
+        'date_latest_news': row['date_latest_news'],
         'flg_read_event': row['flg_read_event'] ?? true,
         'flg_admin': row['flg_admin'] ?? false,
         'flg_special': row['flg_special'] ?? false,
@@ -182,7 +185,8 @@ class Auth {
            u.id_team_fav, u.id_player_fav, u.favorite_high_school,
            COALESCE(u.flg_notify_news, TRUE) AS flg_notify_news,
            COALESCE(u.flg_notify_event, TRUE) AS flg_notify_event,
-           COALESCE(u.flg_read_news, TRUE) AS flg_read_news,
+           u.date_read_news::text AS date_read_news,
+           (SELECT MAX(n.crtat)::timestamptz::text FROM t_nortification n WHERE NOT COALESCE(n.flg_delete,FALSE) AND n.id_user IS NULL) AS date_latest_news,
            COALESCE(u.flg_read_event, TRUE) AS flg_read_event,
            COALESCE(t.name_short, t.name_shortest, '') AS name_team_fav,
            COALESCE(u.flg_admin, FALSE) AS flg_admin,
@@ -625,7 +629,7 @@ class Auth {
       }
       if (target == 'news') {
         await conn.execute(
-          'UPDATE m_user SET flg_read_news = TRUE, updat = NOW() WHERE id = \$1::int',
+          'UPDATE m_user SET date_read_news = NOW(), updat = NOW() WHERE id = \$1::int',
           parameters: [userId],
         );
       } else {

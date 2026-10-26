@@ -44,6 +44,17 @@ void main() {
     expect(labels.values.single, '左安|single/inning2/bases6 遊ゴロ|out/inning5/bases6');
   });
 
+  test('代走ラベルは次打者でなく直前の打撃結果へ付ける', () {
+    final labels = playLabelsByPlayer([
+      _row(result: Value.CodeGameResult.HIT_SINGLE, order: 5)..addAll({'id': 1, 'name_full': '柳田'}),
+      _row(result: 'PINCH_RUNNER', order: 6)..addAll({'id': 2, 'name_full': '次打者', 'name_enter': '川村 友斗', 'name_enter_last': '川村'}),
+      _row(result: 'OUT_GROUND', order: 6)..addAll({'id': 3, 'name_full': '次打者'}),
+    ]);
+    final flag = '/event${Uri.encodeComponent('代走:川村')}';
+    expect(labels[playPlayerKey(null, null, '柳田')], contains(flag));
+    expect(labels[playPlayerKey(null, null, '次打者')], isNot(contains(flag)));
+  });
+
   test('交代と非打撃進塁を打撃の上段用情報として保持する', () {
     final codes = ['CHANGE_PITCHER', 'PINCH_HITTER', 'PINCH_RUNNER', 'PINCH_FIELDER', 'CHANGE_POSITION', 'STEAL_BASE_SAFE', 'WILD_PITCH', 'PASS_BALL', 'ERROR_RUNNING'];
     final expected = ['投手', '代打', '代走', '代守', '守備位置転換', '盗塁', '暴投', '捕逸', '送球エラー'];

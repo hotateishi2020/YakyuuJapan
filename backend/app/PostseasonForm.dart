@@ -1,4 +1,5 @@
 import 'PlayerCountry.dart';
+import '../../lib/logic/postseason_homers.dart';
 import 'dart:convert';
 import 'package:postgres/postgres.dart';
 import 'StrengthUsage.dart';
@@ -42,11 +43,16 @@ Future<void> attachPostseasonForm(Connection conn, List<Map<String, dynamic>> ga
         if (int.tryParse('${g[k]}') != null) int.parse('${g[k]}')
   }.toList();
   final rows = (await conn.execute('''SELECT s.*,p.name_full,p.id_team AS current_team,g.datetime_start::text AS start,g.code_game FROM t_game_summary s JOIN t_game g ON g.id=s.id_game JOIN m_player p ON p.id=s.id_player WHERE g.datetime_start>=make_date(\$1,1,1) AND g.datetime_start<make_date(\$1+1,1,1) AND (g.state LIKE '%終了%' OR g.state LIKE '%コールド%') AND NOT COALESCE(g.flg_delete,false) AND NOT COALESCE(s.flg_delete,false) AND (cardinality(\$2::int[])=0 OR p.id_team=ANY(\$2::int[]))''', parameters: [year, teamIds])).map((r) => r.toColumnMap()).toList();
-  final stats = (await conn.execute("SELECT payload FROM v_stats_player WHERE int_year=\$1 AND payload->>'title' IN ('打率','防御率')", parameters: [year])).map((r) => detailMap(r[0])).toList();
+  final stats = (await conn.execute("SELECT payload FROM v_stats_player WHERE int_year=\$1 AND payload->>'title' IN ('打率','防御率','本塁打','最多勝','勝利','ホールド','セーブ')", parameters: [year])).map((r) => detailMap(r[0])).toList();
   final people = (await conn.execute('SELECT id AS id_player,id_team,url,name_full AS name_full_summary,pitching AS pitching_hand,batting AS batting_hand FROM m_player WHERE id_team=ANY(\$1::int[]) AND NOT COALESCE(flg_delete,false)', parameters: [teamIds])).map((r) => r.toColumnMap()).toList();
   await attachPlayerCountries(conn, year, people);
   for (final game in games) {
     game['player_hands'] = people.where((p) => p['id_team'] == game['id_team_home'] || p['id_team'] == game['id_team_away']).toList();
+    final ids = (game['player_hands'] as List).map((p) => '${p['id_player']}').toSet();
+    game['season_player_stats'] = [for (final row in stats)
+      if (ids.contains('${row['id_player']}'))
+        {for (final key in ['id_player', 'name_player', 'id_team', 'id_league', 'title', 'stats']) key: row[key]},
+    ];
   }
   final careers = (await conn.execute('SELECT c.*,p.url AS identity_url,p.id_team AS identity_team FROM m_player_career c JOIN m_player p ON p.id=c.id_player WHERE c.int_year=\$1 AND p.id_team=ANY(\$2::int[]) AND NOT COALESCE(c.flg_delete,false) ORDER BY c.id DESC', parameters: [year, teamIds])).map((r) => r.toColumnMap()).toList();
   addCareerFormBaselines(stats, careers, people: people);
@@ -99,6 +105,18 @@ void attachFormsFromRecords(List<Map<String, dynamic>> targets, List<Map<String,
         continue;
       }
       groups.putIfAbsent('${r['id_player']}', () => []).add(r);
+    }
+    if (npbPostseasonCodes.contains('${game['code_game']}'.toUpperCase())) {
+      game['postseason_homers_before'] = [
+        for (final entry in groups.entries) {
+          'id_player': int.parse(entry.key),
+          'name': entry.value.first['name_full'],
+          'homers': entry.value.where((r) =>
+            npbPostseasonCodes.contains('${r['code_game']}'.toUpperCase()) &&
+            DateTime.tryParse('${r['start']}'.replaceFirst(' ', 'T'))?.year == start.year
+          ).fold<int>(0, (sum, r) => sum + usageInt(r['int_homerun'])),
+        },
+      ];
     }
     game['postseason_form'] = [
       for (final entry in groups.entries)

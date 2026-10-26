@@ -180,7 +180,8 @@ class Records {
     }
     final clubRecords = org == OrgKind.npb
         ? buildClubRecords(clubTeams.values.toList(), await readClubRecordRows(conn, year), year,
-            streakRows: await readClubStreakRows(conn, baseline, clubTeams.values.toList(), year)) : null;
+            streakRows: await readClubStreakRows(conn, baseline, clubTeams.values.toList(), year),
+            currentStreakSnapshot: usageMap(usageMap(baseline['club_current_streaks'])['$year'])) : null;
     final additional = await readAdditionalRecords(conn, org, year);
     final awards = org == OrgKind.mlb
         ? localizeRecordTitleNames(await PlayerIdentity.localize(conn, baseline['awards']))
@@ -221,9 +222,10 @@ class Records {
               official: officialStreaks.containsKey(d.$1),
               completedGames: games.length,
               loadedGames: games.where((g) => g.toColumnMap()['flg_stats_loaded'] == true).length,
+              audit: usageMap(usageMap(currentSnapshot['categories'])[d.$1]),
             ),
             'current_note': officialStreaks.containsKey(d.$1)
-                ? '${currentSnapshot['note']} 確認日：${currentSnapshot['checked_at']}'
+                ? '${currentSnapshot['note']} ${usageMap(usageMap(currentSnapshot['categories'])[d.$1])['note'] ?? ''} 確認日：${currentSnapshot['checked_at']}'
                 : streaks.containsKey(d.$1)
                     ? '終了済み・成績取得済み試合の連続区間内の最長。未取得試合で区切ります。'
                     : 'この記録の判定に必要な公式記録・打席別データを確認できていません。',

@@ -160,6 +160,26 @@ Map<String, List<Map<String, dynamic>>> selectPitcherAces(Map<String, dynamic> t
     if (relief != null && players.any((p) => matches(p) && usagePlayerKey(p) != (closer == null ? '' : usagePlayerKey(closer)) && p['relief_outs'] == null && (usageInt(p['holds']) > usageInt(relief!['holds']) || (usageInt(p['holds']) == usageInt(relief['holds']) && (p['total_outs'] == null || usageInt(p['total_outs']) >= usageInt(relief['relief_outs'])))))) {
       relief = null;
     }
+    // Archived lineups establish starts even when innings by role are absent.
+    // Display that observed workload rather than inventing an innings split.
+    if (team['historical_enrichment_version'] != null) {
+      if (starter == null) {
+        final candidate = best(players.where((p) => matches(p) &&
+            usageInt(p['starts']) > 0).toList(), 'starts', 'total_outs');
+        if (candidate != null) starter = {...candidate, 'ace_basis': 'starts'};
+      }
+      if (relief == null) {
+        final candidates = [
+          for (final p in players)
+            if (matches(p) && p['starts'] != null && p['appearances'] != null &&
+                usageInt(p['appearances']) > usageInt(p['starts']) &&
+                usagePlayerKey(p) != (closer == null ? '' : usagePlayerKey(closer)))
+              {...p, 'relief_appearances': usageInt(p['appearances']) - usageInt(p['starts'])},
+        ];
+        final candidate = best(candidates, 'holds', 'relief_appearances');
+        if (candidate != null) relief = {...candidate, 'ace_basis': 'relief_appearances'};
+      }
+    }
     if (starter != null) result['SP_$hand'] = [starter];
     if (relief != null) result['RP_$hand'] = [relief];
   }

@@ -185,8 +185,6 @@ class _CountRecordsBoardState extends State<CountRecordsBoard> {
         ? [availableRecords.firstWhere((record) => record['label'] == selected)]
         : availableRecords;
     return LayoutBuilder(builder: (context, constraints) {
-      final columnWidth = portrait ? (constraints.maxWidth - 64).clamp(1.0, double.infinity) : 190.0;
-      final textWidth = (columnWidth - 21).clamp(1.0, double.infinity);
       final ranked = [
         for (final record in records)
           [
@@ -206,21 +204,45 @@ class _CountRecordsBoardState extends State<CountRecordsBoard> {
       }
 
       String playerLabel(Map<String, dynamic> player, int column) => '${player['name']}　${player['value']}${records[column]['unit'] ?? '回'}';
+      double measuredWidth(String text, TextStyle style) {
+        final painter = TextPainter(
+          text: TextSpan(text: text, style: DefaultTextStyle.of(context).style.merge(style)),
+          textDirection: direction, textScaler: scaler,
+        )..layout();
+        final width = painter.width.ceilToDouble();
+        painter.dispose();
+        return width;
+      }
+      final rankWidth = [
+        measuredWidth('順位', headerStyle),
+        for (var rank = 1; rank <= rowCount; rank++) measuredWidth('${rank}位', headerStyle),
+      ].reduce((a, b) => a > b ? a : b) + 9;
+      final columnWidths = [
+        for (var i = 0; i < records.length; i++)
+          ([
+            measuredWidth('${records[i]['label']}', headerStyle),
+            measuredWidth('—', playerStyle),
+            for (final players in ranked[i])
+              for (final player in players) measuredWidth(playerLabel(player, i), playerStyle),
+          ].reduce((a, b) => a > b ? a : b) + 9)
+            .clamp(1.0, portrait ? (constraints.maxWidth - rankWidth).clamp(1.0, double.infinity) : double.infinity),
+      ];
+      double textWidth(int column) => (columnWidths[column] - 9).clamp(1.0, double.infinity);
       final heights = [
         for (var rank = 0; rank < rowCount; rank++)
-          ranked.asMap().entries.fold<double>(textHeight('${rank + 1}位', const TextStyle(fontWeight: FontWeight.bold), 43), (height, entry) {
+          ranked.asMap().entries.fold<double>(textHeight('${rank + 1}位', headerStyle, rankWidth - 9), (height, entry) {
                 final players = rank < entry.value.length ? entry.value[rank] : <Map<String, dynamic>>[];
-                final content = players.fold<double>(0, (sum, player) => sum + textHeight(playerLabel(player, entry.key), playerStyle, textWidth) + 6);
+                final content = players.fold<double>(0, (sum, player) => sum + textHeight(playerLabel(player, entry.key), playerStyle, textWidth(entry.key)) + 6);
                 return content > height ? content : height;
               }) +
               25,
       ];
-      final headerHeight = records.fold<double>(textHeight('順位', headerStyle, 43), (height, record) {
-            final content = textHeight('${record['label']}', headerStyle, textWidth);
+      final headerHeight = records.asMap().entries.fold<double>(textHeight('順位', headerStyle, rankWidth - 9), (height, entry) {
+            final content = textHeight('${entry.value['label']}', headerStyle, textWidth(entry.key));
             return content > height ? content : height;
           }) +
           25;
-      Widget cell(Widget child, double width, double height, Color color) => Container(width: width, height: height, alignment: Alignment.center, padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12), decoration: BoxDecoration(color: color, border: Border.all(color: const Color(0xffdfe4ec), width: .5)), child: child);
+      Widget cell(Widget child, double width, double height, Color color) => Container(width: width, height: height, alignment: Alignment.center, padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12), decoration: BoxDecoration(color: color, border: Border.all(color: const Color(0xffdfe4ec), width: .5)), child: child);
       Color rowColor(int index) => index.isEven ? Colors.white : const Color(0xfff6f8fb);
       return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         if (portrait) MenuBand(level: 3, child: Padding(
@@ -242,16 +264,16 @@ class _CountRecordsBoardState extends State<CountRecordsBoard> {
         Expanded(
             child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           SizedBox(
-              width: 64,
+              width: rankWidth,
               child: Column(children: [
-                cell(const Text('順位', style: headerStyle), 64, headerHeight, const Color(0xff25324b)),
+                cell(const Text('順位', style: headerStyle), rankWidth, headerHeight, const Color(0xff25324b)),
                 Expanded(
                     child: ListView(
                   key: const ValueKey('count-records-ranks'),
                   controller: _ranks,
                   padding: EdgeInsets.zero,
                   children: [
-                    for (var rank = 0; rank < rowCount; rank++) cell(Text('${rank + 1}位', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xff25324b))), 64, heights[rank], rowColor(rank)),
+                    for (var rank = 0; rank < rowCount; rank++) cell(Text('${rank + 1}位', style: headerStyle), rankWidth, heights[rank], const Color(0xff25324b)),
                   ],
                 )),
               ])),
@@ -260,10 +282,10 @@ class _CountRecordsBoardState extends State<CountRecordsBoard> {
             key: const ValueKey('count-records-horizontal'),
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-                width: records.length * columnWidth,
+                width: columnWidths.fold<double>(0, (sum, width) => sum + width),
                 child: Column(children: [
                   Row(children: [
-                    for (final record in records) cell(Text('${record['label']}', textAlign: TextAlign.center, style: headerStyle), columnWidth, headerHeight, const Color(0xff25324b)),
+                    for (var i = 0; i < records.length; i++) cell(Text('${records[i]['label']}', textAlign: TextAlign.center, style: headerStyle), columnWidths[i], headerHeight, const Color(0xff25324b)),
                   ]),
                   Expanded(
                       child: ListView(
@@ -280,7 +302,7 @@ class _CountRecordsBoardState extends State<CountRecordsBoard> {
                                     : Column(mainAxisSize: MainAxisSize.min, children: [
                                         for (final player in ranked[i][rank]) Padding(padding: const EdgeInsets.symmetric(vertical: 3), child: PlayerNameLink(player: player, child: Text(playerLabel(player, i), textAlign: TextAlign.center, style: playerStyle))),
                                       ]),
-                                columnWidth,
+                                columnWidths[i],
                                 heights[rank],
                                 rowColor(rank)),
                         ]),
@@ -333,7 +355,7 @@ class _RegularHistoryBoardState extends State<RegularHistoryBoard> {
         for (final e in const {false: 'ポジション', true: '打順'}.entries) TextButton(onPressed: () => setState(() => batting = e.key), child: Text(e.value, style: TextStyle(fontWeight: batting == e.key ? FontWeight.bold : FontWeight.normal)))
       ]),
       Expanded(child: rows.isEmpty ? const Center(child: Text('この球団の年度別起用情報は未取得です')) : StrengthRegularGrid(key: ValueKey('$id:$batting'), teams: rows, battingOrder: batting, teamHeader: '年度')),
-      if (rows.any((r) => r['source_label'] == 'スタメンデータベース')) const Padding(padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4), child: Text('過去年の先発起用はスタメンデータベース、氏名・成績は取得できた年度のNPB公式記録で補完。途中出場や先発・救援別投球回など未確認の項目は「—」で表示します。', style: TextStyle(fontSize: 11, color: Colors.black54))),
+      if (rows.any((r) => r['source_label'] == 'スタメンデータベース')) const Padding(padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4), child: Text('過去年の先発起用はスタメンデータベース、氏名・成績はNPB公式記録とウスコイ企画の年度別資料で補完。投球回の内訳がない年度は先発登板数、救援はホールド・救援登板数で選出します。該当選手なし・未確認は「—」。', style: TextStyle(fontSize: 11, color: Colors.black54))),
     ]);
   }
 }

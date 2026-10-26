@@ -1,3 +1,4 @@
+import 'today_event_map.dart';
 import '../logic/game_visibility.dart';
 import '../logic/auth_session.dart';
 import '../config/org_config.dart';
@@ -202,6 +203,7 @@ class _HomeBoardState extends State<HomeBoard> {
         Align(alignment: Alignment.centerRight, child: TextButton(
           onPressed: () => _openCalendar(calendarYear), child: const Text('1ヶ月分の日程を見る'))),
       ]),
+      const TodayEventMap(),
       if (widget.gameInformation != null)
         _section('試合情報', [widget.gameInformation!]),
       _section('順位・ゲーム差', [HomeStandingsBoard(year: calendarYear)]),

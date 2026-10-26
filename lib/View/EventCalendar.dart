@@ -201,7 +201,7 @@ class _EventCalendarState extends State<EventCalendar> {
       for (var c = 0; c < 7; c++)
         _gamesOn(_cellDate(row * 7 + c, lead, days)).length
     ].reduce((a, b) => a > b ? a : b);
-    return 26.0 + lanes * (barH + 2) + maxGames * 17;
+    return 26.0 + lanes * (barH + 2) + maxGames * 24;
   }
 
   Widget _week(int row, int lead, int days, double width, double height) {
@@ -245,7 +245,7 @@ class _EventCalendarState extends State<EventCalendar> {
                             SizedBox(height: lanes * 16.0 + 5),
                             for (final game in _gamesOn(date))
                               SizedBox(
-                                  height: 17,
+                                  height: 24,
                                   child: Tooltip(
                                       message:
                                           '${scheduleMatchup(game)} ${game['time'] ?? ''} ${game['stadium'] ?? ''}',
@@ -388,12 +388,12 @@ class ScheduleGameTile extends StatelessWidget {
     final visual =
         teamLogoVisual(name, abbrev: '${game['${side}_code'] ?? ''}');
     Widget fallback() =>
-        const Icon(Icons.sports_baseball, size: 14, color: Colors.grey);
+        const Icon(Icons.sports_baseball, size: 20, color: Colors.grey);
     return Semantics(
         label: name,
         child: SizedBox(
-            width: 16,
-            height: 16,
+            width: 22,
+            height: 22,
             child: visual.asset != null
                 ? SpecialMedia(child: Image.asset(visual.asset!,
                     fit: BoxFit.contain,
@@ -412,12 +412,12 @@ class ScheduleGameTile extends StatelessWidget {
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         logo('away'),
         Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 3),
             child: Text(
                 game['finished'] == true
                     ? '${game['score_away'] ?? '—'}–${game['score_home'] ?? '—'}'
                     : 'vs',
-                style: const TextStyle(fontSize: 9))),
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600))),
         logo('home'),
       ]));
 }

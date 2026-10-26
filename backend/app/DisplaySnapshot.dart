@@ -176,6 +176,7 @@ class DisplaySnapshot {
       'id_game': game['id_game'], 'date_game': game['date_game'],
       'postseason_form': game['postseason_form'] ?? [],
       'player_hands': game['player_hands'] ?? [],
+      'golden_glove_stats_version': game['golden_glove_stats_version'],
       'season_player_stats': game['season_player_stats'] ?? [],
       if (game.containsKey('postseason_homers_before')) 'postseason_homers_before': game['postseason_homers_before'],
     }];

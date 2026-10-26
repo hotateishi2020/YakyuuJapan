@@ -2558,6 +2558,26 @@ class _LeagueRolePersonalStatsState extends State<LeagueRolePersonalStats> {
   @override
   Widget build(BuildContext context) {
     final league = widget.org.leagues[selected ~/ 2];
+    if (MediaQuery.orientationOf(context) == Orientation.portrait) {
+      final leagueRows = canonicalMlbPersonalStats(widget.stats).where((row) =>
+          '${row['id_league']}' == '${league.id}' && hasPersonalStatValue(row) &&
+          (widget.org.kind != OrgKind.npb || row['title'] != 'ボール球見極め率')).toList();
+      List<Map<String, dynamic>> roleRows(bool batting) => leagueRows.where((row) =>
+          _personalRowIsPitcher(row) != batting &&
+          personalStatPlayerMatchesRole(row, batting: batting)).toList();
+      return Column(children: [
+        NavigationPicker(level: 2, alwaysPicker: true,
+          labels: {for (var i = 0; i < widget.org.leagues.length; i++) i: widget.org.leagues[i].name},
+          value: selected ~/ 2,
+          onChanged: (value) => setState(() => selected = value * 2),
+          color: league.color, foreground: Colors.white,
+          itemColors: {for (var i = 0; i < widget.org.leagues.length; i++) i: widget.org.leagues[i].color}),
+        Expanded(child: SegmentedLeaguePersonalStats(
+          key: ValueKey('personal-league-${widget.org.kind.name}'),
+          batting: roleRows(true), pitching: roleRows(false),
+          showJapanFlag: widget.org.kind == OrgKind.mlb)),
+      ]);
+    }
     final batting = selected.isEven;
     final rows = canonicalMlbPersonalStats(widget.stats).where((row) =>
       '${row['id_league']}' == '${league.id}' &&

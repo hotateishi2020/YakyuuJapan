@@ -1,3 +1,4 @@
+import '../logic/career_regions.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import '../tools/network_error.dart';
 import 'dart:async';
@@ -29,6 +30,7 @@ Future<void> showAccountMenu(BuildContext context, {VoidCallback? onChanged}) as
       PopupMenuItem(value: 'password', child: Text('パスワード変更')),
       PopupMenuItem(value: 'notify', child: Text('通知設定')),
       PopupMenuItem(value: 'display', child: Text('表示設定')),
+      PopupMenuItem(value: 'residence', child: Text('居住地設定')),
       PopupMenuItem(value: 'profile', child: Text('基本設定')),
       PopupMenuDivider(),
       PopupMenuItem(value: 'logout', child: Text('ログアウト')),
@@ -37,6 +39,10 @@ Future<void> showAccountMenu(BuildContext context, {VoidCallback? onChanged}) as
   if (!context.mounted || action == null) return;
 
   switch (action) {
+    case 'residence':
+      await showDialog<void>(context: context, builder: (_) => const _ResidenceDialog());
+      onChanged?.call();
+      break;
     case 'display':
       await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const DisplaySettingsPage()));
       onChanged?.call();
@@ -491,5 +497,37 @@ class _BasicSettingsDialogState extends State<_BasicSettingsDialog> {
         ),
       ],
     );
+  }
+}
+
+class _ResidenceDialog extends StatefulWidget {
+  const _ResidenceDialog();
+  @override
+  State<_ResidenceDialog> createState() => _ResidenceDialogState();
+}
+class _ResidenceDialogState extends State<_ResidenceDialog> {
+  String? selected = AuthSession.instance.user?.residencePrefecture;
+  bool busy = false;
+  String? error;
+  @override
+  Widget build(BuildContext context) {
+    final prefectures = japanRegions.values.expand((v) => v).toList();
+    return AlertDialog(title: const Text('居住地設定'), content: Column(
+      mainAxisSize: MainAxisSize.min, children: [
+        DropdownButtonFormField<String>(
+          initialValue: prefectures.contains(selected) ? selected : null,
+          isExpanded: true, hint: const Text('都道府県を選択'),
+          items: [for (final p in prefectures) DropdownMenuItem(value: p, child: Text(p))],
+          onChanged: busy ? null : (v) => setState(() => selected = v)),
+        if (error != null) Text(error!, style: const TextStyle(color: Colors.red)),
+      ]), actions: [
+        TextButton(onPressed: busy ? null : () => Navigator.pop(context), child: const Text('キャンセル')),
+        TextButton(onPressed: busy || !prefectures.contains(selected) ? null : () async {
+          setState(() { busy = true; error = null; });
+          final result = await AuthSession.instance.updateResidence(selected!);
+          if (!mounted) return;
+          if (result == null) { Navigator.pop(this.context); } else { setState(() { busy = false; error = result; }); }
+        }, child: Text(busy ? '保存中…' : '保存')),
+      ]);
   }
 }

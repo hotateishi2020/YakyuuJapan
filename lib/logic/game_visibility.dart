@@ -14,6 +14,11 @@ const _scheduleFields = {
   'id', 'id_game', 'date', 'date_game', 'time_game', 'org',
   'id_team_home', 'id_team_away', 'id_league_home', 'id_league_away',
   'name_team_home', 'name_team_away', 'name_stadium', 'id_stadium',
+  'latitude', 'longitude',
+  // Calendar aliases are team names/codes, not image URLs or live results.
+  'name_home', 'name_away', 'name_home_logo', 'name_away_logo',
+  'home_code', 'away_code', 'league_home', 'league_away',
+  'time', 'datetime_start', 'game_number', 'regular',
   'color_back_home', 'color_back_away', 'color_font_home', 'color_font_away',
   'code_game', 'code_round', 'code_stage', 'code_series', 'int_game',
 };

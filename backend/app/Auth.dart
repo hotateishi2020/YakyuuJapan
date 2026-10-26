@@ -1,3 +1,4 @@
+import '../../lib/logic/career_regions.dart';
 import 'NewsReadDate.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -44,7 +45,7 @@ class Auth {
           AND (SELECT COUNT(*) FROM information_schema.columns
             WHERE table_schema = 'public' AND table_name = 'm_user'
               AND column_name IN ('nickname', 'name_handle', 'id_team_fav', 'id_player_fav',
-                'flg_notify_news', 'flg_notify_event', 'flg_admin', 'favorite_high_school', 'flg_special', 'date_read_news')) = 10
+                'flg_notify_news', 'flg_notify_event', 'flg_admin', 'favorite_high_school', 'flg_special', 'date_read_news', 'residence_prefecture')) = 11
       ''');
       if (existing.isNotEmpty && existing.first[0] == true) {
         _schemaReady = true;
@@ -66,6 +67,8 @@ class Auth {
       await conn.execute("UPDATE m_user SET favorite_high_school='佐賀北' WHERE id=1 AND favorite_high_school IS NULL");
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS id_player_fav INTEGER');
       await ensureNewsReadDate(conn);
+      await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS residence_prefecture TEXT');
+      await conn.execute("UPDATE m_user SET residence_prefecture=CASE id WHEN 1 THEN '佐賀県' WHEN 2 THEN '長野県' END WHERE id IN (1,2) AND residence_prefecture IS NULL");
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS flg_notify_news BOOLEAN DEFAULT TRUE');
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS flg_notify_event BOOLEAN DEFAULT TRUE');
       await conn.execute('ALTER TABLE m_user ADD COLUMN IF NOT EXISTS flg_admin BOOLEAN NOT NULL DEFAULT FALSE');
@@ -166,6 +169,7 @@ class Auth {
         'name_handle': row['name_handle'] ?? '',
         'mailaddress': row['mailaddress'] ?? '',
         'code_color': row['code_color'] ?? '',
+        'residence_prefecture': row['residence_prefecture'],
         'favorite_high_school': row['favorite_high_school'],
         'id_team_fav': row['id_team_fav'],
         'id_player_fav': row['id_player_fav'],
@@ -182,7 +186,7 @@ class Auth {
 
   static const _userSelect = '''
     SELECT u.id, u.name_last, u.name_first, u.nickname, u.name_handle, u.mailaddress, u.code_color,
-           u.id_team_fav, u.id_player_fav, u.favorite_high_school,
+           u.id_team_fav, u.id_player_fav, u.favorite_high_school, u.residence_prefecture,
            COALESCE(u.flg_notify_news, TRUE) AS flg_notify_news,
            COALESCE(u.flg_notify_event, TRUE) AS flg_notify_event,
            u.date_read_news::text AS date_read_news,
@@ -560,6 +564,20 @@ class Auth {
       );
       await _deleteCode(conn, 'password', mail);
       return _json(200, {'ok': true});
+    });
+  }
+
+  static Future<Response> updateResidence(Request request) async {
+    return _withAuthDb((conn) async {
+      final userId = await _requireUserId(conn, request);
+      if (userId == null) return _json(401, {'ok': false, 'error': '未ログイン'});
+      final body = jsonDecode(await request.readAsString()) as Map<String, dynamic>;
+      final prefecture = body['residence_prefecture'];
+      if (!japanRegions.values.expand((v) => v).contains(prefecture)) {
+        return _json(400, {'ok': false, 'error': '都道府県を選択してください'});
+      }
+      await conn.execute(r'UPDATE m_user SET residence_prefecture=$1, updat=NOW() WHERE id=$2', parameters: [prefecture, userId]);
+      return _json(200, {'ok': true, 'residence_prefecture': prefecture});
     });
   }
 

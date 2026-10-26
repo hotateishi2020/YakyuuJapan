@@ -303,6 +303,7 @@ class CalendarResearch {
       }
       result.add({
         'research_key': calendarEventKey(e),
+        'venue': e['venue'],
         'calendar_code': e['code'],
         'calendar_kind': e['kind'],
         'title_event': e['title'],

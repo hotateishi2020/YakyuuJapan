@@ -1,4 +1,5 @@
 import 'PlayerCountry.dart';
+import 'GoldenGloveStats.dart';
 import '../../lib/logic/postseason_homers.dart';
 import 'dart:convert';
 import 'package:postgres/postgres.dart';
@@ -46,7 +47,14 @@ Future<void> attachPostseasonForm(Connection conn, List<Map<String, dynamic>> ga
   final stats = (await conn.execute("SELECT payload FROM v_stats_player WHERE int_year=\$1 AND payload->>'title' IN ('打率','防御率','本塁打','最多勝','勝利','ホールド','セーブ')", parameters: [year])).map((r) => detailMap(r[0])).toList();
   final people = (await conn.execute('SELECT id AS id_player,id_team,url,name_full AS name_full_summary,pitching AS pitching_hand,batting AS batting_hand FROM m_player WHERE id_team=ANY(\$1::int[]) AND NOT COALESCE(flg_delete,false)', parameters: [teamIds])).map((r) => r.toColumnMap()).toList();
   await attachPlayerCountries(conn, year, people);
+  if (games.any((g) => [1, 2].contains(g['id_league_home']) || [1, 2].contains(g['id_league_away']))) {
+    final awardPlayers = await goldenGloveSeasonPlayers(conn, year, [1, 2]);
+    stats.addAll(goldenGloveRows(year, awardPlayers));
+    stats.addAll(goldenGloveRows(year, awardPlayers, pitching: true));
+  }
+
   for (final game in games) {
+    game['golden_glove_stats_version'] = 1;
     game['player_hands'] = people.where((p) => p['id_team'] == game['id_team_home'] || p['id_team'] == game['id_team_away']).toList();
     final ids = (game['player_hands'] as List).map((p) => '${p['id_player']}').toSet();
     game['season_player_stats'] = [for (final row in stats)

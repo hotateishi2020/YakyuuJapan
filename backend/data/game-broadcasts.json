@@ -1,0 +1,82 @@
+[
+  {
+    "date": "2026-10-24",
+    "home": "DeNA",
+    "away": "ソフトバンク",
+    "broadcasts": [
+      {
+        "name": "TVer",
+        "kind": "stream",
+        "website_url": "https://tver.jp/",
+        "logo_url": "https://tver.jp/favicon.ico",
+        "stream_url": "https://tver.jp/live/special/leub1wc2x8",
+        "source_url": "https://tver.jp/live/special/leub1wc2x8"
+      },
+      {
+        "name": "RKB毎日放送",
+        "kind": "tv",
+        "prefectures": [
+          "佐賀県",
+          "福岡県"
+        ],
+        "website_url": "https://rkb.jp/",
+        "logo_url": "https://rkb.jp/favicon.ico",
+        "source_url": "https://www.tbs.co.jp/sports/baseball/onair.html",
+        "remarks": "日本シリーズ地上波・RKB（佐賀は受信環境による）"
+      }
+    ]
+  },
+  {
+    "date": "2026-10-28",
+    "home": "ソフトバンク",
+    "away": "DeNA",
+    "broadcasts": [
+      {
+        "name": "hulu",
+        "kind": "stream",
+        "website_url": "https://www.hulu.jp/",
+        "logo_url": "https://www.hulu.jp/favicon.ico",
+        "stream_url": "https://www.hulu.jp/livetv/285",
+        "source_url": "https://www.hulu.jp/livetv/285"
+      }
+    ]
+  },
+  {
+    "date": "2026-10-25",
+    "home": "DeNA",
+    "away": "ソフトバンク",
+    "broadcasts": [
+      {
+        "name": "RKB毎日放送",
+        "kind": "tv",
+        "prefectures": [
+          "佐賀県",
+          "福岡県"
+        ],
+        "website_url": "https://rkb.jp/",
+        "logo_url": "https://rkb.jp/favicon.ico",
+        "source_url": "https://www.tbs.co.jp/sports/baseball/onair.html",
+        "remarks": "日本シリーズ地上波・RKB（佐賀は受信環境による）"
+      }
+    ]
+  },
+  {
+    "date": "2026-10-27",
+    "home": "ソフトバンク",
+    "away": "DeNA",
+    "broadcasts": [
+      {
+        "name": "RKB毎日放送",
+        "kind": "tv",
+        "prefectures": [
+          "佐賀県",
+          "福岡県"
+        ],
+        "website_url": "https://rkb.jp/",
+        "logo_url": "https://rkb.jp/favicon.ico",
+        "source_url": "https://www.tbs.co.jp/sports/baseball/onair.html",
+        "remarks": "日本シリーズ地上波・RKB（佐賀は受信環境による）"
+      }
+    ]
+  }
+]

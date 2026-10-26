@@ -98,6 +98,7 @@ class AuthUser {
   final String mailaddress;
   final String codeColor;
   final String favoriteHighSchool;
+  final String residencePrefecture;
   final int? idTeamFav;
   final int? idPlayerFav;
   final String nameTeamFav;
@@ -122,6 +123,7 @@ class AuthUser {
     required this.mailaddress,
     required this.codeColor,
     this.favoriteHighSchool = '',
+    this.residencePrefecture = '',
     this.idTeamFav,
     this.idPlayerFav,
     this.nameTeamFav = '',
@@ -162,6 +164,7 @@ class AuthUser {
         nameHandle: '${json['name_handle'] ?? ''}',
         mailaddress: '${json['mailaddress'] ?? ''}',
         codeColor: '${json['code_color'] ?? ''}',
+        residencePrefecture: '${json['residence_prefecture'] ?? ''}',
         favoriteHighSchool: '${json['favorite_high_school'] ?? (int.tryParse('${json['id']}') == 1 ? '佐賀北' : '')}',
         idTeamFav: int.tryParse('${json['id_team_fav'] ?? ''}'),
         idPlayerFav: int.tryParse('${json['id_player_fav'] ?? ''}'),
@@ -185,6 +188,7 @@ class AuthUser {
         'mailaddress': mailaddress,
         'code_color': codeColor,
         'favorite_high_school': favoriteHighSchool,
+        'residence_prefecture': residencePrefecture,
         'id_team_fav': idTeamFav,
         'id_player_fav': idPlayerFav,
         'name_team_fav': nameTeamFav,
@@ -502,6 +506,19 @@ class AuthSession extends ChangeNotifier {
     } catch (e) {
       return networkErrorMessage(e, fallback: '通信エラー: $e');
     }
+  }
+
+  Future<String?> updateResidence(String prefecture) async {
+    try {
+      final response = await http.post(Env.api('/auth/residence'),
+        headers: _authHeaders, body: jsonEncode({'residence_prefecture': prefecture}))
+        .timeout(const Duration(seconds: 20));
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.statusCode != 200 || body['ok'] != true) return '${body['error'] ?? '保存できませんでした'}';
+      if (user != null) user = AuthUser.fromJson({...user!.toJson(), 'residence_prefecture': prefecture});
+      _persistSession();
+      return null;
+    } catch (e) { return networkErrorMessage(e, fallback: '居住地を保存できませんでした'); }
   }
 
   Future<String?> updateNotifications(

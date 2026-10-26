@@ -1,3 +1,4 @@
+import 'GameBench.dart';
 import 'PitcherChangeRepair.dart';
 import 'PlayerIdentity.dart';
 import 'FetchMLB.dart';
@@ -754,6 +755,7 @@ class FetchURL {
   /// 既に取得したトップページを使う。成績表への追加アクセスはしない。
   static Future<void> saveGameTop(Connection conn, Document doc, int gameId, int home, int away, String state) async {
     if (gameId <= 0) return;
+    await GameBench.save(conn, doc, gameId, home, away);
     final announced = _announcedLineup(doc, home, away);
     if (announced.isNotEmpty && !state.contains('回') && !state.contains('試合中') && !state.contains('終了')) {
       await conn.execute('UPDATE t_game SET txt_lineup_announced = \$1 WHERE id = \$2', parameters: [jsonEncode(announced), gameId]);

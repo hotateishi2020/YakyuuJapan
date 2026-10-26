@@ -43,6 +43,10 @@ import 'app/TeamStrength.dart';
 import 'app/RosterMoves.dart';
 import 'app/AdditionalRecords.dart';
 import 'app/VideoFeed.dart';
+import 'app/GameHighlightVideos.dart';
+import 'app/GameBroadcasts.dart';
+import 'app/GameBench.dart';
+import 'app/GameStory.dart';
 import 'app/HomeBirthdays.dart';
 import 'app/VideoChannels.dart';
 import 'app/ClubData.dart';
@@ -295,12 +299,27 @@ String _ymdOf(DateTime date) {
   return '${date.year}-$month-$day';
 }
 
+Map<String, dynamic> Function(String)? _gameVideoFeed;
+void _attachGameVideos(List<Map<String, dynamic>> games) {
+  final feeds = <String, List<dynamic>>{};
+  for (final game in games) {
+    final org = [3, 4].contains(game['id_league_home']) ? 'mlb' : 'npb';
+    final channels = feeds.putIfAbsent(org, () =>
+        _gameVideoFeed?.call(org)['channels'] as List<dynamic>? ?? []);
+    game['highlight_videos'] = gameHighlightVideos(game, channels);
+  }
+}
+
 Future<void> _attachSavedForms(DisplayGames snap, List<Map<String, dynamic>> games, int year) async {
+  await Postgres.withConnection((conn) async {
+    await GameBench.attach(conn, games);
+    await attachGameStory(conn, games, year);
+  });
   final saved = {for (final row in snap.forms) _asInt(row['id_game']): row};
   final missing = <Map<String, dynamic>>[];
   for (final game in games) {
     final row = saved[_asInt(game['id_game'])];
-    if (row == null || !row.containsKey('season_player_stats') || (npbPostseasonCodes.contains('${game['code_game']}'.toUpperCase()) && !row.containsKey('postseason_homers_before'))) { missing.add(game); continue; }
+    if (row == null || row['golden_glove_stats_version'] != 1 || !row.containsKey('season_player_stats') || (npbPostseasonCodes.contains('${game['code_game']}'.toUpperCase()) && !row.containsKey('postseason_homers_before'))) { missing.add(game); continue; }
     game['postseason_form'] = row['postseason_form'];
     game['player_hands'] = row['player_hands'];
     game['season_player_stats'] = row['season_player_stats'];
@@ -390,6 +409,7 @@ Future<Map<String, dynamic>> _buildPredictionsPartGames(
     _useAnnouncedLineup(game);
   }
   _attachLiveBatters(games, playRows);
+  _attachGameVideos(games);
   final postseason = _postseasonForOrg(snap.postseason, org);
   return {
     'org': org.code,
@@ -1129,6 +1149,7 @@ void main() async {
     await videoFeed.start(snapshotPath: Platform.environment['VIDEO_CACHE_PATH'] ?? '.dart_tool/video-feed-v2.json');
     final mlbVideoFeed = VideoFeedService(channels: mlbVideoChannels);
     await mlbVideoFeed.start(snapshotPath: Platform.environment['MLB_VIDEO_CACHE_PATH'] ?? '.dart_tool/mlb-video-feed-v2.json');
+    _gameVideoFeed = (org) => (org == 'mlb' ? mlbVideoFeed : videoFeed).cached();
     final log = Value.SystemCode.Log;
 
     // ====== API ======
@@ -1175,6 +1196,37 @@ void main() async {
         return Response.ok(jsonEncode(readClubFile('club-hub-${org.code}-$year.json')),headers:headers);
       } on FormatException catch(e){return Response.badRequest(body:jsonEncode({'error':e.message}),headers:headers);}
     });
+    app.get('/today-map', (Request request) async {
+      const headers = {'content-type':'application/json; charset=utf-8'};
+      try {
+        final now = DateTime.now().toUtc().add(const Duration(hours: 9));
+        final date = now.toIso8601String().substring(0,10);
+        final data = await Postgres.withConnection((conn) async {
+          final games = (await conn.execute(r"""SELECT g.id AS id_game,
+            g.datetime_start::date::text AS date_game,to_char(g.datetime_start,'HH24:MI') AS time_game,
+            g.state,h.name_short AS name_team_home,a.name_short AS name_team_away,
+            COALESCE(NULLIF(s.name_full,''),s.name_short) AS name_stadium,
+            s.latitude,s.longitude,g.id_stadium,g.code_game,
+            h.id_league AS id_league_home,a.id_league AS id_league_away
+            FROM t_game g JOIN m_team h ON h.id=g.id_team_home JOIN m_team a ON a.id=g.id_team_away
+            LEFT JOIN m_stadium s ON s.id=g.id_stadium
+            WHERE g.datetime_start::date=$1::date AND NOT COALESCE(g.flg_delete,false)""",parameters:[date])).map((r)=>r.toColumnMap()).toList();
+          final events = <dynamic>[];
+          for (final org in [OrgKind.npb, OrgKind.mlb]) {
+            final schedule = await PageSnapshot.read(conn,kind:'schedule',org:org,year:now.year);
+            events.addAll(schedule['events'] as List? ?? []);
+          }
+          return {'date':date,'games':games,'events':events,
+            'venues': [...(catalogFile('stadium-catalog')['stadiums'] as List? ?? []),
+              ...(catalogFile('event-venues')['venues'] as List? ?? [])]};
+        });
+        return Response.ok(jsonEncode(data),headers:headers);
+      } catch (e,st) {
+        _printRequestError(request,e,st);
+        return Response.internalServerError(body:jsonEncode({'error':'開催地を取得できませんでした'}),headers:headers);
+      }
+    });
+
     app.get('/season-schedule', (Request request) async {
       const headers={'content-type':'application/json; charset=utf-8','cache-control':'no-store'};
       try {
@@ -1200,6 +1252,17 @@ void main() async {
       }
       final channels = await searchHomeRunVideos(name, date, opponent, q['pacific'] == '1');
       return Response.ok(jsonEncode({'channels': channels}), headers: {'content-type':'application/json; charset=utf-8'});
+    });
+
+    app.get('/game-broadcasts', (Request request) async {
+      final q = request.url.queryParameters;
+      final date = DateTime.tryParse(q['date'] ?? '');
+      final home = q['home'] ?? '', away = q['away'] ?? '';
+      if (date == null || date.year < 2000 || date.year > 2100 || home.isEmpty || away.isEmpty || home.length > 50 || away.length > 50) {
+        return Response.badRequest(body: '{}');
+      }
+      final rows = await readGameBroadcasts(date, home, away, q['prefecture'] ?? '');
+      return Response.ok(jsonEncode({'broadcasts': rows}), headers: {'content-type':'application/json; charset=utf-8'});
     });
 
     app.get('/videos', (Request request) async {
@@ -2062,6 +2125,8 @@ void main() async {
       }
     });
 
+    app.post('/auth/residence', Auth.updateResidence);
+
     app.post('/auth/profile', (Request request) async {
       try {
         return await Auth.updateProfile(request);
@@ -2294,6 +2359,7 @@ void main() async {
           _useAnnouncedLineup(game);
         }
         _attachLiveBatters(games, playRows);
+  _attachGameVideos(games);
         // print(games);
         final leagueIds = org.leagueIds;
         final filteredGames = _filterByLeagues(games, leagueIds, keys: const ['id_league_home', 'id_league_away']);

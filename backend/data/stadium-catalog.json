@@ -29,7 +29,10 @@
       "dimensions_checked_at": "2026-10-21",
       "fence_height": "約2.8m（大部分）",
       "fence_height_source": "https://www.joqr.co.jp/qr/article/83241/",
-      "fence_height_checked_at": "2026-10-21"
+      "fence_height_checked_at": "2026-10-21",
+      "aliases": [
+        "エスコンF"
+      ]
     },
     {
       "match": "楽天モバイル 最強パーク宮城",
@@ -58,7 +61,10 @@
       "dimensions_checked_at": "2026-10-21",
       "fence_height": "2m（一部1.8m）\n2026年改修後",
       "fence_height_source": "https://www.rakuteneagles.jp/news/detail/202500956507.html",
-      "fence_height_checked_at": "2026-10-21"
+      "fence_height_checked_at": "2026-10-21",
+      "aliases": [
+        "楽天モバイル"
+      ]
     },
     {
       "match": "ベルーナドーム",
@@ -178,7 +184,10 @@
       "dimensions_checked_at": "2026-10-21",
       "fence_height": "3.3m",
       "fence_height_source": "https://column.sp.baseball.findfriends.jp/?id=001-20240506-42&pid=column_detail",
-      "fence_height_checked_at": "2026-10-21"
+      "fence_height_checked_at": "2026-10-21",
+      "aliases": [
+        "ZOZOマリン"
+      ]
     },
     {
       "match": "横浜スタジアム",
@@ -209,7 +218,10 @@
       "dimensions_checked_at": "2026-10-21",
       "fence_height": "5m",
       "fence_height_source": "https://www.daily.co.jp/baseball/2019/06/07/0012406706.shtml",
-      "fence_height_checked_at": "2026-10-21"
+      "fence_height_checked_at": "2026-10-21",
+      "aliases": [
+        "横浜"
+      ]
     },
     {
       "match": "バンテリンドーム ナゴヤ",
@@ -238,7 +250,10 @@
       "dimensions_checked_at": "2026-10-21",
       "fence_height": "3.6m\n2026年改修後",
       "fence_height_source": "https://npb.jp/news/detail/20260319_01.html",
-      "fence_height_checked_at": "2026-10-21"
+      "fence_height_checked_at": "2026-10-21",
+      "aliases": [
+        "バンテリンドーム"
+      ]
     },
     {
       "match": "京セラドーム大阪",
@@ -267,7 +282,10 @@
       "dimensions_checked_at": "2026-10-21",
       "fence_height": "4.2m",
       "fence_height_source": "https://www.kyoceradome-osaka.jp/use_guide/arena/",
-      "fence_height_checked_at": "2026-10-21"
+      "fence_height_checked_at": "2026-10-21",
+      "aliases": [
+        "京セラD大阪"
+      ]
     },
     {
       "match": "甲子園",
@@ -321,7 +339,10 @@
       "address_source": "https://npb.jp/stadium/json/208.json",
       "outfield_distance": "左翼 101m\n中堅 122m\n右翼 100m",
       "outfield_distance_source": "https://npb.jp/stadium/json/208.json",
-      "dimensions_checked_at": "2026-10-21"
+      "dimensions_checked_at": "2026-10-21",
+      "aliases": [
+        "マツダスタジアム"
+      ]
     },
     {
       "match": "みずほPayPayドーム福岡",
@@ -349,7 +370,10 @@
       "dimensions_checked_at": "2026-10-21",
       "fence_height": "約4.2m",
       "fence_height_source": "https://column.sp.baseball.findfriends.jp/?id=001-20240506-42&pid=column_detail",
-      "fence_height_checked_at": "2026-10-21"
+      "fence_height_checked_at": "2026-10-21",
+      "aliases": [
+        "みずほPayPay"
+      ]
     },
     {
       "org": "mlb",
@@ -418,7 +442,10 @@
       "address_source": "https://statsapi.mlb.com/api/v1/venues/2680?hydrate=location",
       "outfield_distance": "左翼 336ft（102.4m）\n中堅 396ft（120.7m）\n右翼 322ft（98.1m）",
       "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/2680?hydrate=fieldInfo",
-      "dimensions_checked_at": "2026-10-21"
+      "dimensions_checked_at": "2026-10-21",
+      "aliases": [
+        "ペトコ・パーク"
+      ]
     },
     {
       "org": "mlb",
@@ -512,7 +539,10 @@
       "address_source": "https://statsapi.mlb.com/api/v1/venues/12?hydrate=location",
       "outfield_distance": "左翼 315ft（96.0m）\n中堅 404ft（123.1m）\n右翼 322ft（98.1m）",
       "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/12?hydrate=fieldInfo",
-      "dimensions_checked_at": "2026-10-21"
+      "dimensions_checked_at": "2026-10-21",
+      "aliases": [
+        "トロピカーナ・フィールド"
+      ]
     },
     {
       "org": "mlb",
@@ -631,7 +661,10 @@
       "address_source": "https://statsapi.mlb.com/api/v1/venues/4705?hydrate=location",
       "outfield_distance": "左翼 335ft（102.1m）\n中堅 400ft（121.9m）\n右翼 325ft（99.1m）",
       "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/4705?hydrate=fieldInfo",
-      "dimensions_checked_at": "2026-10-21"
+      "dimensions_checked_at": "2026-10-21",
+      "aliases": [
+        "トゥルイスト・パーク"
+      ]
     },
     {
       "org": "mlb",
@@ -654,7 +687,10 @@
       "address_source": "https://statsapi.mlb.com/api/v1/venues/4?hydrate=location",
       "outfield_distance": "左翼 330ft（100.6m）\n中堅 400ft（121.9m）\n右翼 335ft（102.1m）",
       "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/4?hydrate=fieldInfo",
-      "dimensions_checked_at": "2026-10-21"
+      "dimensions_checked_at": "2026-10-21",
+      "aliases": [
+        "レート・フィールド"
+      ]
     },
     {
       "org": "mlb",
@@ -700,7 +736,10 @@
       "address_source": "https://statsapi.mlb.com/api/v1/venues/3313?hydrate=location",
       "outfield_distance": "左翼 318ft（96.9m）\n中堅 408ft（124.4m）\n右翼 314ft（95.7m）",
       "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/3313?hydrate=fieldInfo",
-      "dimensions_checked_at": "2026-10-21"
+      "dimensions_checked_at": "2026-10-21",
+      "aliases": [
+        "ヤンキー・スタジアム"
+      ]
     },
     {
       "org": "mlb",
@@ -723,7 +762,10 @@
       "address_source": "https://statsapi.mlb.com/api/v1/venues/32?hydrate=location",
       "outfield_distance": "左翼 344ft（104.9m）\n中堅 400ft（121.9m）\n右翼 345ft（105.2m）",
       "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/32?hydrate=fieldInfo",
-      "dimensions_checked_at": "2026-10-21"
+      "dimensions_checked_at": "2026-10-21",
+      "aliases": [
+        "アメリカンファミリー・フィールド"
+      ]
     },
     {
       "org": "mlb",
@@ -884,7 +926,10 @@
       "address_source": "https://statsapi.mlb.com/api/v1/venues/5?hydrate=location",
       "outfield_distance": "左翼 325ft（99.1m）\n中堅 405ft（123.4m）\n右翼 325ft（99.1m）",
       "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/5?hydrate=fieldInfo",
-      "dimensions_checked_at": "2026-10-21"
+      "dimensions_checked_at": "2026-10-21",
+      "aliases": [
+        "プログレッシブ・フィールド"
+      ]
     },
     {
       "org": "mlb",
@@ -1001,7 +1046,10 @@
       "address_source": "https://statsapi.mlb.com/api/v1/venues/22?hydrate=location",
       "outfield_distance": "左翼 330ft（100.6m）\n中堅 395ft（120.4m）\n右翼 330ft（100.6m）",
       "outfield_distance_source": "https://statsapi.mlb.com/api/v1/venues/22?hydrate=fieldInfo",
-      "dimensions_checked_at": "2026-10-21"
+      "dimensions_checked_at": "2026-10-21",
+      "aliases": [
+        "ドジャー・スタジアム"
+      ]
     },
     {
       "org": "mlb",
@@ -1176,7 +1224,13 @@
       "team": "—",
       "address": "北海道札幌市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?001"
+      "source": "https://npb.jp/stadium/detail.html?001",
+      "latitude": 43.015226,
+      "longitude": 141.409674,
+      "coordinates_source": "https://npb.jp/stadium/json/001.json",
+      "aliases": [
+        "札幌ドーム"
+      ]
     },
     {
       "org": "npb",
@@ -1185,7 +1239,14 @@
       "team": "—",
       "address": "北海道札幌市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?003"
+      "source": "https://npb.jp/stadium/detail.html?003",
+      "latitude": 43.052206,
+      "longitude": 141.305966,
+      "coordinates_source": "https://npb.jp/stadium/json/003.json",
+      "aliases": [
+        "札幌円山",
+        "札幌市円山球場／札幌神社外苑球場"
+      ]
     },
     {
       "org": "npb",
@@ -1194,7 +1255,14 @@
       "team": "—",
       "address": "北海道北見市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?004"
+      "source": "https://npb.jp/stadium/detail.html?004",
+      "latitude": 43.819267,
+      "longitude": 143.895844,
+      "coordinates_source": "https://npb.jp/stadium/json/004.json",
+      "aliases": [
+        "北見東陵公園",
+        "北見市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -1203,7 +1271,14 @@
       "team": "—",
       "address": "北海道釧路市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?006"
+      "source": "https://npb.jp/stadium/detail.html?006",
+      "latitude": 43.025714,
+      "longitude": 144.416546,
+      "coordinates_source": "https://npb.jp/stadium/json/006.json",
+      "aliases": [
+        "ウインドヒルひがし北海道スタジアム",
+        "釧路市民球場"
+      ]
     },
     {
       "org": "npb",
@@ -1212,7 +1287,14 @@
       "team": "—",
       "address": "北海道帯広市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?008"
+      "source": "https://npb.jp/stadium/detail.html?008",
+      "latitude": 42.891164,
+      "longitude": 143.146226,
+      "coordinates_source": "https://npb.jp/stadium/json/008.json",
+      "aliases": [
+        "帯広の森",
+        "帯広の森野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1221,7 +1303,14 @@
       "team": "—",
       "address": "北海道旭川市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?009"
+      "source": "https://npb.jp/stadium/detail.html?009",
+      "latitude": 43.788879,
+      "longitude": 142.368644,
+      "coordinates_source": "https://npb.jp/stadium/json/009.json",
+      "aliases": [
+        "旭川スタルヒン",
+        "花咲スポーツ公園硬式野球場／旭川市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -1230,7 +1319,14 @@
       "team": "—",
       "address": "北海道夕張市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?012"
+      "source": "https://npb.jp/stadium/detail.html?012",
+      "latitude": 43.042466,
+      "longitude": 141.956538,
+      "coordinates_source": "https://npb.jp/stadium/json/012.json",
+      "aliases": [
+        "夕張鹿の谷",
+        "夕張鹿の谷球場"
+      ]
     },
     {
       "org": "npb",
@@ -1239,7 +1335,14 @@
       "team": "—",
       "address": "北海道小樽市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?013"
+      "source": "https://npb.jp/stadium/detail.html?013",
+      "latitude": 43.184872,
+      "longitude": 140.991867,
+      "coordinates_source": "https://npb.jp/stadium/json/013.json",
+      "aliases": [
+        "小樽桜ヶ丘",
+        "小樽桜ヶ丘球場"
+      ]
     },
     {
       "org": "npb",
@@ -1248,7 +1351,14 @@
       "team": "—",
       "address": "北海道室蘭市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?015"
+      "source": "https://npb.jp/stadium/detail.html?015",
+      "latitude": 42.33849,
+      "longitude": 141.016998,
+      "coordinates_source": "https://npb.jp/stadium/json/015.json",
+      "aliases": [
+        "室蘭新日鐵",
+        "室蘭新日鐵球場／室蘭富士球場／輪西製鉄所柏木球場"
+      ]
     },
     {
       "org": "npb",
@@ -1257,7 +1367,14 @@
       "team": "—",
       "address": "北海道函館市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?017"
+      "source": "https://npb.jp/stadium/detail.html?017",
+      "latitude": 41.784983,
+      "longitude": 140.746521,
+      "coordinates_source": "https://npb.jp/stadium/json/017.json",
+      "aliases": [
+        "函館オーシャンスタジアム",
+        "千代台公園野球場／函館市千代台球場"
+      ]
     },
     {
       "org": "npb",
@@ -1266,7 +1383,14 @@
       "team": "—",
       "address": "青森県青森市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?018"
+      "source": "https://npb.jp/stadium/detail.html?018",
+      "latitude": 40.829132,
+      "longitude": 140.777023,
+      "coordinates_source": "https://npb.jp/stadium/json/018.json",
+      "aliases": [
+        "青森市営",
+        "青森市営野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1275,7 +1399,14 @@
       "team": "—",
       "address": "青森県青森市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?019"
+      "source": "https://npb.jp/stadium/detail.html?019",
+      "latitude": 40.805219,
+      "longitude": 140.706456,
+      "coordinates_source": "https://npb.jp/stadium/json/019.json",
+      "aliases": [
+        "青森県営",
+        "青森県総合運動公園野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1284,7 +1415,15 @@
       "team": "—",
       "address": "青森県弘前市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?021"
+      "source": "https://npb.jp/stadium/detail.html?021",
+      "latitude": 40.590979,
+      "longitude": 140.501621,
+      "coordinates_source": "https://npb.jp/stadium/json/021.json",
+      "aliases": [
+        "弘前はるか夢",
+        "弘前市運動公園野球場",
+        "弘前"
+      ]
     },
     {
       "org": "npb",
@@ -1293,7 +1432,14 @@
       "team": "—",
       "address": "青森県八戸市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?022"
+      "source": "https://npb.jp/stadium/detail.html?022",
+      "latitude": 40.510563,
+      "longitude": 141.481725,
+      "coordinates_source": "https://npb.jp/stadium/json/022.json",
+      "aliases": [
+        "八戸長根",
+        "八戸市長根野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1302,7 +1448,15 @@
       "team": "—",
       "address": "岩手県盛岡市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?291"
+      "source": "https://npb.jp/stadium/detail.html?291",
+      "latitude": 39.65041,
+      "longitude": 141.13929,
+      "coordinates_source": "https://npb.jp/stadium/json/291.json",
+      "aliases": [
+        "きたぎんボールパーク",
+        "盛岡南公園野球場",
+        "盛岡"
+      ]
     },
     {
       "org": "npb",
@@ -1311,7 +1465,14 @@
       "team": "—",
       "address": "岩手県花巻市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?026"
+      "source": "https://npb.jp/stadium/detail.html?026",
+      "latitude": 39.408337,
+      "longitude": 141.099411,
+      "coordinates_source": "https://npb.jp/stadium/json/026.json",
+      "aliases": [
+        "花巻市営",
+        "花巻市営球場／花巻温泉野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1320,7 +1481,14 @@
       "team": "—",
       "address": "岩手県一関市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?028"
+      "source": "https://npb.jp/stadium/detail.html?028",
+      "latitude": 38.929027,
+      "longitude": 141.108436,
+      "coordinates_source": "https://npb.jp/stadium/json/028.json",
+      "aliases": [
+        "一関希望ヶ丘",
+        "希望ヶ丘球場"
+      ]
     },
     {
       "org": "npb",
@@ -1329,7 +1497,14 @@
       "team": "—",
       "address": "宮城県石巻市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?030"
+      "source": "https://npb.jp/stadium/detail.html?030",
+      "latitude": 38.445616,
+      "longitude": 141.297358,
+      "coordinates_source": "https://npb.jp/stadium/json/030.json",
+      "aliases": [
+        "石巻水押",
+        "石巻水押球場"
+      ]
     },
     {
       "org": "npb",
@@ -1338,7 +1513,14 @@
       "team": "—",
       "address": "宮城県仙台市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?031"
+      "source": "https://npb.jp/stadium/detail.html?031",
+      "latitude": 38.256348,
+      "longitude": 140.865864,
+      "coordinates_source": "https://npb.jp/stadium/json/031.json",
+      "aliases": [
+        "仙台評定河原",
+        "評定河原野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1347,7 +1529,14 @@
       "team": "—",
       "address": "秋田県秋田市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?032"
+      "source": "https://npb.jp/stadium/detail.html?032",
+      "latitude": 39.730049,
+      "longitude": 140.133534,
+      "coordinates_source": "https://npb.jp/stadium/json/032.json",
+      "aliases": [
+        "秋田手形",
+        "秋田県営手形野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1356,7 +1545,14 @@
       "team": "—",
       "address": "秋田県秋田市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?033"
+      "source": "https://npb.jp/stadium/detail.html?033",
+      "latitude": 39.720135,
+      "longitude": 140.096906,
+      "coordinates_source": "https://npb.jp/stadium/json/033.json",
+      "aliases": [
+        "秋田八橋",
+        "秋田市営八橋球場"
+      ]
     },
     {
       "org": "npb",
@@ -1365,7 +1561,15 @@
       "team": "—",
       "address": "秋田県秋田市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?035"
+      "source": "https://npb.jp/stadium/detail.html?035",
+      "latitude": 39.725368,
+      "longitude": 140.068207,
+      "coordinates_source": "https://npb.jp/stadium/json/035.json",
+      "aliases": [
+        "秋田こまちスタジアム",
+        "秋田県立野球場",
+        "秋田"
+      ]
     },
     {
       "org": "npb",
@@ -1374,7 +1578,14 @@
       "team": "—",
       "address": "山形県山形市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?289"
+      "source": "https://npb.jp/stadium/detail.html?289",
+      "latitude": 38.277733,
+      "longitude": 140.345671,
+      "coordinates_source": "https://npb.jp/stadium/json/289.json",
+      "aliases": [
+        "きらやかスタジアム",
+        "山形市総合スポーツセンター野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1383,7 +1594,14 @@
       "team": "—",
       "address": "山形県東村山郡中山町",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?037"
+      "source": "https://npb.jp/stadium/detail.html?037",
+      "latitude": 38.342088,
+      "longitude": 140.268231,
+      "coordinates_source": "https://npb.jp/stadium/json/037.json",
+      "aliases": [
+        "ヤマリョースタジアムやまがた",
+        "山形県野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1392,7 +1610,14 @@
       "team": "—",
       "address": "山形県米沢市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?038"
+      "source": "https://npb.jp/stadium/detail.html?038",
+      "latitude": 37.916779,
+      "longitude": 140.087891,
+      "coordinates_source": "https://npb.jp/stadium/json/038.json",
+      "aliases": [
+        "米沢市営（旧）",
+        "米沢市営野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1401,7 +1626,14 @@
       "team": "—",
       "address": "山形県酒田市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?040"
+      "source": "https://npb.jp/stadium/detail.html?040",
+      "latitude": 38.93119,
+      "longitude": 139.830152,
+      "coordinates_source": "https://npb.jp/stadium/json/040.json",
+      "aliases": [
+        "酒田光ヶ丘",
+        "酒田市営光ヶ丘野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1410,7 +1642,14 @@
       "team": "—",
       "address": "福島県福島市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?041"
+      "source": "https://npb.jp/stadium/detail.html?041",
+      "latitude": 37.775914,
+      "longitude": 140.489329,
+      "coordinates_source": "https://npb.jp/stadium/json/041.json",
+      "aliases": [
+        "福島信夫ヶ丘",
+        "信夫ヶ丘球場"
+      ]
     },
     {
       "org": "npb",
@@ -1419,7 +1658,14 @@
       "team": "—",
       "address": "福島県福島市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?042"
+      "source": "https://npb.jp/stadium/detail.html?042",
+      "latitude": 37.721469,
+      "longitude": 140.363645,
+      "coordinates_source": "https://npb.jp/stadium/json/042.json",
+      "aliases": [
+        "県営あづま",
+        "福島県営あづま球場"
+      ]
     },
     {
       "org": "npb",
@@ -1428,7 +1674,14 @@
       "team": "—",
       "address": "福島県会津若松市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?044"
+      "source": "https://npb.jp/stadium/detail.html?044",
+      "latitude": 37.460498,
+      "longitude": 139.925983,
+      "coordinates_source": "https://npb.jp/stadium/json/044.json",
+      "aliases": [
+        "あいづ",
+        "会津総合運動公園あいづ球場"
+      ]
     },
     {
       "org": "npb",
@@ -1437,7 +1690,14 @@
       "team": "—",
       "address": "福島県郡山市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?046"
+      "source": "https://npb.jp/stadium/detail.html?046",
+      "latitude": 37.398686,
+      "longitude": 140.359062,
+      "coordinates_source": "https://npb.jp/stadium/json/046.json",
+      "aliases": [
+        "ヨーク開成山スタジアム",
+        "郡山総合運動場開成山野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1446,7 +1706,14 @@
       "team": "—",
       "address": "福島県いわき市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?047"
+      "source": "https://npb.jp/stadium/detail.html?047",
+      "latitude": 37.034925,
+      "longitude": 140.895014,
+      "coordinates_source": "https://npb.jp/stadium/json/047.json",
+      "aliases": [
+        "平市営",
+        "平市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -1455,7 +1722,14 @@
       "team": "—",
       "address": "福島県いわき市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?048"
+      "source": "https://npb.jp/stadium/detail.html?048",
+      "latitude": 37.017244,
+      "longitude": 140.86013,
+      "coordinates_source": "https://npb.jp/stadium/json/048.json",
+      "aliases": [
+        "いわきグリーンスタジアム",
+        "いわき"
+      ]
     },
     {
       "org": "npb",
@@ -1464,7 +1738,14 @@
       "team": "—",
       "address": "茨城県水戸市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?051"
+      "source": "https://npb.jp/stadium/detail.html?051",
+      "latitude": 36.397079,
+      "longitude": 140.439423,
+      "coordinates_source": "https://npb.jp/stadium/json/051.json",
+      "aliases": [
+        "県営水戸",
+        "茨城県営球場"
+      ]
     },
     {
       "org": "npb",
@@ -1473,7 +1754,14 @@
       "team": "—",
       "address": "茨城県水戸市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?052"
+      "source": "https://npb.jp/stadium/detail.html?052",
+      "latitude": 36.355049,
+      "longitude": 140.427322,
+      "coordinates_source": "https://npb.jp/stadium/json/052.json",
+      "aliases": [
+        "水戸市民",
+        "水戸市民球場"
+      ]
     },
     {
       "org": "npb",
@@ -1482,7 +1770,14 @@
       "team": "—",
       "address": "茨城県日立市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?053"
+      "source": "https://npb.jp/stadium/detail.html?053",
+      "latitude": 36.583635,
+      "longitude": 140.648527,
+      "coordinates_source": "https://npb.jp/stadium/json/053.json",
+      "aliases": [
+        "日立会瀬",
+        "日立会瀬球場"
+      ]
     },
     {
       "org": "npb",
@@ -1491,7 +1786,14 @@
       "team": "—",
       "address": "茨城県ひたちなか市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?054"
+      "source": "https://npb.jp/stadium/detail.html?054",
+      "latitude": 36.39175,
+      "longitude": 140.58638,
+      "coordinates_source": "https://npb.jp/stadium/json/054.json",
+      "aliases": [
+        "ひたちなか市民",
+        "ひたちなか市民球場／勝田市民球場"
+      ]
     },
     {
       "org": "npb",
@@ -1500,7 +1802,14 @@
       "team": "—",
       "address": "茨城県土浦市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?055"
+      "source": "https://npb.jp/stadium/detail.html?055",
+      "latitude": 36.080097,
+      "longitude": 140.210587,
+      "coordinates_source": "https://npb.jp/stadium/json/055.json",
+      "aliases": [
+        "土浦市営",
+        "土浦市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -1509,7 +1818,14 @@
       "team": "—",
       "address": "栃木県宇都宮市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?056"
+      "source": "https://npb.jp/stadium/detail.html?056",
+      "latitude": 36.510708,
+      "longitude": 139.858582,
+      "coordinates_source": "https://npb.jp/stadium/json/056.json",
+      "aliases": [
+        "宇都宮総合",
+        "宇都宮総合球場"
+      ]
     },
     {
       "org": "npb",
@@ -1518,7 +1834,14 @@
       "team": "—",
       "address": "栃木県宇都宮市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?058"
+      "source": "https://npb.jp/stadium/detail.html?058",
+      "latitude": 36.544579,
+      "longitude": 139.9841,
+      "coordinates_source": "https://npb.jp/stadium/json/058.json",
+      "aliases": [
+        "宇都宮清原",
+        "宇都宮清原球場"
+      ]
     },
     {
       "org": "npb",
@@ -1527,7 +1850,14 @@
       "team": "—",
       "address": "栃木県足利市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?059"
+      "source": "https://npb.jp/stadium/detail.html?059",
+      "latitude": 36.348301,
+      "longitude": 139.462387,
+      "coordinates_source": "https://npb.jp/stadium/json/059.json",
+      "aliases": [
+        "足利市営",
+        "足利市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -1536,7 +1866,14 @@
       "team": "—",
       "address": "栃木県鹿沼市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?060"
+      "source": "https://npb.jp/stadium/detail.html?060",
+      "latitude": 36.567284,
+      "longitude": 139.744049,
+      "coordinates_source": "https://npb.jp/stadium/json/060.json",
+      "aliases": [
+        "鹿沼御殿山",
+        "鹿沼御殿山球場"
+      ]
     },
     {
       "org": "npb",
@@ -1545,7 +1882,14 @@
       "team": "—",
       "address": "栃木県大田原市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?061"
+      "source": "https://npb.jp/stadium/detail.html?061",
+      "latitude": 36.859801,
+      "longitude": 140.00803,
+      "coordinates_source": "https://npb.jp/stadium/json/061.json",
+      "aliases": [
+        "大田原市営",
+        "大田原市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -1554,7 +1898,15 @@
       "team": "—",
       "address": "群馬県前橋市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?062"
+      "source": "https://npb.jp/stadium/detail.html?062",
+      "latitude": 36.414955,
+      "longitude": 139.051712,
+      "coordinates_source": "https://npb.jp/stadium/json/062.json",
+      "aliases": [
+        "上毛新聞敷島",
+        "群馬県立敷島公園野球場",
+        "前橋"
+      ]
     },
     {
       "org": "npb",
@@ -1563,7 +1915,14 @@
       "team": "—",
       "address": "群馬県高崎市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?063"
+      "source": "https://npb.jp/stadium/detail.html?063",
+      "latitude": 36.313293,
+      "longitude": 139.007919,
+      "coordinates_source": "https://npb.jp/stadium/json/063.json",
+      "aliases": [
+        "高崎城南",
+        "高崎城南球場"
+      ]
     },
     {
       "org": "npb",
@@ -1572,7 +1931,14 @@
       "team": "—",
       "address": "群馬県桐生市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?065"
+      "source": "https://npb.jp/stadium/detail.html?065",
+      "latitude": 36.419197,
+      "longitude": 139.300034,
+      "coordinates_source": "https://npb.jp/stadium/json/065.json",
+      "aliases": [
+        "桐生",
+        "桐生球場"
+      ]
     },
     {
       "org": "npb",
@@ -1581,7 +1947,14 @@
       "team": "—",
       "address": "群馬県太田市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?066"
+      "source": "https://npb.jp/stadium/detail.html?066",
+      "latitude": 36.303814,
+      "longitude": 139.374832,
+      "coordinates_source": "https://npb.jp/stadium/json/066.json",
+      "aliases": [
+        "太田市営東山",
+        "太田市営東山球場"
+      ]
     },
     {
       "org": "npb",
@@ -1590,7 +1963,14 @@
       "team": "—",
       "address": "群馬県沼田市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?067"
+      "source": "https://npb.jp/stadium/detail.html?067",
+      "latitude": 36.648855,
+      "longitude": 139.041391,
+      "coordinates_source": "https://npb.jp/stadium/json/067.json",
+      "aliases": [
+        "沼田公園",
+        "沼田町公園球場"
+      ]
     },
     {
       "org": "npb",
@@ -1599,7 +1979,14 @@
       "team": "—",
       "address": "埼玉県さいたま市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?069"
+      "source": "https://npb.jp/stadium/detail.html?069",
+      "latitude": 35.917831,
+      "longitude": 139.631805,
+      "coordinates_source": "https://npb.jp/stadium/json/069.json",
+      "aliases": [
+        "県営大宮",
+        "埼玉県営大宮公園野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1608,7 +1995,14 @@
       "team": "—",
       "address": "埼玉県川越市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?070"
+      "source": "https://npb.jp/stadium/detail.html?070",
+      "latitude": 35.9259,
+      "longitude": 139.492584,
+      "coordinates_source": "https://npb.jp/stadium/json/070.json",
+      "aliases": [
+        "川越初雁",
+        "川越初雁公園野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1617,7 +2011,14 @@
       "team": "—",
       "address": "埼玉県さいたま市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?072"
+      "source": "https://npb.jp/stadium/detail.html?072",
+      "latitude": 35.869976,
+      "longitude": 139.657501,
+      "coordinates_source": "https://npb.jp/stadium/json/072.json",
+      "aliases": [
+        "浦和市営",
+        "浦和市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -1626,7 +2027,14 @@
       "team": "—",
       "address": "千葉県千葉市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?076"
+      "source": "https://npb.jp/stadium/detail.html?076",
+      "latitude": 35.647495,
+      "longitude": 140.121429,
+      "coordinates_source": "https://npb.jp/stadium/json/076.json",
+      "aliases": [
+        "県営天台",
+        "千葉県営野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1635,7 +2043,14 @@
       "team": "—",
       "address": "千葉県市川市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?077"
+      "source": "https://npb.jp/stadium/detail.html?077",
+      "latitude": 35.743843,
+      "longitude": 139.905426,
+      "coordinates_source": "https://npb.jp/stadium/json/077.json",
+      "aliases": [
+        "市川国府台",
+        "市川国府台球場"
+      ]
     },
     {
       "org": "npb",
@@ -1644,7 +2059,14 @@
       "team": "—",
       "address": "千葉県銚子市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?078"
+      "source": "https://npb.jp/stadium/detail.html?078",
+      "latitude": 35.728107,
+      "longitude": 140.842819,
+      "coordinates_source": "https://npb.jp/stadium/json/078.json",
+      "aliases": [
+        "銚子市営",
+        "銚子市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -1653,7 +2075,14 @@
       "team": "—",
       "address": "千葉県木更津市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?079"
+      "source": "https://npb.jp/stadium/detail.html?079",
+      "latitude": 35.387447,
+      "longitude": 139.944321,
+      "coordinates_source": "https://npb.jp/stadium/json/079.json",
+      "aliases": [
+        "木更津市営",
+        "木更津市営野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1662,7 +2091,14 @@
       "team": "—",
       "address": "東京都昭島市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?090"
+      "source": "https://npb.jp/stadium/detail.html?090",
+      "latitude": 35.702644,
+      "longitude": 139.384598,
+      "coordinates_source": "https://npb.jp/stadium/json/090.json",
+      "aliases": [
+        "昭島市営",
+        "昭島市営球場／昭和町公園野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1671,7 +2107,14 @@
       "team": "—",
       "address": "東京都八王子市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?091"
+      "source": "https://npb.jp/stadium/detail.html?091",
+      "latitude": 35.651165,
+      "longitude": 139.320389,
+      "coordinates_source": "https://npb.jp/stadium/json/091.json",
+      "aliases": [
+        "八王子市営",
+        "八王子市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -1680,7 +2123,13 @@
       "team": "—",
       "address": "東京都福生市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?092"
+      "source": "https://npb.jp/stadium/detail.html?092",
+      "latitude": 35.735531,
+      "longitude": 139.335999,
+      "coordinates_source": "https://npb.jp/stadium/json/092.json",
+      "aliases": [
+        "福生グラウンド"
+      ]
     },
     {
       "org": "npb",
@@ -1689,7 +2138,14 @@
       "team": "—",
       "address": "神奈川県横浜市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?096"
+      "source": "https://npb.jp/stadium/detail.html?096",
+      "latitude": 35.452229,
+      "longitude": 139.581009,
+      "coordinates_source": "https://npb.jp/stadium/json/096.json",
+      "aliases": [
+        "県立保土ヶ谷",
+        "神奈川県立保土ヶ谷野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1698,7 +2154,14 @@
       "team": "—",
       "address": "神奈川県横須賀市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?097"
+      "source": "https://npb.jp/stadium/detail.html?097",
+      "latitude": 35.318287,
+      "longitude": 139.632019,
+      "coordinates_source": "https://npb.jp/stadium/json/097.json",
+      "aliases": [
+        "市営追浜",
+        "横須賀市営追浜球場"
+      ]
     },
     {
       "org": "npb",
@@ -1707,7 +2170,14 @@
       "team": "—",
       "address": "神奈川県相模原市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?098"
+      "source": "https://npb.jp/stadium/detail.html?098",
+      "latitude": 35.556931,
+      "longitude": 139.386383,
+      "coordinates_source": "https://npb.jp/stadium/json/098.json",
+      "aliases": [
+        "サーティーフォー相模原",
+        "相模原市立相模原球場／県立相模原球場"
+      ]
     },
     {
       "org": "npb",
@@ -1716,7 +2186,14 @@
       "team": "—",
       "address": "神奈川県茅ヶ崎市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?099"
+      "source": "https://npb.jp/stadium/detail.html?099",
+      "latitude": 35.320109,
+      "longitude": 139.405348,
+      "coordinates_source": "https://npb.jp/stadium/json/099.json",
+      "aliases": [
+        "茅ヶ崎市営",
+        "茅ヶ崎市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -1725,7 +2202,14 @@
       "team": "—",
       "address": "神奈川県平塚市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?100"
+      "source": "https://npb.jp/stadium/detail.html?100",
+      "latitude": 35.340607,
+      "longitude": 139.344925,
+      "coordinates_source": "https://npb.jp/stadium/json/100.json",
+      "aliases": [
+        "バッティングパレス相石スタジアムひらつか",
+        "平塚球場"
+      ]
     },
     {
       "org": "npb",
@@ -1734,7 +2218,14 @@
       "team": "—",
       "address": "新潟県新潟市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?102"
+      "source": "https://npb.jp/stadium/detail.html?102",
+      "latitude": 37.888,
+      "longitude": 139.043945,
+      "coordinates_source": "https://npb.jp/stadium/json/102.json",
+      "aliases": [
+        "新潟鳥屋野",
+        "新潟市営鳥屋野野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1743,7 +2234,14 @@
       "team": "—",
       "address": "新潟県新潟市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?103"
+      "source": "https://npb.jp/stadium/detail.html?103",
+      "latitude": 37.879532,
+      "longitude": 139.062866,
+      "coordinates_source": "https://npb.jp/stadium/json/103.json",
+      "aliases": [
+        "HARD・OFF ECOスタジアム新潟",
+        "新潟県立鳥屋野潟公園野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1752,7 +2250,14 @@
       "team": "—",
       "address": "新潟県長岡市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?105"
+      "source": "https://npb.jp/stadium/detail.html?105",
+      "latitude": 37.433598,
+      "longitude": 138.87973,
+      "coordinates_source": "https://npb.jp/stadium/json/105.json",
+      "aliases": [
+        "長岡悠久山",
+        "長岡市営悠久山野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1761,7 +2266,14 @@
       "team": "—",
       "address": "新潟県柏崎市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?108"
+      "source": "https://npb.jp/stadium/detail.html?108",
+      "latitude": 37.350506,
+      "longitude": 138.585037,
+      "coordinates_source": "https://npb.jp/stadium/json/108.json",
+      "aliases": [
+        "柏崎市佐藤池",
+        "柏崎市佐藤池野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1770,7 +2282,14 @@
       "team": "—",
       "address": "新潟県三条市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?109"
+      "source": "https://npb.jp/stadium/detail.html?109",
+      "latitude": 37.606823,
+      "longitude": 138.978455,
+      "coordinates_source": "https://npb.jp/stadium/json/109.json",
+      "aliases": [
+        "三条市民",
+        "三条市総合運動公園市民球場"
+      ]
     },
     {
       "org": "npb",
@@ -1779,7 +2298,14 @@
       "team": "—",
       "address": "新潟県上越市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?110"
+      "source": "https://npb.jp/stadium/detail.html?110",
+      "latitude": 37.108829,
+      "longitude": 138.252502,
+      "coordinates_source": "https://npb.jp/stadium/json/110.json",
+      "aliases": [
+        "上越市高田公園",
+        "上越市営球場／高田市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -1788,7 +2314,14 @@
       "team": "—",
       "address": "富山県富山市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?112"
+      "source": "https://npb.jp/stadium/detail.html?112",
+      "latitude": 36.696247,
+      "longitude": 137.187057,
+      "coordinates_source": "https://npb.jp/stadium/json/112.json",
+      "aliases": [
+        "県営富山",
+        "富山県営富山野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1797,7 +2330,14 @@
       "team": "—",
       "address": "富山県富山市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?113"
+      "source": "https://npb.jp/stadium/detail.html?113",
+      "latitude": 36.739075,
+      "longitude": 137.25914,
+      "coordinates_source": "https://npb.jp/stadium/json/113.json",
+      "aliases": [
+        "富山アルペンスタジアム",
+        "富山市民球場"
+      ]
     },
     {
       "org": "npb",
@@ -1806,7 +2346,14 @@
       "team": "—",
       "address": "富山県高岡市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?116"
+      "source": "https://npb.jp/stadium/detail.html?116",
+      "latitude": 36.790257,
+      "longitude": 137.022949,
+      "coordinates_source": "https://npb.jp/stadium/json/116.json",
+      "aliases": [
+        "高岡城光寺",
+        "高岡市営城光寺野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1815,7 +2362,14 @@
       "team": "—",
       "address": "石川県金沢市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?119"
+      "source": "https://npb.jp/stadium/detail.html?119",
+      "latitude": 36.574432,
+      "longitude": 136.600418,
+      "coordinates_source": "https://npb.jp/stadium/json/119.json",
+      "aliases": [
+        "石川県立",
+        "石川県立野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1824,7 +2378,14 @@
       "team": "—",
       "address": "石川県小松市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?120"
+      "source": "https://npb.jp/stadium/detail.html?120",
+      "latitude": 36.400685,
+      "longitude": 136.441945,
+      "coordinates_source": "https://npb.jp/stadium/json/120.json",
+      "aliases": [
+        "小松運動公園",
+        "小松末広野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1833,7 +2394,15 @@
       "team": "—",
       "address": "福井県福井市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?123"
+      "source": "https://npb.jp/stadium/detail.html?123",
+      "latitude": 36.050076,
+      "longitude": 136.184769,
+      "coordinates_source": "https://npb.jp/stadium/json/123.json",
+      "aliases": [
+        "福井県営",
+        "福井県営球場",
+        "福井"
+      ]
     },
     {
       "org": "npb",
@@ -1842,7 +2411,14 @@
       "team": "—",
       "address": "福井県敦賀市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?124"
+      "source": "https://npb.jp/stadium/detail.html?124",
+      "latitude": 35.639852,
+      "longitude": 136.031233,
+      "coordinates_source": "https://npb.jp/stadium/json/124.json",
+      "aliases": [
+        "敦賀運動公園",
+        "敦賀市総合運動公園野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1851,7 +2427,14 @@
       "team": "—",
       "address": "山梨県甲府市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?125"
+      "source": "https://npb.jp/stadium/detail.html?125",
+      "latitude": 35.668919,
+      "longitude": 138.552002,
+      "coordinates_source": "https://npb.jp/stadium/json/125.json",
+      "aliases": [
+        "県営甲府飯田",
+        "山梨県営甲府飯田球場"
+      ]
     },
     {
       "org": "npb",
@@ -1860,7 +2443,14 @@
       "team": "—",
       "address": "山梨県甲府市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?126"
+      "source": "https://npb.jp/stadium/detail.html?126",
+      "latitude": 35.680622,
+      "longitude": 138.557251,
+      "coordinates_source": "https://npb.jp/stadium/json/126.json",
+      "aliases": [
+        "甲府緑が丘",
+        "山梨県営甲府総合球場"
+      ]
     },
     {
       "org": "npb",
@@ -1869,7 +2459,14 @@
       "team": "—",
       "address": "山梨県甲府市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?127"
+      "source": "https://npb.jp/stadium/detail.html?127",
+      "latitude": 35.62075,
+      "longitude": 138.588425,
+      "coordinates_source": "https://npb.jp/stadium/json/127.json",
+      "aliases": [
+        "県営小瀬スポーツ公園",
+        "小瀬スポーツ公園野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1878,7 +2475,14 @@
       "team": "—",
       "address": "長野県長野市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?129"
+      "source": "https://npb.jp/stadium/detail.html?129",
+      "latitude": 36.65844,
+      "longitude": 138.231827,
+      "coordinates_source": "https://npb.jp/stadium/json/129.json",
+      "aliases": [
+        "長野県営",
+        "長野県営野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1887,7 +2491,15 @@
       "team": "—",
       "address": "長野県長野市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?130"
+      "source": "https://npb.jp/stadium/detail.html?130",
+      "latitude": 36.574314,
+      "longitude": 138.167542,
+      "coordinates_source": "https://npb.jp/stadium/json/130.json",
+      "aliases": [
+        "長野オリンピックスタジアム",
+        "南長野運動公園野球場",
+        "長野"
+      ]
     },
     {
       "org": "npb",
@@ -1896,7 +2508,14 @@
       "team": "—",
       "address": "長野県松本市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?131"
+      "source": "https://npb.jp/stadium/detail.html?131",
+      "latitude": 36.253285,
+      "longitude": 137.980555,
+      "coordinates_source": "https://npb.jp/stadium/json/131.json",
+      "aliases": [
+        "松本市営",
+        "松本市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -1905,7 +2524,14 @@
       "team": "—",
       "address": "長野県松本市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?133"
+      "source": "https://npb.jp/stadium/detail.html?133",
+      "latitude": 36.25779,
+      "longitude": 137.9888,
+      "coordinates_source": "https://npb.jp/stadium/json/133.json",
+      "aliases": [
+        "松本市",
+        "松本市野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1914,7 +2540,14 @@
       "team": "—",
       "address": "長野県上田市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?134"
+      "source": "https://npb.jp/stadium/detail.html?134",
+      "latitude": 36.404369,
+      "longitude": 138.243103,
+      "coordinates_source": "https://npb.jp/stadium/json/134.json",
+      "aliases": [
+        "上田市営",
+        "上田市営野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1923,7 +2556,14 @@
       "team": "—",
       "address": "長野県諏訪郡下諏訪町",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?136"
+      "source": "https://npb.jp/stadium/detail.html?136",
+      "latitude": 36.06809,
+      "longitude": 138.079835,
+      "coordinates_source": "https://npb.jp/stadium/json/136.json",
+      "aliases": [
+        "下諏訪町営",
+        "下諏訪町営球場"
+      ]
     },
     {
       "org": "npb",
@@ -1932,7 +2572,14 @@
       "team": "—",
       "address": "長野県飯田市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?138"
+      "source": "https://npb.jp/stadium/detail.html?138",
+      "latitude": 35.525635,
+      "longitude": 137.817276,
+      "coordinates_source": "https://npb.jp/stadium/json/138.json",
+      "aliases": [
+        "飯田今宮",
+        "飯田市営今宮球場"
+      ]
     },
     {
       "org": "npb",
@@ -1941,7 +2588,14 @@
       "team": "—",
       "address": "長野県岡谷市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?139"
+      "source": "https://npb.jp/stadium/detail.html?139",
+      "latitude": 36.076,
+      "longitude": 138.040359,
+      "coordinates_source": "https://npb.jp/stadium/json/139.json",
+      "aliases": [
+        "市営岡谷",
+        "市営岡谷球場"
+      ]
     },
     {
       "org": "npb",
@@ -1950,7 +2604,14 @@
       "team": "—",
       "address": "長野県伊那市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?141"
+      "source": "https://npb.jp/stadium/detail.html?141",
+      "latitude": 35.840714,
+      "longitude": 137.970734,
+      "coordinates_source": "https://npb.jp/stadium/json/141.json",
+      "aliases": [
+        "伊那市営",
+        "伊那市営野球場／伊那町営野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1959,7 +2620,15 @@
       "team": "—",
       "address": "岐阜県岐阜市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?142"
+      "source": "https://npb.jp/stadium/detail.html?142",
+      "latitude": 35.440636,
+      "longitude": 136.762985,
+      "coordinates_source": "https://npb.jp/stadium/json/142.json",
+      "aliases": [
+        "ぎふしん長良川",
+        "岐阜県営長良川球場／岐阜県営野球場",
+        "岐阜"
+      ]
     },
     {
       "org": "npb",
@@ -1968,7 +2637,14 @@
       "team": "—",
       "address": "岐阜県多治見市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?143"
+      "source": "https://npb.jp/stadium/detail.html?143",
+      "latitude": 35.329659,
+      "longitude": 137.144241,
+      "coordinates_source": "https://npb.jp/stadium/json/143.json",
+      "aliases": [
+        "多治見市営",
+        "多治見市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -1977,7 +2653,14 @@
       "team": "—",
       "address": "静岡県静岡市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?145"
+      "source": "https://npb.jp/stadium/detail.html?145",
+      "latitude": 34.989803,
+      "longitude": 138.426682,
+      "coordinates_source": "https://npb.jp/stadium/json/145.json",
+      "aliases": [
+        "静岡草薙",
+        "静岡県草薙総合運動場硬式野球場／静岡県営草薙球場"
+      ]
     },
     {
       "org": "npb",
@@ -1986,7 +2669,14 @@
       "team": "—",
       "address": "静岡県沼津市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?147"
+      "source": "https://npb.jp/stadium/detail.html?147",
+      "latitude": 35.112137,
+      "longitude": 138.861801,
+      "coordinates_source": "https://npb.jp/stadium/json/147.json",
+      "aliases": [
+        "沼津市営",
+        "沼津市営野球場"
+      ]
     },
     {
       "org": "npb",
@@ -1995,7 +2685,14 @@
       "team": "—",
       "address": "静岡県島田市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?148"
+      "source": "https://npb.jp/stadium/detail.html?148",
+      "latitude": 34.824974,
+      "longitude": 138.176575,
+      "coordinates_source": "https://npb.jp/stadium/json/148.json",
+      "aliases": [
+        "島田",
+        "島田球場"
+      ]
     },
     {
       "org": "npb",
@@ -2004,7 +2701,14 @@
       "team": "—",
       "address": "静岡県磐田市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?149"
+      "source": "https://npb.jp/stadium/detail.html?149",
+      "latitude": 34.722427,
+      "longitude": 137.864868,
+      "coordinates_source": "https://npb.jp/stadium/json/149.json",
+      "aliases": [
+        "磐田城山",
+        "磐田城山球場"
+      ]
     },
     {
       "org": "npb",
@@ -2013,7 +2717,14 @@
       "team": "—",
       "address": "静岡県浜松市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?150"
+      "source": "https://npb.jp/stadium/detail.html?150",
+      "latitude": 34.743416,
+      "longitude": 137.736115,
+      "coordinates_source": "https://npb.jp/stadium/json/150.json",
+      "aliases": [
+        "浜松",
+        "浜松球場／浜松市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -2022,7 +2733,15 @@
       "team": "—",
       "address": "愛知県豊橋市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?154"
+      "source": "https://npb.jp/stadium/detail.html?154",
+      "latitude": 34.758804,
+      "longitude": 137.423309,
+      "coordinates_source": "https://npb.jp/stadium/json/154.json",
+      "aliases": [
+        "豊橋市民",
+        "豊橋市民球場",
+        "豊橋"
+      ]
     },
     {
       "org": "npb",
@@ -2031,7 +2750,14 @@
       "team": "—",
       "address": "愛知県豊川市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?155"
+      "source": "https://npb.jp/stadium/detail.html?155",
+      "latitude": 34.828683,
+      "longitude": 137.388542,
+      "coordinates_source": "https://npb.jp/stadium/json/155.json",
+      "aliases": [
+        "豊川いなり外苑",
+        "豊川いなり外苑球場"
+      ]
     },
     {
       "org": "npb",
@@ -2040,7 +2766,14 @@
       "team": "—",
       "address": "愛知県刈谷市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?156"
+      "source": "https://npb.jp/stadium/detail.html?156",
+      "latitude": 34.987442,
+      "longitude": 136.984222,
+      "coordinates_source": "https://npb.jp/stadium/json/156.json",
+      "aliases": [
+        "刈谷市営",
+        "刈谷市営グラウンド"
+      ]
     },
     {
       "org": "npb",
@@ -2049,7 +2782,14 @@
       "team": "—",
       "address": "愛知県豊田市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?157"
+      "source": "https://npb.jp/stadium/detail.html?157",
+      "latitude": 35.088955,
+      "longitude": 137.146118,
+      "coordinates_source": "https://npb.jp/stadium/json/157.json",
+      "aliases": [
+        "挙母トヨタ",
+        "挙母球場"
+      ]
     },
     {
       "org": "npb",
@@ -2058,7 +2798,14 @@
       "team": "—",
       "address": "愛知県一宮市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?161"
+      "source": "https://npb.jp/stadium/detail.html?161",
+      "latitude": 35.305092,
+      "longitude": 136.811905,
+      "coordinates_source": "https://npb.jp/stadium/json/161.json",
+      "aliases": [
+        "一宮市営",
+        "一宮市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -2067,7 +2814,14 @@
       "team": "—",
       "address": "三重県津市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?162"
+      "source": "https://npb.jp/stadium/detail.html?162",
+      "latitude": 34.710873,
+      "longitude": 136.510941,
+      "coordinates_source": "https://npb.jp/stadium/json/162.json",
+      "aliases": [
+        "津市営",
+        "津市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -2076,7 +2830,14 @@
       "team": "—",
       "address": "三重県伊勢市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?165"
+      "source": "https://npb.jp/stadium/detail.html?165",
+      "latitude": 34.487682,
+      "longitude": 136.733643,
+      "coordinates_source": "https://npb.jp/stadium/json/165.json",
+      "aliases": [
+        "伊勢倉田山公園",
+        "伊勢市営倉田山野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2085,7 +2846,14 @@
       "team": "—",
       "address": "三重県松阪市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?166"
+      "source": "https://npb.jp/stadium/detail.html?166",
+      "latitude": 34.576099,
+      "longitude": 136.525345,
+      "coordinates_source": "https://npb.jp/stadium/json/166.json",
+      "aliases": [
+        "松阪市営",
+        "松阪市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -2094,7 +2862,14 @@
       "team": "—",
       "address": "三重県四日市市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?167"
+      "source": "https://npb.jp/stadium/detail.html?167",
+      "latitude": 34.970114,
+      "longitude": 136.633618,
+      "coordinates_source": "https://npb.jp/stadium/json/167.json",
+      "aliases": [
+        "四日市グラウンド",
+        "四日市市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -2103,7 +2878,14 @@
       "team": "—",
       "address": "滋賀県彦根市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?169"
+      "source": "https://npb.jp/stadium/detail.html?169",
+      "latitude": 35.280439,
+      "longitude": 136.256355,
+      "coordinates_source": "https://npb.jp/stadium/json/169.json",
+      "aliases": [
+        "県立彦根",
+        "滋賀県立彦根球場"
+      ]
     },
     {
       "org": "npb",
@@ -2112,7 +2894,14 @@
       "team": "—",
       "address": "滋賀県大津市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?170"
+      "source": "https://npb.jp/stadium/detail.html?170",
+      "latitude": 35.019146,
+      "longitude": 135.857162,
+      "coordinates_source": "https://npb.jp/stadium/json/170.json",
+      "aliases": [
+        "皇子山",
+        "皇子山総合運動公園野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2121,7 +2910,14 @@
       "team": "—",
       "address": "京都府京都市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?172"
+      "source": "https://npb.jp/stadium/detail.html?172",
+      "latitude": 34.99334,
+      "longitude": 135.714676,
+      "coordinates_source": "https://npb.jp/stadium/json/172.json",
+      "aliases": [
+        "わかさスタジアム京都",
+        "西京極総合運動公園野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2130,7 +2926,14 @@
       "team": "—",
       "address": "京都府福知山市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?173"
+      "source": "https://npb.jp/stadium/detail.html?173",
+      "latitude": 35.309624,
+      "longitude": 135.11624,
+      "coordinates_source": "https://npb.jp/stadium/json/173.json",
+      "aliases": [
+        "福知山市民",
+        "福知山市民球場"
+      ]
     },
     {
       "org": "npb",
@@ -2139,7 +2942,14 @@
       "team": "—",
       "address": "大阪府堺市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?179"
+      "source": "https://npb.jp/stadium/detail.html?179",
+      "latitude": 34.579216,
+      "longitude": 135.460175,
+      "coordinates_source": "https://npb.jp/stadium/json/179.json",
+      "aliases": [
+        "堺大浜",
+        "堺大浜球場"
+      ]
     },
     {
       "org": "npb",
@@ -2148,7 +2958,15 @@
       "team": "—",
       "address": "兵庫県神戸市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?183"
+      "source": "https://npb.jp/stadium/detail.html?183",
+      "latitude": 34.678448,
+      "longitude": 135.074722,
+      "coordinates_source": "https://npb.jp/stadium/json/183.json",
+      "aliases": [
+        "ほっともっとフィールド神戸",
+        "神戸総合運動公園野球場",
+        "ほっと神戸"
+      ]
     },
     {
       "org": "npb",
@@ -2157,7 +2975,14 @@
       "team": "—",
       "address": "兵庫県明石市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?186"
+      "source": "https://npb.jp/stadium/detail.html?186",
+      "latitude": 34.654228,
+      "longitude": 134.993103,
+      "coordinates_source": "https://npb.jp/stadium/json/186.json",
+      "aliases": [
+        "明石公園",
+        "明石公園野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2166,7 +2991,14 @@
       "team": "—",
       "address": "兵庫県姫路市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?188"
+      "source": "https://npb.jp/stadium/detail.html?188",
+      "latitude": 34.816425,
+      "longitude": 134.671616,
+      "coordinates_source": "https://npb.jp/stadium/json/188.json",
+      "aliases": [
+        "姫路市立",
+        "姫路市立姫路球場"
+      ]
     },
     {
       "org": "npb",
@@ -2175,7 +3007,14 @@
       "team": "—",
       "address": "奈良県奈良市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?190"
+      "source": "https://npb.jp/stadium/detail.html?190",
+      "latitude": 34.697834,
+      "longitude": 135.827545,
+      "coordinates_source": "https://npb.jp/stadium/json/190.json",
+      "aliases": [
+        "奈良鴻ノ池",
+        "奈良市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -2184,7 +3023,14 @@
       "team": "—",
       "address": "奈良県橿原市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?192"
+      "source": "https://npb.jp/stadium/detail.html?192",
+      "latitude": 34.490685,
+      "longitude": 135.791306,
+      "coordinates_source": "https://npb.jp/stadium/json/192.json",
+      "aliases": [
+        "県立橿原",
+        "奈良県立橿原球場"
+      ]
     },
     {
       "org": "npb",
@@ -2193,7 +3039,14 @@
       "team": "—",
       "address": "和歌山県和歌山市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?194"
+      "source": "https://npb.jp/stadium/detail.html?194",
+      "latitude": 34.165401,
+      "longitude": 135.189896,
+      "coordinates_source": "https://npb.jp/stadium/json/194.json",
+      "aliases": [
+        "県営紀三井寺",
+        "和歌山県営紀三井寺球場"
+      ]
     },
     {
       "org": "npb",
@@ -2202,7 +3055,14 @@
       "team": "—",
       "address": "鳥取県米子市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?197"
+      "source": "https://npb.jp/stadium/detail.html?197",
+      "latitude": 35.428333,
+      "longitude": 133.35434,
+      "coordinates_source": "https://npb.jp/stadium/json/197.json",
+      "aliases": [
+        "どらやきドラマチックパーク米子市民",
+        "米子市民球場"
+      ]
     },
     {
       "org": "npb",
@@ -2211,7 +3071,14 @@
       "team": "—",
       "address": "鳥取県倉吉市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?198"
+      "source": "https://npb.jp/stadium/detail.html?198",
+      "latitude": 35.426228,
+      "longitude": 133.830795,
+      "coordinates_source": "https://npb.jp/stadium/json/198.json",
+      "aliases": [
+        "倉吉市営",
+        "倉吉市営野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2220,7 +3087,14 @@
       "team": "—",
       "address": "島根県松江市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?200"
+      "source": "https://npb.jp/stadium/detail.html?200",
+      "latitude": 35.434441,
+      "longitude": 133.06369,
+      "coordinates_source": "https://npb.jp/stadium/json/200.json",
+      "aliases": [
+        "松江市営（新）",
+        "松江市営野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2229,7 +3103,14 @@
       "team": "—",
       "address": "島根県浜田市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?201"
+      "source": "https://npb.jp/stadium/detail.html?201",
+      "latitude": 34.903908,
+      "longitude": 132.095444,
+      "coordinates_source": "https://npb.jp/stadium/json/201.json",
+      "aliases": [
+        "浜田市",
+        "浜田市設野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2238,7 +3119,14 @@
       "team": "—",
       "address": "島根県出雲市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?202"
+      "source": "https://npb.jp/stadium/detail.html?202",
+      "latitude": 35.381824,
+      "longitude": 132.703369,
+      "coordinates_source": "https://npb.jp/stadium/json/202.json",
+      "aliases": [
+        "出雲",
+        "島根県立浜山公園野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2247,7 +3135,14 @@
       "team": "—",
       "address": "岡山県岡山市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?203"
+      "source": "https://npb.jp/stadium/detail.html?203",
+      "latitude": 34.680832,
+      "longitude": 133.918564,
+      "coordinates_source": "https://npb.jp/stadium/json/203.json",
+      "aliases": [
+        "岡山県営",
+        "岡山県営球場"
+      ]
     },
     {
       "org": "npb",
@@ -2256,7 +3151,14 @@
       "team": "—",
       "address": "岡山県倉敷市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?205"
+      "source": "https://npb.jp/stadium/detail.html?205",
+      "latitude": 34.58601,
+      "longitude": 133.749023,
+      "coordinates_source": "https://npb.jp/stadium/json/205.json",
+      "aliases": [
+        "倉敷市営",
+        "倉敷市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -2265,7 +3167,15 @@
       "team": "—",
       "address": "岡山県倉敷市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?206"
+      "source": "https://npb.jp/stadium/detail.html?206",
+      "latitude": 34.620346,
+      "longitude": 133.803711,
+      "coordinates_source": "https://npb.jp/stadium/json/206.json",
+      "aliases": [
+        "倉敷マスカットスタジアム",
+        "岡山県倉敷スポーツ公園野球場",
+        "倉敷"
+      ]
     },
     {
       "org": "npb",
@@ -2274,7 +3184,14 @@
       "team": "—",
       "address": "岡山県津山市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?207"
+      "source": "https://npb.jp/stadium/detail.html?207",
+      "latitude": 35.084309,
+      "longitude": 134.016815,
+      "coordinates_source": "https://npb.jp/stadium/json/207.json",
+      "aliases": [
+        "津山市営",
+        "津山市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -2283,7 +3200,14 @@
       "team": "—",
       "address": "広島県広島市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?210"
+      "source": "https://npb.jp/stadium/detail.html?210",
+      "latitude": 34.375729,
+      "longitude": 132.422928,
+      "coordinates_source": "https://npb.jp/stadium/json/210.json",
+      "aliases": [
+        "広島総合",
+        "広島総合グランド野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2292,7 +3216,14 @@
       "team": "—",
       "address": "広島県福山市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?212"
+      "source": "https://npb.jp/stadium/detail.html?212",
+      "latitude": 34.442993,
+      "longitude": 133.392853,
+      "coordinates_source": "https://npb.jp/stadium/json/212.json",
+      "aliases": [
+        "福山市民（新）",
+        "福山市竹ヶ端運動公園野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2301,7 +3232,14 @@
       "team": "—",
       "address": "広島県尾道市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?215"
+      "source": "https://npb.jp/stadium/detail.html?215",
+      "latitude": 34.427917,
+      "longitude": 133.177826,
+      "coordinates_source": "https://npb.jp/stadium/json/215.json",
+      "aliases": [
+        "尾道しまなみ",
+        "広島県立びんご運動公園野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2310,7 +3248,14 @@
       "team": "—",
       "address": "広島県東広島市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?216"
+      "source": "https://npb.jp/stadium/detail.html?216",
+      "latitude": 34.438717,
+      "longitude": 132.744095,
+      "coordinates_source": "https://npb.jp/stadium/json/216.json",
+      "aliases": [
+        "西条御建",
+        "御建公園野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2319,7 +3264,14 @@
       "team": "—",
       "address": "広島県呉市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?217"
+      "source": "https://npb.jp/stadium/detail.html?217",
+      "latitude": 34.254528,
+      "longitude": 132.561813,
+      "coordinates_source": "https://npb.jp/stadium/json/217.json",
+      "aliases": [
+        "呉二河",
+        "呉市二河野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2328,7 +3280,14 @@
       "team": "—",
       "address": "広島県三次市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?220"
+      "source": "https://npb.jp/stadium/detail.html?220",
+      "latitude": 34.779697,
+      "longitude": 132.868774,
+      "coordinates_source": "https://npb.jp/stadium/json/220.json",
+      "aliases": [
+        "三次きんさいスタジアム",
+        "みよし運動公園野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2337,7 +3296,13 @@
       "team": "—",
       "address": "山口県山口市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?222"
+      "source": "https://npb.jp/stadium/detail.html?222",
+      "latitude": 34.207539,
+      "longitude": 131.506729,
+      "coordinates_source": "https://npb.jp/stadium/json/222.json",
+      "aliases": [
+        "西京スタジアム"
+      ]
     },
     {
       "org": "npb",
@@ -2346,7 +3311,14 @@
       "team": "—",
       "address": "山口県岩国市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?224"
+      "source": "https://npb.jp/stadium/detail.html?224",
+      "latitude": 34.155628,
+      "longitude": 132.193985,
+      "coordinates_source": "https://npb.jp/stadium/json/224.json",
+      "aliases": [
+        "岩国市民",
+        "岩国市民球場"
+      ]
     },
     {
       "org": "npb",
@@ -2355,7 +3327,14 @@
       "team": "—",
       "address": "山口県周南市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?225"
+      "source": "https://npb.jp/stadium/detail.html?225",
+      "latitude": 34.070518,
+      "longitude": 131.736633,
+      "coordinates_source": "https://npb.jp/stadium/json/225.json",
+      "aliases": [
+        "新南陽",
+        "新南陽球場"
+      ]
     },
     {
       "org": "npb",
@@ -2364,7 +3343,14 @@
       "team": "—",
       "address": "山口県山陽小野田市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?226"
+      "source": "https://npb.jp/stadium/detail.html?226",
+      "latitude": 33.990662,
+      "longitude": 131.170654,
+      "coordinates_source": "https://npb.jp/stadium/json/226.json",
+      "aliases": [
+        "小野田市営",
+        "小野田市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -2373,7 +3359,14 @@
       "team": "—",
       "address": "山口県山陽小野田市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?227"
+      "source": "https://npb.jp/stadium/detail.html?227",
+      "latitude": 34.055674,
+      "longitude": 131.174653,
+      "coordinates_source": "https://npb.jp/stadium/json/227.json",
+      "aliases": [
+        "厚狭",
+        "厚狭球場"
+      ]
     },
     {
       "org": "npb",
@@ -2382,7 +3375,14 @@
       "team": "—",
       "address": "山口県周南市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?229"
+      "source": "https://npb.jp/stadium/detail.html?229",
+      "latitude": 34.041515,
+      "longitude": 131.826248,
+      "coordinates_source": "https://npb.jp/stadium/json/229.json",
+      "aliases": [
+        "徳山市営",
+        "徳山市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -2391,7 +3391,14 @@
       "team": "—",
       "address": "山口県宇部市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?230"
+      "source": "https://npb.jp/stadium/detail.html?230",
+      "latitude": 33.944817,
+      "longitude": 131.268982,
+      "coordinates_source": "https://npb.jp/stadium/json/230.json",
+      "aliases": [
+        "ユーピーアールスタジアム",
+        "宇部市野球場／宇部市営恩田野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2400,7 +3407,14 @@
       "team": "—",
       "address": "山口県下関市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?234"
+      "source": "https://npb.jp/stadium/detail.html?234",
+      "latitude": 34.019386,
+      "longitude": 130.931107,
+      "coordinates_source": "https://npb.jp/stadium/json/234.json",
+      "aliases": [
+        "下関（新）",
+        "下関球場"
+      ]
     },
     {
       "org": "npb",
@@ -2409,7 +3423,14 @@
       "team": "—",
       "address": "徳島県徳島市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?236"
+      "source": "https://npb.jp/stadium/detail.html?236",
+      "latitude": 34.073631,
+      "longitude": 134.512146,
+      "coordinates_source": "https://npb.jp/stadium/json/236.json",
+      "aliases": [
+        "県営蔵本",
+        "徳島県営蔵本球場"
+      ]
     },
     {
       "org": "npb",
@@ -2418,7 +3439,14 @@
       "team": "—",
       "address": "徳島県鳴門市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?237"
+      "source": "https://npb.jp/stadium/detail.html?237",
+      "latitude": 34.16721,
+      "longitude": 134.619598,
+      "coordinates_source": "https://npb.jp/stadium/json/237.json",
+      "aliases": [
+        "県営鳴門",
+        "徳島県営鳴門球場"
+      ]
     },
     {
       "org": "npb",
@@ -2427,7 +3455,14 @@
       "team": "—",
       "address": "香川県高松市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?239"
+      "source": "https://npb.jp/stadium/detail.html?239",
+      "latitude": 34.365211,
+      "longitude": 133.959702,
+      "coordinates_source": "https://npb.jp/stadium/json/239.json",
+      "aliases": [
+        "香川県営",
+        "香川県営野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2436,7 +3471,15 @@
       "team": "—",
       "address": "愛媛県松山市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?242"
+      "source": "https://npb.jp/stadium/detail.html?242",
+      "latitude": 33.808781,
+      "longitude": 132.745239,
+      "coordinates_source": "https://npb.jp/stadium/json/242.json",
+      "aliases": [
+        "松山坊っちゃんスタジアム",
+        "松山中央公園野球場",
+        "松山"
+      ]
     },
     {
       "org": "npb",
@@ -2445,7 +3488,14 @@
       "team": "—",
       "address": "愛媛県今治市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?243"
+      "source": "https://npb.jp/stadium/detail.html?243",
+      "latitude": 34.078396,
+      "longitude": 132.990021,
+      "coordinates_source": "https://npb.jp/stadium/json/243.json",
+      "aliases": [
+        "今治市営",
+        "今治市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -2454,7 +3504,14 @@
       "team": "—",
       "address": "高知県高知市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?244"
+      "source": "https://npb.jp/stadium/detail.html?244",
+      "latitude": 33.552731,
+      "longitude": 133.531418,
+      "coordinates_source": "https://npb.jp/stadium/json/244.json",
+      "aliases": [
+        "高知市営",
+        "高知市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -2463,7 +3520,15 @@
       "team": "—",
       "address": "福岡県北九州市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?248"
+      "source": "https://npb.jp/stadium/detail.html?248",
+      "latitude": 33.868633,
+      "longitude": 130.885666,
+      "coordinates_source": "https://npb.jp/stadium/json/248.json",
+      "aliases": [
+        "北九州市民",
+        "北九州市民球場／小倉市営球場",
+        "北九州"
+      ]
     },
     {
       "org": "npb",
@@ -2472,7 +3537,14 @@
       "team": "—",
       "address": "福岡県北九州市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?251"
+      "source": "https://npb.jp/stadium/detail.html?251",
+      "latitude": 33.861706,
+      "longitude": 130.784973,
+      "coordinates_source": "https://npb.jp/stadium/json/251.json",
+      "aliases": [
+        "八幡桃園",
+        "八幡桃園球場"
+      ]
     },
     {
       "org": "npb",
@@ -2481,7 +3553,14 @@
       "team": "—",
       "address": "福岡県北九州市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?252"
+      "source": "https://npb.jp/stadium/detail.html?252",
+      "latitude": 33.862125,
+      "longitude": 130.807358,
+      "coordinates_source": "https://npb.jp/stadium/json/252.json",
+      "aliases": [
+        "八幡大谷",
+        "八幡大谷球場"
+      ]
     },
     {
       "org": "npb",
@@ -2490,7 +3569,14 @@
       "team": "—",
       "address": "福岡県大牟田市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?256"
+      "source": "https://npb.jp/stadium/detail.html?256",
+      "latitude": 33.022148,
+      "longitude": 130.447357,
+      "coordinates_source": "https://npb.jp/stadium/json/256.json",
+      "aliases": [
+        "大牟田延命（新）",
+        "大牟田延命球場"
+      ]
     },
     {
       "org": "npb",
@@ -2499,7 +3585,14 @@
       "team": "—",
       "address": "佐賀県佐賀市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?260"
+      "source": "https://npb.jp/stadium/detail.html?260",
+      "latitude": 33.238632,
+      "longitude": 130.236313,
+      "coordinates_source": "https://npb.jp/stadium/json/260.json",
+      "aliases": [
+        "佐賀県立",
+        "みどりの森県営球場"
+      ]
     },
     {
       "org": "npb",
@@ -2508,7 +3601,14 @@
       "team": "—",
       "address": "佐賀県杵島郡大町町",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?263"
+      "source": "https://npb.jp/stadium/detail.html?263",
+      "latitude": 33.219116,
+      "longitude": 130.103485,
+      "coordinates_source": "https://npb.jp/stadium/json/263.json",
+      "aliases": [
+        "杵島炭鉱",
+        "杵島炭鉱グラウンド"
+      ]
     },
     {
       "org": "npb",
@@ -2517,7 +3617,14 @@
       "team": "—",
       "address": "長崎県長崎市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?265"
+      "source": "https://npb.jp/stadium/detail.html?265",
+      "latitude": 32.775906,
+      "longitude": 129.860626,
+      "coordinates_source": "https://npb.jp/stadium/json/265.json",
+      "aliases": [
+        "長崎ビッグNスタジアム",
+        "長崎県営野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2526,7 +3633,14 @@
       "team": "—",
       "address": "長崎県佐世保市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?268"
+      "source": "https://npb.jp/stadium/detail.html?268",
+      "latitude": 33.177731,
+      "longitude": 129.672012,
+      "coordinates_source": "https://npb.jp/stadium/json/268.json",
+      "aliases": [
+        "佐世保",
+        "佐世保野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2535,7 +3649,14 @@
       "team": "—",
       "address": "長崎県島原市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?269"
+      "source": "https://npb.jp/stadium/detail.html?269",
+      "latitude": 32.778976,
+      "longitude": 130.357605,
+      "coordinates_source": "https://npb.jp/stadium/json/269.json",
+      "aliases": [
+        "島原市営",
+        "島原市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -2544,7 +3665,14 @@
       "team": "—",
       "address": "熊本県熊本市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?270"
+      "source": "https://npb.jp/stadium/detail.html?270",
+      "latitude": 32.793591,
+      "longitude": 130.73941,
+      "coordinates_source": "https://npb.jp/stadium/json/270.json",
+      "aliases": [
+        "熊本水前寺",
+        "熊本水前寺野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2553,7 +3681,15 @@
       "team": "—",
       "address": "熊本県熊本市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?271"
+      "source": "https://npb.jp/stadium/detail.html?271",
+      "latitude": 32.805843,
+      "longitude": 130.6987,
+      "coordinates_source": "https://npb.jp/stadium/json/271.json",
+      "aliases": [
+        "リブワーク藤崎台",
+        "藤崎台県営野球場",
+        "熊本"
+      ]
     },
     {
       "org": "npb",
@@ -2562,7 +3698,14 @@
       "team": "—",
       "address": "大分県大分市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?273"
+      "source": "https://npb.jp/stadium/detail.html?273",
+      "latitude": 33.253632,
+      "longitude": 131.624298,
+      "coordinates_source": "https://npb.jp/stadium/json/273.json",
+      "aliases": [
+        "県営新大分",
+        "大洲総合運動公園硬式野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2571,7 +3714,14 @@
       "team": "—",
       "address": "宮崎県宮崎市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?276"
+      "source": "https://npb.jp/stadium/detail.html?276",
+      "latitude": 31.828314,
+      "longitude": 131.445221,
+      "coordinates_source": "https://npb.jp/stadium/json/276.json",
+      "aliases": [
+        "ひなたサンマリンスタジアム宮崎",
+        "宮崎県総合運動公園硬式野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2580,7 +3730,14 @@
       "team": "—",
       "address": "宮崎県宮崎市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?277"
+      "source": "https://npb.jp/stadium/detail.html?277",
+      "latitude": 31.828314,
+      "longitude": 131.445221,
+      "coordinates_source": "https://npb.jp/stadium/json/277.json",
+      "aliases": [
+        "宮崎市営",
+        "宮崎市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -2589,7 +3746,14 @@
       "team": "—",
       "address": "宮崎県都城市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?278"
+      "source": "https://npb.jp/stadium/detail.html?278",
+      "latitude": 31.728104,
+      "longitude": 131.078476,
+      "coordinates_source": "https://npb.jp/stadium/json/278.json",
+      "aliases": [
+        "都城市営",
+        "都城市営球場"
+      ]
     },
     {
       "org": "npb",
@@ -2598,7 +3762,14 @@
       "team": "—",
       "address": "鹿児島県鹿児島市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?279"
+      "source": "https://npb.jp/stadium/detail.html?279",
+      "latitude": 31.563736,
+      "longitude": 130.552536,
+      "coordinates_source": "https://npb.jp/stadium/json/279.json",
+      "aliases": [
+        "鴨池市民",
+        "鴨池市民球場"
+      ]
     },
     {
       "org": "npb",
@@ -2607,7 +3778,15 @@
       "team": "—",
       "address": "鹿児島県鹿児島市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?280"
+      "source": "https://npb.jp/stadium/detail.html?280",
+      "latitude": 31.566343,
+      "longitude": 130.558594,
+      "coordinates_source": "https://npb.jp/stadium/json/280.json",
+      "aliases": [
+        "平和リース",
+        "鹿児島県立鴨池野球場",
+        "鹿児島"
+      ]
     },
     {
       "org": "npb",
@@ -2616,7 +3795,14 @@
       "team": "—",
       "address": "沖縄県那覇市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?282"
+      "source": "https://npb.jp/stadium/detail.html?282",
+      "latitude": 26.203539,
+      "longitude": 127.672745,
+      "coordinates_source": "https://npb.jp/stadium/json/282.json",
+      "aliases": [
+        "沖縄セルラースタジアム那覇",
+        "那覇市営奥武山野球場"
+      ]
     },
     {
       "org": "npb",
@@ -2625,7 +3811,14 @@
       "team": "—",
       "address": "海外台北市",
       "stadium_level": "regional",
-      "source": "https://npb.jp/stadium/detail.html?287"
+      "source": "https://npb.jp/stadium/detail.html?287",
+      "latitude": 39.451046,
+      "longitude": 141.066544,
+      "coordinates_source": "https://npb.jp/stadium/json/287.json",
+      "aliases": [
+        "台北天母",
+        "台北市立天母棒球場"
+      ]
     }
   ]
 }

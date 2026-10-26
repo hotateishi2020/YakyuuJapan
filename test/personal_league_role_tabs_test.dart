@@ -47,7 +47,7 @@ void main() {
 
   for (final org in [OrgConfig.npb, OrgConfig.mlb]) {
     for (final wide in [false, true]) {
-      testWidgets('${org.label}は4つのリーグ別打者投手タブで切り替える wide=$wide', (tester) async {
+      testWidgets('${org.label}は縦でリーグpickerと投打セグメント、横で4タブを表示する wide=$wide', (tester) async {
         tester.view.devicePixelRatio = 1;
         tester.view.physicalSize = Size(wide ? 1400 : 375, 900);
         addTearDown(tester.view.resetPhysicalSize);
@@ -86,7 +86,12 @@ void main() {
             expect(tester.widget(picker), isA<DropdownButton<int>>());
             await tester.tap(picker);
             await tester.pumpAndSettle();
-            await tester.tap(find.text('${org.leagues[i ~/ 2].name}${i.isEven ? '打者' : '投手'}').last);
+            expect(tester.widget<DropdownButton<int>>(picker).items, hasLength(2));
+            await tester.tap(find.text(org.leagues[i ~/ 2].name).last);
+            await tester.pumpAndSettle();
+            final segments = find.byType(StatsSegmentControl);
+            expect(segments, findsNWidgets(2));
+            await tester.tap(find.descendant(of: segments.at(i.isEven ? 0 : 1), matching: find.byType(InkWell)).first);
           }
           await tester.pumpAndSettle();
           expect(find.textContaining('選手$i'), findsWidgets);
@@ -97,7 +102,7 @@ void main() {
             final material = find.ancestor(of: tab, matching: find.byType(Material)).first;
             expect(tester.widget<Material>(material).color, org.leagues[i ~/ 2].color);
           } else {
-            final segment = find.byType(StatsSegmentControl);
+            final segment = find.byType(StatsSegmentControl).at(i.isEven ? 0 : 1);
             expect(segment, findsOneWidget);
             expect(tester.widget<StatsSegmentControl>(segment).labels, hasLength(2));
             await tester.tap(find.descendant(of: segment, matching: find.byType(InkWell)).last);

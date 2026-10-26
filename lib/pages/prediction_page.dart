@@ -1849,7 +1849,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         playerStats: npbPlayerStatsActual,
         standings: standings,
         initialDate: _gamesInitialDate(),
-        trailing: showBracket ? [const SizedBox(height: 12), _postseasonBracket()] : const [],
+        trailing: [if (showBracket) ...[const SizedBox(height: 12), _postseasonBracket()]],
         leagues: [
           for (final league in _org.leagues) (id: league.id, name: league.name, color: league.color),
         ],

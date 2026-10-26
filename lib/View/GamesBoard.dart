@@ -1,8 +1,13 @@
+import '../logic/game_story.dart';
 import '../logic/game_visibility.dart';
 import '../logic/batting_turn_columns.dart';
 import '../logic/compact_game_batting.dart';
 import '../logic/auth_session.dart';
 import '../widgets/special_media.dart';
+import '../widgets/golden_glove_badge.dart';
+import '../widgets/game_highlight_row.dart';
+import '../widgets/game_broadcast_logos.dart';
+import '../widgets/game_bench_row.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'player_condition.dart';
 import 'player_detail_dialog.dart';
@@ -2763,11 +2768,13 @@ class _TableGameCard extends StatelessWidget {
             crownStats: _seasonLeaderStats(player.name),
             showJapan: _showJapanFlag(player.name),
           )))),
+      if (!(pitching && gameIsPregameState(_text('state')))) ...[
       const SizedBox(width: 5),
       SizedBox(width: baseSize * 6.8,
         child: Text(_nameSeasonStats(player, pitching: pitching),
           key: ValueKey('game-season-stats-${player.name}'),
           style: TextStyle(fontSize: baseSize * .85, height: 1, color: Colors.black87))),
+      ],
     ]));
   }
 
@@ -3578,7 +3585,10 @@ class _TableGameCard extends StatelessWidget {
         maxLines: 1,
       )..layout();
       final badges = marks.split(RegExp(r'\s+')).where(_isFieldMark).length;
-      return Size(painter.width + 6 + badges * 18, painter.height + 2);
+      final awards = _goldenGloveCount(name);
+      return Size(painter.width + 6 + badges * 18 +
+          (awards > 0 ? GoldenGloveBadge.widthFor(awards) : 0),
+          math.max(painter.height + 2, awards > 0 ? 19 : 0));
     }
 
     final starter = labelSize(spot.starter, spot.starterMarks, pinch: false);
@@ -3804,6 +3814,26 @@ class _TableGameCard extends StatelessWidget {
     );
   }
 
+  int _goldenGloveCount(String name) {
+    final identities = [...rows, ...listMapFromJson(game['player_hands'])];
+    final identity = identities.where((r) =>
+        samePlayerStatName(name, '${r['name_full_summary'] ?? ''}')).firstOrNull;
+    final id = identity?['id_player'];
+    var count = 0;
+    for (final row in [...listMapFromJson(game['season_player_stats']), ...playerStats]) {
+      if (row['title'] != 'GG受賞回数') continue;
+      final matches = id != null && row['id_player'] != null
+          ? '$id' == '${row['id_player']}'
+          : samePlayerStatName(name, '${row['name_player'] ?? ''}');
+      if (!matches) continue;
+      final value = num.tryParse('${row['numeric_value'] ?? row['stats']}');
+      if (value != null && value > 0 && value == value.roundToDouble()) {
+        count = math.max(count, value.toInt());
+      }
+    }
+    return count;
+  }
+
   Widget _defenseNameColumn(String name, String marks, {required String pos, bool pinch = false}) {
     final bg = _positionColor(pos);
     final ink = _inkOn(bg);
@@ -3831,6 +3861,8 @@ class _TableGameCard extends StatelessWidget {
                 ),
               ),
             ),
+            if (_goldenGloveCount(name) > 0)
+              GoldenGloveBadge(key: ValueKey('defense-glove-$name'), count: _goldenGloveCount(name)),
             for (final mark in marks.split(RegExp(r'\s+')).where(_isFieldMark)) _fieldMarkBadge(mark),
           ],
         ),
@@ -4675,6 +4707,8 @@ class _TableGameCard extends StatelessWidget {
 
   double _pitcherBlockH(int count) => math.max(1, count) * _playerRowH + _seasonBlockH();
 
+  List<Map<String, dynamic>> get _highlightVideos => listMapFromJson(game['highlight_videos']);
+
   double intrinsicHeight({bool stackedTeams = false}) {
     final homePitchers = _players(home: true, pitcher: true);
     final awayPitchers = _players(home: false, pitcher: true);
@@ -4682,7 +4716,9 @@ class _TableGameCard extends StatelessWidget {
     const chrome = 8.0;
     final inProgress = '${game['state'] ?? ''}'.contains('回');
     final headerH = _gameHeaderH;
-    final head = headerH + _teamBlockH + chrome + (inProgress ? 6.0 : 0.0);
+    final benchH = listMapFromJson(game['bench_players']).isEmpty ? 0.0 : GameBenchRow.teamHeight * (stackedTeams ? 2 : 1);
+    final videoH = _highlightVideos.isEmpty ? 0.0 : GameHighlightRow.rowHeight;
+    final head = headerH + _teamBlockH + chrome + videoH + benchH + (inProgress ? 6.0 : 0.0);
     final batterHomeH = _showBatterStats ? _battingBlockHeight(true) : 0.0;
     final batterAwayH = _showBatterStats ? _battingBlockHeight(false) : 0.0;
     final defenseH = _showDefense ? _defenseRowH : 0.0;
@@ -4691,7 +4727,7 @@ class _TableGameCard extends StatelessWidget {
     final rosterBarH = statsExpanded && _showRosterPicker ? _statsToggleH : 0.0;
     // カード枠と、試合中の点滅枠の分だけ足す。
     final frame = 2.0 + (inProgress ? 6.0 : 0.0);
-    if (!statsExpanded) return headerH + _teamBlockH + toggleH + frame;
+    if (!statsExpanded) return headerH + _teamBlockH + toggleH + frame + videoH + benchH;
     if (stackedTeams) {
       final homePitchH = showPitchers ? _pitcherBlockH(homePitchers.length) : 0.0;
       final awayPitchH = showPitchers ? _pitcherBlockH(awayPitchers.length) : 0.0;
@@ -5342,7 +5378,9 @@ class _TableGameCard extends StatelessWidget {
       // _pitcherNameBox の左右 padding 2+2 に、末尾が切れない余裕を足す。
       var w = _textWidth(_compactPlayerName(player.name), fontSize, weight: FontWeight.bold, textScaler: scaler) + 8;
       w += _seasonCrownWidth(_seasonLeaderStats(player.name).length, fontSize);
-      w += 5 + fontSize * 6.8;
+      if (!(gameIsPregameState(_text('state')) && ['先', '中', '抑'].contains(player.role))) {
+        w += 5 + fontSize * 6.8;
+      }
       if (_showJapanFlag(player.name)) w += fontSize;
       if (w > width) width = w;
     }
@@ -6621,6 +6659,9 @@ class _TableGameCard extends StatelessWidget {
         );
       }
 
+      final story = gameStory(game,
+        seriesGames: AuthSession.instance.showDetailedGames ? seriesGames : publicGameRows(seriesGames),
+        standings: standings);
       final content = Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
@@ -6638,8 +6679,9 @@ class _TableGameCard extends StatelessWidget {
                 right: false,
                 alignment: Alignment.centerLeft,
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                child: Align(
-                  alignment: Alignment.centerLeft,
+                child: LayoutBuilder(builder: (context, headerConstraints) => Row(children: [
+                  ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: headerConstraints.maxWidth * .32),
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
@@ -6689,6 +6731,22 @@ class _TableGameCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                  Expanded(child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Center(child: FittedBox(fit: BoxFit.scaleDown,
+                      child: story.isEmpty ? const SizedBox.shrink() : Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(4),
+                          color: const Color(0xFFDC143C)),
+                        child: Text(story, key: const ValueKey('game-story'), maxLines: 1, softWrap: false,
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: headerSize)),
+                      ),
+                    )),
+                  )),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: headerConstraints.maxWidth * .30),
+                    child: GameBroadcastLogos(game: game)),
+                ])),
               ),
             ),
             SizedBox(
@@ -6903,6 +6961,9 @@ class _TableGameCard extends StatelessWidget {
                   ),
                 ),
             ],
+            if (listMapFromJson(game['bench_players']).isNotEmpty)
+              GameBenchRow(game: {...game, 'summaries': rows}, stacked: stackedTeams),
+            if (_highlightVideos.isNotEmpty) GameHighlightRow(videos: _highlightVideos),
           ],
         ),
       );

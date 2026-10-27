@@ -2,10 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 String? broadcastLogoAsset(Map<String,dynamic> row) {
-  final name = '${row['name'] ?? ''}'.toLowerCase().replaceAll(RegExp(r'[\s－ー-]'), '');
+  final name = '${row['name'] ?? ''}'.toLowerCase().replaceAll('ｎｈｋ', 'nhk').replaceAll('１', '1').replaceAll(RegExp(r'[\s－ー-]'), '');
   final kind = '${row['kind']}';
   final file = switch (name) {
     'tver' => 'tver.png',
+    _ when kind == 'tv' && name.contains('テレビ信州') => 'tsb.jpg',
+    _ when kind == 'tv' && name.contains('長野朝日放送') => 'abn.png',
+    _ when kind == 'tv' && name.contains('長野放送') => 'nbs.png',
+    _ when kind == 'tv' && (name.contains('nhk総合') || name.contains('nhkeテレ')) => 'nhk-tv.png',
+    _ when kind == 'radio' && const {'nhkラジオ','nhkラジオ第1','nhkラジオ第一','nhk第1','nhk第一','nhkr1','nhkradio1'}.contains(name) => 'nhk-radio1.png',
+    _ when kind == 'tv' && (name.contains('sbc') || name.contains('信越放送')) => 'sbc.png',
     'unext' => 'unext.svg',
     'tbsテレビ' => 'tbs.png',
     '日本テレビ' => 'ntv.svg',
@@ -26,6 +32,10 @@ class BroadcastLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     final asset = broadcastLogoAsset(row);
     if (asset != null) {
+      if (asset.endsWith('/nhk-tv.png')) {
+        return Column(children:[Expanded(child:Image.asset(asset,fit:BoxFit.contain)),
+          Text('${row['name']}'.contains('総合')?'総合':'Eテレ',style:const TextStyle(fontSize:8,height:1))]);
+      }
       return asset.endsWith('.svg') ? SvgPicture.asset(asset,fit:BoxFit.contain)
           : Image.asset(asset,fit:BoxFit.contain);
     }

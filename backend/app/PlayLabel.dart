@@ -125,6 +125,10 @@ String _plateEventLabel(Map<String, dynamic> row) {
     final full = '${row['name_$side'] ?? ''}'.trim();
     return full.split(RegExp(r'[\s　]+')).first;
   }
+  if (type == '盗塁' || type == '盗塁失敗') {
+    final runner = surname('enter').isNotEmpty ? surname('enter') : surname('runner');
+    return runner.isEmpty ? type : '$type:$runner';
+  }
   if (type == '代走') return '$type:${surname('enter')}';
   if (type == '守備位置転換' || type == '代守') {
     final from = position(row['code_position_from']);

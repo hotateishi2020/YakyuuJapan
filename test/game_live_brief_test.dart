@@ -9,6 +9,30 @@ void main() {
     AuthSession.instance.token = 'test';
   });
   tearDown(() { AuthSession.instance.user = null; AuthSession.instance.token = null; });
+  for (final names in [
+    ('松本 晴', '松本晴'),
+    ('東 克樹', '東'),
+  ]) {
+    testWidgets('速報の略名 ${names.$2} を先発 ${names.$1} と重複表示しない', (tester) async {
+      await tester.pumpWidget(MaterialApp(home: Scaffold(body: GamesBoardYahooStyle(
+        games: [{
+          'id_game': 1, 'id_team_home': 1, 'id_team_away': 2,
+          'name_team_home': 'ホーム', 'name_team_away': 'ビジター',
+          'name_pitcher_home': names.$1,
+          'name_pitcher_away': '相手先発',
+          'name_current_pitcher_home': names.$2,
+          'state': '2回表', 'score_home': 0, 'score_away': 0,
+          'date_game': '2026-10-27',
+        }], horizontal: true,
+      ))));
+      await tester.pump(const Duration(milliseconds: 100));
+      // Both the name and the starter role remain; no relief row is appended.
+      expect(find.text('中'), findsNothing);
+      expect(find.textContaining(names.$1.replaceAll(' ', '')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    });
+  }
   for (final announced in [false, true]) {
   testWidgets('成績なしでも投手とホームランを表示する（スタメン=$announced）', (tester) async {
     await tester.pumpWidget(MaterialApp(home: Scaffold(body: GamesBoardYahooStyle(

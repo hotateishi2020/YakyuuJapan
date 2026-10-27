@@ -28,7 +28,7 @@ void main() {
         'lineup': [for (var order = 1; order <= 9; order++) {
           'id_team': 1, 'order': order, 'players': [
             {'name': '先発$order', 'plays': order == 1
-              ? '左安|single/inning1/bases5/event${Uri.encodeComponent('投手:新投手')}/event${Uri.encodeComponent('暴投')}/event${Uri.encodeComponent('盗塁:走 者')}/event${Uri.encodeComponent('代走:川村')}/event${Uri.encodeComponent('代守:守備(中→左)')}/event${Uri.encodeComponent('守備位置転換:守備(左→中)')}/event${Uri.encodeComponent('守備位置転換:近藤(右→左)')}/event${Uri.encodeComponent('代打:代打選手')} 中安|single/inning1/bases2 右安|single/inning3/bases0'
+              ? '左安|single/inning1/bases5/event${Uri.encodeComponent('投手:新投手')}/event${Uri.encodeComponent('暴投')}/event${Uri.encodeComponent('盗塁:三森 大貴')}/event${Uri.encodeComponent('代走:川村')}/event${Uri.encodeComponent('代守:守備(中→左)')}/event${Uri.encodeComponent('守備位置転換:守備(左→中)')}/event${Uri.encodeComponent('守備位置転換:近藤(右→左)')}/event${Uri.encodeComponent('代打:代打選手')} 中安|single/inning1/bases2 右安|single/inning3/bases0'
               : order == 2
                 ? '遊飛|out/inning1 遊飛|out/inning1 遊飛|out/inning3 遊飛|out/inning4 遊飛|out/inning5'
                 : '三振|out/inning1'},
@@ -86,7 +86,7 @@ void main() {
     expect(tester.getTopLeft(runnerFooter).dy, greaterThanOrEqualTo(tester.getBottomLeft(chip).dy));
     for (final expected in [
       ('投手', '新投手', const Color(0xFFFF4B7D)),
-      ('盗塁', '盗塁：走者', const Color(0xFFC6FF00)),
+      ('盗塁', '盗：三森', const Color(0xFFC6FF00)),
       ('代走', '走：川村', const Color(0xFF5C6BC0)),
       ('代守', '守備(左)', const Color(0xFF5C6BC0)),
       ('守備位置転換', '近藤(右→左)', const Color(0xFF5C6BC0)),

@@ -46,11 +46,14 @@ class ReplayFrame {
   final bool bottom, after;
   final int? homeScore, awayScore;
   final String batter, nextBatter, label;
+  final String battingHand, pitchingHand;
   final Map<String, String> defense;
   final String result, direction;
   final int beforeBases, runsScored;
   const ReplayFrame(
-      {this.result = '',
+      {this.battingHand = '',
+      this.pitchingHand = '',
+      this.result = '',
       this.direction = '',
       this.beforeBases = -1,
       this.runsScored = 0,
@@ -132,6 +135,8 @@ List<ReplayFrame> buildGameReplay(
             int? h,
             int? a}) =>
         ReplayFrame(
+            battingHand: replayHand(row['batting_hand']),
+            pitchingHand: replayHand(row['pitching_hand']),
             result: code,
             direction: _s(row['code_direction_batting']),
             beforeBases: bases(row),
@@ -201,4 +206,22 @@ List<ReplayFrame> buildGameReplay(
                 : null));
   }
   return frames;
+}
+
+String replayHand(dynamic value) => switch ('$value'.trim().toUpperCase()) {
+      '0' || 'R' || 'RIGHT' || '右' => '右',
+      '1' || 'L' || 'LEFT' || '左' => '左',
+      '2' || 'S' || 'B' || 'SWITCH' || '両' => '両',
+      _ => '',
+    };
+
+String replayBattingSide(ReplayFrame frame) {
+  final hand = replayHand(frame.battingHand);
+  if (hand != '両') return hand;
+  // 両打ちは相手投手の投げ腕の逆側を模式表示する。
+  return switch (replayHand(frame.pitchingHand)) {
+    '右' => '左',
+    '左' => '右',
+    _ => '',
+  };
 }

@@ -1,3 +1,4 @@
+import '../logic/batting_result_colors.dart';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../logic/game_replay.dart';
@@ -10,6 +11,11 @@ const _bases = [
   Offset(.3, .66),
   Offset(.5, .86)
 ];
+Offset replayBatterBox(ReplayFrame frame) => switch (replayBattingSide(frame)) {
+      '右' => const Offset(.45, .86),
+      '左' => const Offset(.55, .86),
+      _ => const Offset(.5, .89),
+    };
 const _mound = Offset(.5, .645);
 const _positions = {
   '投': _mound,
@@ -24,8 +30,18 @@ const _positions = {
 };
 
 class ReplayField extends StatefulWidget {
-  const ReplayField({super.key, required this.frame});
+  const ReplayField(
+      {super.key,
+      required this.frame,
+      this.homeBackground = Colors.blue,
+      this.awayBackground = Colors.red,
+      this.homeForeground,
+      this.awayForeground,
+      this.scoreboard});
+  final Color homeBackground, awayBackground;
+  final Color? homeForeground, awayForeground;
   final ReplayFrame frame;
+  final Widget? scoreboard;
   @override
   State<ReplayField> createState() => _ReplayFieldState();
 }
@@ -33,7 +49,7 @@ class ReplayField extends StatefulWidget {
 class _ReplayFieldState extends State<ReplayField>
     with SingleTickerProviderStateMixin {
   late final AnimationController motion = AnimationController(
-      vsync: this, duration: const Duration(milliseconds: 3400));
+      vsync: this, duration: const Duration(milliseconds: 6400));
   @override
   void initState() {
     super.initState();
@@ -55,15 +71,16 @@ class _ReplayFieldState extends State<ReplayField>
     super.dispose();
   }
 
-  Widget tag(String text, Color bg, {Key? key}) => Container(
-      key: key,
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-      decoration:
-          BoxDecoration(color: bg, borderRadius: BorderRadius.circular(4)),
-      child: Text(text,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 11, color: Colors.black)));
+  Widget tag(String text, Color bg, {Key? key, Color fg = Colors.black}) =>
+      Container(
+          key: key,
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+          decoration:
+              BoxDecoration(color: bg, borderRadius: BorderRadius.circular(4)),
+          child: Text(text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 11, color: fg)));
   @override
   Widget build(BuildContext context) => AspectRatio(
       aspectRatio: 1.45,
@@ -73,8 +90,51 @@ class _ReplayFieldState extends State<ReplayField>
               child: AnimatedBuilder(
                   animation: motion,
                   builder: (context, _) {
-                    final f = widget.frame, t = motion.value;
+                    final f = widget.frame;
+                    final elapsed = motion.value * 6.4;
+                    final lead = replayLeadSeconds(f);
+                    final t = replayMotionProgress(f, elapsed);
+                    final blinking = f.after && elapsed < lead;
+                    final motionEnd = lead + replayMotionSeconds(f);
+                    final change =
+                        f.after && f.outs == 3 && elapsed >= motionEnd;
+                    final showResult =
+                        f.after && elapsed >= replayResultSeconds(f);
+                    final offense = f.bottom
+                        ? widget.homeBackground
+                        : widget.awayBackground;
+                    final defense = f.bottom
+                        ? widget.awayBackground
+                        : widget.homeBackground;
+                    Color ink(Color bg, Color? configured) =>
+                        configured ??
+                        (bg.computeLuminance() > .45
+                            ? Colors.black
+                            : Colors.white);
+                    final offenseInk = ink(
+                        offense,
+                        f.bottom
+                            ? widget.homeForeground
+                            : widget.awayForeground);
+                    final defenseInk = ink(
+                        defense,
+                        f.bottom
+                            ? widget.awayForeground
+                            : widget.homeForeground);
+                    final title = replayResultTitle(f);
+                    final kind = replayResultKind(f);
+                    final resultColor = change
+                        ? Colors.blueGrey
+                        : battingResultColor(kind, title);
+                    final resultInk =
+                        change ? Colors.white : battingResultInk(kind, title);
                     final travels = replayRunnerTravel(f);
+                    final call = replayCatchCall(f);
+                    final callPoint = call == null
+                        ? null
+                        : call.base != null
+                            ? _bases[call.base!]
+                            : _positions[call.position];
                     final occupancy =
                         f.after && t < 1 ? f.beforeBases : f.bases;
                     return Stack(children: [
@@ -92,8 +152,8 @@ class _ReplayFieldState extends State<ReplayField>
                             width: 88,
                             height: 22,
                             child: Center(
-                                child:
-                                    tag('${e.key} ${e.value}', Colors.white))),
+                                child: tag('${e.key} ${e.value}', defense,
+                                    fg: defenseInk))),
                       for (var b = 1; b <= 3; b++)
                         Positioned(
                             left: _bases[b].dx * c.maxWidth - 18,
@@ -105,7 +165,7 @@ class _ReplayFieldState extends State<ReplayField>
                                             !(f.after &&
                                                 t < 1 &&
                                                 travels.any((r) => r.from == b))
-                                        ? '走者'
+                                        ? '$b塁'
                                         : '$b塁',
                                 occupancy >= 0 &&
                                         occupancy & (1 << (b - 1)) != 0
@@ -117,58 +177,180 @@ class _ReplayFieldState extends State<ReplayField>
                           width: c.maxWidth * .32,
                           child: tag(
                               '次 ${f.nextBatter.isEmpty ? '—' : f.nextBatter}',
-                              Colors.lightBlue.shade100,
+                              offense,
+                              fg: offenseInk,
                               key: const Key('replay-next'))),
                       Positioned(
-                          left: c.maxWidth * .54,
-                          top: c.maxHeight * .84,
-                          width: c.maxWidth * .42,
-                          child: tag('打 ${f.batter.isEmpty ? '—' : f.batter}',
-                              Colors.amber,
-                              key: const Key('replay-batter'))),
-                      Positioned(right:6,bottom:4,child:Semantics(
-                        label:f.outs<0?'アウト数未記録':'${f.outs}アウト',
-                        child:Container(key:const Key('replay-outs'),
-                          padding:const EdgeInsets.symmetric(horizontal:5,vertical:2),
-                          decoration:BoxDecoration(color:Colors.black54,borderRadius:BorderRadius.circular(4)),
-                          child:Text(f.outs<0?'OUT —':'OUT ${List.filled(f.outs.clamp(0,3),'🔴').join()}',
-                            style:const TextStyle(color:Colors.white,fontSize:12))))),
+                          left: c.maxWidth * .04,
+                          bottom: 28,
+                          width: c.maxWidth * .32,
+                          child: Opacity(
+                              opacity: blinking && (elapsed * 4).floor().isOdd
+                                  ? .15
+                                  : 1,
+                              child: tag(
+                                  '打 ${f.batter.isEmpty ? '—' : f.batter}',
+                                  offense,
+                                  fg: offenseInk,
+                                  key: const Key('replay-batter')))),
+                      Positioned(
+                          left: c.maxWidth * .04,
+                          bottom: 52,
+                          child: Semantics(
+                              label: f.outs < 0 ? 'アウト数未記録' : '${f.outs}アウト',
+                              child: Container(
+                                  key: const Key('replay-outs'),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 5, vertical: 2),
+                                  decoration: BoxDecoration(
+                                      color: Colors.black54,
+                                      borderRadius: BorderRadius.circular(4)),
+                                  child: Text(
+                                      f.outs < 0
+                                          ? 'OUT —'
+                                          : 'OUT ${List.filled(f.outs.clamp(0, 3), '🔴').join()}',
+                                      style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold))))),
                       // Ball and runners are painted over all field labels.
                       Positioned.fill(
                           child: IgnorePointer(
                               child: CustomPaint(
-                                  painter: _MotionPainter(f, t, travels)))),
-                      if (f.after)
+                                  painter: _MotionPainter(f, t, travels,
+                                      teamColor: offense,
+                                      pitching: !blinking,
+                                      batterOpacity: blinking &&
+                                              (elapsed * 4).floor().isOdd
+                                          ? .15
+                                          : 1)))),
+                      if (widget.scoreboard != null)
+                        Positioned(
+                            right: 4,
+                            bottom: 4,
+                            width: math.min(400, c.maxWidth * .38),
+                            height: math.min(160, c.maxHeight * .27),
+                            child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.bottomRight,
+                                child: SizedBox(
+                                    key: const Key('replay-field-scoreboard'),
+                                    width: 400,
+                                    child: widget.scoreboard))),
+                      if (showResult)
                         Positioned(
                             left: 8,
                             right: 8,
-                            top: c.maxHeight * .23,
+                            top: c.maxHeight * .22,
                             child: IgnorePointer(
                                 child: Opacity(
-                                    opacity: (t * 4).clamp(0, 1),
+                                    opacity: 1,
                                     child: Center(
                                         child: Container(
                                             key: const Key('replay-result'),
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 12, vertical: 5),
                                             decoration: BoxDecoration(
-                                                color: Colors.black
-                                                    .withValues(alpha: .72),
+                                                color: resultColor,
+                                                border: Border.all(
+                                                    color: Colors.white,
+                                                    width: 3),
                                                 borderRadius:
                                                     BorderRadius.circular(8)),
-                                            child: Text(replayResultTitle(f),
+                                            child: Text(
+                                                change
+                                                    ? 'チェンジ！'
+                                                    : replayResultTitle(f),
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
-                                                    color: Colors.white,
+                                                    color: resultInk,
                                                     fontWeight: FontWeight.w900,
                                                     fontSize: c.maxWidth < 450
-                                                        ? 25
-                                                        : 36,
+                                                        ? 36
+                                                        : 56,
                                                     shadows: const [
                                                       Shadow(
-                                                          color: Colors.red,
+                                                          color: Colors.black26,
                                                           blurRadius: 5)
                                                     ]))))))),
+                      if (call != null &&
+                          callPoint != null &&
+                          t >= call.at &&
+                          !blinking)
+                        Positioned(
+                            left: (callPoint.dx * c.maxWidth - 42)
+                                .clamp(0, c.maxWidth - 84),
+                            top: (callPoint.dy * c.maxHeight - 40)
+                                .clamp(0, c.maxHeight - 30),
+                            width: 84,
+                            child: IgnorePointer(
+                                child: Container(
+                                    key: const Key('replay-catch-call'),
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 4),
+                                    decoration: BoxDecoration(
+                                        color: call.safe
+                                            ? Colors.green.shade700
+                                            : Colors.red.shade700,
+                                        border: Border.all(color: Colors.white, width: 2),
+                                        borderRadius: BorderRadius.circular(6),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                              color: Colors.black54,
+                                              blurRadius: 4)
+                                        ]),
+                                    child: Text(call.safe ? 'セーフ' : 'アウト',
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w900))))),
+                      if (f.after && f.runsScored > 0 && elapsed >= motionEnd)
+                        Positioned.fill(
+                            child: IgnorePointer(
+                                child: Container(
+                          key: const Key('replay-score-effect'),
+                          color: Colors.black.withValues(alpha: .55),
+                          alignment: Alignment.center,
+                          child: Transform.scale(
+                            scale: 1 +
+                                .12 *
+                                    (1 -
+                                        ((elapsed - motionEnd) / .35)
+                                            .clamp(0.0, 1.0)),
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text('${f.runsScored}点！',
+                                          style: const TextStyle(
+                                              fontSize: 42,
+                                              fontWeight: FontWeight.w900,
+                                              color: Colors.amber)),
+                                      Text(
+                                          '${f.awayScore ?? '—'} - ${f.homeScore ?? '—'}',
+                                          style: const TextStyle(
+                                              fontSize: 96,
+                                              fontWeight: FontWeight.w900,
+                                              color: Colors.white,
+                                              shadows: [
+                                                Shadow(
+                                                    color: Colors.amber,
+                                                    blurRadius: 20)
+                                              ])),
+                                      Text(
+                                          '${f.inning}回${f.bottom ? '裏' : '表'}',
+                                          style: const TextStyle(
+                                              fontSize: 24,
+                                              color: Colors.white)),
+                                    ],
+                                  )),
+                            ),
+                          ),
+                        ))),
                     ]);
                   }))));
 }
@@ -184,6 +366,28 @@ class _FieldPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     canvas.drawRect(
         Offset.zero & size, Paint()..color = const Color(0xFF25733D));
+    final fence = Path()
+      ..moveTo(size.width * .05, size.height * .18)
+      ..quadraticBezierTo(size.width * .5, -size.height * .05, size.width * .95,
+          size.height * .18);
+    canvas.drawPath(
+        fence,
+        Paint()
+          ..color = Colors.lightBlue.shade100
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 4);
+    // Extend the exact home-to-base vectors so the infield and outfield
+    // portions remain collinear at every viewport aspect ratio.
+    final home = _pixel(_bases[0], size);
+    for (final base in [_bases[1], _bases[3]]) {
+      final throughBase = _pixel(base, size);
+      canvas.drawLine(
+          home,
+          home + (throughBase - home) * 4,
+          Paint()
+            ..color = Colors.white
+            ..strokeWidth = 2);
+    }
     final path = Path()..moveTo(size.width * .5, size.height * .86);
     for (final p in _bases.skip(1)) {
       path.lineTo(p.dx * size.width, p.dy * size.height);
@@ -195,6 +399,17 @@ class _FieldPainter extends CustomPainter {
           ..color = Colors.white
           ..style = PaintingStyle.stroke
           ..strokeWidth = 2);
+    for (final x in [.45, .55]) {
+      canvas.drawRect(
+          Rect.fromCenter(
+              center: Offset(size.width * x, size.height * .84),
+              width: size.width * .06,
+              height: size.height * .10),
+          Paint()
+            ..color = Colors.white70
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1);
+    }
   }
 
   @override
@@ -202,7 +417,13 @@ class _FieldPainter extends CustomPainter {
 }
 
 class _MotionPainter extends CustomPainter {
-  _MotionPainter(this.f, this.t, this.travels);
+  _MotionPainter(this.f, this.t, this.travels,
+      {this.pitching = true,
+      this.batterOpacity = 1,
+      this.teamColor = Colors.amber});
+  final double batterOpacity;
+  final Color teamColor;
+  final bool pitching;
   final ReplayFrame f;
   final double t;
   final List<RunnerTravel> travels;
@@ -210,6 +431,26 @@ class _MotionPainter extends CustomPainter {
       _positions[replayPosition(f.direction)] ?? const Offset(.5, .24);
   @override
   void paint(Canvas canvas, Size size) {
+    final occupancy = f.after && t < 1 ? f.beforeBases : f.bases;
+    for (var b = 1; b <= 3; b++) {
+      if (occupancy >= 0 &&
+          occupancy & (1 << (b - 1)) != 0 &&
+          !(f.after && t < 1 && travels.any((r) => r.from == b))) {
+        _person(canvas, _pixel(_bases[b], size), 0, false, teamColor);
+      }
+    }
+    final batterDestination = replayBatterDestination(f);
+    final battingEvent =
+        !replayChanges.contains(f.result) && !replayRunning.contains(f.result);
+    final runningBatter =
+        f.after && batterDestination != null && t >= replayBatterRunStart;
+    if (battingEvent && !runningBatter) {
+      _person(canvas, _pixel(replayBatterBox(f), size), 0, false,
+          teamColor.withValues(alpha: batterOpacity),
+          mirror: replayBattingSide(f) == '左',
+          batSwing:
+              f.after && replayBatterSwings(f) ? replaySwingProgress(t) : 0);
+    }
     if (!f.after) return;
     final code = f.result;
     final change = replayChanges.contains(code);
@@ -231,7 +472,7 @@ class _MotionPainter extends CustomPainter {
         code == 'ERROR_FIELDING';
     Offset ball = _mound;
     String phase = '投球';
-    if (!change) {
+    if (!change && pitching) {
       if (running) {
         phase = code == 'ERROR_RUNNING'
             ? '送球エラー'
@@ -241,11 +482,60 @@ class _MotionPainter extends CustomPainter {
                     ? '暴投'
                     : '送球';
         final end = code == 'STEAL_BASE_SAFE' || code == 'STEAL_BASE_OUT'
-            ? _bases[2]
+            ? _bases[replayCatchCall(f)?.base ?? 2]
             : const Offset(.8, .9);
         ball = Offset.lerp(_bases[0], end, t)!;
-      } else if (t < .22) {
-        ball = Offset.lerp(_mound, _bases[0], t / .22)!;
+      } else if (t < replayPitchArrival) {
+        ball = Offset.lerp(
+            _mound,
+            replayResultAtCatch(f) ? _positions['捕']! : _bases[0],
+            t / replayPitchArrival)!;
+      } else if (code == 'HIT2' || code == 'HIT3') {
+        final left = replayPosition(f.direction) != '右';
+        final fence = Offset(left ? .10 : .90, .156);
+        final pickup = Offset(left ? .17 : .83, .20);
+        final corner = Offset(left ? .02 : .98, .14);
+        if (code == 'HIT2') {
+          if (t < .55) {
+            final q = ((t - .22) / .33).clamp(0.0, 1.0);
+            ball = Offset.lerp(_bases[0], fence, q)! -
+                Offset(0, math.sin(q * math.pi) * .08);
+            phase = '打球';
+          } else if (t < .72) {
+            final q = (t - .55) / .17;
+            ball = Offset.lerp(fence, pickup, q)! -
+                Offset(0, math.sin(q * math.pi) * .06);
+            phase = '打球';
+          } else {
+            ball =
+                Offset.lerp(pickup, _bases[2], ((t - .72) / .28).clamp(0, 1))!;
+            phase = '捕球 → 送球';
+          }
+        } else {
+          final fair = Offset(left ? .21 : .79, .31);
+          if (t < .50) {
+            final q = ((t - .22) / .28).clamp(0.0, 1.0);
+            ball = Offset.lerp(_bases[0], fair, q)! -
+                Offset(0, math.sin(q * math.pi) * .12);
+            phase = '打球';
+          } else if (t < .78) {
+            final q = (t - .50) / .28;
+            ball = Offset.lerp(fair, corner, q)! -
+                Offset(0, math.sin(q * math.pi * 4).abs() * .04 * (1 - q));
+            phase = '打球';
+          } else {
+            ball =
+                Offset.lerp(corner, _bases[3], ((t - .78) / .22).clamp(0, 1))!;
+            phase = '捕球 → 送球';
+          }
+        }
+        if (t > .5 && t < .92) {
+          final destination = code == 'HIT2' ? pickup : corner;
+          final fielder =
+              Offset.lerp(target(), destination, ((t - .5) / .22).clamp(0, 1))!;
+          _person(canvas, _pixel(fielder, size), t * 35, true,
+              Colors.lightBlueAccent);
+        }
       } else if (contact) {
         var end = target();
         if (homer) end = Offset(end.dx, .02);
@@ -253,7 +543,11 @@ class _MotionPainter extends CustomPainter {
         ball = Offset.lerp(_bases[0], end, progress)!;
         if (fly) ball -= Offset(0, math.sin(progress * math.pi) * .24);
         if (ground) {
-          ball -= Offset(0, math.sin(progress * math.pi * 5).abs() * .018);
+          ball -= Offset(
+              0,
+              math.sin(progress * math.pi * 5).abs() *
+                  .065 *
+                  (1 - progress * .55));
         }
         phase = '打球';
         if (t > .65 && !fly && code != 'OUT_LINE_DRIVE') {
@@ -264,10 +558,14 @@ class _MotionPainter extends CustomPainter {
           ball = Offset.lerp(end, endThrow, ((t - .65) / .30).clamp(0, 1))!;
         }
       } else {
-        ball = _bases[0];
+        ball = replayResultAtCatch(f) ? _positions['捕']! : _bases[0];
       }
       if (t < 1) {
         final p = _pixel(ball, size);
+        canvas.drawOval(
+            Rect.fromCenter(
+                center: p + const Offset(0, 8), width: 13, height: 4),
+            Paint()..color = Colors.black38);
         canvas.drawCircle(p, 5, Paint()..color = Colors.white);
         canvas.drawCircle(
             p,
@@ -289,24 +587,84 @@ class _MotionPainter extends CustomPainter {
       }
     }
     if (t < 1) {
-      for (final r in travels) {
-        final progress = ((t - .22) / .78).clamp(0.0, 1.0) * (r.to - r.from);
+      final runnerPaths = [
+        ...travels.where((r) => r.from != 0),
+        if (batterDestination != null && runningBatter)
+          RunnerTravel(0, batterDestination)
+      ];
+      for (final r in runnerPaths) {
+        final start = r.from == 0 ? replayBatterRunStart : .22;
+        final progress =
+            ((t - start) / (1 - start)).clamp(0.0, 1.0) * (r.to - r.from);
         final base = (r.from + progress.floor()).clamp(0, 3);
-        final p = Offset.lerp(
-            _bases[base], _bases[base + 1], progress - progress.floor())!;
-        canvas.drawCircle(
-            _pixel(p, size), 7, Paint()..color = Colors.orangeAccent);
-        canvas.drawCircle(
-            _pixel(p, size),
-            7,
-            Paint()
-              ..color = Colors.white
-              ..strokeWidth = 2
-              ..style = PaintingStyle.stroke);
+        final p = Offset.lerp(base == 0 ? replayBatterBox(f) : _bases[base],
+            _bases[base + 1], progress - progress.floor())!;
+        _person(canvas, _pixel(p, size), t * 45, t > .22, teamColor);
       }
     }
   }
 
+  void _person(
+      Canvas canvas, Offset foot, double phase, bool running, Color color,
+      {double? batSwing, bool mirror = false}) {
+    canvas.save();
+    canvas.translate(foot.dx, foot.dy);
+    if (mirror) canvas.scale(-1, 1);
+    final swing = running ? math.sin(phase) * 6 : 0.0;
+    final limb = Paint()
+      ..color = color
+      ..strokeWidth = 3.5
+      ..strokeCap = StrokeCap.round;
+    canvas.drawOval(
+        const Rect.fromLTWH(-7, -1, 14, 4), Paint()..color = Colors.black26);
+    canvas.drawLine(const Offset(0, -13), Offset(-4 + swing, 0), limb);
+    canvas.drawLine(const Offset(0, -13), Offset(4 - swing, 0), limb);
+    canvas.drawLine(
+        const Offset(0, -23), const Offset(0, -12), limb..strokeWidth = 6);
+    if (batSwing != null) {
+      final angle = 1.5 - batSwing * 3.7;
+      final hands = Offset(5 + math.sin(batSwing * math.pi) * 4, -22);
+      canvas.drawLine(const Offset(0, -22), hands, limb..strokeWidth = 3);
+      canvas.drawLine(const Offset(0, -18), hands, limb);
+      final tip = hands + Offset(math.cos(angle) * 27, math.sin(angle) * 27);
+      canvas.drawLine(
+          hands,
+          tip,
+          Paint()
+            ..color = const Color(0xFFE9BD7C).withValues(alpha: color.a)
+            ..strokeWidth = 4
+            ..strokeCap = StrokeCap.round);
+      if (batSwing > 0 && batSwing < 1) {
+        canvas.drawArc(
+            Rect.fromCircle(center: hands, radius: 24),
+            angle + .5,
+            -.5,
+            false,
+            Paint()
+              ..color = Colors.white38
+              ..strokeWidth = 2
+              ..style = PaintingStyle.stroke);
+      }
+    } else {
+      canvas.drawLine(
+          const Offset(0, -21), Offset(-6 - swing, -13), limb..strokeWidth = 3);
+      canvas.drawLine(const Offset(0, -21), Offset(6 + swing, -16), limb);
+    }
+    canvas.drawCircle(const Offset(0, -30), 5, Paint()..color = Colors.white);
+    final helmet = Paint()..color = color;
+    canvas.drawArc(
+        const Rect.fromLTWH(-6, -37, 12, 12), math.pi, math.pi, true, helmet);
+    canvas.drawLine(
+        const Offset(-6, -31), const Offset(9, -31), helmet..strokeWidth = 3);
+    canvas.drawCircle(const Offset(-3, -28), 2, helmet);
+    canvas.restore();
+  }
+
   @override
-  bool shouldRepaint(_MotionPainter old) => old.t != t || old.f != f;
+  bool shouldRepaint(_MotionPainter old) =>
+      old.t != t ||
+      old.f != f ||
+      old.pitching != pitching ||
+      old.batterOpacity != batterOpacity ||
+      old.teamColor != teamColor;
 }

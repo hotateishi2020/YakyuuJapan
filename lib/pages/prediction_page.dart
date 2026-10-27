@@ -265,17 +265,28 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       unawaited(AuthSession.instance.reportTimeout(e, st));
     }
     if (!mounted) return;
+    // Auth restoration can invalidate an in-flight anonymous games response.
+    // Recover after initial loading, even if the early auth callback could not
+    // start the watcher because the games part was not ready yet.
+    if (_gamesCacheAccess[_orgKind] != AuthSession.instance.showDetailedGames ||
+        !_partLoadedForYear(_orgKind, _LoadPart.games)) {
+      await _reloadGamesAfterAuth();
+    }
+    await _startGamesWatch();
+    if (!mounted) return;
     if (AuthSession.instance.isLoggedIn) unawaited(_fetchPredictInvites());
     if (_boardContentReady) {
       unawaited(AuthSession.instance.reportAction('初期表示を読み込んだ'));
     }
   }
 
-  bool _predictionWasLoggedIn = AuthSession.instance.isLoggedIn;
+  (int?, String?) _predictionIdentity = (
+    AuthSession.instance.user?.id, AuthSession.instance.token,
+  );
   void _onPredictionAuthChanged() {
-    final loggedIn = AuthSession.instance.isLoggedIn;
-    if (_predictionWasLoggedIn == loggedIn) return;
-    _predictionWasLoggedIn = loggedIn;
+    final identity = (AuthSession.instance.user?.id, AuthSession.instance.token);
+    if (_predictionIdentity == identity) return;
+    _predictionIdentity = identity;
     // Auth restoration and expiry can happen outside the account menu.
     scheduleMicrotask(() { if (mounted) _onAuthChanged(); });
   }
@@ -289,6 +300,9 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     unawaited(_pollDisplayedGames());
     if (AuthSession.instance.isLoggedIn) {
       setState(() => _authEntryReady = true);
+      // The anonymous request may still be in flight, or its public result may
+      // already be cached. Force an authenticated read independently of polling.
+      unawaited(_reloadGamesAfterAuth());
       for (final part in [_LoadPart.standings, _LoadPart.players]) {
         unawaited(_fetchPart(_orgKind, part, _seasonYear, background: true, force: true));
       }
@@ -310,6 +324,21 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       _predictGroupsError = null;
     });
     unawaited(_holdLoginUntilBoardReady());
+  }
+
+  Future<void> _reloadGamesAfterAuth() async {
+    final kind = _orgKind;
+    final year = _seasonYear;
+    final token = AuthSession.instance.token;
+    await _renewHomeLiveDetails();
+    await _fetchPart(kind, _LoadPart.games, year, background: true, force: true);
+    if (!mounted || kind != _orgKind || year != _seasonYear ||
+        token != AuthSession.instance.token) {
+      return;
+    }
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return;
+    await _startGamesWatch();
   }
 
   Future<void> _holdLoginUntilBoardReady() async {
@@ -1025,12 +1054,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       (WidgetsBinding.instance.lifecycleState == null ||
        WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed);
 
-  bool get _viewingLiveDetails => _canRequestHomeDetails &&
-      [...games, ...postseasonGames].any((game) {
-        final state = '${game['state'] ?? ''}';
-        return !state.contains('終了') && (state.contains('試合中') || RegExp(r'\d+\s*回').hasMatch(state));
-      });
-
   DateTime? _lastGamesPoll;
   DateTime? _lastLiveHeartbeat;
   String? _liveHeartbeatOrg;
@@ -1063,21 +1086,20 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     // 一部パート失敗の error があっても、取れたデータがあれば監視は続ける。
     // 再取得は登録済みの集計テーブルを読むだけで、スクレイピングは呼ばない。
     // t_game の更新日時が前回と同じときはサーバが集計SQLを出さない。
-    if (error != null && !_boardContentReady) return;
     unawaited(_notifyGamesDisplayReady());
     _gamesPollTimer?.cancel();
     unawaited(_renewHomeLiveDetails());
     _gamesPollTimer = Timer.periodic(const Duration(seconds: 10), (_) {
       // Renew independently: a slow games response must not expire live collection.
       unawaited(_renewHomeLiveDetails());
-      final frequent = _viewingLiveDetails;
+      final frequent = _canRequestHomeDetails;
       if (frequent || _lastGamesPoll == null || DateTime.now().difference(_lastGamesPoll!) >= const Duration(minutes: 1)) {
         unawaited(_pollDisplayedGames());
       }
     });
   }
 
-  bool get _canWatchGames => AuthSession.instance.showDetailedGames && mounted && _initialGamesDisplayComplete && _partLoadedForYear(_orgKind, _LoadPart.games) && !_orgLoadFutures.containsKey(_orgKind) && _seasonYear == DateTime.now().year;
+  bool get _canWatchGames => AuthSession.instance.showDetailedGames && mounted && _initialGamesDisplayComplete && _seasonYear == DateTime.now().year;
 
   Map<String, String> get _readHeaders {
     final token = AuthSession.instance.token;
@@ -1127,7 +1149,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
         isLoading = false;
       });
     }
-    if (error != null && !_boardContentReady) return;
+    // 失敗時も定期取得を開始し、次の更新で復旧できるようにする。
     // 応答の受信だけでなく、読み込んだ内容の描画を待って定期取得を許可する。
     await WidgetsBinding.instance.endOfFrame;
     if (!mounted || kind != _orgKind || year != _seasonYear) return;

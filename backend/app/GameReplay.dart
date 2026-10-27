@@ -9,7 +9,8 @@ Future<List<Map<String, dynamic>>> readGameReplay(
       d.int_score_home,d.int_score_away,d.code_result,d.int_runs,d.cnt_homerun,
       d.code_direction_batting,d.code_state_score,d.flg_goodbye,
       d.code_position_from,d.code_position_to,
-      b.name_full,p.name_full AS name_pitcher,
+      b.name_full,b.batting AS batting_hand,
+      p.name_full AS name_pitcher,p.pitching AS pitching_hand,
       en.name_full AS name_enter,ex.name_full AS name_exit,
       en.name_last AS name_enter_last,ex.name_last AS name_exit_last,
       en.name_full AS name_runner

@@ -37,6 +37,17 @@ void main() {
     }
     expect(filterGameBroadcasts([{'kind':'tv','name':'RKB毎日放送'}],'佐賀県'), hasLength(1));
   });
+  test('10月27日のSBC地上波は長野に表示し他県には表示しない', () {
+    final data=jsonDecode(File('data/game-broadcasts.json').readAsStringSync()) as List;
+    final entry=data.firstWhere((e)=>e['date']=='2026-10-27');
+    final rows=(entry['broadcasts'] as List).map((r)=>Map<String,dynamic>.from(r)).toList();
+    final nagano=filterGameBroadcasts(rows,'長野県');
+    expect(nagano.where((r)=>r['kind']=='tv'&&r['name']=='SBC信越放送'),hasLength(1));
+    for(final area in ['佐賀県','東京都','']) {
+      expect(filterGameBroadcasts(rows,area).any((r)=>r['name']=='SBC信越放送'),isFalse);
+    }
+    expect(nagano.firstWhere((r)=>r['name']=='SBC信越放送')['stream_url'],isNull);
+  });
   test('exact event URL only', () {
     expect(isGameStreamUrl('https://tver.jp/'), isFalse);
     expect(isGameStreamUrl('https://tver.jp/live/special/lepw20my0j'), isTrue);

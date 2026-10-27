@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
@@ -15,22 +16,23 @@ class GameBroadcastLogos extends StatefulWidget {
 }
 class _GameBroadcastLogosState extends State<GameBroadcastLogos> {
   static final _cache = <String, ({DateTime at, Future<List<Map<String,dynamic>>> rows})>{};
+  Timer? _refreshTimer;
   String? _key;
   Future<List<Map<String,dynamic>>>? _rows;
   @override
-  void initState() { super.initState(); AuthSession.instance.addListener(_changed); _load(); }
+  void initState() { super.initState(); AuthSession.instance.addListener(_changed); _load(); _refreshTimer=Timer.periodic(const Duration(minutes:5), (_) {if(mounted)setState(()=>_load(force:true));}); }
   @override
-  void dispose() { AuthSession.instance.removeListener(_changed); super.dispose(); }
+  void dispose() { _refreshTimer?.cancel(); AuthSession.instance.removeListener(_changed); super.dispose(); }
   @override
   void didUpdateWidget(covariant GameBroadcastLogos oldWidget) { super.didUpdateWidget(oldWidget); _load(); }
   void _changed() { if (mounted) setState(_load); }
-  void _load() {
+  void _load({bool force=false}) {
     final game = widget.game;
     final query = {'date':'${game['date_game'] ?? ''}'.split(RegExp('[ T]')).first,
       'home':'${game['name_team_home'] ?? ''}', 'away':'${game['name_team_away'] ?? ''}',
       'prefecture':AuthSession.instance.user?.residencePrefecture ?? ''};
     final uri = Env.api('/game-broadcasts').replace(queryParameters: query);
-    if (_key == uri.toString()) return;
+    if (!force && _key == uri.toString()) return;
     _key = uri.toString();
     final old = _cache[_key];
     if (old != null && DateTime.now().difference(old.at).inMinutes < 30) { _rows = old.rows; return; }

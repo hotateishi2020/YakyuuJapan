@@ -1,3 +1,5 @@
+import '../logic/mlb_event_name.dart';
+import '../logic/batting_result_colors.dart';
 import '../widgets/game_replay_dialog.dart';
 import '../logic/game_story.dart';
 import '../logic/game_visibility.dart';
@@ -2839,7 +2841,7 @@ class _TableGameCard extends StatelessWidget {
     required int colorIndex,
     required bool colon,
   }) {
-    final compact = _compactPlayerName(name);
+    final compact = _isMlbGame ? mlbEventSurname(name, playerStats) : _compactPlayerName(name);
     final text = colon ? '$role：$compact' : '$role $compact';
     final bg = _pinchMarkColor(colorIndex);
     return Padding(
@@ -3223,7 +3225,17 @@ class _TableGameCard extends StatelessWidget {
     if (_text('state').contains('回') || _text('state').contains('試合中')) {
       if (pitcher) {
         final current = _text(home ? 'name_current_pitcher_home' : 'name_current_pitcher_away');
-        if (current.isNotEmpty) add(current, '', '投球中');
+        if (current.isNotEmpty) {
+          // The live battery uses surnames (東), whereas the starter/box score
+          // uses full names (東 克樹). Resolve only a unique listed pitcher.
+          final matches = result.where((player) {
+            final full = player.name.trim();
+            final surname = full.split(RegExp(r'[\s\u3000]+')).first;
+            return samePlayerStatName(full, current) ||
+                _compactPlayerName(surname) == _compactPlayerName(current);
+          }).toList();
+          add(matches.length == 1 ? matches.single.name : current, '', '投球中');
+        }
       } else {
         final homers = _text(home ? 'name_homerun_home' : 'name_homerun_away');
         if (homers.isNotEmpty && AuthSession.instance.showSpecialMedia) add(homers, '', 'HR');
@@ -4147,7 +4159,19 @@ class _TableGameCard extends StatelessWidget {
     final events = <String>[];
     for (final flag in _playFlags(play)) {
       if (!flag.startsWith('event')) continue;
-      try { events.add(Uri.decodeComponent(flag.substring(5)).replaceAll(RegExp(r'[\s\u3000]+'), '')); }
+      try {
+        final event = Uri.decodeComponent(flag.substring(5));
+        final steal = event.startsWith('盗塁:') || event.startsWith('盗塁失敗:');
+        final names = [...playerStats,
+          for (final row in rows)
+            if ('${row['name_full_summary'] ?? ''}'.trim().contains(RegExp(r'[\s　]')))
+              {'name_full': row['name_full_summary'],
+               'name_last': '${row['name_full_summary']}'.trim().split(RegExp(r'[\s　]+')).first},
+        ];
+        events.add(_isMlbGame || steal
+          ? mlbEventDetail(event, names)
+          : event.replaceAll(RegExp(r'[\s\u3000]+'), ''));
+      }
       on FormatException { continue; }
       on ArgumentError { continue; }
     }
@@ -4176,7 +4200,7 @@ class _TableGameCard extends StatelessWidget {
       String label;
       Color background;
       if (type == '投手' || type == '先発投手') {
-        label = detail.split('→').last.characters.take(3).toString();
+        label = _isMlbGame ? detail.split('→').last : detail.split('→').last.characters.take(3).toString();
         background = const Color(0xFFFF4B7D);
       } else if (type == '守備位置転換' || type == '守転') {
         // 既存キャッシュの「選手名(左→中)」も新しい文言へ揃える。
@@ -4189,7 +4213,9 @@ class _TableGameCard extends StatelessWidget {
         // 保存済みの代守ラベルも、入った守備位置だけの表記に揃える。
         if (type == '代守') detail = detail.replaceAllMapped(
           RegExp(r'\([^()]*→([^()]+)\)'), (match) => '(${match[1]})');
-        final labelType = type == '代走' ? '走' : type;
+        final labelType = switch (type) {
+          '代走' => '走', '盗塁' => '盗', '盗塁失敗' => '盗失', _ => type,
+        };
         label = type == '代守' ? detail : detail.isEmpty ? labelType : '$labelType：$detail';
         background = type == '盗塁' || type == '盗塁失敗'
             ? _markOutfield
@@ -4262,8 +4288,8 @@ class _TableGameCard extends StatelessWidget {
   };
 
   Widget _substitutionBattingBlock(_PlayerLine player, Widget batting, double size, {Widget? replacedPlay, bool shortenName = false}) {
-    final fullName = _compactPlayerName(player.name);
-    final shownName = shortenName ? fullName.characters.take(3).toString() : fullName;
+    final fullName = _isMlbGame ? mlbEventSurname(player.name, playerStats) : _compactPlayerName(player.name);
+    final shownName = shortenName && !_isMlbGame ? fullName.characters.take(3).toString() : fullName;
     const leftPadding = 4.0;
     // 代走の枠は、直前の打席結果の右端から1/4の位置を通す。
     final overlap = replacedPlay == null ? 0.0 : leftPadding + _playChipWidth(size) * 0.75;
@@ -4717,7 +4743,7 @@ class _TableGameCard extends StatelessWidget {
     const chrome = 8.0;
     final inProgress = '${game['state'] ?? ''}'.contains('回');
     final headerH = _gameHeaderH;
-    final benchH = listMapFromJson(game['bench_players']).isEmpty ? 0.0 : GameBenchRow.teamHeight * (stackedTeams ? 2 : 1);
+    final benchH = listMapFromJson(game['bench_players']).isEmpty ? 0.0 : GameBenchRow.heightFor({...game, 'summaries': rows}, stackedTeams);
     final videoH = _highlightVideos.isEmpty ? 0.0 : GameHighlightRow.rowHeight;
     final head = headerH + _teamBlockH + chrome + videoH + benchH + (inProgress ? 6.0 : 0.0);
     final batterHomeH = _showBatterStats ? _battingBlockHeight(true) : 0.0;
@@ -5484,6 +5510,13 @@ class _TableGameCard extends StatelessWidget {
               }
 
               if (centerNames) {
+                // 予告先発名は下のシーズン成績と同じサイズにする。
+                // 通常の選手欄の幅を流用すると FittedBox が名前を縮小する。
+                final starterNameSize = math.max(12.0, statSize);
+                final starterNameWidth = _nameColumnWidth(pitchers, starterNameSize, context) +
+                    (pitchers.any((pitcher) => _isAcePitcher(
+                          pitcher.name, role: pitcher.role, chips: pitcher.chips, stat: pitcher.stat,
+                        )) ? 3 + (starterNameSize * 1.55).clamp(12.0, 18.0) : 0);
                 Widget centerBadges(_PlayerLine pitcher) {
                   final role = pitcher.role.trim();
                   final hasRole = roleMarks.contains(role);
@@ -5516,9 +5549,9 @@ class _TableGameCard extends StatelessWidget {
                               SizedBox(width: leadingBadgesW, child: centerBadges(pitcher)),
                               _nameBox(
                                 pitcher,
-                                width: nameColW > 0 ? nameColW : _nameColumnWidth(pitchers, nameSize, context),
+                                width: starterNameWidth,
                                 pitching: !notableBatting,
-                                baseSize: nameSize,
+                                baseSize: starterNameSize,
                                 alignLeft: false,
                                 showAce: _isAcePitcher(
                                   pitcher.name,
@@ -5785,27 +5818,7 @@ class _TableGameCard extends StatelessWidget {
     return '$prefix$token${body.substring(0, existing.start)}${body.substring(existing.end)}';
   }
 
-  Color _playColor(String kind, String label) {
-    if (label.contains('併殺')) return Colors.black;
-    if (label.contains('三振') || label.contains('振逃')) return const Color(0xFF616161);
-    if (kind == 'fc' || label.contains('野選')) return const Color(0xFF9E9E9E);
-    if (label.contains('邪') || label.contains('ポップ')) return const Color(0xFF1E88E5);
-    if (label.contains('ゴロ') || label.contains('フライ') || label.contains('ライナー')) return const Color(0xFF1E88E5);
-    return switch (kind) {
-      'hr' || 'cycle' || 'cyclemis' || 'multihit' || 'allhit' || 'allreach' || 'perfect' || 'nohit' || 'maddux' || 'shutout' || 'cg' => const Color(0xFFDC143C),
-      'timely' || 'hqs' => const Color(0xFFFF5722),
-      'triple' || 'double' || 'extra' || 'qs' => const Color(0xFFFFB300),
-      'single' => const Color(0xFFFFEB3B),
-      'walk' => const Color(0xFF43A047),
-      'dead' => label.contains('死球') ? const Color(0xFFE53935) : const Color(0xFF78909C),
-      'error' => const Color(0xFF78909C),
-      'sac' || 'sacfly' || 'squeeze' || 'sacbunt' => const Color(0xFF8E24AA),
-      'k10' => const Color(0xFFDC143C),
-      'steal' => const Color(0xFFC6FF00),
-      'stealout' => const Color(0xFF757575),
-      _ => const Color(0xFFEEEEEE),
-    };
-  }
+  Color _playColor(String kind, String label) => battingResultColor(kind, label);
 
   String _playText(String encoded) {
     final bar = encoded.lastIndexOf('|');
@@ -6971,7 +6984,8 @@ class _TableGameCard extends StatelessWidget {
                 ),
             ],
             if (listMapFromJson(game['bench_players']).isNotEmpty)
-              GameBenchRow(game: {...game, 'summaries': rows}, stacked: stackedTeams),
+              GameBenchRow(game: {...game, 'summaries': rows}, stacked: stackedTeams,
+                headerWidth: roleHeaderW, homeColor: homePale, awayColor: awayPale),
             if (_highlightVideos.isNotEmpty) GameHighlightRow(videos: _highlightVideos),
           ],
         ),

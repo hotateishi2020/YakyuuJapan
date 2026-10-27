@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:Yakyuu_Japan/widgets/replay_field.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/logic/game_replay.dart';
 import 'package:Yakyuu_Japan/widgets/game_replay_dialog.dart';
@@ -44,6 +45,18 @@ const game = <String, dynamic>{
 };
 
 void main() {
+  test('batting hands survive before/after frames and choose matching boxes', () {
+    for (final hand in [0, 1, 2]) {
+      final frames = buildGameReplay(game, [{...play(1), 'batting_hand': hand, 'pitching_hand': 0}]);
+      for (final frame in frames) {
+        expect(frame.battingHand, ['右', '左', '両'][hand]);
+        expect(replayBatterBox(frame).dx, hand == 0 ? .45 : .55);
+      }
+    }
+    final unknown = buildGameReplay(game, [play(1)]).first;
+    expect(replayBattingSide(unknown), isEmpty);
+    expect(replayBatterBox(unknown).dx, .5);
+  });
   test(
       'chronology, steal, scoring and inning transitions use recorded snapshots',
       () {

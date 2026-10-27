@@ -76,6 +76,18 @@
         "logo_url": "https://rkb.jp/favicon.ico",
         "source_url": "https://www.tbs.co.jp/sports/baseball/onair.html",
         "remarks": "日本シリーズ地上波・RKB（佐賀は受信環境による）"
+      },
+      {
+        "name": "SBC信越放送",
+        "kind": "tv",
+        "prefectures": [
+          "長野県"
+        ],
+        "website_url": "https://sbc21.co.jp/",
+        "logo_url": "https://sbc21.co.jp/common/img/logo.png",
+        "source_url": "https://sbc21.co.jp/tv/schedule.php",
+        "remarks": "日本シリーズ第3戦・長野県の地上波放送",
+        "confirmation": "user_reported"
       }
     ]
   }

@@ -1,3 +1,5 @@
+import '../logic/auth_session.dart';
+import '../logic/high_school_calendar.dart';
 import '../widgets/special_media.dart';
 import 'GamesBoard.dart' show teamLogoVisual;
 import 'package:flutter/material.dart';
@@ -29,10 +31,41 @@ class EventCalendar extends StatefulWidget {
 
 class _EventCalendarState extends State<EventCalendar> {
   late DateTime _month;
+  Map<String, dynamic>? _schoolCalendar;
+
+  void _schoolPreferenceChanged() {
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _loadSchoolCalendar() async {
+    try {
+      final catalog = await loadHighSchoolCalendar();
+      if (!mounted) return;
+      setState(() {
+        _schoolCalendar = catalog;
+      });
+    } catch (error) {
+      debugPrint('高校野球カレンダーの読み込みに失敗: $error');
+    }
+  }
+
+  @override
+  void dispose() {
+    AuthSession.instance.removeListener(_schoolPreferenceChanged);
+    super.dispose();
+  }
+
+  List<Map<String, dynamic>> get _events => [
+    ...widget.events,
+    if (_schoolCalendar != null && AuthSession.instance.isLoggedIn)
+      ...highSchoolCalendarEvents(_schoolCalendar!, AuthSession.instance.user!.favoriteHighSchool),
+  ];
 
   @override
   void initState() {
     super.initState();
+    AuthSession.instance.addListener(_schoolPreferenceChanged);
+    _loadSchoolCalendar();
     final now = widget.initialMonth ?? DateTime.now();
     _month = DateTime(now.year, now.month);
   }
@@ -299,7 +332,7 @@ class _EventCalendarState extends State<EventCalendar> {
       Color color,
       Color font
     })>[];
-    for (final event in widget.events) {
+    for (final event in _events) {
       int? start;
       int? end;
       for (var c = 0; c < 7; c++) {

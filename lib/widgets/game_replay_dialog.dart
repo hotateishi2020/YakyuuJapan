@@ -1,3 +1,5 @@
+import '../logic/replay_motion.dart';
+import '../tools/color_parse.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -98,16 +100,36 @@ class _GameReplayDialogState extends State<GameReplayDialog> {
     if (frames.isEmpty) return;
     setState(() {
       if (index == frames.length - 1) index = 0;
+      if (!frames[index].after &&
+          index + 1 < frames.length &&
+          frames[index + 1].after) {
+        index++;
+      }
       playing = true;
     });
-    timer = Timer.periodic(const Duration(milliseconds: 4200), (_) {
-      if (!mounted) return;
+    _schedule();
+  }
+
+  void _schedule() {
+    timer = Timer(
+        Duration(
+            milliseconds: frames[index].after
+                ? ((replayResultSeconds(frames[index]) + 2) * 1000).round()
+                : 0), () {
+      if (!mounted || !playing) return;
       if (index >= frames.length - 1) {
         _pause();
         return;
       }
-      setState(() => index++);
-      if (index == frames.length - 1) _pause();
+      setState(() {
+        index++;
+        if (!frames[index].after &&
+            index + 1 < frames.length &&
+            frames[index + 1].after) {
+          index++;
+        }
+      });
+      _schedule();
     });
   }
 
@@ -124,107 +146,148 @@ class _GameReplayDialogState extends State<GameReplayDialog> {
   @override
   Widget build(BuildContext context) {
     final frame = frames.isEmpty ? null : frames[index];
+    final screen = MediaQuery.sizeOf(context);
+    Widget controls() => LayoutBuilder(builder: (context, constraints) {
+          final buttons = Row(mainAxisSize: MainAxisSize.min, children: [
+            IconButton(
+                tooltip: '最初に戻る',
+                onPressed: index > 0
+                    ? () {
+                        _pause();
+                        setState(() => index = 0);
+                      }
+                    : null,
+                icon: const Icon(Icons.first_page)),
+            IconButton(
+                tooltip: '一つ戻る',
+                onPressed: index > 0 ? () => _step(-1) : null,
+                icon: const Icon(Icons.skip_previous)),
+            if (automatic)
+              IconButton(
+                  tooltip: playing ? '一時停止' : '自動再生',
+                  onPressed: playing ? _pause : _play,
+                  icon: Icon(playing ? Icons.pause_circle : Icons.play_circle),
+                  iconSize: 32),
+            IconButton(
+                tooltip: '一つ進む',
+                onPressed: index < frames.length - 1 ? () => _step(1) : null,
+                icon: const Icon(Icons.skip_next)),
+          ]);
+          final mode = Row(mainAxisSize: MainAxisSize.min, children: [
+            const Text('手動'),
+            Switch(
+                value: automatic,
+                onChanged: (value) {
+                  _pause();
+                  setState(() => automatic = value);
+                }),
+            const Text('自動'),
+          ]);
+          return Column(mainAxisSize: MainAxisSize.min, children: [
+            SizedBox(
+                height: 28,
+                child: Slider(
+                    value: index.toDouble(),
+                    max: frames.length > 1 ? (frames.length - 1).toDouble() : 1,
+                    divisions: frames.length > 1 ? frames.length - 1 : null,
+                    onChanged: frames.length > 1
+                        ? (v) {
+                            _pause();
+                            setState(() => index = v.round());
+                          }
+                        : null)),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              mode,
+              if (constraints.maxWidth >= 500) buttons,
+              Text('${index + 1} / ${frames.length}'),
+            ]),
+            if (constraints.maxWidth < 500) buttons,
+          ]);
+        });
     return Dialog(
-        insetPadding: const EdgeInsets.all(12),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 760, maxHeight: 780),
-          child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                Row(children: [
+      insetPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      child: SizedBox(
+        key: const Key('replay-dialog-body'),
+        width: 1100,
+        height: screen.height,
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(children: [
+            SizedBox(
+                height: 36,
+                child: Row(children: [
                   const Expanded(
                       child: Text('試合ストーリー',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 18))),
+                  const Tooltip(
+                      message:
+                          '記録に基づく模式アニメーションです。軌道は実際の映像とは異なります。移動先を特定できない走者は塁状況のみ表示します。',
+                      triggerMode: TooltipTriggerMode.tap,
+                      child: Padding(
+                          padding: EdgeInsets.all(8),
+                          child: Icon(Icons.info_outline, size: 20))),
                   IconButton(
                       tooltip: '閉じる',
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close))
-                ]),
-                Flexible(
-                    child: SingleChildScrollView(
-                        child: Column(children: [
-                  if (loading)
-                    const Padding(
-                        padding: EdgeInsets.all(32),
-                        child: CircularProgressIndicator()),
-                  if (error != null) ...[
-                    Text(error!),
-                    TextButton(
-                        onPressed: () {
-                          setState(() {
-                            loading = true;
-                            error = null;
-                          });
-                          _load();
-                        },
-                        child: const Text('再試行'))
-                  ],
-                  if (!loading && error == null && frame == null)
-                    const Padding(
-                        padding: EdgeInsets.all(24),
-                        child: Text('再生できる打席・交代記録がまだありません。')),
-                  if (frame != null) ...[
-                    ReplayScoreboard(frames:frames,index:index,home:'${widget.game['name_team_home'] ?? ''}',away:'${widget.game['name_team_away'] ?? ''}'),
-                    const SizedBox(height: 6),
-                    ReplayField(frame: frame),
-                    const SizedBox(height: 8),
-                    const SizedBox(height: 6),
-                    const Text(
-                        '記録に基づく模式アニメーションです。軌道は実際の映像とは異なります。移動先を特定できない走者は塁状況のみ表示します。',
-                        style: TextStyle(fontSize: 11, color: Colors.black54)),
-                  ],
-                ]))),
-                if (frame != null) ...[
-                  Row(children: [
-                    const Text('手動'),
-                    Switch(
-                        value: automatic,
-                        onChanged: (value) {
-                          _pause();
-                          setState(() => automatic = value);
-                        }),
-                    const Text('自動'),
-                    const Spacer(),
-                    Text('${index + 1} / ${frames.length}')
-                  ]),
-                  Slider(
-                      value: index.toDouble(),
-                      max: (frames.length - 1).toDouble(),
-                      divisions: frames.length > 1 ? frames.length - 1 : null,
-                      onChanged: (v) {
-                        _pause();
-                        setState(() => index = v.round());
-                      }),
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    IconButton(
-                        tooltip: '最初に戻る',
-                        onPressed: index > 0
-                            ? () {
-                                _pause();
-                                setState(() => index = 0);
-                              }
-                            : null,
-                        icon: const Icon(Icons.first_page)),
-                    IconButton(
-                        tooltip: '一つ戻る',
-                        onPressed: index > 0 ? () => _step(-1) : null,
-                        icon: const Icon(Icons.skip_previous)),
-                    if (automatic)
-                      IconButton(
-                          tooltip: playing ? '一時停止' : '自動再生',
-                          onPressed: playing ? _pause : _play,
-                          icon: Icon(
-                              playing ? Icons.pause_circle : Icons.play_circle),
-                          iconSize: 36),
-                    IconButton(
-                        tooltip: '一つ進む',
-                        onPressed:
-                            index < frames.length - 1 ? () => _step(1) : null,
-                        icon: const Icon(Icons.skip_next)),
-                  ]),
-                ],
-              ])),
-        ));
+                      icon: const Icon(Icons.close)),
+                ])),
+            if (frame != null) ...[
+              Expanded(
+                  child: LayoutBuilder(
+                      builder: (context, constraints) => FittedBox(
+                          fit: BoxFit.contain,
+                          child: SizedBox(
+                            width: constraints.maxWidth,
+                            height: constraints.maxHeight < 300
+                                ? 300
+                                : constraints.maxHeight,
+                            child: ReplayField(
+                              frame: frame,
+                              scoreboard: ReplayScoreboard(
+                                  frames: frames,
+                                  index: index,
+                                  home:
+                                      '${widget.game['name_team_home'] ?? ''}',
+                                  away:
+                                      '${widget.game['name_team_away'] ?? ''}'),
+                              homeBackground: parseColorNameOrNull(
+                                      '${widget.game['color_back_home'] ?? ''}') ??
+                                  Colors.blue,
+                              homeForeground: parseColorNameOrNull(
+                                  '${widget.game['color_font_home'] ?? ''}'),
+                              awayBackground: parseColorNameOrNull(
+                                      '${widget.game['color_back_away'] ?? ''}') ??
+                                  Colors.red,
+                              awayForeground: parseColorNameOrNull(
+                                  '${widget.game['color_font_away'] ?? ''}'),
+                            ),
+                          )))),
+              controls(),
+            ] else
+              Expanded(
+                  child: Center(
+                      child: loading
+                          ? const CircularProgressIndicator()
+                          : error != null
+                              ? Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                      Text(error!),
+                                      TextButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              loading = true;
+                                              error = null;
+                                            });
+                                            _load();
+                                          },
+                                          child: const Text('再試行')),
+                                    ])
+                              : const Text('再生できる打席・交代記録がまだありません。'))),
+          ]),
+        ),
+      ),
+    );
   }
 }

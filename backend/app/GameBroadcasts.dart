@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'NaganoBroadcasts.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as html;
@@ -98,6 +99,11 @@ Future<List<Map<String,dynamic>>> readGameBroadcasts(DateTime date, String home,
     final source = 'https://${broadcastClubs[team]}/news/broadcast/$month/';
     try { rows.addAll(parseClubBroadcasts(await _get(source), source, date, team == home ? away : home)); } catch (_) {}
   }()]);
+  if (prefecture == '長野県') {
+    try {
+      rows.addAll(parseNaganoBroadcasts(await _get(naganoScheduleUrl(date).toString()),date,home,away));
+    } catch (_) {}
+  }
   // Reviewed entries support all clubs, regional relays, logos and exact event URLs.
   final file = File('data/game-broadcasts.json');
   if (await file.exists()) {

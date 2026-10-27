@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import '../widgets/map_scale_listener.dart';
+import '../logic/date_line_world_map.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -40,9 +41,7 @@ class _TodayEventMapState extends State<TodayEventMap> {
   }
   List<LatLng> get points => entries.where((e)=>e['located']==true).map((e)=>LatLng((e['latitude'] as num).toDouble(),(e['longitude'] as num).toDouble())).toList();
   void fit() {
-    final p=points;
-    if(p.length>1) { controller.fitCamera(CameraFit.bounds(bounds:LatLngBounds.fromPoints(p),padding:const EdgeInsets.all(90),maxZoom:8)); }
-    else { controller.move(p.isEmpty ? const LatLng(36,138) : p.first, p.isEmpty ? 4 : 7); }
+    controller.move(const LatLng(20,180), singleWorldMinZoom(controller.camera.size.width, controller.camera.size.height));
   }
   Color color(String kind) => switch(kind) {'試合'=>Colors.red.shade700,'キャンプ'=>Colors.green.shade700,'自主トレ'=>Colors.teal,'トークショー'=>Colors.purple,'式典'=>Colors.orange.shade800,_=>Colors.blue.shade700};
   void details(List<Map<String,dynamic>> rows) => showDialog<void>(context:context,builder:(context)=>AlertDialog(
@@ -69,9 +68,12 @@ class _TodayEventMapState extends State<TodayEventMap> {
         if(loading) const LinearProgressIndicator(),
         if(error!=null) Text(error!,style:const TextStyle(color:Colors.red)),
         if(!loading && entries.isEmpty && error==null) const Text('今日の開催情報はありません。'),
-        SizedBox(height:420,child:ClipRRect(borderRadius:BorderRadius.circular(6),child:Stack(children:[
+        SizedBox(height:420,child:LayoutBuilder(builder:(context, constraints) {
+          final minZoom=singleWorldMinZoom(constraints.maxWidth, constraints.maxHeight);
+          return ClipRRect(borderRadius:BorderRadius.circular(6),child:Stack(children:[
           MapScaleListener(controller: controller, child: FlutterMap(mapController:controller,
-            options:MapOptions(initialCenter:const LatLng(36,138),initialZoom:4,minZoom:0,maxZoom:18,
+            options:MapOptions(initialCenter:const LatLng(20,180),initialZoom:minZoom,minZoom:0,maxZoom:18,
+              cameraConstraint:const DateLineWorldConstraint(),
               interactionOptions: InteractionOptions(flags: InteractiveFlag.all & ~InteractiveFlag.rotate, cursorKeyboardRotationOptions: CursorKeyboardRotationOptions.disabled()),
               onMapReady:() { mapReady=true; fit(); }),children:[
               TileLayer(urlTemplate:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',userAgentPackageName:'jp.yakyuu.japan'),
@@ -91,14 +93,15 @@ class _TodayEventMapState extends State<TodayEventMap> {
               )]),
             ])),
           Positioned(right:6,top:6,child:Material(elevation:2,borderRadius:BorderRadius.circular(6),child:Column(children:[
-            IconButton(tooltip:'拡大',onPressed:()=>controller.move(controller.camera.center,(controller.camera.zoom+1).clamp(0,18).toDouble()),icon:const Icon(Icons.add)),
-            IconButton(tooltip:'縮小',onPressed:()=>controller.move(controller.camera.center,(controller.camera.zoom-1).clamp(0,18).toDouble()),icon:const Icon(Icons.remove)),
-            IconButton(tooltip:'すべての開催地を表示',onPressed:fit,icon:const Icon(Icons.fit_screen)),
+            IconButton(tooltip:'拡大',onPressed:()=>controller.move(controller.camera.center,(controller.camera.zoom+1).clamp(controller.camera.minZoom ?? 0,18).toDouble()),icon:const Icon(Icons.add)),
+            IconButton(tooltip:'縮小',onPressed:()=>controller.move(controller.camera.center,(controller.camera.zoom-1).clamp(controller.camera.minZoom ?? 0,18).toDouble()),icon:const Icon(Icons.remove)),
+            IconButton(tooltip:'日付変更線中心の世界地図に戻す',onPressed:fit,icon:const Icon(Icons.fit_screen)),
           ]))),
           Positioned(right:0,bottom:0,child:ColoredBox(color:Colors.white,child:InkWell(
             onTap:()=>launchUrl(Uri.parse('https://www.openstreetmap.org/copyright')),
             child:const Padding(padding:EdgeInsets.all(3),child:Text('© OpenStreetMap contributors',style:TextStyle(fontSize:10)))))),
-        ]))),
+        ]));
+        })),
         const Text('タッチパッド・指のピンチ・ホイール・＋／−で拡大縮小。吹き出しを押すと詳細を表示します。',style:TextStyle(fontSize:11,color:Colors.black54)),
         if(unknown.isNotEmpty) ExpansionTile(title:Text('会場の位置未確認（${unknown.length}件）'),children:[
           for(final e in unknown) ListTile(dense:true,title:Text('${e['title']}'),subtitle:Text('${e['venue'] ?? ''}'),onTap:()=>details([e]))]),

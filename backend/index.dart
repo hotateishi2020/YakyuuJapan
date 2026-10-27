@@ -1,3 +1,4 @@
+import 'app/GameReplay.dart';
 import 'app/GameVisibility.dart';
 import 'app/GameStatsLoad.dart';
 import 'app/AdminLogQuery.dart';
@@ -1196,6 +1197,18 @@ void main() async {
         return Response.ok(jsonEncode(readClubFile('club-hub-${org.code}-$year.json')),headers:headers);
       } on FormatException catch(e){return Response.badRequest(body:jsonEncode({'error':e.message}),headers:headers);}
     });
+    app.get('/game-replay', (Request request) async {
+      final id = int.tryParse(request.url.queryParameters['id'] ?? '');
+      if (id == null || id <= 0) return Response.badRequest(body:'Invalid game');
+      return Postgres.withConnection((conn) async {
+        final user = await Auth.readOnlyUserIdOf(conn, request);
+        if (user != 1 && user != 2) return Response(403,body:'Forbidden');
+        final plays = await readGameReplay(conn,id);
+        return Response.ok(jsonEncode({'play_rows':plays}),headers:{
+          'content-type':'application/json; charset=utf-8','cache-control':'private, no-store'});
+      });
+    });
+
     app.get('/today-map', (Request request) async {
       const headers = {'content-type':'application/json; charset=utf-8'};
       try {

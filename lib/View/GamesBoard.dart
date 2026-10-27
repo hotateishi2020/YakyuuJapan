@@ -1,3 +1,4 @@
+import '../widgets/game_replay_dialog.dart';
 import '../logic/game_story.dart';
 import '../logic/game_visibility.dart';
 import '../logic/batting_turn_columns.dart';
@@ -4789,6 +4790,14 @@ class _TableGameCard extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 child: SpecialMedia(child: Text('  HR $liveHomers', style: const TextStyle(fontSize: 11, color: Color(0xFFB3261E)))),
               )),
+              if (liveHomers.isEmpty) const Spacer(),
+              if (AuthSession.instance.showDetailedGames)
+                Builder(builder: (context) => IconButton(
+                  key: const ValueKey('game-replay-button'), tooltip: '試合ストーリーを再生',
+                  padding: EdgeInsets.zero, constraints: const BoxConstraints(minWidth: 32),
+                  icon: const Icon(Icons.play_circle_fill, size: 20),
+                  onPressed: () => showGameReplay(context, game),
+                )),
             ]),
           ),
         ),

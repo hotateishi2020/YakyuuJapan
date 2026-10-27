@@ -627,3 +627,11 @@ bool _asBool(dynamic value) {
   final text = '$value'.trim().toLowerCase();
   return text == 'true' || text == 't' || text == '1';
 }
+
+/// Replay keeps non-batting events in their recorded sequence.
+String replayEventLabel(Map<String,dynamic> row) {
+  final event = _plateEventLabel(row);
+  if (event.isNotEmpty) return event;
+  final label = formatPlayLabels([Map<String,dynamic>.from(row)]);
+  return label.isEmpty ? '${row['code_result'] ?? '記録'}' : label.split('|').first;
+}

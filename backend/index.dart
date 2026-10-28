@@ -1,4 +1,5 @@
 import 'app/GameReplay.dart';
+import 'app/HighSchoolSchedule.dart';
 import 'app/GameVisibility.dart';
 import 'app/GameStatsLoad.dart';
 import 'app/AdminLogQuery.dart';
@@ -53,7 +54,7 @@ import 'app/VideoChannels.dart';
 import 'app/ClubData.dart';
 import 'app/PlayerDetailSnapshot.dart';
 import 'app/PostseasonForm.dart';
-import '../lib/logic/postseason_homers.dart';
+import 'package:koko_shared/postseason_homers.dart';
 import 'app/PlayerMetricSchedule.dart';
 import 'app/GamesReadGate.dart';
 import 'app/FetchURL.dart';
@@ -1162,6 +1163,10 @@ void main() async {
     });
 
     app.get('/healthz', (Request _) => Response.ok('ok'));
+    app.get('/high-school/schedule', (Request _) => Response.ok(
+      jsonEncode(HighSchoolSchedule.snapshot()),
+      headers: {'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store'},
+    ));
 
     app.get('/player-art/<filename>', (Request request, String filename) async {
       if (!RegExp(r'^(?:npb-)?\d+-[a-f0-9]{64}\.png$').hasMatch(filename)) return Response.notFound('Not found');
@@ -2432,11 +2437,19 @@ void main() async {
           if (await index.exists()) {
             return Response.ok(
               index.openRead(),
-              headers: {'content-type': 'text/html; charset=utf-8'},
+              headers: {'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store'},
             );
           }
         }
-        return res;
+        // Always revalidate assets; entry points and the release marker must
+        // never be reused from an HTTP cache after a deployment.
+        final entryPoint = req.url.path.isEmpty || const {
+          'index.html', 'app_version.json', 'app_update.js',
+          'flutter_bootstrap.js', 'flutter_service_worker.js', 'main.dart.js',
+        }.contains(req.url.path);
+        return res.change(headers: {
+          'cache-control': entryPoint ? 'no-store' : 'no-cache',
+        });
       }
 
       handler = Cascade()
@@ -2477,6 +2490,7 @@ void main() async {
     PlayerStatsSchedule.start(onUpdated: _clearPredictionsCache);
     TeamStrength.start();
     RosterMoves.start();
+    HighSchoolSchedule.start();
     NpbResearch.start();
     PlayerArtSchedule.start();
     PlayerMetricSchedule.start(onUpdated: _clearPredictionsCache);

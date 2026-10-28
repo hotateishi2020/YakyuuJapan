@@ -1,0 +1,6 @@
+name: koko_shared
+description: Shared pure Dart logic for the web app and backend.
+publish_to: none
+version: 1.0.0
+environment:
+  sdk: '>=3.0.0 <4.0.0'

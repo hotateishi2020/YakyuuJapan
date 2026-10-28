@@ -5,28 +5,86 @@ import 'package:Yakyuu_Japan/View/club_records_board.dart';
 
 void main() {
   final comparisonCases = [
-    ('同じID・同じ値', {'id_player': 1, 'name': '清水 達也', 'value': 123},
-      [{'id_player': '1', 'name': '清水達也', 'value': '123.0'}], false, false),
-    ('IDなし・空白だけ異なる名前', {'name': '清水　達也', 'value': 123},
-      [{'name': '清水 達也', 'value': 123}], false, false),
-    ('同名でも別ID', {'id_player': 1, 'name': '清水達也', 'value': 123},
-      [{'id_player': 2, 'name': '清水達也', 'value': 123}], true, false),
-    ('別選手の同率', {'name': '歴代選手', 'value': 123},
-      [{'name': '今季選手', 'value': 123}], true, false),
-    ('同率に別選手を含む', {'name': '清水達也', 'value': 123},
-      [{'name': '清水達也', 'value': 123}, {'name': '今季選手', 'value': 123}], true, false),
-    ('同じ選手の更新', {'name': '清水達也', 'value': 123},
-      [{'name': '清水達也', 'value': 124}], false, true),
+    (
+      '同じID・同じ値',
+      {'id_player': 1, 'name': '清水 達也', 'value': 123},
+      [
+        {'id_player': '1', 'name': '清水達也', 'value': '123.0'}
+      ],
+      false,
+      false
+    ),
+    (
+      'IDなし・空白だけ異なる名前',
+      {'name': '清水　達也', 'value': 123},
+      [
+        {'name': '清水 達也', 'value': 123}
+      ],
+      false,
+      false
+    ),
+    (
+      '同名でも別ID',
+      {'id_player': 1, 'name': '清水達也', 'value': 123},
+      [
+        {'id_player': 2, 'name': '清水達也', 'value': 123}
+      ],
+      true,
+      false
+    ),
+    (
+      '別選手の同率',
+      {'name': '歴代選手', 'value': 123},
+      [
+        {'name': '今季選手', 'value': 123}
+      ],
+      true,
+      false
+    ),
+    (
+      '同率に別選手を含む',
+      {'name': '清水達也', 'value': 123},
+      [
+        {'name': '清水達也', 'value': 123},
+        {'name': '今季選手', 'value': 123}
+      ],
+      true,
+      false
+    ),
+    (
+      '同じ選手の更新',
+      {'name': '清水達也', 'value': 123},
+      [
+        {'name': '清水達也', 'value': 124}
+      ],
+      false,
+      true
+    ),
   ];
   for (final scenario in comparisonCases) {
     testWidgets('通算の比較表示：${scenario.$1}', (tester) async {
-      await tester.pumpWidget(MaterialApp(home: Scaffold(body: ClubRecordsBoard(data: {
+      await tester.pumpWidget(MaterialApp(
+          home: Scaffold(
+              body: ClubRecordsBoard(data: {
         'year': 2026,
-        'teams': [{'id_team': 1, 'name': '中日'}],
-        'metrics': [{
-          'group': 'career', 'key': 'holds', 'label': 'ホールド', 'unit': 'ホールド',
-          'cells': [{'id_team': 1, 'record': [scenario.$2], 'current': scenario.$3}],
-        }],
+        'teams': const [
+          {'id_team': 1, 'name': '中日'}
+        ],
+        'metrics': [
+          {
+            'group': 'career',
+            'key': 'holds',
+            'label': 'ホールド',
+            'unit': 'ホールド',
+            'cells': [
+              {
+                'id_team': 1,
+                'record': [scenario.$2],
+                'current': scenario.$3
+              }
+            ],
+          }
+        ],
       }))));
       await tester.tap(find.text('通算記録'));
       await tester.pump();
@@ -37,23 +95,50 @@ void main() {
     });
   }
   testWidgets('球団連続記録は未確認理由を表示し不完全な歴代値から新記録と断定しない', (tester) async {
-    await tester.pumpWidget(const MaterialApp(home: Scaffold(body: ClubRecordsBoard(data:{
-      'year':2026,'teams':[{'id_team':1,'short_name':'阪神'}],
-      'metrics':[
-        {'group':'streak','key':'streak_wins','label':'連続勝利','unit':'勝','cells':[
-          {'id_team':1,'record':[{'name':'登録済み歴代','value':5,'year':2000}],
-            'current':[{'name':'球団内首位','value':10}], 'historical_status':'partial'}]},
-        {'group':'streak','key':'streak_outs','label':'連続アウト','unit':'人','cells':[
-          {'id_team':1,'record':[],'current':[],'current_message':'球団別の年度内最長は未確認です。'}]},
+    await tester.pumpWidget(const MaterialApp(
+        home: Scaffold(
+            body: ClubRecordsBoard(data: {
+      'year': 2026,
+      'teams': [
+        {'id_team': 1, 'short_name': '阪神'}
+      ],
+      'metrics': [
+        {
+          'group': 'streak',
+          'key': 'streak_wins',
+          'label': '連続勝利',
+          'unit': '勝',
+          'cells': [
+            {
+              'id_team': 1,
+              'record': [
+                {'name': '登録済み歴代', 'value': 5, 'year': 2000}
+              ],
+              'current': [
+                {'name': '球団内首位', 'value': 10}
+              ],
+              'historical_status': 'partial'
+            }
+          ]
+        },
+        {
+          'group': 'streak',
+          'key': 'streak_outs',
+          'label': '連続アウト',
+          'unit': '人',
+          'cells': [
+            {'id_team': 1, 'record': [], 'current': [], 'current_message': '球団別の年度内最長は未確認です。'}
+          ]
+        },
       ]
     }))));
     await tester.tap(find.text('連続記録'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('球団内首位'),findsOneWidget);
-    expect(find.text('球団別の年度内最長は未確認です。'),findsOneWidget);
-    expect(find.text('確認済みの歴代記録'),findsNWidgets(2));
-    expect(find.textContaining('新記録'),findsNothing);
-    expect(tester.takeException(),isNull);
+    expect(find.textContaining('球団内首位'), findsOneWidget);
+    expect(find.text('球団別の年度内最長は未確認です。'), findsOneWidget);
+    expect(find.text('確認済みの歴代記録'), findsNWidgets(2));
+    expect(find.textContaining('新記録'), findsNothing);
+    expect(tester.takeException(), isNull);
   });
   for (final width in [375.0, 1366.0]) {
     testWidgets('幅$widthで12球団の記録と今季記録を上下に表示', (tester) async {
@@ -193,17 +278,34 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-    await tester.pumpWidget(MaterialApp(home: Scaffold(body: MenuScope(child: Column(children: [
+    await tester.pumpWidget(MaterialApp(
+        home: Scaffold(
+            body: MenuScope(
+                child: Column(children: [
       const MenuBand(level: 2, child: Text('球団記録タブ')),
-      Expanded(child: ClubRecordsBoard(data: {
+      Expanded(
+          child: ClubRecordsBoard(data: {
         'year': 2026,
-        'teams': [for (var id = 1; id <= 12; id++) {'id_team': id, 'name': '球団$id'}],
-        'metrics': [for (final group in ['season', 'career']) {
-          'group': group, 'label': '本塁打', 'unit': '本',
-          'cells': [for (var id = 1; id <= 12; id++) {
-            'id_team': id, 'current': [{'name': '選手$id', 'value': 10}],
-          }],
-        }],
+        'teams': [
+          for (var id = 1; id <= 12; id++) {'id_team': id, 'name': '球団$id'}
+        ],
+        'metrics': [
+          for (final group in ['season', 'career'])
+            {
+              'group': group,
+              'label': '本塁打',
+              'unit': '本',
+              'cells': [
+                for (var id = 1; id <= 12; id++)
+                  {
+                    'id_team': id,
+                    'current': [
+                      {'name': '選手$id', 'value': 10}
+                    ],
+                  }
+              ],
+            }
+        ],
       })),
     ])))));
     await tester.pumpAndSettle();
@@ -241,5 +343,4 @@ void main() {
     expect(find.text('選手12\n10本'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
-
 }

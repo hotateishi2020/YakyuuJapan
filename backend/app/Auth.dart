@@ -1,4 +1,4 @@
-import '../../lib/logic/career_regions.dart';
+import 'package:koko_shared/career_regions.dart';
 import 'NewsReadDate.dart';
 import 'dart:async';
 import 'dart:convert';

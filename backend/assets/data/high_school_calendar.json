@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-27",
+  "checked_at": "2026-10-28",
   "school_prefectures": {
     "近大高専": "三重",
     "津商": "三重",
@@ -4478,7 +4478,9 @@
           "time": "9:00",
           "round": "1回戦",
           "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/",
-          "note": "開始予定時刻。雨天順延後の日程。"
+          "note": "開始予定時刻。雨天順延後の日程。",
+          "score_home": 6,
+          "score_away": 0
         },
         {
           "home": "早稲田佐賀",
@@ -4489,7 +4491,9 @@
           "time": "11:30",
           "round": "1回戦",
           "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/",
-          "note": "開始予定時刻。雨天順延後の日程。"
+          "note": "開始予定時刻。雨天順延後の日程。",
+          "score_home": 3,
+          "score_away": 1
         },
         {
           "home": "樟南",
@@ -4500,7 +4504,9 @@
           "time": "14:00",
           "round": "1回戦",
           "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/",
-          "note": "開始予定時刻。雨天順延後の日程。"
+          "note": "開始予定時刻。雨天順延後の日程。",
+          "score_home": 2,
+          "score_away": 3
         },
         {
           "home": "創成館",
@@ -4511,7 +4517,9 @@
           "time": "9:00",
           "round": "1回戦",
           "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/",
-          "note": "開始予定時刻。雨天順延後の日程。"
+          "note": "開始予定時刻。雨天順延後の日程。",
+          "score_home": 1,
+          "score_away": 0
         },
         {
           "home": "小林西",
@@ -4522,7 +4530,9 @@
           "time": "11:30",
           "round": "1回戦",
           "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/",
-          "note": "開始予定時刻。雨天順延後の日程。"
+          "note": "開始予定時刻。雨天順延後の日程。",
+          "score_home": 9,
+          "score_away": 5
         },
         {
           "home": "福岡大大濠",
@@ -4533,7 +4543,9 @@
           "time": "14:00",
           "round": "1回戦",
           "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/",
-          "note": "開始予定時刻。雨天順延後の日程。"
+          "note": "開始予定時刻。雨天順延後の日程。",
+          "score_home": 2,
+          "score_away": 3
         },
         {
           "home": "沖縄尚学",
@@ -4544,7 +4556,9 @@
           "time": "9:00",
           "round": "1回戦",
           "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/",
-          "note": "開始予定時刻。雨天順延後の日程。"
+          "note": "開始予定時刻。雨天順延後の日程。",
+          "score_home": 2,
+          "score_away": 0
         },
         {
           "home": "佐賀北",
@@ -4555,7 +4569,9 @@
           "time": "11:30",
           "round": "1回戦",
           "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/",
-          "note": "開始予定時刻。雨天順延後の日程。"
+          "note": "開始予定時刻。雨天順延後の日程。",
+          "score_home": 7,
+          "score_away": 1
         },
         {
           "date": "2026-10-28",
@@ -4565,7 +4581,9 @@
           "home_prefecture": "福岡",
           "away_prefecture": "佐賀",
           "round": "準々決勝",
-          "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/"
+          "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/",
+          "score_home": 7,
+          "score_away": 6
         },
         {
           "date": "2026-10-28",
@@ -4575,7 +4593,9 @@
           "home_prefecture": "沖縄",
           "away_prefecture": "長崎",
           "round": "準々決勝",
-          "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/"
+          "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/",
+          "score_home": 0,
+          "score_away": 4
         },
         {
           "date": "2026-10-29",
@@ -4591,44 +4611,32 @@
           "date": "2026-10-29",
           "time": "11:30",
           "home": "沖縄尚学",
-          "away": "佐賀北／大分の勝者",
-          "candidate_schools": [
-            "沖縄尚学",
-            "佐賀北",
-            "大分"
-          ],
-          "conditional": true,
+          "away": "佐賀北",
           "round": "準々決勝",
           "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/",
-          "note": "勝ち上がり条件付きの日程です。出場確定を示すものではありません。"
+          "home_prefecture": "沖縄",
+          "away_prefecture": "佐賀"
         },
         {
           "date": "2026-10-31",
           "time": "9:00",
-          "home": "祐誠／早稲田佐賀の勝者",
-          "away": "コザ／創成館の勝者",
-          "candidate_schools": [
-            "祐誠",
-            "早稲田佐賀",
-            "コザ",
-            "創成館"
-          ],
-          "conditional": true,
+          "home": "祐誠",
+          "away": "創成館",
           "round": "準決勝",
           "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/",
-          "note": "勝ち上がり条件付きの日程です。出場確定を示すものではありません。"
+          "home_prefecture": "福岡",
+          "away_prefecture": "長崎"
         },
         {
           "date": "2026-10-31",
           "time": "11:30",
           "home": "小林西／鹿児島城西の勝者",
-          "away": "沖縄尚学／佐賀北／大分の勝者",
+          "away": "沖縄尚学／佐賀北の勝者",
           "candidate_schools": [
             "小林西",
             "鹿児島城西",
             "沖縄尚学",
-            "佐賀北",
-            "大分"
+            "佐賀北"
           ],
           "conditional": true,
           "round": "準決勝",
@@ -4638,18 +4646,15 @@
         {
           "date": "2026-11-02",
           "time": "9:00",
-          "home": "準決勝第1試合の勝者",
-          "away": "準決勝第2試合の勝者",
+          "home": "祐誠／創成館の勝者",
+          "away": "小林西／鹿児島城西／沖縄尚学／佐賀北の勝者",
           "candidate_schools": [
             "祐誠",
-            "早稲田佐賀",
-            "コザ",
             "創成館",
             "小林西",
             "鹿児島城西",
             "沖縄尚学",
-            "佐賀北",
-            "大分"
+            "佐賀北"
           ],
           "conditional": true,
           "round": "決勝",

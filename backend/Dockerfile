@@ -4,6 +4,7 @@ WORKDIR /app
 
 # 依存関係の解決（キャッシュを効かせるため最初に pubspec 系だけ）
 COPY pubspec.yaml pubspec.lock* ./
+COPY shared ./shared
 RUN dart pub get
 
 # アプリ本体をコピー

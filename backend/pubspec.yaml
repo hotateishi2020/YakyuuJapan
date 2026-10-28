@@ -6,6 +6,8 @@ environment:
   sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
+  koko_shared:
+    path: shared
   shelf: ^1.4.1
   shelf_router: ^1.1.4
   shelf_cors_headers: ^0.1.5

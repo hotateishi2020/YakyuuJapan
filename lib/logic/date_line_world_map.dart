@@ -8,6 +8,7 @@ double singleWorldMinZoom(double width, double height) =>
 
 /// Keep the visible longitude range within the single world centered on the date line.
 /// Tile wrapping remains enabled so the Americas appear east of Japan.
+/// Fix latitude so dragging and zooming cannot scroll the HOME map vertically.
 class DateLineWorldConstraint extends CameraConstraint {
   const DateLineWorldConstraint();
   @override
@@ -19,7 +20,7 @@ class DateLineWorldConstraint extends CameraConstraint {
     final halfLongitude = camera.size.width / worldWidth * 180;
     if (halfLongitude > 180) return null;
     return camera.withPosition(zoom: zoom, center: LatLng(
-      camera.center.latitude.clamp(-70, 70),
+      20,
       camera.center.longitude.clamp(halfLongitude, 360 - halfLongitude),
     ));
   }

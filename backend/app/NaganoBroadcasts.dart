@@ -9,10 +9,7 @@ const naganoStations = <String, String>{
   'SBC信越放送': 'SBC信越放送',
   '長野放送': '長野放送',
 };
-String _normalize(String text) => String.fromCharCodes(
-        text.runes.map((c) => c >= 0xff01 && c <= 0xff5e ? c - 0xfee0 : c))
-    .toLowerCase()
-    .replaceAll(RegExp(r'[\s　・･－-]'), '');
+String _normalize(String text) => String.fromCharCodes(text.runes.map((c) => c >= 0xff01 && c <= 0xff5e ? c - 0xfee0 : c)).toLowerCase().replaceAll(RegExp(r'[\s　・･－-]'), '');
 String? naganoStationName(String text) {
   final normalized = _normalize(text);
   for (final entry in naganoStations.entries) {
@@ -42,31 +39,28 @@ bool _matchesTeam(String text, String team) {
   if (team.trim().isEmpty) return false;
   final names = {team};
   for (final entry in _teamAliases.entries) {
-    if ([entry.key, ...entry.value]
-        .any((n) => _normalize(n) == _normalize(team)))
+    if ([entry.key, ...entry.value].any((n) => _normalize(n) == _normalize(team))) {
       names.addAll([entry.key, ...entry.value]);
+    }
   }
   return names.any((n) => text.contains(_normalize(n)));
 }
 
 Uri naganoScheduleUrl(DateTime date) => Uri.https('bangumi.org', '/epg/td', {
       'ggm_group_id': '51',
-      'broad_cast_date':
-          '${date.year}${date.month.toString().padLeft(2, '0')}${date.day.toString().padLeft(2, '0')}',
+      'broad_cast_date': '${date.year}${date.month.toString().padLeft(2, '0')}${date.day.toString().padLeft(2, '0')}',
     });
 
 /// Parse the dated Nagano terrestrial EPG, not network affiliations. News and
 /// highlights mentioning the same teams are not game broadcasts.
-List<Map<String, dynamic>> parseNaganoBroadcasts(
-    String body, DateTime date, String home, String away) {
+List<Map<String, dynamic>> parseNaganoBroadcasts(String body, DateTime date, String home, String away) {
   final doc = html.parse(body);
   final day = naganoScheduleUrl(date).queryParameters['broad_cast_date'];
   try {
-    final metadata = jsonDecode(
-            doc.querySelector('meta[name="pv"]')?.attributes['content'] ?? '{}')
-        as Map;
-    if (metadata['broad_cast_date'] != day || metadata['broad_cast'] != 'td')
+    final metadata = jsonDecode(doc.querySelector('meta[name="pv"]')?.attributes['content'] ?? '{}') as Map;
+    if (metadata['broad_cast_date'] != day || metadata['broad_cast'] != 'td') {
       return [];
+    }
   } catch (_) {
     return [];
   }
@@ -82,12 +76,13 @@ List<Map<String, dynamic>> parseNaganoBroadcasts(
       if (start.length != 12 || !start.startsWith(day!)) continue;
       final title = item.querySelector('.program_title')?.text ?? '';
       final normalized = _normalize(title);
-      if (RegExp(r'ハイライト|ニュース|ダイジェスト|結果|振り返|総集編|再放送|録画|🈞')
-          .hasMatch(normalized)) continue;
-      if (!RegExp(r'プロ野球|野球中継|mlb|メジャーリーグ|日本シリーズ|ワールドシリーズ|クライマックス|リーグ.*シリーズ')
-          .hasMatch(normalized)) continue;
-      final text = _normalize(
-          '$title ${item.querySelector('.program_detail')?.text ?? ''}');
+      if (RegExp(r'ハイライト|ニュース|ダイジェスト|結果|振り返|総集編|再放送|録画|🈞').hasMatch(normalized)) {
+        continue;
+      }
+      if (!RegExp(r'プロ野球|野球中継|mlb|メジャーリーグ|日本シリーズ|ワールドシリーズ|クライマックス|リーグ.*シリーズ').hasMatch(normalized)) {
+        continue;
+      }
+      final text = _normalize('$title ${item.querySelector('.program_detail')?.text ?? ''}');
       if (!_matchesTeam(text, home) || !_matchesTeam(text, away)) continue;
       final href = item.querySelector('a.title_link')?.attributes['href'];
       final source = naganoScheduleUrl(date);
@@ -95,12 +90,10 @@ List<Map<String, dynamic>> parseNaganoBroadcasts(
         'name': station,
         'kind': 'tv',
         'prefectures': ['長野県'],
-        'source_url':
-            href == null ? source.toString() : source.resolve(href).toString(),
+        'source_url': href == null ? source.toString() : source.resolve(href).toString(),
         'website_url': source.toString(),
         'program_title': title,
-        'broadcast_start':
-            '${start.substring(8, 10)}:${start.substring(10, 12)}',
+        'broadcast_start': '${start.substring(8, 10)}:${start.substring(10, 12)}',
         'remarks': '長野県の地上波番組表で確認',
       };
     }

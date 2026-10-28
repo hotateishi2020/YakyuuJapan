@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:async';
+import '../logic/high_school_schedule.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../logic/auth_session.dart';
@@ -79,17 +81,31 @@ class FavoriteHighSchoolBoard extends StatefulWidget {
 
 class _FavoriteHighSchoolBoardState extends State<FavoriteHighSchoolBoard> {
   late String school = favoriteSchoolForUser(widget.user);
-  late final future = Future.wait([
+  late var future = _load();
+  Timer? _refresh;
+  Future<List<Map<String, dynamic>>> _load() => Future.wait([
     loadHighSchoolCatalog(),
     rootBundle
         .loadString('backend/assets/data/high_school_results_supplement.json')
         .then((s) => jsonDecode(s) as Map<String, dynamic>),
-    rootBundle.loadString('backend/assets/data/autumn_kyushu_2026.json').then(
+    loadAutumnKyushuSchedule().then(
         (s) => <String, dynamic>{
-              ...jsonDecode(s) as Map<String, dynamic>,
+              ...s,
               'year': 2026
             }),
   ]);
+  @override
+  void initState() {
+    super.initState();
+    _refresh = Timer.periodic(const Duration(minutes: 5), (_) {
+      setState(() { future = _load(); });
+    });
+  }
+  @override
+  void dispose() {
+    _refresh?.cancel();
+    super.dispose();
+  }
   @override
   void didUpdateWidget(covariant FavoriteHighSchoolBoard oldWidget) {
     super.didUpdateWidget(oldWidget);

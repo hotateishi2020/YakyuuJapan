@@ -1,7 +1,7 @@
 {
   "title": "2026年 第159回秋季九州地区高等学校野球大会",
   "venue": "リブワーク藤崎台球場",
-  "checked_at": "2026-10-19",
+  "checked_at": "2026-10-28",
   "source": "https://kumakyougikai.com/20261016-2/",
   "matches": [
     {
@@ -10,7 +10,10 @@
       "home": "祐誠（福岡1）",
       "away": "日本文理大附（大分2）",
       "date": "10/24",
-      "time": "9:00"
+      "time": "9:00",
+      "score_home": 6,
+      "score_away": 0,
+      "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/"
     },
     {
       "round": 0,
@@ -18,7 +21,10 @@
       "home": "早稲田佐賀（佐賀1）",
       "away": "宮崎商業（宮崎2）",
       "date": "10/24",
-      "time": "11:30"
+      "time": "11:30",
+      "score_home": 3,
+      "score_away": 1,
+      "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/"
     },
     {
       "round": 0,
@@ -26,7 +32,10 @@
       "home": "樟南（鹿児島2）",
       "away": "コザ（沖縄1）",
       "date": "10/24",
-      "time": "14:00"
+      "time": "14:00",
+      "score_home": 2,
+      "score_away": 3,
+      "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/"
     },
     {
       "round": 0,
@@ -34,7 +43,10 @@
       "home": "創成館（長崎2）",
       "away": "開新（熊本1）",
       "date": "10/25",
-      "time": "9:00"
+      "time": "9:00",
+      "score_home": 1,
+      "score_away": 0,
+      "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/"
     },
     {
       "round": 0,
@@ -42,7 +54,10 @@
       "home": "小林西（宮崎1）",
       "away": "九州学院（熊本2）",
       "date": "10/25",
-      "time": "11:30"
+      "time": "11:30",
+      "score_home": 9,
+      "score_away": 5,
+      "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/"
     },
     {
       "round": 0,
@@ -50,62 +65,77 @@
       "home": "福岡大大濠（福岡2）",
       "away": "鹿児島城西（鹿児島1）",
       "date": "10/25",
-      "time": "14:00"
+      "time": "14:00",
+      "score_home": 2,
+      "score_away": 3,
+      "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/"
     },
     {
       "round": 0,
       "slot": 6,
       "home": "沖縄尚学（沖縄2）",
       "away": "海星（長崎1）",
-      "date": "10/26",
-      "time": "9:00"
+      "date": "10/27",
+      "time": "9:00",
+      "score_home": 2,
+      "score_away": 0,
+      "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/"
     },
     {
       "round": 0,
       "slot": 7,
       "home": "佐賀北（佐賀2）",
       "away": "大分（大分1）",
-      "date": "10/26",
-      "time": "11:30"
+      "date": "10/27",
+      "time": "11:30",
+      "score_home": 7,
+      "score_away": 1,
+      "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/"
     },
     {
       "round": 1,
       "slot": 0,
-      "home": "1組の勝者",
-      "away": "2組の勝者",
-      "date": "10/27",
-      "time": "9:00"
+      "home": "祐誠（福岡1）",
+      "away": "早稲田佐賀（佐賀1）",
+      "date": "10/28",
+      "time": "9:00",
+      "score_home": 7,
+      "score_away": 6,
+      "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/"
     },
     {
       "round": 1,
       "slot": 1,
-      "home": "3組の勝者",
-      "away": "4組の勝者",
-      "date": "10/27",
-      "time": "11:30"
+      "home": "コザ（沖縄1）",
+      "away": "創成館（長崎2）",
+      "date": "10/28",
+      "time": "11:30",
+      "score_home": 0,
+      "score_away": 4,
+      "source_url": "https://www.sportzorg24.tv/baseball-kumamoto-20261024-r758b7e-results/"
     },
     {
       "round": 1,
       "slot": 2,
-      "home": "5組の勝者",
-      "away": "6組の勝者",
-      "date": "10/28",
+      "home": "小林西（宮崎1）",
+      "away": "鹿児島城西（鹿児島1）",
+      "date": "10/29",
       "time": "9:00"
     },
     {
       "round": 1,
       "slot": 3,
-      "home": "7組の勝者",
-      "away": "8組の勝者",
-      "date": "10/28",
+      "home": "沖縄尚学（沖縄2）",
+      "away": "佐賀北（佐賀2）",
+      "date": "10/29",
       "time": "11:30"
     },
     {
       "round": 2,
       "slot": 0,
-      "home": "1組の勝者",
-      "away": "2組の勝者",
-      "date": "10/30",
+      "home": "祐誠（福岡1）",
+      "away": "創成館（長崎2）",
+      "date": "10/31",
       "time": "9:00"
     },
     {
@@ -113,7 +143,7 @@
       "slot": 1,
       "home": "3組の勝者",
       "away": "4組の勝者",
-      "date": "10/30",
+      "date": "10/31",
       "time": "11:30"
     },
     {
@@ -121,7 +151,7 @@
       "slot": 0,
       "home": "1組の勝者",
       "away": "2組の勝者",
-      "date": "11/1",
+      "date": "11/2",
       "time": "9:00"
     }
   ]

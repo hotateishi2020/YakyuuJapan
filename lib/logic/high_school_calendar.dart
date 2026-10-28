@@ -1,15 +1,7 @@
-import 'dart:convert';
-import 'package:flutter/services.dart';
+import 'high_school_schedule.dart';
 
-Future<Map<String, dynamic>>? _catalogFuture;
-Future<Map<String, dynamic>> loadHighSchoolCalendar() =>
-    _catalogFuture ??= rootBundle
-        .loadString('backend/assets/data/high_school_calendar.json')
-        .then((raw) => jsonDecode(raw) as Map<String, dynamic>)
-        .catchError((Object error) {
-      _catalogFuture = null;
-      throw error;
-    });
+Future<Map<String, dynamic>> loadHighSchoolCalendar() async =>
+    Map<String, dynamic>.from((await loadHighSchoolSchedule())['calendar']);
 
 /// Select only the signed-in user's school and its prefectural representatives.
 /// Prefectures belong to schools, independently of the user's residence.

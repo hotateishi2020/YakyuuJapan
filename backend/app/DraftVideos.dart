@@ -1,4 +1,4 @@
-import '../../lib/logic/draft_video_priority.dart';
+import 'package:koko_shared/draft_video_priority.dart';
 import 'dart:convert';
 
 String _name(String value) => value.replaceAll(RegExp(r'[\s　]'), '').replaceAll('髙', '高').replaceAll('﨑', '崎').replaceAll('凜', '凛').replaceAll('澤', '沢');

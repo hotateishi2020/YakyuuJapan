@@ -1,6 +1,6 @@
 import 'PlayerCountry.dart';
 import 'GoldenGloveStats.dart';
-import '../../lib/logic/postseason_homers.dart';
+import 'package:koko_shared/postseason_homers.dart';
 import 'dart:convert';
 import 'package:postgres/postgres.dart';
 import 'StrengthUsage.dart';

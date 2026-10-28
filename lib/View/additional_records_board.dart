@@ -92,36 +92,36 @@ class AgeRecordsBoard extends StatelessWidget {
           child: Align(
             alignment: Alignment.topCenter,
             child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xffdfe6ee)),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: SingleChildScrollView(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xffdfe6ee)),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: SingleChildScrollView(
                   child: Table(
-                      key: const ValueKey('age-records-grid'),
-                      defaultColumnWidth: const IntrinsicColumnWidth(),
-                      border: const TableBorder(horizontalInside: BorderSide(color: Color(0xffe5eaf0), width: .5)),
-                      children: [
-                        TableRow(children: [
-                          for (final (column, label) in const ['記録', '最年少・選手名', '年齢', '日時', '最年長・選手名', '年齢', '日時'].indexed) cell(Text(label, softWrap: false), column, 40, header: true),
-                        ]),
-                        for (var i = 0; i < labels.length; i++)
-                          TableRow(
-                            children: [
-                              cell(Text(labels[i], softWrap: false, style: const TextStyle(fontWeight: FontWeight.w600)), 0, rowHeight(labels[i]), alternate: i.isOdd),
-                              for (final (edgeIndex, edge) in ['youngest', 'oldest'].indexed)
-                                for (final (fieldIndex, field) in ['name', 'age', 'date'].indexed) cell(entries(labels[i], edge, field), 1 + edgeIndex * 3 + fieldIndex, rowHeight(labels[i]), alternate: i.isOdd)
-                            ],
-                          )
-                      ],
-                    ),
+                    key: const ValueKey('age-records-grid'),
+                    defaultColumnWidth: const IntrinsicColumnWidth(),
+                    border: const TableBorder(horizontalInside: BorderSide(color: Color(0xffe5eaf0), width: .5)),
+                    children: [
+                      TableRow(children: [
+                        for (final (column, label) in const ['記録', '最年少・選手名', '年齢', '日時', '最年長・選手名', '年齢', '日時'].indexed) cell(Text(label, softWrap: false), column, 40, header: true),
+                      ]),
+                      for (var i = 0; i < labels.length; i++)
+                        TableRow(
+                          children: [
+                            cell(Text(labels[i], softWrap: false, style: const TextStyle(fontWeight: FontWeight.w600)), 0, rowHeight(labels[i]), alternate: i.isOdd),
+                            for (final (edgeIndex, edge) in ['youngest', 'oldest'].indexed)
+                              for (final (fieldIndex, field) in ['name', 'age', 'date'].indexed) cell(entries(labels[i], edge, field), 1 + edgeIndex * 3 + fieldIndex, rowHeight(labels[i]), alternate: i.isOdd)
+                          ],
+                        )
+                    ],
+                  ),
                 ),
               ),
-          ),
+            ),
           ),
         ),
       ),
@@ -179,11 +179,8 @@ class _CountRecordsBoardState extends State<CountRecordsBoard> {
       return const Center(child: Text('回数記録は未取得です'));
     }
     final portrait = MediaQuery.orientationOf(context) == Orientation.portrait;
-    final selected = availableRecords.any((record) => record['label'] == _selectedLabel)
-        ? _selectedLabel! : '${availableRecords.first['label']}';
-    final records = portrait
-        ? [availableRecords.firstWhere((record) => record['label'] == selected)]
-        : availableRecords;
+    final selected = availableRecords.any((record) => record['label'] == _selectedLabel) ? _selectedLabel! : '${availableRecords.first['label']}';
+    final records = portrait ? [availableRecords.firstWhere((record) => record['label'] == selected)] : availableRecords;
     return LayoutBuilder(builder: (context, constraints) {
       final ranked = [
         for (final record in records)
@@ -207,25 +204,29 @@ class _CountRecordsBoardState extends State<CountRecordsBoard> {
       double measuredWidth(String text, TextStyle style) {
         final painter = TextPainter(
           text: TextSpan(text: text, style: DefaultTextStyle.of(context).style.merge(style)),
-          textDirection: direction, textScaler: scaler,
+          textDirection: direction,
+          textScaler: scaler,
         )..layout();
         final width = painter.width.ceilToDouble();
         painter.dispose();
         return width;
       }
+
       final rankWidth = [
-        measuredWidth('順位', headerStyle),
-        for (var rank = 1; rank <= rowCount; rank++) measuredWidth('${rank}位', headerStyle),
-      ].reduce((a, b) => a > b ? a : b) + 9;
+            measuredWidth('順位', headerStyle),
+            for (var rank = 1; rank <= rowCount; rank++) measuredWidth('$rank位', headerStyle),
+          ].reduce((a, b) => a > b ? a : b) +
+          9;
       final columnWidths = [
         for (var i = 0; i < records.length; i++)
           ([
-            measuredWidth('${records[i]['label']}', headerStyle),
-            measuredWidth('—', playerStyle),
-            for (final players in ranked[i])
-              for (final player in players) measuredWidth(playerLabel(player, i), playerStyle),
-          ].reduce((a, b) => a > b ? a : b) + 9)
-            .clamp(1.0, portrait ? (constraints.maxWidth - rankWidth).clamp(1.0, double.infinity) : double.infinity),
+                    measuredWidth('${records[i]['label']}', headerStyle),
+                    measuredWidth('—', playerStyle),
+                    for (final players in ranked[i])
+                      for (final player in players) measuredWidth(playerLabel(player, i), playerStyle),
+                  ].reduce((a, b) => a > b ? a : b) +
+                  9)
+              .clamp(1.0, portrait ? (constraints.maxWidth - rankWidth).clamp(1.0, double.infinity) : double.infinity),
       ];
       double textWidth(int column) => (columnWidths[column] - 9).clamp(1.0, double.infinity);
       final heights = [
@@ -245,22 +246,25 @@ class _CountRecordsBoardState extends State<CountRecordsBoard> {
       Widget cell(Widget child, double width, double height, Color color) => Container(width: width, height: height, alignment: Alignment.center, padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12), decoration: BoxDecoration(color: color, border: Border.all(color: const Color(0xffdfe4ec), width: .5)), child: child);
       Color rowColor(int index) => index.isEven ? Colors.white : const Color(0xfff6f8fb);
       return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        if (portrait) MenuBand(level: 3, child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: DropdownButtonHideUnderline(child: DropdownButton<String>(
-            key: const ValueKey('count-records-picker'),
-            value: selected,
-            isExpanded: true,
-            items: [for (final record in availableRecords)
-              DropdownMenuItem(value: '${record['label']}', child: Text('${record['label']}'))],
-            onChanged: (value) {
-              if (value == null || value == selected) return;
-              if (_body.hasClients) _body.jumpTo(0);
-              if (_ranks.hasClients) _ranks.jumpTo(0);
-              setState(() => _selectedLabel = value);
-            },
-          )),
-        )),
+        if (portrait)
+          MenuBand(
+              level: 3,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                  key: const ValueKey('count-records-picker'),
+                  value: selected,
+                  isExpanded: true,
+                  items: [for (final record in availableRecords) DropdownMenuItem(value: '${record['label']}', child: Text('${record['label']}'))],
+                  onChanged: (value) {
+                    if (value == null || value == selected) return;
+                    if (_body.hasClients) _body.jumpTo(0);
+                    if (_ranks.hasClients) _ranks.jumpTo(0);
+                    setState(() => _selectedLabel = value);
+                  },
+                )),
+              )),
         Expanded(
             child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           SizedBox(
@@ -350,7 +354,7 @@ class _RegularHistoryBoardState extends State<RegularHistoryBoard> {
           foreground: Colors.white,
         )
       else
-      SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: [for (final e in teams.entries) Padding(padding: const EdgeInsets.all(3), child: ChoiceChip(label: Text(e.value), selected: id == e.key, onSelected: (_) => setState(() => selected = e.key)))])),
+        SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: [for (final e in teams.entries) Padding(padding: const EdgeInsets.all(3), child: ChoiceChip(label: Text(e.value), selected: id == e.key, onSelected: (_) => setState(() => selected = e.key)))])),
       Row(children: [
         for (final e in const {false: 'ポジション', true: '打順'}.entries) TextButton(onPressed: () => setState(() => batting = e.key), child: Text(e.value, style: TextStyle(fontWeight: batting == e.key ? FontWeight.bold : FontWeight.normal)))
       ]),

@@ -67,9 +67,12 @@ void main() {
     expect(highSchoolCalendarEvents(data, '未登録校').length, 1);
   });
   test('unconfirmed advancement remains explicitly conditional', () {
-    final catalog = jsonDecode(
-        File('backend/assets/data/high_school_calendar.json')
-            .readAsStringSync()) as Map<String, dynamic>;
+    final catalog = jsonDecode(jsonEncode(data)) as Map<String, dynamic>;
+    (catalog['tournaments'][0]['matches'] as List).add({
+      'date': '2026-10-29', 'time': '11:30',
+      'home': '沖縄尚学', 'away': '佐賀北／大分の勝者',
+      'candidate_schools': ['沖縄尚学', '佐賀北', '大分'], 'conditional': true,
+    });
     final events = highSchoolCalendarEvents(catalog, '佐賀北');
     final quarter =
         events.where((e) => e['date_from_temp'] == '2026-10-29').single;

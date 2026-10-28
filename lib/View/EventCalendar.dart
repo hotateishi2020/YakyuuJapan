@@ -1,4 +1,5 @@
 import '../logic/auth_session.dart';
+import 'dart:async';
 import '../logic/high_school_calendar.dart';
 import '../widgets/special_media.dart';
 import 'GamesBoard.dart' show teamLogoVisual;
@@ -32,6 +33,7 @@ class EventCalendar extends StatefulWidget {
 class _EventCalendarState extends State<EventCalendar> {
   late DateTime _month;
   Map<String, dynamic>? _schoolCalendar;
+  Timer? _schoolRefresh;
 
   void _schoolPreferenceChanged() {
     if (mounted) setState(() {});
@@ -51,6 +53,7 @@ class _EventCalendarState extends State<EventCalendar> {
 
   @override
   void dispose() {
+    _schoolRefresh?.cancel();
     AuthSession.instance.removeListener(_schoolPreferenceChanged);
     super.dispose();
   }
@@ -66,6 +69,7 @@ class _EventCalendarState extends State<EventCalendar> {
     super.initState();
     AuthSession.instance.addListener(_schoolPreferenceChanged);
     _loadSchoolCalendar();
+    _schoolRefresh = Timer.periodic(const Duration(minutes: 5), (_) => _loadSchoolCalendar());
     final now = widget.initialMonth ?? DateTime.now();
     _month = DateTime(now.year, now.month);
   }

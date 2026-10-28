@@ -9,9 +9,11 @@ import 'package:Yakyuu_Japan/widgets/app_section_tabs.dart';
 
 void main() {
   final tournament = <String, dynamic>{
-    ...jsonDecode(File('backend/assets/data/autumn_kyushu_2026.json')
-        .readAsStringSync()) as Map<String, dynamic>,
-    'year': 2026
+    'year': 2026,
+    'matches': [
+      {'home': '佐賀北（佐賀2）', 'away': '大分（大分1）', 'date': '10/27', 'time': '11:30'},
+      {'home': '佐賀北（佐賀2）', 'away': '沖縄尚学（沖縄2）', 'date': '10/29', 'time': '11:30'},
+    ],
   };
   test('user 1 defaults to Saga Kita and other users do not inherit it', () {
     expect(favoriteSchoolForUser(AuthUser.fromJson({'id': 1})), '佐賀北');

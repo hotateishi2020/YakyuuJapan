@@ -4,9 +4,9 @@ import '../logic/auth_session.dart';
 import 'favorite_high_school_board.dart';
 import '../widgets/collapsible_menu.dart';
 import 'high_school_records_board.dart';
-import 'dart:convert';
+import 'dart:async';
+import '../logic/high_school_schedule.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../widgets/baseball_loading.dart';
 
 class OtherBaseballBoard extends StatelessWidget {
@@ -89,9 +89,20 @@ class AutumnKyushuBracket extends StatefulWidget {
 }
 
 class _AutumnKyushuBracketState extends State<AutumnKyushuBracket> {
-  late final Future<Map<String, dynamic>> data = rootBundle
-      .loadString('backend/assets/data/autumn_kyushu_2026.json')
-      .then((s) => jsonDecode(s) as Map<String, dynamic>);
+  Future<Map<String, dynamic>> data = loadAutumnKyushuSchedule();
+  Timer? _refresh;
+  @override
+  void initState() {
+    super.initState();
+    _refresh = Timer.periodic(const Duration(minutes: 5), (_) {
+      setState(() { data = loadAutumnKyushuSchedule(); });
+    });
+  }
+  @override
+  void dispose() {
+    _refresh?.cancel();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) => widget.year != 2026
       ? Center(child: Text('${widget.year}年の秋季九州大会は未収録です。2026年を選択してください。'))
@@ -215,7 +226,7 @@ class _AutumnKyushuBracketState extends State<AutumnKyushuBracket> {
                   const Padding(
                       padding: EdgeInsets.all(6),
                       child: Text(
-                          '出典：熊本県野球・ソフトボール連絡協議会（高野連掲載組合せ）。未実施試合の得点は表示しません。',
+                          '出典：熊本県野球・ソフトボール連絡協議会（組合せ）、ぐぐスポ！（日程・結果）。未実施試合の得点は表示しません。',
                           style: TextStyle(fontSize: 10))),
                 ]);
           });

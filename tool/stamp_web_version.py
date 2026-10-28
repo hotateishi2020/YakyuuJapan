@@ -16,3 +16,8 @@ updater.write_text(updater.read_text().replace('__APP_BUILD_ID__', build))
 
 index = root / 'index.html'
 index.write_text(index.read_text().replace('src="app_update.js"', f'src="app_update.js?v={build}"').replace('src="flutter_bootstrap.js"', f'src="flutter_bootstrap.js?v={build}"'))
+
+# The loader must request the new compiled application even when an older
+# main.dart.js is still in the browser's HTTP cache.
+bootstrap = root / 'flutter_bootstrap.js'
+bootstrap.write_text(bootstrap.read_text().replace('"mainJsPath":"main.dart.js"', f'"mainJsPath":"main.dart.js?v={build}"'))

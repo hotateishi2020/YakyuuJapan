@@ -51,8 +51,8 @@ void main() {
     expect(replayBatterSwings(frame('PINCH_RUNNER')), isFalse);
   });
   testWidgets('batter flashes for two seconds and change follows the result', (tester) async {
-    const f = ReplayFrame(inning: 1, bottom: false, after: true, outs: 3, bases: 0, beforeBases: 1, homeScore: 0, awayScore: 0, batter: '打者', nextBatter: '次打者', label: '左飛', result: 'OUT_FLY', direction: 'LEFT', defense: const {});
-    await tester.pumpWidget(MaterialApp(home: Center(child: SizedBox(width: 340, child: ReplayField(frame: f)))));
+    const f = ReplayFrame(inning: 1, bottom: false, after: true, outs: 3, bases: 0, beforeBases: 1, homeScore: 0, awayScore: 0, batter: '打者', nextBatter: '次打者', label: '左飛', result: 'OUT_FLY', direction: 'LEFT', defense: {});
+    await tester.pumpWidget(const MaterialApp(home: Center(child: SizedBox(width: 340, child: ReplayField(frame: f)))));
     double opacity() => tester.widget<Opacity>(find.ancestor(of: find.byKey(const Key('replay-batter')), matching: find.byType(Opacity)).first).opacity;
     await tester.pump(const Duration(milliseconds: 300));
     expect(opacity(), .15);

@@ -1,5 +1,5 @@
 (() => {
-  const current = '1b1ba5a0a7949e2865fbb785b355dd5574c32377abcc57ebf7de7bcf501e9a64';
+  const current = 'c72f9b599ede1c05cb74744f64f159852c3ca324ba2689802853288eb30a6e45';
   // Replaced only by tool/build_web.sh; IDE builds use reload-on-save.
   if (current.startsWith('__APP_')) return;
   let checking = false;

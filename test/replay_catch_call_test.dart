@@ -27,7 +27,7 @@ void main(){
   });
   testWidgets('fly verdict appears at the left fielder only after the catch',(tester)async{
     await tester.pumpWidget(MaterialApp(home:Center(child:SizedBox(width:340,child:ReplayField(frame:play('OUT_FLY'))))));
-    await tester.pump(const Duration(milliseconds:5100));
+    await tester.pump(const Duration(milliseconds:4200));
     expect(find.byKey(const Key('replay-catch-call')),findsNothing);
     await tester.pump(const Duration(milliseconds:200));
     expect(find.text('アウト'),findsOneWidget);
@@ -39,9 +39,9 @@ void main(){
   });
   testWidgets('double shows safe at second base when the throw arrives',(tester)async{
     await tester.pumpWidget(MaterialApp(home:Center(child:SizedBox(width:340,child:ReplayField(frame:play('HIT2',bases:2))))));
-    await tester.pump(const Duration(milliseconds:6300));
+    await tester.pump(const Duration(milliseconds:5399));
     expect(find.text('セーフ'),findsNothing);
-    await tester.pump(const Duration(milliseconds:200));
+    await tester.pump(const Duration(milliseconds:2));
     expect(find.text('セーフ'),findsOneWidget);
     final field=tester.getRect(find.byType(ReplayField));
     final call=tester.getCenter(find.byKey(const Key('replay-catch-call')));

@@ -23,4 +23,9 @@ void main() {
     expect(gameSeasonStats([{'title': 'HP', 'stats': 20}], pitching: true, role: '中'), '— —H');
     expect(gameSeasonStats([{'title': '打率', 'stats': 0}, {'title': '本塁打', 'stats': 0}], pitching: false), '.000 0本');
   });
+  test('公式で出場なしと確認した場合は空欄や架空の率にしない', () {
+    expect(gameSeasonStats([{'title': '防御率','stats': '登板なし'}, {'title': '勝利','stats': 0}], pitching: true, role: '先'), '登板なし 0勝');
+    expect(gameSeasonStats([{'title': '打率','stats': '打席なし'}, {'title': '本塁打','stats': 0}], pitching: false), '打席なし 0本');
+    expect(gameSeasonStats([{'title': '打率','numeric_value': .251}, {'title': '本塁打','stats': 0}], pitching: false), '.251 0本');
+  });
 }

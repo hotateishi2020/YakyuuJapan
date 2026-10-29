@@ -7,7 +7,6 @@ import '../View/season_titles_board.dart';
 import '../View/japanese_mlb_board.dart';
 import '../View/other_baseball_board.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
-import '../View/videos_board.dart';
 import '../tools/tab_preferences.dart';
 import '../View/retained_tab_body.dart';
 import '../View/player_detail_dialog.dart';
@@ -197,7 +196,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     } else {
       _orgKind = OrgKind.npb;
     }
-    _itemTab = readSavedTab('main_${_orgKind.name}', [1, 2, 3, 4, 6, 8, if (_orgKind == OrgKind.mlb) 7], fallback: 1);
+    _itemTab = readSavedTab('main_${_orgKind.name}', [1, 2, 3, 4, 8, if (_orgKind == OrgKind.mlb) 7], fallback: 1);
     _personalStatsLayout = readPersonalStatsLayout();
     if (readBrowserCookie(_bracketCookie) == '0') _bracketOpen = false;
     // First paint contains only the header/tabs; cache decoding and requests follow.
@@ -957,7 +956,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     setState(() {
       _predictGroupsOpen = false;
       _orgKind = kind;
-      _itemTab = readSavedTab('main_${kind.name}', [1, 2, 3, 4, 6, 8, if (kind == OrgKind.mlb) 7], fallback: 1);
+      _itemTab = readSavedTab('main_${kind.name}', [1, 2, 3, 4, 8, if (kind == OrgKind.mlb) 7], fallback: 1);
       error = null;
       if (usable) {
         _applyBundle(cached, kind: kind);
@@ -1254,7 +1253,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   }
 
   Future<void> _ensureItemYearLoaded(int item) async {
-    if (item >= 3) return; // 戦力・記録・動画はタブを開いたときだけデータを取得する。
+    if (item >= 3) return; // 戦力・記録はタブを開いたときだけデータを取得する。
     final kind = _orgKind;
     final year = _seasonYear;
     // 試合画面はトーナメントの順位と先発投手の個人成績も使用する。
@@ -1706,6 +1705,15 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
           selectedYear: DateTime.now().toUtc().add(const Duration(hours: 9)).year,
         );
 
+  void _openHome() {
+    writeBrowserCookie(_orgCookie, 'home');
+    setState(() { _homeOpen = true; _otherOpen = false; _predictGroupsOpen = false; });
+    unawaited(_ensureSharedInfo());
+    unawaited(_loadThenWatchGames());
+    unawaited(AuthSession.instance.reportAction('HOMEタブを開いた'));
+    if (AuthSession.instance.isLoggedIn) unawaited(_loadInitialPredictGroups());
+  }
+
   Widget _orgTabBar() => AppSectionTabs(
     alwaysTabs: _homeOpen,
     tabs: [('🏠HOME', 4), ('🎯予想対決${_predictInvites.isNotEmpty ? ' ●' : ''}', 0), ('🇯🇵NPB', 1), ('🇺🇸MLB', 2), ('⚾️その他', 3)],
@@ -1714,12 +1722,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     selectedForeground: _homeOpen || _otherOpen || _predictGroupsOpen ? Colors.white : _org.tabForeground,
     onSelected: (value) {
       if (value == 4) {
-        writeBrowserCookie(_orgCookie, 'home');
-        setState(() { _homeOpen = true; _otherOpen = false; _predictGroupsOpen = false; });
-        unawaited(_ensureSharedInfo());
-        unawaited(_loadThenWatchGames());
-        unawaited(AuthSession.instance.reportAction('HOMEタブを開いた'));
-        if (AuthSession.instance.isLoggedIn) unawaited(_loadInitialPredictGroups());
+        _openHome();
         return;
       }
       if (value == 3) {
@@ -1745,16 +1748,15 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
               ('🏆タイトル', 8),
               ('💪戦力', 3),
               ('📝記録', 4),
-              ('🎥動画', 6),
             ],
             highlightGames: _seasonYear == DateTime.now().year && orgGamesInProgress(
               [...postseasonGames, ...games], DateFormatUtil.ymdWithOffset(0), _org.leagueIds),
             selectedIndex: _itemTab,
             onSelected: (i) {
               if (i == _itemTab) return;
-              const actions = ['試合情報タブを開いた', 'チーム順位タブを開いた', '個人成績タブを開いた', '戦力タブを開いた', '記録タブを開いた', '日程タブを開いた', '動画タブを開いた', '日本人タブを開いた', 'タイトルタブを開いた'];
-              if (i >= 0 && i < actions.length) {
-                unawaited(AuthSession.instance.reportAction(actions[i]));
+              const actions = {0: '試合情報タブを開いた', 1: 'チーム順位タブを開いた', 2: '個人成績タブを開いた', 3: '戦力タブを開いた', 4: '記録タブを開いた', 7: '日本人タブを開いた', 8: 'タイトルタブを開いた'};
+              if (actions[i] case final action?) {
+                unawaited(AuthSession.instance.reportAction(action));
               }
               saveTab('main_${_orgKind.name}', i);
               setState(() => _itemTab = i);
@@ -1804,7 +1806,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
   Widget _itemBoard({bool wideLayout = false}) {
     if (_itemTab == 8) return SeasonTitlesBoard(key: ValueKey("titles-${_orgKind.name}-$_seasonYear"), org: _org, year: _seasonYear);
     if (_itemTab == 7 && _orgKind == OrgKind.mlb) return JapaneseMlbBoard(key: ValueKey('japanese-$_seasonYear'), year: _seasonYear);
-    if (_itemTab == 6) return VideosBoard(key: ValueKey(_orgKind), org: _orgKind, color: _org.tabColor);
     if (_itemTab == 4) {
       return RecordsBoard(org: _org, year: _seasonYear);
     }
@@ -1929,7 +1930,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
       builder: (context, constraints) {
         final isMlb = _orgKind == OrgKind.mlb;
         final boardW = isMlb ? MlbBracketGeom.w : BracketGeom.w;
-        final boardH = isMlb ? MlbBracketGeom.h : BracketGeom.h;
         final width = constraints.maxWidth.isFinite ? constraints.maxWidth : boardW;
         final loadingTeams = !_partReady(_LoadPart.standings);
         return Column(
@@ -1959,7 +1959,6 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
             if (_bracketOpen)
               SizedBox(
                 width: width,
-                height: width * boardH / boardW,
                 child: isMlb
                     ? MlbPostseasonBracket(
                         standings: standings,
@@ -2368,7 +2367,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
     if (isLoading && !_shellReady) {
       return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         MenuBand(level: 0, toggle: false, child: Headers.globalHeader(context, HEADER_GLOBAL_H, ALL_COLOR_APP, HEADER_TITLE,
-          HEADER_PAD_VERTICAL, ALL_MARGIN_LEFT, showRightActions: false)),
+          HEADER_PAD_VERTICAL, ALL_MARGIN_LEFT, onHome: _openHome, showRightActions: false)),
         Padding(padding: const EdgeInsets.symmetric(horizontal: ALL_MARGIN_LEFT),
           child: Column(children: [
             const MenuGap(height: ALL_SPACE_BLOCK),
@@ -2478,6 +2477,7 @@ class _PredictionPageState extends State<PredictionPage> with WidgetsBindingObse
                         HEADER_TITLE,
                         HEADER_PAD_VERTICAL,
                         ALL_MARGIN_LEFT,
+                        onHome: _openHome,
                         onAuthChanged: _onAuthChanged,
                         authReady: _authEntryReady,
                         showRightActions: _authEntryReady,

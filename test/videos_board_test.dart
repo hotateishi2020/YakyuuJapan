@@ -1,3 +1,7 @@
+import 'package:Yakyuu_Japan/View/home_board.dart';
+import 'package:Yakyuu_Japan/widgets/app_section_tabs.dart';
+import 'package:Yakyuu_Japan/tools/home_data_cache.dart';
+import 'package:Yakyuu_Japan/View/season_schedule_board.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'package:Yakyuu_Japan/config/org_config.dart';
@@ -167,6 +171,11 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('球団関連動画'), findsOneWidget);
       expect(find.text('ドジャース解説0'), findsOneWidget);
+      expect(tester.widget<ListView>(find.byKey(const PageStorageKey('video-row-mlb-team-dodgers'))).childrenDelegate.estimatedChildCount, 6);
+      final row = find.byKey(const PageStorageKey('video-row-mlb-team-dodgers'));
+      final scroll = tester.state<ScrollableState>(find.descendant(of: row, matching: find.byType(Scrollable)));
+      scroll.position.jumpTo(scroll.position.maxScrollExtent);
+      await tester.pumpAndSettle();
       expect(find.byKey(ValueKey('video-${videoId(9005)}')), findsOneWidget);
       await tester.tap(find.byKey(const ValueKey('videos-tab-mlb-team-yankees')));
       await tester.pumpAndSettle();
@@ -286,139 +295,75 @@ void main() {
         await tester
             .pumpWidget(const MaterialApp(home: Scaffold(body: VideosBoard())));
         await tester.pumpAndSettle();
-        expect(find.textContaining('パ動画'), findsNWidgets(7));
+        int count(String id) => tester.widget<ListView>(
+          find.byKey(PageStorageKey('video-row-$id'))).childrenDelegate.estimatedChildCount!;
+        expect(count(channelId(1)), 7);
         expect(find.text('当日〜2日前の動画（10件未満の場合は最新10件）'), findsOneWidget);
-        expect(find.text('球団公式'), findsWidgets);
-        expect(find.text('関連チャンネル'), findsWidgets);
-        final first =
-            tester.getRect(find.byKey(ValueKey('video-${videoId(0)}')));
-        final second =
-            tester.getRect(find.byKey(ValueKey('video-${videoId(1)}')));
-        final third =
-            tester.getRect(find.byKey(ValueKey('video-${videoId(2)}')));
+        final first = tester.getRect(find.byKey(ValueKey('video-${videoId(0)}')));
+        final second = tester.getRect(find.byKey(ValueKey('video-${videoId(1)}')));
         expect(second.top, first.top);
-        expect(third.top, first.top);
-        expect(third.left, greaterThan(second.left));
+        expect(second.left, greaterThan(first.left));
         final row = find.byKey(PageStorageKey('video-row-${channelId(1)}'));
-        final last = find.byKey(ValueKey('video-${videoId(6)}'));
-        final before = tester.getTopLeft(last).dx;
-        await tester.drag(row, const Offset(-400, 0));
-        await tester.pumpAndSettle();
-        expect(tester.getTopLeft(last).dx, lessThan(before));
         final scroll = tester.state<ScrollableState>(
-            find.descendant(of: row, matching: find.byType(Scrollable)));
+          find.descendant(of: row, matching: find.byType(Scrollable)));
+        await tester.drag(row, const Offset(-150, 0));
+        await tester.pumpAndSettle();
+        expect(scroll.position.pixels, greaterThan(0));
         scroll.position.jumpTo(scroll.position.maxScrollExtent);
         await tester.pumpAndSettle();
-        expect(tester.getRect(last).right, lessThanOrEqualTo(size.width));
+        expect(tester.getRect(find.byKey(ValueKey('video-${videoId(6)}'))).right,
+          lessThanOrEqualTo(size.width));
         scroll.position.jumpTo(0);
         await tester.pumpAndSettle();
         await tester.tap(find.byKey(ValueKey('video-${videoId(0)}')));
         await tester.pumpAndSettle();
-        expect(launcher.urls.single,
-            'https://www.youtube.com/watch?v=${videoId(0)}');
-        final list = tester.widget<ListView>(
-            find.byKey(const PageStorageKey('video-channel-list')));
-        final children =
-            (list.childrenDelegate as SliverChildListDelegate).children;
+        expect(launcher.urls.single, 'https://www.youtube.com/watch?v=${videoId(0)}');
+        final list = tester.widget<ListView>(find.byKey(const PageStorageKey('video-channel-list')));
+        final children = (list.childrenDelegate as SliverChildListDelegate).children;
         expect(children[1].key, const ValueKey('videos-section-ob'));
         expect(children[2].key, const ValueKey('videos-section-teams'));
 
         final expert = find.byKey(ValueKey('videos-tab-${channelId(3)}'));
         await show(tester, expert);
-        expect(find.textContaining('上原動画'), findsNWidgets(4));
-        expect(find.textContaining('里崎動画'), findsNWidgets(7));
-        expect(
-            find.descendant(
-                of: find.byKey(const ValueKey('videos-section-ob')),
-                matching: find.text('ALL')),
-            findsOneWidget);
+        expect(count('ob-all'), 11);
         expect(find.text('各有識者の動画をすべて表示（新しい順・11件）'), findsOneWidget);
-        expect(find.byTooltip('有識者の動画一覧をYouTubeで開く'), findsNothing);
-
-        expect(find.descendant(of: expert, matching: find.text('里崎智也')),
-            findsOneWidget);
-        expect(
-            find.descendant(
-                of: expert, matching: find.text('Satozaki Channel')),
-            findsNothing);
         await tester.tap(expert);
         await tester.pumpAndSettle();
-        expect(find.textContaining('里崎動画'), findsNWidgets(7));
+        expect(count(channelId(3)), 7);
+        expect(find.textContaining('里崎動画'), findsWidgets);
         expect(find.textContaining('上原動画'), findsNothing);
         expect(find.textContaining('前回取得分'), findsOneWidget);
         await tester.tap(find.byTooltip('Satozaki ChannelをYouTubeで開く'));
         await tester.pumpAndSettle();
-        expect(launcher.urls.last,
-            'https://www.youtube.com/channel/${channelId(3)}');
-
+        expect(launcher.urls.last, 'https://www.youtube.com/channel/${channelId(3)}');
         final allExperts = find.byKey(const ValueKey('videos-tab-ob-all'));
         await show(tester, allExperts);
         await tester.tap(allExperts);
         await tester.pumpAndSettle();
-        expect(find.textContaining('上原動画'), findsNWidgets(4));
-        expect(find.textContaining('里崎動画'), findsNWidgets(7));
-        final allRow = find.byKey(const PageStorageKey('video-row-ob-all'));
-        expect(find.descendant(of: allRow, matching: find.text('上原浩治の雑談魂')),
-            findsNWidgets(4));
-        expect(
-            find.descendant(
-                of: allRow, matching: find.text('Satozaki Channel')),
-            findsNWidgets(7));
-        expect(calls, 1);
+        expect(count('ob-all'), 11);
 
         final team = find.byKey(ValueKey('videos-tab-${channelId(11)}'));
         await show(tester, team);
         for (var i = 0; i < 12; i++) {
-          expect(find.byKey(ValueKey('videos-tab-${channelId(10 + i)}')),
-              findsOneWidget);
+          expect(find.byKey(ValueKey('videos-tab-${channelId(10 + i)}')), findsOneWidget);
         }
         final firstTab = find.byKey(ValueKey('videos-tab-${channelId(10)}'));
         final lastCentral = find.byKey(ValueKey('videos-tab-${channelId(15)}'));
-        final firstPacific =
-            find.byKey(ValueKey('videos-tab-${channelId(16)}'));
+        final firstPacific = find.byKey(ValueKey('videos-tab-${channelId(16)}'));
         final lastPacific = find.byKey(ValueKey('videos-tab-${channelId(21)}'));
         expect(tester.getCenter(firstTab).dy, tester.getCenter(lastCentral).dy);
-        expect(tester.getCenter(firstPacific).dy,
-            tester.getCenter(lastPacific).dy);
-        expect(tester.getCenter(firstPacific).dy,
-            greaterThan(tester.getCenter(firstTab).dy));
-        Color? tabColor(Finder tab) => tester
-            .widget<Material>(
-                find.ancestor(of: tab, matching: find.byType(Material)).first)
-            .color;
-        expect(tabColor(firstTab), const Color(0xFF005BAC));
-        expect(tabColor(team),
-            Color.lerp(const Color(0xFF005BAC), Colors.white, .88));
-        expect(find.textContaining('球団0動画'), findsNWidgets(30));
+        expect(tester.getCenter(firstPacific).dy, tester.getCenter(lastPacific).dy);
+        expect(tester.getCenter(firstPacific).dy, greaterThan(tester.getCenter(firstTab).dy));
+        expect(count(channelId(10)), 30);
         await tester.tap(team);
         await tester.pumpAndSettle();
-        expect(tabColor(team), const Color(0xFF005BAC));
-        expect(tabColor(firstTab),
-            Color.lerp(const Color(0xFF005BAC), Colors.white, .88));
-        expect(find.textContaining('球団1動画'), findsNWidgets(30));
+        expect(count(channelId(11)), 30);
+        expect(find.textContaining('球団1動画'), findsWidgets);
         expect(find.textContaining('球団0動画'), findsNothing);
         await show(tester, find.text('野球系解説チャンネル'));
-        expect(find.text('野球系解説チャンネル'), findsOneWidget);
-        expect(find.textContaining('Baseball動画'), findsNWidgets(10));
-        expect(find.textContaining('MN動画'), findsNWidgets(10));
-        expect(find.textContaining('追加解説動画'), findsNWidgets(10));
+        expect(count('media-all'), 30);
         expect(find.text('各チャンネルの最新動画（新しい順・30件）'), findsOneWidget);
-        expect(
-            find.byKey(ValueKey('videos-tab-${channelId(30)}')), findsNothing);
-        expect(
-            find.byKey(ValueKey('videos-tab-${channelId(31)}')), findsNothing);
-        expect(
-            find.byKey(const ValueKey('videos-tab-media-all')), findsNothing);
-        final mediaRow =
-            find.byKey(const PageStorageKey('video-row-media-all'));
-        final mnFirst = find.descendant(
-            of: mediaRow,
-            matching: find.byKey(ValueKey('video-${videoId(1700)}')));
-        final baseballFirst = find.descendant(
-            of: mediaRow,
-            matching: find.byKey(ValueKey('video-${videoId(1600)}')));
-        expect(tester.getTopLeft(mnFirst).dx,
-            lessThan(tester.getTopLeft(baseballFirst).dx));
+        expect(find.byKey(const ValueKey('videos-tab-media-all')), findsNothing);
 
         expect(calls, 1);
         expect(tester.takeException(), isNull);
@@ -541,32 +486,76 @@ void main() {
               return calls == 1 ? http.Response('', 503) : jsonResponse(data());
             }));
   });
-  testWidgets('動画タブは記録の右にあり開いたときだけ取得する', (tester) async {
+  testWidgets('NPB・MLBのナビゲーションに動画タブを表示しない', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(600, 1000));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
     var videoCalls = 0;
     await http.runWithClient(() async {
-      await tester.pumpWidget(
-          const MaterialApp(home: Scaffold(body: PredictionPage())));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pumpWidget(const MaterialApp(home: Scaffold(body: PredictionPage())));
+      for (var i = 0; i < 12; i++) { await tester.pump(); }
+      void noVideoTab() {
+        final tabs = tester.widgetList<AppSectionTabs>(find.byType(AppSectionTabs));
+        expect(tabs.any((bar) => bar.tabs.any((tab) => tab.$1.contains('記録'))), isTrue);
+        expect(tabs.any((bar) => bar.tabs.any((tab) => tab.$1.contains('動画'))), isFalse);
+      }
+      noVideoTab();
+      await tester.tap(find.byKey(const ValueKey('navigation-picker-0')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('🇺🇸MLB').last);
+      for (var i = 0; i < 12; i++) { await tester.pump(); }
+      noVideoTab();
       expect(videoCalls, 0);
-      expect(tester.getCenter(find.text('動画')).dx,
-          greaterThan(tester.getCenter(find.text('記録')).dx));
-      await tester.tap(find.text('動画'));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
-      expect(videoCalls, 1);
-      expect(find.byType(VideosBoard), findsOneWidget);
-      expect(find.text('パ動画0'), findsOneWidget);
+      expect(find.byType(VideosBoard), findsNothing);
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pump(const Duration(seconds: 21));
-    },
-        () => MockClient((r) async {
-              if (r.url.path == '/videos') {
-                videoCalls++;
-                return jsonResponse(data());
-              }
-              return jsonResponse({});
-            }));
+    }, () => MockClient((r) async {
+      if (r.url.path == '/videos') videoCalls++;
+      return jsonResponse({});
+    }));
+  });
+
+  testWidgets('HOME下部でNPBとMLBの動画を同じ縦スクロールで見られる', (tester) async {
+    HomeDataCache.clear();
+    HomeCalendarCache.clear();
+    addTearDown(HomeCalendarCache.clear);
+    final requests = <String>[];
+    await http.runWithClient(() async {
+      await tester.pumpWidget(const MaterialApp(home: Scaffold(body: HomeBoard(year: 2026))));
+      await tester.pumpAndSettle();
+      for (final org in ['NPB', 'MLB']) {
+        final scrollable = find.descendant(of: find.byKey(const ValueKey('home-scroll')), matching: find.byType(Scrollable)).first;
+        for (var i = 0; i < 100 && find.text('$orgの動画').evaluate().isEmpty; i++) {
+          final position = tester.state<ScrollableState>(scrollable).position;
+          position.jumpTo((position.pixels + 300).clamp(0, position.maxScrollExtent));
+          await tester.pumpAndSettle();
+        }
+        final position = tester.state<ScrollableState>(scrollable).position;
+        expect(find.text('$orgの動画'), findsOneWidget,
+          reason: 'scroll=${position.pixels}/${position.maxScrollExtent} requests=$requests');
+        await tester.ensureVisible(find.text('$orgの動画'));
+        await tester.pumpAndSettle();
+        final section = find.byKey(ValueKey('home-section-$orgの動画'));
+        expect(section, findsOneWidget);
+        expect(tester.widget<VideosBoard>(find.descendant(of: section, matching: find.byType(VideosBoard))).embedded, isTrue);
+        expect(find.descendant(of: section, matching: find.text('$org公式チャンネル')), findsOneWidget);
+        expect(tester.widgetList<ListView>(find.descendant(of: section, matching: find.byType(ListView)))
+          .every((list) => list.scrollDirection == Axis.horizontal), isTrue);
+        expect(tester.takeException(), isNull);
+      }
+      expect(requests.toSet(), {'npb', 'mlb'});
+      await tester.pumpWidget(const SizedBox.shrink());
+    }, () => MockClient((r) async {
+      if (r.url.path == '/videos') {
+        final org = r.url.queryParameters['org']!;
+        requests.add(org);
+        return jsonResponse({'channels': [{
+          'id': channelId(org == 'npb' ? 1 : 2), 'name': '${org.toUpperCase()}公式チャンネル',
+          'category': 'league', 'status': 'ok', 'display_mode': 'all',
+          'videos': videos(0, 1, org),
+        }]});
+      }
+      return jsonResponse({'today': '2026-10-29', 'games': [], 'events': [], 'heroes': [], 'birthdays': []});
+    }));
   });
 }

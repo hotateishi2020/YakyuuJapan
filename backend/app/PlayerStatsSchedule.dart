@@ -1,4 +1,5 @@
 import 'SnapshotWork.dart';
+import 'GameSeasonStats.dart';
 import 'ScheduledLog.dart';
 import 'dart:async';
 
@@ -57,10 +58,16 @@ class PlayerStatsSchedule {
   }
 
   static Future<void> _runAll() async {
-    await _runNpb();
-    await _runMlb();
+    final result = await GameSeasonStats.refresh(DateTime.now().year);
+    print('試合表示用・全選手シーズン成績: $result');
+    for (final run in [_runNpb, _runMlb]) {
+      try { await run(); } catch (error, stack) {
+        print('個人成績ランキング取得失敗（他リーグと全選手成績の更新は継続）: $error\n$stack');
+      }
+    }
     await Postgres.withConnection((conn) async {
       await DisplaySnapshot.refreshPlayers(conn, DateTime.now().year);
+      await DisplaySnapshot.refreshGames(conn, DateTime.now().year);
       await PredictionSnapshot.refresh(conn);
     });
   }

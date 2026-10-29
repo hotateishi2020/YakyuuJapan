@@ -3,6 +3,8 @@ import '../logic/home_run_video.dart';
 import '../tools/open_home_run_link.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'dart:convert';
+import 'dart:async';
+import '../tools/player_detail_cache.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
@@ -65,32 +67,89 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
   String? error;
   final Map<String, Uri> _homeRunLinks = {};
   final Set<String> _homeRunChecked = {};
+  Timer? _pendingRefresh;
+  int _pendingAttempts = 0;
+  int _loadGeneration = 0;
   @override
   void initState() {
     super.initState();
     load();
   }
 
-  Future<void> load() async {
+  @override
+  void dispose() {
+    _pendingRefresh?.cancel();
+    super.dispose();
+  }
+
+  Future<Map<String,dynamic>> _getProfile(Uri uri, String? token) async {
+    for (var attempt = 0; ; attempt++) {
+      try {
+        final response = await http.get(uri, headers: {if (token != null) 'Authorization': 'Bearer $token'})
+            .timeout(const Duration(seconds: 10));
+        if (response.statusCode != 200) {
+          if (attempt == 0 && const [408,429,500,502,503,504].contains(response.statusCode)) {
+            await Future<void>.delayed(const Duration(milliseconds: 300));
+            continue;
+          }
+          throw FormatException('HTTP ${response.statusCode}');
+        }
+        return Map<String,dynamic>.from(jsonDecode(utf8.decode(response.bodyBytes)) as Map);
+      } catch (error) {
+        if (attempt > 0 || error is FormatException) rethrow;
+        await Future<void>.delayed(const Duration(milliseconds: 300));
+      }
+    }
+  }
+
+  Future<void> load({bool refresh = false}) async {
+    _pendingRefresh?.cancel();
+    if (refresh) _pendingAttempts = 0;
+    final generation = ++_loadGeneration;
     setState(() {
-      loading = true;
+      loading = data['found'] != true;
       error = null;
     });
     try {
       final p = widget.player;
       final q = <String, String>{'org': widget.org, 'year': '${widget.year}', 'name': '${p['name'] ?? p['name_full'] ?? p['name_player'] ?? p['player_name'] ?? ''}'.replaceAll(RegExp(r'\(.*\)$'), ''), if (p['id_player'] != null) 'id_player': '${p['id_player']}', if (p['source_player_id'] != null) 'source_player_id': '${p['source_player_id']}', if (p['id_team'] != null) 'id_team': '${p['id_team']}'};
-      final r = await http.get(Env.api('/player-detail').replace(queryParameters: q), headers: {if (AuthSession.instance.token != null) 'Authorization': 'Bearer ${AuthSession.instance.token}'}).timeout(const Duration(seconds: 15));
-      if (r.statusCode != 200) throw Exception('HTTP ${r.statusCode}');
-      final d = jsonDecode(utf8.decode(r.bodyBytes));
-      if (mounted) {
-        setState(() => data = Map<String, dynamic>.from(d));
-        prepareHomeRunVideos();
+      final token = AuthSession.instance.token;
+      final key = '$token|${widget.org}|${widget.year}|${q['id_player'] ?? q['source_player_id'] ?? '${q['id_team']}:${q['name']}'}';
+      final d = await PlayerDetailCache.read(key,
+          () => _getProfile(Env.api('/player-detail').replace(queryParameters: q), token), refresh: refresh);
+      if (mounted && generation == _loadGeneration) {
+        setState(() => data = d);
+        if (d['pending'] == true && _pendingAttempts < 6) {
+          _pendingAttempts++;
+          _pendingRefresh = Timer(const Duration(seconds: 5), () => load());
+        } else if (d['found'] == true && d['pending'] != true) {
+          prepareHomeRunVideos();
+          unawaited(_refreshSeason(q, token, key, generation, refresh: refresh));
+        }
       }
     } catch (_) {
-      if (mounted) setState(() => error = '選手情報を取得できませんでした。');
+      if (mounted && generation == _loadGeneration && data['found'] != true) setState(() => error = '選手情報を取得できませんでした。');
     } finally {
-      if (mounted) setState(() => loading = false);
+      if (mounted && generation == _loadGeneration) setState(() => loading = false);
     }
+  }
+
+  Future<void> _refreshSeason(Map<String,String> identity, String? token, String key, int generation,
+      {required bool refresh}) async {
+    final id = map(data['profile'])['id'] ?? identity['id_player'];
+    if (id == null) return;
+    try {
+      final result = await PlayerDetailCache.read('$key:season', () async {
+        final response = await _getProfile(Env.api('/player-detail').replace(queryParameters: {
+          ...identity, 'id_player': '$id', 'section': 'season',
+        }), token);
+        return {...response, 'found': response['season_stats'] is List};
+      }, refresh: refresh);
+      if (mounted && generation == _loadGeneration && result['season_stats'] is List) {
+        setState(() => data = {...data, 'season_stats': result['season_stats'],
+          if (result['character_image'] != null) 'character_image': result['character_image']});
+      }
+    } catch (_) { /* Keep the profile usable when optional live stats fail. */ }
   }
 
   Map<String, dynamic> map(dynamic v) => v is Map ? Map<String, dynamic>.from(v) : {};
@@ -601,8 +660,12 @@ class _PlayerDetailDialogState extends State<PlayerDetailDialog> {
                       : error != null
                           ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Text(error!), TextButton(onPressed: load, child: const Text('再読み込み'))]))
                           : data['found'] == false
-                              ? Center(child: Text('${data['message']}'))
+                              ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Text('${data['message']}'), TextButton(onPressed: () => load(refresh:true), child: const Text('再読み込み'))]))
                               : ListView(padding: const EdgeInsets.all(16), children: [
+                                  if (data['pending'] == true) Padding(padding: const EdgeInsets.only(bottom: 12), child: Row(children: [
+                                    Expanded(child: Text('${data['message'] ?? '詳細データを準備しています。'}')),
+                                    TextButton(onPressed: () => load(refresh:true), child: const Text('更新')),
+                                  ])),
                                   profileOverview(name, {
                                     '所属': profile['name_team'],
                                     '生年月日': profile['date_birth'] == null ? null : '${profile['date_birth']}'.split(RegExp(r'[T\s]')).first,

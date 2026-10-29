@@ -3,7 +3,8 @@ String gameSeasonStats(List<Map<String, dynamic>> rows, {required bool pitching,
   String value(List<String> titles, {int? decimals, String suffix = ''}) {
     for (final title in titles) {
       for (final row in rows.where((r) => r['title'] == title)) {
-        final raw = '${row['stats'] ?? ''}'.trim();
+        final raw = '${row['stats'] ?? row['numeric_value'] ?? ''}'.trim();
+        if (const ['登板なし', '打席なし', '算出不可', '∞'].contains(raw)) return raw;
         final n = num.tryParse(RegExp(r'^(?:\d+(?:\.\d+)?|\.\d+)').firstMatch(raw)?.group(0) ?? '');
         if (n == null) continue;
         var text = decimals == null ? n.toInt().toString() : n.toStringAsFixed(decimals);

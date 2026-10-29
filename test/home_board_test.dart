@@ -5,6 +5,7 @@ import 'package:Yakyuu_Japan/View/home_games_behind_board.dart';
 import 'package:Yakyuu_Japan/View/season_schedule_board.dart';
 import 'package:Yakyuu_Japan/View/EventCalendar.dart';
 import 'dart:convert';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:Yakyuu_Japan/logic/auth_session.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,6 +17,65 @@ void main() {
   setUp(HomeDataCache.clear);
   setUp(HomeCalendarCache.clear);
   tearDown(HomeCalendarCache.clear);
+  testWidgets('HOME取得前にニュースとカレンダーを表示し、再訪で読み直さない', (tester) async {
+    final response = Completer<http.Response>();
+    var homeReads = 0;
+    await http.runWithClient(() async {
+      Widget page() => const MaterialApp(home: Scaffold(body: HomeBoard(
+        year: 2026, news: Text('先に表示するニュース'),
+      )));
+      await tester.pumpWidget(page());
+      await tester.pump();
+      expect(find.text('先に表示するニュース'), findsOneWidget);
+      expect(find.byType(HomeSeasonCalendar), findsOneWidget);
+      final calendar = tester.state(find.byType(HomeSeasonCalendar));
+      response.complete(http.Response(jsonEncode({
+        'today': '2026-10-28','games': [],'heroes': [],
+        'birthdays': [{'name_player': '誕生日選手','name_team': '阪神','age': 25,'org': 'npb'}],
+      }), 200, headers: {'content-type': 'application/json; charset=utf-8'}));
+      await tester.pumpAndSettle();
+      expect(tester.state(find.byType(HomeSeasonCalendar)), same(calendar));
+      await tester.pumpWidget(const SizedBox());
+      await tester.pumpWidget(page());
+      await tester.pumpAndSettle();
+      expect(homeReads, 1);
+      await tester.tap(find.byTooltip('再読み込み').first);
+      await tester.pumpAndSettle();
+      expect(homeReads, 2);
+      await tester.pumpWidget(const SizedBox());
+    }, () => MockClient((request) async {
+      if (request.url.path == '/home') { homeReads++; return response.future; }
+      return http.Response('{"games":[],"events":[]}',200,
+        headers: {'content-type': 'application/json; charset=utf-8'});
+    }));
+  });
+  testWidgets('活躍選手は画像の取得を待たずに表示する', (tester) async {
+    AuthSession.instance.user = AuthUser.fromJson({'id': 1, 'flg_special': true});
+    AuthSession.instance.token = 'test';
+    addTearDown(() { AuthSession.instance.user = null; AuthSession.instance.token = null; });
+    final images = Completer<http.Response>();
+    await http.runWithClient(() async {
+      await tester.pumpWidget(const MaterialApp(home: Scaffold(body: HomeBoard())));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('画像を待たない選手'), findsOneWidget);
+      expect(find.text('4打数3安打'), findsOneWidget);
+      images.complete(http.Response('{"images":{}}', 200));
+      await tester.pumpAndSettle();
+      expect(find.text('4打数3安打'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    }, () => MockClient((request) async {
+      if (request.url.path == '/home') {
+        if (request.url.queryParameters['section'] == 'images') return images.future;
+        return http.Response(jsonEncode({
+          'today': '2026-10-28','birthdays': [],
+          'games': [{'id_game': 1,'org': 'NPB','date_game': '2026-10-28','state': '試合終了','name_team_home': '阪神','name_team_away': '巨人','score_home': 2,'score_away': 0}],
+          'heroes': [{'id_game': 1,'org': 'NPB','id_player': 10,'name_player': '画像を待たない選手','name_team': '阪神','appearance_stats': ['4打数3安打']}],
+        }),200,headers: {'content-type': 'application/json; charset=utf-8'});
+      }
+      return http.Response('{"games":[],"events":[]}',200);
+    }));
+  });
   testWidgets('HOME表示で前回既読日時を保持し、認証ユーザーの日時を一度だけ更新する', (tester) async {
     final session = AuthSession.instance;
     session.user = AuthUser.fromJson({'id': 1, 'date_read_news': '2026-10-25T00:00:00Z'});

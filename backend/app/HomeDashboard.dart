@@ -1,4 +1,57 @@
 import 'package:postgres/postgres.dart';
+import 'HomeBirthdays.dart';
+
+/// Share short-lived HOME reads without holding several league-wide snapshots.
+class HomeDashboardCache {
+  static Map<String,dynamic>? _value;
+  static Future<Map<String,dynamic>>? _pending;
+  static DateTime? _expires;
+  static String? _day;
+  static int _generation = 0;
+  static void clear() { _generation++; _value = null; _pending = null; _expires = null; _day = null; }
+  static Future<Map<String,dynamic>> read(String day,
+      Future<Map<String,dynamic>> Function() fetch) async {
+    if (_day != day) clear();
+    _day = day;
+    if (_value != null && _expires!.isAfter(DateTime.now())) return _value!;
+    if (_pending != null) return _pending!;
+    final generation = _generation;
+    final future = fetch();
+    _pending = future;
+    try {
+      final result = await future;
+      if (generation == _generation) {
+        _value = result;
+        _expires = DateTime.now().add(const Duration(seconds: 45));
+      }
+      return result;
+    } finally { if (identical(_pending, future)) _pending = null; }
+  }
+}
+
+/// HOME needs today's score summary and heroes, not batting blocks, postseason
+/// forms, player rankings or next week's full game details.
+Future<Map<String,dynamic>> readHomeSummary(Connection conn, String today) async {
+  final birthdays = await homeBirthdays(conn, today);
+  final games = (await conn.execute('''SELECT g.id AS id_game,
+    g.datetime_start::date::text AS date_game,to_char(g.datetime_start,'HH24:MI') AS time_game,
+    g.state,g.score_home,g.score_away,g.id_team_home,g.id_team_away,
+    h.name_short AS name_team_home,a.name_short AS name_team_away,
+    CASE WHEN h.id_league IN(1,2) THEN 'NPB' ELSE 'MLB' END AS org
+    FROM t_game g JOIN m_team h ON h.id=g.id_team_home JOIN m_team a ON a.id=g.id_team_away
+    WHERE g.datetime_start>=\$1::date AND g.datetime_start<\$1::date+INTERVAL '1 day'
+      AND h.id_league IN(1,2,3,4) AND NOT COALESCE(g.flg_delete,false)
+    ORDER BY g.datetime_start,g.id''', parameters: [today])).map((r) => r.toColumnMap()).toList();
+  final lines = games.any((g) => '${g['state']}'.contains('試合終了'))
+      ? await homeHeroLines(conn, today) : <Map<String,dynamic>>[];
+  final heroes = <Map<String,dynamic>>[];
+  for (final game in games) {
+    final hero = homeHero(game, lines);
+    if (hero != null) heroes.add({...hero, 'id_game': game['id_game'], 'org': game['org']});
+  }
+  return {'today': today, 'birthdays': birthdays, 'games': games, 'heroes': heroes,
+    'notification': [], 'events': [], 'leaders': []};
+}
 
 const homeBattingTitles = ['打率', '本塁打', '打点', '盗塁', '最多安打', '出塁率'];
 const homePitchingTitles = ['防御率', '最多勝', '勝率', '奪三振', 'HP', 'セーブ'];

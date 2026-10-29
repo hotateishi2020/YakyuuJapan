@@ -49,7 +49,8 @@ class PlayerDetailSnapshot {
   static Future<Map<String, dynamic>> read(Connection conn,
       {required int year,
       required List<int> leagues,
-      required Map<String, dynamic> identity}) async {
+      required Map<String, dynamic> identity,
+      bool withCurrentStats = true}) async {
     if (!_ready) {
       _ready = (await conn.execute(
                   "SELECT to_regclass('public.t_player_detail_snapshot') IS NOT NULL"))
@@ -57,6 +58,8 @@ class PlayerDetailSnapshot {
           true;
     }
     if (!_ready) {
+      final basic = await _basicProfile(conn, year, leagues, identity);
+      if (basic != null) return basic;
       _request(year, identity);
       final art = leagues.any((league) => league == 1 || league == 2)
           ? await PlayerArt.official(conn, identity)
@@ -84,6 +87,10 @@ class PlayerDetailSnapshot {
       LIMIT 2''',
         parameters: [year, leagues, id, source, name, team]);
     if (rows.length != 1) {
+      if (rows.isEmpty) {
+        final basic = await _basicProfile(conn, year, leagues, identity);
+        if (basic != null) return basic;
+      }
       if (rows.isEmpty) _request(year, identity);
       if (rows.isEmpty && leagues.any((league) => league == 1 || league == 2)) {
         final art = await PlayerArt.official(conn, identity);
@@ -99,17 +106,70 @@ class PlayerDetailSnapshot {
     }
     final payload = detailMap(rows.single[0]);
     final playerId = int.tryParse('${detailMap(payload['profile'])['id']}');
-    final current = playerId == null ? null
-        : await PredictionSnapshot.players(conn, year, leagues);
+    final season = withCurrentStats && playerId != null
+        ? await currentSeasonStats(conn, year, leagues, playerId)
+        : [for (final row in (payload['season_stats'] as List? ?? []))
+            {...detailMap(row)}..remove('int_rank')];
+    Map<String, dynamic>? art;
+    if (withCurrentStats && playerId != null) {
+      try {
+        art = await PlayerArt.read(conn, playerId,
+            sourceId: officialPlayerId(detailMap(payload['profile'])));
+      } catch (_) { /* Optional images must not fail the player profile. */ }
+    }
     return {
       ...payload,
-      'season_stats': current == null ? <Map<String, dynamic>>[]
-          : playerDetailSeasonStats(current.stats, playerId!),
+      'season_stats': season,
       'updated_at': rows.single[1],
       if (playerId != null)
-        'character_image': await PlayerArt.read(conn, playerId,
-            sourceId: officialPlayerId(detailMap(payload['profile'])))
+        'character_image': art ?? payload['character_image'],
     };
+  }
+
+  static final _seasonReads = <String, ({DateTime expires, Future<List<Map<String,dynamic>>> rows})>{};
+  static Future<List<Map<String,dynamic>>> currentSeasonStats(Connection conn,
+      int year, List<int> leagues, int playerId) async {
+    final sorted = [...leagues]..sort();
+    final key = '$year:${sorted.join(',')}';
+    final now = DateTime.now();
+    _seasonReads.removeWhere((_, entry) => entry.expires.isBefore(now));
+    var entry = _seasonReads[key];
+    if (entry == null) {
+      if (_seasonReads.length >= 6) _seasonReads.remove(_seasonReads.keys.first);
+      final rows = PredictionSnapshot.players(conn, year, leagues).then((display) => display.stats);
+      entry = (expires: now.add(const Duration(seconds: 30)), rows: rows);
+      _seasonReads[key] = entry;
+    }
+    try {
+      return playerDetailSeasonStats(await entry.rows, playerId);
+    } catch (_) {
+      if (identical(_seasonReads[key]?.rows, entry.rows)) _seasonReads.remove(key);
+      rethrow;
+    }
+  }
+
+  static Future<Map<String,dynamic>?> _basicProfile(Connection conn, int year,
+      List<int> leagues, Map<String,dynamic> identity) async {
+    final id = int.tryParse('${identity['id_player']}') ?? 0;
+    final source = '${identity['source_player_id'] ?? ''}';
+    final name = normalizedPlayerName(identity['name'] ?? '');
+    final people = await conn.execute('''SELECT p.id,p.id_team,p.name_full,p.date_birth::text,
+      p.txt_position,p.pitching,p.batting,p.height,p.weight,p.uniform_number,p.url,
+      t.id_league,t.name_short AS name_team FROM m_player p JOIN m_team t ON t.id=p.id_team
+      WHERE t.id_league=ANY(\$1::int[]) AND
+        CASE WHEN \$2::int>0 THEN p.id=COALESCE((SELECT merged_into_player_id FROM m_player WHERE id=\$2),\$2)
+        WHEN \$3::text<>'' THEN p.identity_sources->>'mlb'=\$3 OR p.identity_sources->>'npb'=\$3
+          OR substring(p.url from '/players/([0-9]+)')=\$3
+        ELSE (player_identity_key(\$4)=ANY(p.name_pattern_keys) OR player_identity_key(p.name_full)=player_identity_key(\$4))
+          AND (\$5::int IS NULL OR p.id_team=\$5) END
+      LIMIT 2''', parameters: [leagues,id,source,name,int.tryParse('${identity['id_team']}')]);
+    if (people.length != 1) return null;
+    final profile = people.single.toColumnMap();
+    _request(year, {'id_player': profile['id']});
+    return {'found': true,'pending': true,'profile': profile,
+      'season_stats': <Map<String,dynamic>>[], 'careers': <Map<String,dynamic>>[],
+      'recent_games': <Map<String,dynamic>>[],
+      'message': '詳細データを準備しています。プロフィールを先に表示しています。'};
   }
 
   static Future<Map<String, dynamic>> refresh(int year,
@@ -215,7 +275,7 @@ class PlayerDetailSnapshot {
   static void start() {
     _timer?.cancel();
     _pendingTimer?.cancel();
-    _pendingTimer = Timer.periodic(const Duration(minutes: 5), (_) async {
+    _pendingTimer = Timer.periodic(const Duration(seconds: 30), (_) async {
       try {
         if (_requestedPlayers.values.any((ids) => ids.isNotEmpty)) {
           await ScheduledLog.run('player_detail_missing', _fillRequested);

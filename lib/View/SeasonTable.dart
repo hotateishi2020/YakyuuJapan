@@ -1,3 +1,4 @@
+import '../logic/auth_session.dart';
 import '../widgets/special_media.dart';
 import '../widgets/navigation_picker.dart';
 import '../widgets/collapsible_menu.dart';
@@ -2115,7 +2116,10 @@ Widget _batterPitcherTabBar({
           if (i > 0) const SizedBox(width: ALL_SPACE_BLOCK),
           Expanded(
             child: GestureDetector(
-              onTap: () => onSelected(tabs[i].$2),
+              onTap: () {
+                AuthSession.instance.reportAction('タブ選択: ${tabs[i].$1}');
+                onSelected(tabs[i].$2);
+              },
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(TAB_RADIUS),
                 child: Stack(
@@ -2479,7 +2483,7 @@ Widget _personalStatsTypeTabs() => MenuBand(
                 color: controller.index == i ? tabs[i].$2 : Color.lerp(Colors.white, tabs[i].$2, 0.15),
                 borderRadius: BorderRadius.circular(TAB_RADIUS),
                 child: InkWell(
-                  onTap: () => controller.animateTo(i),
+                  onTap: () { AuthSession.instance.reportAction('タブ選択: ${tabs[i].$1}'); controller.animateTo(i); },
                   borderRadius: BorderRadius.circular(TAB_RADIUS),
                   child: Semantics(
                     button: true,
@@ -2518,7 +2522,7 @@ Widget _personalLeagueTabs(OrgConfig org) => MenuBand(
                       color: controller.index == i ? org.leagues[i].color : Color.lerp(Colors.white, org.leagues[i].color, 0.15),
                       borderRadius: BorderRadius.circular(TAB_RADIUS),
                       child: InkWell(
-                        onTap: () => controller.animateTo(i),
+                        onTap: () { AuthSession.instance.reportAction('タブ選択: ${org.leagues[i].name}'); controller.animateTo(i); },
                         borderRadius: BorderRadius.circular(TAB_RADIUS),
                         child: Tooltip(
                           message: org.leagues[i].name,

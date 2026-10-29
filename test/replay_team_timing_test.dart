@@ -54,7 +54,7 @@ void main() {
     }
   });
   testWidgets(
-      'walk is shown at catch and next batter starts exactly two seconds later',
+      'walk result and running finish before the next batter starts',
       (tester) async {
     AuthSession.instance.user = AuthUser.fromJson({'id': 1});
     AuthSession.instance.token = 'test';
@@ -74,7 +74,15 @@ void main() {
     await tester.pump(const Duration(milliseconds: 1999));
     expect(find.text('打 打者'), findsOneWidget);
     expect(replayMotionProgress(makeFrame(), 4.747), 1);
+    // The old wall-clock schedule advanced here, while the field could still
+    // be drawing. Hold the completed play for two seconds instead.
     await tester.pump(const Duration(milliseconds: 1));
+    expect(find.text('打 打者'), findsOneWidget);
+    final remaining = replayPresentationDuration(makeFrame()) - const Duration(milliseconds: 4748);
+    await tester.pump(remaining - const Duration(milliseconds: 1));
+    expect(find.text('打 打者'), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 17));
+    await tester.pump();
     expect(find.text('打 次の打者'), findsOneWidget);
     expect(find.byKey(const Key('replay-result')), findsNothing);
     await tester.pump(const Duration(milliseconds: 300));
@@ -88,4 +96,30 @@ void main() {
     AuthSession.instance.user = null;
     AuthSession.instance.token = null;
   });
+  testWidgets('描画が止まっている間は時間が経っても次の打者を開始しない', (tester) async {
+    AuthSession.instance.user = AuthUser.fromJson({'id': 1});
+    AuthSession.instance.token = 'test';
+    addTearDown(() { AuthSession.instance.user = null; AuthSession.instance.token = null; });
+    final frames = [makeFrame(after: false), makeFrame(),
+      makeFrame(after: false, batter: '次の打者'), makeFrame(batter: '次の打者')];
+    Widget page(bool enabled) => MaterialApp(home: TickerMode(enabled: enabled,
+      child: GameReplayDialog(game: const {}, frames: frames)));
+    await tester.pumpWidget(page(false));
+    await tester.tap(find.byTooltip('自動再生'));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 20));
+    expect(find.text('2 / 4'), findsOneWidget);
+    expect(find.text('打 打者'), findsOneWidget);
+    expect(find.byKey(const Key('replay-result')), findsNothing);
+    await tester.pumpWidget(page(true));
+    await tester.pump();
+    await tester.pump(replayPresentationDuration(makeFrame()));
+    await tester.pump();
+    expect(find.text('打 次の打者'), findsOneWidget);
+    await tester.tap(find.byTooltip('一時停止'));
+    await tester.pumpAndSettle();
+    expect(find.text('4 / 4'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
 }

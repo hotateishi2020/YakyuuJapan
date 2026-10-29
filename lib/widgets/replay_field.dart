@@ -37,11 +37,13 @@ class ReplayField extends StatefulWidget {
       this.awayBackground = Colors.red,
       this.homeForeground,
       this.awayForeground,
-      this.scoreboard});
+      this.scoreboard,
+      this.onPresentationComplete});
   final Color homeBackground, awayBackground;
   final Color? homeForeground, awayForeground;
   final ReplayFrame frame;
   final Widget? scoreboard;
+  final VoidCallback? onPresentationComplete;
   @override
   State<ReplayField> createState() => _ReplayFieldState();
 }
@@ -49,20 +51,44 @@ class ReplayField extends StatefulWidget {
 class _ReplayFieldState extends State<ReplayField>
     with SingleTickerProviderStateMixin {
   late final AnimationController motion = AnimationController(
-      vsync: this, duration: const Duration(milliseconds: 6400));
+      vsync: this, duration: replayPresentationDuration(widget.frame));
   @override
   void initState() {
     super.initState();
-    if (widget.frame.after) motion.forward();
+    motion.addStatusListener(_motionStatus);
+    _startPresentation();
   }
 
   @override
   void didUpdateWidget(ReplayField old) {
     super.didUpdateWidget(old);
     if (old.frame != widget.frame) {
-      motion.reset();
-      if (widget.frame.after) motion.forward();
+      _startPresentation();
     }
+  }
+
+  void _startPresentation() {
+    motion.reset();
+    motion.duration = replayPresentationDuration(widget.frame);
+    if (widget.frame.after) {
+      motion.forward();
+    } else {
+      _notifyPresented();
+    }
+  }
+
+  void _motionStatus(AnimationStatus status) {
+    if (status == AnimationStatus.completed) _notifyPresented();
+  }
+
+  void _notifyPresented() {
+    final frame = widget.frame;
+    final callback = widget.onPresentationComplete;
+    // Wait until the completed result has actually been painted. Old queued
+    // completions must never advance a manually selected or restarted frame.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && identical(widget.frame, frame)) callback?.call();
+    });
   }
 
   @override
@@ -91,7 +117,7 @@ class _ReplayFieldState extends State<ReplayField>
                   animation: motion,
                   builder: (context, _) {
                     final f = widget.frame;
-                    final elapsed = motion.value * 6.4;
+                    final elapsed = motion.value * motion.duration!.inMicroseconds / Duration.microsecondsPerSecond;
                     final lead = replayLeadSeconds(f);
                     final t = replayMotionProgress(f, elapsed);
                     final blinking = f.after && elapsed < lead;

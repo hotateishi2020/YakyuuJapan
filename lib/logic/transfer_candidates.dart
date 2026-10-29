@@ -44,6 +44,42 @@ List<Map<String, dynamic>> transferCandidates(
       final status = usageInt(player['move_status_year']) == year
           ? player['move_status']
           : null;
+      final method = '${player['move_method'] ?? ''}';
+      final draftType = '${player['arrival_draft_type'] ?? ''}';
+      final activeDraft = method.contains('現役ドラフト') || draftType.contains('現役');
+      final rookieDraft = !activeDraft &&
+          (method.contains('ドラフト') || draftType.isNotEmpty ||
+              usageInt(player['arrival_draft_rank']) > 0);
+      if (rookieDraft) continue;
+      final arrivalYear = usageInt(player['arrival_year']);
+      final announced = DateTime.tryParse('${player['arrival_as_of'] ?? player['move_method_as_of'] ?? player['status_as_of'] ?? ''}');
+      final newArrival = player['new_arrival'] == true &&
+          (arrivalYear == year || arrivalYear == year + 1) &&
+          (announced != null ? announced.year == year :
+              arrivalYear == year || usageInt(player['move_method_year']) == year);
+      if (newArrival) {
+        final previous = player['previous_team'];
+        final previousName = previous is Map
+            ? '${previous['name'] ?? previous['label'] ?? ''}'
+            : '${player['previous_team_name'] ?? previous ?? ''}';
+        final sources = <String>{
+          for (final key in ['status_source', 'arrival_source', 'move_method_source'])
+            if ('${player[key] ?? ''}'.isNotEmpty) '${player[key]}',
+        };
+        result.add({
+          'player': player, 'team': team,
+          'labels': [method.isEmpty ? '新加入' : method],
+          'reported': false, 'attention': 3,
+          'attention_reason': '入団・移籍決定',
+          'contract': '入団決定', 'status': '入団決定',
+          'detail': [
+            if (previousName.isNotEmpty && previousName != '前所属未確認') '$previousName → ${team['name_team']}',
+            if (announced != null) '${announced.toIso8601String().substring(0,10)} 発表',
+          ].join('\n'),
+          'sources': sources.toList(),
+        });
+        continue;
+      }
       if (status == 'FA残留' ||
           (usageInt(player['move_method_year']) == year &&
               player['move_method'] == 'FA移籍')) {

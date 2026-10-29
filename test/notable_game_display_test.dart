@@ -141,11 +141,11 @@ void main() {
         session.token = null;
       });
       await tester.pumpWidget(const MaterialApp(
-          home: const Scaffold(
-              body: const GamesBoardYahooStyle(
+          home: Scaffold(
+              body: GamesBoardYahooStyle(
         initialStatsExpanded: true,
         horizontal: true,
-        games: const [
+        games: [
           {
             'id_game': 1,
             'date_game': '2026-10-25',
@@ -161,11 +161,11 @@ void main() {
             'flg_pitcher': false,
             'txt_batting': '1打数1安打(1HR1打点)',
             'txt_plays': '代打ソロホームラン|hr',
-            'lineup': const [
+            'lineup': [
               {
                 'id_team': 1,
                 'order': 9,
-                'players': const [
+                'players': [
                   {'name': '先発投手', 'pos': '投', 'plays': '三振|out'},
                   {'name': '穂高', 'role': '代打', 'plays': '代打ソロホームラン|hr', 'rbi': 1},
                 ]

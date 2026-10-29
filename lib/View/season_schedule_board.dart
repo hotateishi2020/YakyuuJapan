@@ -1,3 +1,5 @@
+import 'package:koko_shared/championship_calendar.dart';
+import 'package:koko_shared/championship_schedule.dart';
 import 'dart:async';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
 import 'SeasonTable.dart';
@@ -20,17 +22,22 @@ Future<Map<String, dynamic>> _fetchSeasonSchedule(OrgConfig org, int year) async
 /// HOME week/month views share successful results for this app session.
 class HomeCalendarCache {
   static final _saved = <String, Map<String, dynamic>>{};
+  static final _loadedAt = <String, DateTime>{};
   static final _pending = <String, Future<Map<String, dynamic>>>{};
   static String _key(OrgConfig org, int year) => '${org.kind.name}:$year';
   static bool contains(OrgConfig org, int year) => _saved.containsKey(_key(org, year));
   static Future<Map<String, dynamic>> read(OrgConfig org, int year) {
     final key = _key(org, year);
     final saved = _saved[key];
-    if (saved != null) return Future.value(saved);
+    final loadedAt = _loadedAt[key];
+    if (saved != null && loadedAt != null && DateTime.now().difference(loadedAt) < const Duration(minutes: 1)) return Future.value(saved);
     return _pending.putIfAbsent(key, () async {
       try {
         final data = await _fetchSeasonSchedule(org, year);
-        if (data['pending'] != true) _saved[key] = data;
+        if (data['pending'] != true) {
+          _saved[key] = data;
+          _loadedAt[key] = DateTime.now();
+        }
         return data;
       } finally {
         _pending.remove(key);
@@ -38,7 +45,7 @@ class HomeCalendarCache {
     });
   }
   @visibleForTesting
-  static void clear() { _saved.clear(); _pending.clear(); }
+  static void clear() { _saved.clear(); _loadedAt.clear(); _pending.clear(); }
 }
 
 class SeasonScheduleLoader extends StatefulWidget {
@@ -127,8 +134,8 @@ class _SeasonScheduleLoaderState extends State<SeasonScheduleLoader>
         return;
       }
       setState(() {
-        _games = listMapFromJson(data['games']);
-        _events = listMapFromJson(data['events']);
+        _games = championshipSchedule(listMapFromJson(data['games']));
+        _events = championshipCalendarEvents(listMapFromJson(data['events']), _games);
         _error = null;
       });
     } catch (_) {

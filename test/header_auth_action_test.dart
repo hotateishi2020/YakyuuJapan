@@ -5,6 +5,15 @@ import 'package:Yakyuu_Japan/View/Headers.dart';
 import 'package:Yakyuu_Japan/config/app_design.dart';
 
 void main() {
+  testWidgets('header logo opens HOME', (tester) async {
+    var opened = false;
+    await tester.pumpWidget(MaterialApp(home: Builder(builder: (context) =>
+      Headers.globalHeader(context, HEADER_GLOBAL_H, ALL_COLOR_APP, HEADER_TITLE,
+        HEADER_PAD_VERTICAL, 8, onHome: () => opened = true))));
+    await tester.tap(find.bySemanticsLabel(HEADER_TITLE));
+    expect(opened, isTrue);
+  });
+
   testWidgets('title logo letters are about 70% of the header height', (tester) async {
     await tester.pumpWidget(
       MaterialApp(

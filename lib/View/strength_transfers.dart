@@ -46,7 +46,7 @@ class _StrengthTransfersState extends State<StrengthTransfers> {
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Padding(
           padding: const EdgeInsets.all(8),
-          child: Text('${widget.year}年オフの移籍候補',
+          child: Text('${widget.year}年の移籍・入団情報',
               style: const TextStyle(fontWeight: FontWeight.bold))),
       Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: Wrap(spacing: 8, runSpacing: 4, children: [
         for (final sort in TransferSort.values)
@@ -55,11 +55,11 @@ class _StrengthTransfersState extends State<StrengthTransfers> {
             onSelected: (_) => setState(() => _sort = sort)),
       ])),
       const Padding(padding: EdgeInsets.all(8), child: Text(
-        '注目度（登録情報に基づく目安）：★★★ FA宣言・ポスティング容認／★★ 移籍報道あり／★ 権利保有・行使未確認',
+        '注目度（登録情報に基づく目安）：★★★ 入団・移籍決定、FA宣言・ポスティング容認／★★ 移籍報道あり／★ 権利保有・行使未確認',
         style: TextStyle(fontSize: 11, color: Colors.black54))),
       Expanded(
           child: rows.isEmpty
-              ? const Center(child: Text('この年度の移籍候補情報はありません。'))
+              ? const Center(child: Text('この年度の移籍・入団情報はありません。'))
               : LayoutBuilder(builder: (context, constraints) {
                   final width = math.max(760.0, constraints.maxWidth);
                   return SingleChildScrollView(

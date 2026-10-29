@@ -5,6 +5,23 @@ import 'package:latlong2/latlong.dart';
 import 'package:Yakyuu_Japan/logic/date_line_world_map.dart';
 
 void main() {
+  testWidgets('縦長の地図でも上下がタイルの外に出ない', (tester) async {
+    final controller = MapController();
+    await tester.pumpWidget(MaterialApp(home: Center(child: SizedBox(width: 350, height: 420,
+      child: FlutterMap(mapController: controller,
+        options: MapOptions(initialCenter: const LatLng(20, 180),
+          initialZoom: singleWorldMinZoom(350, 420), cameraConstraint: const DateLineWorldConstraint()),
+        children: const []),
+    ))));
+    controller.move(const LatLng(20, 180), singleWorldMinZoom(350, 420));
+    await tester.pump();
+    final camera = controller.camera;
+    final world = camera.projectAtZoom(const LatLng(0, 180)).dx;
+    expect(camera.pixelOrigin.dy, greaterThanOrEqualTo(-.01));
+    expect(camera.pixelOrigin.dy + camera.size.height, lessThanOrEqualTo(world + .01));
+    await tester.pumpWidget(const SizedBox());
+    controller.dispose();
+  });
   testWidgets('wide map shows Japan and US markers once and limits panning', (tester) async {
     tester.view.physicalSize = const Size(1800, 700);
     tester.view.devicePixelRatio = 1;

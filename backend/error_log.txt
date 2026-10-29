@@ -4114,3 +4114,162 @@ SocketException: Connection timed out, host: ep-fragrant-wave-b34kmerl.c-4.ap-so
 <asynchronous suspension>
 
 
+2026-10-28
+TimeoutException after 0:00:08.000000: Future not completed
+#0      Future.timeout.<anonymous closure> (dart:async/future_impl.dart:1042:24)
+<asynchronous suspension>
+#1      PgConnectionImplementation._connect (package:postgres/src/v3/connection.dart:332:18)
+<asynchronous suspension>
+#2      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:222:29)
+<asynchronous suspension>
+#3      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:47:18)
+<asynchronous suspension>
+#4      Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:56:14)
+<asynchronous suspension>
+#5      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:216:20)
+<asynchronous suspension>
+#6      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2671:7)
+<asynchronous suspension>
+#7      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2218:14)
+<asynchronous suspension>
+#8      RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#9      RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#10     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#11     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#12     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#13     RequestMetrics.middleware.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/app/RequestMetrics.dart:64:24)
+<asynchronous suspension>
+#14     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#15     gameVisibility.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/app/GameVisibility.dart:9:24)
+<asynchronous suspension>
+#16     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+TimeoutException after 0:00:08.000000: Future not completed
+#0      Future.timeout.<anonymous closure> (dart:async/future_impl.dart:1042:24)
+<asynchronous suspension>
+#1      _PgSessionBase._withResource.<anonymous closure>.<anonymous closure> (package:postgres/src/v3/connection.dart:78:44)
+<asynchronous suspension>
+#2      Pool.withResource (package:pool/pool.dart:127:14)
+<asynchronous suspension>
+#3      PgConnectionImplementation.connect (package:postgres/src/v3/connection.dart:243:5)
+<asynchronous suspension>
+#4      Postgres._openFresh (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:47:18)
+<asynchronous suspension>
+#5      Postgres._openCounted (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:56:14)
+<asynchronous suspension>
+#6      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:216:20)
+<asynchronous suspension>
+#7      _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2541:16)
+<asynchronous suspension>
+#8      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2679:15)
+<asynchronous suspension>
+#9      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2218:14)
+<asynchronous suspension>
+#10     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#11     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#12     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#13     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#14     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#15     RequestMetrics.middleware.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/app/RequestMetrics.dart:64:24)
+<asynchronous suspension>
+#16     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#17     gameVisibility.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/app/GameVisibility.dart:9:24)
+<asynchronous suspension>
+#18     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+
+2026-10-29
+Severity.error Socket error: SocketException: Connection reset by peer (OS Error: Connection reset by peer, errno = 54), address = ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech, port = 56713
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PgSessionBase._prepare (package:postgres/src/v3/connection.dart:195:11)
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:171:30)
+#3      DisplaySnapshot._spans (file:///Users/standapp/StudioProjects/Koko/backend/app/DisplaySnapshot.dart:400:29)
+#4      DisplaySnapshot.games (file:///Users/standapp/StudioProjects/Koko/backend/app/DisplaySnapshot.dart:238:25)
+<asynchronous suspension>
+#5      _buildPredictionsPartGames.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:318:22)
+<asynchronous suspension>
+#6      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:219:16)
+<asynchronous suspension>
+#7      _buildPredictionsPartGames (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:316:16)
+<asynchronous suspension>
+#8      jsonEncode (dart:convert/json.dart:115:1)
+<asynchronous suspension>
+#9      main.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2272:18)
+<asynchronous suspension>
+#10     tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2676:16)
+<asynchronous suspension>
+#11     main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2218:14)
+<asynchronous suspension>
+#12     RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#13     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#14     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#15     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#16     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#17     RequestMetrics.middleware.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/app/RequestMetrics.dart:64:24)
+<asynchronous suspension>
+#18     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#19     gameVisibility.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/app/GameVisibility.dart:9:24)
+<asynchronous suspension>
+#20     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+---
+Severity.error Socket error: SocketException: Connection reset by peer (OS Error: Connection reset by peer, errno = 54), address = ep-fragrant-wave-b34kmerl.c-4.ap-southeast-1.aws.neon.tech, port = 57080
+#0      _PgSessionBase._sendAndWaitForQuery (package:postgres/src/v3/connection.dart:87:30)
+#1      _PreparedStatement.dispose (package:postgres/src/v3/connection.dart:698:22)
+<asynchronous suspension>
+#2      _PgSessionBase.execute (package:postgres/src/v3/connection.dart:175:9)
+<asynchronous suspension>
+#3      Postgres.insert (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:328:20)
+<asynchronous suspension>
+#4      insertLogError (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2811:10)
+<asynchronous suspension>
+#5      Postgres.withConnection (file:///Users/standapp/StudioProjects/Koko/backend/tools/Postgres.dart:219:16)
+<asynchronous suspension>
+#6      _saveErrorLog (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2541:16)
+<asynchronous suspension>
+#7      tryCatchAPIReadonly (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2679:15)
+<asynchronous suspension>
+#8      main.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/index.dart:2218:14)
+<asynchronous suspension>
+#9      RouterEntry.invoke.<anonymous closure> (package:shelf_router/src/router_entry.dart:107:16)
+<asynchronous suspension>
+#10     RouterEntry.invoke (package:shelf_router/src/router_entry.dart:104:12)
+<asynchronous suspension>
+#11     Router.call (package:shelf_router/src/router.dart:184:26)
+<asynchronous suspension>
+#12     Cascade.handler.<anonymous closure>.<anonymous closure> (package:shelf/src/cascade.dart:76:63)
+<asynchronous suspension>
+#13     corsHeaders.<anonymous closure>.<anonymous closure> (package:shelf_cors_headers/src/shelf_cors_headers_base.dart:84:24)
+<asynchronous suspension>
+#14     RequestMetrics.middleware.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/app/RequestMetrics.dart:64:24)
+<asynchronous suspension>
+#15     logRequests.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:shelf/src/middleware/logger.dart:30:62)
+<asynchronous suspension>
+#16     gameVisibility.<anonymous closure>.<anonymous closure> (file:///Users/standapp/StudioProjects/Koko/backend/app/GameVisibility.dart:9:24)
+<asynchronous suspension>
+#17     handleRequest (package:shelf/shelf_io.dart:140:16)
+<asynchronous suspension>
+
+

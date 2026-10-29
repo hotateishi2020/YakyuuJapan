@@ -16,26 +16,63 @@ void main() {
       tester.view.resetPhysicalSize();
       tester.view.resetDevicePixelRatio();
     });
-    await tester.pumpWidget(MaterialApp(home: Scaffold(body: GamesBoardYahooStyle(
+    await tester.pumpWidget(MaterialApp(
+        home: Scaffold(
+            body: GamesBoardYahooStyle(
       horizontal: true,
+      playerStats: const [{'name_full': 'ジェーコブ ミジオロウスキー', 'name_last': 'ジェーコブ'}],
       initialStatsExpanded: true,
-      games: [{
-        'id_game': 1, 'date_game': '2026-10-28', 'state': '8回表',
-        'id_team_home': 1, 'id_team_away': 2,
-        'id_league_home': 3, 'id_league_away': 4,
-        'name_team_home': 'ホーム', 'name_team_away': 'ビジター',
-        'lineup': [{
-          'id_team': 1, 'order': 1,
-          'players': [
-            {'name': 'M.ディアス', 'pos': '左', 'plays': '三振|out'},
-            {'name': 'エリー・デラクルーズ', 'role': '代打', 'plays': '左ホームラン|hr/pinch'},
+      games: [
+        {
+          'id_game': 1,
+          'date_game': '2026-10-28',
+          'state': '8回表',
+          'id_team_home': 1,
+          'id_team_away': 2,
+          'id_league_home': 3,
+          'id_league_away': 4,
+          'name_team_home': 'ホーム',
+          'name_team_away': 'ビジター',
+          'player_hands': const [
+            {'id_player': 501, 'id_team': 1, 'name_full_summary': 'マイケル・ディアス'}
           ],
-        }],
-      }],
+          'season_player_stats': const [
+            {'id_player': 501, 'name_player': '別の表記', 'title': '打率', 'stats': .301},
+            {'id_player': 501, 'name_player': '別の表記', 'title': '本塁打', 'stats': 14},
+          ],
+          'lineup': [
+            {
+              'id_team': 1,
+              'order': 1,
+              'players': [
+                {'name': 'M.ディアス', 'pos': '左', 'plays': ['三振|out/event${Uri.encodeComponent('先発投手:ジェーコブ・ミジオロウスキー')}', ...List.filled(11, '三振|out')].join(' ')},
+                const {'name': 'エリー・デラクルーズ', 'role': '代打', 'plays': '左ホームラン|hr/pinch'},
+              ],
+            }
+          ],
+        }
+      ],
     ))));
     await tester.pump(const Duration(milliseconds: 300));
     expect(find.descendant(of: find.byKey(const ValueKey('batting-name-home-1')), matching: find.text('M.ディアス')), findsOneWidget);
+    expect(find.descendant(of: find.byKey(const ValueKey('plate-event-label-先発投手')), matching: find.text('ミジオ')), findsOneWidget);
+    expect(find.text('ジェー'), findsNothing);
+    expect(tester.widget<Text>(find.byKey(const ValueKey('game-season-stats-M.ディアス'))).data, '.301 14本');
     expect(tester.widget<Text>(find.byKey(const ValueKey('substitution-title-エリー・デラクルーズ'))).data, 'デラク');
+    final season = find.byKey(const ValueKey('game-season-stats-M.ディアス'));
+    final horizontalScroll = find
+        .ancestor(
+            of: season,
+            matching: find.byWidgetPredicate(
+              (widget) => widget is SingleChildScrollView && widget.scrollDirection == Axis.horizontal,
+            ))
+        .first;
+    final fixedNameX = tester.getTopLeft(find.descendant(of: find.byKey(const ValueKey('batting-name-home-1')), matching: find.text('M.ディアス'))).dx;
+    final seasonX = tester.getTopLeft(season).dx;
+    await tester.drag(horizontalScroll, const Offset(-100, 0));
+    await tester.pump();
+    expect(tester.getTopLeft(season).dx, lessThan(seasonX - 20));
+    expect(tester.getTopLeft(find.descendant(of: find.byKey(const ValueKey('batting-name-home-1')), matching: find.text('M.ディアス'))).dx, fixedNameX);
     expect(tester.takeException(), isNull);
   });
   for (final runnerPlays in ['', '中ホームラン|hr']) {
@@ -70,7 +107,7 @@ void main() {
               const {
                 'id_team': 1,
                 'order': 1,
-                'players': const [
+                'players': [
                   {'name': '先発一', 'plays': '三振|out'},
                   {'name': '山川　穂高', 'role': '代打', 'plays': '左ホームラン|hr/pinch'},
                 ]
@@ -86,7 +123,7 @@ void main() {
               const {
                 'id_team': 1,
                 'order': 3,
-                'players': const [
+                'players': [
                   {'name': '先発三', 'plays': '右飛|out'},
                   {'name': '守備　選手', 'role': '代守', 'plays': '右安|single/pinch1'},
                 ]
@@ -94,7 +131,7 @@ void main() {
               const {
                 'id_team': 1,
                 'order': 4,
-                'players': const [
+                'players': [
                   {'name': '先発四', 'plays': '遊ゴ|out'},
                   {'name': '代打　選手名', 'role': '代打', 'plays': '四球|walk 中安|single'},
                   {'name': '代走　選手名', 'role': '代走', 'plays': '二飛|out'},

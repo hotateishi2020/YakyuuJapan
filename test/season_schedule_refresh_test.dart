@@ -38,7 +38,9 @@ void main() {
       expect(requests.toSet(),hasLength(4));
       expect(tester.takeException(),isNull);
     },()=>MockClient((request) async {
-      requests.add(request.url.query);
+      if (request.url.path.endsWith('/season-schedule')) {
+        requests.add(request.url.query);
+      }
       return http.Response(jsonEncode({'games':[],'events':[]}),200);
     }));
   });

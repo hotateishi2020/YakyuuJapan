@@ -5,11 +5,7 @@ import 'package:html/parser.dart' as html;
 import 'package:http/http.dart' as http;
 
 const highSchoolRounds = ['1回戦', '準々決勝', '準決勝', '決勝'];
-String schoolName(Object? value) => '$value'
-    .split(RegExp(r'[（(]'))
-    .first
-    .replaceAll(RegExp(r'\s'), '')
-    .replaceAll('日本文理大付', '日本文理大附');
+String schoolName(Object? value) => '$value'.split(RegExp(r'[（(]')).first.replaceAll(RegExp(r'\s'), '').replaceAll('日本文理大付', '日本文理大附');
 
 /// The source's stable round/slot IDs also identify games after postponements.
 List<Map<String, dynamic>> parseHighSchoolResults(String body, int year) {
@@ -19,8 +15,7 @@ List<Map<String, dynamic>> parseHighSchoolResults(String body, int year) {
   }
   final result = <Map<String, dynamic>>[];
   for (final round in document.querySelectorAll('.gdw-round')) {
-    final number = highSchoolRounds
-        .indexOf(round.querySelector('.gdw-rh')?.text.trim() ?? '');
+    final number = highSchoolRounds.indexOf(round.querySelector('.gdw-rh')?.text.trim() ?? '');
     if (number < 0) continue;
     for (final game in round.querySelectorAll('.gdw-m')) {
       final slot = int.tryParse(game.attributes['data-no'] ?? '');
@@ -31,12 +26,10 @@ List<Map<String, dynamic>> parseHighSchoolResults(String body, int year) {
         final side = i == 0 ? 'home' : 'away';
         row[side] = schoolName(sides[i].querySelector('.gdw-name')?.text ?? '');
         if (game.classes.contains('gdw-m--finished')) {
-          row['score_$side'] = int.tryParse(
-              sides[i].querySelector('.gdw-score')?.text.trim() ?? '');
+          row['score_$side'] = int.tryParse(sides[i].querySelector('.gdw-score')?.text.trim() ?? '');
         }
       }
-      final date = RegExp(r'(\d{1,2})月(\d{1,2})日.*?(\d{1,2}:\d{2})')
-          .firstMatch(game.querySelector('.gdw-court')?.text ?? '');
+      final date = RegExp(r'(\d{1,2})月(\d{1,2})日.*?(\d{1,2}:\d{2})').firstMatch(game.querySelector('.gdw-court')?.text ?? '');
       if (date != null) {
         row['date'] = '${date[1]}/${date[2]}';
         row['time'] = date[3];
@@ -45,8 +38,7 @@ List<Map<String, dynamic>> parseHighSchoolResults(String body, int year) {
     }
   }
   // Reject changed layouts and unrelated/partial tournament widgets.
-  if (result.length != 15 ||
-      result.map((m) => '${m['round']}:${m['slot']}').toSet().length != 15) {
+  if (result.length != 15 || result.map((m) => '${m['round']}:${m['slot']}').toSet().length != 15) {
     throw const FormatException('Incomplete tournament results');
   }
   return result;
@@ -59,16 +51,12 @@ String? highSchoolWinner(Map<String, dynamic> game) {
 }
 
 /// Apply only final results of the expected teams, then advance those winners.
-Map<String, dynamic> updateHighSchoolSchedule(Map<String, dynamic> current,
-    List<Map<String, dynamic>> results, String source, DateTime now) {
+Map<String, dynamic> updateHighSchoolSchedule(Map<String, dynamic> current, List<Map<String, dynamic>> results, String source, DateTime now) {
   final updated = jsonDecode(jsonEncode(current)) as Map<String, dynamic>;
   final bracket = updated['kyushu'] as Map<String, dynamic>;
   final matches = (bracket['matches'] as List).cast<Map<String, dynamic>>();
-  Map<String, dynamic> gameAt(int round, int slot) =>
-      matches.singleWhere((m) => m['round'] == round && m['slot'] == slot);
-  final byId = {
-    for (final row in results) '${row['round']}:${row['slot']}': row
-  };
+  Map<String, dynamic> gameAt(int round, int slot) => matches.singleWhere((m) => m['round'] == round && m['slot'] == slot);
+  final byId = {for (final row in results) '${row['round']}:${row['slot']}': row};
   for (var round = 0; round < 4; round++) {
     for (var slot = 0; slot < (8 >> round); slot++) {
       final game = gameAt(round, slot);
@@ -91,9 +79,7 @@ Map<String, dynamic> updateHighSchoolSchedule(Map<String, dynamic> current,
       final actual = {schoolName(row['home']), schoolName(row['away'])};
       if (actual.length != 2 || !expected.containsAll(actual)) continue;
       // Scheduled/live scores never decide a winner.
-      if (row['score_home'] is int &&
-          row['score_away'] is int &&
-          highSchoolWinner(row) != null) {
+      if (row['score_home'] is int && row['score_away'] is int && highSchoolWinner(row) != null) {
         final sameOrder = schoolName(game['home']) == schoolName(row['home']);
         game['score_home'] = row[sameOrder ? 'score_home' : 'score_away'];
         game['score_away'] = row[sameOrder ? 'score_away' : 'score_home'];
@@ -106,11 +92,8 @@ Map<String, dynamic> updateHighSchoolSchedule(Map<String, dynamic> current,
     }
   }
   final calendar = updated['calendar'] as Map<String, dynamic>;
-  final tournament = (calendar['tournaments'] as List)
-      .cast<Map<String, dynamic>>()
-      .singleWhere((t) => t['id'] == 'autumn-kyushu-2026');
-  final calendarMatches =
-      (tournament['matches'] as List).cast<Map<String, dynamic>>();
+  final tournament = (calendar['tournaments'] as List).cast<Map<String, dynamic>>().singleWhere((t) => t['id'] == 'autumn-kyushu-2026');
+  final calendarMatches = (tournament['matches'] as List).cast<Map<String, dynamic>>();
   final prefectures = calendar['school_prefectures'] as Map;
   // Candidate schools must shrink as soon as a school is eliminated, so its
   // supporters no longer see conditional games for that school.
@@ -119,16 +102,11 @@ Map<String, dynamic> updateHighSchoolSchedule(Map<String, dynamic> current,
     final winner = highSchoolWinner(game);
     if (winner != null) return [schoolName(winner)];
     if (round == 0) return [schoolName(game['home']), schoolName(game['away'])];
-    return [
-      ...candidates(round - 1, slot * 2),
-      ...candidates(round - 1, slot * 2 + 1)
-    ];
+    return [...candidates(round - 1, slot * 2), ...candidates(round - 1, slot * 2 + 1)];
   }
 
   for (var round = 0; round < 4; round++) {
-    final scheduled = calendarMatches
-        .where((m) => m['round'] == highSchoolRounds[round])
-        .toList();
+    final scheduled = calendarMatches.where((m) => m['round'] == highSchoolRounds[round]).toList();
     for (var slot = 0; slot < scheduled.length; slot++) {
       final match = scheduled[slot], game = gameAt(round, slot);
       for (final side in ['home', 'away']) {
@@ -137,14 +115,12 @@ Map<String, dynamic> updateHighSchoolSchedule(Map<String, dynamic> current,
           match[side] = school;
           match['${side}_prefecture'] = prefectures[school] ?? '';
         } else if (round > 0) {
-          final remaining =
-              candidates(round - 1, slot * 2 + (side == 'home' ? 0 : 1));
+          final remaining = candidates(round - 1, slot * 2 + (side == 'home' ? 0 : 1));
           match[side] = '${remaining.join('／')}の勝者';
         }
       }
       final date = '${game['date']}'.split('/');
-      match['date'] =
-          '2026-${date[0].padLeft(2, '0')}-${date[1].padLeft(2, '0')}';
+      match['date'] = '2026-${date[0].padLeft(2, '0')}-${date[1].padLeft(2, '0')}';
       match['time'] = game['time'];
       final pending = '${match['home']} ${match['away']}'.contains('勝者');
       if (pending) {
@@ -169,11 +145,7 @@ Map<String, dynamic> updateHighSchoolSchedule(Map<String, dynamic> current,
       }
     }
   }
-  final checked = now
-      .toUtc()
-      .add(const Duration(hours: 9))
-      .toIso8601String()
-      .substring(0, 10);
+  final checked = now.toUtc().add(const Duration(hours: 9)).toIso8601String().substring(0, 10);
   bracket['checked_at'] = calendar['checked_at'] = checked;
   updated['checked_at'] = now.toUtc().toIso8601String();
   return updated;
@@ -183,42 +155,28 @@ class HighSchoolSchedule {
   static Timer? _timer;
   static bool _busy = false;
   static Map<String, dynamic>? _cached;
-  static String get _prefix =>
-      Directory('backend/public').existsSync() ? 'backend/' : '';
+  static String get _prefix => Directory('backend/public').existsSync() ? 'backend/' : '';
   static File get _store => File('${_prefix}data/high-school-schedule.json');
   static Map<String, dynamic> snapshot() {
     if (_cached != null) return _cached!;
     if (_store.existsSync()) {
       try {
-        return _cached =
-            jsonDecode(_store.readAsStringSync()) as Map<String, dynamic>;
+        return _cached = jsonDecode(_store.readAsStringSync()) as Map<String, dynamic>;
       } catch (_) {}
     }
     Map<String, dynamic> asset(String name) {
       final local = File('${_prefix}assets/data/$name.json');
-      final deployed =
-          File('${_prefix}public/assets/backend/assets/data/$name.json');
-      return jsonDecode(
-              (local.existsSync() ? local : deployed).readAsStringSync())
-          as Map<String, dynamic>;
+      final deployed = File('${_prefix}public/assets/backend/assets/data/$name.json');
+      return jsonDecode((local.existsSync() ? local : deployed).readAsStringSync()) as Map<String, dynamic>;
     }
 
-    final calendar = asset('high_school_calendar'),
-        bracket = asset('autumn_kyushu_2026');
-    final tournament = (calendar['tournaments'] as List)
-        .cast<Map>()
-        .singleWhere((t) => t['id'] == 'autumn-kyushu-2026');
+    final calendar = asset('high_school_calendar'), bracket = asset('autumn_kyushu_2026');
+    final tournament = (calendar['tournaments'] as List).cast<Map>().singleWhere((t) => t['id'] == 'autumn-kyushu-2026');
     for (var round = 0; round < 4; round++) {
-      final scheduled = (tournament['matches'] as List)
-          .cast<Map>()
-          .where((m) => m['round'] == highSchoolRounds[round])
-          .toList();
+      final scheduled = (tournament['matches'] as List).cast<Map>().where((m) => m['round'] == highSchoolRounds[round]).toList();
       for (var slot = 0; slot < scheduled.length; slot++) {
-        final game = (bracket['matches'] as List)
-            .cast<Map>()
-            .singleWhere((m) => m['round'] == round && m['slot'] == slot);
-        final match = scheduled[slot],
-            date = '${scheduled[slot]['date']}'.split('-');
+        final game = (bracket['matches'] as List).cast<Map>().singleWhere((m) => m['round'] == round && m['slot'] == slot);
+        final match = scheduled[slot], date = '${scheduled[slot]['date']}'.split('-');
         game['date'] = '${int.parse(date[1])}/${int.parse(date[2])}';
         game['time'] = match['time'];
       }
@@ -229,8 +187,7 @@ class HighSchoolSchedule {
   static void start() {
     if (_timer != null) return;
     unawaited(tick());
-    _timer =
-        Timer.periodic(const Duration(minutes: 30), (_) => unawaited(tick()));
+    _timer = Timer.periodic(const Duration(minutes: 30), (_) => unawaited(tick()));
   }
 
   static Future<void> tick() async {
@@ -238,32 +195,22 @@ class HighSchoolSchedule {
     _busy = true;
     try {
       final current = snapshot();
-      final tournament = ((current['calendar'] as Map)['tournaments'] as List)
-          .cast<Map>()
-          .singleWhere((t) => t['id'] == 'autumn-kyushu-2026');
-      final today = DateTime.now()
-          .toUtc()
-          .add(const Duration(hours: 9))
-          .toIso8601String()
-          .substring(0, 10);
+      final tournament = ((current['calendar'] as Map)['tournaments'] as List).cast<Map>().singleWhere((t) => t['id'] == 'autumn-kyushu-2026');
+      final today = DateTime.now().toUtc().add(const Duration(hours: 9)).toIso8601String().substring(0, 10);
       // Continue after the advertised final date in case rain postpones play.
-      if (today.compareTo('${tournament['date_from']}') < 0 ||
-          highSchoolWinner(((current['kyushu'] as Map)['matches'] as List)
-                  .cast<Map<String, dynamic>>()
-                  .last) !=
-              null) return;
+      if (today.compareTo('${tournament['date_from']}') < 0 || highSchoolWinner(((current['kyushu'] as Map)['matches'] as List).cast<Map<String, dynamic>>().last) != null) {
+        return;
+      }
       final source = '${tournament['source_url']}';
-      final response = await http
-          .get(Uri.parse(source))
-          .timeout(const Duration(seconds: 25));
-      if (response.statusCode != 200)
+      final response = await http.get(Uri.parse(source)).timeout(const Duration(seconds: 25));
+      if (response.statusCode != 200) {
         throw HttpException('Results: ${response.statusCode}');
+      }
       final body = utf8.decode(response.bodyBytes);
       if (!(html.parse(body).querySelector('h1')?.text ?? '').contains('九州')) {
         throw const FormatException('Unexpected tournament');
       }
-      final next = updateHighSchoolSchedule(
-          current, parseHighSchoolResults(body, 2026), source, DateTime.now());
+      final next = updateHighSchoolSchedule(current, parseHighSchoolResults(body, 2026), source, DateTime.now());
       await _store.parent.create(recursive: true);
       final pending = File('${_store.path}.tmp');
       await pending.writeAsString(jsonEncode(next), flush: true);

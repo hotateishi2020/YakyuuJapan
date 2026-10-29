@@ -5630,6 +5630,34 @@ void main() {
     expect(regular.logoAsset, isNull);
   });
 
+  test('日本シリーズの見出しはリーグに関係なく日本語と深緑に統一する', () {
+    for (final league in [0, 1, 2]) {
+      final header = npbClimaxHeader(leagueId: league, fallbackLabel: 'リーグ', games: [{'code_game': ' js '}]);
+      expect(header.label, '日本シリーズ');
+      expect(header.gradient, [const Color(0xFF004832), const Color(0xFF004832)]);
+    }
+  });
+
+  testWidgets('日本シリーズの試合情報ヘッダーに日本語と深緑を描画する', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: SizedBox(width: 480, height: 420,
+      child: BothLeagueGameDay(initialDate: '2026-10-28',
+        leagues: [(id: 1, name: 'セ・リーグ', color: Color(0xFF0E8E2D))],
+        games: [{
+          'code_game': 'JS','date_game': '2026-10-28','state': '試合終了',
+          'id_team_home': 2,'id_team_away': 1,'id_league_home': 1,'id_league_away': 1,
+          'name_team_home': '阪神','name_team_away': '巨人','score_home': 1,'score_away': 0,
+        }],
+      ),
+    )));
+    await tester.pump();
+    expect(find.text('日本シリーズ'), findsOneWidget);
+    expect(find.text('JAPAN SERIES'), findsNothing);
+    final header = tester.widget<Container>(find.ancestor(of: find.text('日本シリーズ'), matching: find.byType(Container)).first);
+    final decoration = header.decoration! as BoxDecoration;
+    expect((decoration.gradient! as LinearGradient).colors,
+        [const Color(0xFF004832), const Color(0xFF004832)]);
+  });
+
   testWidgets('スタメン発表前は守備欄を出さない', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(

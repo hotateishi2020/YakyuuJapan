@@ -25,4 +25,15 @@ void main() {
     await HomeDataCache.read('b', () async => {'pending': true});
     expect(await HomeDataCache.read('b', () async => {'ok': true}), {'ok': true});
   });
+  test('有効なHOMEデータを同期的に再利用し、期限切れは取り直す', () async {
+    var calls = 0;
+    Future<Map<String,dynamic>> fetch() async => {'version': ++calls};
+    expect(HomeDataCache.peek('home'), isNull);
+    await HomeDataCache.read('home', fetch);
+    expect(HomeDataCache.peek('home')!['version'], 1);
+    await HomeDataCache.read('home', fetch, maxAge: const Duration(minutes: 1));
+    expect(calls, 1);
+    await HomeDataCache.read('home', fetch, maxAge: Duration.zero);
+    expect(HomeDataCache.peek('home')!['version'], 2);
+  });
 }

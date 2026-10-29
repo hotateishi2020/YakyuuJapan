@@ -6,6 +6,34 @@ import 'package:Yakyuu_Japan/logic/roster_contract_status.dart';
 import 'package:Yakyuu_Japan/View/strength_transfers.dart';
 
 void main() {
+  test('入団決定はFA権がなくても掲載し、新人ドラフトを除外して現役ドラフトを残す', () {
+    Map<String,dynamic> arrival(String name, {String method = '', String type = ''}) => {
+      'player_key': name,'name': name,'new_arrival': true,'arrival_year': 2026,
+      'arrival_as_of': '2026-09-23','move_method': method,
+      if (type.isNotEmpty) 'arrival_draft_type': type,
+      'status_source': 'https://example.com/announcement',
+      'previous_team': {'name': 'ドジャース'},
+    };
+    final rows = transferCandidates([{
+      'id_team': 3,'id_league': 1,'name_team': '中日','roster': [
+        arrival('ライアン・ウォード'),
+        arrival('FA加入',method: 'FA移籍'),
+        arrival('新人',method: '新人ドラフト1位'),
+        arrival('育成',type: '育成'),
+        arrival('現役移籍',method: '現役ドラフト',type: '現役'),
+        {...arrival('前年の新加入'), 'arrival_as_of': '2025-12-01'},
+        {...arrival('翌年加入決定'), 'arrival_year': 2027},
+        {...arrival('退団済み'), 'departure_confirmed': true},
+      ],
+    }], 2026);
+    expect(rows.map((r) => r['player']['name']).toSet(),
+        {'ライアン・ウォード','FA加入','現役移籍','翌年加入決定'});
+    final ward = rows.singleWhere((r) => r['player']['name'] == 'ライアン・ウォード');
+    expect(ward['status'], '入団決定');
+    expect(ward['labels'], ['新加入']);
+    expect(ward['detail'], contains('ドジャース → 中日'));
+    expect(ward['sources'], ['https://example.com/announcement']);
+  });
   final team = <String, dynamic>{
     'id_team': 7,
     'name_team': '西武',

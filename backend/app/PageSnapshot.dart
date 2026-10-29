@@ -1,3 +1,4 @@
+import 'package:koko_shared/championship_schedule.dart';
 import 'SeasonCalendarEvents.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -54,8 +55,10 @@ class PageSnapshot {
     if (kind == 'schedule') {
       // Enrich old snapshots too, without source queries or waiting for refresh.
       final events = data['events'];
+      final games = (data['games'] as List? ?? []).whereType<Map>().map((g) => Map<String,dynamic>.from(g)).toList();
+      data['games'] = championshipSchedule(games);
       data['events'] = seasonCalendarEvents(
-        org: org.code, year: year, legacy: const [],
+        org: org.code, year: year, games: games, legacy: const [],
         researched: events is List
             ? events.whereType<Map>().map((e) => Map<String,dynamic>.from(e)).toList()
             : [],

@@ -1,3 +1,5 @@
+import 'dart:async';
+import '../logic/auth_session.dart';
 import '../View/LeagueLogo.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -134,7 +136,10 @@ class _NavigationPickerState extends State<NavigationPicker> {
     final version = ++revision;
     final entry =
         _PickerEntry(level, Map.of(widget.labels), widget.value, (value) {
-      if (mounted && TickerMode.valuesOf(context).enabled) widget.onChanged(value);
+      if (mounted && TickerMode.valuesOf(context).enabled) {
+        unawaited(AuthSession.instance.reportAction('タブ選択: ${widget.labels[value]}'));
+        widget.onChanged(value);
+      }
     }, widget.color, widget.foreground, widget.pickerKey, Map.of(widget.itemColors), Map.of(widget.logoAssets), widget.alwaysPicker, widget.alwaysTabs);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && revision == version) {
@@ -256,7 +261,7 @@ class NavigationPickerBar extends StatelessWidget {
             child: InkWell(
               key: ValueKey('navigation-option-${entry.level}-${indexed.$2}'),
               borderRadius: BorderRadius.circular(8),
-              onTap: () { if (indexed.$2 != entry.value) entry.onChanged(indexed.$2); },
+              onTap: () { entry.onChanged(indexed.$2); },
               child: Padding(padding: const EdgeInsets.symmetric(horizontal: 14),
                 child: Center(child: DefaultTextStyle.merge(style: _textStyle, child: _label(entry, indexed.$2, foreground: indexed.$2 == entry.value ? null : Colors.black87)))),
             ),
@@ -317,7 +322,7 @@ class NavigationPickerBar extends StatelessWidget {
                     child: _label(entry, item.key)))
           ],
           onChanged: (value) {
-            if (value != null && value != entry.value) entry.onChanged(value);
+            if (value != null) entry.onChanged(value);
           },
         )),
       );

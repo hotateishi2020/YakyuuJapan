@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'dart:math' as math;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -19,8 +20,12 @@ class DateLineWorldConstraint extends CameraConstraint {
     final worldWidth = 256 * math.pow(2, zoom);
     final halfLongitude = camera.size.width / worldWidth * 180;
     if (halfLongitude > 180) return null;
+    // Keep both polar edges inside the tile world, including tall/narrow maps.
+    final desired = camera.projectAtZoom(const LatLng(20, 180), zoom);
+    final centerY = desired.dy.clamp(camera.size.height / 2, worldWidth - camera.size.height / 2);
+    final latitude = centerY == desired.dy ? 20.0 : camera.unprojectAtZoom(Offset(desired.dx, centerY), zoom).latitude;
     return camera.withPosition(zoom: zoom, center: LatLng(
-      20,
+      latitude,
       camera.center.longitude.clamp(halfLongitude, 360 - halfLongitude),
     ));
   }

@@ -1,3 +1,5 @@
+import 'dart:async';
+import '../logic/auth_session.dart';
 import '../widgets/navigation_picker.dart';
 import '../widgets/collapsible_menu.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +60,8 @@ class AdaptiveSectionSelector extends StatelessWidget {
         final extraWidth = (available - total()) / labels.length;
         final style = textStyle.copyWith(color: foreground);
         void select(int next) {
-          if (next != value) onChanged(next);
+          unawaited(AuthSession.instance.reportAction('タブ選択: ${labels[next]}'));
+          onChanged(next);
         }
 
         if (fits && !alwaysPicker) {

@@ -178,6 +178,7 @@ class DisplaySnapshot {
       'player_hands': game['player_hands'] ?? [],
       'golden_glove_stats_version': game['golden_glove_stats_version'],
       'season_player_stats': game['season_player_stats'] ?? [],
+      'season_stats_version': game['season_stats_version'],
       if (game.containsKey('postseason_homers_before')) 'postseason_homers_before': game['postseason_homers_before'],
     }];
     final dates = <int, String>{

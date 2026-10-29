@@ -18,6 +18,7 @@ class Headers {
     double paddingVertical,
     double paddingHorizontal, {
     VoidCallback? onAuthChanged,
+    VoidCallback? onHome,
     List<Widget> actions = const [],
     bool authReady = true,
     bool showRightActions = true,
@@ -64,7 +65,11 @@ class Headers {
                   children: [
                     Transform.translate(
                       offset: Offset(0, paddingVertical * 0.3),
-                      child: _titleLogo(h, title, maxWidth: logoW),
+                      child: Semantics(
+                        button: onHome != null, label: 'HOMEへ移動',
+                        child: GestureDetector(onTap: onHome,
+                          child: _titleLogo(h, title, maxWidth: logoW)),
+                      ),
                     ),
                     if (titleTrailing != null) ...[
                       const Spacer(),

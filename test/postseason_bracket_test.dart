@@ -1,3 +1,4 @@
+import 'package:Yakyuu_Japan/logic/auth_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Yakyuu_Japan/View/PostseasonBracket.dart';
@@ -83,6 +84,8 @@ Map<String, dynamic> game({
 }
 
 void main() {
+  setUp(() { AuthSession.instance.user = AuthUser.fromJson({'id': 1, 'admin': true}); AuthSession.instance.token = 'test'; });
+  tearDown(() { AuthSession.instance.user = null; AuthSession.instance.token = null; });
   test('勝率5割未満またはゲーム差10以上でアドバンテージが2勝になる', () {
     expect(finalistTakesExtraAdvantage(team(id: 3, league: 1, rank: 3, wins: 60, losses: 70, behind: 8)), isTrue);
     expect(finalistTakesExtraAdvantage(team(id: 3, league: 1, rank: 3, wins: 70, losses: 70, behind: 4)), isFalse);

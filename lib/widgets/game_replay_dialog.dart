@@ -1,6 +1,4 @@
-import '../logic/replay_motion.dart';
 import '../tools/color_parse.dart';
-import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -30,7 +28,8 @@ class _GameReplayDialogState extends State<GameReplayDialog> {
   int index = 0;
   bool automatic = true, playing = false, loading = true;
   String? error;
-  Timer? timer;
+  int playbackGeneration = 0;
+  int presentationRun = 0;
   int? owner;
   @override
   void initState() {
@@ -48,14 +47,14 @@ class _GameReplayDialogState extends State<GameReplayDialog> {
   void _authChanged() {
     if (!AuthSession.instance.showDetailedGames ||
         owner != AuthSession.instance.user?.id) {
-      timer?.cancel();
+      playbackGeneration++;
       if (mounted) Navigator.of(context).pop();
     }
   }
 
   @override
   void dispose() {
-    timer?.cancel();
+    playbackGeneration++;
     AuthSession.instance.removeListener(_authChanged);
     super.dispose();
   }
@@ -96,7 +95,8 @@ class _GameReplayDialogState extends State<GameReplayDialog> {
   }
 
   void _play() {
-    timer?.cancel();
+    playbackGeneration++;
+    presentationRun++;
     if (frames.isEmpty) return;
     setState(() {
       if (index == frames.length - 1) index = 0;
@@ -107,34 +107,25 @@ class _GameReplayDialogState extends State<GameReplayDialog> {
       }
       playing = true;
     });
-    _schedule();
   }
 
-  void _schedule() {
-    timer = Timer(
-        Duration(
-            milliseconds: frames[index].after
-                ? ((replayResultSeconds(frames[index]) + 2) * 1000).round()
-                : 0), () {
-      if (!mounted || !playing) return;
-      if (index >= frames.length - 1) {
-        _pause();
-        return;
-      }
-      setState(() {
-        index++;
-        if (!frames[index].after &&
-            index + 1 < frames.length &&
-            frames[index + 1].after) {
-          index++;
-        }
-      });
-      _schedule();
+  VoidCallback _completionCallback(int frameIndex, int generation) =>
+      () => _presentationComplete(frameIndex, generation);
+
+  void _presentationComplete(int frameIndex, int generation) {
+    if (!mounted || !playing || index != frameIndex || playbackGeneration != generation) return;
+    if (index >= frames.length - 1) {
+      _pause();
+      return;
+    }
+    setState(() {
+      index++;
+      if (!frames[index].after && index + 1 < frames.length && frames[index + 1].after) index++;
     });
   }
 
   void _pause() {
-    timer?.cancel();
+    playbackGeneration++;
     if (mounted) setState(() => playing = false);
   }
 
@@ -243,7 +234,11 @@ class _GameReplayDialogState extends State<GameReplayDialog> {
                                 ? 300
                                 : constraints.maxHeight,
                             child: ReplayField(
+                              key: ValueKey('replay-$index-$presentationRun'),
                               frame: frame,
+                              onPresentationComplete: playing
+                                  ? _completionCallback(index, playbackGeneration)
+                                  : null,
                               scoreboard: ReplayScoreboard(
                                   frames: frames,
                                   index: index,

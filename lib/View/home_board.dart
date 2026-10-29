@@ -1,3 +1,4 @@
+import 'videos_board.dart';
 import 'today_event_map.dart';
 import '../logic/game_visibility.dart';
 import '../logic/auth_session.dart';
@@ -6,11 +7,11 @@ import 'season_titles_board.dart';
 import 'home_games_behind_board.dart';
 import 'season_schedule_board.dart';
 import 'dart:convert';
+import '../tools/home_data_cache.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../tools/Env.dart';
 import '../tools/json_utils.dart';
-import '../widgets/baseball_loading.dart';
 import 'player_detail_dialog.dart';
 
 class HomeBoard extends StatefulWidget {
@@ -28,14 +29,31 @@ class _HomeBoardState extends State<HomeBoard> {
   Map<String, dynamic>? _data;
   String? _error;
   bool _loading = false;
+  int _request = 0;
+  late String _scope;
+  String get _sessionScope => '${AuthSession.instance.token}:${AuthSession.instance.showDetailedGames}:${AuthSession.instance.showSpecialMedia}';
+  String get _cacheKey {
+    final day = DateTime.now().toUtc().add(const Duration(hours: 9)).toIso8601String().substring(0,10);
+    return 'dashboard:$day:$_scope';
+  }
   @override
   void initState() {
     super.initState();
-    AuthSession.instance.addListener(_scheduleNewsRead);
+    _scope = _sessionScope;
+    _data = HomeDataCache.peek(_cacheKey, maxAge: const Duration(seconds:45));
+    AuthSession.instance.addListener(_sessionChanged);
     _scheduleNewsRead();
     _load();
   }
   int? _newsReadUser;
+  void _sessionChanged() {
+    _scheduleNewsRead();
+    if (_scope != _sessionScope) {
+      _scope = _sessionScope;
+      _data = HomeDataCache.peek(_cacheKey, maxAge: const Duration(seconds:45));
+      _load();
+    }
+  }
   bool _newsReadScheduled = false;
   void _scheduleNewsRead() {
     if (_newsReadScheduled) return;
@@ -55,21 +73,49 @@ class _HomeBoardState extends State<HomeBoard> {
   }
   @override
   void dispose() {
-    AuthSession.instance.removeListener(_scheduleNewsRead);
+    AuthSession.instance.removeListener(_sessionChanged);
     super.dispose();
   }
-  Future<void> _load() async {
+  Future<void> _load({bool refresh = false}) async {
+    final request = ++_request;
+    final token = AuthSession.instance.token;
+    final key = _cacheKey;
     setState(() { _loading = true; _error = null; });
     try {
-      final response = await http.get(Env.api('/home'), headers: {if (AuthSession.instance.token != null) 'Authorization': 'Bearer ${AuthSession.instance.token}'}).timeout(const Duration(seconds: 60));
+      final data = await HomeDataCache.read(key, () async {
+      final response = await http.get(Env.api(refresh ? '/home?fresh=1' : '/home'), headers: {if (token != null) 'Authorization': 'Bearer $token'}).timeout(const Duration(seconds: 20));
       if (response.statusCode != 200) throw const FormatException();
-      final data = Map<String, dynamic>.from(jsonDecode(utf8.decode(response.bodyBytes)) as Map);
-      if (mounted) setState(() => _data = data);
+      return Map<String, dynamic>.from(jsonDecode(utf8.decode(response.bodyBytes)) as Map);
+      }, refresh: refresh, maxAge: const Duration(seconds:45));
+      if (mounted && request == _request) {
+        setState(() => _data = data);
+        if (AuthSession.instance.showSpecialMedia && listMapFromJson(data['heroes']).any((h) => h['character_image'] == null)) {
+          _loadImages(key, token, request, refresh: refresh);
+        }
+      }
     } catch (_) {
-      if (mounted) setState(() => _error = 'HOMEを取得できませんでした。再読み込みしてください。');
+      if (mounted && request == _request) setState(() => _error = 'HOMEを取得できませんでした。再読み込みしてください。');
     } finally {
-      if (mounted) setState(() => _loading = false);
+      if (mounted && request == _request) setState(() => _loading = false);
     }
+  }
+  Future<void> _loadImages(String key, String? token, int request, {required bool refresh}) async {
+    try {
+      final ids = listMapFromJson(_data?['heroes']).map((h) => '${h['id_player']}').toSet().toList()..sort();
+      final result = await HomeDataCache.read('$key:images:${ids.join(',')}', () async {
+        final response = await http.get(Env.api('/home?section=images'), headers: {
+          if (token != null) 'Authorization': 'Bearer $token',
+        }).timeout(const Duration(seconds:20));
+        if (response.statusCode != 200) throw const FormatException();
+        return Map<String,dynamic>.from(jsonDecode(utf8.decode(response.bodyBytes)) as Map);
+      }, refresh: refresh, maxAge: const Duration(minutes:5));
+      if (mounted && request == _request && result['images'] is Map) {
+        final images = result['images'] as Map;
+        setState(() => _data = {..._data!, 'heroes': [for (final hero in listMapFromJson(_data!['heroes'])) {
+          ...hero, if (images['${hero['id_player']}'] != null) 'character_image': images['${hero['id_player']}'],
+        }]});
+      }
+    } catch (_) { /* Optional images never block HOME content. */ }
   }
   void _openCalendar(int year) {
     showDialog<void>(context: context, builder: (context) {
@@ -89,6 +135,7 @@ class _HomeBoardState extends State<HomeBoard> {
     });
   }
   Widget _section(String title, List<Widget> children) => Card(
+    key: ValueKey('home-section-$title'),
     margin: const EdgeInsets.only(bottom: 12),
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -135,7 +182,6 @@ class _HomeBoardState extends State<HomeBoard> {
   );
 
   Widget _buildContent(BuildContext context) {
-    if (_data == null && _loading) return const Center(child: BaseballLoading());
     final data = _data ?? {};
     final today = DateTime.tryParse('${data['today']}');
     final calendarYear = widget.year ?? today?.year ?? DateTime.now().year;
@@ -146,12 +192,13 @@ class _HomeBoardState extends State<HomeBoard> {
     final heroes = listMapFromJson(data['heroes']);
     final birthdays = listMapFromJson(data['birthdays']);
     final todayGames = games.where((g) => g['date_game'] == data['today'] && '${g['state']}'.contains('試合終了')).toList();
-    return ListView(padding: const EdgeInsets.all(12), children: [
+    return ListView(key: const ValueKey('home-scroll'), padding: const EdgeInsets.all(12), children: [
       if (widget.news != null) ...[widget.news!, const SizedBox(height: 12)],
       if (widget.predictionScores != null)
         _section('予想対決のスコア', [widget.predictionScores!]),
       Align(alignment: Alignment.centerRight,
-        child: IconButton(tooltip: '再読み込み', onPressed: _loading ? null : _load, icon: const Icon(Icons.refresh))),
+        child: IconButton(tooltip: '再読み込み', onPressed: _loading ? null : () => _load(refresh:true), icon: const Icon(Icons.refresh))),
+      if (_loading) const LinearProgressIndicator(),
       if (_error != null) Text(_error!, style: const TextStyle(color: Colors.red)),
       if (_data != null)
         _section('今日誕生日の選手', [
@@ -203,7 +250,7 @@ class _HomeBoardState extends State<HomeBoard> {
         Align(alignment: Alignment.centerRight, child: TextButton(
           onPressed: () => _openCalendar(calendarYear), child: const Text('1ヶ月分の日程を見る'))),
       ]),
-      const TodayEventMap(),
+      const TodayEventMap(key: ValueKey('home-today-event-map')),
       if (widget.gameInformation != null)
         _section('試合情報', [widget.gameInformation!]),
       _section('順位・ゲーム差', [HomeStandingsBoard(year: calendarYear)]),
@@ -217,6 +264,11 @@ class _HomeBoardState extends State<HomeBoard> {
             child: SeasonTitlesBoard(org: org, year: calendarYear, individualOnly: true)),
         ],
       ]),
+      for (final org in [OrgConfig.npb, OrgConfig.mlb])
+        _section('${org.label}の動画', [
+          VideosBoard(key: ValueKey('home-videos-${org.kind.name}'),
+            org: org.kind, color: org.tabColor, embedded: true),
+        ]),
     ]);
   }
 }

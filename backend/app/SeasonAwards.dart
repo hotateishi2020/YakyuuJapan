@@ -204,7 +204,7 @@ class SeasonAwards {
     return data;
   }
 
-  static Future<Map<String, dynamic>> update(int year) async {
+  static Future<Map<String, dynamic>> update(int year, {bool seriesOnly = false}) async {
     if (!_running.add(year)) return read(year, refresh: false);
     _checked[year] = DateTime.now();
     final client = http.Client();
@@ -239,6 +239,7 @@ class SeasonAwards {
       'freshas/$year/award.html',
       'freshas/$year/roster.html',
     ];
+    if (seriesOnly) paths.removeWhere((path) => !path.startsWith('nippons/'));
     try {
       for (var i = 0; i < paths.length; i += 3) {
         await Future.wait(paths.skip(i).take(3).map((path) async {
@@ -272,7 +273,7 @@ class SeasonAwards {
         }));
       }
       final weeklyIndex = {2025: 'https://sports.yahoo.co.jp/contents/17973', 2026: 'https://sports.yahoo.co.jp/contents/22023'}[year];
-      if (weeklyIndex != null) {
+      if (!seriesOnly && weeklyIndex != null) {
         try {
           final response = await client.get(Uri.parse(weeklyIndex)).timeout(const Duration(seconds: 20));
           if (response.statusCode != 200) {

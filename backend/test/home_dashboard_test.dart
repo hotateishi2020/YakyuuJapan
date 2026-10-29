@@ -1,6 +1,28 @@
 import 'package:test/test.dart';
+import 'dart:async';
 import '../app/HomeDashboard.dart';
 void main() {
+  setUp(HomeDashboardCache.clear);
+  test('HOME集計を同時取得・再取得で共有し、更新通知後だけ取り直す', () async {
+    var calls = 0;
+    final pending = Completer<Map<String,dynamic>>();
+    Future<Map<String,dynamic>> fetch() { calls++; return pending.future; }
+    final a = HomeDashboardCache.read('2026-10-28', fetch);
+    final b = HomeDashboardCache.read('2026-10-28', fetch);
+    pending.complete({'today': '2026-10-28'});
+    await a; await b;
+    await HomeDashboardCache.read('2026-10-28', fetch);
+    expect(calls, 1);
+    HomeDashboardCache.clear();
+    await HomeDashboardCache.read('2026-10-28', fetch);
+    expect(calls, 2);
+    await HomeDashboardCache.read('2026-10-29', fetch);
+    expect(calls, 3);
+  });
+  test('HOME取得失敗はキャッシュせず次回に復旧できる', () async {
+    await expectLater(HomeDashboardCache.read('today', () async => throw StateError('DB')), throwsStateError);
+    expect(await HomeDashboardCache.read('today', () async => {'ok': true}), {'ok': true});
+  });
   test('首位タイを残し六冠以外や二位を除外する', () {
     expect(homeLeaders([
       for (final id in [1,2]) {'title': '本塁打', 'int_rank': 1, 'id_player': id, 'id_league': 1},

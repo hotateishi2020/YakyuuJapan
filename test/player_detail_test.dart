@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:async';
+import 'package:Yakyuu_Japan/tools/player_detail_cache.dart';
 import 'package:Yakyuu_Japan/logic/auth_session.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -13,10 +15,55 @@ import 'package:Yakyuu_Japan/View/BlinkBg.dart';
 
 void main() {
   setUp(() {
+    PlayerDetailCache.clear();
     AuthSession.instance.user = AuthUser.fromJson({'id': 1});
     AuthSession.instance.token = 'test';
   });
   tearDown(() { AuthSession.instance.user = null; AuthSession.instance.token = null; });
+  testWidgets('最新成績の取得を待たずにプロフィールを表示する', (t) async {
+    final season = Completer<http.Response>();
+    await http.runWithClient(() async {
+      await t.pumpWidget(const MaterialApp(home: PlayerDetailDialog(player: {'id_player': 999}, org: 'npb', year: 2026)));
+      await t.pumpAndSettle();
+      expect(find.text('先に表示する選手'), findsWidgets);
+      expect(find.text('生年月日'), findsWidgets);
+      season.complete(http.Response('{}', 503));
+      await t.pumpAndSettle();
+      await t.pump(const Duration(milliseconds: 400));
+      await t.pumpAndSettle();
+      expect(find.text('選手情報を取得できませんでした。'), findsNothing);
+      expect(find.text('先に表示する選手'), findsWidgets);
+      await t.pumpWidget(const SizedBox());
+    }, () => MockClient((request) async {
+      if (request.url.queryParameters['section'] == 'season') return season.future;
+      return http.Response(jsonEncode({'found': true, 'profile': {'id': 999, 'name_full': '先に表示する選手'}}), 200,
+          headers: {'content-type': 'application/json; charset=utf-8'});
+    }));
+  });
+  testWidgets('一時的な503は自動再試行し、再表示はプロフィールを再取得しない', (t) async {
+    var requests = 0;
+    await http.runWithClient(() async {
+      Widget dialog() => const MaterialApp(home: PlayerDetailDialog(player: {'id_player': 999}, org: 'npb', year: 2026));
+      await t.pumpWidget(dialog());
+      await t.pump();
+      await t.pump(const Duration(milliseconds: 400));
+      await t.pumpAndSettle();
+      expect(find.text('復旧した選手'), findsWidgets);
+      expect(requests, 2);
+      await t.pumpWidget(const SizedBox());
+      await t.pumpWidget(dialog());
+      await t.pumpAndSettle();
+      expect(find.text('復旧した選手'), findsWidgets);
+      expect(requests, 2);
+      await t.pumpWidget(const SizedBox());
+    }, () => MockClient((request) async {
+      if (request.url.queryParameters['section'] == 'season') return http.Response('{"season_stats":[]}', 200);
+      requests++;
+      if (requests == 1) return http.Response('{}', 503);
+      return http.Response('{"found":true,"profile":{"id":999,"name_full":"復旧した選手"}}', 200,
+          headers: {'content-type': 'application/json; charset=utf-8'});
+    }));
+  });
   for (final special in [false, true]) {
     testWidgets('選手生成画像は許可ユーザーだけ表示しログアウトで消える $special', (t) async {
       AuthSession.instance.user = AuthUser.fromJson({'id': special ? 1 : 3, 'flg_special': special});
@@ -125,6 +172,7 @@ void main() {
 
     testWidgets('代打の今季スタッツは投手では非表示にし野手では表示する', (t) async {
       for (final pitcher in [true, false]) {
+        PlayerDetailCache.clear();
         await http.runWithClient(() async {
           await t.pumpWidget(MaterialApp(home: Scaffold(body: PlayerDetailDialog(key: ValueKey(pitcher), player: const {'name': '甲'}, org: 'npb', year: 2026))));
           await t.pumpAndSettle();

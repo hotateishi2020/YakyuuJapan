@@ -1,3 +1,5 @@
+import 'dart:async';
+import '../logic/auth_session.dart';
 import 'navigation_picker.dart';
 import '../tools/tab_preferences.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +37,10 @@ class AppSectionTabs extends StatelessWidget {
       return NavigationPicker(alwaysTabs: alwaysTabs, alwaysPicker: alwaysPicker, labels: {for (final tab in tabs) tab.$2: highlightGames && tab.$2 == 0 ? '🔴 ${tab.$1}' : tab.$1}, value: selectedIndex,
         onChanged: onSelected, color: selectedColor ?? ALL_COLOR_APP,
         foreground: selectedForeground ?? TAB_COLOR_FONT);
+    }
+    void select(int value) {
+      unawaited(AuthSession.instance.reportAction('タブ選択: ${tabs.firstWhere((tab) => tab.$2 == value).$1}'));
+      onSelected(value);
     }
     Widget tabLabel((String, int) tab, [TextStyle? style]) =>
         tab.$2 == 0 && highlightGames && specialLabel != null
@@ -92,7 +98,7 @@ class AppSectionTabs extends StatelessWidget {
                         DropdownMenuItem(value: tab.$2, child: tabLabel(tab))
                     ],
                     onChanged: (i) {
-                      if (i != null) onSelected(i);
+                      if (i != null) select(i);
                     })));
       }
       return Padding(
@@ -110,7 +116,7 @@ class AppSectionTabs extends StatelessWidget {
                           : Colors.grey.shade300,
                       borderRadius: BorderRadius.circular(TAB_RADIUS),
                       child: InkWell(
-                        onTap: () => onSelected(tabs[i].$2),
+                        onTap: () => select(tabs[i].$2),
                         borderRadius: BorderRadius.circular(TAB_RADIUS),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 2),

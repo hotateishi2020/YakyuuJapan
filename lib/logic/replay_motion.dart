@@ -195,6 +195,12 @@ double replayResultSeconds(ReplayFrame f) =>
     (replayResultAtCatch(f) ? 3.4 * replayPitchArrival : 1.8);
 double replayMotionSeconds(ReplayFrame f) =>
     replayResultAtCatch(f) ? 3.4 * replayPitchArrival + 1.6 : 3.4;
+/// Finish the entire play and hold the result before introducing the next batter.
+Duration replayPresentationDuration(ReplayFrame f) {
+  final motionEnd = replayLeadSeconds(f) + replayMotionSeconds(f);
+  final result = replayResultSeconds(f);
+  return Duration(milliseconds: (((motionEnd > result ? motionEnd : result) + 2) * 1000).ceil());
+}
 double replayMotionProgress(ReplayFrame f, double elapsed) {
   final time = elapsed - replayLeadSeconds(f);
   const arrival = 3.4 * replayPitchArrival;

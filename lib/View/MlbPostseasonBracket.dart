@@ -1,3 +1,5 @@
+import '../config/postseason_design.dart';
+import '../widgets/championship_victory.dart';
 import '../logic/game_visibility.dart';
 import '../logic/auth_session.dart';
 import '../widgets/special_media.dart';
@@ -107,69 +109,63 @@ class MlbPostseasonBracket extends StatelessWidget {
     final board = buildMlbPostseasonBoard(standings: standings, games: AuthSession.instance.showDetailedGames ? games : publicGameRows(games));
     return FittedBox(
       fit: BoxFit.contain,
-      child: SizedBox(
-        width: MlbBracketGeom.w,
-        height: MlbBracketGeom.h,
-        child: Stack(
-          children: [
-            const Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                      Color(0xFFE91E63),
-                      Color(0xFFD81B60),
-                      Color(0xFFAD1457),
-                      Color(0xFF5C6BC0),
-                      Color(0xFF283593),
-                      Color(0xFF0D1B4A),
-                    ],
-                    stops: [0.0, 0.18, 0.38, 0.62, 0.82, 1.0],
+      child: ChampionshipVictory(
+        champion: _finalist(board.worldSeries, [...board.american, ...board.national]),
+        width: MlbBracketGeom.w, height: MlbBracketGeom.h, finalTop: MlbBracketGeom.ws.top,
+        title: 'WORLD CHAMPIONS', mlb: true, background: mlbPostseasonGradient,
+        child: SizedBox(
+          width: MlbBracketGeom.w,
+          height: MlbBracketGeom.h,
+          child: Stack(
+            children: [
+              const Positioned.fill(
+                child: DecoratedBox(
+                  key: Key('mlb-postseason-background'),
+                  decoration: BoxDecoration(
+                    gradient: mlbPostseasonGradient,
                   ),
                 ),
               ),
-            ),
-            CustomPaint(
-              size: const Size(MlbBracketGeom.boardW, MlbBracketGeom.h),
-              painter: _MlbBracketLinePainter(board),
-            ),
-            _cornerLeagueLogo(
-              left: 10,
-              asset: 'backend/assets/images/logo_al.png',
-            ),
-            _cornerLeagueLogo(
-              left: MlbBracketGeom.boardW - 10 - 88,
-              asset: 'backend/assets/images/logo_nl.png',
-            ),
-            _worldSeriesBox(MlbBracketGeom.ws, board),
-            _stageBox(MlbBracketGeom.alCs, 'ALCS', background: _alColor),
-            _stageBox(MlbBracketGeom.nlCs, 'NLCS', background: _nlColor),
-            _stageBox(MlbBracketGeom.alDs1, 'ALDS', fontSize: 10, background: _alColor),
-            _stageBox(MlbBracketGeom.alDs2, 'ALDS', fontSize: 10, background: _alColor),
-            _stageBox(MlbBracketGeom.nlDs1, 'NLDS', fontSize: 10, background: _nlColor),
-            _stageBox(MlbBracketGeom.nlDs2, 'NLDS', fontSize: 10, background: _nlColor),
-            _stageBox(MlbBracketGeom.alWc45Box, 'ALWC', fontSize: 10, background: _alColor),
-            _stageBox(MlbBracketGeom.alWc36Box, 'ALWC', fontSize: 10, background: _alColor),
-            _stageBox(MlbBracketGeom.nlWc45Box, 'NLWC', fontSize: 10, background: _nlColor),
-            _stageBox(MlbBracketGeom.nlWc36Box, 'NLWC', fontSize: 10, background: _nlColor),
-            ..._stars(board),
-            // AL: 1,4,5,3,6,2（外側=シード1、内側=シード2）
-            _team(MlbBracketGeom.al1, board, board.american[0], mlbBracketLabel('AL', board.american[0]), _alColor),
-            _team(MlbBracketGeom.al4, board, board.american[3], mlbBracketLabel('AL', board.american[3]), _alColor),
-            _team(MlbBracketGeom.al5, board, board.american[4], mlbBracketLabel('AL', board.american[4]), _alColor),
-            _team(MlbBracketGeom.al3, board, board.american[2], mlbBracketLabel('AL', board.american[2]), _alColor),
-            _team(MlbBracketGeom.al6, board, board.american[5], mlbBracketLabel('AL', board.american[5]), _alColor),
-            _team(MlbBracketGeom.al2, board, board.american[1], mlbBracketLabel('AL', board.american[1]), _alColor),
-            // NL: 2,6,3,5,4,1（AL の鏡映。内側=シード2、外側=シード1）
-            _team(MlbBracketGeom.nl2, board, board.national[1], mlbBracketLabel('NL', board.national[1]), _nlColor),
-            _team(MlbBracketGeom.nl6, board, board.national[5], mlbBracketLabel('NL', board.national[5]), _nlColor),
-            _team(MlbBracketGeom.nl3, board, board.national[2], mlbBracketLabel('NL', board.national[2]), _nlColor),
-            _team(MlbBracketGeom.nl5, board, board.national[4], mlbBracketLabel('NL', board.national[4]), _nlColor),
-            _team(MlbBracketGeom.nl4, board, board.national[3], mlbBracketLabel('NL', board.national[3]), _nlColor),
-            _team(MlbBracketGeom.nl1, board, board.national[0], mlbBracketLabel('NL', board.national[0]), _nlColor),
-          ],
+              CustomPaint(
+                size: const Size(MlbBracketGeom.boardW, MlbBracketGeom.h),
+                painter: _MlbBracketLinePainter(board),
+              ),
+              _cornerLeagueLogo(
+                left: 10,
+                asset: 'backend/assets/images/logo_al.png',
+              ),
+              _cornerLeagueLogo(
+                left: MlbBracketGeom.boardW - 10 - 88,
+                asset: 'backend/assets/images/logo_nl.png',
+              ),
+              _worldSeriesBox(MlbBracketGeom.ws, board),
+              _stageBox(MlbBracketGeom.alCs, 'ALCS', background: _alColor),
+              _stageBox(MlbBracketGeom.nlCs, 'NLCS', background: _nlColor),
+              _stageBox(MlbBracketGeom.alDs1, 'ALDS', fontSize: 10, background: _alColor),
+              _stageBox(MlbBracketGeom.alDs2, 'ALDS', fontSize: 10, background: _alColor),
+              _stageBox(MlbBracketGeom.nlDs1, 'NLDS', fontSize: 10, background: _nlColor),
+              _stageBox(MlbBracketGeom.nlDs2, 'NLDS', fontSize: 10, background: _nlColor),
+              _stageBox(MlbBracketGeom.alWc45Box, 'ALWC', fontSize: 10, background: _alColor),
+              _stageBox(MlbBracketGeom.alWc36Box, 'ALWC', fontSize: 10, background: _alColor),
+              _stageBox(MlbBracketGeom.nlWc45Box, 'NLWC', fontSize: 10, background: _nlColor),
+              _stageBox(MlbBracketGeom.nlWc36Box, 'NLWC', fontSize: 10, background: _nlColor),
+              ..._stars(board),
+              // AL: 1,4,5,3,6,2（外側=シード1、内側=シード2）
+              _team(MlbBracketGeom.al1, board, board.american[0], mlbBracketLabel('AL', board.american[0]), _alColor),
+              _team(MlbBracketGeom.al4, board, board.american[3], mlbBracketLabel('AL', board.american[3]), _alColor),
+              _team(MlbBracketGeom.al5, board, board.american[4], mlbBracketLabel('AL', board.american[4]), _alColor),
+              _team(MlbBracketGeom.al3, board, board.american[2], mlbBracketLabel('AL', board.american[2]), _alColor),
+              _team(MlbBracketGeom.al6, board, board.american[5], mlbBracketLabel('AL', board.american[5]), _alColor),
+              _team(MlbBracketGeom.al2, board, board.american[1], mlbBracketLabel('AL', board.american[1]), _alColor),
+              // NL: 2,6,3,5,4,1（AL の鏡映。内側=シード2、外側=シード1）
+              _team(MlbBracketGeom.nl2, board, board.national[1], mlbBracketLabel('NL', board.national[1]), _nlColor),
+              _team(MlbBracketGeom.nl6, board, board.national[5], mlbBracketLabel('NL', board.national[5]), _nlColor),
+              _team(MlbBracketGeom.nl3, board, board.national[2], mlbBracketLabel('NL', board.national[2]), _nlColor),
+              _team(MlbBracketGeom.nl5, board, board.national[4], mlbBracketLabel('NL', board.national[4]), _nlColor),
+              _team(MlbBracketGeom.nl4, board, board.national[3], mlbBracketLabel('NL', board.national[3]), _nlColor),
+              _team(MlbBracketGeom.nl1, board, board.national[0], mlbBracketLabel('NL', board.national[0]), _nlColor),
+            ],
+          ),
         ),
       ),
     );

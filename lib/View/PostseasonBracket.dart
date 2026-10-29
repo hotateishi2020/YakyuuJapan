@@ -1,4 +1,6 @@
+import '../widgets/championship_victory.dart';
 import '../logic/game_visibility.dart';
+import '../config/postseason_design.dart';
 import '../logic/auth_session.dart';
 import '../widgets/special_media.dart';
 import 'package:Yakyuu_Japan/widgets/baseball_loading.dart';
@@ -83,27 +85,20 @@ class PostseasonBracket extends StatelessWidget {
     final board = buildPostseasonBoard(standings: standings, games: AuthSession.instance.showDetailedGames ? games : publicGameRows(games));
     return FittedBox(
       fit: BoxFit.contain,
-      child: SizedBox(
-        width: BracketGeom.w,
-        height: BracketGeom.h,
-        child: DecoratedBox(
-          key: const Key('postseason-background'),
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [
-                Color(0xFF8CFAF7),
-                Color(0xFF2BCFAD),
-                Color(0xFF14C4C0),
-                Color(0xFF5AD8EA),
-                Color(0xFF1E6FE0),
-                Color(0xFF1F52EB),
-              ],
-              stops: [0.0, 0.22, 0.38, 0.52, 0.75, 1.0],
+      child: ChampionshipVictory(
+        champion: _finalist(board.japan, [board.central1, board.central2, board.central3, board.pacific1, board.pacific2, board.pacific3]),
+        width: BracketGeom.w, height: BracketGeom.h, finalTop: BracketGeom.js.top,
+        title: '日本一', mlb: false, background: npbPostseasonGradient,
+        child: SizedBox(
+          width: BracketGeom.w,
+          height: BracketGeom.h,
+          child: DecoratedBox(
+            key: const Key('postseason-background'),
+            decoration: const BoxDecoration(
+              gradient: npbPostseasonGradient,
             ),
+            child: _bracket(board),
           ),
-          child: _bracket(board),
         ),
       ),
     );
@@ -210,12 +205,12 @@ class PostseasonBracket extends StatelessWidget {
           child: Column(
             children: [
               const ColoredBox(
-                color: Color(0xFF004832),
+                color: japanSeriesHeaderColor,
                 child: SizedBox(
                   height: 22,
                   width: double.infinity,
                   child: Center(
-                    child: Text('日本シリーズ', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, height: 1.05)),
+                    child: Text(japanSeriesLabel, style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, height: 1.05)),
                   ),
                 ),
               ),

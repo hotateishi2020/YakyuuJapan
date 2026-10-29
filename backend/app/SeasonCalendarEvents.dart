@@ -1,3 +1,4 @@
+import 'package:koko_shared/championship_calendar.dart';
 import 'AnnualAwardEvents.dart';
 
 /// Combine researched events and existing event periods without duplicate bands.
@@ -6,6 +7,7 @@ List<Map<String, dynamic>> seasonCalendarEvents({
   required int year,
   required List<Map<String, dynamic>> legacy,
   required List<Map<String, dynamic>> researched,
+  List<Map<String, dynamic>> games = const [],
 }) {
   String day(dynamic value) => '${value ?? ''}'.split(' ').first.split('T').first;
   final result = <Map<String, dynamic>>[...researched];
@@ -68,5 +70,5 @@ List<Map<String, dynamic>> seasonCalendarEvents({
       'detail': '東京ドーム。2026年11月12日〜15日（日本時間）。\n$source',
     });
   }
-  return org == 'npb' ? annualAwardEvents(result, year) : result;
+  return championshipCalendarEvents(org == 'npb' ? annualAwardEvents(result, year) : result, games);
 }

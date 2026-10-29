@@ -1,4 +1,5 @@
 import 'app/GameReplay.dart';
+import 'app/GameSeasonStats.dart';
 import 'app/HighSchoolSchedule.dart';
 import 'app/GameVisibility.dart';
 import 'app/GameStatsLoad.dart';
@@ -49,7 +50,6 @@ import 'app/GameHighlightVideos.dart';
 import 'app/GameBroadcasts.dart';
 import 'app/GameBench.dart';
 import 'app/GameStory.dart';
-import 'app/HomeBirthdays.dart';
 import 'app/VideoChannels.dart';
 import 'app/ClubData.dart';
 import 'app/PlayerDetailSnapshot.dart';
@@ -75,46 +75,12 @@ import 'app/PredictionSnapshot.dart';
 import 'app/GameFetchSchedule.dart';
 
 /// HOME reads existing snapshots and completed box scores; it never starts a fetch.
-Future<Map<String, dynamic>> readHomeDashboard() async {
+Future<Map<String, dynamic>> readHomeDashboard({bool refresh = false}) async {
+  if (refresh) HomeDashboardCache.clear();
   final now = DateTime.now().toUtc().add(const Duration(hours: 9));
   final today = _ymdOf(now);
-  final until = _ymdOf(now.add(const Duration(days: 6)));
-  final results = await Future.wait([
-    _buildPredictionsPartInfo(OrgKind.npb),
-    _buildPredictionsPartGames(OrgKind.npb, now.year, from: today, to: until),
-    _buildPredictionsPartGames(OrgKind.mlb, now.year, from: today, to: until),
-    Postgres.withConnection((conn) async => <String, dynamic>{'stats_player': await DisplaySnapshot.players(conn, now.year)}),
-    Postgres.withConnection((conn) async => <String, dynamic>{'birthdays': await homeBirthdays(conn, today)}),
-  ]);
-  final games = <Map<String, dynamic>>[
-    for (final index in [1, 2])
-      for (final game in results[index]['games'] as List)
-        {...Map<String, dynamic>.from(game as Map), 'org': index == 1 ? 'NPB' : 'MLB'},
-  ];
-  final heroes = await Postgres.withConnection((conn) async {
-    final lines = await homeHeroLines(conn, today);
-    final result = <Map<String, dynamic>>[];
-    for (final game in games.where((g) => g['date_game'] == today)) {
-      final hero = homeHero(game, lines);
-      if (hero == null) continue;
-      final id = int.tryParse('${hero['id_player']}');
-      final art = id == null ? null : await PlayerArt.read(conn, id);
-      result.add({...hero, 'id_game': game['id_game'], 'org': game['org'],
-        if (art != null) 'character_image': art});
-    }
-    return result;
-  });
-  return {
-    'today': today,
-    'birthdays': results[4]['birthdays'],
-    'notification': results[0]['notification'],
-    'events': results[0]['events'],
-    'games': [for (final game in games) {
-      for (final key in ['id_game', 'org', 'date_game', 'time_game', 'state', 'name_team_home', 'name_team_away', 'score_home', 'score_away']) key: game[key],
-    }],
-    'heroes': heroes,
-    'leaders': homeLeaders([for (final row in results[3]['stats_player'] as List) Map<String, dynamic>.from(row as Map)]),
-  };
+  return HomeDashboardCache.read(today,
+      () => Postgres.withConnection((conn) => readHomeSummary(conn, today), urgent: true));
 }
 
 /// /predictions 用の短TTLキャッシュ（同一プロセス内・団体別）
@@ -133,6 +99,7 @@ const Duration _predictionsCacheTtl = Duration(seconds: 45);
 int _predictionsCacheGeneration = 0;
 
 void _clearPredictionsCache() {
+  HomeDashboardCache.clear();
   _predictionsCacheGeneration++;
   _partBuildInflight.clear();
   _predictionsCacheBody.clear();
@@ -321,7 +288,7 @@ Future<void> _attachSavedForms(DisplayGames snap, List<Map<String, dynamic>> gam
   final missing = <Map<String, dynamic>>[];
   for (final game in games) {
     final row = saved[_asInt(game['id_game'])];
-    if (row == null || row['golden_glove_stats_version'] != 1 || !row.containsKey('season_player_stats') || (npbPostseasonCodes.contains('${game['code_game']}'.toUpperCase()) && !row.containsKey('postseason_homers_before'))) { missing.add(game); continue; }
+    if (row == null || row['golden_glove_stats_version'] != 1 || row['season_stats_version'] != gameSeasonStatsVersion || !row.containsKey('season_player_stats') || (npbPostseasonCodes.contains('${game['code_game']}'.toUpperCase()) && !row.containsKey('postseason_homers_before'))) { missing.add(game); continue; }
     game['postseason_form'] = row['postseason_form'];
     game['player_hands'] = row['player_hands'];
     game['season_player_stats'] = row['season_player_stats'];
@@ -1158,7 +1125,22 @@ void main() async {
 
     app.get('/home', (Request request) async {
       return tryCatchAPIReadonly(request, 'HOME', 'READ', () async {
-        return Response.ok(jsonEncode(await readHomeDashboard()), headers: {'content-type': 'application/json; charset=utf-8'});
+        final data = await readHomeDashboard(refresh: request.url.queryParameters['fresh'] == '1');
+        if (request.url.queryParameters['section'] == 'images') {
+          final ids = (data['heroes'] as List).map((h) => int.tryParse('${h['id_player']}')).whereType<int>().toSet();
+          final images = await Postgres.withConnection((conn) async {
+            final result = <String,dynamic>{};
+            for (final id in ids) {
+              try {
+                final image = await PlayerArt.read(conn, id);
+                if (image != null) result['$id'] = image;
+              } catch (_) { /* Images must not affect HOME's summary. */ }
+            }
+            return result;
+          });
+          return Response.ok(jsonEncode({'images': images}), headers: {'content-type': 'application/json; charset=utf-8','cache-control':'private, no-store'});
+        }
+        return Response.ok(jsonEncode(data), headers: {'content-type': 'application/json; charset=utf-8','cache-control':'private, no-store'});
       });
     });
 
@@ -1183,17 +1165,27 @@ void main() async {
       return Response.notFound('Not found');
     });
     app.get('/player-detail', (Request request) async {
-      const headers={'content-type':'application/json; charset=utf-8'};
+      const headers={'content-type':'application/json; charset=utf-8','cache-control':'private, no-store'};
       try {
         final org=OrgKind.parse(request.url.queryParameters['org']);
         final year=_seasonYear(request,org);
         final query=request.url.queryParameters;
         if((query['name']??'').length>100)throw const FormatException('選手名が長すぎます');
         final identity=<String,dynamic>{'name':query['name']??'',if(query['id_player']!=null)'id_player':int.tryParse(query['id_player']!),if(query['id_team']!=null)'id_team':int.tryParse(query['id_team']!),if(query['source_player_id']!=null)'source_player_id':query['source_player_id']};
-        final data=await Postgres.withConnection((conn)=>PlayerDetailSnapshot.read(conn,year:year,leagues:org.leagueIds,identity:identity),urgent:true);
+        final data=await Postgres.withConnection((conn) async {
+          if (query['section'] == 'season') {
+            final id = int.tryParse(query['id_player'] ?? '') ?? 0;
+            if (id <= 0) throw const FormatException('選手IDが必要です');
+            final stats = await PlayerDetailSnapshot.currentSeasonStats(conn,year,org.leagueIds,id);
+            Map<String,dynamic>? art;
+            try { art = await PlayerArt.read(conn,id); } catch (_) {}
+            return <String,dynamic>{'season_stats': stats, if(art!=null)'character_image': art};
+          }
+          return PlayerDetailSnapshot.read(conn,year:year,leagues:org.leagueIds,identity:identity,withCurrentStats:false);
+        },urgent:true);
         return Response.ok(jsonEncode(data),headers:headers);
       } on FormatException catch(e) {return Response.badRequest(body:jsonEncode({'error':e.message}),headers:headers);
-      } catch(e,st) {_printRequestError(request,e,st);return Response.internalServerError(body:jsonEncode({'error':'選手情報を取得できませんでした'}),headers:headers);}
+      } catch(e,st) {_printRequestError(request,e,st);final busy=e is TimeoutException || Postgres.isBrokenConnection(e);return Response(busy?503:500,body:jsonEncode({'error':'選手情報を取得できませんでした'}),headers:{...headers,if(busy)'retry-after':'1'});}
     });
 
     app.get('/club-hub', (Request request) async {

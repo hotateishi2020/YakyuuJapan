@@ -20,8 +20,10 @@ class VideosBoard extends StatefulWidget {
   const VideosBoard(
       {super.key,
       this.color = const Color(0xFF173C64),
-      this.org = OrgKind.npb});
+      this.org = OrgKind.npb,
+      this.embedded = false});
   final OrgKind org;
+  final bool embedded;
   final Color color;
 
   @override
@@ -157,6 +159,7 @@ class _VideosBoardState extends State<VideosBoard> {
   @override
   Widget build(BuildContext context) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: widget.embedded ? MainAxisSize.min : MainAxisSize.max,
         children: [
           Row(children: [
             const Expanded(
@@ -179,36 +182,34 @@ class _VideosBoardState extends State<VideosBoard> {
                 padding: const EdgeInsets.all(8),
                 child:
                     Text(_error!, style: const TextStyle(color: Colors.red))),
-          Expanded(
-              child: _channels.isEmpty
-                  ? Center(
-                      child: _loading
-                          ? BaseballLoading(progress: _progress)
-                          : TextButton.icon(
-                              onPressed: () => _load(refresh: true),
-                              icon: const Icon(Icons.refresh),
-                              label: const Text('再読み込み')))
-                  : ListView(
-                      key: const PageStorageKey('video-channel-list'),
-                      padding: const EdgeInsets.all(8),
-                      children: [
-                        for (final channel in _channels
-                            .where((c) => c['category'] == 'league'))
-                          _channelSection(channel),
-                        _switchingSection('ob', '有識者'),
-                        if (widget.org == OrgKind.npb) ...[
-                          _switchingSection('teams', '12球団の動画'),
-                        ],
-                        if (widget.org == OrgKind.mlb)
-                          _switchingSection('mlb_teams', '球団関連動画'),
-                        _switchingSection('program', '野球番組・対談'),
-                        _switchingSection('media', '野球系解説チャンネル'),
-                        _switchingSection('fan', '球団ファン系動画'),
-
-                      ],
-                    )),
+          if (widget.embedded) _content() else Expanded(child: _content()),
         ],
       );
+
+  Widget _content() {
+    if (_channels.isEmpty) {
+      return Center(child: _loading
+          ? BaseballLoading(progress: _progress, compact: widget.embedded)
+          : TextButton.icon(onPressed: () => _load(refresh: true),
+              icon: const Icon(Icons.refresh), label: const Text('再読み込み')));
+    }
+    final sections = <Widget>[
+      for (final channel in _channels.where((c) => c['category'] == 'league'))
+        _channelSection(channel),
+      _switchingSection('ob', '有識者'),
+      if (widget.org == OrgKind.npb) _switchingSection('teams', '12球団の動画'),
+      if (widget.org == OrgKind.mlb) _switchingSection('mlb_teams', '球団関連動画'),
+      _switchingSection('program', '野球番組・対談'),
+      _switchingSection('media', '野球系解説チャンネル'),
+      _switchingSection('fan', '球団ファン系動画'),
+    ];
+    if (widget.embedded) {
+      return Padding(padding: const EdgeInsets.all(8),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: sections));
+    }
+    return ListView(key: const PageStorageKey('video-channel-list'),
+      padding: const EdgeInsets.all(8), children: sections);
+  }
 
   double _expertTabWidth(BuildContext context, String label) {
     final painter = TextPainter(
